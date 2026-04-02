@@ -7,7 +7,7 @@ collect.py
   - TQQQ 가격       (yfinance)
   - 버핏지수        (gurufocus.com / Playwright)
   - Fear & Greed    (CNN JSON API)
-  - RSI(14)         (yfinance로 직접 계산)
+  - RSI(14)         (yfinance로 S&P 500 직접 계산)
 
 복합 지수:
   각 지표를 0~1 매수 점수로 정규화한 뒤 곱셈 → 0~1000 스케일로 표현
@@ -24,20 +24,26 @@ from pathlib import Path
 
 
 # ──────────────────────────────────────────────
-# 1. TQQQ 가격 + RSI(14)
+# 1. TQQQ 가격 + S&P 500 RSI(14)
 # ──────────────────────────────────────────────
 
-def get_tqqq_and_rsi(rsi_period: int = 14):
-    """yfinance로 TQQQ 종가 및 RSI(14) 계산"""
-    ticker = yf.Ticker("TQQQ")
-    hist = ticker.history(period=f"{rsi_period + 25}d")
-
-    if hist.empty:
+def get_tqqq_and_sp500_rsi(rsi_period: int = 14):
+    """yfinance로 TQQQ 종가 수집 및 S&P 500(^GSPC) RSI(14) 계산"""
+    
+    # 1. TQQQ 종가 가져오기
+    tqqq = yf.Ticker("TQQQ")
+    tqqq_hist = tqqq.history(period="5d")
+    if tqqq_hist.empty:
         raise ValueError("TQQQ 데이터를 가져올 수 없습니다.")
+    price = round(float(tqqq_hist["Close"].iloc[-1]), 2)
 
-    price = round(float(hist["Close"].iloc[-1]), 2)
+    # 2. S&P 500(^GSPC) RSI 계산
+    sp500 = yf.Ticker("^GSPC")
+    sp500_hist = sp500.history(period=f"{rsi_period + 25}d")
+    if sp500_hist.empty:
+        raise ValueError("S&P 500 데이터를 가져올 수 없습니다.")
 
-    delta = hist["Close"].diff()
+    delta = sp500_hist["Close"].diff()
     gain  = delta.clip(lower=0).rolling(window=rsi_period).mean()
     loss  = (-delta.clip(upper=0)).rolling(window=rsi_period).mean()
     rs    = gain / loss
@@ -228,12 +234,12 @@ def main():
     print(f"  📊 시장 데이터 수집 시작: {today}")
     print(f"{'='*50}\n")
 
-    # ① TQQQ + RSI
-    print("▶ TQQQ 가격 & RSI(14) 수집 중...")
+    # ① TQQQ + S&P 500 RSI
+    print("▶ TQQQ 가격 & S&P 500 RSI(14) 수집 중...")
     try:
-        tqqq, rsi = get_tqqq_and_rsi()
-        print(f"   TQQQ : ${tqqq}")
-        print(f"   RSI  : {rsi}")
+        tqqq, rsi = get_tqqq_and_sp500_rsi()
+        print(f"   TQQQ        : ${tqqq}")
+        print(f"   S&P 500 RSI : {rsi}")
     except Exception as e:
         print(f"   ❌ 오류: {e}")
         tqqq, rsi = None, None
@@ -242,7 +248,7 @@ def main():
     print("\n▶ Fear & Greed Index 수집 중...")
     try:
         fg = get_fear_greed()
-        print(f"   F&G  : {fg}")
+        print(f"   F&G         : {fg}")
     except Exception as e:
         print(f"   ❌ 오류: {e}")
         fg = None
@@ -251,7 +257,7 @@ def main():
     print("\n▶ 버핏지수 수집 중 (JS 렌더링, 수십 초 소요)...")
     try:
         buffett = get_buffett_indicator()
-        print(f"   버핏  : {buffett}%")
+        print(f"   버핏        : {buffett}%")
     except Exception as e:
         print(f"   ❌ 오류: {e}")
         buffett = None
@@ -276,7 +282,7 @@ def main():
     print(f"   TQQQ        : {row['TQQQ']}")
     print(f"   버핏지수    : {row['Buffett_Indicator']}")
     print(f"   F&G Index   : {row['Fear_Greed']}")
-    print(f"   RSI(14)     : {row['RSI_14']}")
+    print(f"   S&P 500 RSI : {row['RSI_14']}")
     print(f"   복합 지수   : {row['Composite_Index']}  (0~1000, 높을수록 매수)")
     print(f"\n{'='*50}\n")
 
