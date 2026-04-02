@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Signal Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #08090f;
+    --panel:    #0e1019;
+    --card:     #12151f;
+    --border:   #1e2235;
+    --buy:      #00e5a0;
+    --sell:     #ff4060;
+    --warn:     #f5a623;
+    --info:     #4a9eff;
+    --txt:      #dde2f0;
+    --txt2:     #6b7899;
+    --txt3:     #9da8c0;
+    --font-hd:  'Bebas Neue', sans-serif;
+    --font-num: 'DM Mono', monospace;
+    --font-body:'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--txt);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Noise texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 256px;
+    opacity: 0.6;
+  }
+
+  /* ── Grid bg ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(78,95,180,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(78,95,180,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* ── Layout ── */
+  .wrapper { position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── Header ── */
+  header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 48px 0 36px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-area h1 {
+    font-family: var(--font-hd);
+    font-size: clamp(36px, 6vw, 64px);
+    letter-spacing: 3px;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 30%, var(--buy) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-area p {
+    margin-top: 8px;
+    font-family: var(--font-num);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--txt2);
+    text-transform: uppercase;
+  }
+
+  .meta {
+    text-align: right;
+    font-family: var(--font-num);
+    font-size: 12px;
+    color: var(--txt2);
+  }
+
+  .meta .date-val {
+    display: block;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--txt3);
+    letter-spacing: 1px;
+  }
+
+  .live-dot {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: var(--buy);
+    margin-right: 6px; vertical-align: middle;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,229,160,.5); }
+    50%       { opacity: .7; box-shadow: 0 0 0 6px rgba(0,229,160,0); }
+  }
+
+  /* ── Composite Hero ── */
+  .hero {
+    margin: 40px 0 32px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 48px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--buy), transparent);
+  }
+
+  .hero-glow {
+    position: absolute; top: -80px; right: -60px;
+    width: 360px; height: 360px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,229,160,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-family: var(--font-num);
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--txt2); margin-bottom: 12px;
+  }
+
+  .hero-score {
+    font-family: var(--font-hd);
+    font-size: clamp(72px, 10vw, 120px);
+    line-height: 1;
+    letter-spacing: -1px;
+    transition: color .5s;
+  }
+
+  .hero-sub {
+    margin-top: 12px; font-size: 14px; color: var(--txt2); max-width: 480px; line-height: 1.7;
+  }
+
+  .hero-sub strong { color: var(--txt3); }
+
+  .signal-badge {
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-family: var(--font-num);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid;
+    white-space: nowrap;
+    align-self: flex-start;
+  }
+
+  /* ── Gauge bar ── */
+  .gauge-wrap { margin-top: 28px; }
+
+  .gauge-track {
+    height: 6px; border-radius: 3px;
+    background: var(--border);
+    position: relative; overflow: hidden;
+  }
+
+  .gauge-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--sell), var(--warn), var(--buy));
+    transition: width 1.2s cubic-bezier(.22,1,.36,1);
+  }
+
+  .gauge-labels {
+    display: flex; justify-content: space-between;
+    margin-top: 8px;
+    font-family: var(--font-num);
+    font-size: 10px; color: var(--txt2); letter-spacing: 1px;
+  }
+
+  /* ── Cards Grid ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .cards { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    border-color: rgba(255,255,255,.12);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(0,0,0,.4);
+  }
+
+  .card-tag {
+    font-family: var(--font-num);
+    font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--txt2); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .tag-dot { width: 4px; height: 4px; border-radius: 50%; }
+
+  .card-value {
+    font-family: var(--font-hd);
+    font-size: clamp(42px, 5vw, 58px);
+    line-height: 1;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    transition: color .3s;
+  }
+
+  .card-unit {
+    font-family: var(--font-num);
+    font-size: 13px; color: var(--txt2); margin-bottom: 20px;
+  }
+
+  .mini-bar {
+    height: 3px; border-radius: 2px; background: var(--border); margin-bottom: 16px; overflow: hidden;
+  }
+  .mini-fill { height: 100%; border-radius: 2px; transition: width 1.5s cubic-bezier(.22,1,.36,1); }
+
+  .card-desc { font-size: 12px; color: var(--txt2); line-height: 1.6; }
+
+  /* Expand panel */
+  .card-detail {
+    max-height: 0; overflow: hidden;
+    transition: max-height .4s ease;
+  }
+  .card.open .card-detail { max-height: 300px; }
+
+  .card-detail-inner {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--txt2);
+    line-height: 1.8;
+  }
+
+  .card-detail-inner .row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0;
+  }
+
+  .card-detail-inner .row span:last-child {
+    font-family: var(--font-num);
+    font-size: 12px; font-weight: 500;
+  }
+
+  .expand-hint {
+    position: absolute; bottom: 14px; right: 18px;
+    font-family: var(--font-num);
+    font-size: 9px; letter-spacing: 1px;
+    color: var(--txt2); text-transform: uppercase;
+    opacity: .6; transition: opacity .2s;
+  }
+  .card:hover .expand-hint { opacity: 1; }
+  .card.open .expand-hint::after { content: '▲'; }
+  .card:not(.open) .expand-hint::after { content: '▼'; }
+
+  /* ── History Table ── */
+  .section-title {
+    font-family: var(--font-num);
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--txt2); margin: 44px 0 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); }
+
+  thead th {
+    font-family: var(--font-num);
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--txt2); padding: 16px 20px;
+    text-align: left; border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(30,34,53,.6);
+    transition: background .15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,.02); }
+
+  tbody td {
+    padding: 14px 20px;
+    font-family: var(--font-num);
+    font-size: 13px; color: var(--txt3);
+  }
+  tbody td:first-child { color: var(--txt2); font-size: 12px; }
+  tbody td.is-buy { color: var(--buy); }
+  tbody td.is-sell { color: var(--sell); }
+  tbody td.is-warn { color: var(--warn); }
+
+  /* composite pill in table */
+  .cpill {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; border: 1px solid;
+  }
+
+  /* ── Footer ── */
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-num);
+    font-size: 11px; color: var(--txt2);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; flex-wrap: wrap;
+  }
+
+  /* ── Tooltip note ── */
+  .note {
+    background: rgba(74,158,255,.08); border: 1px solid rgba(74,158,255,.2);
+    border-radius: 10px; padding: 14px 18px;
+    font-size: 12px; color: #8ab5e8; line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  /* ── Fade-in ── */
+  .fade-up {
+    opacity: 0; transform: translateY(16px);
+    animation: fadeUp .6s ease forwards;
+  }
+  @keyframes fadeUp { to { opacity: 1; transform: none; } }
+  .delay-1 { animation-delay: .1s; }
+  .delay-2 { animation-delay: .2s; }
+  .delay-3 { animation-delay: .3s; }
+  .delay-4 { animation-delay: .4s; }
+  .delay-5 { animation-delay: .5s; }
+  .delay-6 { animation-delay: .6s; }
+
+  /* ── Error state ── */
+  .error-msg {
+    background: rgba(255,64,96,.08); border: 1px solid rgba(255,64,96,.3);
+    border-radius: 10px; padding: 20px; color: #ff8099; font-size: 13px; line-height: 1.7;
+  }
+
+  /* ── Loading skeleton ── */
+  .skel {
+    background: linear-gradient(90deg, var(--border) 25%, #1e2840 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 4px;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <header class="fade-up">
+    <div class="logo-area">
+      <h1>Market Signal</h1>
+      <p><span class="live-dot"></span>Auto-updated every morning · KST 08:00</p>
+    </div>
+    <div class="meta">
+      <span class="date-val" id="latest-date">—</span>
+      최신 업데이트
+    </div>
+  </header>
+
+  <!-- Note -->
+  <div class="note fade-up delay-1" style="margin-top:28px;">
+    💡 이 대시보드는 TQQQ 매수 타이밍을 포착하기 위한 4가지 지표를 종합합니다. 각 카드를 클릭하면 지표 해석 기준을 확인할 수 있습니다. <strong style="color:#aac8f0">복합 지수가 높을수록 (≥300) 분할매수를 고려해볼 시점</strong>입니다. 투자 판단은 본인 책임입니다.
+  </div>
+
+  <!-- Hero composite -->
+  <div class="hero fade-up delay-2">
+    <div class="hero-glow"></div>
+    <div>
+      <p class="hero-label">// 복합 매수 신호 지수</p>
+      <div class="hero-score" id="hero-score">—</div>
+      <p class="hero-sub" id="hero-desc">데이터를 불러오는 중...</p>
+      <div class="gauge-wrap" style="max-width:480px">
+        <div class="gauge-track">
+          <div class="gauge-fill" id="hero-gauge" style="width:0%"></div>
+        </div>
+        <div class="gauge-labels">
+          <span>0 · 강한 매도</span>
+          <span>500</span>
+          <span>강한 매수 · 1000</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="signal-badge" id="signal-badge" style="color:var(--txt2); border-color:var(--border)">LOADING</div>
+    </div>
+  </div>
+
+  <!-- 4 indicator cards -->
+  <div class="cards" id="cards-grid">
+    <div class="card skel" style="height:240px"></div>
+    <div class="card skel" style="height:240px"></div>
+    <div class="card skel" style="height:240px"></div>
+    <div class="card skel" style="height:240px"></div>
+  </div>
+
+  <!-- History table -->
+  <p class="section-title fade-up delay-4">최근 기록</p>
+
+  <div class="table-wrap fade-up delay-5">
+    <table>
+      <thead>
+        <tr>
+          <th>날짜</th>
+          <th>TQQQ ($)</th>
+          <th>버핏지수 (%)</th>
+          <th>F&amp;G</th>
+          <th>RSI (14)</th>
+          <th>복합 지수</th>
+        </tr>
+      </thead>
+      <tbody id="history-body">
+        <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--txt2)">데이터 로딩 중...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Explanation cards -->
+  <p class="section-title fade-up delay-5" style="margin-top:52px;">지표 해석 가이드</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;" class="fade-up delay-6">
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--info);margin-bottom:12px;">버핏지수 (Buffett Indicator)</p>
+      <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
+        <strong style="color:var(--txt3)">미국 전체 주식 시가총액 / GDP</strong>로 주식시장 전반의 고평가 여부를 판단합니다.<br><br>
+        <span style="color:var(--buy)">●</span> &lt;100% — 저평가, 매수 유리<br>
+        <span style="color:var(--warn)">●</span> 100~160% — 다소 고평가<br>
+        <span style="color:var(--sell)">●</span> &gt;200% — 극단적 고평가 (버핏 경고 수준)
+      </p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sell);margin-bottom:12px;">Fear &amp; Greed Index</p>
+      <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
+        <strong style="color:var(--txt3)">CNN이 집계하는 시장 심리 지표</strong>로 변동성·모멘텀·옵션·안전자산 수요 등 7개 지표를 종합합니다.<br><br>
+        <span style="color:var(--buy)">●</span> 0~25 — 극단적 공포 (역발상 매수 기회)<br>
+        <span style="color:var(--warn)">●</span> 25~50 — 공포<br>
+        <span style="color:var(--sell)">●</span> 75~100 — 극단적 탐욕 (주의)
+      </p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warn);margin-bottom:12px;">RSI (14)</p>
+      <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
+        <strong style="color:var(--txt3)">14일 상대강도지수</strong>로 TQQQ의 단기 과매수·과매도를 판단합니다.<br><br>
+        <span style="color:var(--buy)">●</span> &lt;30 — 과매도, 반등 가능성<br>
+        <span style="color:var(--warn)">●</span> 30~50 — 약세권<br>
+        <span style="color:var(--sell)">●</span> &gt;70 — 과매수, 조정 주의
+      </p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--buy);margin-bottom:12px;">복합 지수 계산법</p>
+      <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
+        각 지표를 <strong style="color:var(--txt3)">0~1 매수 점수로 정규화</strong>한 뒤 곱셈합니다:<br><br>
+        <code style="background:rgba(0,229,160,.08);padding:2px 8px;border-radius:4px;font-size:11px;color:var(--buy)">버핏 × F&amp;G × RSI × 1000</code><br><br>
+        세 지표가 모두 강한 매수 신호일 때 1000에 수렴합니다. 하나라도 극단적 고평가면 전체 점수가 크게 낮아집니다.
+      </p>
+    </div>
+
+  </div>
+
+  <footer class="fade-up delay-6">
+    <span>데이터 출처: Yahoo Finance · gurufocus.com · CNN Markets</span>
+    <span>GitHub Actions 매일 자동 수집 — 전일 미국 시장 종가 기준</span>
+  </footer>
+
+</div>
+
+<script>
+/* ── CSV Parser ── */
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const vals = line.split(',').map(v => v.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = vals[i] ?? '');
+    return obj;
+  }).filter(r => r.Date);
+}
+
+/* ── Signal helpers ── */
+function signalInfo(score) {
+  const s = parseFloat(score);
+  if (isNaN(s)) return { label: 'N/A', color: 'var(--txt2)', border: 'var(--border)' };
+  if (s >= 400)  return { label: '강한 매수', color: 'var(--buy)',  border: 'rgba(0,229,160,.4)' };
+  if (s >= 200)  return { label: '분할 매수', color: '#7ee8c4',    border: 'rgba(126,232,196,.3)' };
+  if (s >= 100)  return { label: '관망',     color: 'var(--warn)', border: 'rgba(245,166,35,.3)' };
+  return              { label: '매수 자제',  color: 'var(--sell)', border: 'rgba(255,64,96,.3)' };
+}
+
+function rsiColor(v)  { return v < 30 ? 'var(--buy)' : v < 50 ? 'var(--warn)' : v > 70 ? 'var(--sell)' : 'var(--txt3)'; }
+function fgColor(v)   { return v < 25 ? 'var(--buy)' : v < 50 ? 'var(--warn)' : v > 75 ? 'var(--sell)' : 'var(--txt3)'; }
+function buffColor(v) { return v < 100 ? 'var(--buy)' : v < 160 ? 'var(--warn)' : 'var(--sell)'; }
+function compColor(v) { return v >= 400 ? 'var(--buy)' : v >= 200 ? '#7ee8c4' : v >= 100 ? 'var(--warn)' : 'var(--sell)'; }
+
+/* ── Hero render ── */
+function renderHero(latest) {
+  const score  = parseFloat(latest.Composite_Index) || 0;
+  const sig    = signalInfo(score);
+  const pct    = Math.min(score / 10, 100);
+
+  const heroEl = document.getElementById('hero-score');
+  heroEl.textContent = isNaN(score) ? '—' : score.toFixed(0);
+  heroEl.style.color = sig.color;
+
+  const descMap = [
+    [400, '세 지표가 동시에 강한 매수 신호를 보내고 있습니다. <strong style="color:#7ee8c4">분할 매수를 적극 고려</strong>할 시점입니다.'],
+    [200, '일부 지표가 매수 구간에 진입했습니다. <strong style="color:var(--warn)">소량 분할 매수</strong>를 검토해 볼 수 있습니다.'],
+    [100, '지표 신호가 혼재합니다. <strong style="color:var(--warn)">추가 확인 후 관망</strong>을 권장합니다.'],
+    [0,   '하나 이상의 지표가 고위험 영역에 있습니다. <strong style="color:var(--sell)">신규 매수를 자제</strong>하고 기다리세요.'],
+  ];
+  const desc = descMap.find(([t]) => score >= t);
+  document.getElementById('hero-desc').innerHTML = desc ? desc[1] : '데이터를 확인하세요.';
+
+  const badge = document.getElementById('signal-badge');
+  badge.textContent = sig.label;
+  badge.style.color  = sig.color;
+  badge.style.borderColor = sig.border;
+  badge.style.background  = sig.border.replace('0.4', '0.08').replace('0.3', '0.06');
+
+  setTimeout(() => {
+    document.getElementById('hero-gauge').style.width = pct + '%';
+  }, 300);
+}
+
+/* ── Cards render ── */
+const CARDS_META = [
+  {
+    key: 'TQQQ', label: 'TQQQ Price', unit: 'USD',
+    color: 'var(--info)', dotColor: '#4a9eff',
+    range: [0, 200],
+    barColor: (v) => 'var(--info)',
+    desc: 'ProShares Ultra QQQ — 나스닥 100의 3배 레버리지 ETF. 고위험·고수익 상품이므로 시장 타이밍이 중요합니다.',
+    details: (v) => [
+      { label: '기준 지수', val: 'NASDAQ-100 (QQQ)' },
+      { label: '레버리지', val: '3× 일간' },
+      { label: '운용사', val: 'ProShares' },
+    ],
+    fmt: (v) => '$' + parseFloat(v).toFixed(2),
+    noFmt: true,
+  },
+  {
+    key: 'Buffett_Indicator', label: 'Buffett Indicator', unit: '미국 시가총액 / GDP',
+    color: 'var(--info)', dotColor: '#60b0ff',
+    range: [50, 300], barColor: buffColor,
+    desc: '워런 버핏이 주목한 주식시장 과열 지표. 현재 미국 주식시장이 경제 규모 대비 얼마나 비싼지를 나타냅니다.',
+    details: (v) => [
+      { label: '상태', val: v < 100 ? '🟢 저평가' : v < 160 ? '🟡 다소 고평가' : '🔴 극단 고평가' },
+      { label: '역대 평균', val: '약 85~90%' },
+      { label: '버핏 경고선', val: '>200%' },
+    ],
+    fmt: (v) => parseFloat(v).toFixed(1),
+    unitSuffix: '%',
+  },
+  {
+    key: 'Fear_Greed', label: 'Fear & Greed', unit: 'CNN Market Sentiment',
+    color: 'var(--sell)', dotColor: '#ff6080',
+    range: [0, 100], barColor: fgColor,
+    desc: 'CNN이 집계하는 시장 심리 지수. 극단적 공포(0)일수록 역발상 매수 기회일 가능성이 높습니다.',
+    details: (v) => [
+      { label: '현재 심리', val: v < 25 ? '😱 극단적 공포' : v < 50 ? '😨 공포' : v < 75 ? '😏 탐욕' : '🤑 극단적 탐욕' },
+      { label: '매수 구간', val: '0 ~ 25' },
+      { label: '주의 구간', val: '75 ~ 100' },
+    ],
+    fmt: (v) => parseFloat(v).toFixed(1),
+  },
+  {
+    key: 'RSI_14', label: 'RSI (14)', unit: 'TQQQ 상대강도지수',
+    color: 'var(--warn)', dotColor: '#f5a623',
+    range: [0, 100], barColor: rsiColor,
+    desc: '14일 RSI. 30 이하면 과매도로 반등 가능성, 70 이상이면 과매수로 조정 위험이 높아집니다.',
+    details: (v) => [
+      { label: '현재 상태', val: v < 30 ? '📉 과매도' : v < 50 ? '↘ 약세권' : v < 70 ? '↗ 강세권' : '📈 과매수' },
+      { label: '과매도 기준', val: '< 30' },
+      { label: '과매수 기준', val: '> 70' },
+    ],
+    fmt: (v) => parseFloat(v).toFixed(1),
+  },
+];
+
+function renderCards(latest) {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+
+  CARDS_META.forEach((meta, i) => {
+    const raw = latest[meta.key];
+    const num = parseFloat(raw);
+    const isNA = raw === 'N/A' || isNaN(num);
+
+    const [min, max] = meta.range;
+    const pct = isNA ? 0 : Math.min(Math.max((num - min) / (max - min) * 100, 0), 100);
+    const color = isNA ? 'var(--txt2)' : meta.barColor(num);
+    const displayVal = isNA ? 'N/A' : meta.fmt(num);
+    const suffix = meta.unitSuffix || '';
+
+    const details = meta.details ? meta.details(num) : [];
+
+    const card = document.createElement('div');
+    card.className = 'card fade-up delay-' + (i + 3);
+    card.innerHTML = `
+      <p class="card-tag">
+        <span class="tag-dot" style="background:${meta.dotColor}"></span>
+        ${meta.label}
+      </p>
+      <div class="card-value" style="color:${color}">${displayVal}<span style="font-family:var(--font-num);font-size:18px;opacity:.5">${suffix}</span></div>
+      <p class="card-unit">${meta.unit}</p>
+      <div class="mini-bar">
+        <div class="mini-fill" data-pct="${pct}" style="width:0%;background:${color}"></div>
+      </div>
+      <p class="card-desc">${meta.desc}</p>
+      <div class="card-detail">
+        <div class="card-detail-inner">
+          ${details.map(d => `<div class="row"><span>${d.label}</span><span>${d.val}</span></div>`).join('')}
+        </div>
+      </div>
+      <span class="expand-hint"></span>
+    `;
+
+    card.addEventListener('click', () => {
+      card.classList.toggle('open');
+    });
+
+    grid.appendChild(card);
+  });
+
+  // animate mini bars after paint
+  setTimeout(() => {
+    document.querySelectorAll('.mini-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 400);
+}
+
+/* ── History table render ── */
+function renderHistory(rows) {
+  const tbody = document.getElementById('history-body');
+  const recent = [...rows].reverse().slice(0, 20);
+
+  if (!recent.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--txt2)">데이터 없음</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = recent.map((r, idx) => {
+    const comp  = parseFloat(r.Composite_Index);
+    const sig   = signalInfo(comp);
+    const tqqq  = isNaN(parseFloat(r.TQQQ)) ? r.TQQQ : '$' + parseFloat(r.TQQQ).toFixed(2);
+    const buff  = isNaN(parseFloat(r.Buffett_Indicator)) ? r.Buffett_Indicator : parseFloat(r.Buffett_Indicator).toFixed(1) + '%';
+    const fg    = isNaN(parseFloat(r.Fear_Greed)) ? r.Fear_Greed : parseFloat(r.Fear_Greed).toFixed(1);
+    const rsi   = isNaN(parseFloat(r.RSI_14)) ? r.RSI_14 : parseFloat(r.RSI_14).toFixed(1);
+    const compDisplay = isNaN(comp) ? r.Composite_Index : comp.toFixed(0);
+
+    return `<tr style="opacity:${1 - idx * 0.035}">
+      <td>${r.Date}</td>
+      <td>${tqqq}</td>
+      <td style="color:${isNaN(parseFloat(r.Buffett_Indicator)) ? 'var(--txt3)' : buffColor(parseFloat(r.Buffett_Indicator))}">${buff}</td>
+      <td style="color:${isNaN(parseFloat(r.Fear_Greed)) ? 'var(--txt3)' : fgColor(parseFloat(r.Fear_Greed))}">${fg}</td>
+      <td style="color:${isNaN(parseFloat(r.RSI_14)) ? 'var(--txt3)' : rsiColor(parseFloat(r.RSI_14))}">${rsi}</td>
+      <td><span class="cpill" style="color:${sig.color};border-color:${sig.border};background:${sig.border.replace('0.4','0.07').replace('0.3','0.06')}">${compDisplay} · ${sig.label}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Main init ── */
+async function init() {
+  try {
+    const res  = await fetch('data/indicators.csv');
+    if (!res.ok) throw new Error('CSV not found');
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    if (!rows.length) throw new Error('데이터가 비어있습니다');
+
+    const latest = rows[rows.length - 1];
+    document.getElementById('latest-date').textContent = latest.Date ?? '—';
+
+    renderHero(latest);
+    renderCards(latest);
+    renderHistory(rows);
+
+  } catch (e) {
+    document.getElementById('cards-grid').innerHTML = `
+      <div class="error-msg" style="grid-column:1/-1">
+        ⚠️ 데이터를 불러올 수 없습니다.<br><small>${e.message}</small><br><br>
+        <code style="font-family:var(--font-num);font-size:11px;opacity:.7">data/indicators.csv</code> 파일이 존재하는지 확인하세요.
+        GitHub Actions가 아직 실행되지 않았을 수 있습니다.
+      </div>`;
+    document.getElementById('hero-score').textContent = 'ERR';
+    document.getElementById('hero-desc').textContent = 'data/indicators.csv 파일을 찾을 수 없습니다.';
+    document.getElementById('history-body').innerHTML =
+      '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--txt2)">데이터 없음</td></tr>';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
