@@ -87,11 +87,20 @@
     text-transform: uppercase;
   }
 
-  .meta-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
-  .ticker-select { background: var(--card); color: var(--txt); border: 2px solid var(--border); padding: 6px 16px; border-radius: 8px; font-family: var(--font-num); font-size: 16px; font-weight: bold; cursor: pointer; outline: none; transition: border-color 0.2s; }
-  .ticker-select:focus { border-color: var(--buy); }
-  .meta { font-family: var(--font-num); font-size: 12px; color: var(--txt2); }
-  .meta .date-val { display: block; font-size: 20px; font-weight: 500; color: var(--txt3); letter-spacing: 1px; }
+  .meta {
+    text-align: right;
+    font-family: var(--font-num);
+    font-size: 12px;
+    color: var(--txt2);
+  }
+
+  .meta .date-val {
+    display: block;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--txt3);
+    letter-spacing: 1px;
+  }
 
   .live-dot {
     display: inline-block; width: 6px; height: 6px;
@@ -374,7 +383,6 @@
     border-radius: 4px;
   }
   @keyframes shimmer { to { background-position: -200% 0; } }
-  
 </style>
 </head>
 <body>
@@ -383,21 +391,16 @@
   <header class="fade-up">
     <div class="logo-area">
       <h1>Market Signal</h1>
-      <p><span class="live-dot"></span>Auto-updated every morning</p>
+      <p><span class="live-dot"></span>Auto-updated every morning · KST 08:00</p>
     </div>
-    <div class="meta-right">
-      <select id="ticker-select" class="ticker-select">
-        <option value="">데이터 로딩 중...</option>
-      </select>
-      <div class="meta">
-        <span class="date-val" id="latest-date">—</span>
-        최신 업데이트
-      </div>
+    <div class="meta">
+      <span class="date-val" id="latest-date">—</span>
+      최신 업데이트
     </div>
   </header>
 
   <div class="note fade-up delay-1" style="margin-top:28px;">
-    💡 선택한 주식 종목의 매수 타이밍을 포착하기 위한 4가지 지표를 종합합니다. 각 카드를 클릭하면 지표 해석 기준을 확인할 수 있습니다.
+    💡 이 대시보드는 매수 타이밍을 포착하기 위한 4가지 지표를 종합합니다. 각 카드를 클릭하면 지표 해석 기준을 확인할 수 있습니다. <strong style="color:var(--info)">복합 지수가 높을수록 (≥300) 분할매수를 고려해볼 시점</strong>입니다. 투자 판단은 본인 책임입니다.
   </div>
 
   <div class="hero fade-up delay-2">
@@ -411,9 +414,9 @@
           <div class="gauge-fill" id="hero-gauge" style="width:0%"></div>
         </div>
         <div class="gauge-labels">
-          <span>0 · 매도</span>
+          <span>0 · 강한 매도</span>
           <span>500</span>
-          <span>매수 · 1000</span>
+          <span>강한 매수 · 1000</span>
         </div>
       </div>
     </div>
@@ -423,19 +426,23 @@
   </div>
 
   <div class="cards" id="cards-grid">
-    <div class="card skel" style="height:240px"></div><div class="card skel" style="height:240px"></div><div class="card skel" style="height:240px"></div><div class="card skel" style="height:240px"></div>
+    <div class="card skel" style="height:240px"></div>
+    <div class="card skel" style="height:240px"></div>
+    <div class="card skel" style="height:240px"></div>
+    <div class="card skel" style="height:240px"></div>
   </div>
 
   <p class="section-title fade-up delay-4">최근 기록</p>
+
   <div class="table-wrap fade-up delay-5">
     <table>
       <thead>
         <tr>
           <th>날짜</th>
-          <th>종가 ($)</th>
+          <th>TQQQ ($)</th>
           <th>버핏지수 (%)</th>
           <th>F&amp;G</th>
-          <th>S&amp;P 500 RSI</th>
+          <th>RSI (14)</th>
           <th>복합 지수</th>
         </tr>
       </thead>
@@ -443,6 +450,56 @@
         <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--txt2)">데이터 로딩 중...</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <p class="section-title fade-up delay-5" style="margin-top:52px;">지표 해석 가이드</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;" class="fade-up delay-6">
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--info);margin-bottom:12px;">버핏지수 (Buffett Indicator)</p>
+      <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
+        <strong style="color:var(--txt3)">미국 전체 주식 시가총액 / GDP</strong>로 주식시장 전반의 고평가 여부를 판단합니다. 워런 버핏이 "어느 시점이든 주식 시장의 가치가 어느 정도인지 측정할 수 있는 최고의 단일 척도"라고 극찬한 지표이기도 합니다.<br><br>
+        <span style="color:var(--buy)">●</span> &lt;100% — 저평가, 매수 유리<br>
+        <span style="color:var(--warn)">●</span> 100~160% — 다소 고평가<br>
+        <span style="color:var(--sell)">●</span> &gt;200% — 극단적 고평가 (경고 수준)
+      </p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sell);margin-bottom:12px;">Fear &amp; Greed 타임라인</p>
+      <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
+        <strong style="color:var(--txt3)">CNN이 집계하는 시장 심리 지표</strong>로 변동성·모멘텀·옵션·안전자산 수요 등 7개 지표를 종합합니다. 극단적 공포일수록 역발상 매수 기회입니다.
+      </p>
+      <div style="margin-top:18px; position:relative;">
+        <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--txt2); margin-bottom:8px; font-weight:500;">
+          <span style="color:var(--buy)">0 (공포)</span>
+          <span style="color:var(--warn)">50 (중립)</span>
+          <span style="color:var(--sell)">100 (탐욕)</span>
+        </div>
+        <div style="height:6px; width:100%; border-radius:3px; background:linear-gradient(90deg, var(--buy), var(--warn), var(--sell));"></div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warn);margin-bottom:12px;">RSI (14)</p>
+      <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
+        <strong style="color:var(--txt3)">14일 상대강도지수</strong>로 S&P 500의 단기 과매수·과매도를 판단합니다.<br><br>
+        <span style="color:var(--buy)">●</span> &lt;30 — 과매도, 반등 가능성<br>
+        <span style="color:var(--warn)">●</span> 30~50 — 약세권<br>
+        <span style="color:var(--sell)">●</span> &gt;70 — 과매수, 조정 주의
+      </p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--buy);margin-bottom:12px;">복합 지수 계산법</p>
+      <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
+        각 지표를 <strong style="color:var(--txt3)">0~1 매수 점수로 정규화</strong>한 뒤 곱셈합니다:<br><br>
+        <code style="background:rgba(5,150,105,.1);padding:2px 8px;border-radius:4px;font-size:11px;color:var(--buy)">버핏 × F&amp;G × RSI × 1000</code><br><br>
+        세 지표가 모두 강한 매수 신호일 때 1000에 수렴합니다. 하나라도 극단적 고평가면 전체 점수가 크게 낮아집니다.
+      </p>
+    </div>
+
   </div>
 
   <footer class="fade-up delay-6">
@@ -453,9 +510,7 @@
 </div>
 
 <script>
-let globalData = [];
-let currentTicker = '';
-
+/* ── CSV Parser ── */
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const headers = lines[0].split(',').map(h => h.trim());
@@ -467,6 +522,7 @@ function parseCSV(text) {
   }).filter(r => r.Date);
 }
 
+/* ── Signal helpers ── */
 function signalInfo(score) {
   const s = parseFloat(score);
   if (isNaN(s)) return { label: 'N/A', color: 'var(--txt2)', border: 'var(--border)' };
@@ -479,80 +535,156 @@ function signalInfo(score) {
 function rsiColor(v)  { return v < 30 ? 'var(--buy)' : v < 50 ? 'var(--warn)' : v > 70 ? 'var(--sell)' : 'var(--txt3)'; }
 function fgColor(v)   { return v < 25 ? 'var(--buy)' : v < 50 ? 'var(--warn)' : v > 75 ? 'var(--sell)' : 'var(--txt3)'; }
 function buffColor(v) { return v < 100 ? 'var(--buy)' : v < 160 ? 'var(--warn)' : 'var(--sell)'; }
+function compColor(v) { return v >= 400 ? 'var(--buy)' : v >= 200 ? '#10b981' : v >= 100 ? 'var(--warn)' : 'var(--sell)'; }
 
+/* ── Hero render ── */
 function renderHero(latest) {
-  const score = parseFloat(latest.Composite_Index) || 0;
-  const sig = signalInfo(score);
-  document.getElementById('hero-score').textContent = isNaN(score) ? '—' : score.toFixed(0);
-  document.getElementById('hero-score').style.color = sig.color;
-  document.getElementById('hero-desc').innerHTML = `현재 <strong>${currentTicker}</strong> 지표 현황입니다. 복합 지수가 높을수록 매수를 고려해볼 시점입니다.`;
-  
+  const score  = parseFloat(latest.Composite_Index) || 0;
+  const sig    = signalInfo(score);
+  const pct    = Math.min(score / 10, 100);
+
+  const heroEl = document.getElementById('hero-score');
+  heroEl.textContent = isNaN(score) ? '—' : score.toFixed(0);
+  heroEl.style.color = sig.color;
+
+  const descMap = [
+    [400, '세 지표가 동시에 강한 매수 신호를 보내고 있습니다. <strong style="color:#10b981">분할 매수를 적극 고려</strong>할 시점입니다.'],
+    [200, '일부 지표가 매수 구간에 진입했습니다. <strong style="color:var(--warn)">소량 분할 매수</strong>를 검토해 볼 수 있습니다.'],
+    [100, '지표 신호가 혼재합니다. <strong style="color:var(--warn)">추가 확인 후 관망</strong>을 권장합니다.'],
+    [0,   '하나 이상의 지표가 고위험 영역에 있습니다. <strong style="color:var(--sell)">신규 매수를 자제</strong>하고 기다리세요.'],
+  ];
+  const desc = descMap.find(([t]) => score >= t);
+  document.getElementById('hero-desc').innerHTML = desc ? desc[1] : '데이터를 확인하세요.';
+
   const badge = document.getElementById('signal-badge');
   badge.textContent = sig.label;
-  badge.style.color = sig.color;
+  badge.style.color  = sig.color;
   badge.style.borderColor = sig.border;
-  badge.style.background = sig.border.replace('0.4', '0.08').replace('0.3', '0.06');
-  
-  setTimeout(() => { document.getElementById('hero-gauge').style.width = Math.min(score / 10, 100) + '%'; }, 100);
+  badge.style.background  = sig.border.replace('0.4', '0.08').replace('0.3', '0.06');
+
+  setTimeout(() => {
+    document.getElementById('hero-gauge').style.width = pct + '%';
+  }, 300);
 }
 
-function renderCards(latest) {
-  const CARDS_META = [
-    {
-      key: 'Price', label: `${currentTicker} Price`, unit: 'USD',
-      color: 'var(--info)', dotColor: '#3b82f6', range: [0, 1000], barColor: () => 'var(--info)',
-      desc: `선택된 ${currentTicker}의 최근 종가입니다.`,
-      fmt: (v) => '$' + parseFloat(v).toFixed(2),
+/* ── Cards render ── */
+const CARDS_META = [
+  {
+    key: 'TQQQ', label: 'TQQQ Price', unit: 'USD',
+    color: 'var(--info)', dotColor: '#3b82f6',
+    range: [0, 200],
+    barColor: (v) => 'var(--info)',
+    desc: 'ProShares Ultra QQQ — 나스닥 100의 3배 레버리지 ETF. 고위험·고수익 상품이므로 시장 타이밍이 중요합니다.',
+    details: (v) => [
+      { label: '기준 지수', val: 'NASDAQ-100 (QQQ)' },
+      { label: '레버리지', val: '3× 일간' },
+      { label: '운용사', val: 'ProShares' },
+    ],
+    fmt: (v) => '$' + parseFloat(v).toFixed(2),
+    noFmt: true,
+  },
+  {
+    key: 'Buffett_Indicator', label: 'Buffett Indicator', unit: '미국 시가총액 / GDP',
+    color: 'var(--info)', dotColor: '#60a5fa',
+    range: [50, 300], barColor: buffColor,
+    desc: '워런 버핏이 측정 가능한 최고의 단일 척도라고 극찬한 주식시장 과열 지표. 시장이 경제 규모 대비 얼마나 비싼지 나타냅니다.',
+    details: (v) => [
+      { label: '상태', val: v < 100 ? '🟢 저평가' : v < 160 ? '🟡 다소 고평가' : '🔴 극단 고평가' },
+      { label: '역대 평균', val: '약 85~90%' },
+      { label: '버핏 경고선', val: '>200%' },
+    ],
+    fmt: (v) => parseFloat(v).toFixed(1),
+    unitSuffix: '%',
+  },
+  {
+    key: 'Fear_Greed', label: 'Fear & Greed', unit: 'CNN Market Sentiment',
+    color: 'var(--sell)', dotColor: '#f43f5e',
+    range: [0, 100], barColor: fgColor,
+    desc: 'CNN이 집계하는 시장 심리 지수 타임라인. 현재 시장의 공포와 탐욕 수준이 어느 위치에 있는지 시각적으로 확인합니다.',
+    details: (v) => {
+      // 타임라인 UI를 문자열 템플릿으로 제공
+      const pos = Math.min(Math.max(v, 0), 100);
+      const timelineHtml = `
+        <div style="width:100%; height:4px; background:linear-gradient(90deg, var(--buy), var(--warn), var(--sell)); border-radius:2px; position:relative; margin:12px 0;">
+          <div style="position:absolute; left:${pos}%; top:-4px; width:12px; height:12px; background:var(--txt); border-radius:50%; transform:translateX(-50%); border:2px solid var(--card); box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+        </div>
+      `;
+      return [
+        { label: '타임라인', val: timelineHtml },
+        { label: '현재 심리', val: v < 25 ? '😱 극단적 공포' : v < 50 ? '😨 공포' : v < 75 ? '😏 탐욕' : '🤑 극단적 탐욕' },
+        { label: '매수 구간', val: '0 ~ 25' },
+      ];
     },
-    {
-      key: 'Buffett_Indicator', label: 'Buffett Indicator', unit: '미국 시가총액 / GDP',
-      color: 'var(--info)', dotColor: '#60a5fa', range: [50, 300], barColor: buffColor,
-      desc: '시장 전반의 고평가 여부를 판단합니다. <100% (저평가), >160% (고평가)',
-      fmt: (v) => parseFloat(v).toFixed(1), unitSuffix: '%',
-    },
-    {
-      key: 'Fear_Greed', label: 'Fear & Greed', unit: 'CNN Sentiment',
-      color: 'var(--sell)', dotColor: '#f43f5e', range: [0, 100], barColor: fgColor,
-      desc: 'CNN 시장 심리 지수. 극단적 공포(0)일수록 역발상 매수 기회입니다.',
-      fmt: (v) => parseFloat(v).toFixed(1),
-    },
-    {
-      key: 'RSI_14', label: 'S&P 500 RSI (14)', unit: '상대강도지수',
-      color: 'var(--warn)', dotColor: '#f59e0b', range: [0, 100], barColor: rsiColor,
-      desc: 'S&P 500 기준 14일 RSI. <30 (과매도), >70 (과매수)',
-      fmt: (v) => parseFloat(v).toFixed(1),
-    }
-  ];
+    fmt: (v) => parseFloat(v).toFixed(1),
+  },
+  {
+    key: 'RSI_14', label: 'RSI (14)', unit: 'S&P 500 상대강도지수',
+    color: 'var(--warn)', dotColor: '#f59e0b',
+    range: [0, 100], barColor: rsiColor,
+    desc: '14일 RSI. S&P 500을 기준으로 30 이하면 과매도로 반등 가능성, 70 이상이면 과매수로 조정 위험이 높아집니다.',
+    details: (v) => [
+      { label: '현재 상태', val: v < 30 ? '📉 과매도' : v < 50 ? '↘ 약세권' : v < 70 ? '↗ 강세권' : '📈 과매수' },
+      { label: '과매도 기준', val: '< 30' },
+      { label: '과매수 기준', val: '> 70' },
+    ],
+    fmt: (v) => parseFloat(v).toFixed(1),
+  },
+];
 
+function renderCards(latest) {
   const grid = document.getElementById('cards-grid');
   grid.innerHTML = '';
 
-  CARDS_META.forEach((meta) => {
+  CARDS_META.forEach((meta, i) => {
     const raw = latest[meta.key];
     const num = parseFloat(raw);
     const isNA = raw === 'N/A' || isNaN(num);
-    
-    // 가격 카드의 게이지 바는 100%로 고정
-    let pct = meta.key === 'Price' ? 100 : (isNA ? 0 : Math.min(Math.max((num - meta.range[0]) / (meta.range[1] - meta.range[0]) * 100, 0), 100));
-    
+
+    const [min, max] = meta.range;
+    const pct = isNA ? 0 : Math.min(Math.max((num - min) / (max - min) * 100, 0), 100);
     const color = isNA ? 'var(--txt2)' : meta.barColor(num);
     const displayVal = isNA ? 'N/A' : meta.fmt(num);
+    const suffix = meta.unitSuffix || '';
+
+    const details = meta.details ? meta.details(num) : [];
 
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'card fade-up delay-' + (i + 3);
     card.innerHTML = `
-      <p class="card-tag"><span class="tag-dot" style="background:${meta.dotColor}"></span>${meta.label}</p>
-      <div class="card-value" style="color:${color}">${displayVal}<span style="font-family:var(--font-num);font-size:18px;opacity:.5">${meta.unitSuffix || ''}</span></div>
+      <p class="card-tag">
+        <span class="tag-dot" style="background:${meta.dotColor}"></span>
+        ${meta.label}
+      </p>
+      <div class="card-value" style="color:${color}">${displayVal}<span style="font-family:var(--font-num);font-size:18px;opacity:.5">${suffix}</span></div>
       <p class="card-unit">${meta.unit}</p>
-      <div class="mini-bar"><div class="mini-fill" data-pct="${pct}" style="width:0%;background:${color}"></div></div>
+      <div class="mini-bar">
+        <div class="mini-fill" data-pct="${pct}" style="width:0%;background:${color}"></div>
+      </div>
       <p class="card-desc">${meta.desc}</p>
+      <div class="card-detail">
+        <div class="card-detail-inner">
+          ${details.map(d => `<div class="row" style="${d.label === '타임라인' ? 'display:block; margin-bottom:8px;' : ''}"><span style="${d.label === '타임라인' ? 'display:block; margin-bottom:4px;' : ''}">${d.label}</span><span>${d.val}</span></div>`).join('')}
+        </div>
+      </div>
+      <span class="expand-hint"></span>
     `;
+
+    card.addEventListener('click', () => {
+      card.classList.toggle('open');
+    });
+
     grid.appendChild(card);
   });
 
-  setTimeout(() => { document.querySelectorAll('.mini-fill').forEach(el => el.style.width = el.dataset.pct + '%'); }, 100);
+  // animate mini bars after paint
+  setTimeout(() => {
+    document.querySelectorAll('.mini-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 400);
 }
 
+/* ── History table render ── */
 function renderHistory(rows) {
   const tbody = document.getElementById('history-body');
   const recent = [...rows].reverse().slice(0, 20);
@@ -563,63 +695,53 @@ function renderHistory(rows) {
   }
 
   tbody.innerHTML = recent.map((r, idx) => {
-    const comp = parseFloat(r.Composite_Index);
-    const sig = signalInfo(comp);
-    const price = isNaN(parseFloat(r.Price)) ? r.Price : '$' + parseFloat(r.Price).toFixed(2);
-    const buff = isNaN(parseFloat(r.Buffett_Indicator)) ? r.Buffett_Indicator : parseFloat(r.Buffett_Indicator).toFixed(1) + '%';
-    const fg = isNaN(parseFloat(r.Fear_Greed)) ? r.Fear_Greed : parseFloat(r.Fear_Greed).toFixed(1);
-    const rsi = isNaN(parseFloat(r.RSI_14)) ? r.RSI_14 : parseFloat(r.RSI_14).toFixed(1);
+    const comp  = parseFloat(r.Composite_Index);
+    const sig   = signalInfo(comp);
+    const tqqq  = isNaN(parseFloat(r.TQQQ)) ? r.TQQQ : '$' + parseFloat(r.TQQQ).toFixed(2);
+    const buff  = isNaN(parseFloat(r.Buffett_Indicator)) ? r.Buffett_Indicator : parseFloat(r.Buffett_Indicator).toFixed(1) + '%';
+    const fg    = isNaN(parseFloat(r.Fear_Greed)) ? r.Fear_Greed : parseFloat(r.Fear_Greed).toFixed(1);
+    const rsi   = isNaN(parseFloat(r.RSI_14)) ? r.RSI_14 : parseFloat(r.RSI_14).toFixed(1);
+    const compDisplay = isNaN(comp) ? r.Composite_Index : comp.toFixed(0);
 
     return `<tr style="opacity:${1 - idx * 0.035}">
       <td>${r.Date}</td>
-      <td>${price}</td>
+      <td>${tqqq}</td>
       <td style="color:${isNaN(parseFloat(r.Buffett_Indicator)) ? 'var(--txt3)' : buffColor(parseFloat(r.Buffett_Indicator))}">${buff}</td>
       <td style="color:${isNaN(parseFloat(r.Fear_Greed)) ? 'var(--txt3)' : fgColor(parseFloat(r.Fear_Greed))}">${fg}</td>
       <td style="color:${isNaN(parseFloat(r.RSI_14)) ? 'var(--txt3)' : rsiColor(parseFloat(r.RSI_14))}">${rsi}</td>
-      <td><span class="cpill" style="color:${sig.color};border-color:${sig.border}">${isNaN(comp) ? r.Composite_Index : comp.toFixed(0)} · ${sig.label}</span></td>
+      <td><span class="cpill" style="color:${sig.color};border-color:${sig.border}">${compDisplay} · ${sig.label}</span></td>
     </tr>`;
   }).join('');
 }
 
-function updateDashboard() {
-  const filteredData = globalData.filter(d => d.Ticker === currentTicker);
-  if (filteredData.length === 0) return;
-  
-  const latest = filteredData[filteredData.length - 1];
-  document.getElementById('latest-date').textContent = latest.Date ?? '—';
-  
-  renderHero(latest);
-  renderCards(latest);
-  renderHistory(filteredData);
-}
-
+/* ── Main init ── */
 async function init() {
   try {
-    const res = await fetch('data/indicators.csv');
-    if (!res.ok) throw new Error('CSV 파일을 찾을 수 없습니다.');
+    const res  = await fetch('data/indicators.csv');
+    if (!res.ok) throw new Error('CSV not found');
     const text = await res.text();
-    globalData = parseCSV(text);
-    
-    // 존재하는 모든 Ticker 추출
-    const tickers = [...new Set(globalData.map(d => d.Ticker))].filter(Boolean);
-    if (tickers.length === 0) throw new Error('데이터 내 종목 정보가 없습니다.');
-    
-    // Select 박스 세팅
-    const select = document.getElementById('ticker-select');
-    select.innerHTML = tickers.map(t => `<option value="${t}">${t}</option>`).join('');
-    
-    currentTicker = tickers[0];
-    select.value = currentTicker;
-    
-    select.addEventListener('change', (e) => {
-      currentTicker = e.target.value;
-      updateDashboard();
-    });
-    
-    updateDashboard();
-    
+    const rows = parseCSV(text);
+
+    if (!rows.length) throw new Error('데이터가 비어있습니다');
+
+    const latest = rows[rows.length - 1];
+    document.getElementById('latest-date').textContent = latest.Date ?? '—';
+
+    renderHero(latest);
+    renderCards(latest);
+    renderHistory(rows);
+
   } catch (e) {
-    document.getElementById('cards-grid').innerHTML = `<div class="error-msg" style="grid-column:1/-1">⚠️ 데이터를 불러올 수 없습니다.<br><small>${e.message}</small></div>`;
+    document.getElementById('cards-grid').innerHTML = `
+      <div class="error-msg" style="grid-column:1/-1">
+        ⚠️ 데이터를 불러올 수 없습니다.<br><small>${e.message}</small><br><br>
+        <code style="font-family:var(--font-num);font-size:11px;opacity:.7">data/indicators.csv</code> 파일이 존재하는지 확인하세요.
+        GitHub Actions가 아직 실행되지 않았을 수 있습니다.
+      </div>`;
+    document.getElementById('hero-score').textContent = 'ERR';
+    document.getElementById('hero-desc').textContent = 'data/indicators.csv 파일을 찾을 수 없습니다.';
+    document.getElementById('history-body').innerHTML =
+      '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--txt2)">데이터 없음</td></tr>';
   }
 }
 
