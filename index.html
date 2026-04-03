@@ -717,7 +717,8 @@ function renderHistory(rows) {
 /* ── Main init ── */
 async function init() {
   try {
-    const res  = await fetch('data/indicators.csv');
+    // 🔥 캐시 방지를 위해 URL에 타임스탬프를 추가 (GitHub Pages 강력 캐싱 우회)
+    const res  = await fetch(`data/indicators.csv?t=${new Date().getTime()}`);
     if (!res.ok) throw new Error('CSV not found');
     const text = await res.text();
     const rows = parseCSV(text);
