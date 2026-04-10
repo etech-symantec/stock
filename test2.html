@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STOCK WATCH — 원스크린 대시보드</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0d0f14; --bg2: #141720; --bg3: #1c2030; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14); --text: #e8eaf0; --text2: #8890a4; --text3: #555e72; --green: #00c87a; --green-bg: rgba(0,200,122,0.1); --red: #ff4d6a; --red-bg: rgba(255,77,106,0.1); --blue: #4d9fff; --accent: #7c6af7; --accent-bg: rgba(124,106,247,0.12); --radius: 8px; --radius-lg: 12px; --font-mono: 'Space Mono', monospace; --font-sans: 'Noto Sans KR', sans-serif; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  /* ── 1. 화면 전체를 100vh로 꽉 채우고 스크롤 방지 ── */
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
+  
+  /* ── 2. 네비게이션 바 압축 ── */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 50px; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; }
+  .logo { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+
+  .view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); }
+  .vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; }
+  .vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+  /* ── 3. 메인 영역을 Flex로 구성 ── */
+  main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 15px 20px; gap: 12px; }
+  
+  /* ── 상단 컨트롤 & 대시보드 컴팩트화 ── */
+  .add-bar { display: flex; gap: 10px; position: relative; flex-shrink: 0; }
+  .search-input { flex: 1; padding: 10px 14px; font-size: 13px; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); outline: none; }
+  .search-dropdown { position: absolute; top: 100%; left: 0; width: 400px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); z-index: 100; display: none; list-style: none; overflow-y: auto; max-height: 250px; margin-top: 5px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); }
+  .search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 12px; }
+  .search-item:hover { background: var(--bg2); }
+
+  .dashboard-top { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; flex-shrink: 0; height: 110px; }
+  .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .sum-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: flex; flex-direction: column; justify-content: center; }
+  .sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; }
+  .sum-value { font-family: var(--font-mono); font-size: 20px; font-weight: 700; }
+  .allocation { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; height: 100%; }
+
+  /* ── 4. 주식 카드 그리드 (독립 스크롤 영역) ── */
+  .grid-container { flex: 1; overflow-y: auto; padding-right: 5px; }
+  /* 커스텀 스크롤바 */
+  .grid-container::-webkit-scrollbar { width: 6px; }
+  .grid-container::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; align-content: start; }
+  
+  /* 카드 디자인 축소 */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; position: relative; cursor: pointer; transition: 0.15s; }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card-tag { position: absolute; top: 10px; right: 10px; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+  .tag-held { background: var(--accent-bg); color: var(--accent); }
+  .tag-watch { background: var(--bg3); color: var(--text2); }
+
+  .card-ticker { font-family: var(--font-mono); font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .card-price { font-size: 20px; font-family: var(--font-mono); font-weight: 700; margin-bottom: 8px; }
+  .chart-wrap { height: 60px; margin-bottom: 10px; }
+  
+  .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); }
+  .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); }
+  .btn-sm:hover { background: var(--bg3); color: var(--text); }
+  
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .overlay.open { display: flex; }
+  .modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 320px; border: 1px solid var(--border2); }
+  
+  @media (max-width: 768px) { .dashboard-top { grid-template-columns: 1fr; height: auto; } .allocation { height: 120px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><div class="logo-dot"></div>STOCK&nbsp;WATCH</div>
+  <div class="view-tabs">
+    <button class="vtab active" onclick="setView('all', this)">전체</button>
+    <button class="vtab" onclick="setView('held', this)">보유</button>
+    <button class="vtab" onclick="setView('watch', this)">관심</button>
+  </div>
+  <div class="nav-right">
+    <button class="btn-sm" onclick="exportData()">데이터 백업</button>
+  </div>
+</nav>
+
+<main>
+  <div class="add-bar">
+    <input type="text" id="searchInput" class="search-input" placeholder="종목명 또는 코드 검색 (예: 애플, 삼성전자)..." autocomplete="off">
+    <ul id="searchDropdown" class="search-dropdown"></ul>
+  </div>
+
+  <div class="dashboard-top" id="dashboardTop" style="display:none">
+    <div class="summary">
+      <div class="sum-card"><div class="sum-label">총 자산 가치</div><div class="sum-value" id="totalVal">₩0</div></div>
+      <div class="sum-card"><div class="sum-label">총 수익률</div><div class="sum-value" id="totalRoi">0%</div></div>
+    </div>
+    <div class="allocation"><canvas id="allocChart"></canvas></div>
+  </div>
+
+  <div class="grid-container">
+    <div class="grid" id="stockGrid"></div>
+  </div>
+</main>
+
+<div class="overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 id="modalTitle" style="margin-bottom:15px; font-size:16px;">잔고 정보 입력</h3>
+    <div style="margin-bottom:10px">
+      <label style="display:block; font-size:11px; color:var(--text2); margin-bottom:4px">평균 매입가</label>
+      <input type="number" id="inputAvg" class="search-input" style="width:100%" placeholder="0">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block; font-size:11px; color:var(--text2); margin-bottom:4px">보유 수량 (0 입력 시 관심종목 전환)</label>
+      <input type="number" id="inputQty" class="search-input" style="width:100%" placeholder="0">
+    </div>
+    <div style="display:flex; gap:8px">
+      <button class="btn-sm" style="flex:1; padding:10px" onclick="closeModal()">취소</button>
+      <button class="btn-sm" style="flex:1; padding:10px; background:var(--accent); color:white; border:none" onclick="saveBalance()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = JSON.parse(localStorage.getItem('sw_state_v3')) || { stocks: [], currentView: 'all' };
+let marketData = {}; 
+let editingSymbol = null;
+let allocChart = null;
+let searchTimeout = null;
+
+const saveState = () => localStorage.setItem('sw_state_v3', JSON.stringify(state));
+
+async function getPriceData(symbol) {
+  const proxy = `https://corsproxy.io/?`;
+  const url = encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1d`);
+  try {
+    const res = await fetch(proxy + url);
+    const json = await res.json();
+    const result = json.chart.result[0];
+    return {
+      symbol,
+      price: result.meta.regularMarketPrice,
+      currency: result.meta.currency,
+      history: result.indicators.quote[0].close.filter(p => p !== null),
+      change: ((result.meta.regularMarketPrice - result.meta.chartPreviousClose) / result.meta.chartPreviousClose * 100).toFixed(2)
+    };
+  } catch(e) { return null; }
+}
+
+const searchInput = document.getElementById('searchInput');
+const dropdown = document.getElementById('searchDropdown');
+
+searchInput.addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  const q = e.target.value.trim();
+  if(q.length < 1) { dropdown.style.display='none'; return; }
+  
+  searchTimeout = setTimeout(async () => {
+    dropdown.innerHTML = `<li class="search-item" style="color:var(--text3)">검색 중...</li>`;
+    dropdown.style.display = 'block';
+    
+    try {
+      const res = await fetch(`https://corsproxy.io/?` + encodeURIComponent(`https://query2.finance.yahoo.com/v1/finance/search?q=${q}`));
+      const data = await res.json();
+      const validQuotes = (data.quotes || []).filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF').slice(0,6);
+      
+      if(validQuotes.length === 0) {
+        dropdown.innerHTML = `<li class="search-item" style="color:var(--red)">결과가 없습니다.</li>`;
+        return;
+      }
+
+      dropdown.innerHTML = validQuotes.map(q => `
+        <li class="search-item" onclick="addStock('${q.symbol}')">
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">${q.shortname || q.longname || q.symbol}</span>
+          <span style="color:var(--accent); font-weight:700; font-family:var(--font-mono)">${q.symbol}</span>
+        </li>
+      `).join('');
+    } catch(err) { dropdown.style.display='none'; }
+  }, 300);
+});
+
+document.addEventListener('click', (e) => {
+  if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
+});
+
+async function addStock(symbol) {
+  if(state.stocks.find(s => s.symbol === symbol)) {
+    alert('이미 등록된 종목입니다.');
+  } else {
+    state.stocks.push({ symbol, category: 'watch', avg: 0, qty: 0 });
+    saveState();
+  }
+  searchInput.value = '';
+  dropdown.style.display = 'none';
+  render();
+}
+
+searchInput.addEventListener('keydown', e => { 
+  if (e.key === 'Enter' && searchInput.value.trim()) addStock(searchInput.value.trim().toUpperCase()); 
+});
+
+async function render() {
+  const grid = document.getElementById('stockGrid');
+  const dash = document.getElementById('dashboardTop');
+  const filtered = state.stocks.filter(s => state.currentView === 'all' ? true : s.category === state.currentView);
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text3); border:1px dashed var(--border2); border-radius:var(--radius-lg)">등록된 종목이 없습니다. 위에서 검색해보세요.</div>';
+    dash.style.display = state.stocks.filter(s=>s.category==='held').length > 0 ? 'grid' : 'none';
+    return;
+  }
+
+  grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text3); font-size:12px;">데이터 로딩 중...</div>';
+
+  const promises = filtered.map(async s => {
+    if(!marketData[s.symbol]) marketData[s.symbol] = await getPriceData(s.symbol);
+    return { ...s, data: marketData[s.symbol] };
+  });
+
+  const list = await Promise.all(promises);
+  grid.innerHTML = '';
+
+  let totalVal = 0, totalGain = 0, costBasis = 0;
+  const allocs = { labels: [], values: [] };
+
+  list.forEach(s => {
+    if(!s.data) return;
+    const isHeld = s.category === 'held';
+    const curVal = s.qty * s.data.price;
+    if(isHeld) {
+      totalVal += curVal;
+      costBasis += s.qty * s.avg;
+      if(curVal > 0) { allocs.labels.push(s.symbol); allocs.values.push(curVal); }
+    }
+
+    const card = document.createElement('div');
+    card.className = `card`;
+    card.innerHTML = `
+      <span class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}">${isHeld ? '보유' : '관심'}</span>
+      <div class="card-ticker">${s.symbol}</div>
+      <div class="card-price">${s.data.currency === 'KRW' ? '₩' : '$'}${s.data.price.toLocaleString(undefined, {minimumFractionDigits: isHeld && s.data.currency!=='KRW'?2:0, maximumFractionDigits: isHeld && s.data.currency!=='KRW'?2:0})}</div>
+      <div style="font-size:11px; font-weight:500; color:${s.data.change >= 0 ? 'var(--green)' : 'var(--red)'}; margin-bottom:8px">
+        ${s.data.change >= 0 ? '▲' : '▼'} ${Math.abs(s.data.change)}%
+      </div>
+      <div class="chart-wrap"><canvas id="chart_${s.symbol}"></canvas></div>
+      ${isHeld ? `
+        <div style="font-size:11px; color:var(--text2); margin-bottom:8px; line-height:1.4">
+          수익: <span style="font-family:var(--font-mono); font-weight:700; color:${s.data.price >= s.avg ? 'var(--green)' : 'var(--red)'}">
+            ${((s.data.price - s.avg) / s.avg * 100).toFixed(2)}%
+          </span><br>평단가: ${s.data.currency === 'KRW' ? '₩' : '$'}${s.avg} (${s.qty}주)
+        </div>
+      ` : ''}
+      <div class="card-footer">
+        <button class="btn-sm" onclick="event.stopPropagation(); openModal('${s.symbol}')">${isHeld ? '잔고 편집' : '잔고 입력'}</button>
+        <button class="btn-sm" style="color:var(--red)" onclick="event.stopPropagation(); deleteStock('${s.symbol}')">삭제</button>
+      </div>
+    `;
+    grid.appendChild(card);
+    drawMiniChart(`chart_${s.symbol}`, s.data.history);
+  });
+
+  if(totalVal > 0 && (state.currentView === 'all' || state.currentView === 'held')) {
+    dash.style.display = 'grid';
+    document.getElementById('totalVal').innerText = '₩' + Math.round(totalVal).toLocaleString();
+    const roi = costBasis > 0 ? ((totalVal - costBasis) / costBasis * 100).toFixed(2) : 0;
+    document.getElementById('totalRoi').innerText = (roi >= 0 ? '+' : '') + roi + '%';
+    document.getElementById('totalRoi').style.color = roi >= 0 ? 'var(--green)' : 'var(--red)';
+    drawAllocChart(allocs);
+  } else {
+    dash.style.display = 'none';
+  }
+}
+
+function drawMiniChart(id, data) {
+  const ctx = document.getElementById(id).getContext('2d');
+  const isUp = data[data.length-1] >= data[0];
+  const color = isUp ? '#00c87a' : '#ff4d6a';
+  const fill = isUp ? 'rgba(0,200,122,0.1)' : 'rgba(255,77,106,0.1)';
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: data.map((_,i)=>i), datasets: [{ data, borderColor: color, backgroundColor: fill, borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false}, tooltip: {enabled:false} }, scales: { x:{display:false}, y:{display:false} }, animation: {duration: 0} }
+  });
+}
+
+function drawAllocChart(data) {
+  const ctx = document.getElementById('allocChart').getContext('2d');
+  if(allocChart) allocChart.destroy();
+  if(data.values.length === 0) return;
+  allocChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: data.labels, datasets: [{ data: data.values, backgroundColor: ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8'], borderWidth: 0 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#8890a4', font: { size: 10, family: 'Space Mono' }, boxWidth: 8 } } }, cutout: '70%', animation:{duration:0} }
+  });
+}
+
+function setView(view, el) {
+  state.currentView = view;
+  document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function openModal(symbol) {
+  editingSymbol = symbol;
+  const s = state.stocks.find(x => x.symbol === symbol);
+  document.getElementById('inputAvg').value = s.avg || '';
+  document.getElementById('inputQty').value = s.qty || '';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) { 
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('modalOverlay').classList.remove('open'); 
+}
+
+function saveBalance() {
+  const avg = parseFloat(document.getElementById('inputAvg').value) || 0;
+  const qty = parseFloat(document.getElementById('inputQty').value) || 0;
+  const s = state.stocks.find(x => x.symbol === editingSymbol);
+  
+  s.avg = avg;
+  s.qty = qty;
+  s.category = qty > 0 ? 'held' : 'watch';
+  
+  saveState();
+  closeModal();
+  render();
+}
+
+function deleteStock(symbol) {
+  state.stocks = state.stocks.filter(s => s.symbol !== symbol);
+  delete marketData[symbol];
+  saveState();
+  render();
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `stock_watch_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+}
+
+render();
+</script>
+</body>
+</html>
