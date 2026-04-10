@@ -4,58 +4,77 @@ import FinanceDataReader as fdr
 
 def main():
     db = []
-    
-    print("🇺🇸 미국 주식(S&P 500) 데이터를 가져옵니다...")
-    # S&P 500 (미국 시총 상위 500여개) + 나스닥 100 등 활용 가능
-    # 여기서는 S&P500 전체와 나스닥 상위 종목을 섞어 약 1000개를 추출합니다.
-    sp500 = fdr.StockListing('S&P500')
-    for _, row in sp500.iterrows():
-        db.append({
-            "symbol": row['Symbol'],
-            "name": row['Name'],
-            "exch": "US"
-        })
-        
-    print("🇰🇷 한국 주식(KOSPI/KOSDAQ) 데이터를 가져옵니다...")
-    # 한국 거래소 전체 종목 가져오기
-    krx = fdr.StockListing('KRX')
-    
-    # 시가총액(Marcap) 기준으로 내림차순 정렬 후 상위 1000개 자르기
-    if 'Marcap' in krx.columns:
-        krx = krx.sort_values('Marcap', ascending=False)
-    
-    krx_top1000 = krx.head(1000)
-    
-    for _, row in krx_top1000.iterrows():
-        sym = row['Code']
-        market = row.get('Market', 'KRX')
-        
-        # 야후 파이낸스 티커 형식에 맞게 접미사(.KS, .KQ) 붙이기
-        if market == "KOSPI":
-            suffix = ".KS"
-        elif market == "KOSDAQ" or market == "KOSDAQ GLOBAL":
-            suffix = ".KQ"
-        else:
-            suffix = ".KS" # 기본값
+    added_symbols = set()  # 중복 등록 방지용
+
+    def add_to_db(symbol, name, exch):
+        # 야후 파이낸스에서 인식 못하는 빈 심볼이나 중복 심볼 제외
+        if symbol and symbol not in added_symbols:
+            db.append({
+                "symbol": symbol,
+                "name": name,
+                "exch": exch
+            })
+            added_symbols.add(symbol)
+
+    print("🇺🇸 1. 미국 주식 (S&P 500) 데이터를 가져옵니다...")
+    try:
+        sp500 = fdr.StockListing('S&P500')
+        for _, row in sp500.iterrows():
+            add_to_db(row['Symbol'], row['Name'], "US_STOCK")
+    except Exception as e:
+        print(f"미국 주식 가져오기 실패: {e}")
+
+    print("🇰🇷 2. 한국 주식 (KOSPI/KOSDAQ 시총 상위 2000개) 데이터를 가져옵니다...")
+    try:
+        krx = fdr.StockListing('KRX')
+        # 시가총액(Marcap) 기준으로 내림차순 정렬
+        if 'Marcap' in krx.columns:
+            krx = krx.sort_values('Marcap', ascending=False)
             
-        db.append({
-            "symbol": f"{sym}{suffix}",
-            "name": row['Name'],
-            "exch": market
-        })
-        
-    print("🪙 주요 ETF 및 암호화폐 데이터를 추가합니다...")
+        for _, row in krx.head(2000).iterrows():
+            sym = str(row['Code'])
+            market = str(row.get('Market', 'KRX'))
+            # 코스닥은 .KQ, 코스피/기타는 .KS (야후 파이낸스 기준)
+            suffix = ".KQ" if "KOSDAQ" in market else ".KS"
+            add_to_db(f"{sym}{suffix}", row['Name'], market)
+    except Exception as e:
+        print(f"한국 주식 가져오기 실패: {e}")
+
+    print("🦅 3. 미국 ETF (거래량 상위 500개) 데이터를 가져옵니다...")
+    try:
+        us_etfs = fdr.StockListing('ETF/US')
+        # 거래량이 높은 순서대로 주요 ETF 추출
+        if 'Volume' in us_etfs.columns:
+            us_etfs = us_etfs.sort_values('Volume', ascending=False)
+            
+        for _, row in us_etfs.head(500).iterrows():
+            add_to_db(row['Symbol'], row['Name'], "US_ETF")
+    except Exception as e:
+        print(f"미국 ETF 가져오기 실패: {e}")
+
+    print("🐯 4. 한국 ETF (거래량 상위 500개) 데이터를 가져옵니다...")
+    try:
+        kr_etfs = fdr.StockListing('ETF/KR')
+        # 거래량이 높은 순서대로 주요 ETF 추출
+        if 'Volume' in kr_etfs.columns:
+            kr_etfs = kr_etfs.sort_values('Volume', ascending=False)
+            
+        for _, row in kr_etfs.head(500).iterrows():
+            sym = str(row['Symbol'])
+            # 한국 ETF는 야후 파이낸스에서 모두 코스피(.KS)로 취급됨
+            add_to_db(f"{sym}.KS", row['Name'], "KR_ETF")
+    except Exception as e:
+        print(f"한국 ETF 가져오기 실패: {e}")
+
+    print("🪙 5. 암호화폐 및 커스텀 추가 데이터를 가져옵니다...")
     extras = [
-        {"symbol": "TQQQ", "name": "ProShares UltraPro QQQ", "exch": "ETF"},
-        {"symbol": "SQQQ", "name": "ProShares UltraPro Short QQQ", "exch": "ETF"},
-        {"symbol": "SOXL", "name": "Direxion Daily Semi Bull 3X", "exch": "ETF"},
-        {"symbol": "SOXS", "name": "Direxion Daily Semi Bear 3X", "exch": "ETF"},
-        {"symbol": "SCHD", "name": "Schwab US Dividend Equity ETF", "exch": "ETF"},
-        {"symbol": "BTC-USD", "name": "Bitcoin", "exch": "CRYPTO"},
-        {"symbol": "ETH-USD", "name": "Ethereum", "exch": "CRYPTO"},
+        {"symbol": "BTC-USD", "name": "Bitcoin (비트코인)", "exch": "CRYPTO"},
+        {"symbol": "ETH-USD", "name": "Ethereum (이더리움)", "exch": "CRYPTO"},
+        {"symbol": "SOL-USD", "name": "Solana (솔라나)", "exch": "CRYPTO"}
     ]
-    db.extend(extras)
-    
+    for item in extras:
+        add_to_db(item['symbol'], item['name'], item['exch'])
+
     # data 폴더가 없으면 생성
     os.makedirs('data', exist_ok=True)
     
