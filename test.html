@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 주식 포트폴리오 대시보드</title>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        body {
+            font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+            background-color: #131722; /* 다크 모드 배경 */
+            color: #d1d4dc;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        /* 반응형 그리드 레이아웃 설정 */
+        .grid-container {
+            display: grid;
+            /* 화면 크기에 맞춰 최소 400px 이상의 차트들을 자동 배치 */
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .chart-box {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📈 내 주식 포트폴리오 실시간 모니터링</h1>
+    <div class="grid-container" id="chart-container"></div>
+
+    <script>
+        // 💡 여기에 모니터링할 종목 코드를 수동으로 등록하세요.
+        // 한국 주식: KRX:종목코드 (예: KRX:005930)
+        // 미국 주식: 거래소:티커 (예: NASDAQ:AAPL, NYSE:TSM)
+        // 암호화폐: 거래소:티커 (예: BINANCE:BTCUSDT)
+        const portfolio = [
+            "NASDAQ:AAPL",   // 애플
+            "NASDAQ:TSLA",   // 테슬라
+            "NASDAQ:NVDA",   // 엔비디아
+            "KRX:005930",    // 삼성전자
+            "KRX:000660"     // SK하이닉스
+        ];
+
+        const container = document.getElementById('chart-container');
+
+        // 포트폴리오 배열을 순회하며 차트 위젯 생성
+        portfolio.forEach((symbol, index) => {
+            // 1. 차트가 들어갈 컨테이너 div 생성
+            const divId = `tv-chart-${index}`;
+            const chartDiv = document.createElement('div');
+            chartDiv.id = divId;
+            chartDiv.className = 'chart-box';
+            container.appendChild(chartDiv);
+
+            // 2. TradingView 위젯 렌더링
+            new TradingView.widget({
+                "autosize": true,        // 부모 요소(.chart-box)에 꽉 차게 설정
+                "symbol": symbol,
+                "interval": "D",         // 기본 캔들 단위 (D: 일봉, 60: 60분봉, W: 주봉 등)
+                "timezone": "Asia/Seoul",// 한국 시간 기준
+                "theme": "dark",         // 다크 모드 (라이트 모드는 "light")
+                "style": "1",            // 1: 캔들스틱, 2: 라인, 3: 면적
+                "locale": "kr",          // 한국어 UI
+                "enable_publishing": false,
+                "hide_top_toolbar": false,
+                "hide_legend": false,
+                "save_image": false,
+                "container_id": divId    // 생성한 div의 ID 매핑
+            });
+        });
+    </script>
+
+</body>
+</html>
