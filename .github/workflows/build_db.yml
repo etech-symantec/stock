@@ -1,0 +1,37 @@
+name: 🗄️ Build Stock Database
+
+on:
+  workflow_dispatch:  # GitHub 홈페이지에서 수동으로 버튼을 눌러 실행하도록 설정
+
+jobs:
+  build-db:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 생성된 JSON 파일을 저장소에 커밋하기 위한 권한
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 파이썬 환경 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 라이브러리 설치
+        run: |
+          pip install -r requirements.txt
+          pip install finance-datareader  # 명시적 설치
+
+      - name: DB 생성 스크립트 실행
+        run: python scripts/build_stock_db.py
+
+      - name: 완성된 JSON 파일 커밋 및 푸시
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/stocks.json
+          # 변경사항이 있을 때만 커밋하도록 처리
+          git diff --staged --quiet || git commit -m "🗂️ 종목 DB 자동 생성 및 업데이트"
+          git push
