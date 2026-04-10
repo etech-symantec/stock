@@ -1,75 +1,7552 @@
 [
-  {"symbol": "AAPL", "name": "Apple (애플)", "exch": "NASDAQ"},
-  {"symbol": "MSFT", "name": "Microsoft (마이크로소프트)", "exch": "NASDAQ"},
-  {"symbol": "NVDA", "name": "NVIDIA (엔비디아)", "exch": "NASDAQ"},
-  {"symbol": "TSLA", "name": "Tesla (테슬라)", "exch": "NASDAQ"},
-  {"symbol": "AMZN", "name": "Amazon (아마존)", "exch": "NASDAQ"},
-  {"symbol": "GOOGL", "name": "Alphabet Class A (구글)", "exch": "NASDAQ"},
-  {"symbol": "META", "name": "Meta Platforms (메타)", "exch": "NASDAQ"},
-  {"symbol": "TSM", "name": "TSMC (대만반도체)", "exch": "NYSE"},
-  {"symbol": "AVGO", "name": "Broadcom (브로드컴)", "exch": "NASDAQ"},
-  {"symbol": "NFLX", "name": "Netflix (넷플릭스)", "exch": "NASDAQ"},
-  {"symbol": "AMD", "name": "AMD (에이엠디)", "exch": "NASDAQ"},
-  {"symbol": "INTC", "name": "Intel (인텔)", "exch": "NASDAQ"},
-  {"symbol": "QCOM", "name": "Qualcomm (퀄컴)", "exch": "NASDAQ"},
-  {"symbol": "ARM", "name": "ARM Holdings", "exch": "NASDAQ"},
-  {"symbol": "PLTR", "name": "Palantir (팔란티어)", "exch": "NYSE"},
-  {"symbol": "SNOW", "name": "Snowflake (스노우플레이크)", "exch": "NYSE"},
-  {"symbol": "LLY", "name": "Eli Lilly (일라이릴리)", "exch": "NYSE"},
-  {"symbol": "JPM", "name": "JPMorgan Chase (JP모건)", "exch": "NYSE"},
-  {"symbol": "V", "name": "Visa (비자)", "exch": "NYSE"},
-  {"symbol": "MA", "name": "Mastercard (마스터카드)", "exch": "NYSE"},
-  {"symbol": "COST", "name": "Costco (코스트코)", "exch": "NASDAQ"},
-  {"symbol": "WMT", "name": "Walmart (월마트)", "exch": "NYSE"},
-  {"symbol": "DIS", "name": "Walt Disney (디즈니)", "exch": "NYSE"},
-  {"symbol": "KO", "name": "Coca-Cola (코카콜라)", "exch": "NYSE"},
-  {"symbol": "PEP", "name": "PepsiCo (펩시)", "exch": "NASDAQ"},
-
-  {"symbol": "SPY", "name": "SPDR S&P 500 ETF", "exch": "ETF"},
-  {"symbol": "QQQ", "name": "Invesco QQQ Trust", "exch": "ETF"},
-  {"symbol": "TQQQ", "name": "ProShares UltraPro QQQ (나스닥 3배)", "exch": "ETF"},
-  {"symbol": "SQQQ", "name": "ProShares UltraPro Short QQQ (나스닥 인버스 3배)", "exch": "ETF"},
-  {"symbol": "SOXL", "name": "Direxion Daily Semi Bull 3X (반도체 3배)", "exch": "ETF"},
-  {"symbol": "SOXS", "name": "Direxion Daily Semi Bear 3X (반도체 인버스 3배)", "exch": "ETF"},
-  {"symbol": "VOO", "name": "Vanguard S&P 500 ETF", "exch": "ETF"},
-  {"symbol": "SCHD", "name": "Schwab US Dividend Equity ETF", "exch": "ETF"},
-  {"symbol": "JEPI", "name": "JPMorgan Equity Premium Income ETF", "exch": "ETF"},
-  {"symbol": "TLT", "name": "iShares 20+ Year Treasury Bond ETF", "exch": "ETF"},
-
-  {"symbol": "005930.KS", "name": "삼성전자", "exch": "KOSPI"},
-  {"symbol": "000660.KS", "name": "SK하이닉스", "exch": "KOSPI"},
-  {"symbol": "373220.KS", "name": "LG에너지솔루션", "exch": "KOSPI"},
-  {"symbol": "207940.KS", "name": "삼성바이오로직스", "exch": "KOSPI"},
-  {"symbol": "005380.KS", "name": "현대차", "exch": "KOSPI"},
-  {"symbol": "000270.KS", "name": "기아", "exch": "KOSPI"},
-  {"symbol": "068270.KS", "name": "셀트리온", "exch": "KOSPI"},
-  {"symbol": "035420.KS", "name": "NAVER (네이버)", "exch": "KOSPI"},
-  {"symbol": "035720.KS", "name": "카카오", "exch": "KOSPI"},
-  {"symbol": "105560.KS", "name": "KB금융", "exch": "KOSPI"},
-  {"symbol": "055550.KS", "name": "신한지주", "exch": "KOSPI"},
-  {"symbol": "005490.KS", "name": "POSCO홀딩스", "exch": "KOSPI"},
-  {"symbol": "051910.KS", "name": "LG화학", "exch": "KOSPI"},
-  {"symbol": "028260.KS", "name": "삼성물산", "exch": "KOSPI"},
-  {"symbol": "032830.KS", "name": "삼성생명", "exch": "KOSPI"},
-  {"symbol": "012330.KS", "name": "현대모비스", "exch": "KOSPI"},
-  {"symbol": "066570.KS", "name": "LG전자", "exch": "KOSPI"},
-  {"symbol": "323410.KS", "name: "카카오뱅크", "exch": "KOSPI"},
-  {"symbol": "033780.KS", "name": "KT&G", "exch": "KOSPI"},
-  {"symbol": "003550.KS", "name": "LG", "exch": "KOSPI"},
-  {"symbol": "015760.KS", "name": "한국전력", "exch": "KOSPI"},
-  {"symbol": "034730.KS", "name": "SK", "exch": "KOSPI"},
-  {"symbol": "017670.KS", "name": "SK텔레콤", "exch": "KOSPI"},
-  
-  {"symbol": "247540.KQ", "name": "에코프로비엠", "exch": "KOSDAQ"},
-  {"symbol": "091990.KQ", "name": "셀트리온헬스케어", "exch": "KOSDAQ"},
-  {"symbol": "066970.KQ", "name": "엘앤에프", "exch": "KOSDAQ"},
-  {"symbol": "022100.KQ", "name": "포스코DX", "exch": "KOSDAQ"},
-  {"symbol": "028300.KQ", "name": "HLB", "exch": "KOSDAQ"},
-  {"symbol": "293490.KQ", "name": "카카오게임즈", "exch": "KOSDAQ"},
-  {"symbol": "259960.KQ", "name": "크래프톤", "exch": "KOSDAQ"},
-  {"symbol": "041510.KQ", "name": "에스엠", "exch": "KOSDAQ"},
-  
-  {"symbol": "BTC-USD", "name": "Bitcoin (비트코인)", "exch": "CRYPTO"},
-  {"symbol": "ETH-USD", "name": "Ethereum (이더리움)", "exch": "CRYPTO"},
-  {"symbol": "SOL-USD", "name": "Solana (솔라나)", "exch": "CRYPTO"}
+  {
+    "symbol": "MMM",
+    "name": "3M",
+    "exch": "US"
+  },
+  {
+    "symbol": "AOS",
+    "name": "A. O. Smith",
+    "exch": "US"
+  },
+  {
+    "symbol": "ABT",
+    "name": "Abbott Laboratories",
+    "exch": "US"
+  },
+  {
+    "symbol": "ABBV",
+    "name": "AbbVie",
+    "exch": "US"
+  },
+  {
+    "symbol": "ACN",
+    "name": "Accenture",
+    "exch": "US"
+  },
+  {
+    "symbol": "ADBE",
+    "name": "Adobe Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "AMD",
+    "name": "Advanced Micro Devices",
+    "exch": "US"
+  },
+  {
+    "symbol": "AES",
+    "name": "AES Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "AFL",
+    "name": "Aflac",
+    "exch": "US"
+  },
+  {
+    "symbol": "A",
+    "name": "Agilent Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "APD",
+    "name": "Air Products",
+    "exch": "US"
+  },
+  {
+    "symbol": "ABNB",
+    "name": "Airbnb",
+    "exch": "US"
+  },
+  {
+    "symbol": "AKAM",
+    "name": "Akamai Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "ALB",
+    "name": "Albemarle Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "ARE",
+    "name": "Alexandria Real Estate Equities",
+    "exch": "US"
+  },
+  {
+    "symbol": "ALGN",
+    "name": "Align Technology",
+    "exch": "US"
+  },
+  {
+    "symbol": "ALLE",
+    "name": "Allegion",
+    "exch": "US"
+  },
+  {
+    "symbol": "LNT",
+    "name": "Alliant Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "ALL",
+    "name": "Allstate",
+    "exch": "US"
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "Alphabet Inc. (Class A)",
+    "exch": "US"
+  },
+  {
+    "symbol": "GOOG",
+    "name": "Alphabet Inc. (Class C)",
+    "exch": "US"
+  },
+  {
+    "symbol": "MO",
+    "name": "Altria",
+    "exch": "US"
+  },
+  {
+    "symbol": "AMZN",
+    "name": "Amazon",
+    "exch": "US"
+  },
+  {
+    "symbol": "AMCR",
+    "name": "Amcor",
+    "exch": "US"
+  },
+  {
+    "symbol": "AEE",
+    "name": "Ameren",
+    "exch": "US"
+  },
+  {
+    "symbol": "AEP",
+    "name": "American Electric Power",
+    "exch": "US"
+  },
+  {
+    "symbol": "AXP",
+    "name": "American Express",
+    "exch": "US"
+  },
+  {
+    "symbol": "AIG",
+    "name": "American International Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "AMT",
+    "name": "American Tower",
+    "exch": "US"
+  },
+  {
+    "symbol": "AWK",
+    "name": "American Water Works",
+    "exch": "US"
+  },
+  {
+    "symbol": "AMP",
+    "name": "Ameriprise Financial",
+    "exch": "US"
+  },
+  {
+    "symbol": "AME",
+    "name": "Ametek",
+    "exch": "US"
+  },
+  {
+    "symbol": "AMGN",
+    "name": "Amgen",
+    "exch": "US"
+  },
+  {
+    "symbol": "APH",
+    "name": "Amphenol",
+    "exch": "US"
+  },
+  {
+    "symbol": "ADI",
+    "name": "Analog Devices",
+    "exch": "US"
+  },
+  {
+    "symbol": "AON",
+    "name": "Aon plc",
+    "exch": "US"
+  },
+  {
+    "symbol": "APA",
+    "name": "APA Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "APO",
+    "name": "Apollo Global Management",
+    "exch": "US"
+  },
+  {
+    "symbol": "AAPL",
+    "name": "Apple Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "AMAT",
+    "name": "Applied Materials",
+    "exch": "US"
+  },
+  {
+    "symbol": "APP",
+    "name": "AppLovin",
+    "exch": "US"
+  },
+  {
+    "symbol": "APTV",
+    "name": "Aptiv",
+    "exch": "US"
+  },
+  {
+    "symbol": "ACGL",
+    "name": "Arch Capital Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "ADM",
+    "name": "Archer Daniels Midland",
+    "exch": "US"
+  },
+  {
+    "symbol": "ARES",
+    "name": "Ares Management",
+    "exch": "US"
+  },
+  {
+    "symbol": "ANET",
+    "name": "Arista Networks",
+    "exch": "US"
+  },
+  {
+    "symbol": "AJG",
+    "name": "Arthur J. Gallagher & Co.",
+    "exch": "US"
+  },
+  {
+    "symbol": "AIZ",
+    "name": "Assurant",
+    "exch": "US"
+  },
+  {
+    "symbol": "T",
+    "name": "AT&T",
+    "exch": "US"
+  },
+  {
+    "symbol": "ATO",
+    "name": "Atmos Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "ADSK",
+    "name": "Autodesk",
+    "exch": "US"
+  },
+  {
+    "symbol": "ADP",
+    "name": "Automatic Data Processing",
+    "exch": "US"
+  },
+  {
+    "symbol": "AZO",
+    "name": "AutoZone",
+    "exch": "US"
+  },
+  {
+    "symbol": "AVB",
+    "name": "AvalonBay Communities",
+    "exch": "US"
+  },
+  {
+    "symbol": "AVY",
+    "name": "Avery Dennison",
+    "exch": "US"
+  },
+  {
+    "symbol": "AXON",
+    "name": "Axon Enterprise",
+    "exch": "US"
+  },
+  {
+    "symbol": "BKR",
+    "name": "Baker Hughes",
+    "exch": "US"
+  },
+  {
+    "symbol": "BALL",
+    "name": "Ball Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "BAC",
+    "name": "Bank of America",
+    "exch": "US"
+  },
+  {
+    "symbol": "BAX",
+    "name": "Baxter International",
+    "exch": "US"
+  },
+  {
+    "symbol": "BDX",
+    "name": "Becton Dickinson",
+    "exch": "US"
+  },
+  {
+    "symbol": "BRKB",
+    "name": "Berkshire Hathaway",
+    "exch": "US"
+  },
+  {
+    "symbol": "BBY",
+    "name": "Best Buy",
+    "exch": "US"
+  },
+  {
+    "symbol": "TECH",
+    "name": "Bio-Techne",
+    "exch": "US"
+  },
+  {
+    "symbol": "BIIB",
+    "name": "Biogen",
+    "exch": "US"
+  },
+  {
+    "symbol": "BLK",
+    "name": "BlackRock",
+    "exch": "US"
+  },
+  {
+    "symbol": "BX",
+    "name": "Blackstone Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "XYZ",
+    "name": "Block, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "BK",
+    "name": "BNY Mellon",
+    "exch": "US"
+  },
+  {
+    "symbol": "BA",
+    "name": "Boeing",
+    "exch": "US"
+  },
+  {
+    "symbol": "BKNG",
+    "name": "Booking Holdings",
+    "exch": "US"
+  },
+  {
+    "symbol": "BSX",
+    "name": "Boston Scientific",
+    "exch": "US"
+  },
+  {
+    "symbol": "BMY",
+    "name": "Bristol Myers Squibb",
+    "exch": "US"
+  },
+  {
+    "symbol": "AVGO",
+    "name": "Broadcom",
+    "exch": "US"
+  },
+  {
+    "symbol": "BR",
+    "name": "Broadridge Financial Solutions",
+    "exch": "US"
+  },
+  {
+    "symbol": "BRO",
+    "name": "Brown & Brown",
+    "exch": "US"
+  },
+  {
+    "symbol": "BFB",
+    "name": "Brown–Forman",
+    "exch": "US"
+  },
+  {
+    "symbol": "BLDR",
+    "name": "Builders FirstSource",
+    "exch": "US"
+  },
+  {
+    "symbol": "BG",
+    "name": "Bunge Global",
+    "exch": "US"
+  },
+  {
+    "symbol": "BXP",
+    "name": "BXP, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "CHRW",
+    "name": "C.H. Robinson",
+    "exch": "US"
+  },
+  {
+    "symbol": "CDNS",
+    "name": "Cadence Design Systems",
+    "exch": "US"
+  },
+  {
+    "symbol": "CPT",
+    "name": "Camden Property Trust",
+    "exch": "US"
+  },
+  {
+    "symbol": "CPB",
+    "name": "Campbell's Company (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "COF",
+    "name": "Capital One",
+    "exch": "US"
+  },
+  {
+    "symbol": "CAH",
+    "name": "Cardinal Health",
+    "exch": "US"
+  },
+  {
+    "symbol": "CCL",
+    "name": "Carnival",
+    "exch": "US"
+  },
+  {
+    "symbol": "CARR",
+    "name": "Carrier Global",
+    "exch": "US"
+  },
+  {
+    "symbol": "CVNA",
+    "name": "Carvana",
+    "exch": "US"
+  },
+  {
+    "symbol": "CASY",
+    "name": "Casey's",
+    "exch": "US"
+  },
+  {
+    "symbol": "CAT",
+    "name": "Caterpillar Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "CBOE",
+    "name": "Cboe Global Markets",
+    "exch": "US"
+  },
+  {
+    "symbol": "CBRE",
+    "name": "CBRE Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "CDW",
+    "name": "CDW Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "COR",
+    "name": "Cencora",
+    "exch": "US"
+  },
+  {
+    "symbol": "CNC",
+    "name": "Centene Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "CNP",
+    "name": "CenterPoint Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "CF",
+    "name": "CF Industries",
+    "exch": "US"
+  },
+  {
+    "symbol": "CRL",
+    "name": "Charles River Laboratories",
+    "exch": "US"
+  },
+  {
+    "symbol": "SCHW",
+    "name": "Charles Schwab Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "CHTR",
+    "name": "Charter Communications",
+    "exch": "US"
+  },
+  {
+    "symbol": "CVX",
+    "name": "Chevron Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "CMG",
+    "name": "Chipotle Mexican Grill",
+    "exch": "US"
+  },
+  {
+    "symbol": "CB",
+    "name": "Chubb Limited",
+    "exch": "US"
+  },
+  {
+    "symbol": "CHD",
+    "name": "Church & Dwight",
+    "exch": "US"
+  },
+  {
+    "symbol": "CIEN",
+    "name": "Ciena",
+    "exch": "US"
+  },
+  {
+    "symbol": "CI",
+    "name": "Cigna",
+    "exch": "US"
+  },
+  {
+    "symbol": "CINF",
+    "name": "Cincinnati Financial",
+    "exch": "US"
+  },
+  {
+    "symbol": "CTAS",
+    "name": "Cintas",
+    "exch": "US"
+  },
+  {
+    "symbol": "CSCO",
+    "name": "Cisco",
+    "exch": "US"
+  },
+  {
+    "symbol": "C",
+    "name": "Citigroup",
+    "exch": "US"
+  },
+  {
+    "symbol": "CFG",
+    "name": "Citizens Financial Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "CLX",
+    "name": "Clorox",
+    "exch": "US"
+  },
+  {
+    "symbol": "CME",
+    "name": "CME Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "CMS",
+    "name": "CMS Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "KO",
+    "name": "Coca-Cola Company (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "CTSH",
+    "name": "Cognizant",
+    "exch": "US"
+  },
+  {
+    "symbol": "COHR",
+    "name": "Coherent Corp.",
+    "exch": "US"
+  },
+  {
+    "symbol": "COIN",
+    "name": "Coinbase",
+    "exch": "US"
+  },
+  {
+    "symbol": "CL",
+    "name": "Colgate-Palmolive",
+    "exch": "US"
+  },
+  {
+    "symbol": "CMCSA",
+    "name": "Comcast",
+    "exch": "US"
+  },
+  {
+    "symbol": "FIX",
+    "name": "Comfort Systems USA",
+    "exch": "US"
+  },
+  {
+    "symbol": "CAG",
+    "name": "Conagra Brands",
+    "exch": "US"
+  },
+  {
+    "symbol": "COP",
+    "name": "ConocoPhillips",
+    "exch": "US"
+  },
+  {
+    "symbol": "ED",
+    "name": "Consolidated Edison",
+    "exch": "US"
+  },
+  {
+    "symbol": "STZ",
+    "name": "Constellation Brands",
+    "exch": "US"
+  },
+  {
+    "symbol": "CEG",
+    "name": "Constellation Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "COO",
+    "name": "Cooper Companies (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "CPRT",
+    "name": "Copart",
+    "exch": "US"
+  },
+  {
+    "symbol": "GLW",
+    "name": "Corning Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "CPAY",
+    "name": "Corpay",
+    "exch": "US"
+  },
+  {
+    "symbol": "CTVA",
+    "name": "Corteva",
+    "exch": "US"
+  },
+  {
+    "symbol": "CSGP",
+    "name": "CoStar Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "COST",
+    "name": "Costco",
+    "exch": "US"
+  },
+  {
+    "symbol": "CTRA",
+    "name": "Coterra",
+    "exch": "US"
+  },
+  {
+    "symbol": "CRH",
+    "name": "CRH plc",
+    "exch": "US"
+  },
+  {
+    "symbol": "CRWD",
+    "name": "CrowdStrike",
+    "exch": "US"
+  },
+  {
+    "symbol": "CCI",
+    "name": "Crown Castle",
+    "exch": "US"
+  },
+  {
+    "symbol": "CSX",
+    "name": "CSX Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "CMI",
+    "name": "Cummins",
+    "exch": "US"
+  },
+  {
+    "symbol": "CVS",
+    "name": "CVS Health",
+    "exch": "US"
+  },
+  {
+    "symbol": "DHR",
+    "name": "Danaher Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "DRI",
+    "name": "Darden Restaurants",
+    "exch": "US"
+  },
+  {
+    "symbol": "DDOG",
+    "name": "Datadog",
+    "exch": "US"
+  },
+  {
+    "symbol": "DVA",
+    "name": "DaVita",
+    "exch": "US"
+  },
+  {
+    "symbol": "DECK",
+    "name": "Deckers Brands",
+    "exch": "US"
+  },
+  {
+    "symbol": "DE",
+    "name": "Deere & Company",
+    "exch": "US"
+  },
+  {
+    "symbol": "DELL",
+    "name": "Dell Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "DAL",
+    "name": "Delta Air Lines",
+    "exch": "US"
+  },
+  {
+    "symbol": "DVN",
+    "name": "Devon Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "DXCM",
+    "name": "Dexcom",
+    "exch": "US"
+  },
+  {
+    "symbol": "FANG",
+    "name": "Diamondback Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "DLR",
+    "name": "Digital Realty",
+    "exch": "US"
+  },
+  {
+    "symbol": "DG",
+    "name": "Dollar General",
+    "exch": "US"
+  },
+  {
+    "symbol": "DLTR",
+    "name": "Dollar Tree",
+    "exch": "US"
+  },
+  {
+    "symbol": "D",
+    "name": "Dominion Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "DPZ",
+    "name": "Domino's",
+    "exch": "US"
+  },
+  {
+    "symbol": "DASH",
+    "name": "DoorDash",
+    "exch": "US"
+  },
+  {
+    "symbol": "DOV",
+    "name": "Dover Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "DOW",
+    "name": "Dow Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "DHI",
+    "name": "D. R. Horton",
+    "exch": "US"
+  },
+  {
+    "symbol": "DTE",
+    "name": "DTE Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "DUK",
+    "name": "Duke Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "DD",
+    "name": "DuPont",
+    "exch": "US"
+  },
+  {
+    "symbol": "ETN",
+    "name": "Eaton Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "EBAY",
+    "name": "eBay Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "SATS",
+    "name": "EchoStar",
+    "exch": "US"
+  },
+  {
+    "symbol": "ECL",
+    "name": "Ecolab",
+    "exch": "US"
+  },
+  {
+    "symbol": "EIX",
+    "name": "Edison International",
+    "exch": "US"
+  },
+  {
+    "symbol": "EW",
+    "name": "Edwards Lifesciences",
+    "exch": "US"
+  },
+  {
+    "symbol": "EA",
+    "name": "Electronic Arts",
+    "exch": "US"
+  },
+  {
+    "symbol": "ELV",
+    "name": "Elevance Health",
+    "exch": "US"
+  },
+  {
+    "symbol": "EME",
+    "name": "Emcor",
+    "exch": "US"
+  },
+  {
+    "symbol": "EMR",
+    "name": "Emerson Electric",
+    "exch": "US"
+  },
+  {
+    "symbol": "ETR",
+    "name": "Entergy",
+    "exch": "US"
+  },
+  {
+    "symbol": "EOG",
+    "name": "EOG Resources",
+    "exch": "US"
+  },
+  {
+    "symbol": "EPAM",
+    "name": "EPAM Systems",
+    "exch": "US"
+  },
+  {
+    "symbol": "EQT",
+    "name": "EQT Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "EFX",
+    "name": "Equifax",
+    "exch": "US"
+  },
+  {
+    "symbol": "EQIX",
+    "name": "Equinix",
+    "exch": "US"
+  },
+  {
+    "symbol": "EQR",
+    "name": "Equity Residential",
+    "exch": "US"
+  },
+  {
+    "symbol": "ERIE",
+    "name": "Erie Indemnity",
+    "exch": "US"
+  },
+  {
+    "symbol": "ESS",
+    "name": "Essex Property Trust",
+    "exch": "US"
+  },
+  {
+    "symbol": "EL",
+    "name": "Estée Lauder Companies (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "EG",
+    "name": "Everest Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "EVRG",
+    "name": "Evergy",
+    "exch": "US"
+  },
+  {
+    "symbol": "ES",
+    "name": "Eversource Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "EXC",
+    "name": "Exelon",
+    "exch": "US"
+  },
+  {
+    "symbol": "EXE",
+    "name": "Expand Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "EXPE",
+    "name": "Expedia Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "EXPD",
+    "name": "Expeditors International",
+    "exch": "US"
+  },
+  {
+    "symbol": "EXR",
+    "name": "Extra Space Storage",
+    "exch": "US"
+  },
+  {
+    "symbol": "XOM",
+    "name": "ExxonMobil",
+    "exch": "US"
+  },
+  {
+    "symbol": "FFIV",
+    "name": "F5, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "FDS",
+    "name": "FactSet",
+    "exch": "US"
+  },
+  {
+    "symbol": "FICO",
+    "name": "Fair Isaac",
+    "exch": "US"
+  },
+  {
+    "symbol": "FAST",
+    "name": "Fastenal",
+    "exch": "US"
+  },
+  {
+    "symbol": "FRT",
+    "name": "Federal Realty Investment Trust",
+    "exch": "US"
+  },
+  {
+    "symbol": "FDX",
+    "name": "FedEx",
+    "exch": "US"
+  },
+  {
+    "symbol": "FIS",
+    "name": "Fidelity National Information Services",
+    "exch": "US"
+  },
+  {
+    "symbol": "FITB",
+    "name": "Fifth Third Bancorp",
+    "exch": "US"
+  },
+  {
+    "symbol": "FSLR",
+    "name": "First Solar",
+    "exch": "US"
+  },
+  {
+    "symbol": "FE",
+    "name": "FirstEnergy",
+    "exch": "US"
+  },
+  {
+    "symbol": "FISV",
+    "name": "Fiserv",
+    "exch": "US"
+  },
+  {
+    "symbol": "F",
+    "name": "Ford Motor Company",
+    "exch": "US"
+  },
+  {
+    "symbol": "FTNT",
+    "name": "Fortinet",
+    "exch": "US"
+  },
+  {
+    "symbol": "FTV",
+    "name": "Fortive",
+    "exch": "US"
+  },
+  {
+    "symbol": "FOXA",
+    "name": "Fox Corporation (Class A)",
+    "exch": "US"
+  },
+  {
+    "symbol": "FOX",
+    "name": "Fox Corporation (Class B)",
+    "exch": "US"
+  },
+  {
+    "symbol": "BEN",
+    "name": "Franklin Resources",
+    "exch": "US"
+  },
+  {
+    "symbol": "FCX",
+    "name": "Freeport-McMoRan",
+    "exch": "US"
+  },
+  {
+    "symbol": "GRMN",
+    "name": "Garmin",
+    "exch": "US"
+  },
+  {
+    "symbol": "IT",
+    "name": "Gartner",
+    "exch": "US"
+  },
+  {
+    "symbol": "GE",
+    "name": "GE Aerospace",
+    "exch": "US"
+  },
+  {
+    "symbol": "GEHC",
+    "name": "GE HealthCare",
+    "exch": "US"
+  },
+  {
+    "symbol": "GEV",
+    "name": "GE Vernova",
+    "exch": "US"
+  },
+  {
+    "symbol": "GEN",
+    "name": "Gen Digital",
+    "exch": "US"
+  },
+  {
+    "symbol": "GNRC",
+    "name": "Generac",
+    "exch": "US"
+  },
+  {
+    "symbol": "GD",
+    "name": "General Dynamics",
+    "exch": "US"
+  },
+  {
+    "symbol": "GIS",
+    "name": "General Mills",
+    "exch": "US"
+  },
+  {
+    "symbol": "GM",
+    "name": "General Motors",
+    "exch": "US"
+  },
+  {
+    "symbol": "GPC",
+    "name": "Genuine Parts Company",
+    "exch": "US"
+  },
+  {
+    "symbol": "GILD",
+    "name": "Gilead Sciences",
+    "exch": "US"
+  },
+  {
+    "symbol": "GPN",
+    "name": "Global Payments",
+    "exch": "US"
+  },
+  {
+    "symbol": "GL",
+    "name": "Globe Life",
+    "exch": "US"
+  },
+  {
+    "symbol": "GDDY",
+    "name": "GoDaddy",
+    "exch": "US"
+  },
+  {
+    "symbol": "GS",
+    "name": "Goldman Sachs",
+    "exch": "US"
+  },
+  {
+    "symbol": "HAL",
+    "name": "Halliburton",
+    "exch": "US"
+  },
+  {
+    "symbol": "HIG",
+    "name": "Hartford (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "HAS",
+    "name": "Hasbro",
+    "exch": "US"
+  },
+  {
+    "symbol": "HCA",
+    "name": "HCA Healthcare",
+    "exch": "US"
+  },
+  {
+    "symbol": "DOC",
+    "name": "Healthpeak Properties",
+    "exch": "US"
+  },
+  {
+    "symbol": "HSIC",
+    "name": "Henry Schein",
+    "exch": "US"
+  },
+  {
+    "symbol": "HSY",
+    "name": "Hershey Company (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "HPE",
+    "name": "Hewlett Packard Enterprise",
+    "exch": "US"
+  },
+  {
+    "symbol": "HLT",
+    "name": "Hilton Worldwide",
+    "exch": "US"
+  },
+  {
+    "symbol": "HD",
+    "name": "Home Depot (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "HON",
+    "name": "Honeywell",
+    "exch": "US"
+  },
+  {
+    "symbol": "HRL",
+    "name": "Hormel Foods",
+    "exch": "US"
+  },
+  {
+    "symbol": "HST",
+    "name": "Host Hotels & Resorts",
+    "exch": "US"
+  },
+  {
+    "symbol": "HWM",
+    "name": "Howmet Aerospace",
+    "exch": "US"
+  },
+  {
+    "symbol": "HPQ",
+    "name": "HP Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "HUBB",
+    "name": "Hubbell Incorporated",
+    "exch": "US"
+  },
+  {
+    "symbol": "HUM",
+    "name": "Humana",
+    "exch": "US"
+  },
+  {
+    "symbol": "HBAN",
+    "name": "Huntington Bancshares",
+    "exch": "US"
+  },
+  {
+    "symbol": "HII",
+    "name": "Huntington Ingalls Industries",
+    "exch": "US"
+  },
+  {
+    "symbol": "IBM",
+    "name": "IBM",
+    "exch": "US"
+  },
+  {
+    "symbol": "IEX",
+    "name": "IDEX Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "IDXX",
+    "name": "Idexx Laboratories",
+    "exch": "US"
+  },
+  {
+    "symbol": "ITW",
+    "name": "Illinois Tool Works",
+    "exch": "US"
+  },
+  {
+    "symbol": "INCY",
+    "name": "Incyte",
+    "exch": "US"
+  },
+  {
+    "symbol": "IR",
+    "name": "Ingersoll Rand",
+    "exch": "US"
+  },
+  {
+    "symbol": "PODD",
+    "name": "Insulet Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "INTC",
+    "name": "Intel",
+    "exch": "US"
+  },
+  {
+    "symbol": "IBKR",
+    "name": "Interactive Brokers",
+    "exch": "US"
+  },
+  {
+    "symbol": "ICE",
+    "name": "Intercontinental Exchange",
+    "exch": "US"
+  },
+  {
+    "symbol": "IFF",
+    "name": "International Flavors & Fragrances",
+    "exch": "US"
+  },
+  {
+    "symbol": "IP",
+    "name": "International Paper",
+    "exch": "US"
+  },
+  {
+    "symbol": "INTU",
+    "name": "Intuit",
+    "exch": "US"
+  },
+  {
+    "symbol": "ISRG",
+    "name": "Intuitive Surgical",
+    "exch": "US"
+  },
+  {
+    "symbol": "IVZ",
+    "name": "Invesco",
+    "exch": "US"
+  },
+  {
+    "symbol": "INVH",
+    "name": "Invitation Homes",
+    "exch": "US"
+  },
+  {
+    "symbol": "IQV",
+    "name": "IQVIA",
+    "exch": "US"
+  },
+  {
+    "symbol": "IRM",
+    "name": "Iron Mountain",
+    "exch": "US"
+  },
+  {
+    "symbol": "JBHT",
+    "name": "J.B. Hunt",
+    "exch": "US"
+  },
+  {
+    "symbol": "JBL",
+    "name": "Jabil",
+    "exch": "US"
+  },
+  {
+    "symbol": "JKHY",
+    "name": "Jack Henry & Associates",
+    "exch": "US"
+  },
+  {
+    "symbol": "J",
+    "name": "Jacobs Solutions",
+    "exch": "US"
+  },
+  {
+    "symbol": "JNJ",
+    "name": "Johnson & Johnson",
+    "exch": "US"
+  },
+  {
+    "symbol": "JCI",
+    "name": "Johnson Controls",
+    "exch": "US"
+  },
+  {
+    "symbol": "JPM",
+    "name": "JPMorgan Chase",
+    "exch": "US"
+  },
+  {
+    "symbol": "KVUE",
+    "name": "Kenvue",
+    "exch": "US"
+  },
+  {
+    "symbol": "KDP",
+    "name": "Keurig Dr Pepper",
+    "exch": "US"
+  },
+  {
+    "symbol": "KEY",
+    "name": "KeyCorp",
+    "exch": "US"
+  },
+  {
+    "symbol": "KEYS",
+    "name": "Keysight Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "KMB",
+    "name": "Kimberly-Clark",
+    "exch": "US"
+  },
+  {
+    "symbol": "KIM",
+    "name": "Kimco Realty",
+    "exch": "US"
+  },
+  {
+    "symbol": "KMI",
+    "name": "Kinder Morgan",
+    "exch": "US"
+  },
+  {
+    "symbol": "KKR",
+    "name": "KKR & Co.",
+    "exch": "US"
+  },
+  {
+    "symbol": "KLAC",
+    "name": "KLA Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "KHC",
+    "name": "Kraft Heinz",
+    "exch": "US"
+  },
+  {
+    "symbol": "KR",
+    "name": "Kroger",
+    "exch": "US"
+  },
+  {
+    "symbol": "LHX",
+    "name": "L3Harris",
+    "exch": "US"
+  },
+  {
+    "symbol": "LH",
+    "name": "Labcorp",
+    "exch": "US"
+  },
+  {
+    "symbol": "LRCX",
+    "name": "Lam Research",
+    "exch": "US"
+  },
+  {
+    "symbol": "LVS",
+    "name": "Las Vegas Sands",
+    "exch": "US"
+  },
+  {
+    "symbol": "LDOS",
+    "name": "Leidos",
+    "exch": "US"
+  },
+  {
+    "symbol": "LEN",
+    "name": "Lennar",
+    "exch": "US"
+  },
+  {
+    "symbol": "LII",
+    "name": "Lennox International",
+    "exch": "US"
+  },
+  {
+    "symbol": "LLY",
+    "name": "Lilly (Eli)",
+    "exch": "US"
+  },
+  {
+    "symbol": "LIN",
+    "name": "Linde plc",
+    "exch": "US"
+  },
+  {
+    "symbol": "LYV",
+    "name": "Live Nation Entertainment",
+    "exch": "US"
+  },
+  {
+    "symbol": "LMT",
+    "name": "Lockheed Martin",
+    "exch": "US"
+  },
+  {
+    "symbol": "L",
+    "name": "Loews Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "LOW",
+    "name": "Lowe's",
+    "exch": "US"
+  },
+  {
+    "symbol": "LULU",
+    "name": "Lululemon Athletica",
+    "exch": "US"
+  },
+  {
+    "symbol": "LITE",
+    "name": "Lumentum",
+    "exch": "US"
+  },
+  {
+    "symbol": "LYB",
+    "name": "LyondellBasell",
+    "exch": "US"
+  },
+  {
+    "symbol": "MTB",
+    "name": "M&T Bank",
+    "exch": "US"
+  },
+  {
+    "symbol": "MPC",
+    "name": "Marathon Petroleum",
+    "exch": "US"
+  },
+  {
+    "symbol": "MAR",
+    "name": "Marriott International",
+    "exch": "US"
+  },
+  {
+    "symbol": "MRSH",
+    "name": "Marsh McLennan",
+    "exch": "US"
+  },
+  {
+    "symbol": "MLM",
+    "name": "Martin Marietta Materials",
+    "exch": "US"
+  },
+  {
+    "symbol": "MAS",
+    "name": "Masco",
+    "exch": "US"
+  },
+  {
+    "symbol": "MA",
+    "name": "Mastercard",
+    "exch": "US"
+  },
+  {
+    "symbol": "MKC",
+    "name": "McCormick & Company",
+    "exch": "US"
+  },
+  {
+    "symbol": "MCD",
+    "name": "McDonald's",
+    "exch": "US"
+  },
+  {
+    "symbol": "MCK",
+    "name": "McKesson Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "MDT",
+    "name": "Medtronic",
+    "exch": "US"
+  },
+  {
+    "symbol": "MRK",
+    "name": "Merck & Co.",
+    "exch": "US"
+  },
+  {
+    "symbol": "META",
+    "name": "Meta Platforms",
+    "exch": "US"
+  },
+  {
+    "symbol": "MET",
+    "name": "MetLife",
+    "exch": "US"
+  },
+  {
+    "symbol": "MTD",
+    "name": "Mettler Toledo",
+    "exch": "US"
+  },
+  {
+    "symbol": "MGM",
+    "name": "MGM Resorts",
+    "exch": "US"
+  },
+  {
+    "symbol": "MCHP",
+    "name": "Microchip Technology",
+    "exch": "US"
+  },
+  {
+    "symbol": "MU",
+    "name": "Micron Technology",
+    "exch": "US"
+  },
+  {
+    "symbol": "MSFT",
+    "name": "Microsoft",
+    "exch": "US"
+  },
+  {
+    "symbol": "MAA",
+    "name": "Mid-America Apartment Communities",
+    "exch": "US"
+  },
+  {
+    "symbol": "MRNA",
+    "name": "Moderna",
+    "exch": "US"
+  },
+  {
+    "symbol": "TAP",
+    "name": "Molson Coors Beverage Company",
+    "exch": "US"
+  },
+  {
+    "symbol": "MDLZ",
+    "name": "Mondelez International",
+    "exch": "US"
+  },
+  {
+    "symbol": "MPWR",
+    "name": "Monolithic Power Systems",
+    "exch": "US"
+  },
+  {
+    "symbol": "MNST",
+    "name": "Monster Beverage",
+    "exch": "US"
+  },
+  {
+    "symbol": "MCO",
+    "name": "Moody's Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "MS",
+    "name": "Morgan Stanley",
+    "exch": "US"
+  },
+  {
+    "symbol": "MOS",
+    "name": "Mosaic Company (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "MSI",
+    "name": "Motorola Solutions",
+    "exch": "US"
+  },
+  {
+    "symbol": "MSCI",
+    "name": "MSCI Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "NDAQ",
+    "name": "Nasdaq, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "NTAP",
+    "name": "NetApp",
+    "exch": "US"
+  },
+  {
+    "symbol": "NFLX",
+    "name": "Netflix",
+    "exch": "US"
+  },
+  {
+    "symbol": "NEM",
+    "name": "Newmont",
+    "exch": "US"
+  },
+  {
+    "symbol": "NWSA",
+    "name": "News Corp (Class A)",
+    "exch": "US"
+  },
+  {
+    "symbol": "NWS",
+    "name": "News Corp (Class B)",
+    "exch": "US"
+  },
+  {
+    "symbol": "NEE",
+    "name": "NextEra Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "NKE",
+    "name": "Nike, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "NI",
+    "name": "NiSource",
+    "exch": "US"
+  },
+  {
+    "symbol": "NDSN",
+    "name": "Nordson Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "NSC",
+    "name": "Norfolk Southern",
+    "exch": "US"
+  },
+  {
+    "symbol": "NTRS",
+    "name": "Northern Trust",
+    "exch": "US"
+  },
+  {
+    "symbol": "NOC",
+    "name": "Northrop Grumman",
+    "exch": "US"
+  },
+  {
+    "symbol": "NCLH",
+    "name": "Norwegian Cruise Line Holdings",
+    "exch": "US"
+  },
+  {
+    "symbol": "NRG",
+    "name": "NRG Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "NUE",
+    "name": "Nucor",
+    "exch": "US"
+  },
+  {
+    "symbol": "NVDA",
+    "name": "Nvidia",
+    "exch": "US"
+  },
+  {
+    "symbol": "NVR",
+    "name": "NVR, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "NXPI",
+    "name": "NXP Semiconductors",
+    "exch": "US"
+  },
+  {
+    "symbol": "ORLY",
+    "name": "O’Reilly Automotive",
+    "exch": "US"
+  },
+  {
+    "symbol": "OXY",
+    "name": "Occidental Petroleum",
+    "exch": "US"
+  },
+  {
+    "symbol": "ODFL",
+    "name": "Old Dominion",
+    "exch": "US"
+  },
+  {
+    "symbol": "OMC",
+    "name": "Omnicom Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "ON",
+    "name": "ON Semiconductor",
+    "exch": "US"
+  },
+  {
+    "symbol": "OKE",
+    "name": "Oneok",
+    "exch": "US"
+  },
+  {
+    "symbol": "ORCL",
+    "name": "Oracle Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "OTIS",
+    "name": "Otis Worldwide",
+    "exch": "US"
+  },
+  {
+    "symbol": "PCAR",
+    "name": "Paccar",
+    "exch": "US"
+  },
+  {
+    "symbol": "PKG",
+    "name": "Packaging Corporation of America",
+    "exch": "US"
+  },
+  {
+    "symbol": "PLTR",
+    "name": "Palantir Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "PANW",
+    "name": "Palo Alto Networks",
+    "exch": "US"
+  },
+  {
+    "symbol": "PSKY",
+    "name": "Paramount Skydance Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "PH",
+    "name": "Parker Hannifin",
+    "exch": "US"
+  },
+  {
+    "symbol": "PAYX",
+    "name": "Paychex",
+    "exch": "US"
+  },
+  {
+    "symbol": "PYPL",
+    "name": "PayPal",
+    "exch": "US"
+  },
+  {
+    "symbol": "PNR",
+    "name": "Pentair",
+    "exch": "US"
+  },
+  {
+    "symbol": "PEP",
+    "name": "PepsiCo",
+    "exch": "US"
+  },
+  {
+    "symbol": "PFE",
+    "name": "Pfizer",
+    "exch": "US"
+  },
+  {
+    "symbol": "PCG",
+    "name": "PG&E Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "PM",
+    "name": "Philip Morris International",
+    "exch": "US"
+  },
+  {
+    "symbol": "PSX",
+    "name": "Phillips 66",
+    "exch": "US"
+  },
+  {
+    "symbol": "PNW",
+    "name": "Pinnacle West Capital",
+    "exch": "US"
+  },
+  {
+    "symbol": "PNC",
+    "name": "PNC Financial Services",
+    "exch": "US"
+  },
+  {
+    "symbol": "POOL",
+    "name": "Pool Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "PPG",
+    "name": "PPG Industries",
+    "exch": "US"
+  },
+  {
+    "symbol": "PPL",
+    "name": "PPL Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "PFG",
+    "name": "Principal Financial Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "PG",
+    "name": "Procter & Gamble",
+    "exch": "US"
+  },
+  {
+    "symbol": "PGR",
+    "name": "Progressive Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "PLD",
+    "name": "Prologis",
+    "exch": "US"
+  },
+  {
+    "symbol": "PRU",
+    "name": "Prudential Financial",
+    "exch": "US"
+  },
+  {
+    "symbol": "PEG",
+    "name": "Public Service Enterprise Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "PTC",
+    "name": "PTC Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "PSA",
+    "name": "Public Storage",
+    "exch": "US"
+  },
+  {
+    "symbol": "PHM",
+    "name": "PulteGroup",
+    "exch": "US"
+  },
+  {
+    "symbol": "PWR",
+    "name": "Quanta Services",
+    "exch": "US"
+  },
+  {
+    "symbol": "QCOM",
+    "name": "Qualcomm",
+    "exch": "US"
+  },
+  {
+    "symbol": "DGX",
+    "name": "Quest Diagnostics",
+    "exch": "US"
+  },
+  {
+    "symbol": "Q",
+    "name": "Qnity Electronics",
+    "exch": "US"
+  },
+  {
+    "symbol": "RL",
+    "name": "Ralph Lauren Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "RJF",
+    "name": "Raymond James Financial",
+    "exch": "US"
+  },
+  {
+    "symbol": "RTX",
+    "name": "RTX Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "O",
+    "name": "Realty Income",
+    "exch": "US"
+  },
+  {
+    "symbol": "REG",
+    "name": "Regency Centers",
+    "exch": "US"
+  },
+  {
+    "symbol": "REGN",
+    "name": "Regeneron Pharmaceuticals",
+    "exch": "US"
+  },
+  {
+    "symbol": "RF",
+    "name": "Regions Financial Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "RSG",
+    "name": "Republic Services",
+    "exch": "US"
+  },
+  {
+    "symbol": "RMD",
+    "name": "ResMed",
+    "exch": "US"
+  },
+  {
+    "symbol": "RVTY",
+    "name": "Revvity",
+    "exch": "US"
+  },
+  {
+    "symbol": "HOOD",
+    "name": "Robinhood Markets",
+    "exch": "US"
+  },
+  {
+    "symbol": "ROK",
+    "name": "Rockwell Automation",
+    "exch": "US"
+  },
+  {
+    "symbol": "ROL",
+    "name": "Rollins, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "ROP",
+    "name": "Roper Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "ROST",
+    "name": "Ross Stores",
+    "exch": "US"
+  },
+  {
+    "symbol": "RCL",
+    "name": "Royal Caribbean Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "SPGI",
+    "name": "S&P Global",
+    "exch": "US"
+  },
+  {
+    "symbol": "CRM",
+    "name": "Salesforce",
+    "exch": "US"
+  },
+  {
+    "symbol": "SNDK",
+    "name": "Sandisk",
+    "exch": "US"
+  },
+  {
+    "symbol": "SBAC",
+    "name": "SBA Communications",
+    "exch": "US"
+  },
+  {
+    "symbol": "SLB",
+    "name": "Schlumberger",
+    "exch": "US"
+  },
+  {
+    "symbol": "STX",
+    "name": "Seagate Technology",
+    "exch": "US"
+  },
+  {
+    "symbol": "SRE",
+    "name": "Sempra",
+    "exch": "US"
+  },
+  {
+    "symbol": "NOW",
+    "name": "ServiceNow",
+    "exch": "US"
+  },
+  {
+    "symbol": "SHW",
+    "name": "Sherwin-Williams",
+    "exch": "US"
+  },
+  {
+    "symbol": "SPG",
+    "name": "Simon Property Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "SWKS",
+    "name": "Skyworks Solutions",
+    "exch": "US"
+  },
+  {
+    "symbol": "SJM",
+    "name": "J.M. Smucker Company (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "SW",
+    "name": "Smurfit Westrock",
+    "exch": "US"
+  },
+  {
+    "symbol": "SNA",
+    "name": "Snap-on",
+    "exch": "US"
+  },
+  {
+    "symbol": "SOLV",
+    "name": "Solventum",
+    "exch": "US"
+  },
+  {
+    "symbol": "SO",
+    "name": "Southern Company",
+    "exch": "US"
+  },
+  {
+    "symbol": "LUV",
+    "name": "Southwest Airlines",
+    "exch": "US"
+  },
+  {
+    "symbol": "SWK",
+    "name": "Stanley Black & Decker",
+    "exch": "US"
+  },
+  {
+    "symbol": "SBUX",
+    "name": "Starbucks",
+    "exch": "US"
+  },
+  {
+    "symbol": "STT",
+    "name": "State Street Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "STLD",
+    "name": "Steel Dynamics",
+    "exch": "US"
+  },
+  {
+    "symbol": "STE",
+    "name": "Steris",
+    "exch": "US"
+  },
+  {
+    "symbol": "SYK",
+    "name": "Stryker Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "SMCI",
+    "name": "Supermicro",
+    "exch": "US"
+  },
+  {
+    "symbol": "SYF",
+    "name": "Synchrony Financial",
+    "exch": "US"
+  },
+  {
+    "symbol": "SNPS",
+    "name": "Synopsys",
+    "exch": "US"
+  },
+  {
+    "symbol": "SYY",
+    "name": "Sysco",
+    "exch": "US"
+  },
+  {
+    "symbol": "TMUS",
+    "name": "T-Mobile US",
+    "exch": "US"
+  },
+  {
+    "symbol": "TROW",
+    "name": "T. Rowe Price",
+    "exch": "US"
+  },
+  {
+    "symbol": "TTWO",
+    "name": "Take-Two Interactive",
+    "exch": "US"
+  },
+  {
+    "symbol": "TPR",
+    "name": "Tapestry, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "TRGP",
+    "name": "Targa Resources",
+    "exch": "US"
+  },
+  {
+    "symbol": "TGT",
+    "name": "Target Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "TEL",
+    "name": "TE Connectivity",
+    "exch": "US"
+  },
+  {
+    "symbol": "TDY",
+    "name": "Teledyne Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "TER",
+    "name": "Teradyne",
+    "exch": "US"
+  },
+  {
+    "symbol": "TSLA",
+    "name": "Tesla, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "TXN",
+    "name": "Texas Instruments",
+    "exch": "US"
+  },
+  {
+    "symbol": "TPL",
+    "name": "Texas Pacific Land Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "TXT",
+    "name": "Textron",
+    "exch": "US"
+  },
+  {
+    "symbol": "TMO",
+    "name": "Thermo Fisher Scientific",
+    "exch": "US"
+  },
+  {
+    "symbol": "TJX",
+    "name": "TJX Companies",
+    "exch": "US"
+  },
+  {
+    "symbol": "TKO",
+    "name": "TKO Group Holdings",
+    "exch": "US"
+  },
+  {
+    "symbol": "TTD",
+    "name": "Trade Desk (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "TSCO",
+    "name": "Tractor Supply",
+    "exch": "US"
+  },
+  {
+    "symbol": "TT",
+    "name": "Trane Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "TDG",
+    "name": "TransDigm Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "TRV",
+    "name": "Travelers Companies (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "TRMB",
+    "name": "Trimble Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "TFC",
+    "name": "Truist Financial",
+    "exch": "US"
+  },
+  {
+    "symbol": "TYL",
+    "name": "Tyler Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "TSN",
+    "name": "Tyson Foods",
+    "exch": "US"
+  },
+  {
+    "symbol": "USB",
+    "name": "U.S. Bancorp",
+    "exch": "US"
+  },
+  {
+    "symbol": "UBER",
+    "name": "Uber",
+    "exch": "US"
+  },
+  {
+    "symbol": "UDR",
+    "name": "UDR, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "ULTA",
+    "name": "Ulta Beauty",
+    "exch": "US"
+  },
+  {
+    "symbol": "UNP",
+    "name": "Union Pacific Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "UAL",
+    "name": "United Airlines Holdings",
+    "exch": "US"
+  },
+  {
+    "symbol": "UPS",
+    "name": "United Parcel Service",
+    "exch": "US"
+  },
+  {
+    "symbol": "URI",
+    "name": "United Rentals",
+    "exch": "US"
+  },
+  {
+    "symbol": "UNH",
+    "name": "UnitedHealth Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "UHS",
+    "name": "Universal Health Services",
+    "exch": "US"
+  },
+  {
+    "symbol": "VLO",
+    "name": "Valero Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "VTR",
+    "name": "Ventas",
+    "exch": "US"
+  },
+  {
+    "symbol": "VLTO",
+    "name": "Veralto",
+    "exch": "US"
+  },
+  {
+    "symbol": "VRSN",
+    "name": "Verisign",
+    "exch": "US"
+  },
+  {
+    "symbol": "VRSK",
+    "name": "Verisk Analytics",
+    "exch": "US"
+  },
+  {
+    "symbol": "VZ",
+    "name": "Verizon",
+    "exch": "US"
+  },
+  {
+    "symbol": "VRTX",
+    "name": "Vertex Pharmaceuticals",
+    "exch": "US"
+  },
+  {
+    "symbol": "VRT",
+    "name": "Vertiv",
+    "exch": "US"
+  },
+  {
+    "symbol": "VTRS",
+    "name": "Viatris",
+    "exch": "US"
+  },
+  {
+    "symbol": "VICI",
+    "name": "Vici Properties",
+    "exch": "US"
+  },
+  {
+    "symbol": "V",
+    "name": "Visa Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "VST",
+    "name": "Vistra Corp.",
+    "exch": "US"
+  },
+  {
+    "symbol": "VMC",
+    "name": "Vulcan Materials Company",
+    "exch": "US"
+  },
+  {
+    "symbol": "WRB",
+    "name": "W. R. Berkley Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "GWW",
+    "name": "W. W. Grainger",
+    "exch": "US"
+  },
+  {
+    "symbol": "WAB",
+    "name": "Wabtec",
+    "exch": "US"
+  },
+  {
+    "symbol": "WMT",
+    "name": "Walmart",
+    "exch": "US"
+  },
+  {
+    "symbol": "DIS",
+    "name": "Walt Disney Company (The)",
+    "exch": "US"
+  },
+  {
+    "symbol": "WBD",
+    "name": "Warner Bros. Discovery",
+    "exch": "US"
+  },
+  {
+    "symbol": "WM",
+    "name": "Waste Management",
+    "exch": "US"
+  },
+  {
+    "symbol": "WAT",
+    "name": "Waters Corporation",
+    "exch": "US"
+  },
+  {
+    "symbol": "WEC",
+    "name": "WEC Energy Group",
+    "exch": "US"
+  },
+  {
+    "symbol": "WFC",
+    "name": "Wells Fargo",
+    "exch": "US"
+  },
+  {
+    "symbol": "WELL",
+    "name": "Welltower",
+    "exch": "US"
+  },
+  {
+    "symbol": "WST",
+    "name": "West Pharmaceutical Services",
+    "exch": "US"
+  },
+  {
+    "symbol": "WDC",
+    "name": "Western Digital",
+    "exch": "US"
+  },
+  {
+    "symbol": "WY",
+    "name": "Weyerhaeuser",
+    "exch": "US"
+  },
+  {
+    "symbol": "WSM",
+    "name": "Williams-Sonoma, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "WMB",
+    "name": "Williams Companies",
+    "exch": "US"
+  },
+  {
+    "symbol": "WTW",
+    "name": "Willis Towers Watson",
+    "exch": "US"
+  },
+  {
+    "symbol": "WDAY",
+    "name": "Workday, Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "WYNN",
+    "name": "Wynn Resorts",
+    "exch": "US"
+  },
+  {
+    "symbol": "XEL",
+    "name": "Xcel Energy",
+    "exch": "US"
+  },
+  {
+    "symbol": "XYL",
+    "name": "Xylem Inc.",
+    "exch": "US"
+  },
+  {
+    "symbol": "YUM",
+    "name": "Yum! Brands",
+    "exch": "US"
+  },
+  {
+    "symbol": "ZBRA",
+    "name": "Zebra Technologies",
+    "exch": "US"
+  },
+  {
+    "symbol": "ZBH",
+    "name": "Zimmer Biomet",
+    "exch": "US"
+  },
+  {
+    "symbol": "ZTS",
+    "name": "Zoetis",
+    "exch": "US"
+  },
+  {
+    "symbol": "005930.KS",
+    "name": "삼성전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000660.KS",
+    "name": "SK하이닉스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005935.KS",
+    "name": "삼성전자우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005380.KS",
+    "name": "현대차",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "373220.KS",
+    "name": "LG에너지솔루션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "012450.KS",
+    "name": "한화에어로스페이스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "402340.KS",
+    "name": "SK스퀘어",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "207940.KS",
+    "name": "삼성바이오로직스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "034020.KS",
+    "name": "두산에너빌리티",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "105560.KS",
+    "name": "KB금융",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000270.KS",
+    "name": "기아",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "329180.KS",
+    "name": "HD현대중공업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "028260.KS",
+    "name": "삼성물산",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "032830.KS",
+    "name": "삼성생명",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "055550.KS",
+    "name": "신한지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "068270.KS",
+    "name": "셀트리온",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009150.KS",
+    "name": "삼성전기",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006400.KS",
+    "name": "삼성SDI",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "042660.KS",
+    "name": "한화오션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006800.KS",
+    "name": "미래에셋증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "012330.KS",
+    "name": "현대모비스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "267260.KS",
+    "name": "HD현대일렉트릭",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "086790.KS",
+    "name": "하나금융지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010130.KS",
+    "name": "고려아연",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035420.KS",
+    "name": "NAVER",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005490.KS",
+    "name": "POSCO홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009540.KS",
+    "name": "HD한국조선해양",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "015760.KS",
+    "name": "한국전력",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "298040.KS",
+    "name": "효성중공업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "042700.KS",
+    "name": "한미반도체",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "034730.KS",
+    "name": "SK",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "272210.KS",
+    "name": "한화시스템",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "051910.KS",
+    "name": "LG화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010140.KS",
+    "name": "삼성중공업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "316140.KS",
+    "name": "우리금융지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010120.KS",
+    "name": "LS ELECTRIC",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "064350.KS",
+    "name": "현대로템",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000810.KS",
+    "name": "삼성화재",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035720.KS",
+    "name": "카카오",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000150.KS",
+    "name": "두산",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "096770.KS",
+    "name": "SK이노베이션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "011200.KS",
+    "name": "HMM",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "079550.KS",
+    "name": "LIG넥스원",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000720.KS",
+    "name": "현대건설",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "017670.KS",
+    "name": "SK텔레콤",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "267250.KS",
+    "name": "HD현대",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "086520.KQ",
+    "name": "에코프로",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "247540.KQ",
+    "name": "에코프로비엠",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "138040.KS",
+    "name": "메리츠금융지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "047810.KS",
+    "name": "한국항공우주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "196170.KQ",
+    "name": "알테오젠",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "003670.KS",
+    "name": "포스코퓨처엠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "066570.KS",
+    "name": "LG전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "033780.KS",
+    "name": "KT&G",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "024110.KS",
+    "name": "기업은행",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "086280.KS",
+    "name": "현대글로비스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "030200.KS",
+    "name": "KT",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "278470.KS",
+    "name": "에이피알",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003550.KS",
+    "name": "LG",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0126Z0.KS",
+    "name": "삼성에피스홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010950.KS",
+    "name": "S-Oil",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "071050.KS",
+    "name": "한국금융지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "047050.KS",
+    "name": "포스코인터내셔널",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005940.KS",
+    "name": "NH투자증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "323410.KS",
+    "name": "카카오뱅크",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "039490.KS",
+    "name": "키움증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000250.KQ",
+    "name": "삼천당제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005830.KS",
+    "name": "DB손해보험",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "018260.KS",
+    "name": "삼성에스디에스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "277810.KQ",
+    "name": "레인보우로보틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "259960.KS",
+    "name": "크래프톤",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "352820.KS",
+    "name": "하이브",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "307950.KS",
+    "name": "현대오토에버",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "028050.KS",
+    "name": "삼성E&A",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "047040.KS",
+    "name": "대우건설",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "016360.KS",
+    "name": "삼성증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000880.KS",
+    "name": "한화",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003230.KS",
+    "name": "삼양식품",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006260.KS",
+    "name": "LS",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003490.KS",
+    "name": "대한항공",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "011070.KS",
+    "name": "LG이노텍",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "298380.KQ",
+    "name": "에이비엘바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "058470.KQ",
+    "name": "리노공업",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "007660.KS",
+    "name": "이수페타시스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005387.KS",
+    "name": "현대차2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "443060.KS",
+    "name": "HD현대마린솔루션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "950160.KQ",
+    "name": "코오롱티슈진",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "161390.KS",
+    "name": "한국타이어앤테크놀로지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "180640.KS",
+    "name": "한진칼",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "267270.KS",
+    "name": "HD건설기계",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "090430.KS",
+    "name": "아모레퍼시픽",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "326030.KS",
+    "name": "SK바이오팜",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "028300.KQ",
+    "name": "HLB",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "066970.KS",
+    "name": "엘앤에프",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "032640.KS",
+    "name": "LG유플러스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000100.KS",
+    "name": "유한양행",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "377300.KS",
+    "name": "카카오페이",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009830.KS",
+    "name": "한화솔루션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "141080.KQ",
+    "name": "리가켐바이오",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "078930.KS",
+    "name": "GS",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "241560.KS",
+    "name": "두산밥캣",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "128940.KS",
+    "name": "한미약품",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "029780.KS",
+    "name": "삼성카드",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "052690.KS",
+    "name": "한전기술",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "034220.KS",
+    "name": "LG디스플레이",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "087010.KQ",
+    "name": "펩트론",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064400.KS",
+    "name": "LG씨엔에스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "240810.KQ",
+    "name": "원익IPS",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "001040.KS",
+    "name": "CJ",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001440.KS",
+    "name": "대한전선",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "175330.KS",
+    "name": "JB금융지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "454910.KS",
+    "name": "두산로보틱스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "138930.KS",
+    "name": "BNK금융지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005385.KS",
+    "name": "현대차우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "039030.KQ",
+    "name": "이오테크닉스",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "095340.KQ",
+    "name": "ISC",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "088980.KS",
+    "name": "맥쿼리인프라",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004020.KS",
+    "name": "현대제철",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "021240.KS",
+    "name": "코웨이",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "310210.KQ",
+    "name": "보로노이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "271560.KS",
+    "name": "오리온",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "450080.KS",
+    "name": "에코프로머티",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "036570.KS",
+    "name": "엔씨소프트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "022100.KS",
+    "name": "포스코DX",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "062040.KS",
+    "name": "산일전기",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "002380.KS",
+    "name": "KCC",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "214370.KQ",
+    "name": "케어젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "353200.KS",
+    "name": "대덕전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "088350.KS",
+    "name": "한화생명",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000990.KS",
+    "name": "DB하이텍",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "251270.KS",
+    "name": "넷마블",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "018880.KS",
+    "name": "한온시스템",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "011170.KS",
+    "name": "롯데케미칼",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "103590.KS",
+    "name": "일진전기",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "082740.KS",
+    "name": "한화엔진",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "051900.KS",
+    "name": "LG생활건강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "403870.KQ",
+    "name": "HPSP",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "017800.KS",
+    "name": "현대엘리베이터",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010060.KS",
+    "name": "OCI홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "489790.KS",
+    "name": "한화비전",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "375500.KS",
+    "name": "DL이앤씨",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "111770.KS",
+    "name": "영원무역",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "011790.KS",
+    "name": "SKC",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035250.KS",
+    "name": "강원랜드",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "012510.KS",
+    "name": "더존비즈온",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "108490.KQ",
+    "name": "로보티즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032820.KQ",
+    "name": "우리기술",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "097950.KS",
+    "name": "CJ제일제당",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "263750.KQ",
+    "name": "펄어비스",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "214150.KQ",
+    "name": "클래시스",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "011780.KS",
+    "name": "금호석유화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "012750.KS",
+    "name": "에스원",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "439260.KS",
+    "name": "대한조선",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "036460.KS",
+    "name": "한국가스공사",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "319400.KQ",
+    "name": "현대무벡스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "031210.KS",
+    "name": "서울보증보험",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001720.KS",
+    "name": "신영증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "226950.KQ",
+    "name": "올릭스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "357780.KQ",
+    "name": "솔브레인",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "302440.KS",
+    "name": "SK바이오사이언스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004170.KS",
+    "name": "신세계",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "347850.KQ",
+    "name": "디앤디파마텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006360.KS",
+    "name": "GS건설",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "043260.KQ",
+    "name": "성호전자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "014680.KS",
+    "name": "한솔케미칼",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "214450.KQ",
+    "name": "파마리서치",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "145020.KQ",
+    "name": "휴젤",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "0009K0.KQ",
+    "name": "에임드바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "023530.KS",
+    "name": "롯데쇼핑",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004990.KS",
+    "name": "롯데지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "237690.KQ",
+    "name": "에스티팜",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "036930.KQ",
+    "name": "주성엔지니어링",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "009970.KS",
+    "name": "영원무역홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "085620.KS",
+    "name": "미래에셋생명",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "139130.KS",
+    "name": "iM금융지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "457190.KS",
+    "name": "이수스페셜티케미컬",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "084370.KQ",
+    "name": "유진테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "028670.KS",
+    "name": "팬오션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "112610.KS",
+    "name": "씨에스윈드",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "083650.KQ",
+    "name": "비에이치아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "440110.KQ",
+    "name": "파두",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "103140.KS",
+    "name": "풍산",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "026960.KS",
+    "name": "동서",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010170.KQ",
+    "name": "대한광통신",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "00680K.KS",
+    "name": "미래에셋증권2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "071970.KS",
+    "name": "HD현대마린엔진",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001450.KS",
+    "name": "현대해상",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "064760.KQ",
+    "name": "티씨케이",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "178320.KQ",
+    "name": "서진시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "008930.KS",
+    "name": "한미사이언스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "140410.KQ",
+    "name": "메지온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005850.KS",
+    "name": "에스엘",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "476830.KQ",
+    "name": "알지노믹스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "257720.KQ",
+    "name": "실리콘투",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "139480.KS",
+    "name": "이마트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "051600.KS",
+    "name": "한전KPS",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "020150.KS",
+    "name": "롯데에너지머티리얼즈",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "383220.KS",
+    "name": "F&F",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005290.KQ",
+    "name": "동진쎄미켐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "222800.KQ",
+    "name": "심텍",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "279570.KS",
+    "name": "케이뱅크",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004800.KS",
+    "name": "효성",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009420.KS",
+    "name": "한올바이오파마",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "068760.KQ",
+    "name": "셀트리온제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "218410.KQ",
+    "name": "RFHIC",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000120.KS",
+    "name": "CJ대한통운",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "120110.KS",
+    "name": "코오롱인더",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "058610.KQ",
+    "name": "에스피지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "017960.KS",
+    "name": "한국카본",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "204320.KS",
+    "name": "HL만도",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "336260.KS",
+    "name": "두산퓨얼셀",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000240.KS",
+    "name": "한국앤컴퍼니",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "319660.KQ",
+    "name": "피에스케이",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "097230.KS",
+    "name": "HJ중공업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003690.KS",
+    "name": "코리안리",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004370.KS",
+    "name": "농심",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "031980.KQ",
+    "name": "피에스케이홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "282330.KS",
+    "name": "BGF리테일",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001430.KS",
+    "name": "세아베스틸지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "018670.KS",
+    "name": "SK가스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "081660.KS",
+    "name": "미스토홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "030000.KS",
+    "name": "제일기획",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "483650.KS",
+    "name": "달바글로벌",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "030530.KQ",
+    "name": "원익홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000155.KS",
+    "name": "두산우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "011210.KS",
+    "name": "현대위아",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035900.KQ",
+    "name": "JYP Ent.",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "002790.KS",
+    "name": "아모레퍼시픽홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "192820.KS",
+    "name": "코스맥스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "023590.KS",
+    "name": "다우기술",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005440.KS",
+    "name": "현대지에프홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "101490.KQ",
+    "name": "에스앤에스텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007340.KS",
+    "name": "DN오토모티브",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "067310.KQ",
+    "name": "하나마이크론",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "082920.KQ",
+    "name": "비츠로셀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "039200.KQ",
+    "name": "오스코텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "475150.KS",
+    "name": "SK이터닉스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "298020.KS",
+    "name": "효성티앤씨",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "008770.KS",
+    "name": "호텔신라",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "089030.KQ",
+    "name": "테크윙",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "041510.KQ",
+    "name": "에스엠",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "347700.KQ",
+    "name": "스피어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "395400.KS",
+    "name": "SK리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "462870.KS",
+    "name": "시프트업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "078600.KQ",
+    "name": "대주전자재료",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007810.KS",
+    "name": "코리아써키트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003540.KS",
+    "name": "대신증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "361610.KS",
+    "name": "SK아이이테크놀로지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "322000.KS",
+    "name": "HD현대에너지솔루션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "098460.KQ",
+    "name": "고영",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003570.KS",
+    "name": "SNT다이내믹스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "161890.KS",
+    "name": "한국콜마",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "007070.KS",
+    "name": "GS리테일",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "038500.KQ",
+    "name": "삼표시멘트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001120.KS",
+    "name": "LX인터내셔널",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "475830.KQ",
+    "name": "오름테라퓨틱",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "069960.KS",
+    "name": "현대백화점",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005070.KS",
+    "name": "코스모신소재",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "073240.KS",
+    "name": "금호타이어",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000500.KS",
+    "name": "가온전선",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "069620.KS",
+    "name": "대웅제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "290650.KQ",
+    "name": "엘앤씨바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "140860.KQ",
+    "name": "파크시스템스",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "131970.KQ",
+    "name": "두산테스나",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "006040.KS",
+    "name": "동원산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006280.KS",
+    "name": "녹십자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "323280.KQ",
+    "name": "태성",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "099320.KQ",
+    "name": "쎄트렉아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "012630.KS",
+    "name": "HDC",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "085660.KQ",
+    "name": "차바이오텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "491000.KQ",
+    "name": "리브스메드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "100090.KS",
+    "name": "SK오션플랜트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "232140.KQ",
+    "name": "와이씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "095610.KQ",
+    "name": "테스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003380.KQ",
+    "name": "하림지주",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "065350.KQ",
+    "name": "신성델타테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060370.KQ",
+    "name": "LS마린솔루션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003530.KS",
+    "name": "한화투자증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "437730.KQ",
+    "name": "삼현",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "294870.KS",
+    "name": "IPARK현대산업개발",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "100790.KQ",
+    "name": "미래에셋벤처투자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "030610.KS",
+    "name": "교보증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001800.KS",
+    "name": "오리온홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "007310.KS",
+    "name": "오뚜기",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "127120.KQ",
+    "name": "제이에스링크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "020560.KS",
+    "name": "아시아나항공",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "376900.KQ",
+    "name": "로킷헬스케어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "082640.KS",
+    "name": "동양생명",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "080220.KQ",
+    "name": "제주반도체",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "034230.KS",
+    "name": "파라다이스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "183300.KQ",
+    "name": "코미코",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "330590.KS",
+    "name": "롯데리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000210.KS",
+    "name": "DL",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "229640.KS",
+    "name": "LS에코에너지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "195940.KQ",
+    "name": "HK이노엔",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "032350.KS",
+    "name": "롯데관광개발",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "417200.KQ",
+    "name": "LS머트리얼즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "048410.KQ",
+    "name": "현대바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "077970.KS",
+    "name": "STX엔진",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "213420.KQ",
+    "name": "덕산네오룩스",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "004000.KS",
+    "name": "롯데정밀화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "281740.KQ",
+    "name": "레이크머티리얼즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "131290.KQ",
+    "name": "티에스이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003240.KS",
+    "name": "태광산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003090.KS",
+    "name": "대웅",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "090710.KQ",
+    "name": "휴림로봇",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "051915.KS",
+    "name": "LG화학우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "115180.KQ",
+    "name": "큐리언트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "100840.KS",
+    "name": "SNT에너지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "397030.KQ",
+    "name": "에이프릴바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "445680.KQ",
+    "name": "큐리옥스바이오시스템즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "300720.KS",
+    "name": "한일시멘트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "181710.KS",
+    "name": "NHN",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "096530.KQ",
+    "name": "씨젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "189300.KQ",
+    "name": "인텔리안테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000080.KS",
+    "name": "하이트진로",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "388210.KQ",
+    "name": "씨엠티엑스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "415640.KS",
+    "name": "KB발해인프라",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "007390.KQ",
+    "name": "네이처셀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "023160.KQ",
+    "name": "태광",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "124500.KQ",
+    "name": "아이티센글로벌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "185750.KS",
+    "name": "종근당",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "166090.KQ",
+    "name": "하나머티리얼즈",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "082270.KQ",
+    "name": "젬백스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001740.KS",
+    "name": "SK네트웍스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "456160.KQ",
+    "name": "지투지바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "089860.KS",
+    "name": "롯데렌탈",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "137400.KQ",
+    "name": "피엔티",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "035760.KQ",
+    "name": "CJ ENM",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "000815.KS",
+    "name": "삼성화재우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "160190.KQ",
+    "name": "하이젠알앤엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "086450.KQ",
+    "name": "동국제약",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "365550.KS",
+    "name": "ESR켄달스퀘어리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "093370.KS",
+    "name": "후성",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "036540.KQ",
+    "name": "SFA반도체",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "089970.KQ",
+    "name": "브이엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032500.KQ",
+    "name": "케이엠더블유",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "466100.KQ",
+    "name": "클로봇",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "036830.KQ",
+    "name": "솔브레인홀딩스",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "005300.KS",
+    "name": "롯데칠성",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "293490.KQ",
+    "name": "카카오게임즈",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "000670.KS",
+    "name": "영풍",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "328130.KQ",
+    "name": "루닛",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "420770.KQ",
+    "name": "기가비스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "280360.KS",
+    "name": "롯데웰푸드",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "490470.KQ",
+    "name": "세미파이브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "014620.KQ",
+    "name": "성광벤드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "052020.KQ",
+    "name": "에스티큐브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "050890.KQ",
+    "name": "쏠리드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "484870.KS",
+    "name": "엠앤씨솔루션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "027360.KQ",
+    "name": "아주IB투자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006120.KS",
+    "name": "SK디스커버리",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "281820.KS",
+    "name": "케이씨텍",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "192080.KS",
+    "name": "더블유게임즈",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006650.KS",
+    "name": "대한유화",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "253450.KQ",
+    "name": "스튜디오드래곤",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "036530.KS",
+    "name": "SNT홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "388720.KQ",
+    "name": "유일로보틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "075580.KS",
+    "name": "세진중공업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "056190.KQ",
+    "name": "에스에프에이",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "451800.KS",
+    "name": "한화리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005690.KS",
+    "name": "파미셀",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "174900.KQ",
+    "name": "앱클론",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "137310.KS",
+    "name": "에스디바이오센서",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005880.KS",
+    "name": "대한해운",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "295310.KQ",
+    "name": "에이치브이엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "079900.KS",
+    "name": "전진건설로봇",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "071055.KS",
+    "name": "한국금융지주우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "285130.KS",
+    "name": "SK케미칼",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "192400.KS",
+    "name": "쿠쿠홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003470.KS",
+    "name": "유안타증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003030.KS",
+    "name": "세아제강지주",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "122870.KQ",
+    "name": "와이지엔터테인먼트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "298050.KS",
+    "name": "HS효성첨단소재",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "476060.KQ",
+    "name": "온코닉테라퓨틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "00088K.KS",
+    "name": "한화3우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "204270.KQ",
+    "name": "제이앤티씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009450.KS",
+    "name": "경동나비엔",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "195870.KS",
+    "name": "해성디에스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "222080.KQ",
+    "name": "씨아이에스",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "057050.KS",
+    "name": "현대홈쇼핑",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009240.KS",
+    "name": "한샘",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "161580.KQ",
+    "name": "필옵틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064960.KS",
+    "name": "SNT모티브",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "032190.KQ",
+    "name": "다우데이타",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "066575.KS",
+    "name": "LG전자우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "044490.KQ",
+    "name": "태웅",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006730.KQ",
+    "name": "서부T&D",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "358570.KQ",
+    "name": "지아이이노베이션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "071320.KS",
+    "name": "지역난방공사",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003160.KS",
+    "name": "디아이",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "499790.KS",
+    "name": "GS피앤엘",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "056080.KQ",
+    "name": "유진로봇",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "030190.KS",
+    "name": "NICE평가정보",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001510.KS",
+    "name": "SK증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "248070.KS",
+    "name": "솔루엠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010780.KS",
+    "name": "아이에스동서",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "171090.KQ",
+    "name": "선익시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "052400.KQ",
+    "name": "코나아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "249420.KS",
+    "name": "일동제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "241710.KQ",
+    "name": "코스메카코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "372320.KQ",
+    "name": "큐로셀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "036810.KQ",
+    "name": "에프에스티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "121600.KQ",
+    "name": "나노신소재",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "004490.KS",
+    "name": "세방전지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003850.KS",
+    "name": "보령",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "317450.KS",
+    "name": "명인제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006110.KS",
+    "name": "삼아알미늄",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "108320.KS",
+    "name": "LX세미콘",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "456040.KS",
+    "name": "OCI",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "074600.KQ",
+    "name": "원익QnC",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "187660.KQ",
+    "name": "페니트리움바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "389470.KQ",
+    "name": "인벤티지랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005090.KS",
+    "name": "SGC에너지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "348370.KQ",
+    "name": "엔켐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002020.KS",
+    "name": "코오롱",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "365340.KQ",
+    "name": "성일하이텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001270.KS",
+    "name": "부국증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "078160.KQ",
+    "name": "메디포스트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003280.KS",
+    "name": "흥아해운",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "327260.KQ",
+    "name": "RF머트리얼즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "090460.KS",
+    "name": "비에이치",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "496320.KS",
+    "name": "본시스템즈",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "079160.KS",
+    "name": "CJ CGV",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "225570.KQ",
+    "name": "넥슨게임즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "011930.KS",
+    "name": "신성이엔지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "033100.KQ",
+    "name": "제룡전기",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003620.KS",
+    "name": "KG모빌리티",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000370.KS",
+    "name": "한화손해보험",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "033500.KQ",
+    "name": "동성화인텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025540.KS",
+    "name": "한국단자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "348210.KQ",
+    "name": "넥스틴",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "033240.KS",
+    "name": "자화전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009520.KQ",
+    "name": "포스코엠텍",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "114090.KS",
+    "name": "GKL",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001060.KS",
+    "name": "JW중외제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "014820.KS",
+    "name": "동원시스템즈",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "368770.KQ",
+    "name": "파이버프로",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003000.KS",
+    "name": "부광약품",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "086900.KQ",
+    "name": "메디톡스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "376300.KQ",
+    "name": "디어유",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007700.KS",
+    "name": "F&F홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "00104K.KS",
+    "name": "CJ4우(전환)",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "356860.KQ",
+    "name": "티엘비",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002350.KS",
+    "name": "넥센타이어",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "102940.KQ",
+    "name": "코오롱생명과학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "214320.KS",
+    "name": "이노션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "126340.KQ",
+    "name": "비나텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "033790.KQ",
+    "name": "피노",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "024850.KQ",
+    "name": "HLB이노베이션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "093050.KS",
+    "name": "LF",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "493280.KQ",
+    "name": "아이엠바이오로직스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001680.KS",
+    "name": "대상",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "025980.KQ",
+    "name": "아난티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "069260.KS",
+    "name": "TKG휴켐스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "102710.KQ",
+    "name": "이엔에프테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "293940.KS",
+    "name": "신한알파리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "486990.KQ",
+    "name": "노타",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "399720.KQ",
+    "name": "가온칩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005180.KS",
+    "name": "빙그레",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "348340.KQ",
+    "name": "뉴로메카",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "112040.KQ",
+    "name": "위메이드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "214430.KQ",
+    "name": "아이쓰리시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "200710.KQ",
+    "name": "에이디테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "475960.KQ",
+    "name": "토모큐브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "067160.KQ",
+    "name": "SOOP",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "060250.KQ",
+    "name": "NHN KCP",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "015750.KQ",
+    "name": "성우하이텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "053800.KQ",
+    "name": "안랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "178920.KS",
+    "name": "PI첨단소재",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "336370.KS",
+    "name": "솔루스첨단소재",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000400.KS",
+    "name": "롯데손해보험",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "425420.KQ",
+    "name": "티에프이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "253590.KQ",
+    "name": "네오셈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005810.KS",
+    "name": "풍산홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "058650.KS",
+    "name": "세아홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001500.KS",
+    "name": "현대차증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "008730.KS",
+    "name": "율촌화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "084110.KQ",
+    "name": "휴온스글로벌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001820.KS",
+    "name": "삼화콘덴서",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "017940.KS",
+    "name": "E1",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "002960.KS",
+    "name": "한국쉘석유",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "460930.KQ",
+    "name": "현대힘스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "278280.KQ",
+    "name": "천보",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005250.KS",
+    "name": "녹십자홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "094800.KS",
+    "name": "맵스리얼티",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "336570.KQ",
+    "name": "원텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002840.KS",
+    "name": "미원상사",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "039130.KS",
+    "name": "하나투어",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003545.KS",
+    "name": "대신증권우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "031330.KQ",
+    "name": "에스에이엠티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "468530.KQ",
+    "name": "프로티나",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "046890.KQ",
+    "name": "서울반도체",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "001570.KS",
+    "name": "금양",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "042000.KQ",
+    "name": "카페24",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "383310.KQ",
+    "name": "에코프로에이치엔",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "272290.KQ",
+    "name": "이녹스첨단소재",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "268280.KS",
+    "name": "미원에스씨",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "383800.KS",
+    "name": "LX홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "041960.KQ",
+    "name": "코미팜",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002240.KS",
+    "name": "고려제강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000640.KS",
+    "name": "동아쏘시오홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006380.KS",
+    "name": "카프로",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009155.KS",
+    "name": "삼성전기우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "161000.KS",
+    "name": "애경케미칼",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "017900.KS",
+    "name": "광전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "053610.KQ",
+    "name": "프로텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060280.KQ",
+    "name": "큐렉소",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005420.KS",
+    "name": "코스모화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "064260.KQ",
+    "name": "다날",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009410.KS",
+    "name": "태영건설",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "130660.KS",
+    "name": "한전산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "083450.KQ",
+    "name": "GST",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "252990.KQ",
+    "name": "샘씨엔에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "458870.KQ",
+    "name": "씨어스테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "287840.KQ",
+    "name": "인투셀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "271940.KS",
+    "name": "일진하이솔루스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "217590.KS",
+    "name": "티엠씨",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "090360.KQ",
+    "name": "로보스타",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "033640.KQ",
+    "name": "네패스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002030.KS",
+    "name": "아세아",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "211050.KQ",
+    "name": "인카금융서비스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "094170.KQ",
+    "name": "동운아나텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "047920.KQ",
+    "name": "HLB제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "138490.KS",
+    "name": "코오롱ENP",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "099190.KQ",
+    "name": "아이센스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "393890.KQ",
+    "name": "더블유씨피",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "016380.KS",
+    "name": "KG스틸",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "077360.KQ",
+    "name": "덕산하이메탈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0120G0.KS",
+    "name": "삼양바이오팜",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "199800.KQ",
+    "name": "툴젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "016610.KS",
+    "name": "DB증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "019170.KS",
+    "name": "신풍제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010820.KS",
+    "name": "퍼스텍",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "014830.KS",
+    "name": "유니드",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "045100.KQ",
+    "name": "한양이엔지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "950210.KS",
+    "name": "프레스티지바이오파마",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "025320.KQ",
+    "name": "시노펙스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "119850.KQ",
+    "name": "지엔씨에너지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "251970.KQ",
+    "name": "펌텍코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "018290.KQ",
+    "name": "브이티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "389650.KQ",
+    "name": "넥스트바이오메디컬",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005389.KS",
+    "name": "현대차3우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "041190.KQ",
+    "name": "우리기술투자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025900.KQ",
+    "name": "동화기업",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "448730.KS",
+    "name": "삼성FN리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004690.KS",
+    "name": "삼천리",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "284740.KS",
+    "name": "쿠쿠홈시스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "104830.KQ",
+    "name": "원익머트리얼즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "424870.KQ",
+    "name": "이뮨온시아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003300.KS",
+    "name": "한일홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000070.KS",
+    "name": "삼양홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "122640.KQ",
+    "name": "예스티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "448900.KQ",
+    "name": "한국피아이엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "453340.KS",
+    "name": "현대그린푸드",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "215600.KQ",
+    "name": "신라젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "020000.KS",
+    "name": "한섬",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "460860.KS",
+    "name": "동국제강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "095660.KQ",
+    "name": "네오위즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "016590.KS",
+    "name": "신대양제지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "013030.KQ",
+    "name": "하이록코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009900.KS",
+    "name": "명신산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "138080.KQ",
+    "name": "오이솔루션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "093320.KQ",
+    "name": "케이아이엔엑스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "377740.KS",
+    "name": "바이오노트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "067630.KQ",
+    "name": "HLB생명과학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "488900.KQ",
+    "name": "비츠로넥스텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "098070.KQ",
+    "name": "한텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001530.KS",
+    "name": "DI동일",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "230360.KQ",
+    "name": "에코마케팅",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006220.KS",
+    "name": "제주은행",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "090435.KS",
+    "name": "아모레퍼시픽우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "484590.KQ",
+    "name": "삼양컴텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "101160.KQ",
+    "name": "월덱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "027410.KS",
+    "name": "BGF",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "089010.KQ",
+    "name": "켐트로닉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "034310.KS",
+    "name": "NICE",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "381970.KS",
+    "name": "케이카",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "206650.KQ",
+    "name": "유바이오로직스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "029530.KS",
+    "name": "신도리코",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "030520.KQ",
+    "name": "한글과컴퓨터",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "0082N0.KQ",
+    "name": "카나프테라퓨틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "039440.KQ",
+    "name": "에스티아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "125490.KQ",
+    "name": "한라캐스트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "019210.KQ",
+    "name": "와이지-원",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "180400.KQ",
+    "name": "DXVX",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "036620.KQ",
+    "name": "감성코퍼레이션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "059090.KQ",
+    "name": "미코",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "145990.KS",
+    "name": "삼양사",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "069540.KQ",
+    "name": "빛과전자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "101930.KQ",
+    "name": "인화정공",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "033160.KQ",
+    "name": "엠케이전자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006910.KQ",
+    "name": "보성파워텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "452260.KS",
+    "name": "한화갤러리아",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "079370.KQ",
+    "name": "제우스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005945.KS",
+    "name": "NH투자증권우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "037460.KQ",
+    "name": "삼지전자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001200.KS",
+    "name": "유진투자증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "107640.KQ",
+    "name": "한중엔시에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "017810.KS",
+    "name": "풀무원",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "034950.KQ",
+    "name": "한국기업평가",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "105840.KS",
+    "name": "우진",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "215200.KQ",
+    "name": "메가스터디교육",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "105630.KS",
+    "name": "한세실업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "008060.KS",
+    "name": "대덕",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "114810.KQ",
+    "name": "한솔아이원스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "357120.KS",
+    "name": "코람코라이프인프라리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "376270.KQ",
+    "name": "HEM파마",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "004700.KS",
+    "name": "조광피혁",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "168360.KQ",
+    "name": "펨트론",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "042520.KQ",
+    "name": "한스바이오메드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "900290.KQ",
+    "name": "GRT",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "072710.KS",
+    "name": "농심홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "354320.KQ",
+    "name": "알멕",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "192650.KS",
+    "name": "드림텍",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "145720.KS",
+    "name": "덴티움",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "306200.KS",
+    "name": "세아제강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "015360.KS",
+    "name": "INVENI",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "091700.KQ",
+    "name": "파트론",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "016800.KS",
+    "name": "퍼시스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "031430.KS",
+    "name": "신세계인터내셔날",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "002710.KS",
+    "name": "TCC스틸",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005610.KS",
+    "name": "SPC삼립",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "092790.KS",
+    "name": "넥스틸",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006340.KS",
+    "name": "대원전선",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "344820.KS",
+    "name": "KCC글라스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "078350.KQ",
+    "name": "한양디지텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "088800.KQ",
+    "name": "에이스테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "228760.KQ",
+    "name": "지노믹트리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009290.KS",
+    "name": "광동제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "220100.KQ",
+    "name": "퓨쳐켐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "170900.KS",
+    "name": "동아에스티",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "069080.KQ",
+    "name": "웹젠",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "340570.KQ",
+    "name": "티앤엘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "084990.KQ",
+    "name": "헬릭스미스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "089590.KS",
+    "name": "제주항공",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "455900.KQ",
+    "name": "엔젤로보틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "183190.KS",
+    "name": "아세아시멘트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "084010.KS",
+    "name": "대한제강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "389260.KQ",
+    "name": "대명에너지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "394280.KQ",
+    "name": "오픈엣지테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "078340.KQ",
+    "name": "컴투스",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "126720.KS",
+    "name": "수산인더스트리",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "441270.KQ",
+    "name": "파인엠텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "080580.KQ",
+    "name": "오킨스전자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "084850.KQ",
+    "name": "아이티엠반도체",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "0001A0.KQ",
+    "name": "덕양에너젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000157.KS",
+    "name": "두산2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "029460.KS",
+    "name": "케이씨",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "450950.KQ",
+    "name": "아스테라시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "078020.KQ",
+    "name": "LS증권",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "494120.KQ",
+    "name": "큐리오시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "318060.KQ",
+    "name": "그래피",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "117730.KQ",
+    "name": "티로보틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "101730.KQ",
+    "name": "위메이드맥스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "041830.KQ",
+    "name": "인바디",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "230240.KQ",
+    "name": "에치에프알",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "097520.KS",
+    "name": "엠씨넥스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "025860.KS",
+    "name": "남해화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "179900.KQ",
+    "name": "유티아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "417310.KS",
+    "name": "코람코더원리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "026890.KS",
+    "name": "스틱인베스트먼트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "091810.KS",
+    "name": "티웨이항공",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "018250.KS",
+    "name": "애경산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "241770.KQ",
+    "name": "메카로",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "308430.KQ",
+    "name": "셀비온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "290550.KQ",
+    "name": "디케이티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "338840.KQ",
+    "name": "와이바이오로직스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "010690.KS",
+    "name": "화신",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006405.KS",
+    "name": "삼성SDI우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "034830.KS",
+    "name": "한국토지신탁",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "036890.KQ",
+    "name": "진성티이씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065660.KQ",
+    "name": "안트로젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "110990.KQ",
+    "name": "디아이티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060980.KS",
+    "name": "HL홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "241520.KQ",
+    "name": "DSC인베스트먼트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "298830.KQ",
+    "name": "슈어소프트테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "194370.KS",
+    "name": "제이에스코퍼레이션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "478340.KQ",
+    "name": "나라스페이스테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "089980.KQ",
+    "name": "상아프론테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001390.KS",
+    "name": "KG케미칼",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003800.KQ",
+    "name": "에이스침대",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002310.KS",
+    "name": "아세아제지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "104700.KS",
+    "name": "한국철강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035810.KQ",
+    "name": "이지홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "200670.KQ",
+    "name": "휴메딕스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "035890.KQ",
+    "name": "서희건설",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "234340.KQ",
+    "name": "헥토파이낸셜",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "126560.KS",
+    "name": "현대퓨처넷",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001940.KS",
+    "name": "KISCO홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "079940.KQ",
+    "name": "가비아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "041920.KQ",
+    "name": "메디아나",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "403550.KS",
+    "name": "쏘카",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "089890.KQ",
+    "name": "코세스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "015860.KS",
+    "name": "일진홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "144510.KQ",
+    "name": "지씨셀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "352480.KQ",
+    "name": "씨앤씨인터내셔널",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "053030.KQ",
+    "name": "바이넥스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "018000.KQ",
+    "name": "유니슨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "053690.KS",
+    "name": "한미글로벌",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "078130.KQ",
+    "name": "국일제지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "394800.KQ",
+    "name": "쓰리빌리언",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "200880.KS",
+    "name": "서연이화",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "317330.KQ",
+    "name": "덕산테코피아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "482630.KQ",
+    "name": "삼양엔씨켐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005720.KS",
+    "name": "넥센",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009160.KS",
+    "name": "SIMPAC",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "092230.KS",
+    "name": "KPX홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "114190.KQ",
+    "name": "강원에너지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "011760.KS",
+    "name": "현대코퍼레이션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "007690.KS",
+    "name": "국도화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "314930.KQ",
+    "name": "바이오다인",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "108860.KQ",
+    "name": "셀바스AI",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "475400.KQ",
+    "name": "씨메스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002810.KS",
+    "name": "삼영무역",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "348950.KS",
+    "name": "제이알글로벌리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "330860.KQ",
+    "name": "네패스아크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "092870.KQ",
+    "name": "엑시콘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "204620.KQ",
+    "name": "글로벌텍스프리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "304360.KQ",
+    "name": "에스바이오메딕스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "474650.KQ",
+    "name": "링크솔루션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001230.KS",
+    "name": "동국홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "094360.KQ",
+    "name": "칩스앤미디어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0015G0.KQ",
+    "name": "그린광학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "084690.KS",
+    "name": "대상홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "049630.KQ",
+    "name": "재영솔루텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "419530.KQ",
+    "name": "SAMG엔터",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "272450.KS",
+    "name": "진에어",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "086390.KQ",
+    "name": "유니테스트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "389500.KQ",
+    "name": "에스비비테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "043150.KQ",
+    "name": "바텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "217730.KQ",
+    "name": "강스템바이오텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "046120.KQ",
+    "name": "오르비텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "136480.KQ",
+    "name": "하림",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "200130.KQ",
+    "name": "콜마비앤에이치",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "046970.KQ",
+    "name": "우리로",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064820.KQ",
+    "name": "케이프",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "012030.KS",
+    "name": "DB",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "017860.KS",
+    "name": "DS단석",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "094480.KQ",
+    "name": "갤럭시아머니트리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "378340.KQ",
+    "name": "필에너지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "073490.KQ",
+    "name": "이노와이어리스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "011500.KS",
+    "name": "한농화성",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "462350.KQ",
+    "name": "이노스페이스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "448280.KQ",
+    "name": "에코아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "093520.KQ",
+    "name": "매커스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "099430.KQ",
+    "name": "바이오플러스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "033270.KS",
+    "name": "유나이티드제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "123890.KS",
+    "name": "한국자산신탁",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "067390.KQ",
+    "name": "아스트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "236200.KQ",
+    "name": "슈프리마",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "051500.KQ",
+    "name": "CJ프레시웨이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "037270.KS",
+    "name": "YG PLUS",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001750.KS",
+    "name": "한양증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "058970.KQ",
+    "name": "엠로",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060720.KQ",
+    "name": "KH바텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003520.KS",
+    "name": "영진약품",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "451760.KQ",
+    "name": "컨텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "045390.KQ",
+    "name": "대아티아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "128820.KS",
+    "name": "대성산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "023410.KQ",
+    "name": "유진기업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "900140.KS",
+    "name": "엘브이엠씨홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "036170.KQ",
+    "name": "에이치엠넥스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "389020.KQ",
+    "name": "자람테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000650.KS",
+    "name": "천일고속",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "078520.KS",
+    "name": "에이블씨엔씨",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "416180.KQ",
+    "name": "신성에스티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064290.KQ",
+    "name": "인텍플러스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "243840.KQ",
+    "name": "신흥에스이씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "101360.KQ",
+    "name": "에코앤드림",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "286940.KS",
+    "name": "롯데이노베이트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "265520.KQ",
+    "name": "AP시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "215000.KQ",
+    "name": "골프존",
+    "exch": "KOSDAQ GLOBAL"
+  },
+  {
+    "symbol": "003920.KS",
+    "name": "남양유업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "014940.KQ",
+    "name": "오리엔탈정공",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005010.KS",
+    "name": "휴스틸",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "475560.KS",
+    "name": "더본코리아",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "042370.KQ",
+    "name": "비츠로테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "085910.KQ",
+    "name": "네오티스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "243070.KQ",
+    "name": "휴온스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "088260.KS",
+    "name": "이리츠코크렙",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "024720.KS",
+    "name": "콜마홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "096760.KS",
+    "name": "JW홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "092200.KS",
+    "name": "디아이씨",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "017390.KS",
+    "name": "서울가스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "151860.KQ",
+    "name": "KG에코솔루션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "255220.KQ",
+    "name": "SG",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "365270.KQ",
+    "name": "큐라클",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003120.KS",
+    "name": "일성아이에스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0008Z0.KQ",
+    "name": "에스엔시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025770.KQ",
+    "name": "한국정보통신",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001340.KS",
+    "name": "PKC",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "023760.KQ",
+    "name": "한국캐피탈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "012210.KQ",
+    "name": "삼미금속",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "099440.KQ",
+    "name": "스맥",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "472850.KQ",
+    "name": "폰드그룹",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003070.KS",
+    "name": "코오롱글로벌",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "006805.KS",
+    "name": "미래에셋증권우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "002320.KS",
+    "name": "한진",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003960.KS",
+    "name": "사조대림",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "322310.KQ",
+    "name": "오로스테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "445090.KQ",
+    "name": "에이직랜드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001460.KS",
+    "name": "BYC",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "334890.KS",
+    "name": "이지스밸류플러스리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "078070.KQ",
+    "name": "유비쿼스홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "095500.KQ",
+    "name": "미래나노텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "170920.KQ",
+    "name": "엘티씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "054950.KQ",
+    "name": "제이브이엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "037710.KS",
+    "name": "광주신세계",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "160980.KQ",
+    "name": "싸이맥스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "049070.KQ",
+    "name": "인탑스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "221800.KQ",
+    "name": "유투바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "251370.KQ",
+    "name": "와이엠티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002900.KS",
+    "name": "TYM",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "115450.KQ",
+    "name": "HLB테라퓨틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001250.KS",
+    "name": "GS글로벌",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035600.KQ",
+    "name": "KG이니시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "138610.KQ",
+    "name": "나이벡",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "086820.KQ",
+    "name": "바이오솔루션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "044450.KS",
+    "name": "KSS해운",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "361390.KQ",
+    "name": "제노코",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "321550.KQ",
+    "name": "티움바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000490.KS",
+    "name": "대동",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004360.KS",
+    "name": "세방",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "024060.KQ",
+    "name": "흥구석유",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005680.KS",
+    "name": "삼영전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0088M0.KQ",
+    "name": "메쥬",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "092220.KS",
+    "name": "KEC",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0007C0.KQ",
+    "name": "아크릴",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "425040.KQ",
+    "name": "티이엠씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000320.KS",
+    "name": "노루홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "058430.KS",
+    "name": "포스코스틸리온",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "052710.KQ",
+    "name": "아모텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "036200.KQ",
+    "name": "유니셈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "091580.KQ",
+    "name": "상신이디피",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "051370.KQ",
+    "name": "인터플렉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064850.KQ",
+    "name": "에프앤가이드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "008350.KS",
+    "name": "남선알미늄",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "034120.KS",
+    "name": "SBS",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "200470.KQ",
+    "name": "에이팩트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "357550.KQ",
+    "name": "석경에이티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "232530.KS",
+    "name": "이엠티",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "294570.KQ",
+    "name": "쿠콘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "241590.KS",
+    "name": "화승엔터프라이즈",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "018310.KQ",
+    "name": "삼목에스폼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "194480.KQ",
+    "name": "데브시스터즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "108670.KS",
+    "name": "LX하우시스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000540.KS",
+    "name": "흥국화재",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "272110.KQ",
+    "name": "케이엔제이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "004310.KS",
+    "name": "현대약품",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003200.KS",
+    "name": "일신방직",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "092730.KQ",
+    "name": "네오팜",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "377190.KS",
+    "name": "디앤디플랫폼리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "216080.KQ",
+    "name": "제테마",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "226590.KQ",
+    "name": "엠디바이스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "02826K.KS",
+    "name": "삼성물산우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035510.KS",
+    "name": "신세계 I&C",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "267980.KQ",
+    "name": "매일유업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "274090.KQ",
+    "name": "켄코아에어로스페이스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "459510.KQ",
+    "name": "나우로보틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "304100.KQ",
+    "name": "솔트룩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064550.KQ",
+    "name": "바이오니아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001790.KS",
+    "name": "대한제당",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "309710.KQ",
+    "name": "아이티켐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "013120.KQ",
+    "name": "동원개발",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000430.KS",
+    "name": "대원강업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "418550.KQ",
+    "name": "제이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007160.KS",
+    "name": "사조산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "043370.KQ",
+    "name": "피에이치에이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "012860.KQ",
+    "name": "모베이스전자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "092460.KQ",
+    "name": "한라IMS",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "182400.KQ",
+    "name": "엔케이젠바이오텍코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "464080.KQ",
+    "name": "에스오에스랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "042600.KQ",
+    "name": "새로닉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "054210.KQ",
+    "name": "이랜텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "452430.KQ",
+    "name": "사피엔반도체",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "058820.KQ",
+    "name": "CMG제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "194700.KQ",
+    "name": "노바렉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009470.KS",
+    "name": "삼화전기",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "134380.KS",
+    "name": "미원화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "067080.KQ",
+    "name": "대화제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "126600.KQ",
+    "name": "BGF에코머티리얼즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000050.KS",
+    "name": "경방",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0030R0.KS",
+    "name": "대신밸류리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035150.KS",
+    "name": "백산",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "084680.KS",
+    "name": "이월드",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "053300.KQ",
+    "name": "한국정보인증",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "452280.KQ",
+    "name": "한선엔지니어링",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "033920.KS",
+    "name": "무학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "030210.KS",
+    "name": "다올투자증권",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "013890.KS",
+    "name": "지누스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "121800.KQ",
+    "name": "비덴트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "117580.KS",
+    "name": "대성에너지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "298690.KS",
+    "name": "에어부산",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "094820.KQ",
+    "name": "일진파워",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "256840.KQ",
+    "name": "한국비엔씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "176750.KQ",
+    "name": "듀켐바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "199430.KQ",
+    "name": "케이엔알시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "017890.KQ",
+    "name": "한국알콜",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "484810.KQ",
+    "name": "티엑스알로보틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "371950.KQ",
+    "name": "풍원정밀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "402490.KQ",
+    "name": "그린리소스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "377460.KQ",
+    "name": "위니아에이드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000680.KS",
+    "name": "LS네트웍스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "404990.KS",
+    "name": "신한서부티엔디리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003720.KS",
+    "name": "삼영",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001780.KS",
+    "name": "알루코",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005710.KQ",
+    "name": "대원산업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "206640.KQ",
+    "name": "바디텍메드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000390.KS",
+    "name": "삼화페인트",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "019010.KQ",
+    "name": "베뉴지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "254490.KQ",
+    "name": "미래반도체",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "462860.KQ",
+    "name": "더즌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "332570.KQ",
+    "name": "PS일렉트로닉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "098120.KQ",
+    "name": "마이크로컨텍솔",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001130.KS",
+    "name": "대한제분",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "122900.KS",
+    "name": "아이마켓코리아",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "036800.KQ",
+    "name": "나이스정보통신",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "382900.KQ",
+    "name": "범한퓨얼셀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "034810.KQ",
+    "name": "해성산업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065680.KQ",
+    "name": "우주일렉트로",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "108380.KQ",
+    "name": "대양전기공업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "244920.KS",
+    "name": "에이플러스에셋",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005500.KS",
+    "name": "삼진제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "136490.KS",
+    "name": "선진",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "126700.KQ",
+    "name": "하이비젼시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "474170.KQ",
+    "name": "루미르",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "013580.KS",
+    "name": "계룡건설",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "403850.KQ",
+    "name": "더핑크퐁컴퍼니",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "028100.KS",
+    "name": "동아지질",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "950250.KQ",
+    "name": "테라뷰",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "036030.KQ",
+    "name": "케이티알파",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "190510.KQ",
+    "name": "나무가",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "950170.KQ",
+    "name": "JTC",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "380550.KQ",
+    "name": "뉴로핏",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "353810.KQ",
+    "name": "이지바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "123330.KQ",
+    "name": "제닉",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "061970.KQ",
+    "name": "LB세미콘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "481070.KQ",
+    "name": "에이유브랜즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "405100.KQ",
+    "name": "큐알티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "004380.KS",
+    "name": "삼익THK",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "394420.KQ",
+    "name": "리센스메디컬",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "211270.KQ",
+    "name": "AP위성",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002150.KS",
+    "name": "도화엔지니어링",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004980.KS",
+    "name": "성신양회",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "210980.KS",
+    "name": "SK디앤디",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "144960.KQ",
+    "name": "뉴파워프라즈마",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001630.KS",
+    "name": "종근당홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "092070.KQ",
+    "name": "디엔에프",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "264450.KQ",
+    "name": "유비쿼스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "214180.KQ",
+    "name": "헥토이노베이션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "112290.KQ",
+    "name": "와이씨켐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "372170.KQ",
+    "name": "윤성에프앤씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "289930.KQ",
+    "name": "웨이비스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000480.KS",
+    "name": "CR홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "036560.KQ",
+    "name": "KZ정밀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "039560.KQ",
+    "name": "다산네트웍스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "234690.KQ",
+    "name": "녹십자웰빙",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "051360.KQ",
+    "name": "토비스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009680.KS",
+    "name": "모토닉",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "100120.KQ",
+    "name": "뷰웍스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "338220.KQ",
+    "name": "뷰노",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "083310.KQ",
+    "name": "엘오티베큠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "095570.KS",
+    "name": "AJ네트웍스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "457550.KQ",
+    "name": "우진엔텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "432320.KS",
+    "name": "KB스타리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "053210.KS",
+    "name": "스카이라이프",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003547.KS",
+    "name": "대신증권2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004560.KS",
+    "name": "현대비앤지스틸",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003220.KS",
+    "name": "대원제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "314130.KQ",
+    "name": "지놈앤컴퍼니",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "004430.KS",
+    "name": "송원산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "010580.KS",
+    "name": "에스엠벡셀",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "402030.KQ",
+    "name": "코난테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "475230.KQ",
+    "name": "엔알비",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "388050.KQ",
+    "name": "지투파워",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "199820.KQ",
+    "name": "제일일렉트릭",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "119610.KQ",
+    "name": "인터로조",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "010955.KS",
+    "name": "S-Oil우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "051905.KS",
+    "name": "LG생활건강우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "065710.KQ",
+    "name": "서호전기",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007570.KS",
+    "name": "일양약품",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "382800.KQ",
+    "name": "지앤비에스 에코",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "950140.KQ",
+    "name": "잉글우드랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "226320.KS",
+    "name": "잇츠한불",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "056090.KQ",
+    "name": "시지메드텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "104480.KQ",
+    "name": "티케이케미칼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025000.KS",
+    "name": "KPX케미칼",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "219130.KQ",
+    "name": "타이거일렉",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "095700.KQ",
+    "name": "제넥신",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "285490.KQ",
+    "name": "노바텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "115310.KQ",
+    "name": "인포바인",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "078150.KQ",
+    "name": "HB테크놀러지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "079960.KQ",
+    "name": "동양이엔피",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "039840.KQ",
+    "name": "디오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "061090.KQ",
+    "name": "세나테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003350.KS",
+    "name": "한국화장품제조",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "007860.KS",
+    "name": "서연",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "036190.KQ",
+    "name": "금화피에스시",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "432720.KQ",
+    "name": "퀄리타스반도체",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "TQQQ",
+    "name": "ProShares UltraPro QQQ",
+    "exch": "ETF"
+  },
+  {
+    "symbol": "SQQQ",
+    "name": "ProShares UltraPro Short QQQ",
+    "exch": "ETF"
+  },
+  {
+    "symbol": "SOXL",
+    "name": "Direxion Daily Semi Bull 3X",
+    "exch": "ETF"
+  },
+  {
+    "symbol": "SOXS",
+    "name": "Direxion Daily Semi Bear 3X",
+    "exch": "ETF"
+  },
+  {
+    "symbol": "SCHD",
+    "name": "Schwab US Dividend Equity ETF",
+    "exch": "ETF"
+  },
+  {
+    "symbol": "BTC-USD",
+    "name": "Bitcoin",
+    "exch": "CRYPTO"
+  },
+  {
+    "symbol": "ETH-USD",
+    "name": "Ethereum",
+    "exch": "CRYPTO"
+  }
 ]
