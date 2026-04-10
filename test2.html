@@ -18,7 +18,7 @@
   .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   
-  /* ── VIEW TABS (보유/관심 구분) ── */
+  /* ── VIEW TABS ── */
   .view-tabs { display: flex; gap: 4px; background: var(--bg2); padding: 4px; border-radius: var(--radius); border: 1px solid var(--border); }
   .vtab { padding: 6px 16px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 7px; transition: 0.2s; border:none; background:none; }
   .vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
@@ -251,23 +251,7 @@ function importData(e) {
   reader.readAsText(file);
 }
 
-// ── 💡 다중 프록시 우회 ──
-async function fetchWithProxy(targetUrl, useCache = true) {
-  const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
-  const proxies = [
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(finalUrl)}`,
-    `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`
-  ];
-  for (let proxy of proxies) {
-    try {
-      const res = await fetch(proxy);
-      if (res.ok) return await res.json();
-    } catch (e) { console.warn("Proxy failed, trying next..."); }
-  }
-  return null;
-}
-
-// ── 🔍 검색 ──
+// ── 🔍 YAHOO FINANCE SEARCH (초고속 버전 원복) ──
 const searchInput = document.getElementById('tickerInput');
 const searchDropdown = document.getElementById('searchDropdown');
 let searchTimeout = null;
@@ -279,21 +263,33 @@ searchInput.addEventListener('input', (e) => {
     searchDropdown.style.display = 'none';
     return;
   }
-  searchTimeout = setTimeout(async () => {
-    searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--text3);font-size:12px;">검색 중...</span></li>`;
-    searchDropdown.style.display = 'block';
+  // 디바운스: 0.35초 대기 후 API 호출
+  searchTimeout = setTimeout(() => fetchSearchResults(query), 350);
+});
 
-    const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=6&newsCount=0`;
-    const data = await fetchWithProxy(url, true);
+// 드롭다운 외부 클릭 시 닫기
+document.addEventListener('click', (e) => {
+  if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+    searchDropdown.style.display = 'none';
+  }
+});
+
+async function fetchSearchResults(query) {
+  searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--text3);font-size:12px;">검색 중...</span></li>`;
+  searchDropdown.style.display = 'block';
+
+  const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=6&newsCount=0`;
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+  
+  try {
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const quotes = data.quotes || [];
     
-    if (!data || !data.quotes || data.quotes.length === 0) {
-      searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--red);font-size:12px;">결과가 없습니다.</span></li>`;
-      return;
-    }
+    const validQuotes = quotes.filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF');
 
-    const validQuotes = data.quotes.filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF');
     if(validQuotes.length === 0) {
-      searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--red);font-size:12px;">주식/ETF 결과가 없습니다.</span></li>`;
+      searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--red);font-size:12px;">결과가 없습니다.</span></li>`;
       return;
     }
 
@@ -310,12 +306,10 @@ searchInput.addEventListener('input', (e) => {
         </li>
       `;
     }).join('');
-  }, 350);
-});
-
-document.addEventListener('click', (e) => {
-  if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) searchDropdown.style.display = 'none';
-});
+  } catch (err) {
+    searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--red);font-size:12px;">검색 오류 발생</span></li>`;
+  }
+}
 
 function selectSearchResult(symbol) {
   searchInput.value = '';
@@ -329,41 +323,44 @@ function addManualTicker() {
 }
 searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') addManualTicker(); });
 
-// ── FETCH DATA ──
+// ── DATA FETCHING (초고속 버전 원복) ──
 async function fetchYahooData(symbol, range) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=1d`;
-  const json = await fetchWithProxy(url, false);
-  
-  if (!json || !json.chart || !json.chart.result) return null;
-  
-  const result = json.chart.result[0];
-  const timestamps = result.timestamp;
-  const quotes = result.indicators.quote[0];
-  const prices = quotes.close;
-  
-  let validPrices = [], validDates = [];
-  for(let i=0; i<timestamps.length; i++) {
-    if(prices[i] !== null) {
-      validPrices.push(prices[i]);
-      const d = new Date(timestamps[i] * 1000);
-      validDates.push(`${d.getMonth()+1}/${d.getDate()}`);
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+  try {
+    const res = await fetch(proxyUrl);
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (!json.chart || !json.chart.result || json.chart.result.length === 0) return null;
+    
+    const result = json.chart.result[0];
+    const timestamps = result.timestamp;
+    const quotes = result.indicators.quote[0];
+    const prices = quotes.close;
+    
+    let validPrices = [], validDates = [];
+    for(let i=0; i<timestamps.length; i++) {
+      if(prices[i] !== null) {
+        validPrices.push(prices[i]);
+        const d = new Date(timestamps[i] * 1000);
+        validDates.push(`${d.getMonth()+1}/${d.getDate()}`);
+      }
     }
-  }
-  if(validPrices.length === 0) return null;
-  
-  // 종목명 추출 추가
-  const meta = result.meta;
-  const companyName = meta.shortName || meta.longName || symbol;
-  
-  return {
-    symbol: symbol,
-    name: companyName, // 추가됨
-    currency: meta.currency || 'USD',
-    prices: validPrices,
-    dates: validDates,
-    last: validPrices[validPrices.length-1],
-    prev: validPrices[validPrices.length-2] || validPrices[validPrices.length-1]
-  };
+    if(validPrices.length === 0) return null;
+    
+    const meta = result.meta;
+    const companyName = meta.shortName || meta.longName || symbol;
+    
+    return {
+      symbol: symbol,
+      name: companyName,
+      currency: meta.currency || 'USD',
+      prices: validPrices,
+      dates: validDates,
+      last: validPrices[validPrices.length-1],
+      prev: validPrices[validPrices.length-2] || validPrices[validPrices.length-1]
+    };
+  } catch(e) { return null; }
 }
 
 async function validateAndFetch(ticker, range) {
@@ -454,7 +451,7 @@ async function render() {
     if(data) { cachedMarketData[originalTicker] = data; validTickers.push(originalTicker); }
   });
 
-  // 1. 보유/관심 필터링 적용
+  // 보유/관심 필터링
   let displayTickers = validTickers.filter(t => {
     const h = state.holdings[t] || {};
     const isHeld = (h.qty || 0) > 0;
@@ -463,7 +460,7 @@ async function render() {
     return true; // 'all'
   });
 
-  // 2. 정렬 로직 적용
+  // 정렬
   const tickerStats = {};
   displayTickers.forEach(t => {
     const data = cachedMarketData[t];
@@ -497,7 +494,6 @@ async function render() {
     const pnlPct = isHeld && avg > 0 ? ((data.last-avg)/avg*100).toFixed(2) : null;
     const fmt = (n) => data.currency === 'KRW' ? '₩'+Math.round(n).toLocaleString() : '$'+n.toFixed(2);
 
-    // 종목명 + 티커 + 보유/관심 태그 UI 구성
     return `
       <div class="card ${cls}" onclick="openChartModal('${ticker}')">
         <div class="card-head" style="align-items:center;">
