@@ -211,14 +211,33 @@
 </div>
 
 <script>
-const STORE_KEY = 'stockwatch_real_v3';
+const STORE_KEY = 'stockwatch_real_v4';
 let state = loadState();
-let currentView = 'all'; // 전체, 보유, 관심 필터 상태
+let currentView = 'all';
 let currentSortMode = 'default';
 let allocationChartInst = null;
 const chartInstances = {};
 let modalChartInst = null;
 let cachedMarketData = {}; 
+let localStockDB = []; // 외부 파일에서 불러올 DB 배열
+
+// ── 💡 1. 외부 JSON 파일 불러오기 ──
+async function loadStockDB() {
+  try {
+    // data/stocks.json 파일을 비동기로 불러옵니다.
+    const res = await fetch('data/stocks.json');
+    if (res.ok) {
+      localStockDB = await res.json();
+    } else {
+      console.warn("data/stocks.json 파일을 찾을 수 없어 기본 모드로 동작합니다.");
+    }
+  } catch(e) {
+    // 로컬(file://) 환경에서는 fetch가 막힐 수 있으므로 예외처리
+    console.warn("로컬 환경이거나 JSON 파일을 읽어올 수 없습니다.", e);
+  }
+}
+// 스크립트 시작 시 즉시 실행
+loadStockDB();
 
 function loadState() {
   try {
@@ -251,65 +270,51 @@ function importData(e) {
   reader.readAsText(file);
 }
 
-// ── 🔍 YAHOO FINANCE SEARCH (초고속 버전 원복) ──
+// ── 🚀 2. 외부 DB 기반 실시간 검색 (0 딜레이) ──
 const searchInput = document.getElementById('tickerInput');
 const searchDropdown = document.getElementById('searchDropdown');
-let searchTimeout = null;
 
 searchInput.addEventListener('input', (e) => {
-  clearTimeout(searchTimeout);
-  const query = e.target.value.trim();
+  const query = e.target.value.trim().toLowerCase();
   if (query.length < 1) {
     searchDropdown.style.display = 'none';
     return;
   }
-  // 디바운스: 0.35초 대기 후 API 호출
-  searchTimeout = setTimeout(() => fetchSearchResults(query), 350);
+  
+  if (localStockDB.length === 0) {
+    searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--text2);font-size:12px;">DB 로딩 중이거나 없습니다. 엔터(Enter)키를 눌러 직접 추가하세요.</span></li>`;
+    searchDropdown.style.display = 'block';
+    return;
+  }
+  
+  const results = localStockDB.filter(stock => 
+    stock.symbol.toLowerCase().includes(query) || 
+    stock.name.toLowerCase().includes(query)
+  ).slice(0, 8);
+
+  if (results.length === 0) {
+    searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--text2);font-size:12px;">목록에 없습니다. 엔터(Enter)키를 눌러 티커를 직접 검색하세요.</span></li>`;
+    searchDropdown.style.display = 'block';
+    return;
+  }
+
+  searchDropdown.innerHTML = results.map(q => `
+    <li class="search-item" onclick="selectSearchResult('${q.symbol}')">
+      <div class="si-left">
+        <span class="si-name">${q.name}</span>
+        <span class="si-exch">${q.exch}</span>
+      </div>
+      <span class="si-ticker">${q.symbol}</span>
+    </li>
+  `).join('');
+  searchDropdown.style.display = 'block';
 });
 
-// 드롭다운 외부 클릭 시 닫기
 document.addEventListener('click', (e) => {
   if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
     searchDropdown.style.display = 'none';
   }
 });
-
-async function fetchSearchResults(query) {
-  searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--text3);font-size:12px;">검색 중...</span></li>`;
-  searchDropdown.style.display = 'block';
-
-  const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=6&newsCount=0`;
-  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-  
-  try {
-    const res = await fetch(proxyUrl);
-    const data = await res.json();
-    const quotes = data.quotes || [];
-    
-    const validQuotes = quotes.filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF');
-
-    if(validQuotes.length === 0) {
-      searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--red);font-size:12px;">결과가 없습니다.</span></li>`;
-      return;
-    }
-
-    searchDropdown.innerHTML = validQuotes.map(q => {
-      const name = q.shortname || q.longname || q.symbol;
-      const exch = q.exchDisp || q.exchange;
-      return `
-        <li class="search-item" onclick="selectSearchResult('${q.symbol}')">
-          <div class="si-left">
-            <span class="si-name">${name}</span>
-            <span class="si-exch">${exch}</span>
-          </div>
-          <span class="si-ticker">${q.symbol}</span>
-        </li>
-      `;
-    }).join('');
-  } catch (err) {
-    searchDropdown.innerHTML = `<li class="search-item"><span style="color:var(--red);font-size:12px;">검색 오류 발생</span></li>`;
-  }
-}
 
 function selectSearchResult(symbol) {
   searchInput.value = '';
@@ -323,10 +328,11 @@ function addManualTicker() {
 }
 searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') addManualTicker(); });
 
-// ── DATA FETCHING (초고속 버전 원복) ──
+// ── DATA FETCHING (차트 데이터용, 가장 빠르고 안전한 corsproxy 우회) ──
 async function fetchYahooData(symbol, range) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=1d`;
   const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+  
   try {
     const res = await fetch(proxyUrl);
     if (!res.ok) return null;
@@ -351,9 +357,12 @@ async function fetchYahooData(symbol, range) {
     const meta = result.meta;
     const companyName = meta.shortName || meta.longName || symbol;
     
+    // 로드된 외부 DB에서 한글 이름이 있는지 우선 확인
+    const localMatch = localStockDB.find(s => s.symbol === symbol);
+    
     return {
       symbol: symbol,
-      name: companyName,
+      name: localMatch ? localMatch.name : companyName,
       currency: meta.currency || 'USD',
       prices: validPrices,
       dates: validDates,
@@ -382,7 +391,7 @@ async function addTickerToPortfolio(symbol) {
     alert("이미 등록된 종목입니다.");
     searchInput.value = ''; return;
   }
-  searchInput.disabled = true; btn.disabled = true; btn.textContent = "검증 중...";
+  searchInput.disabled = true; btn.disabled = true; btn.textContent = "가져오는 중...";
 
   const validData = await validateAndFetch(symbol, '1mo');
   
@@ -395,7 +404,7 @@ async function addTickerToPortfolio(symbol) {
     searchInput.value = '';
     render();
   } else {
-    alert("차트 데이터를 불러올 수 없는 종목입니다.");
+    alert("차트 데이터를 불러올 수 없는 종목이거나 티커명이 잘못되었습니다.");
   }
 }
 
