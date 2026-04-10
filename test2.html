@@ -130,23 +130,47 @@ let searchTimeout = null;
 
 const saveState = () => localStorage.setItem('sw_state_v3', JSON.stringify(state));
 
-async function getPriceData(symbol) {
-  const proxy = `https://corsproxy.io/?`;
-  const url = encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1d`);
-  try {
-    const res = await fetch(proxy + url);
-    const json = await res.json();
-    const result = json.chart.result[0];
-    return {
-      symbol,
-      price: result.meta.regularMarketPrice,
-      currency: result.meta.currency,
-      history: result.indicators.quote[0].close.filter(p => p !== null),
-      change: ((result.meta.regularMarketPrice - result.meta.chartPreviousClose) / result.meta.chartPreviousClose * 100).toFixed(2)
-    };
-  } catch(e) { return null; }
+// ── 💡 핵심 업데이트: 다중 프록시 우회 도우미 ──
+async function fetchWithProxy(targetUrl, useCache = true) {
+  // 실시간 가격 데이터는 캐시(과거 데이터)를 무시하도록 타임스탬프 추가
+  const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
+  
+  // 1순위: allorigins (안정적), 2순위: corsproxy (백업용)
+  const proxies = [
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(finalUrl)}`,
+    `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`
+  ];
+
+  for (let proxy of proxies) {
+    try {
+      const res = await fetch(proxy);
+      if (res.ok) return await res.json();
+    } catch (e) {
+      console.warn(`프록시 실패, 다음 서버 시도 중...`);
+    }
+  }
+  return null; // 모든 프록시 실패 시
 }
 
+// ── 데이터 호출 (Yahoo Finance) ──
+async function getPriceData(symbol) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1d`;
+  
+  const json = await fetchWithProxy(url, false); // 캐시 끄기
+  
+  if (!json || !json.chart || !json.chart.result) return null;
+  
+  const result = json.chart.result[0];
+  return {
+    symbol,
+    price: result.meta.regularMarketPrice,
+    currency: result.meta.currency,
+    history: result.indicators.quote[0].close.filter(p => p !== null),
+    change: ((result.meta.regularMarketPrice - result.meta.chartPreviousClose) / result.meta.chartPreviousClose * 100).toFixed(2)
+  };
+}
+
+// ── 검색 기능 ──
 const searchInput = document.getElementById('searchInput');
 const dropdown = document.getElementById('searchDropdown');
 
@@ -156,27 +180,31 @@ searchInput.addEventListener('input', (e) => {
   if(q.length < 1) { dropdown.style.display='none'; return; }
   
   searchTimeout = setTimeout(async () => {
-    dropdown.innerHTML = `<li class="search-item" style="color:var(--text3)">검색 중...</li>`;
+    dropdown.innerHTML = `<li class="search-item" style="color:var(--text3)">🔍 검색 중...</li>`;
     dropdown.style.display = 'block';
     
-    try {
-      const res = await fetch(`https://corsproxy.io/?` + encodeURIComponent(`https://query2.finance.yahoo.com/v1/finance/search?q=${q}`));
-      const data = await res.json();
-      const validQuotes = (data.quotes || []).filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF').slice(0,6);
-      
-      if(validQuotes.length === 0) {
-        dropdown.innerHTML = `<li class="search-item" style="color:var(--red)">결과가 없습니다.</li>`;
-        return;
-      }
+    const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}`;
+    const data = await fetchWithProxy(url, true); // 검색은 캐시 켜기
+    
+    if (!data || !data.quotes || data.quotes.length === 0) {
+      dropdown.innerHTML = `<li class="search-item" style="color:var(--red)">검색 결과가 없습니다. (종목명이나 코드를 확인하세요)</li>`;
+      return;
+    }
 
-      dropdown.innerHTML = validQuotes.map(q => `
-        <li class="search-item" onclick="addStock('${q.symbol}')">
-          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">${q.shortname || q.longname || q.symbol}</span>
-          <span style="color:var(--accent); font-weight:700; font-family:var(--font-mono)">${q.symbol}</span>
-        </li>
-      `).join('');
-    } catch(err) { dropdown.style.display='none'; }
-  }, 300);
+    const validQuotes = data.quotes.filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF').slice(0,6);
+    
+    if(validQuotes.length === 0) {
+      dropdown.innerHTML = `<li class="search-item" style="color:var(--red)">주식/ETF 검색 결과가 없습니다.</li>`;
+      return;
+    }
+
+    dropdown.innerHTML = validQuotes.map(q => `
+      <li class="search-item" onclick="addStock('${q.symbol}')">
+        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">${q.shortname || q.longname || q.symbol}</span>
+        <span style="color:var(--accent); font-weight:700; font-family:var(--font-mono)">${q.symbol}</span>
+      </li>
+    `).join('');
+  }, 400); // 디바운스 타임 살짝 늘림 (API 과부하 방지)
 });
 
 document.addEventListener('click', (e) => {
@@ -224,7 +252,11 @@ async function render() {
   const allocs = { labels: [], values: [] };
 
   list.forEach(s => {
-    if(!s.data) return;
+    if(!s.data) {
+      // API 통신 실패 시 오류 카드 표시
+      grid.innerHTML += `<div class="card" style="opacity:0.5"><div class="card-ticker">${s.symbol}</div><div style="font-size:11px; color:var(--red)">데이터를 불러오지 못했습니다.</div><button class="btn-sm" style="margin-top:10px" onclick="deleteStock('${s.symbol}')">삭제</button></div>`;
+      return;
+    }
     const isHeld = s.category === 'held';
     const curVal = s.qty * s.data.price;
     if(isHeld) {
