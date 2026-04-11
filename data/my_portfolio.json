@@ -30,7 +30,8 @@
     "263020.KQ",
     "AVGO",
     "GOOGL",
-    "META"
+    "META",
+    "MSFT"
   ],
   "transactions": [
     {
@@ -272,6 +273,14 @@
       "symbol": "META",
       "qty": 2,
       "price": 648
+    },
+    {
+      "id": 1775891765585,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "MSFT",
+      "qty": 5,
+      "price": 435
     }
   ],
   "range": "1y"
