@@ -308,6 +308,14 @@
       "symbol": "PLTR",
       "qty": 12,
       "price": 173.75
+    },
+    {
+      "id": 1775891844868,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "TSLA",
+      "qty": 18,
+      "price": 182.1095
     }
   ],
   "range": "1y"
