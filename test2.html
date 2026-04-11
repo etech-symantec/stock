@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOCK WATCH — 거래 내역 대시보드</title>
+<title>STOCK WATCH — 클라우드 자동 동기화 장부</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,7 +13,6 @@
   
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
   
-  /* ── 1. 네비게이션 ── */
   nav { display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 50px; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; }
   .logo { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
   .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
@@ -28,15 +27,21 @@
   .rtab.active { background: var(--accent); color: #fff; }
   .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); font-family: var(--font-sans); transition: 0.15s; }
   .btn-sm:hover { background: var(--bg3); color: var(--text); }
-  .btn-github { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); }
+  .btn-github { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); display: flex; align-items: center; gap: 6px; }
   .btn-github:hover { background: #fff; color: #000; }
+  
+  .sync-status { font-size: 10px; font-family: var(--font-mono); color: var(--text3); display: flex; align-items: center; gap: 4px; padding: 0 8px; }
+  .sync-status.active { color: var(--green); }
+  .sync-status.error { color: var(--red); }
+  .sync-spinner { width: 8px; height: 8px; border: 2px solid var(--text3); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
   
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); outline: none; cursor: pointer; }
 
-  /* ── 2. 메인 레이아웃 (사이드바 + 콘텐츠) ── */
+  /* ── 레이아웃 (사이드바 + 콘텐츠) ── */
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; }
   
-  /* ── 3. 사이드바 (거래 내역 입력) ── */
+  /* ── 사이드바 ── */
   .ledger-sidebar { width: 320px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; }
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); }
   
@@ -63,7 +68,7 @@
   .tx-del { cursor: pointer; color: var(--text3); font-size: 12px; transition: color 0.2s; }
   .tx-del:hover { color: var(--red); }
 
-  /* ── 4. 메인 콘텐츠 (대시보드) ── */
+  /* ── 대시보드 ── */
   .dashboard-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 1.5rem 2rem; background: var(--bg); max-width: 100%; }
   
   .add-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
@@ -115,6 +120,14 @@
   .modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
   .modal-sm { max-width: 400px; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  
+  /* Toggle Switch */
+  .toggle-switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--bg3); border: 1px solid var(--border2); border-radius: 20px; transition: .2s; }
+  .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: var(--text2); border-radius: 50%; transition: .2s; }
+  input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
+  input:checked + .slider:before { transform: translateX(16px); background-color: #fff; }
 </style>
 </head>
 <body>
@@ -140,9 +153,15 @@
       <button class="rtab" onclick="setRange('6mo',this)">6M</button>
       <button class="rtab active" onclick="setRange('1y',this)">1Y</button>
     </div>
-    <button class="btn-sm" onclick="exportData()" title="로컬 파일 백업">⬇️ 로컬 저장</button>
-    <button class="btn-sm" onclick="document.getElementById('importFile').click()" title="로컬 파일 복원">⬆️ 로컬 불러오기</button>
-    <button class="btn-sm btn-github" onclick="openGithubModal()" title="GitHub 저장소에 거래 장부 동기화">☁️ GitHub 클라우드 연동</button>
+    
+    <div class="sync-status" id="syncStatus">
+      <div class="sync-spinner" id="syncSpinner"></div>
+      <span id="syncText"></span>
+    </div>
+    
+    <button class="btn-sm btn-github" onclick="openGithubModal()" title="GitHub 연동 설정">☁️ 설정</button>
+    <button class="btn-sm" onclick="exportData()" title="로컬 백업">⬇️ 저장</button>
+    <button class="btn-sm" onclick="document.getElementById('importFile').click()" title="로컬 복원">⬆️ 불러오기</button>
   </div>
 </nav>
 
@@ -210,8 +229,6 @@
       <div class="allocation" title="포트폴리오 비중"><canvas id="allocationCanvas"></canvas></div>
     </div>
 
-    <div class="section-title" id="gridTitle" style="display:none">포트폴리오</div>
-    
     <div class="grid-container" id="gridContainer"></div>
   </main>
 </div>
@@ -237,13 +254,12 @@
 <div class="overlay" id="githubOverlay" onclick="closeModal('githubOverlay')">
   <div class="modal modal-sm" onclick="event.stopPropagation()">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-      <h3 style="font-size:16px;">☁️ GitHub 클라우드 동기화</h3>
+      <h3 style="font-size:16px;">☁️ GitHub 클라우드 설정</h3>
       <button class="btn-sm" onclick="closeModal('githubOverlay')">닫기</button>
     </div>
     
     <div style="font-size:11px; color:var(--text2); margin-bottom:20px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px;">
-      GitHub API를 사용하여 현재 장부를 저장소의 <strong style="color:#fff">data/my_portfolio.json</strong> 파일로 저장하거나 불러옵니다. <br><br>
-      ⚠️ <strong>주의:</strong> Personal Access Token은 <strong>Contents: Write</strong> 권한이 포함된 Classic Token이거나 Fine-grained Token이어야 합니다. 이 정보는 브라우저 캐시에만 안전하게 저장됩니다.
+      발급받은 Personal Access Token (Contents: Write 권한 필요)을 브라우저에 안전하게 저장합니다.
     </div>
 
     <div class="form-group" style="margin-bottom:12px;">
@@ -254,21 +270,29 @@
       <label>저장소 이름 (Repo)</label>
       <input type="text" id="ghRepo" class="form-input" placeholder="예: stock">
     </div>
-    <div class="form-group" style="margin-bottom:20px;">
+    <div class="form-group" style="margin-bottom:15px;">
       <label>Personal Access Token (PAT)</label>
-      <input type="password" id="ghToken" class="form-input" placeholder="ghp_xxxxxxxxxxxxxxxxx">
+      <input type="password" id="ghToken" class="form-input" placeholder="ghp_... 또는 github_pat_...">
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 10px; background:rgba(0,0,0,0.2); border-radius:6px; margin-bottom:20px;">
+      <span style="font-size:12px; font-weight:500; color:var(--text);">🔄 내역 추가 시 자동 동기화</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="ghAutoSync">
+        <span class="slider"></span>
+      </label>
     </div>
 
     <div style="display:flex; gap:10px;">
-      <button class="btn-submit" style="background:var(--blue); flex:1;" onclick="pullFromGithub()">⬆️ 불러오기 (Pull)</button>
-      <button class="btn-submit" style="flex:1;" onclick="pushToGithub()">⬇️ 저장하기 (Push)</button>
+      <button class="btn-submit" style="background:var(--blue); flex:1;" onclick="pullFromGithub(false)">⬆️ 수동 불러오기</button>
+      <button class="btn-submit" style="flex:1;" onclick="pushToGithub(false)">⬇️ 수동 저장하기</button>
     </div>
   </div>
 </div>
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v7';
+const STORE_KEY = 'stockwatch_real_v8';
 let state = loadState();
 let currentView = 'all';
 let currentSortMode = 'default';
@@ -292,13 +316,15 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
+    let oldS = localStorage.getItem('stockwatch_real_v7');
+    if(oldS) return JSON.parse(oldS);
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
 }
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// ── 통화 및 국가 분류 유틸리티 ──
+// 통화/국가 식별
 function isKorean(symbol) { return symbol.endsWith('.KS') || symbol.endsWith('.KQ'); }
 function isCrypto(symbol) { return symbol.endsWith('-USD'); }
 function formatPrice(val, symbol) {
@@ -349,11 +375,15 @@ function addTransaction() {
   document.getElementById('txPrice').value = '';
   
   renderTxList(); render();
+  
+  // 자동 동기화 체크
+  triggerAutoSync();
 }
 
 function deleteTransaction(id) {
   state.transactions = state.transactions.filter(t => t.id !== id);
   saveState(); renderTxList(); render();
+  triggerAutoSync();
 }
 
 function renderTxList() {
@@ -504,12 +534,14 @@ async function addTickerToPortfolio(symbol) {
   if (data) {
     state.tickers.push(data.symbol); cachedMarketData = {}; saveState();
     document.getElementById('tickerInput').value = ''; render();
+    triggerAutoSync();
   } else { alert("차트 데이터를 불러올 수 없는 종목입니다."); }
 }
 
 function removeTicker(t) {
   state.tickers = state.tickers.filter(x => x !== t);
   delete cachedMarketData[t]; saveState(); render();
+  triggerAutoSync();
 }
 
 function setRange(rangeStr, el) {
@@ -731,33 +763,39 @@ function updateSummaryAndAllocation(validTickers, currentHoldings) {
   }
 }
 
-// ── 8. GitHub 연동 및 모달 제어 ──
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
+// ── 8. 클라우드 자동 동기화 로직 ──
+function getGhSettings() {
+  const stored = localStorage.getItem('gh_settings');
+  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
+  return JSON.parse(stored);
+}
+
+function saveGhSettings(settings) {
+  localStorage.setItem('gh_settings', JSON.stringify(settings));
+}
+
 function openGithubModal() {
-  let settings = JSON.parse(localStorage.getItem('gh_settings')) || { user: '', repo: '', token: '' };
-  document.getElementById('ghUser').value = settings.user;
-  document.getElementById('ghRepo').value = settings.repo;
-  document.getElementById('ghToken').value = settings.token;
+  let s = getGhSettings();
+  document.getElementById('ghUser').value = s.user;
+  document.getElementById('ghRepo').value = s.repo;
+  document.getElementById('ghToken').value = s.token;
+  document.getElementById('ghAutoSync').checked = s.autoSync;
   document.getElementById('githubOverlay').classList.add('open');
 }
 
-function getGhSettings() {
-  const user = document.getElementById('ghUser').value.trim();
-  const repo = document.getElementById('ghRepo').value.trim();
-  const token = document.getElementById('ghToken').value.trim();
-  if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return null; }
-  localStorage.setItem('gh_settings', JSON.stringify({ user, repo, token }));
-  return { user, repo, token };
-}
+// 모달 내 스위치 토글 시 즉시 저장
+document.getElementById('ghAutoSync').addEventListener('change', function(e) {
+  let s = getGhSettings();
+  s.autoSync = e.target.checked;
+  saveGhSettings(s);
+  if(s.autoSync) triggerAutoSync();
+});
 
-function utf8_to_b64(str) {
-  return window.btoa(unescape(encodeURIComponent(str)));
-}
-
-function b64_to_utf8(str) {
-  return decodeURIComponent(escape(window.atob(str)));
-}
+// Base64 유니코드 처리
+function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
+function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
 async function getGithubFileSha(settings, path) {
   const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
@@ -766,65 +804,108 @@ async function getGithubFileSha(settings, path) {
   return null;
 }
 
-async function pushToGithub() {
-  const settings = getGhSettings(); if(!settings) return;
+function updateSyncStatus(status) {
+  const el = document.getElementById('syncStatus');
+  const spinner = document.getElementById('syncSpinner');
+  const text = document.getElementById('syncText');
+  
+  el.className = 'sync-status';
+  if(status === 'syncing') {
+    spinner.style.display = 'block'; text.textContent = '저장 중...';
+  } else if(status === 'success') {
+    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
+  } else if(status === 'error') {
+    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패 (토큰 확인)'; el.classList.add('error');
+  } else {
+    spinner.style.display = 'none'; text.textContent = '';
+  }
+}
+
+async function pushToGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  
+  if(!silent) {
+    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+
+  updateSyncStatus('syncing');
   const path = 'data/my_portfolio.json';
-  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
+  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
   
   try {
-    const fileInfo = await getGithubFileSha(settings, path);
+    const fileInfo = await getGithubFileSha({user, repo, token}, path);
     const content = utf8_to_b64(JSON.stringify(state, null, 2));
-    const body = { message: "🗂️ 포트폴리오 거래 장부 동기화 (Push)", content: content };
+    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
     if (fileInfo) body.sha = fileInfo.sha;
 
     const putRes = await fetch(url, {
       method: 'PUT',
-      headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' },
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
       body: JSON.stringify(body)
     });
     
-    if(putRes.ok) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
-    else { alert('저장 실패: ' + putRes.statusText); }
-  } catch(e) { alert('네트워크 에러 발생'); }
+    if(putRes.ok) { 
+      updateSyncStatus('success');
+      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
+    } else { 
+      updateSyncStatus('error');
+      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
+    }
+  } catch(e) { 
+    updateSyncStatus('error');
+    if(!silent) alert('네트워크 에러 발생'); 
+  }
 }
 
-async function pullFromGithub() {
-  const settings = getGhSettings(); if(!settings) return;
-  const path = 'data/my_portfolio.json';
+function triggerAutoSync() {
+  const s = getGhSettings();
+  if(s.autoSync && s.token) {
+    pushToGithub(true);
+  }
+}
+
+async function pullFromGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
   
+  if(!silent) {
+    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+
+  const path = 'data/my_portfolio.json';
   try {
-    const fileInfo = await getGithubFileSha(settings, path);
+    const fileInfo = await getGithubFileSha({user, repo, token}, path);
     if (fileInfo && fileInfo.content) {
       const dataStr = b64_to_utf8(fileInfo.content);
       const data = JSON.parse(dataStr);
       if(data.tickers && data.transactions) {
         state = data; saveState(); cachedMarketData = {};
         render(); renderTxList();
-        alert('✅ 성공적으로 GitHub에서 불러왔습니다!');
-        closeModal('githubOverlay');
-      } else { alert('유효한 포트폴리오 파일이 아닙니다.'); }
-    } else { alert('저장소에 저장된 포트폴리오 파일(data/my_portfolio.json)이 없습니다.'); }
-  } catch(e) { alert('가져오기 실패'); }
+        updateSyncStatus('success');
+        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('githubOverlay'); }
+      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
+    } else if(!silent) alert('저장소에 파일이 없습니다.');
+  } catch(e) { if(!silent) alert('가져오기 실패'); }
 }
 
-function openChartModal(ticker) {
-  const data = cachedMarketData[ticker]; if(!data) return;
-  const hi = Math.max(...data.prices), lo = Math.min(...data.prices);
-  
-  document.getElementById('mTicker').textContent = data.name;
-  document.getElementById('mBroker').textContent = data.symbol;
-  document.getElementById('mPrice').textContent = formatPrice(data.last, ticker);
-  const chgPct = ((data.last-data.prev)/data.prev*100).toFixed(2);
-  const chgEl = document.getElementById('mChange');
-  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(data.last-data.prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
-  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
-  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('mMeta').textContent = `최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
-  
-  document.getElementById('chartOverlay').classList.add('open');
-  if (modalChartInst) modalChartInst.destroy();
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', data.prices, data.dates, false); }, 50);
-}
+// 앱 실행 시 자동 동기화 켜져있으면 최초 1회 Pull (충돌 방지를 위해 생략 가능하나 원하면 추가)
+window.onload = () => {
+  let s = getGhSettings();
+  if(s.autoSync && s.token) {
+    // 풀 동작은 안전상 수동으로 하는 것이 좋지만 원한다면: pullFromGithub(true);
+  }
+};
 
 renderTxList();
 render();
