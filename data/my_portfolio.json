@@ -28,7 +28,8 @@
     "490490.KS",
     "494840.KS",
     "263020.KQ",
-    "AVGO"
+    "AVGO",
+    "GOOGL"
   ],
   "transactions": [
     {
@@ -254,6 +255,14 @@
       "symbol": "AVGO",
       "qty": 7,
       "price": 337.0928
+    },
+    {
+      "id": 1775891745140,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "GOOGL",
+      "qty": 8,
+      "price": 184.5
     }
   ],
   "range": "1y"
