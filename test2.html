@@ -26,8 +26,11 @@
   .range-group { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px; }
   .rtab { padding: 4px 10px; font-size: 11px; font-family: var(--font-mono); background: transparent; border: none; color: var(--text2); cursor: pointer; border-radius: 6px; transition: all 0.15s; }
   .rtab.active { background: var(--accent); color: #fff; }
-  .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); font-family: var(--font-sans); }
+  .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); font-family: var(--font-sans); transition: 0.15s; }
   .btn-sm:hover { background: var(--bg3); color: var(--text); }
+  .btn-github { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); }
+  .btn-github:hover { background: #fff; color: #000; }
+  
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); outline: none; cursor: pointer; }
 
   /* ── 2. 메인 레이아웃 (사이드바 + 콘텐츠) ── */
@@ -74,7 +77,6 @@
   .summary { flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
   .sum-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; }
   .sum-label { font-size: 11px; color: var(--text3); letter-spacing: 0.06em; margin-bottom: 8px; text-transform: uppercase; }
-  /* 분리된 통화 요약 텍스트용 스타일 */
   .sum-val-krw { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text); }
   .sum-val-usd { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text2); margin-top: 4px; }
   .sum-val-krw.up, .sum-val-usd.up { color: var(--green); }
@@ -84,13 +86,11 @@
   .section-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 15px 0 10px 0; flex-shrink: 0; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* 그리드 컨테이너 */
   .grid-container { flex: 1; overflow-y: auto; padding-right: 5px; padding-bottom: 20px; }
   .grid-container::-webkit-scrollbar { width: 6px; }
   .grid-container::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-content: start; }
   
-  /* 종목 카드 */
   .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 12px; position: relative; cursor: pointer; transition: 0.15s; overflow: hidden; }
   .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   .card.up::before { background: var(--green); } .card.down::before { background: var(--red); }
@@ -112,7 +112,8 @@
   /* ── 5. 모달 ── */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .overlay.open { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg); width: 100%; max-width: 600px; animation: fadeUp 0.2s ease; }
+  .modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
+  .modal-sm { max-width: 400px; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 </style>
 </head>
@@ -139,8 +140,9 @@
       <button class="rtab" onclick="setRange('6mo',this)">6M</button>
       <button class="rtab active" onclick="setRange('1y',this)">1Y</button>
     </div>
-    <button class="btn-sm" onclick="exportData()" title="데이터 JSON 백업">⬇️ 저장</button>
-    <button class="btn-sm" onclick="document.getElementById('importFile').click()" title="JSON 불러오기">⬆️ 복원</button>
+    <button class="btn-sm" onclick="exportData()" title="로컬 파일 백업">⬇️ 로컬 저장</button>
+    <button class="btn-sm" onclick="document.getElementById('importFile').click()" title="로컬 파일 복원">⬆️ 로컬 불러오기</button>
+    <button class="btn-sm btn-github" onclick="openGithubModal()" title="GitHub 저장소에 거래 장부 동기화">☁️ GitHub 클라우드 연동</button>
   </div>
 </nav>
 
@@ -208,27 +210,58 @@
       <div class="allocation" title="포트폴리오 비중"><canvas id="allocationCanvas"></canvas></div>
     </div>
 
-    <div class="grid-container" id="gridContainer">
-      </div>
+    <div class="section-title" id="gridTitle" style="display:none">포트폴리오</div>
+    
+    <div class="grid-container" id="gridContainer"></div>
   </main>
 </div>
 
-<div class="overlay" id="chartOverlay" onclick="closeChartModal(event)">
+<div class="overlay" id="chartOverlay" onclick="closeModal('chartOverlay')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding: 20px 24px 0;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
       <div>
         <div id="mTicker" style="font-size:18px; font-weight:700;"></div>
         <div id="mBroker" style="font-family:var(--font-mono); font-size:12px; color:var(--text3); margin-top:2px;"></div>
       </div>
-      <button class="btn-sm" onclick="closeChartModal()" style="padding:6px 14px;">닫기</button>
+      <button class="btn-sm" onclick="closeModal('chartOverlay')">닫기</button>
     </div>
-    <div style="padding: 16px 24px 24px;">
-      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
-        <div id="mPrice" style="font-family:var(--font-mono); font-size:28px; font-weight:700;"></div>
-        <div id="mChange" style="font-size:14px; font-weight:500; padding:3px 10px; border-radius:20px;"></div>
-      </div>
-      <div id="mMeta" style="font-size:12px; color:var(--text3); margin-bottom:14px;"></div>
-      <div style="height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
+    <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
+      <div id="mPrice" style="font-family:var(--font-mono); font-size:28px; font-weight:700;"></div>
+      <div id="mChange" style="font-size:14px; font-weight:500; padding:3px 10px; border-radius:20px;"></div>
+    </div>
+    <div id="mMeta" style="font-size:12px; color:var(--text3); margin-bottom:14px;"></div>
+    <div style="height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
+  </div>
+</div>
+
+<div class="overlay" id="githubOverlay" onclick="closeModal('githubOverlay')">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 style="font-size:16px;">☁️ GitHub 클라우드 동기화</h3>
+      <button class="btn-sm" onclick="closeModal('githubOverlay')">닫기</button>
+    </div>
+    
+    <div style="font-size:11px; color:var(--text2); margin-bottom:20px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px;">
+      GitHub API를 사용하여 현재 장부를 저장소의 <strong style="color:#fff">data/my_portfolio.json</strong> 파일로 저장하거나 불러옵니다. <br><br>
+      ⚠️ <strong>주의:</strong> Personal Access Token은 <strong>Contents: Write</strong> 권한이 포함된 Classic Token이거나 Fine-grained Token이어야 합니다. 이 정보는 브라우저 캐시에만 안전하게 저장됩니다.
+    </div>
+
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>GitHub 사용자 이름 (Owner)</label>
+      <input type="text" id="ghUser" class="form-input" placeholder="예: etech-symantec">
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>저장소 이름 (Repo)</label>
+      <input type="text" id="ghRepo" class="form-input" placeholder="예: stock">
+    </div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <label>Personal Access Token (PAT)</label>
+      <input type="password" id="ghToken" class="form-input" placeholder="ghp_xxxxxxxxxxxxxxxxx">
+    </div>
+
+    <div style="display:flex; gap:10px;">
+      <button class="btn-submit" style="background:var(--blue); flex:1;" onclick="pullFromGithub()">⬆️ 불러오기 (Pull)</button>
+      <button class="btn-submit" style="flex:1;" onclick="pushToGithub()">⬇️ 저장하기 (Push)</button>
     </div>
   </div>
 </div>
@@ -249,8 +282,7 @@ document.getElementById('txDate').valueAsDate = new Date();
 
 async function loadStockDB() {
   try {
-    const url = 'data/stocks.json?t=' + new Date().getTime();
-    const res = await fetch(url);
+    const res = await fetch('data/stocks.json?t=' + new Date().getTime());
     if (res.ok) localStockDB = await res.json();
   } catch(e) {}
 }
@@ -260,35 +292,11 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v6');
-    if(oldS) return JSON.parse(oldS);
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
 }
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-
-function exportData() {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-  const dl = document.createElement('a');
-  dl.setAttribute("href", dataStr);
-  dl.setAttribute("download", `portfolio_ledger_${new Date().toISOString().split('T')[0]}.json`);
-  document.body.appendChild(dl); dl.click(); dl.remove();
-}
-
-function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if(data.tickers && data.transactions) { state = data; saveState(); cachedMarketData = {}; render(); renderTxList(); alert('복원 완료'); }
-    } catch(err) { alert('오류 발생'); }
-    e.target.value = '';
-  };
-  reader.readAsText(file);
-}
 
 // ── 통화 및 국가 분류 유틸리티 ──
 function isKorean(symbol) { return symbol.endsWith('.KS') || symbol.endsWith('.KQ'); }
@@ -517,7 +525,6 @@ function setView(view, el) {
   el.classList.add('active'); render();
 }
 
-// 개별 종목 카드 HTML 생성 함수
 function generateCardHtml(ticker, currentHoldings) {
   const data = cachedMarketData[ticker];
   const h = currentHoldings[ticker] || {qty:0, avg:0};
@@ -622,7 +629,6 @@ async function render() {
      return;
   }
 
-  // ── 국가별 그룹화(섹션) 로직 ──
   const krTickers = displayTickers.filter(isKorean);
   const usTickers = displayTickers.filter(t => !isKorean(t) && !isCrypto(t));
   const cryptoTickers = displayTickers.filter(isCrypto);
@@ -651,7 +657,6 @@ async function render() {
   updateSummaryAndAllocation(validTickers, currentHoldings);
 }
 
-// ── 7. 차트 및 요약 업데이트 ──
 function getColors(prices) {
   const last = prices[prices.length-1], first = prices[0];
   if (last > first) return { line:'#00c87a', fill:'rgba(0,200,122,0.12)' };
@@ -683,7 +688,7 @@ function updateSummaryAndAllocation(validTickers, currentHoldings) {
       const cAmt = h.qty * h.avg;
       
       if(isKorean(t)) { evalKRW += eAmt; costKRW += cAmt; allocData.push(eAmt); }
-      else { evalUSD += eAmt; costUSD += cAmt; allocData.push(eAmt * 1400); } // 차트용 임시환율 1400원 적용
+      else { evalUSD += eAmt; costUSD += cAmt; allocData.push(eAmt * 1400); } 
       
       if(eAmt > 0) { allocLabels.push(data.name); }
     }
@@ -694,7 +699,6 @@ function updateSummaryAndAllocation(validTickers, currentHoldings) {
   const roiKRW = costKRW > 0 ? (pnlKRW/costKRW*100) : 0;
   const roiUSD = costUSD > 0 ? (pnlUSD/costUSD*100) : 0;
 
-  // 통화별 Summary 업데이트 (KRW / USD 분리)
   const elValKrw = document.getElementById('totalValKrw'), elValUsd = document.getElementById('totalValUsd');
   const elPnlKrw = document.getElementById('totalPnlKrw'), elPnlUsd = document.getElementById('totalPnlUsd');
   const elRoiKrw = document.getElementById('totalRoiKrw'), elRoiUsd = document.getElementById('totalRoiUsd');
@@ -727,6 +731,82 @@ function updateSummaryAndAllocation(validTickers, currentHoldings) {
   }
 }
 
+// ── 8. GitHub 연동 및 모달 제어 ──
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function openGithubModal() {
+  let settings = JSON.parse(localStorage.getItem('gh_settings')) || { user: '', repo: '', token: '' };
+  document.getElementById('ghUser').value = settings.user;
+  document.getElementById('ghRepo').value = settings.repo;
+  document.getElementById('ghToken').value = settings.token;
+  document.getElementById('githubOverlay').classList.add('open');
+}
+
+function getGhSettings() {
+  const user = document.getElementById('ghUser').value.trim();
+  const repo = document.getElementById('ghRepo').value.trim();
+  const token = document.getElementById('ghToken').value.trim();
+  if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return null; }
+  localStorage.setItem('gh_settings', JSON.stringify({ user, repo, token }));
+  return { user, repo, token };
+}
+
+function utf8_to_b64(str) {
+  return window.btoa(unescape(encodeURIComponent(str)));
+}
+
+function b64_to_utf8(str) {
+  return decodeURIComponent(escape(window.atob(str)));
+}
+
+async function getGithubFileSha(settings, path) {
+  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
+  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
+  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
+  return null;
+}
+
+async function pushToGithub() {
+  const settings = getGhSettings(); if(!settings) return;
+  const path = 'data/my_portfolio.json';
+  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
+  
+  try {
+    const fileInfo = await getGithubFileSha(settings, path);
+    const content = utf8_to_b64(JSON.stringify(state, null, 2));
+    const body = { message: "🗂️ 포트폴리오 거래 장부 동기화 (Push)", content: content };
+    if (fileInfo) body.sha = fileInfo.sha;
+
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+    
+    if(putRes.ok) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
+    else { alert('저장 실패: ' + putRes.statusText); }
+  } catch(e) { alert('네트워크 에러 발생'); }
+}
+
+async function pullFromGithub() {
+  const settings = getGhSettings(); if(!settings) return;
+  const path = 'data/my_portfolio.json';
+  
+  try {
+    const fileInfo = await getGithubFileSha(settings, path);
+    if (fileInfo && fileInfo.content) {
+      const dataStr = b64_to_utf8(fileInfo.content);
+      const data = JSON.parse(dataStr);
+      if(data.tickers && data.transactions) {
+        state = data; saveState(); cachedMarketData = {};
+        render(); renderTxList();
+        alert('✅ 성공적으로 GitHub에서 불러왔습니다!');
+        closeModal('githubOverlay');
+      } else { alert('유효한 포트폴리오 파일이 아닙니다.'); }
+    } else { alert('저장소에 저장된 포트폴리오 파일(data/my_portfolio.json)이 없습니다.'); }
+  } catch(e) { alert('가져오기 실패'); }
+}
+
 function openChartModal(ticker) {
   const data = cachedMarketData[ticker]; if(!data) return;
   const hi = Math.max(...data.prices), lo = Math.min(...data.prices);
@@ -745,7 +825,6 @@ function openChartModal(ticker) {
   if (modalChartInst) modalChartInst.destroy();
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', data.prices, data.dates, false); }, 50);
 }
-function closeChartModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('chartOverlay').classList.remove('open'); }
 
 renderTxList();
 render();
