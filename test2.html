@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOCK WATCH — 클라우드 자동 동기화 장부</title>
+<title>STOCK WATCH — 멀티 유저 & 클라우드 장부</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -65,9 +65,10 @@
   .tx-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 12px; position: relative; }
   .tx-card-head { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--text2); font-size: 11px; }
   .tx-card-body { display: flex; justify-content: space-between; align-items: flex-end; }
-  .tx-sym { font-family: var(--font-sans); font-weight: 700; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; display: inline-block; }
+  .tx-sym { font-family: var(--font-sans); font-weight: 700; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; display: inline-block; }
   .tx-del { cursor: pointer; color: var(--text3); font-size: 12px; transition: color 0.2s; }
   .tx-del:hover { color: var(--red); }
+  .owner-badge { font-size: 9px; padding: 2px 6px; border-radius: 12px; background: rgba(255,255,255,0.1); color: #fff; margin-bottom: 2px; display: inline-block; }
 
   /* ── 대시보드 메인 ── */
   .dashboard-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 1.5rem 2rem; background: var(--bg); max-width: 100%; }
@@ -79,7 +80,7 @@
   .btn-primary { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; white-space: nowrap; }
   .btn-primary:hover { background: var(--accent); color: #fff; }
 
-  /* ── 대시보드 상단 개편 (통합 요약 띠) ── */
+  /* ── 대시보드 상단 요약 ── */
   .dashboard-top { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1.5rem; flex-shrink: 0; }
   
   .global-summary { display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 24px; flex-wrap: wrap; gap: 15px; }
@@ -108,7 +109,8 @@
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: border-color 0.2s; }
   .acc-row:hover { border-color: var(--border2); }
   
-  .acc-pie-wrap { width: 70px; height: 70px; position: relative; flex-shrink: 0; }
+  /* 파이 차트 크기 확대 */
+  .acc-pie-wrap { width: 85px; height: 85px; position: relative; flex-shrink: 0; }
   
   .acc-content { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .acc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px; }
@@ -118,7 +120,6 @@
   .acc-pnl.up { color: var(--green); } .acc-pnl.down { color: var(--red); }
   .acc-roi { font-size: 11px; font-weight: 500; }
   
-  /* 가로 막대 그래프 디자인 */
   .acc-bars { display: flex; flex-direction: column; gap: 6px; }
   .acc-bar-row { display: flex; align-items: center; gap: 8px; }
   .acc-bar-label { font-size: 11px; color: var(--text2); width: 24px; flex-shrink: 0; }
@@ -173,8 +174,8 @@
   input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
   input:checked + .slider:before { transform: translateX(16px); background-color: #fff; }
 
-  /* 차트 툴팁 (잘림 방지용 커스텀 툴팁) */
-  #chartjs-tooltip { opacity: 0; position: absolute; background: rgba(20, 23, 32, 0.95); border: 1px solid var(--border2); border-radius: 6px; color: #fff; pointer-events: none; transform: translate(-50%, -110%); transition: all .1s ease; z-index: 99999; padding: 6px 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+  /* 차트 커스텀 툴팁 (잘림 방지 및 최상위 표시) */
+  #chartjs-tooltip { opacity: 0; position: absolute; background: rgba(20, 23, 32, 0.95); border: 1px solid var(--border2); border-radius: 6px; color: #fff; pointer-events: none; transform: translate(-50%, -110%); transition: all .1s ease; z-index: 999999; padding: 8px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); font-family: var(--font-sans); }
 </style>
 </head>
 <body>
@@ -185,7 +186,9 @@
   <div class="logo"><div class="logo-dot"></div>STOCK&nbsp;WATCH</div>
   <div class="view-tabs">
     <button class="vtab active" onclick="setView('all', this)">전체보기</button>
-    <button class="vtab" onclick="setView('held', this)">보유종목</button>
+    <button class="vtab" onclick="setView('user1', this)">보유자1</button>
+    <button class="vtab" onclick="setView('user2', this)">보유자2</button>
+    
     <button class="vtab" onclick="setView('watch', this)">관심종목</button>
     <button class="vtab" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
   </div>
@@ -220,13 +223,21 @@
     <div class="sidebar-header">✏️ 거래 장부 (Ledger)</div>
     
     <div class="tx-form">
-      <div class="form-group" style="display:flex; gap:15px; margin-bottom:5px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text); font-size:12px; font-weight:500;">
-          <input type="radio" name="txType" value="trade" checked onchange="toggleTxType()" style="accent-color:var(--accent)"> 주식 매매
-        </label>
-        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text); font-size:12px; font-weight:500;">
-          <input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="accent-color:var(--green)"> 배당금
-        </label>
+      <div style="display:flex; gap:10px; margin-bottom:5px;">
+        <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
+          <span style="font-size:10px; color:var(--text2); font-weight:700;">소유자</span>
+          <div style="display:flex; gap:10px;">
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txOwner" value="보유자1" checked style="accent-color:var(--accent)"> 보유자1</label>
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txOwner" value="보유자2" style="accent-color:var(--accent)"> 보유자2</label>
+          </div>
+        </div>
+        <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
+          <span style="font-size:10px; color:var(--text2); font-weight:700;">유형</span>
+          <div style="display:flex; gap:10px;">
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="trade" checked onchange="toggleTxType()" style="accent-color:var(--accent)"> 매매</label>
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="accent-color:var(--green)"> 배당</label>
+          </div>
+        </div>
       </div>
 
       <div class="form-group">
@@ -338,6 +349,15 @@
     <div class="grid-container" id="gridContainer"></div>
 
     <div id="dividendDashboard">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+        <div class="section-title" style="margin:0;">💰 배당금 현황</div>
+        <div class="view-tabs" style="background:var(--bg3);">
+          <button class="vtab active div-filter" onclick="setDivFilter('all', this)">전체 합산</button>
+          <button class="vtab div-filter" onclick="setDivFilter('보유자1', this)">보유자1</button>
+          <button class="vtab div-filter" onclick="setDivFilter('보유자2', this)">보유자2</button>
+        </div>
+      </div>
+
       <div class="summary" style="display:flex; gap:10px;">
         <div class="sum-card" style="flex:1; background:var(--green-bg); border-color:var(--green);">
           <div class="sum-label" style="color:var(--green)">누적 배당금 총액 (환산)</div>
@@ -423,10 +443,11 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v19'; 
+const STORE_KEY = 'stockwatch_real_v20'; 
 let state = loadState();
 
-let currentView = 'all';
+let currentView = 'all'; // 'all', 'user1', 'user2', 'watch', 'dividend'
+let currentDivFilter = 'all'; // 배당금 탭 내부 필터
 let currentSortMode = 'default';
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
@@ -454,8 +475,16 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v18'); 
-    if(oldS) return JSON.parse(oldS);
+    let oldS = localStorage.getItem('stockwatch_real_v19'); 
+    if(oldS) {
+      let parsed = JSON.parse(oldS);
+      // 기존 데이터에 owner가 없으면 기본값 '보유자1'로 할당
+      parsed.transactions.forEach(t => { 
+        if(!t.txType) t.txType = 'trade'; 
+        if(!t.owner) t.owner = '보유자1';
+      });
+      return parsed;
+    }
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
 }
@@ -486,17 +515,20 @@ function toggleTxType() {
 }
 
 // ── 3. 거래 장부 (Ledger) 로직 ──
-function calculateHoldings() {
+function calculateHoldings(ownerFilter = 'all') {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
   
   sortedTx.forEach(tx => {
     if (tx.txType === 'dividend') return;
+    if (ownerFilter !== 'all' && tx.owner !== ownerFilter) return;
 
     let broker = tx.broker ? tx.broker.trim() : '미지정';
-    let key = `${tx.symbol}::${broker}`;
+    // '전체보기'일 때는 계좌명 뒤에 소유자를 붙여서 합산되지 않고 분리되도록 처리
+    let displayBroker = ownerFilter === 'all' ? `${broker} (${tx.owner})` : broker;
+    let key = `${tx.symbol}::${displayBroker}`;
 
-    if(!holdings[key]) holdings[key] = { qty: 0, avg: 0, broker: broker, symbol: tx.symbol };
+    if(!holdings[key]) holdings[key] = { qty: 0, avg: 0, broker: displayBroker, symbol: tx.symbol };
     let h = holdings[key];
     
     if (tx.qty > 0) {
@@ -513,11 +545,12 @@ function calculateHoldings() {
 
 function addTransaction() {
   const date = document.getElementById('txDate').value;
+  const owner = document.querySelector('input[name="txOwner"]:checked').value;
+  const txType = document.querySelector('input[name="txType"]:checked').value;
   const broker = document.getElementById('txBroker').value.trim();
   let symbol = document.getElementById('txSymbol').value.trim().toUpperCase();
   const qty = parseFloat(document.getElementById('txQty').value) || 0;
   const price = parseFloat(document.getElementById('txPrice').value);
-  const txType = document.querySelector('input[name="txType"]:checked').value;
 
   if(!date || !symbol || isNaN(price)) {
     alert("종목코드, 단가(배당금액)를 정확히 입력해주세요."); return;
@@ -528,7 +561,7 @@ function addTransaction() {
   
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
-  state.transactions.push({ id: Date.now(), date, broker, symbol, qty, price, txType });
+  state.transactions.push({ id: Date.now(), date, owner, broker, symbol, qty, price, txType });
   if(!state.tickers.includes(symbol)) state.tickers.push(symbol);
 
   saveState();
@@ -573,7 +606,7 @@ function renderTxList() {
     return `
       <li class="tx-card">
         <div class="tx-card-head">
-          <span>${tx.date} ${tx.broker ? `| ${tx.broker}` : ''}</span>
+          <span>${tx.date} | ${tx.owner} ${tx.broker ? `| ${tx.broker}` : ''}</span>
           <span class="tx-del" onclick="deleteTransaction(${tx.id})">✕</span>
         </div>
         <div class="tx-card-body">
@@ -597,7 +630,11 @@ function renderTxList() {
 
 function prepareTransaction(symbol, broker) {
   document.getElementById('txSymbol').value = symbol;
-  if(broker) document.getElementById('txBroker').value = broker;
+  
+  // 브로커명에서 '(보유자1)' 같은 텍스트 제거
+  if(broker) {
+    document.getElementById('txBroker').value = broker.replace(/\s*\(보유자[12]\)/, '');
+  }
   
   document.querySelector('input[name="txType"][value="trade"]').checked = true;
   toggleTxType();
@@ -743,6 +780,14 @@ function setView(view, el) {
   el.classList.add('active'); render();
 }
 
+// 배당금 탭 내부 보유자 필터
+function setDivFilter(filter, el) {
+  currentDivFilter = filter;
+  document.querySelectorAll('.div-filter').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderDividendDashboard();
+}
+
 function generateCardHtml(item) {
   const data = item.data;
   const isHeld = item.type === 'held';
@@ -755,14 +800,17 @@ function generateCardHtml(item) {
   const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
   const uniqueId = `c_${item.symbol}_${Math.random().toString(36).substring(7)}`;
 
+  // 브로커명 오버플로우 처리
+  const brokerDisp = isHeld && item.broker !== '미지정' ? `<span style="color:var(--text2); margin-left:6px; display:inline-block; max-width:120px; overflow:hidden; text-overflow:ellipsis; vertical-align:bottom;">[${item.broker}]</span>` : '';
+
   return `
     <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
       <span class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}">${isHeld ? '보유' : '관심'}</span>
       <div class="card-head" style="align-items:center;">
         <div style="flex:1; min-width:0; margin-right:10px;">
           <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
-          <div style="font-size:11px; font-family:var(--font-mono); color:var(--text3); margin-top:2px;">
-            ${item.symbol} ${isHeld && item.broker !== '미지정' ? `<span style="color:var(--text2); margin-left:6px;">[${item.broker}]</span>` : ''}
+          <div style="font-size:11px; font-family:var(--font-mono); color:var(--text3); margin-top:2px; white-space:nowrap;">
+            ${item.symbol} ${brokerDisp}
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
@@ -792,7 +840,12 @@ function renderDividendDashboard() {
   let monthlyKrw = {}, monthlyUsd = {};
   let symTotals = {};
 
-  const divTxs = state.transactions.filter(t => t.txType === 'dividend');
+  // 필터 적용
+  const divTxs = state.transactions.filter(t => {
+    if(t.txType !== 'dividend') return false;
+    if(currentDivFilter !== 'all' && t.owner !== currentDivFilter) return false;
+    return true;
+  });
 
   divTxs.forEach(tx => {
      const isKRW = isKorean(tx.symbol);
@@ -837,7 +890,7 @@ function renderDividendDashboard() {
       </div>
     `;
   }).join('');
-  document.getElementById('divStockList').innerHTML = listHtml || '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">배당 내역이 없습니다.</div>';
+  document.getElementById('divStockList').innerHTML = listHtml || '<div style="color:var(--text3); font-size:12px; text-align:center; padding:40px;">조회된 배당 내역이 없습니다.</div>';
 
   const allMonths = Array.from(new Set([...Object.keys(monthlyKrw), ...Object.keys(monthlyUsd)])).sort();
   const krwData = allMonths.map(m => monthlyKrw[m] || 0);
@@ -895,9 +948,28 @@ async function render() {
     divDash.style.display = 'none';
   }
 
-  const currentHoldings = calculateHoldings();
+  // 보유자 필터 설정
+  let ownerFilter = 'all';
+  if (currentView === 'user1') ownerFilter = '보유자1';
+  if (currentView === 'user2') ownerFilter = '보유자2';
+
+  const currentHoldings = calculateHoldings(ownerFilter);
   
-  if (state.tickers.length === 0 && Object.keys(currentHoldings).length === 0) {
+  // 전체보기 시, 같은 종목이면 수량/평단가를 통합하기 위한 처리
+  let symbolHoldings = {};
+  for(let key in currentHoldings) {
+    let h = currentHoldings[key];
+    if(h.qty > 0) {
+      if(!symbolHoldings[h.symbol]) {
+        symbolHoldings[h.symbol] = { qty: 0, totalCost: 0, brokers: new Set() };
+      }
+      symbolHoldings[h.symbol].qty += h.qty;
+      symbolHoldings[h.symbol].totalCost += (h.qty * h.avg);
+      symbolHoldings[h.symbol].brokers.add(h.broker);
+    }
+  }
+
+  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
     dash.style.display = 'none';
     return;
@@ -908,8 +980,8 @@ async function render() {
   }
 
   let allSymbols = new Set(state.tickers);
-  for(let key in currentHoldings) {
-    if(currentHoldings[key].qty > 0) allSymbols.add(currentHoldings[key].symbol);
+  for(let sym in symbolHoldings) {
+    allSymbols.add(sym);
   }
   allSymbols = Array.from(allSymbols);
 
@@ -924,10 +996,12 @@ async function render() {
   await Promise.all(promises);
 
   let displayItems = [];
-  for(let key in currentHoldings) {
-    let h = currentHoldings[key];
-    if(h.qty > 0 && cachedMarketData[h.symbol]) {
-      displayItems.push({ type: 'held', symbol: h.symbol, broker: h.broker, qty: h.qty, avg: h.avg, data: cachedMarketData[h.symbol] });
+  for(let sym in symbolHoldings) {
+    let sh = symbolHoldings[sym];
+    let avg = sh.qty > 0 ? sh.totalCost / sh.qty : 0;
+    let brokerStr = Array.from(sh.brokers).join(', ');
+    if (cachedMarketData[sym]) {
+      displayItems.push({ type: 'held', symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, data: cachedMarketData[sym] });
     }
   }
 
@@ -939,7 +1013,8 @@ async function render() {
   });
 
   displayItems = displayItems.filter(item => {
-    if(currentView === 'held') return item.type === 'held';
+    if(currentView === 'all') return true;
+    if(currentView === 'user1' || currentView === 'user2') return item.type === 'held';
     if(currentView === 'watch') return item.type === 'watch';
     return true; 
   });
@@ -977,7 +1052,7 @@ async function render() {
   Object.values(chartInstances).forEach(c => c.destroy());
   
   if(displayItems.length === 0) {
-     container.innerHTML = `<div class="empty">조건에 맞는 종목이 없습니다.</div>`;
+     container.innerHTML = `<div class="empty">선택한 보유자의 등록된 종목이 없습니다.</div>`;
      updateSummaryAndAllocation(displayItems);
      return;
   }
@@ -1014,7 +1089,8 @@ async function render() {
     }
   });
 
-  updateSummaryAndAllocation(displayItems);
+  // 대시보드 상단 요약에는 합산되지 않은 원본 CurrentHoldings를 넘겨야 계좌가 제대로 분리됨
+  updateSummaryAndAllocation(currentHoldings);
 }
 
 function getColors(prices) {
@@ -1036,36 +1112,39 @@ function buildChart(canvasId, prices, dates, mini) {
   });
 }
 
-function updateSummaryAndAllocation(displayItems) {
+function updateSummaryAndAllocation(rawHoldings) {
   accountPieChartInsts.forEach(c => c.destroy());
   accountPieChartInsts = [];
 
   let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
   let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
-  displayItems.forEach(item => {
-    if(item.type === 'held' && item.data) {
-      const eAmt = item.evalAmt; 
-      const cAmt = item.costAmt;
-      let broker = item.broker || '미지정';
+  // rawHoldings는 calculateHoldings(ownerFilter)에서 온 원본 객체 (key: symbol::broker)
+  for(let key in rawHoldings) {
+    let h = rawHoldings[key];
+    if(h.qty > 0 && cachedMarketData[h.symbol]) {
+      const data = cachedMarketData[h.symbol];
+      const eAmt = h.qty * data.last; 
+      const cAmt = h.qty * h.avg;
+      let broker = h.broker; // '전체보기'인 경우 이미 "키움증권 (보유자1)" 형태로 들어옴
       
-      if(isKorean(item.symbol)) { 
+      if(isKorean(h.symbol)) { 
         krwSummary.totalEval += eAmt;
         krwSummary.totalCost += cAmt;
         if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
         krwSummary.accounts[broker].eval += eAmt;
         krwSummary.accounts[broker].cost += cAmt;
-        krwSummary.accounts[broker].items.push({ name: item.data.name, costAmt: cAmt, evalAmt: eAmt });
+        krwSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
       } else { 
         usdSummary.totalEval += eAmt;
         usdSummary.totalCost += cAmt;
         if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
         usdSummary.accounts[broker].eval += eAmt;
         usdSummary.accounts[broker].cost += cAmt;
-        usdSummary.accounts[broker].items.push({ name: item.data.name, costAmt: cAmt, evalAmt: eAmt });
+        usdSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
       }
     }
-  });
+  }
 
   const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
   const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
@@ -1134,7 +1213,7 @@ function updateSummaryAndAllocation(displayItems) {
       </div>
     `;
   }).join('');
-  document.getElementById('krwAccountList').innerHTML = krwAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
+  document.getElementById('krwAccountList').innerHTML = krwAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:20px;">등록된 계좌가 없습니다.</div>';
 
   // ── USD 렌더링 ──
   const usdPnl = usdSummary.totalEval - usdSummary.totalCost;
@@ -1191,7 +1270,7 @@ function updateSummaryAndAllocation(displayItems) {
       </div>
     `;
   }).join('');
-  document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
+  document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:20px;">등록된 계좌가 없습니다.</div>';
 
   // ── 미니 파이 차트 그리기 ──
   const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
@@ -1216,6 +1295,14 @@ function updateSummaryAndAllocation(displayItems) {
           legend: { display: false },
           tooltip: {
             enabled: false,
+            // 종목명 및 포맷팅을 명시적으로 전달하기 위한 label 콜백
+            callbacks: {
+              label: function(context) {
+                let v = context.raw;
+                let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v).toLocaleString();
+                return context.label + ': ' + formatVal;
+              }
+            },
             external: function(context) {
               let tooltipEl = document.getElementById('chartjs-tooltip');
               if (!tooltipEl) {
@@ -1234,14 +1321,8 @@ function updateSummaryAndAllocation(displayItems) {
                 bodyLines.forEach(function(body, i) {
                   const colors = tooltipModel.labelColors[i];
                   const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
-                  let txt = body[0];
-                  let splitTxt = txt.split(': ');
-                  if(splitTxt.length === 2) {
-                    let val = parseFloat(splitTxt[1].replace(/,/g,''));
-                    let formatVal = cfg.isUsd ? '$' + val.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(val).toLocaleString();
-                    txt = `${splitTxt[0]}: ${formatVal}`;
-                  }
-                  innerHtml += `<div style="font-size:11px; display:flex; align-items:center; white-space:nowrap;">${span}${txt}</div>`;
+                  let txt = body[0]; // "종목명: 포맷된 금액" 그대로 가져옴
+                  innerHtml += `<div style="font-size:12px; display:flex; align-items:center; white-space:nowrap; padding:2px 0;">${span}${txt}</div>`;
                 });
                 innerHtml += '</div>';
                 tooltipEl.innerHTML = innerHtml;
@@ -1253,7 +1334,7 @@ function updateSummaryAndAllocation(displayItems) {
             }
           }
         },
-        cutout: '60%', animation: { duration: 0 }
+        cutout: '55%', animation: { duration: 0 }
       }
     });
     accountPieChartInsts.push(c);
