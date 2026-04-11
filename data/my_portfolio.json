@@ -36,7 +36,8 @@
     "PLTR",
     "UNH",
     "368590.KS",
-    "379780.KS"
+    "379780.KS",
+    "SMR"
   ],
   "transactions": [
     {
@@ -45,7 +46,8 @@
       "broker": "키움",
       "symbol": "005935.KS",
       "qty": 101,
-      "price": 66918
+      "price": 66918,
+      "txType": "trade"
     },
     {
       "id": 1775889555171,
@@ -53,7 +55,8 @@
       "broker": "키움",
       "symbol": "139250.KS",
       "qty": 25,
-      "price": 22500
+      "price": 22500,
+      "txType": "trade"
     },
     {
       "id": 1775889578144,
@@ -61,7 +64,8 @@
       "broker": "키움",
       "symbol": "360750.KS",
       "qty": 11,
-      "price": 18750
+      "price": 18750,
+      "txType": "trade"
     },
     {
       "id": 1775889594406,
@@ -69,7 +73,8 @@
       "broker": "키움",
       "symbol": "487230.KS",
       "qty": 162,
-      "price": 17365
+      "price": 17365,
+      "txType": "trade"
     },
     {
       "id": 1775889713850,
@@ -77,7 +82,8 @@
       "broker": "미래에셋",
       "symbol": "0047R0.KS",
       "qty": 580,
-      "price": 13001
+      "price": 13001,
+      "txType": "trade"
     },
     {
       "id": 1775889728130,
@@ -85,7 +91,8 @@
       "broker": "미래에셋",
       "symbol": "005380.KS",
       "qty": 2,
-      "price": 483000
+      "price": 483000,
+      "txType": "trade"
     },
     {
       "id": 1775889746620,
@@ -93,7 +100,8 @@
       "broker": "미래에셋",
       "symbol": "015760.KS",
       "qty": 63,
-      "price": 49879
+      "price": 49879,
+      "txType": "trade"
     },
     {
       "id": 1775889760256,
@@ -101,7 +109,8 @@
       "broker": "미래에셋",
       "symbol": "0172V0.KS",
       "qty": 50,
-      "price": 10535
+      "price": 10535,
+      "txType": "trade"
     },
     {
       "id": 1775889774268,
@@ -109,7 +118,8 @@
       "broker": "미래에셋",
       "symbol": "122870.KQ",
       "qty": 38,
-      "price": 66245
+      "price": 66245,
+      "txType": "trade"
     },
     {
       "id": 1775889795220,
@@ -117,7 +127,8 @@
       "broker": "미래에셋",
       "symbol": "133690.KS",
       "qty": 27,
-      "price": 143513
+      "price": 143513,
+      "txType": "trade"
     },
     {
       "id": 1775889809156,
@@ -125,7 +136,8 @@
       "broker": "미래에셋",
       "symbol": "161510.KS",
       "qty": 190,
-      "price": 20651
+      "price": 20651,
+      "txType": "trade"
     },
     {
       "id": 1775889822386,
@@ -133,7 +145,8 @@
       "broker": "미래에셋",
       "symbol": "179900.KQ",
       "qty": 60,
-      "price": 21283
+      "price": 21283,
+      "txType": "trade"
     },
     {
       "id": 1775889836347,
@@ -141,7 +154,8 @@
       "broker": "미래에셋",
       "symbol": "229200.KS",
       "qty": 200,
-      "price": 15665
+      "price": 15665,
+      "txType": "trade"
     },
     {
       "id": 1775889849565,
@@ -149,7 +163,8 @@
       "broker": "미래에셋",
       "symbol": "347700.KQ",
       "qty": 10,
-      "price": 47300
+      "price": 47300,
+      "txType": "trade"
     },
     {
       "id": 1775889862408,
@@ -157,7 +172,8 @@
       "broker": "미래에셋",
       "symbol": "352820.KS",
       "qty": 26,
-      "price": 315038
+      "price": 315038,
+      "txType": "trade"
     },
     {
       "id": 1775889875956,
@@ -165,7 +181,8 @@
       "broker": "미래에셋",
       "symbol": "454910.KS",
       "qty": 20,
-      "price": 93300
+      "price": 93300,
+      "txType": "trade"
     },
     {
       "id": 1775889890957,
@@ -173,7 +190,8 @@
       "broker": "미래에셋",
       "symbol": "457480.KS",
       "qty": 256,
-      "price": 15618
+      "price": 15618,
+      "txType": "trade"
     },
     {
       "id": 1775889906136,
@@ -181,7 +199,8 @@
       "broker": "미래에셋",
       "symbol": "458730.KS",
       "qty": 3582,
-      "price": 11593
+      "price": 11593,
+      "txType": "trade"
     },
     {
       "id": 1775889918234,
@@ -189,7 +208,8 @@
       "broker": "미래에셋",
       "symbol": "469070.KS",
       "qty": 291,
-      "price": 16234
+      "price": 16234,
+      "txType": "trade"
     },
     {
       "id": 1775889931013,
@@ -197,7 +217,8 @@
       "broker": "미래에셋",
       "symbol": "478150.KS",
       "qty": 90,
-      "price": 22620
+      "price": 22620,
+      "txType": "trade"
     },
     {
       "id": 1775889945763,
@@ -205,7 +226,8 @@
       "broker": "미래에셋",
       "symbol": "481180.KS",
       "qty": 510,
-      "price": 13239
+      "price": 13239,
+      "txType": "trade"
     },
     {
       "id": 1775889967421,
@@ -213,7 +235,8 @@
       "broker": "미래에셋",
       "symbol": "487230.KS",
       "qty": 200,
-      "price": 15100
+      "price": 15100,
+      "txType": "trade"
     },
     {
       "id": 1775889988493,
@@ -221,7 +244,8 @@
       "broker": "미래에셋",
       "symbol": "487240.KS",
       "qty": 200,
-      "price": 24503
+      "price": 24503,
+      "txType": "trade"
     },
     {
       "id": 1775890001619,
@@ -229,7 +253,8 @@
       "broker": "미래에셋",
       "symbol": "490490.KS",
       "qty": 300,
-      "price": 9707
+      "price": 9707,
+      "txType": "trade"
     },
     {
       "id": 1775890012849,
@@ -237,7 +262,8 @@
       "broker": "미래에셋",
       "symbol": "494840.KS",
       "qty": 190,
-      "price": 13666
+      "price": 13666,
+      "txType": "trade"
     },
     {
       "id": 1775891678344,
@@ -245,7 +271,8 @@
       "broker": "키움",
       "symbol": "263020.KQ",
       "qty": 200,
-      "price": 3355
+      "price": 3355,
+      "txType": "trade"
     },
     {
       "id": 1775891714821,
@@ -253,7 +280,8 @@
       "broker": "키움",
       "symbol": "AAPL",
       "qty": 36,
-      "price": 110.9597
+      "price": 110.9597,
+      "txType": "trade"
     },
     {
       "id": 1775891732238,
@@ -261,7 +289,8 @@
       "broker": "키움",
       "symbol": "AVGO",
       "qty": 7,
-      "price": 337.0928
+      "price": 337.0928,
+      "txType": "trade"
     },
     {
       "id": 1775891745140,
@@ -269,7 +298,8 @@
       "broker": "키움",
       "symbol": "GOOGL",
       "qty": 8,
-      "price": 184.5
+      "price": 184.5,
+      "txType": "trade"
     },
     {
       "id": 1775891756351,
@@ -277,7 +307,8 @@
       "broker": "키움",
       "symbol": "META",
       "qty": 2,
-      "price": 648
+      "price": 648,
+      "txType": "trade"
     },
     {
       "id": 1775891765585,
@@ -285,7 +316,8 @@
       "broker": "키움",
       "symbol": "MSFT",
       "qty": 5,
-      "price": 435
+      "price": 435,
+      "txType": "trade"
     },
     {
       "id": 1775891778085,
@@ -293,7 +325,8 @@
       "broker": "키움",
       "symbol": "NVDA",
       "qty": 87,
-      "price": 12.2754
+      "price": 12.2754,
+      "txType": "trade"
     },
     {
       "id": 1775891794198,
@@ -301,7 +334,8 @@
       "broker": "키움",
       "symbol": "ORCL",
       "qty": 13,
-      "price": 191.35
+      "price": 191.35,
+      "txType": "trade"
     },
     {
       "id": 1775891805434,
@@ -309,7 +343,8 @@
       "broker": "키움",
       "symbol": "PLTR",
       "qty": 12,
-      "price": 173.75
+      "price": 173.75,
+      "txType": "trade"
     },
     {
       "id": 1775891844868,
@@ -317,7 +352,8 @@
       "broker": "키움",
       "symbol": "TSLA",
       "qty": 18,
-      "price": 182.1095
+      "price": 182.1095,
+      "txType": "trade"
     },
     {
       "id": 1775891856916,
@@ -325,7 +361,8 @@
       "broker": "키움",
       "symbol": "UNH",
       "qty": 4,
-      "price": 303.15
+      "price": 303.15,
+      "txType": "trade"
     },
     {
       "id": 1775893641841,
@@ -333,7 +370,8 @@
       "broker": "KB",
       "symbol": "368590.KS",
       "qty": 100,
-      "price": 19525
+      "price": 19525,
+      "txType": "trade"
     },
     {
       "id": 1775893659107,
@@ -341,7 +379,8 @@
       "broker": "KB",
       "symbol": "379780.KS",
       "qty": 120,
-      "price": 16550
+      "price": 16550,
+      "txType": "trade"
     },
     {
       "id": 1775893675762,
@@ -349,7 +388,8 @@
       "broker": "KB",
       "symbol": "457480.KS",
       "qty": 196,
-      "price": 21338
+      "price": 21338,
+      "txType": "trade"
     },
     {
       "id": 1775893690771,
@@ -357,8 +397,18 @@
       "broker": "KB",
       "symbol": "490490.KS",
       "qty": 200,
-      "price": 9840
+      "price": 9840,
+      "txType": "trade"
+    },
+    {
+      "id": 1775893841822,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "SMR",
+      "qty": 6,
+      "price": 86.999,
+      "txType": "trade"
     }
   ],
-  "range": "1y"
+  "range": "6mo"
 }
