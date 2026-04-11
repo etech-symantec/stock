@@ -33,7 +33,8 @@
     "META",
     "MSFT",
     "NVDA",
-    "ORCL"
+    "ORCL",
+    "PLTR"
   ],
   "transactions": [
     {
@@ -299,6 +300,14 @@
       "symbol": "ORCL",
       "qty": 13,
       "price": 191.35
+    },
+    {
+      "id": 1775891805434,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "PLTR",
+      "qty": 12,
+      "price": 173.75
     }
   ],
   "range": "1y"
