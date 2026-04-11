@@ -7,20 +7,31 @@ def main():
     added_symbols = set()  # 중복 등록 방지용
 
     def add_to_db(symbol, name, exch):
-        # 야후 파이낸스에서 인식 못하는 빈 심볼이나 중복 심볼 제외
-        if symbol and symbol not in added_symbols:
+        # 문자열인지 확인하고, 빈 값이나 중복 심볼 제외
+        if isinstance(symbol, str) and symbol.strip() and symbol not in added_symbols:
             db.append({
-                "symbol": symbol,
-                "name": name,
+                "symbol": symbol.strip(),
+                "name": str(name).strip(),
                 "exch": exch
             })
             added_symbols.add(symbol)
 
-    print("🇺🇸 1. 미국 주식 (S&P 500) 데이터를 가져옵니다...")
+    print("🇺🇸 1. 미국 주식 (S&P500 + NASDAQ + NYSE 전체) 데이터를 가져옵니다...")
     try:
+        # 가장 중요한 S&P 500 기업 500개를 우선적으로 검색망 상단에 배치하기 위해 먼저 추가
         sp500 = fdr.StockListing('S&P500')
         for _, row in sp500.iterrows():
             add_to_db(row['Symbol'], row['Name'], "US_STOCK")
+
+        # 나스닥(NASDAQ)과 뉴욕증권거래소(NYSE) 상장 종목 전체 수집 (약 6,000여개)
+        nasdaq = fdr.StockListing('NASDAQ')
+        nyse = fdr.StockListing('NYSE')
+        
+        for df in [nasdaq, nyse]:
+            for _, row in df.iterrows():
+                # S&P500에 이미 들어간 종목은 add_to_db 내부의 set에 의해 자동으로 중복 제외됨
+                add_to_db(row['Symbol'], row['Name'], "US_STOCK")
+                
     except Exception as e:
         print(f"미국 주식 가져오기 실패: {e}")
 
