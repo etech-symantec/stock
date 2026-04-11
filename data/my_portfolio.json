@@ -34,7 +34,8 @@
     "NVDA",
     "ORCL",
     "PLTR",
-    "UNH"
+    "UNH",
+    "368590.KS"
   ],
   "transactions": [
     {
@@ -324,6 +325,14 @@
       "symbol": "UNH",
       "qty": 4,
       "price": 303.15
+    },
+    {
+      "id": 1775893641841,
+      "date": "2026-04-11",
+      "broker": "KB",
+      "symbol": "368590.KS",
+      "qty": 100,
+      "price": 19525
     }
   ],
   "range": "1y"
