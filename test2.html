@@ -43,7 +43,7 @@
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; }
   
   /* ── 사이드바 ── */
-  .ledger-sidebar { width: 320px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; }
+  .ledger-sidebar { width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; }
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); }
   
   .tx-form { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
@@ -72,11 +72,10 @@
   .tx-del { cursor: pointer; color: var(--text3); font-size: 12px; transition: color 0.2s; }
   .tx-del:hover { color: var(--red); }
   
-  /* 거래 내역 소유자 클릭 뱃지 */
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 대시보드 메인 (전체 스크롤 방식으로 최적화) ── */
+  /* ── 대시보드 메인 ── */
   .dashboard-main { flex: 1; display: block; overflow-y: auto; padding: 1.5rem 2rem; background: var(--bg); max-width: 100%; }
   .dashboard-main::-webkit-scrollbar { width: 8px; }
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
@@ -88,18 +87,14 @@
   .btn-primary { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; white-space: nowrap; }
   .btn-primary:hover { background: var(--accent); color: #fff; }
 
-  /* ── 대시보드 상단 레이아웃 ── */
-  .dashboard-top { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1.5rem; }
+  /* ── 3분할 그리드 레이아웃 ── */
+  .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 1.5rem; flex-shrink: 0; align-items: stretch; }
   
-  .global-summary { display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 24px; flex-wrap: wrap; gap: 15px; }
-  .gs-group { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
-  .gs-item { display: flex; flex-direction: column; gap: 4px; }
-  .gs-label { font-size: 11px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-  .gs-val { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--text); }
-  .gs-sub { font-size: 13px; color: var(--text2); font-family: var(--font-mono); font-weight: 500; }
+  /* 반응형: 화면이 좁아지면 2개, 1개로 줄어듦 */
+  @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 900px) { .dashboard-top { grid-template-columns: 1fr; } }
 
-  .country-panels { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start; }
-  .country-panel { flex: 1; min-width: 380px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+  .country-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
   .cp-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
   .cp-title { font-size: 15px; font-weight: 700; color: var(--text); }
   
@@ -109,7 +104,7 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
-  /* 국가별 계좌 리스트 테이블 (스크롤 제거, 높이 자동 팽창) */
+  /* 계좌 리스트 (내부 스크롤 제거, 자연스러운 높이 팽창) */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
   
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: border-color 0.2s; }
@@ -238,8 +233,9 @@
         </div>
         <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
           <span style="font-size:10px; color:var(--text2); font-weight:700;">유형</span>
-          <div style="display:flex; gap:10px;">
-            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="trade" checked onchange="toggleTxType()" style="accent-color:var(--accent)"> 매매</label>
+          <div style="display:flex; gap:6px;">
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="buy" checked onchange="toggleTxType()" style="accent-color:var(--red)"> 매수</label>
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="sell" onchange="toggleTxType()" style="accent-color:var(--blue)"> 매도</label>
             <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="accent-color:var(--green)"> 배당</label>
           </div>
         </div>
@@ -256,7 +252,7 @@
       </div>
       <div style="display:flex; gap:10px;">
         <div class="form-group" style="flex:1;" id="txQtyWrap">
-          <label>수량 (매도시 -)</label>
+          <label>수량</label>
           <input type="number" id="txQty" class="form-input" placeholder="0">
         </div>
         <div class="form-group" style="flex:1;">
@@ -285,69 +281,72 @@
     </div>
 
     <div class="dashboard-top" id="dashboardTop" style="display:none">
-      <div class="global-summary">
-        <div class="gs-group">
-          <div class="gs-item">
-            <div class="gs-label">통합 투자 원금</div>
-            <div class="gs-val" id="globalTotalCost">—</div>
+      
+      <div class="country-panel">
+        <div class="cp-header">
+          <div class="cp-title">🌐 통합 자산</div>
+          <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
+        </div>
+        <div class="cp-summary">
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">통합 투자액</div>
+            <div class="cp-sum-val" id="globalTotalCost">—</div>
           </div>
-          <div class="gs-item">
-            <div class="gs-label">통합 평가 자산</div>
-            <div class="gs-val" id="globalTotalVal" style="color:var(--blue)">—</div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">통합 평가액</div>
+            <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue)">—</div>
           </div>
-          <div class="gs-item">
-            <div class="gs-label">통합 수익률</div>
-            <div class="gs-val" id="globalTotalRoi">—</div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">통합 수익금 (수익률)</div>
+            <div class="cp-sum-val" id="globalTotalRoi">—</div>
           </div>
         </div>
-        <div class="gs-item" style="align-items:flex-end;">
-          <div class="gs-label">실시간 환율</div>
-          <div class="gs-sub" id="globalExchangeRate">조회 중...</div>
+        <div class="cp-accounts" style="flex:1;">
+           <div class="sum-label" style="margin: 10px 0;">포트폴리오 비중</div>
+           <div style="flex:1; position:relative; min-height: 180px;"><canvas id="allocationCanvas"></canvas></div>
         </div>
       </div>
 
-      <div class="country-panels">
-        <div class="country-panel">
-          <div class="cp-header">
-            <div class="cp-title">🇰🇷 국내 주식</div>
-          </div>
-          <div class="cp-summary">
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">총 투자액</div>
-              <div class="cp-sum-val" id="krwTotalCost">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">총 평가액</div>
-              <div class="cp-sum-val" id="krwTotalEval">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">수익금 (수익률)</div>
-              <div class="cp-sum-val" id="krwTotalPnl">—</div>
-            </div>
-          </div>
-          <div class="cp-accounts" id="krwAccountList"></div>
+      <div class="country-panel">
+        <div class="cp-header">
+          <div class="cp-title">🇰🇷 국내 주식</div>
         </div>
+        <div class="cp-summary">
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">총 투자액</div>
+            <div class="cp-sum-val" id="krwTotalCost">—</div>
+          </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">총 평가액</div>
+            <div class="cp-sum-val" id="krwTotalEval">—</div>
+          </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">수익금 (수익률)</div>
+            <div class="cp-sum-val" id="krwTotalPnl">—</div>
+          </div>
+        </div>
+        <div class="cp-accounts" id="krwAccountList"></div>
+      </div>
 
-        <div class="country-panel">
-          <div class="cp-header">
-            <div class="cp-title">🇺🇸 미국 주식</div>
-          </div>
-          <div class="cp-summary">
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">총 투자액</div>
-              <div class="cp-sum-val" id="usdTotalCost">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">총 평가액</div>
-              <div class="cp-sum-val" id="usdTotalEval">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">수익금 (수익률)</div>
-              <div class="cp-sum-val" id="usdTotalPnl">—</div>
-            </div>
-          </div>
-          <div class="cp-accounts" id="usdAccountList"></div>
+      <div class="country-panel">
+        <div class="cp-header">
+          <div class="cp-title">🇺🇸 미국 주식</div>
         </div>
+        <div class="cp-summary">
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">총 투자액</div>
+            <div class="cp-sum-val" id="usdTotalCost">—</div>
+          </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">총 평가액</div>
+            <div class="cp-sum-val" id="usdTotalEval">—</div>
+          </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">수익금 (수익률)</div>
+            <div class="cp-sum-val" id="usdTotalPnl">—</div>
+          </div>
+        </div>
+        <div class="cp-accounts" id="usdAccountList"></div>
       </div>
     </div>
 
@@ -411,6 +410,27 @@
   </div>
 </div>
 
+<div class="overlay" id="ownerOverlay" onclick="closeModal('ownerOverlay')">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 style="font-size:16px;">👥 소유자 이름 설정</h3>
+      <button class="btn-sm" onclick="closeModal('ownerOverlay')">닫기</button>
+    </div>
+    <div style="font-size:11px; color:var(--text2); margin-bottom:20px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px;">
+      장부와 대시보드에 표시될 소유자의 이름을 변경할 수 있습니다. 변경 시 기존 거래 내역의 이름도 일괄 변경됩니다.
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>보유자1 이름</label>
+      <input type="text" id="inputOwner1" class="form-input" placeholder="예: 아빠">
+    </div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <label>보유자2 이름</label>
+      <input type="text" id="inputOwner2" class="form-input" placeholder="예: 엄마">
+    </div>
+    <button class="btn-submit" style="background:var(--accent); width:100%;" onclick="saveOwnerNames()">변경 사항 저장</button>
+  </div>
+</div>
+
 <div class="overlay" id="githubOverlay" onclick="closeModal('githubOverlay')">
   <div class="modal modal-sm" onclick="event.stopPropagation()">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -446,30 +466,9 @@
   </div>
 </div>
 
-<div class="overlay" id="ownerOverlay" onclick="closeModal('ownerOverlay')">
-  <div class="modal modal-sm" onclick="event.stopPropagation()">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-      <h3 style="font-size:16px;">👥 소유자 이름 설정</h3>
-      <button class="btn-sm" onclick="closeModal('ownerOverlay')">닫기</button>
-    </div>
-    <div style="font-size:11px; color:var(--text2); margin-bottom:20px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px;">
-      장부와 대시보드에 표시될 소유자의 이름을 자유롭게 변경할 수 있습니다. 변경 시 기존 거래 내역의 이름도 모두 일괄 변경됩니다.
-    </div>
-    <div class="form-group" style="margin-bottom:12px;">
-      <label>보유자1 이름</label>
-      <input type="text" id="inputOwner1" class="form-input" placeholder="예: 아빠">
-    </div>
-    <div class="form-group" style="margin-bottom:20px;">
-      <label>보유자2 이름</label>
-      <input type="text" id="inputOwner2" class="form-input" placeholder="예: 엄마">
-    </div>
-    <button class="btn-submit" style="background:var(--accent); width:100%;" onclick="saveOwnerNames()">변경 사항 저장</button>
-  </div>
-</div>
-
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v21'; 
+const STORE_KEY = 'stockwatch_real_v22'; 
 let state = loadState();
 
 let currentView = 'all'; // 'all', 'user1', 'user2', 'watch', 'dividend'
@@ -479,6 +478,7 @@ if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replac
 
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
+let allocationChartInst = null;
 const chartInstances = {};
 let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
@@ -501,13 +501,14 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v20'); 
+    let oldS = localStorage.getItem('stockwatch_real_v21'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
       parsed.transactions.forEach(t => { 
         if(!t.txType) t.txType = 'trade'; 
         if(!t.owner) t.owner = parsed.ownerNames.user1;
+        // 기존 trade를 buy/sell/trade 그대로 유지 (하위 호환성)
       });
       return parsed;
     }
@@ -517,7 +518,6 @@ function loadState() {
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// 초기 이름 세팅
 function updateOwnerLabels() {
   document.getElementById('tabUser1').textContent = state.ownerNames.user1;
   document.getElementById('tabUser2').textContent = state.ownerNames.user2;
@@ -527,7 +527,6 @@ function updateOwnerLabels() {
   document.getElementById('divTabUser2').textContent = state.ownerNames.user2;
 }
 
-// 초기 실행 시
 window.addEventListener('DOMContentLoaded', () => {
   if(!state.ownerNames) state.ownerNames = { user1: '보유자1', user2: '보유자2' };
   updateOwnerLabels();
@@ -543,7 +542,7 @@ function formatPrice(val, symbol) {
   return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-// ── 2. 폼 UI 제어 (매매 vs 배당) ──
+// ── 2. 폼 UI 제어 (매수/매도/배당) ──
 function toggleTxType() {
   const type = document.querySelector('input[name="txType"]:checked').value;
   if(type === 'dividend') {
@@ -573,7 +572,6 @@ function saveOwnerNames() {
   state.ownerNames.user1 = new1;
   state.ownerNames.user2 = new2;
   
-  // 기존 거래내역 소유자 일괄 변경
   state.transactions.forEach(tx => {
     if (tx.owner === old1) tx.owner = new1;
     else if (tx.owner === old2) tx.owner = new2;
@@ -587,7 +585,6 @@ function saveOwnerNames() {
   triggerAutoSync();
 }
 
-// 장부 내 보유자 클릭 스위치
 function toggleTxOwner(id) {
   const tx = state.transactions.find(t => t.id === id);
   if(!tx) return;
@@ -612,7 +609,6 @@ function calculateHoldings(ownerFilter = 'all') {
     if (ownerFilter !== 'all' && tx.owner !== ownerFilter) return;
 
     let broker = tx.broker ? tx.broker.trim() : '미지정';
-    // 전체보기 시 계좌명 뒤에 소유자를 붙여서 합산 방지
     let displayBroker = ownerFilter === 'all' ? `${broker} (${tx.owner})` : broker;
     let key = `${tx.symbol}::${displayBroker}`;
 
@@ -635,22 +631,29 @@ function addTransaction() {
   const date = document.getElementById('txDate').value;
   const ownerKey = document.querySelector('input[name="txOwner"]:checked').value;
   const owner = state.ownerNames[ownerKey];
-  const txType = document.querySelector('input[name="txType"]:checked').value;
+  const typeVal = document.querySelector('input[name="txType"]:checked').value;
   const broker = document.getElementById('txBroker').value.trim();
   let symbol = document.getElementById('txSymbol').value.trim().toUpperCase();
-  const qty = parseFloat(document.getElementById('txQty').value) || 0;
+  
+  let qty = parseFloat(document.getElementById('txQty').value) || 0;
   const price = parseFloat(document.getElementById('txPrice').value);
 
   if(!date || !symbol || isNaN(price)) {
     alert("종목코드, 단가(배당금액)를 정확히 입력해주세요."); return;
   }
-  if(txType === 'trade' && qty === 0) {
+  
+  if(typeVal !== 'dividend' && qty === 0) {
     alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
+
+  // 매도 선택시 수량을 자동으로 음수로 전환
+  if (typeVal === 'sell') qty = -Math.abs(qty);
+  else if (typeVal === 'buy') qty = Math.abs(qty);
   
+  const finalTxType = typeVal === 'dividend' ? 'dividend' : 'trade'; // 저장용 타입
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
-  state.transactions.push({ id: Date.now(), date, owner, broker, symbol, qty, price, txType });
+  state.transactions.push({ id: Date.now(), date, owner, broker, symbol, qty, price, txType: finalTxType });
   if(!state.tickers.includes(symbol)) state.tickers.push(symbol);
 
   saveState();
@@ -725,12 +728,11 @@ function prepareTransaction(symbol, broker) {
   document.getElementById('txSymbol').value = symbol;
   
   if(broker) {
-    // '(보유자1)' 형태의 접미사 제거
     let cleanBroker = broker.replace(/\s*\([^)]*\)$/, '');
     document.getElementById('txBroker').value = cleanBroker;
   }
   
-  document.querySelector('input[name="txType"][value="trade"]').checked = true;
+  document.querySelector('input[name="txType"][value="buy"]').checked = true;
   toggleTxType();
   
   document.getElementById('txQty').focus();
@@ -784,7 +786,7 @@ setupSearch('txSymbol', 'txDropdown', 'selectSidebarSearchResult');
 function selectSidebarSearchResult(symbol) {
   document.getElementById('txSymbol').value = symbol;
   document.getElementById('txDropdown').style.display = 'none';
-  if(document.querySelector('input[name="txType"]:checked').value === 'trade') {
+  if(document.querySelector('input[name="txType"]:checked').value !== 'dividend') {
     document.getElementById('txQty').focus();
   } else {
     document.getElementById('txPrice').focus();
@@ -936,7 +938,6 @@ function renderDividendDashboard() {
   const divTxs = state.transactions.filter(t => {
     if(t.txType !== 'dividend') return false;
     
-    // 필터 값에 따라 매칭 (all, user1, user2)
     let filterName = 'all';
     if(currentDivFilter === 'user1') filterName = state.ownerNames.user1;
     if(currentDivFilter === 'user2') filterName = state.ownerNames.user2;
@@ -1040,20 +1041,18 @@ async function render() {
     renderDividendDashboard();
     return;
   } else {
-    dash.style.display = 'flex';
+    dash.style.display = 'grid';
     container.style.display = 'block';
     mainAddBar.style.display = 'flex';
     divDash.style.display = 'none';
   }
 
-  // 보유자 뷰 필터 식별
   let ownerFilter = 'all';
   if (currentView === 'user1') ownerFilter = state.ownerNames.user1;
   if (currentView === 'user2') ownerFilter = state.ownerNames.user2;
 
   const currentHoldings = calculateHoldings(ownerFilter);
   
-  // 전체보기 등에서 중복 종목을 카드 하나로 합산 처리
   let symbolHoldings = {};
   for(let key in currentHoldings) {
     let h = currentHoldings[key];
@@ -1212,9 +1211,15 @@ function buildChart(canvasId, prices, dates, mini) {
 function updateSummaryAndAllocation(rawHoldings) {
   accountPieChartInsts.forEach(c => c.destroy());
   accountPieChartInsts = [];
+  
+  // 캔버스 초기화 (차트 중복 생성 방지)
+  if(allocationChartInst) allocationChartInst.destroy();
 
   let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
   let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
+
+  // 글로벌 파이차트용 변수
+  const allocData = [], allocLabels = [], allocColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703'];
 
   for(let key in rawHoldings) {
     let h = rawHoldings[key];
@@ -1231,6 +1236,7 @@ function updateSummaryAndAllocation(rawHoldings) {
         krwSummary.accounts[broker].eval += eAmt;
         krwSummary.accounts[broker].cost += cAmt;
         krwSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
+        allocData.push(eAmt);
       } else { 
         usdSummary.totalEval += eAmt;
         usdSummary.totalCost += cAmt;
@@ -1238,21 +1244,49 @@ function updateSummaryAndAllocation(rawHoldings) {
         usdSummary.accounts[broker].eval += eAmt;
         usdSummary.accounts[broker].cost += cAmt;
         usdSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
+        allocData.push(eAmt * currentUsdKrw); // 글로벌 차트용 달러 환산
       }
+      allocLabels.push(`${data.name} ${broker!=='미지정'?`(${broker})`:''}`);
     }
   }
 
   const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
   const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
   const globalRoi = globalCost > 0 ? ((globalEval - globalCost) / globalCost * 100) : 0;
+  const globalPnl = globalEval - globalCost;
 
   document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
   document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
+  
   const gRoiEl = document.getElementById('globalTotalRoi');
-  gRoiEl.textContent = `${globalRoi >= 0 ? '+' : ''}${globalRoi.toFixed(2)}%`;
-  gRoiEl.style.color = globalRoi >= 0 ? 'var(--green)' : (globalCost > 0 ? 'var(--red)' : 'var(--text)');
+  const signG = globalPnl >= 0 ? '+' : '';
+  gRoiEl.innerHTML = `${signG}₩${Math.round(Math.abs(globalPnl)).toLocaleString()}<br><span style="font-size:12px; font-weight:500">(${signG}${globalRoi.toFixed(2)}%)</span>`;
+  gRoiEl.style.color = globalPnl >= 0 ? 'var(--green)' : (globalCost > 0 ? 'var(--red)' : 'var(--text)');
   
   document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
+
+  // 글로벌 통합 자산 차트 그리기
+  const ctxGlobal = document.getElementById('allocationCanvas').getContext('2d');
+  if (allocData.length > 0) {
+    allocationChartInst = new Chart(ctxGlobal, {
+      type: 'doughnut',
+      data: {
+        labels: allocLabels,
+        datasets: [{ data: allocData, backgroundColor: allocColors, borderWidth: 0 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        cutout: '70%'
+      }
+    });
+  } else {
+    allocationChartInst = new Chart(ctxGlobal, {
+      type: 'doughnut',
+      data: { labels: ['자산 없음'], datasets: [{ data: [1], backgroundColor: ['#1c2030'], borderWidth: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, cutout: '70%' }
+    });
+  }
 
   // ── KRW 렌더링 ──
   const krwPnl = krwSummary.totalEval - krwSummary.totalCost;
@@ -1386,11 +1420,18 @@ function updateSummaryAndAllocation(rawHoldings) {
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        layout: { padding: 2 },
+        layout: { padding: 4 },
         plugins: {
           legend: { display: false },
           tooltip: {
             enabled: false,
+            callbacks: {
+              label: function(context) {
+                let v = context.raw;
+                let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v).toLocaleString();
+                return context.label + ': ' + formatVal;
+              }
+            },
             external: function(context) {
               let tooltipEl = document.getElementById('chartjs-tooltip');
               if (!tooltipEl) {
@@ -1410,12 +1451,6 @@ function updateSummaryAndAllocation(rawHoldings) {
                   const colors = tooltipModel.labelColors[i];
                   const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
                   let txt = body[0];
-                  let splitTxt = txt.split(': ');
-                  if(splitTxt.length === 2) {
-                    let val = parseFloat(splitTxt[1].replace(/,/g,''));
-                    let formatVal = cfg.isUsd ? '$' + val.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(val).toLocaleString();
-                    txt = `${splitTxt[0]}: ${formatVal}`;
-                  }
                   innerHtml += `<div style="font-size:12px; display:flex; align-items:center; white-space:nowrap; padding:2px 0;">${span}${txt}</div>`;
                 });
                 innerHtml += '</div>';
@@ -1428,7 +1463,7 @@ function updateSummaryAndAllocation(rawHoldings) {
             }
           }
         },
-        cutout: '60%', animation: { duration: 0 }
+        cutout: '55%', animation: { duration: 0 }
       }
     });
     accountPieChartInsts.push(c);
