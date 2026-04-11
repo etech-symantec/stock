@@ -12515,6 +12515,4416 @@
     "exch": "KOSPI"
   },
   {
+    "symbol": "471820.KQ",
+    "name": "셀로맥스사이언스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "099520.KQ",
+    "name": "DGI",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "277070.KQ",
+    "name": "린드먼아시아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007680.KQ",
+    "name": "대원",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "041650.KS",
+    "name": "상신브레이크",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "245620.KQ",
+    "name": "EDGC",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "069410.KQ",
+    "name": "엔텔스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "066360.KQ",
+    "name": "체리부로",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "179530.KQ",
+    "name": "애드바이오텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000950.KS",
+    "name": "전방",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "097800.KQ",
+    "name": "윈팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "123700.KS",
+    "name": "SJM",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "038070.KQ",
+    "name": "서린바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "440290.KQ",
+    "name": "HB인베스트먼트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "122350.KQ",
+    "name": "삼기",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "332290.KQ",
+    "name": "누보",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "28513K.KS",
+    "name": "SK케미칼우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "413640.KQ",
+    "name": "비아이매트릭스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "320000.KQ",
+    "name": "한울반도체",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006920.KQ",
+    "name": "모헨즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "450330.KQ",
+    "name": "하스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032540.KQ",
+    "name": "TJ미디어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "011300.KS",
+    "name": "성안머티리얼스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "089790.KQ",
+    "name": "제이티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "452200.KQ",
+    "name": "민테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "100660.KQ",
+    "name": "서암기계공업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "340930.KQ",
+    "name": "유일에너테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "466410.KQ",
+    "name": "사이냅소프트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "066130.KQ",
+    "name": "하츠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "105760.KQ",
+    "name": "포스뱅크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "010770.KS",
+    "name": "평화홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "012280.KS",
+    "name": "영화금속",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "122690.KQ",
+    "name": "서진오토모티브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003475.KS",
+    "name": "유안타증권우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "384470.KQ",
+    "name": "코어라인소프트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032960.KQ",
+    "name": "동일기연",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "052460.KQ",
+    "name": "아이크래프트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "217480.KQ",
+    "name": "에스디생명공학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007815.KS",
+    "name": "코리아써우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "067170.KQ",
+    "name": "오텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "024950.KQ",
+    "name": "삼천리자전거",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "023350.KS",
+    "name": "한국종합기술",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "043910.KQ",
+    "name": "자연과환경",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "419080.KQ",
+    "name": "엔젯",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "219420.KQ",
+    "name": "링크제니시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "053160.KQ",
+    "name": "프리엠스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "363250.KQ",
+    "name": "진시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "106240.KQ",
+    "name": "파인테크닉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "215380.KQ",
+    "name": "우정바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025530.KS",
+    "name": "SJM홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "114450.KQ",
+    "name": "그린생명과학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "364950.KQ",
+    "name": "에이아이코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001210.KS",
+    "name": "금호전기",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "013720.KQ",
+    "name": "THE CUBE&",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007610.KS",
+    "name": "선도전기",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "311390.KQ",
+    "name": "네오크레마",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "080520.KQ",
+    "name": "오디텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "189690.KQ",
+    "name": "포시에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007120.KS",
+    "name": "미래아이앤지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "032860.KQ",
+    "name": "더라미",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "026940.KS",
+    "name": "부국철강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "126640.KQ",
+    "name": "화신정공",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "023960.KS",
+    "name": "에쓰씨엔지니어링",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "090080.KS",
+    "name": "평화산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "016600.KQ",
+    "name": "큐캐피탈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002410.KS",
+    "name": "범양건영",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "460470.KQ",
+    "name": "아이빔테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007530.KQ",
+    "name": "와이엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064480.KQ",
+    "name": "브리지텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "097870.KQ",
+    "name": "효성오앤비",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "361570.KQ",
+    "name": "알비더블유",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "056700.KQ",
+    "name": "신화인터텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "352700.KQ",
+    "name": "씨앤투스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "452160.KQ",
+    "name": "제이엔비",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003080.KS",
+    "name": "SB성보",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "190650.KQ",
+    "name": "코리아에셋투자증권",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "476080.KQ",
+    "name": "M83",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "258610.KQ",
+    "name": "케일럼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "465480.KQ",
+    "name": "인스피언",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "250000.KQ",
+    "name": "보라티알",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "314140.KQ",
+    "name": "알피바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "260660.KQ",
+    "name": "알리코제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "012160.KS",
+    "name": "영흥",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "026040.KQ",
+    "name": "제이에스티나",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "088340.KQ",
+    "name": "유라클",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "189860.KQ",
+    "name": "서전기전",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "058110.KQ",
+    "name": "멕아이씨에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "160550.KQ",
+    "name": "NEW",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "054780.KQ",
+    "name": "키이스트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "096610.KQ",
+    "name": "알에프세미",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "049800.KS",
+    "name": "우진플라임",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "070300.KQ",
+    "name": "엑스큐어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "043340.KQ",
+    "name": "에쎈테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "046310.KQ",
+    "name": "백금T&A",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "027740.KS",
+    "name": "마니커",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "186230.KQ",
+    "name": "그린플러스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "239890.KQ",
+    "name": "피엔에이치테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "103840.KQ",
+    "name": "우양",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "241840.KQ",
+    "name": "에이스토리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "051490.KQ",
+    "name": "나라엠앤디",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "086040.KQ",
+    "name": "바이오톡스텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "038880.KQ",
+    "name": "아이에이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065130.KQ",
+    "name": "탑엔지니어링",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065770.KQ",
+    "name": "CS",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025880.KQ",
+    "name": "케이씨피드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "393970.KQ",
+    "name": "대진첨단소재",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "200350.KQ",
+    "name": "아티스트스튜디오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "432430.KQ",
+    "name": "와이랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "057540.KQ",
+    "name": "옴니시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006125.KS",
+    "name": "SK디스커버리우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "376180.KQ",
+    "name": "피코그램",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "011420.KS",
+    "name": "갤럭시아에스엠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "008420.KS",
+    "name": "문배철강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "300120.KQ",
+    "name": "라온피플",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "273060.KQ",
+    "name": "와이즈버즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "335810.KQ",
+    "name": "프리시젼바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "388610.KQ",
+    "name": "지에프씨생명과학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003060.KS",
+    "name": "에이프로젠바이오로직스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "081580.KQ",
+    "name": "성우전자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006050.KQ",
+    "name": "국영지앤엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "178780.KQ",
+    "name": "일월지엠엘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001380.KS",
+    "name": "SG글로벌",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "087600.KQ",
+    "name": "픽셀플러스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060850.KQ",
+    "name": "영림원소프트랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "011230.KS",
+    "name": "삼화전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "091590.KQ",
+    "name": "남화토건",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000215.KS",
+    "name": "DL우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009320.KS",
+    "name": "아진전자부품",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "199480.KQ",
+    "name": "뱅크웨어글로벌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "051390.KQ",
+    "name": "YW",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "263770.KQ",
+    "name": "유에스티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "336060.KQ",
+    "name": "웨이버스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "066670.KQ",
+    "name": "디티씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "097780.KQ",
+    "name": "에코볼트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "119500.KQ",
+    "name": "포메탈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002290.KQ",
+    "name": "삼일기업공사",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "128540.KQ",
+    "name": "에코캡",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "481850.KS",
+    "name": "신한글로벌액티브리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "048770.KQ",
+    "name": "TPC",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "221840.KQ",
+    "name": "하이즈항공",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "224110.KQ",
+    "name": "에이텍모빌리티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "044960.KQ",
+    "name": "이글벳",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "257990.KS",
+    "name": "나우코스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "307280.KQ",
+    "name": "원바이오젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "376290.KQ",
+    "name": "씨유테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "270520.KQ",
+    "name": "앱튼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "082660.KQ",
+    "name": "코스나인",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "418250.KQ",
+    "name": "시큐레터",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "398120.KQ",
+    "name": "에스지헬스케어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001000.KQ",
+    "name": "신라섬유",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "129890.KQ",
+    "name": "앱코",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "019770.KQ",
+    "name": "서연탑메탈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "317240.KQ",
+    "name": "TS트릴리온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "429270.KQ",
+    "name": "시지트로닉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "250030.KS",
+    "name": "진코스텍",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "220180.KQ",
+    "name": "핸디소프트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "171010.KQ",
+    "name": "램테크놀러지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "140520.KQ",
+    "name": "대창스틸",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "122830.KS",
+    "name": "원포유",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "083550.KQ",
+    "name": "케이엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "232830.KQ",
+    "name": "아이티센피엔에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "051630.KS",
+    "name": "진양화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "073110.KQ",
+    "name": "엘엠에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "383930.KQ",
+    "name": "디티앤씨알오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "288980.KQ",
+    "name": "모아데이타",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "263700.KQ",
+    "name": "케어랩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "023440.KQ",
+    "name": "제이스코홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002360.KS",
+    "name": "SH에너지화학",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "464280.KQ",
+    "name": "티디에스팜",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "464500.KQ",
+    "name": "아이언디바이스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "363260.KQ",
+    "name": "모비데이즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002920.KS",
+    "name": "유성기업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "049830.KQ",
+    "name": "승일",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "020760.KS",
+    "name": "일진디스플",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "022220.KQ",
+    "name": "티케이지애강",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "069460.KS",
+    "name": "대호에이엘",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "057030.KQ",
+    "name": "YBM넷",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "263810.KQ",
+    "name": "상신전자",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "465770.KS",
+    "name": "STX그린로지스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "008870.KS",
+    "name": "금비",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "208860.KQ",
+    "name": "다산디엠씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "184230.KQ",
+    "name": "SGA솔루션즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "263020.KQ",
+    "name": "디케이앤디",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "420570.KQ",
+    "name": "제이투케이바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "291230.KQ",
+    "name": "엔피",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032790.KQ",
+    "name": "엠젠솔루션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005030.KS",
+    "name": "부산주공",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "290090.KQ",
+    "name": "트윔",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "354200.KQ",
+    "name": "엔젠바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "359090.KQ",
+    "name": "씨엔알리서치",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "050860.KQ",
+    "name": "아세아텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "074610.KS",
+    "name": "이엔플러스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "462980.KQ",
+    "name": "아이지넷",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "142760.KQ",
+    "name": "모아라이프플러스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "308170.KS",
+    "name": "씨티알모빌리티",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "444530.KQ",
+    "name": "심플랫폼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "200580.KS",
+    "name": "메디쎄이",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "206400.KQ",
+    "name": "베노티앤알",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "008250.KS",
+    "name": "이건산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "013810.KQ",
+    "name": "스페코",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "351870.KQ",
+    "name": "차이커뮤니케이션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "014570.KQ",
+    "name": "고려제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "140430.KQ",
+    "name": "카티스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "450520.KQ",
+    "name": "인스웨이브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "068050.KQ",
+    "name": "팬엔터테인먼트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "288330.KQ",
+    "name": "파라택시스코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "057680.KQ",
+    "name": "티사이언티픽",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "037370.KQ",
+    "name": "EG",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "475460.KQ",
+    "name": "미트박스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "052600.KQ",
+    "name": "한네트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "046390.KQ",
+    "name": "삼화네트웍스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "080530.KQ",
+    "name": "코디",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "145270.KS",
+    "name": "케이탑리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "475660.KQ",
+    "name": "에스켐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "357430.KS",
+    "name": "마스턴프리미어리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "073540.KQ",
+    "name": "에프알텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003535.KS",
+    "name": "한화투자증권우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "189330.KQ",
+    "name": "씨이랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025750.KS",
+    "name": "한솔홈데코",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "277410.KQ",
+    "name": "인산가",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "256150.KQ",
+    "name": "한독크린텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "024120.KQ",
+    "name": "KB오토시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "038870.KQ",
+    "name": "에코바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "084870.KS",
+    "name": "TBH글로벌",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "016670.KQ",
+    "name": "디모아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "200230.KQ",
+    "name": "텔콘RF제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "195500.KQ",
+    "name": "마니커에프앤지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "203450.KQ",
+    "name": "유니온바이오메트릭스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "290120.KQ",
+    "name": "DH오토리드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "133750.KQ",
+    "name": "메가엠디",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "039290.KQ",
+    "name": "인포뱅크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065950.KQ",
+    "name": "웰크론",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "271830.KQ",
+    "name": "팸텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007720.KQ",
+    "name": "소노스퀘어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000760.KS",
+    "name": "이화산업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "270870.KQ",
+    "name": "뉴트리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "462510.KQ",
+    "name": "라메디텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "101240.KQ",
+    "name": "씨큐브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "340810.KQ",
+    "name": "시선AI",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "123570.KQ",
+    "name": "이엠넷",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002880.KS",
+    "name": "대유에이텍",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "021880.KQ",
+    "name": "메이슨캐피탈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "434480.KQ",
+    "name": "모니터랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "200780.KQ",
+    "name": "비씨월드제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "159910.KQ",
+    "name": "에코글로우",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065650.KQ",
+    "name": "하이퍼코퍼레이션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "086060.KQ",
+    "name": "진바이오텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "221980.KQ",
+    "name": "케이디켐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "114630.KQ",
+    "name": "폴라리스우노",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "019490.KS",
+    "name": "엑시큐어하이트론",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "043200.KQ",
+    "name": "파루",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "373170.KQ",
+    "name": "엠아이큐브솔루션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "239610.KQ",
+    "name": "에이치엘사이언스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "257370.KQ",
+    "name": "피엔티엠에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "012620.KQ",
+    "name": "원일특강",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "228340.KQ",
+    "name": "동양파일",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "318020.KQ",
+    "name": "포인트모바일",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "469750.KQ",
+    "name": "아이비젼웍스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "109820.KQ",
+    "name": "진매트릭스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "35320K.KS",
+    "name": "대덕전자1우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "131100.KQ",
+    "name": "티엔엔터테인먼트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "417860.KQ",
+    "name": "오브젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "223310.KQ",
+    "name": "사토시홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "204020.KQ",
+    "name": "그리티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "466910.KQ",
+    "name": "엔에이치스팩30호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "356890.KQ",
+    "name": "싸이버원",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "020180.KQ",
+    "name": "대신정보통신",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "017040.KS",
+    "name": "광명전기",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "075970.KQ",
+    "name": "동국알앤에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "254120.KQ",
+    "name": "자비스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "455180.KQ",
+    "name": "케이지에이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002870.KS",
+    "name": "신풍",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "150900.KQ",
+    "name": "파수",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "318410.KQ",
+    "name": "비비씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064090.KQ",
+    "name": "인크레더블버즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "452980.KQ",
+    "name": "신한제11호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "195990.KQ",
+    "name": "에이비프로바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "290560.KQ",
+    "name": "파라택시스이더리움",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "153490.KQ",
+    "name": "우리이앤엘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "239340.KQ",
+    "name": "이스트에이드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "290520.KQ",
+    "name": "신도기연",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "430690.KQ",
+    "name": "한싹",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "045060.KQ",
+    "name": "오공",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "010640.KS",
+    "name": "진양폴리",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "146060.KQ",
+    "name": "율촌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "109960.KQ",
+    "name": "앱토크롬",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "263920.KQ",
+    "name": "휴엠앤씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025440.KQ",
+    "name": "DH오토웨어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "134790.KS",
+    "name": "시디즈",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "347770.KQ",
+    "name": "핌스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065370.KQ",
+    "name": "위세아이텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "351320.KQ",
+    "name": "넥사다이내믹스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "066910.KQ",
+    "name": "손오공",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "118000.KS",
+    "name": "메타케어",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "464580.KQ",
+    "name": "닷밀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "014910.KS",
+    "name": "성문전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "038620.KQ",
+    "name": "위즈코프",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "075130.KQ",
+    "name": "플랜티넷",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006200.KS",
+    "name": "한국전자홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "286750.KQ",
+    "name": "나노실리칸첨단소재",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "064520.KQ",
+    "name": "테크엘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "262840.KQ",
+    "name": "아이퀘스트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "177830.KQ",
+    "name": "파버나인",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "027580.KQ",
+    "name": "상보",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "092600.KQ",
+    "name": "앤씨앤",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "148250.KQ",
+    "name": "알엔투테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "130500.KQ",
+    "name": "GH신소재",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "123010.KQ",
+    "name": "알엔티엑스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "004870.KS",
+    "name": "티웨이홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000040.KS",
+    "name": "KR모터스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "032580.KQ",
+    "name": "피델릭스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "355390.KQ",
+    "name": "크라우드웍스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "053290.KQ",
+    "name": "NE능률",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "318000.KQ",
+    "name": "KBG",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "101000.KQ",
+    "name": "KS인더스트리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "035200.KQ",
+    "name": "프럼파스트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "438700.KQ",
+    "name": "버넥트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "059100.KQ",
+    "name": "아이컴포넌트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "298060.KQ",
+    "name": "에스씨엠생명과학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "038530.KQ",
+    "name": "케이바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "377220.KQ",
+    "name": "프롬바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "310870.KQ",
+    "name": "디와이씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "021650.KQ",
+    "name": "한국큐빅",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "296640.KQ",
+    "name": "이노룰스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "071850.KQ",
+    "name": "캐스텍코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "187270.KQ",
+    "name": "신화콘텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "387570.KQ",
+    "name": "파인메딕스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "148780.KQ",
+    "name": "비큐AI",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "169330.KQ",
+    "name": "엠브레인",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "196490.KQ",
+    "name": "디에이테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "038060.KQ",
+    "name": "루멘스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "017000.KQ",
+    "name": "신원종합개발",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "112190.KS",
+    "name": "KC산업",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "049120.KQ",
+    "name": "파인디앤씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001840.KQ",
+    "name": "이화공영",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "285800.KQ",
+    "name": "진영",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "337840.KS",
+    "name": "유엑스엔",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "284620.KQ",
+    "name": "카이노스메드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "210120.KQ",
+    "name": "캔버스엔",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "238490.KQ",
+    "name": "힘스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "068940.KQ",
+    "name": "셀피글로벌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001070.KS",
+    "name": "대한방직",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009140.KS",
+    "name": "경인전자",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001810.KQ",
+    "name": "무림SP",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "462310.KQ",
+    "name": "뉴키즈온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005820.KS",
+    "name": "원림",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "33637K.KS",
+    "name": "솔루스첨단소재1우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "353590.KQ",
+    "name": "오토앤",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "073570.KQ",
+    "name": "리튬포어스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "056730.KQ",
+    "name": "CNT85",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005320.KS",
+    "name": "온타이드",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "123840.KQ",
+    "name": "뉴온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "263050.KQ",
+    "name": "유틸렉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "019660.KQ",
+    "name": "글로본",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "050120.KQ",
+    "name": "ES큐브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "187220.KQ",
+    "name": "디티앤씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "013000.KS",
+    "name": "세우글로벌",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "451700.KQ",
+    "name": "엔에이치스팩29호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "099390.KQ",
+    "name": "브레인즈컴퍼니",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "354390.KS",
+    "name": "바스칸바이오제약",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "090370.KS",
+    "name": "메타랩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "094860.KQ",
+    "name": "네오리진",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "019175.KS",
+    "name": "신풍제약우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "147760.KQ",
+    "name": "피엠티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "274400.KQ",
+    "name": "이노시뮬레이션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "290270.KQ",
+    "name": "휴네시온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002690.KS",
+    "name": "동일제강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "004365.KS",
+    "name": "세방우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "405920.KQ",
+    "name": "나라셀라",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "342870.KQ",
+    "name": "오아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "225220.KQ",
+    "name": "제놀루션",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "131220.KQ",
+    "name": "대한과학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "243870.KS",
+    "name": "아이티센코어",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "303030.KQ",
+    "name": "지니틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "038950.KQ",
+    "name": "파인디지털",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060540.KQ",
+    "name": "에스에이티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "023150.KS",
+    "name": "MH에탄올",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "900300.KQ",
+    "name": "오가닉티코스메틱",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "008470.KQ",
+    "name": "부스타",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002025.KS",
+    "name": "코오롱우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009730.KQ",
+    "name": "이렘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "322970.KS",
+    "name": "무진메디",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "162120.KS",
+    "name": "루켄테크놀러지스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "376980.KQ",
+    "name": "원티드랩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "048470.KQ",
+    "name": "대동스틸",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "252500.KQ",
+    "name": "세화피앤씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "367000.KQ",
+    "name": "플래티어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "068100.KQ",
+    "name": "케이웨더",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "024940.KQ",
+    "name": "PN풍년",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "434190.KS",
+    "name": "탈로스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "179720.KS",
+    "name": "머니무브",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "090150.KQ",
+    "name": "아이윈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "258790.KQ",
+    "name": "소프트캠프",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "333050.KQ",
+    "name": "모코엠시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "079170.KQ",
+    "name": "한창산업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "495810.KS",
+    "name": "유비씨",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "045510.KQ",
+    "name": "정원엔시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "301300.KQ",
+    "name": "바이브컴퍼니",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "089140.KQ",
+    "name": "넥스턴앤롤코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "440320.KQ",
+    "name": "오픈놀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "446070.KS",
+    "name": "유니드비티플러스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "088790.KS",
+    "name": "진도",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "054220.KQ",
+    "name": "비츠로시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "014130.KS",
+    "name": "한익스프레스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "039740.KQ",
+    "name": "한국정보공학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "115480.KQ",
+    "name": "씨유메디칼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "018680.KQ",
+    "name": "서울제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009460.KS",
+    "name": "한창제지",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "270210.KS",
+    "name": "에스알바이오텍",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "009810.KS",
+    "name": "플레이그램",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "051380.KQ",
+    "name": "피씨디렉트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "335870.KQ",
+    "name": "윙스풋",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "397810.KQ",
+    "name": "애드포러스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "024890.KS",
+    "name": "대원화성",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "446440.KS",
+    "name": "에피바이오텍",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "033250.KS",
+    "name": "체시스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003680.KS",
+    "name": "한성기업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "115160.KQ",
+    "name": "휴맥스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "044480.KQ",
+    "name": "빌리언스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "900310.KQ",
+    "name": "컬러레이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "115610.KQ",
+    "name": "이미지스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "131090.KQ",
+    "name": "시큐브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005360.KS",
+    "name": "모나미",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "236810.KQ",
+    "name": "엔비티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "303530.KQ",
+    "name": "이노뎁",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "045300.KQ",
+    "name": "성우테크론",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "431190.KQ",
+    "name": "케이쓰리아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "900340.KQ",
+    "name": "윙입푸드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "063760.KQ",
+    "name": "이엘피",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "066900.KQ",
+    "name": "디에이피",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "069140.KQ",
+    "name": "누리플랜",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006740.KS",
+    "name": "블루산업개발",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "208710.KQ",
+    "name": "포톤",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "258830.KQ",
+    "name": "세종메디칼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "208640.KQ",
+    "name": "썸에이지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "039310.KQ",
+    "name": "세중",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "027040.KQ",
+    "name": "서울전자통신",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "024070.KS",
+    "name": "WISCOM",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "123750.KQ",
+    "name": "알톤",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "196700.KQ",
+    "name": "웹스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032750.KQ",
+    "name": "삼진",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006570.KS",
+    "name": "대림통상",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "002420.KS",
+    "name": "세기상사",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "083470.KQ",
+    "name": "이엠앤아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "047080.KQ",
+    "name": "한빛소프트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "304840.KQ",
+    "name": "피플바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "052300.KQ",
+    "name": "오션인더블유",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "033050.KQ",
+    "name": "제이엠아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "138070.KQ",
+    "name": "신진에스엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "246250.KQ",
+    "name": "에스엘에스바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "148930.KQ",
+    "name": "에이치와이티씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "050110.KQ",
+    "name": "캠시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "083640.KQ",
+    "name": "인콘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "432980.KQ",
+    "name": "엠에프씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002820.KS",
+    "name": "SUN&L",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "191410.KQ",
+    "name": "육일씨엔에쓰",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "015260.KS",
+    "name": "에이엔피",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "091340.KQ",
+    "name": "S&K폴리텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "457600.KQ",
+    "name": "벡트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "080470.KQ",
+    "name": "성창오토텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "237750.KQ",
+    "name": "피앤씨테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "317120.KQ",
+    "name": "라닉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "279600.KQ",
+    "name": "미디어젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "109670.KQ",
+    "name": "씨싸이트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "031510.KQ",
+    "name": "오스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "010400.KS",
+    "name": "우진아이엔에스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "216400.KS",
+    "name": "인바이츠바이오코아",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "079650.KQ",
+    "name": "서산",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "222980.KQ",
+    "name": "한국맥널티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "069640.KS",
+    "name": "한세엠케이",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "372800.KQ",
+    "name": "아이티아이즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "023790.KQ",
+    "name": "동일스틸럭스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "030720.KS",
+    "name": "동원수산",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "115530.KQ",
+    "name": "씨엔플러스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "085810.KQ",
+    "name": "알티캐스트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "096690.KQ",
+    "name": "에이루트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "318010.KQ",
+    "name": "팜스빌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060380.KQ",
+    "name": "동양에스텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032080.KQ",
+    "name": "아즈텍WB",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "377330.KQ",
+    "name": "이지트로닉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "016920.KQ",
+    "name": "카스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "33626L.KS",
+    "name": "두산퓨얼셀2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "405000.KQ",
+    "name": "플라즈맵",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "227420.KS",
+    "name": "도부",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "023770.KQ",
+    "name": "플레이위드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "036480.KQ",
+    "name": "대성미생물",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "016100.KQ",
+    "name": "리더스코스메틱",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "355690.KQ",
+    "name": "에이텀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "311060.KS",
+    "name": "엘에이티",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "060230.KQ",
+    "name": "제이케이시냅스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "900110.KQ",
+    "name": "이스트아시아홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002355.KS",
+    "name": "넥센타이어1우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "328380.KQ",
+    "name": "솔트웨어",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "076080.KQ",
+    "name": "웰크론한텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "101400.KQ",
+    "name": "엔시트론",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "226340.KQ",
+    "name": "본느",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060900.KQ",
+    "name": "에이전트AI",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "034940.KQ",
+    "name": "조아제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "007770.KQ",
+    "name": "한일화학",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "900070.KQ",
+    "name": "글로벌에스엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "004270.KS",
+    "name": "남성",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "131760.KQ",
+    "name": "파인텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "043220.KQ",
+    "name": "티에스넥스젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "093380.KQ",
+    "name": "풍강",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "227610.KQ",
+    "name": "아우딘퓨쳐스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "224060.KQ",
+    "name": "더코디",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "067730.KQ",
+    "name": "로지시스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "139670.KQ",
+    "name": "키네마스터",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "233990.KS",
+    "name": "질경이",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "188040.KQ",
+    "name": "바이오포트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "042040.KQ",
+    "name": "케이피엠테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "424760.KQ",
+    "name": "벨로크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "131180.KQ",
+    "name": "딜리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "070590.KQ",
+    "name": "인티큐브",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "008775.KS",
+    "name": "호텔신라우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "103230.KQ",
+    "name": "에스앤더블류",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "464680.KQ",
+    "name": "KB제27호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "406820.KQ",
+    "name": "뷰티스킨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "044780.KQ",
+    "name": "에이치케이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "217620.KQ",
+    "name": "선샤인푸드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "377030.KQ",
+    "name": "비트맥스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "267790.KQ",
+    "name": "배럴",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "206950.KS",
+    "name": "볼빅",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "417180.KQ",
+    "name": "핑거스토리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "331520.KQ",
+    "name": "밸로프",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "208350.KQ",
+    "name": "지란지교시큐리티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "198940.KQ",
+    "name": "한주라이트메탈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005110.KS",
+    "name": "한창",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "054090.KQ",
+    "name": "삼진엘앤디",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "003495.KS",
+    "name": "대한항공우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "115570.KQ",
+    "name": "스타플렉스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "143210.KS",
+    "name": "핸즈코퍼레이션",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "021040.KQ",
+    "name": "대호특수강",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "348030.KQ",
+    "name": "모비릭스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002210.KS",
+    "name": "동성제약",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "078860.KQ",
+    "name": "스테이지원엔터",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "278990.KS",
+    "name": "EMB",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "362990.KQ",
+    "name": "드림인사이트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "059180.KS",
+    "name": "엔더블유시",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "037400.KQ",
+    "name": "우리엔터프라이즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "418620.KQ",
+    "name": "E8",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "193250.KQ",
+    "name": "링크드",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032680.KQ",
+    "name": "소프트센",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "900270.KQ",
+    "name": "헝셩그룹",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "197140.KQ",
+    "name": "디지캡",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "353190.KQ",
+    "name": "휴럼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "011090.KS",
+    "name": "에넥스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "012170.KS",
+    "name": "아센디오",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "054940.KQ",
+    "name": "엑사이엔씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "308100.KQ",
+    "name": "형지글로벌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002680.KQ",
+    "name": "한탑",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "309930.KQ",
+    "name": "조이웍스앤코",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "373110.KQ",
+    "name": "엑셀세라퓨틱스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "067010.KQ",
+    "name": "이씨에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "139050.KQ",
+    "name": "BF랩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "130740.KQ",
+    "name": "티피씨글로벌",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "352940.KQ",
+    "name": "인바이오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "403360.KS",
+    "name": "라피치",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "207490.KS",
+    "name": "에이펙스인텍",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "336040.KS",
+    "name": "타스컴",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "044380.KS",
+    "name": "주연테크",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "403810.KS",
+    "name": "아이엘로보틱스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "101680.KQ",
+    "name": "한국정밀기계",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "154030.KQ",
+    "name": "아시아종묘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "137940.KQ",
+    "name": "넥스트아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "415380.KQ",
+    "name": "스튜디오삼익",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "238200.KQ",
+    "name": "비피도",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "322780.KQ",
+    "name": "코퍼스코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "275630.KQ",
+    "name": "에스에스알",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "113810.KQ",
+    "name": "디젠스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "121890.KQ",
+    "name": "에스디시스템",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "00499K.KS",
+    "name": "롯데지주우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "240600.KQ",
+    "name": "유진테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009310.KS",
+    "name": "참엔지니어링",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "065150.KQ",
+    "name": "대산F&B",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "019570.KQ",
+    "name": "플루토스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "225590.KQ",
+    "name": "패션플랫폼",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "365900.KQ",
+    "name": "브이씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "291810.KQ",
+    "name": "핀텔",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "043360.KQ",
+    "name": "디지아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "017250.KQ",
+    "name": "인터엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032280.KQ",
+    "name": "삼일",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001420.KS",
+    "name": "태원물산",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "076340.KS",
+    "name": "지에이이노더스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "368600.KQ",
+    "name": "아이씨에이치",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "091970.KQ",
+    "name": "나노캠텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025890.KS",
+    "name": "한국주강",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001685.KS",
+    "name": "대상우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001515.KS",
+    "name": "SK증권우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "312610.KQ",
+    "name": "에이에프더블류",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "192390.KQ",
+    "name": "윈하이텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "020400.KQ",
+    "name": "대동금속",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "053060.KQ",
+    "name": "세동",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "900100.KQ",
+    "name": "애머릿지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "050760.KQ",
+    "name": "에스폴리텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "389680.KQ",
+    "name": "유디엠텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "289010.KQ",
+    "name": "아이스크림에듀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "341170.KS",
+    "name": "퓨쳐메디신",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "191600.KS",
+    "name": "블루탑",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "110020.KQ",
+    "name": "전진바이오팜",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "098660.KQ",
+    "name": "에스티오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "080720.KQ",
+    "name": "한국유니온제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "045520.KQ",
+    "name": "크린앤사이언스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "247660.KQ",
+    "name": "나노씨엠에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "230980.KQ",
+    "name": "비유테크놀러지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "177350.KQ",
+    "name": "베셀",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "018620.KQ",
+    "name": "우진비앤지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065690.KQ",
+    "name": "파커스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "084180.KQ",
+    "name": "수성웹툰",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "048830.KQ",
+    "name": "엔피케이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "054410.KQ",
+    "name": "케이피티유",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "154040.KQ",
+    "name": "다산솔루에타",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060260.KQ",
+    "name": "뉴보텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "134060.KQ",
+    "name": "이퓨쳐",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "084440.KQ",
+    "name": "유비온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "019685.KS",
+    "name": "대교우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "015020.KS",
+    "name": "이스타코",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "317860.KS",
+    "name": "노드메이슨",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "069920.KQ",
+    "name": "엑시온그룹",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001770.KS",
+    "name": "SHD",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "014100.KQ",
+    "name": "메디앙스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "199730.KQ",
+    "name": "바이오인프라",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "018700.KQ",
+    "name": "바른손",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "088290.KQ",
+    "name": "이원컴포텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "215480.KQ",
+    "name": "토박스코리아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "096870.KQ",
+    "name": "엘디티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "067770.KQ",
+    "name": "세진티에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "071950.KS",
+    "name": "코아스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "005257.KS",
+    "name": "녹십자홀딩스2우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "214610.KQ",
+    "name": "롤링스톤",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "060480.KQ",
+    "name": "국일신동",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "028080.KQ",
+    "name": "휴맥스홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "344860.KQ",
+    "name": "이노진",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "086220.KS",
+    "name": "광동헬스바이오",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "051780.KQ",
+    "name": "큐로홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "361670.KQ",
+    "name": "삼영에스앤씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "419540.KQ",
+    "name": "비스토스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "222670.KS",
+    "name": "플럼라인생명과학",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "011080.KQ",
+    "name": "형지I&C",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "217880.KS",
+    "name": "틸론",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "254160.KS",
+    "name": "제이엠멀티",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "065420.KQ",
+    "name": "에스아이리소스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032980.KQ",
+    "name": "바이온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "102950.KS",
+    "name": "아하",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "043590.KQ",
+    "name": "웰킵스하이텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "368970.KQ",
+    "name": "오에스피",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "025870.KQ",
+    "name": "신라에스지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "18064K.KS",
+    "name": "한진칼우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "035620.KQ",
+    "name": "바른손이앤에이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "052960.KS",
+    "name": "태양3C",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "008600.KS",
+    "name": "윌비스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "331660.KS",
+    "name": "한국미라클피플사",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "45226K.KS",
+    "name": "한화갤러리아우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009440.KS",
+    "name": "KC그린홀딩스",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "121850.KQ",
+    "name": "코이즈",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "476710.KS",
+    "name": "타조이엔터테인먼트",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "276730.KQ",
+    "name": "한울앤제주",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "083660.KQ",
+    "name": "CSA 코스믹",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "241820.KQ",
+    "name": "피씨엘",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "008500.KS",
+    "name": "일정실업",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "477380.KQ",
+    "name": "미래에셋비전스팩4호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "069330.KQ",
+    "name": "유아이디",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "482680.KQ",
+    "name": "미래에셋비전스팩7호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "250930.KQ",
+    "name": "예선테크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "035290.KQ",
+    "name": "골드앤에스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "108675.KS",
+    "name": "LX하우시스우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "176590.KS",
+    "name": "코나솔",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "001795.KS",
+    "name": "대한제당우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "012340.KQ",
+    "name": "뉴인텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "152550.KS",
+    "name": "한국ANKOR유전",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "050090.KQ",
+    "name": "비케이홀딩스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "002070.KS",
+    "name": "비비안",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "204210.KS",
+    "name": "스타에스엠리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "106520.KQ",
+    "name": "노블엠앤비",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005725.KS",
+    "name": "넥센우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000087.KS",
+    "name": "하이트진로2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0072Z0.KQ",
+    "name": "KB제33호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "032800.KQ",
+    "name": "판타지오",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0130H0.KQ",
+    "name": "엔에이치스팩33호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0101C0.KQ",
+    "name": "하나36호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0044K0.KQ",
+    "name": "삼성스팩10호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "009620.KQ",
+    "name": "삼보산업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "225430.KQ",
+    "name": "케이엠제약",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "457630.KQ",
+    "name": "대신밸런스제16호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "477340.KQ",
+    "name": "에이치엠씨제7호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "469880.KQ",
+    "name": "하나30호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "008290.KQ",
+    "name": "원풍물산",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "030350.KQ",
+    "name": "드래곤플라이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "233250.KS",
+    "name": "메디안디노스틱",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "368030.KS",
+    "name": "창대정밀",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "900120.KQ",
+    "name": "씨엑스아이",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0115H0.KQ",
+    "name": "삼성스팩13호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "073190.KQ",
+    "name": "듀오백",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "227100.KQ",
+    "name": "프로브잇",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "217320.KS",
+    "name": "썬테크",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "208850.KS",
+    "name": "이비테크",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "473050.KQ",
+    "name": "유안타제15호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "478440.KQ",
+    "name": "미래에셋비전스팩6호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "079950.KQ",
+    "name": "인베니아",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "379390.KS",
+    "name": "이성씨엔아이",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "302920.KS",
+    "name": "더콘텐츠온",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "004105.KS",
+    "name": "태양금속우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "479880.KQ",
+    "name": "한국제15호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0099W0.KQ",
+    "name": "미래에셋비전스팩11호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "351020.KS",
+    "name": "미쥬",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "140910.KS",
+    "name": "에이리츠",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "065060.KQ",
+    "name": "지엔코",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "223220.KS",
+    "name": "로지스몬",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "352770.KQ",
+    "name": "셀레스트라",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "084695.KS",
+    "name": "대상홀딩스우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "489480.KQ",
+    "name": "키움제11호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "244460.KQ",
+    "name": "올리패스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "481890.KQ",
+    "name": "엔에이치스팩31호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0096B0.KQ",
+    "name": "삼성스팩12호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "188260.KQ",
+    "name": "세니젠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "031860.KQ",
+    "name": "디에이치엑스컴퍼니",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "489730.KQ",
+    "name": "디비금융제13호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001755.KS",
+    "name": "한양증권우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "149010.KS",
+    "name": "아이케이세미콘",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "0099X0.KQ",
+    "name": "IBKS제25호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "33637L.KS",
+    "name": "솔루스첨단소재2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0097F0.KQ",
+    "name": "미래에셋비전스팩10호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "477760.KQ",
+    "name": "DB금융스팩12호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "058450.KQ",
+    "name": "한주에이알티",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "478390.KQ",
+    "name": "KB제29호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0093G0.KQ",
+    "name": "미래에셋비전스팩8호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0088D0.KQ",
+    "name": "메리츠제1호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "492220.KQ",
+    "name": "KB제31호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0054V0.KQ",
+    "name": "엔에이치스팩32호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0037T0.KQ",
+    "name": "KB제32호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "482520.KQ",
+    "name": "교보16호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "471050.KQ",
+    "name": "대신밸런스제17호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "054180.KQ",
+    "name": "메디콕스",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "079190.KQ",
+    "name": "케스피온",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "004255.KS",
+    "name": "NPC우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0091W0.KQ",
+    "name": "신영스팩11호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "065570.KQ",
+    "name": "삼영이엔씨",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "456190.KS",
+    "name": "큐라켐",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "0041L0.KQ",
+    "name": "하나35호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "38380K.KS",
+    "name": "LX홀딩스1우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "482690.KQ",
+    "name": "대신밸런스제19호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0132G0.KQ",
+    "name": "교보20호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "00806K.KS",
+    "name": "대덕1우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "145995.KS",
+    "name": "삼양사우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "003075.KS",
+    "name": "코오롱글로벌우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "001067.KS",
+    "name": "JW중외제약2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "0071M0.KQ",
+    "name": "삼성스팩11호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "477470.KQ",
+    "name": "미래에셋비전스팩5호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "469900.KQ",
+    "name": "하나31호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "487360.KQ",
+    "name": "신한제14호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "224760.KS",
+    "name": "엔에스컴퍼니",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "060240.KQ",
+    "name": "스타코링크",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "496070.KQ",
+    "name": "신한제16호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0105P0.KQ",
+    "name": "유진스팩12호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "474660.KQ",
+    "name": "신한제12호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "474490.KQ",
+    "name": "유안타제16호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "169670.KS",
+    "name": "코스텍시스템",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "289170.KS",
+    "name": "바이오텐",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "0098T0.KQ",
+    "name": "교보19호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0096D0.KQ",
+    "name": "미래에셋비전스팩9호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "199150.KS",
+    "name": "데이터스트림즈",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "486630.KQ",
+    "name": "KB제30호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "452670.KQ",
+    "name": "상상인제4호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "489210.KQ",
+    "name": "교보17호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0004Y0.KQ",
+    "name": "디비금융제14호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0130D0.KQ",
+    "name": "신한제17호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "493790.KQ",
+    "name": "유안타제17호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "00781K.KS",
+    "name": "코리아써키트2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "455310.KQ",
+    "name": "한화플러스제4호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "043100.KQ",
+    "name": "알파AI",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "466690.KQ",
+    "name": "키움히어로제1호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "026910.KQ",
+    "name": "광진실업",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0041B0.KQ",
+    "name": "교보18호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "478110.KQ",
+    "name": "이베스트스팩6호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "253610.KS",
+    "name": "루트락",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "472220.KQ",
+    "name": "신영스팩10호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "114920.KS",
+    "name": "대주이엔티",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "498390.KQ",
+    "name": "한화플러스제5호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "03481K.KQ",
+    "name": "해성산업1우",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "006345.KS",
+    "name": "대원전선우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "238500.KS",
+    "name": "로보쓰리에이아이",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "178600.KS",
+    "name": "대동고려삼",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "012205.KS",
+    "name": "계양전기우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "000225.KS",
+    "name": "유유제약1우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "488060.KQ",
+    "name": "유진스팩11호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "106080.KQ",
+    "name": "케이이엠텍",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "244880.KS",
+    "name": "나눔테크",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "145210.KS",
+    "name": "다이나믹디자인",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "467930.KQ",
+    "name": "IBKS제23호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "484130.KQ",
+    "name": "하나34호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "469480.KQ",
+    "name": "IBKS제24호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001065.KS",
+    "name": "JW중외제약우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "462020.KQ",
+    "name": "에이치엠씨제6호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "464440.KQ",
+    "name": "한국제13호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "487830.KQ",
+    "name": "신한제15호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "473950.KQ",
+    "name": "에스케이증권제13호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "465320.KQ",
+    "name": "교보15호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "468760.KQ",
+    "name": "유진스팩10호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "447690.KS",
+    "name": "아이오바이오",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "004835.KS",
+    "name": "덕성우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "189350.KS",
+    "name": "코셋",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "487720.KQ",
+    "name": "키움제10호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "0068Y0.KQ",
+    "name": "비엔케이제3호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "472230.KQ",
+    "name": "에스케이증권제11호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "185190.KS",
+    "name": "수프로",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "318660.KS",
+    "name": "타임기술",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "251280.KS",
+    "name": "안지오랩",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "0041J0.KQ",
+    "name": "엘에스스팩1호",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "224810.KS",
+    "name": "엄지하우스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "103660.KS",
+    "name": "씨앗",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "004985.KS",
+    "name": "성신양회우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "066830.KS",
+    "name": "제노텍",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "475250.KQ",
+    "name": "하나33호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "474930.KQ",
+    "name": "신한제13호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "079970.KQ",
+    "name": "투비소프트",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "212310.KS",
+    "name": "오건에코텍",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "000325.KS",
+    "name": "노루홀딩스우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "26490K.KS",
+    "name": "크라운제과우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "202960.KS",
+    "name": "판도라티비",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "276040.KQ",
+    "name": "스코넥",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "473000.KQ",
+    "name": "에스케이증권제12호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "475240.KQ",
+    "name": "하나32호스팩",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "101390.KQ",
+    "name": "아이엠",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "234070.KS",
+    "name": "에이원알폼",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "215570.KS",
+    "name": "크로넥스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "199290.KS",
+    "name": "바이오프로테크",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "090355.KS",
+    "name": "노루페인트우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "009415.KS",
+    "name": "태영건설우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "236340.KS",
+    "name": "메디젠휴먼케어",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "276240.KS",
+    "name": "엘리비젼",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "267080.KS",
+    "name": "세븐브로이맥주",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "236030.KS",
+    "name": "씨알푸드",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "092590.KS",
+    "name": "럭스피아",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "000145.KS",
+    "name": "하이트진로홀딩스우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "044180.KQ",
+    "name": "KD",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "000545.KS",
+    "name": "흥국화재우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "313760.KQ",
+    "name": "캐리",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "36328K.KS",
+    "name": "티와이홀딩스우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "311960.KS",
+    "name": "인터로이드",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "266350.KS",
+    "name": "팡스카이",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "258050.KS",
+    "name": "테크트랜스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "327610.KS",
+    "name": "펨토바이오메드",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "007575.KS",
+    "name": "일양약품우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "346010.KS",
+    "name": "타이드",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "116100.KS",
+    "name": "태양기계",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "043090.KQ",
+    "name": "더테크놀로지",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005965.KS",
+    "name": "동부건설우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "002995.KS",
+    "name": "금호건설우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "052770.KQ",
+    "name": "아이톡시",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "005745.KS",
+    "name": "크라운해태홀딩스우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "299480.KS",
+    "name": "지앤이헬스케어",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "008355.KS",
+    "name": "남선알미우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "014825.KS",
+    "name": "동원시스템즈우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "121060.KS",
+    "name": "유니포인트",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "217910.KS",
+    "name": "에스제이켐",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "140660.KS",
+    "name": "위월드",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "093510.KS",
+    "name": "엔지브이아이",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "014285.KS",
+    "name": "금강공업우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "208890.KS",
+    "name": "미래엔에듀파트너",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "004545.KS",
+    "name": "깨끗한나라우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "390110.KS",
+    "name": "애니메디솔루션",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "136660.KS",
+    "name": "큐엠씨",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "000227.KS",
+    "name": "유유제약2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "266470.KS",
+    "name": "바이오인프라생명과학",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "448780.KS",
+    "name": "마이크로엔엑스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "002785.KS",
+    "name": "진흥기업우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "245450.KS",
+    "name": "씨앤에스링크",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "001525.KS",
+    "name": "동양우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "413300.KS",
+    "name": "티엘엔지니어링",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "004415.KS",
+    "name": "서울식품우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "011155.KS",
+    "name": "CJ씨푸드1우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "296520.KS",
+    "name": "가이아코퍼레이션",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "014915.KS",
+    "name": "성문전자우",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "402420.KS",
+    "name": "켈스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "002787.KS",
+    "name": "진흥기업2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "332190.KS",
+    "name": "오션스바이오",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "021045.KQ",
+    "name": "대호특수강우",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "001527.KS",
+    "name": "동양2우B",
+    "exch": "KOSPI"
+  },
+  {
+    "symbol": "032685.KQ",
+    "name": "소프트센우",
+    "exch": "KOSDAQ"
+  },
+  {
+    "symbol": "149300.KS",
+    "name": "아퓨어스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "279060.KS",
+    "name": "이노벡스",
+    "exch": "KONEX"
+  },
+  {
+    "symbol": "266170.KS",
+    "name": "레드우즈",
+    "exch": "KONEX"
+  },
+  {
     "symbol": "SPY",
     "name": "State Street SPDR S&P 500 ETF Trust",
     "exch": "US_ETF"
@@ -12530,8 +16940,8 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "IGV",
-    "name": "iShares Expanded Tech-Software Sector ETF",
+    "symbol": "IWM",
+    "name": "iShares Russell 2000 ETF",
     "exch": "US_ETF"
   },
   {
@@ -12540,8 +16950,8 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "IWM",
-    "name": "iShares Russell 2000 ETF",
+    "symbol": "IGV",
+    "name": "iShares Expanded Tech-Software Sector ETF",
     "exch": "US_ETF"
   },
   {
@@ -12555,68 +16965,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "GLD",
-    "name": "SPDR Gold Shares",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SOXS",
-    "name": "Direxion Daily Semiconductor Bear 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "XLE",
-    "name": "State Street Energy Select Sector SPDR ETF",
-    "exch": "US_ETF"
-  },
-  {
     "symbol": "VOO",
     "name": "Vanguard 500 Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SOXX",
-    "name": "iShares Semiconductor ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VUG",
-    "name": "Vanguard Growth Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "USO",
-    "name": "United States Oil Fund LP",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "LQD",
-    "name": "iShares iBoxx $ Inv Grade Corporate Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCHG",
-    "name": "Schwab US Large-Cap Growth ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "XLF",
-    "name": "State Street Financial Sel Sec SPDR ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EWZ",
-    "name": "Ishares Msci Brazil ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VTV",
-    "name": "Vanguard Value Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "GDX",
-    "name": "VanEck Gold Miners ETF",
+    "symbol": "GLD",
+    "name": "SPDR Gold Shares",
     "exch": "US_ETF"
   },
   {
@@ -12625,48 +16980,18 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "SGOV",
-    "name": "iShares 0-3 Month Treasury Bond ETF",
+    "symbol": "LQD",
+    "name": "iShares iBoxx $ Inv Grade Corporate Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SLV",
-    "name": "iShares Silver Trust",
+    "symbol": "XLE",
+    "name": "State Street Energy Select Sector SPDR ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IBIT",
-    "name": "iShares Bitcoin Trust ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCHV",
-    "name": "Schwab US Large-Cap Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EWY",
-    "name": "Ishares Msci South Korea ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "RSP",
-    "name": "Invesco S&P 500 Eql Wght ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPXL",
-    "name": "Direxion Daily S&P 500 Bull 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPYM",
-    "name": "State Street SPDR Portfolio S&P 500 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DIA",
-    "name": "State Street SPDR Dow Jones Indust Avg ETF Trust",
+    "symbol": "SOXX",
+    "name": "iShares Semiconductor ETF",
     "exch": "US_ETF"
   },
   {
@@ -12675,28 +17000,48 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "NVDL",
-    "name": "GraniteShares 2x Long NVDA Daily ETF",
+    "symbol": "USO",
+    "name": "United States Oil Fund LP",
     "exch": "US_ETF"
   },
   {
-    "symbol": "XLI",
-    "name": "State Street Industrial Select Sector SPDR ETF",
+    "symbol": "SOXS",
+    "name": "Direxion Daily Semiconductor Bear 3X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "TSLL",
-    "name": "Direxion Daily TSLA Bull 2X ETF",
+    "symbol": "SGOV",
+    "name": "iShares 0-3 Month Treasury Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "TLT",
-    "name": "iShares 20+ Year Treasury Bond ETF",
+    "symbol": "XLF",
+    "name": "State Street Financial Sel Sec SPDR ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SNXX",
-    "name": "Tradr 2X Long SNDK Daily ETF",
+    "symbol": "GDX",
+    "name": "VanEck Gold Miners ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWZ",
+    "name": "Ishares Msci Brazil ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWY",
+    "name": "Ishares Msci South Korea ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IBIT",
+    "name": "iShares Bitcoin Trust ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SLV",
+    "name": "iShares Silver Trust",
     "exch": "US_ETF"
   },
   {
@@ -12705,33 +17050,8 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "VTI",
-    "name": "Vanguard Total Stock Market Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EEM",
-    "name": "iShares MSCI Emerging Markets ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EMB",
-    "name": "iShares JPMorgan USD Emerging Markets Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "XLV",
-    "name": "State Street Health Care Select Sector SPDR ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BITO",
-    "name": "ProShares Bitcoin ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "KRE",
-    "name": "State Street SPDR S&P Regional Banking ETF",
+    "symbol": "RSP",
+    "name": "Invesco S&P 500 Eql Wght ETF",
     "exch": "US_ETF"
   },
   {
@@ -12740,8 +17060,98 @@
     "exch": "US_ETF"
   },
   {
+    "symbol": "DIA",
+    "name": "State Street SPDR Dow Jones Indust Avg ETF Trust",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EEM",
+    "name": "iShares MSCI Emerging Markets ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "TLT",
+    "name": "iShares 20+ Year Treasury Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VUG",
+    "name": "Vanguard Growth Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "XLP",
+    "name": "State Street Cons Staples Sel Sec SPDR Inc ETF",
+    "exch": "US_ETF"
+  },
+  {
     "symbol": "BIL",
     "name": "State Street SPDR Bloomberg 1-3 Month T-Bill ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "TSLL",
+    "name": "Direxion Daily TSLA Bull 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHG",
+    "name": "Schwab US Large-Cap Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VTV",
+    "name": "Vanguard Value Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "XLV",
+    "name": "State Street Health Care Select Sector SPDR ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "XLI",
+    "name": "State Street Industrial Select Sector SPDR ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EFA",
+    "name": "iShares MSCI EAFE ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VTI",
+    "name": "Vanguard Total Stock Market Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "KRE",
+    "name": "State Street SPDR S&P Regional Banking ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPYM",
+    "name": "State Street SPDR Portfolio S&P 500 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPXL",
+    "name": "Direxion Daily S&P 500 Bull 3X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BITO",
+    "name": "ProShares Bitcoin ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NVDL",
+    "name": "GraniteShares 2x Long NVDA Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VEA",
+    "name": "Vanguard Tax Managed Fund FTSE Developed Markets ETF",
     "exch": "US_ETF"
   },
   {
@@ -12755,8 +17165,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "XLP",
-    "name": "State Street Cons Staples Sel Sec SPDR Inc ETF",
+    "symbol": "EMB",
+    "name": "iShares JPMorgan USD Emerging Markets Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHV",
+    "name": "Schwab US Large-Cap Value ETF",
     "exch": "US_ETF"
   },
   {
@@ -12765,48 +17180,8 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "MUU",
-    "name": "Direxion Daily MU Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
     "symbol": "SCHD",
     "name": "Schwab US Dividend Equity ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ETHA",
-    "name": "iShares Ethereum Trust ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EFA",
-    "name": "iShares MSCI EAFE ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPTL",
-    "name": "State Street SPDR Portfolio Long Term Treasury ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FXI",
-    "name": "iShares China Large-Cap ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "PLTD",
-    "name": "Direxion Daily PLTR Bear 1X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "QQQM",
-    "name": "Invesco NASDAQ 100 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "XRT",
-    "name": "State Street PDR S&P Retail ETF",
     "exch": "US_ETF"
   },
   {
@@ -12815,28 +17190,28 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "TBLL",
-    "name": "Invesco Short Term Treasury ETF",
+    "symbol": "FXI",
+    "name": "iShares China Large-Cap ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IEMG",
-    "name": "iShares Core MSCI Emerging Markets ETF",
+    "symbol": "ACWI",
+    "name": "iShares MSCI ACWI ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "PLTU",
-    "name": "Direxion Daily PLTR Bull 2X ETF",
+    "symbol": "PLTD",
+    "name": "Direxion Daily PLTR Bear 1X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SPAB",
-    "name": "State Street SPDR Portfolio Aggregate Bond ETF",
+    "symbol": "SNXX",
+    "name": "Tradr 2X Long SNDK Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "KWEB",
-    "name": "KraneShares CSI China Internet ETF",
+    "symbol": "QQQM",
+    "name": "Invesco NASDAQ 100 ETF",
     "exch": "US_ETF"
   },
   {
@@ -12845,13 +17220,28 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "JNK",
-    "name": "State Street SPDR Bloomberg High Yield Bond ETF",
+    "symbol": "IEMG",
+    "name": "iShares Core MSCI Emerging Markets ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ARKK",
-    "name": "ARK Innovation ETF",
+    "symbol": "MDY",
+    "name": "State Street SPDR S&P MidCap 400 ETF Trust",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ETHA",
+    "name": "iShares Ethereum Trust ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IWF",
+    "name": "iShares Russell 1000 Growth",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "JNK",
+    "name": "State Street SPDR Bloomberg High Yield Bond ETF",
     "exch": "US_ETF"
   },
   {
@@ -12865,38 +17255,8 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "TIP",
-    "name": "iShares TIPS Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CRWG",
-    "name": "Leverage Shares 2X Long CRWV Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VXUS",
-    "name": "Vanguard Total International Stock Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VT",
-    "name": "Vanguard Total World Stock Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IJR",
-    "name": "iShares Core S&P Small-Cap ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TNA",
-    "name": "Direxion Daily Small Cap Bull 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EWT",
-    "name": "Ishares Msci Taiwan ETF",
+    "symbol": "KWEB",
+    "name": "KraneShares CSI China Internet ETF",
     "exch": "US_ETF"
   },
   {
@@ -12905,163 +17265,8 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "XLB",
-    "name": "State Street Materials Select Sector SPDR ETF",
-    "exch": "US_ETF"
-  },
-  {
     "symbol": "NVD",
     "name": "GraniteShares 2x Short NVDA Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BKLN",
-    "name": "Invesco Senior Loan ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VEA",
-    "name": "Vanguard Tax Managed Fund FTSE Developed Markets ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EWJ",
-    "name": "iShares MSCI Japan ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "KORU",
-    "name": "Direxion Daily MSCI South Korea Bull 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AGQ",
-    "name": "ProShares Ultra Silver",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IYR",
-    "name": "iShares US Real Estate ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BIV",
-    "name": "Vanguard Intermediate-Term Bond Index Fund ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPDW",
-    "name": "State Street SPDR Portfolio Devt World ex-US ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPDN",
-    "name": "Direxion Daily S&P 500 Bear 1X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPYG",
-    "name": "State Street SPDR Portfolio S&P 500 Growth ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPIB",
-    "name": "State Street SPDR Portfolio Int Term Corp Bd ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPXS",
-    "name": "Direxion Daily S&P 500 Bear 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IWF",
-    "name": "iShares Russell 1000 Growth",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "XLC",
-    "name": "State Street Com Svc Sel Sec SPDR ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MDY",
-    "name": "State Street SPDR S&P MidCap 400 ETF Trust",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VWO",
-    "name": "Vanguard Emerging Markets Stock Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "USHY",
-    "name": "iShares Broad USD High Yield Corporate Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPXU",
-    "name": "ProShares UltraPro Short S&P500",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IJH",
-    "name": "iShares Core S&P Mid-Cap ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IAU",
-    "name": "iShares Gold Trust",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "UPRO",
-    "name": "ProShares UltraPro S&P500",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "JPST",
-    "name": "JPMorgan Ultra-Short Income ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TLH",
-    "name": "iShares 10-20 Year Treasury Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IVW",
-    "name": "iShares S&P 500 Growth ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "INDA",
-    "name": "iShares MSCI India ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AAOX",
-    "name": "Tradr 2X Long AAOI Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "QLD",
-    "name": "ProShares Ultra QQQ",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SH",
-    "name": "ProShares Short S&P500 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AMDL",
-    "name": "GraniteShares 2x Long AMD Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TSLG",
-    "name": "Leverage Shares 2X Long TSLA Daily ETF",
     "exch": "US_ETF"
   },
   {
@@ -13070,38 +17275,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "TSLQ",
-    "name": "Tradr 2X Short TSLA Daily ETF",
+    "symbol": "ARKK",
+    "name": "ARK Innovation ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ITOT",
-    "name": "iShares Core S&P Total US Stock Market ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VGT",
-    "name": "Vanguard Information Technology Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SHV",
-    "name": "iShares 0-1 Year Treasury Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IWD",
-    "name": "iShares Russell 1000 Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "GLDM",
-    "name": "SPDR Gold MiniShares Trust",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "UVIX",
-    "name": "2x Long VIX Futures ETF",
+    "symbol": "SPDN",
+    "name": "Direxion Daily S&P 500 Bear 1X ETF",
     "exch": "US_ETF"
   },
   {
@@ -13110,343 +17290,38 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "GDXJ",
-    "name": "VanEck Junior Gold Miners ETF",
+    "symbol": "MUU",
+    "name": "Direxion Daily MU Bull 2X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "QID",
-    "name": "ProShares UltraShort QQQ",
+    "symbol": "VWO",
+    "name": "Vanguard Emerging Markets Stock Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "UDOW",
-    "name": "ProShares UltraPro Dow30",
+    "symbol": "EWJ",
+    "name": "iShares MSCI Japan ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "PTIR",
-    "name": "GraniteShares 2x Long PLTR Daily ETF",
+    "symbol": "BKLN",
+    "name": "Invesco Senior Loan ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "XME",
-    "name": "State Street SPDR S&P Metals & Mining ETF",
+    "symbol": "IYR",
+    "name": "iShares US Real Estate ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "UCO",
-    "name": "ProShares Ultra Bloomberg Crude Oil",
+    "symbol": "IJH",
+    "name": "iShares Core S&P Mid-Cap ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "JEPQ",
-    "name": "JPMorgan Nasdaq Equity Premium Income ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DRAM",
-    "name": "Roundhill Memory ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BMNU",
-    "name": "T-REX 2X Long BMNR Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "PLTZ",
-    "name": "Defiance Daily Target 2x Short PLTR ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CGDV",
-    "name": "Capital Group Dividend Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BOXX",
-    "name": "Alpha Architect 1-3 Month Box ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MUB",
-    "name": "iShares National Muni Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FBTC",
-    "name": "Fidelity Wise Origin Bitcoin Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "COPX",
-    "name": "Global X Copper Miners ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPYI",
-    "name": "NEOS S&P 500 High Income ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VIG",
-    "name": "Vanguard Dividend Appreciation Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCHX",
-    "name": "Schwab US Large-Cap ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VGSH",
-    "name": "Vanguard Short-Term Treasury Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CONL",
-    "name": "GraniteShares 2x Long COIN Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "QQQI",
-    "name": "NEOS Nasdaq-100 High Income ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SDS",
-    "name": "ProShares UltraShort S&P500",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FAS",
-    "name": "Direxion Daily Financial Bull 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MAGS",
-    "name": "Roundhill Magnificent Seven ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VTEB",
-    "name": "Vanguard Tax-Exempt Bond Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ILF",
-    "name": "iShares Latin America 40 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPMO",
-    "name": "Invesco S&P 500 Momentum ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ETHU",
-    "name": "2X Ether ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "JEPI",
-    "name": "JPMorgan Equity Premium Income ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BNO",
-    "name": "United States Brent Oil Fund LP",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "PSQ",
-    "name": "ProShares Short QQQ",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPTI",
-    "name": "State Street SPDR Portfolio Int Term Treasury ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MSFU",
-    "name": "Direxion Daily MSFT Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IWB",
-    "name": "iShares Russell 1000 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BITX",
-    "name": "2x Bitcoin Strategy ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCHB",
-    "name": "Schwab US Broad Market ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NVDX",
-    "name": "T-Rex 2X Long Nvidia Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VNQ",
-    "name": "Vanguard Real Estate Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VTWO",
-    "name": "Vanguard Russell 2000 Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VGK",
-    "name": "Vanguard European Stock Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AMZU",
-    "name": "Direxion Daily AMZN Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VFH",
-    "name": "Vanguard Financials Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CIBR",
-    "name": "First Trust NASDAQ Cybersecurity ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BOIL",
-    "name": "ProShares Ultra Bloomberg Natural Gas ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DRIP",
-    "name": "Direxion Daily S&P Oil & Gas Exp & Prod Br 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CWVX",
-    "name": "Tradr 2X Long Crwv Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VDE",
-    "name": "Vanguard Energy Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "OIH",
-    "name": "VanEck Oil Services ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "USFR",
-    "name": "WisdomTree Floating Rate Treasury Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BNDX",
-    "name": "Vanguard Total International Bond Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "INTW",
-    "name": "GraniteShares 2x Long INTC Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPYV",
-    "name": "State Street SPDR Portfolio S&P 500 Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ITB",
-    "name": "iShares US Home Construction ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AMDD",
-    "name": "Direxion Daily AMD Bear 1X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MSTU",
-    "name": "T-Rex 2X Long MSTR Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CORD",
-    "name": "T-Rex 2X Inverse CRWV Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MSTZ",
-    "name": "T-Rex 2X Inverse MSTR Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPSM",
-    "name": "State Street SPDR Portfolio S&P 600 Small Cap ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "UVXY",
-    "name": "ProShares Ultra VIX Short-Term Futures ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SDOW",
-    "name": "ProShares UltraPro Short Dow30 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "XLRE",
-    "name": "State Street Real Estate Select Sector SPDR ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EMXC",
-    "name": "iShares MSCI Emerging Markets ex China ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "GRID",
-    "name": "First Trust NASDAQ Cln Edge Smart Grid Infra Ix Fd",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IYW",
-    "name": "iShares US Technology ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCO",
-    "name": "ProShares UltraShort Bloomberg Crude Oil",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IUSG",
-    "name": "iShares Core S&P US Growth ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VONG",
-    "name": "Vanguard Russell 1000 Growth Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VCLT",
-    "name": "Vanguard Long-Term Corporate Bond Idx Fund",
+    "symbol": "VXUS",
+    "name": "Vanguard Total International Stock Index Fund",
     "exch": "US_ETF"
   },
   {
@@ -13455,333 +17330,198 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "ZSL",
-    "name": "ProShares UltraShort Silver ETF",
+    "symbol": "SPTL",
+    "name": "State Street SPDR Portfolio Long Term Treasury ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IRE",
-    "name": "Defiance Daily Target 2X Long IREN ETF",
+    "symbol": "IJR",
+    "name": "iShares Core S&P Small-Cap ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "TECL",
-    "name": "Direxion Daily Technology Bull 3X ETF",
+    "symbol": "TSLG",
+    "name": "Leverage Shares 2X Long TSLA Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IBB",
-    "name": "iShares Biotechnology ETF",
+    "symbol": "XRT",
+    "name": "State Street PDR S&P Retail ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SGOL",
-    "name": "abrdn Physical Gold Shares ETF",
+    "symbol": "USHY",
+    "name": "iShares Broad USD High Yield Corporate Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ACWI",
-    "name": "iShares MSCI ACWI ETF",
+    "symbol": "BOXX",
+    "name": "Alpha Architect 1-3 Month Box ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ASTX",
-    "name": "Tradr 2X Long Asts Daily ETF",
+    "symbol": "SPDW",
+    "name": "State Street SPDR Portfolio Devt World ex-US ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "MGK",
-    "name": "Vanguard Mega Cap Growth Index Fund",
+    "symbol": "VT",
+    "name": "Vanguard Total World Stock Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ASHR",
-    "name": "Xtrackers Hvst CSI 300 China A Shs ETF Class A",
+    "symbol": "COPX",
+    "name": "Global X Copper Miners ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SPLB",
-    "name": "State Street SPDR Portfolio Long Term Corp Bd ETF",
+    "symbol": "GRID",
+    "name": "First Trust NASDAQ Cln Edge Smart Grid Infra Ix Fd",
     "exch": "US_ETF"
   },
   {
-    "symbol": "NEBX",
-    "name": "Tradr 2X Long NBIS Daily ETF",
+    "symbol": "UVIX",
+    "name": "2x Long VIX Futures ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SCHF",
-    "name": "Schwab International Equity ETF",
+    "symbol": "LITX",
+    "name": "Tradr 2X Long LITE Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IWR",
-    "name": "iShares Russell Mid-Cap ETF",
+    "symbol": "SPXS",
+    "name": "Direxion Daily S&P 500 Bear 3X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "PDBC",
-    "name": "Invesco Optimum Yld Dvsfd Cmd Str No K-1 ETF",
+    "symbol": "VTEB",
+    "name": "Vanguard Tax-Exempt Bond Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "TSMX",
-    "name": "Direxion Daily TSM Bull 2X ETF",
+    "symbol": "XLB",
+    "name": "State Street Materials Select Sector SPDR ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "DYNF",
-    "name": "Ishares US Equity Factor Rotation Active ETF",
+    "symbol": "IWB",
+    "name": "iShares Russell 1000 ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VO",
-    "name": "Vanguard Mid-Cap Index Fund",
+    "symbol": "MUB",
+    "name": "iShares National Muni Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SCHH",
-    "name": "Schwab US REIT ETF",
+    "symbol": "JPST",
+    "name": "JPMorgan Ultra-Short Income ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SIVR",
-    "name": "abrdn Physical Silver Shares ETF",
+    "symbol": "IAU",
+    "name": "iShares Gold Trust",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IWP",
-    "name": "iShares Russell Mid-Cap Growth ETF",
+    "symbol": "TNA",
+    "name": "Direxion Daily Small Cap Bull 3X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "TSDD",
-    "name": "GraniteShares 2x Short TSLA Daily ETF",
+    "symbol": "VGT",
+    "name": "Vanguard Information Technology Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SSO",
-    "name": "ProShares Ultra S&P500",
+    "symbol": "INDA",
+    "name": "iShares MSCI India ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SHLD",
-    "name": "Global X Defense Tech ETF",
+    "symbol": "XLC",
+    "name": "State Street Com Svc Sel Sec SPDR ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "RWM",
-    "name": "ProShares Short Russell2000",
+    "symbol": "GDXJ",
+    "name": "VanEck Junior Gold Miners ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SPLV",
-    "name": "Invesco S&P 500 Low Volatility ETF",
+    "symbol": "PLTU",
+    "name": "Direxion Daily PLTR Bull 2X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VWOB",
-    "name": "Vanguard Emerging Markets Govt Bd Idx ETF",
+    "symbol": "UPRO",
+    "name": "ProShares UltraPro S&P500",
     "exch": "US_ETF"
   },
   {
-    "symbol": "AAPD",
-    "name": "Direxion Daily AAPL Bear 1X ETF",
+    "symbol": "SPYG",
+    "name": "State Street SPDR Portfolio S&P 500 Growth ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "AMZD",
-    "name": "Direxion Daily AMZN Bear 1X ETF",
+    "symbol": "SPXU",
+    "name": "ProShares UltraPro Short S&P500",
     "exch": "US_ETF"
   },
   {
-    "symbol": "BUG",
-    "name": "Global X Cybersecurity ETF",
+    "symbol": "QLD",
+    "name": "ProShares Ultra QQQ",
     "exch": "US_ETF"
   },
   {
-    "symbol": "JAAA",
-    "name": "Janus Henderson AAA CLO ETF",
+    "symbol": "IWD",
+    "name": "iShares Russell 1000 Value ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "URA",
-    "name": "Global X Uranium ETF",
+    "symbol": "SHV",
+    "name": "iShares 0-1 Year Treasury Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VYM",
-    "name": "Vanguard High Dividend Yield Index Fund",
+    "symbol": "CRWG",
+    "name": "Leverage Shares 2X Long CRWV Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "RKLX",
-    "name": "Defiance Daily Target 2X Long RKLB ETF",
+    "symbol": "AGQ",
+    "name": "ProShares Ultra Silver",
     "exch": "US_ETF"
   },
   {
-    "symbol": "UGL",
-    "name": "ProShares Ultra Gold",
+    "symbol": "UCO",
+    "name": "ProShares Ultra Bloomberg Crude Oil",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SKYY",
-    "name": "First Trust Cloud Computing ETF",
+    "symbol": "SPIB",
+    "name": "State Street SPDR Portfolio Int Term Corp Bd ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IGSB",
-    "name": "iShares 1-5 Year Investment Grade Corporate Bd ETF",
+    "symbol": "GLDM",
+    "name": "SPDR Gold MiniShares Trust",
     "exch": "US_ETF"
   },
   {
-    "symbol": "GBTC",
-    "name": "Grayscale Bitcoin Trust ETF",
+    "symbol": "SCO",
+    "name": "ProShares UltraShort Bloomberg Crude Oil",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IAUM",
-    "name": "iShares Gold Trust Micro",
+    "symbol": "IVW",
+    "name": "iShares S&P 500 Growth ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "XHB",
-    "name": "State Street SPDR S&P Homebuilders ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MTUM",
-    "name": "iShares MSCI USA Momentum Factor ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DGRO",
-    "name": "iShares Core Dividend Growth ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "KBWB",
-    "name": "Invesco KBW Bank ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "QUS",
-    "name": "State Street SPDR MSCI USA StrategicFactors ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EDV",
-    "name": "Vanguard Extended Duration Treasury Index Fd",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FNDX",
-    "name": "Schwab Fundamental US Large Company ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "USMV",
-    "name": "iShares MSCI USA Min Vol Factor ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AVL",
-    "name": "Direxion Daily AVGO Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TFLO",
-    "name": "iShares Treasury Floating Rate Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TMF",
-    "name": "Direxion Daily 20 Year Treasury Bull 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ITA",
-    "name": "iShares US Aerospace & Defense ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EFV",
-    "name": "iShares MSCI EAFE Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MOAT",
-    "name": "VanEck Morningstar Wide Moat ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ORCX",
-    "name": "Defiance Daily Target 2X Long ORCL ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BSV",
-    "name": "Vanguard Short-Term Bond Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IVE",
-    "name": "iShares S&P 500 Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VSS",
-    "name": "Vanguard FTSE All-World ex-US Small-Cap Index",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "OEF",
-    "name": "iShares S&P 100 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "GNR",
-    "name": "State Street SPDR S&P Global Nat Resources ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AVUV",
-    "name": "Avantis US Small Cap Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "LABU",
-    "name": "Direxion Daily S&P Biotech Bull 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NUGT",
-    "name": "Direxion Daily Gold Miners Index Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CWB",
-    "name": "State Street SPDR Bloomberg Convertible Sec ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "URTH",
-    "name": "iShares MSCI World ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "GGLL",
-    "name": "Direxion Daily GOOGL Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IYE",
-    "name": "iShares US Energy ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IREZ",
-    "name": "Tradr 2X Short IREN Daily ETF",
+    "symbol": "COMT",
+    "name": "iShares GSCI Commodity Dynamic Roll Strategy ETF",
     "exch": "US_ETF"
   },
   {
@@ -13790,148 +17530,198 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "DOG",
-    "name": "ProShares Short Dow30",
+    "symbol": "MTUM",
+    "name": "iShares MSCI USA Momentum Factor ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IWY",
-    "name": "iShares Russell Top 200 Growth Index ETF",
+    "symbol": "QID",
+    "name": "ProShares UltraShort QQQ",
     "exch": "US_ETF"
   },
   {
-    "symbol": "MULL",
-    "name": "GraniteShares 2x Long MU Daily ETF",
+    "symbol": "EWT",
+    "name": "Ishares Msci Taiwan ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IWN",
-    "name": "iShares Russell 2000 Value ETF",
+    "symbol": "BSV",
+    "name": "Vanguard Short-Term Bond Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "QUAL",
-    "name": "iShares MSCI USA Quality Factor ETF",
+    "symbol": "SCHX",
+    "name": "Schwab US Large-Cap ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "MCHI",
-    "name": "iShares MSCI China ETF",
+    "symbol": "BNO",
+    "name": "United States Brent Oil Fund LP",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SHYG",
-    "name": "iShares 0-5 Year High Yield Corporate Bond ETF",
+    "symbol": "TIP",
+    "name": "iShares TIPS Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IEI",
-    "name": "iShares 3-7 Year Treasury Bond ETF",
+    "symbol": "USFR",
+    "name": "WisdomTree Floating Rate Treasury Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "CRCA",
-    "name": "ProShares Ultra CRCL ETF",
+    "symbol": "SPAB",
+    "name": "State Street SPDR Portfolio Aggregate Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VEU",
-    "name": "Vanguard FTSE All World ex US ETF",
+    "symbol": "KORU",
+    "name": "Direxion Daily MSCI South Korea Bull 3X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "MSTX",
-    "name": "Defiance Daily Target 2x Long MSTR ETF",
+    "symbol": "TSDD",
+    "name": "GraniteShares 2x Short TSLA Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "UNG",
-    "name": "United States Natural Gas Fund LP",
+    "symbol": "TBLL",
+    "name": "Invesco Short Term Treasury ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VOOG",
-    "name": "Vanguard S&P 500 Growth Index Fund",
+    "symbol": "VNQ",
+    "name": "Vanguard Real Estate Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "DPST",
-    "name": "Direxion Daily Regional Banks Bull 3X ETF",
+    "symbol": "ITOT",
+    "name": "iShares Core S&P Total US Stock Market ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VV",
-    "name": "Vanguard Large-Cap Index Fund",
+    "symbol": "KLMN",
+    "name": "Invesco MSCI North America Climate ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ACWX",
-    "name": "iShares MSCI ACWI ex US ETF",
+    "symbol": "JEPI",
+    "name": "JPMorgan Equity Premium Income ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "USD",
-    "name": "ProShares Ultra Semiconductors",
+    "symbol": "MAGS",
+    "name": "Roundhill Magnificent Seven ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "FISR",
-    "name": "State Street SPDR SSGA Fixed Income Sctr Rtn ETF",
+    "symbol": "PIEQ",
+    "name": "Principal International Equity ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "BTC",
-    "name": "Grayscale Bitcoin Mini Trust ETF",
+    "symbol": "SPMO",
+    "name": "Invesco S&P 500 Momentum ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "FBND",
-    "name": "Fidelity Total Bond ETF",
+    "symbol": "JEPQ",
+    "name": "JPMorgan Nasdaq Equity Premium Income ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ETH",
-    "name": "Grayscale Ethereum Staking Mini ETF",
+    "symbol": "SDS",
+    "name": "ProShares UltraShort S&P500",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VB",
-    "name": "Vanguard Small-Cap Index Fund",
+    "symbol": "NVDX",
+    "name": "T-Rex 2X Long Nvidia Daily Target ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IXUS",
-    "name": "iShares Core MSCI Total International Stock ETF",
+    "symbol": "TSLQ",
+    "name": "Tradr 2X Short TSLA Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "KOLD",
-    "name": "ProShares UltraShort Bloomberg Natural Gas",
+    "symbol": "SCHB",
+    "name": "Schwab US Broad Market ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "NBIL",
-    "name": "Graniteshares 2X Long NBIS Daily ETF",
+    "symbol": "RWM",
+    "name": "ProShares Short Russell2000",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SMCL",
-    "name": "Graniteshares 2X Long SMCI Daily ETF",
+    "symbol": "XLRE",
+    "name": "State Street Real Estate Select Sector SPDR ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "STIP",
-    "name": "iShares 0-5 Year TIPS Bond ETF",
+    "symbol": "BMNU",
+    "name": "T-REX 2X Long BMNR Daily Target ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "COWZ",
-    "name": "Pacer US Cash Cows 100 ETF",
+    "symbol": "SH",
+    "name": "ProShares Short S&P500 ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "TETH",
-    "name": "21Shares Ethereum ETF",
+    "symbol": "BIV",
+    "name": "Vanguard Intermediate-Term Bond Index Fund ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHF",
+    "name": "Schwab International Equity ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EMXC",
+    "name": "iShares MSCI Emerging Markets ex China ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPLV",
+    "name": "Invesco S&P 500 Low Volatility ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VGK",
+    "name": "Vanguard European Stock Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "USMV",
+    "name": "iShares MSCI USA Min Vol Factor ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "XME",
+    "name": "State Street SPDR S&P Metals & Mining ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FBTC",
+    "name": "Fidelity Wise Origin Bitcoin Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AMDD",
+    "name": "Direxion Daily AMD Bear 1X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IBB",
+    "name": "iShares Biotechnology ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPYI",
+    "name": "NEOS S&P 500 High Income ETF",
     "exch": "US_ETF"
   },
   {
@@ -13940,18 +17730,23 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "FTCS",
-    "name": "First Trust Capital Strength ETF",
+    "symbol": "AAOX",
+    "name": "Tradr 2X Long AAOI Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VLUE",
-    "name": "iShares MSCI USA Value Factor ETF",
+    "symbol": "QQQI",
+    "name": "NEOS Nasdaq-100 High Income ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SILJ",
-    "name": "Amplify Junior Silver Miners ETF",
+    "symbol": "CGDV",
+    "name": "Capital Group Dividend Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PSQ",
+    "name": "ProShares Short QQQ",
     "exch": "US_ETF"
   },
   {
@@ -13960,183 +17755,48 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "ACWV",
-    "name": "iShares MSCI Global Min Vol Factor ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "KIE",
-    "name": "State Street SPDR S&P Insurance ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BMNG",
-    "name": "Leverage Shares 2X Long BMNR Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ERY",
-    "name": "Direxion Daily Energy Bear 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FTEC",
-    "name": "Fidelity MSCI Information Technology Index ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "METU",
-    "name": "Direxion Daily META Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "YINN",
-    "name": "Direxion Daily FTSE China Bull 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EZU",
-    "name": "iShares MSCI Eurozone ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NAIL",
-    "name": "Direxion Daily Homebuilders & Supplies Bull 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AVGX",
-    "name": "Defiance Daily Target 2X Long AVGO ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "JTEK",
-    "name": "JPMorgan US Tech Leaders ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ARKB",
-    "name": "ARK 21Shares Bitcoin ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NBIZ",
-    "name": "Tradr 2X Short NBIS Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BITB",
-    "name": "Bitwise Bitcoin ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BAI",
-    "name": "iShares AI Innovation and Tech Active ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "QYLD",
-    "name": "Global X NASDAQ 100 Covered Call ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FDVV",
-    "name": "Fidelity High Dividend ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EMLC",
-    "name": "VanEck JP Morgan EM Local Currency Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
     "symbol": "SRLN",
     "name": "State Street SPDR Blackstone Senior Loan ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "MVLL",
-    "name": "GraniteShares 2x Long MRVL Daily ETF",
+    "symbol": "VGSH",
+    "name": "Vanguard Short-Term Treasury Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IWO",
-    "name": "iShares Russell 2000 Growth ETF",
+    "symbol": "VO",
+    "name": "Vanguard Mid-Cap Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "GGLS",
-    "name": "Direxion Daily GOOGL Bear 1X ETF",
+    "symbol": "VCLT",
+    "name": "Vanguard Long-Term Corporate Bond Idx Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "REMX",
-    "name": "VanEck Rare Earth and Strategic Metals ETF",
+    "symbol": "UDOW",
+    "name": "ProShares UltraPro Dow30",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IGIB",
-    "name": "iShares 5-10 Yr Investment Grade Corporate Bd ETF",
+    "symbol": "VIG",
+    "name": "Vanguard Dividend Appreciation Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "GSY",
-    "name": "Invesco Ultra Short Duration ETF",
+    "symbol": "AMDL",
+    "name": "GraniteShares 2x Long AMD Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SMCX",
-    "name": "Defiance Daily Target 2X Long SMCI ETF",
+    "symbol": "JAAA",
+    "name": "Janus Henderson AAA CLO ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SOXQ",
-    "name": "Invesco PHLX Semiconductor ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FAZ",
-    "name": "Direxion Daily Financial Bear 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NVDY",
-    "name": "YieldMax NVDA Option Income Strategy ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BTCZ",
-    "name": "T-Rex 2X Inverse Bitcoin Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VGIT",
-    "name": "Vanguard Intermediate-Term Treasury Index Fd",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AAAU",
-    "name": "Goldman Sachs Physical Gold ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "WIP",
-    "name": "SPDR FTSE Intl Govt Inflation-Protected Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPHQ",
-    "name": "Invesco S&P 500 Quality ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SIL",
-    "name": "Global X Silver Miners ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IHI",
-    "name": "iShares US Medical Devices ETF",
+    "symbol": "ILF",
+    "name": "iShares Latin America 40 ETF",
     "exch": "US_ETF"
   },
   {
@@ -14145,268 +17805,83 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "KBE",
-    "name": "State Street SPDR S&P Bank ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCHP",
-    "name": "Schwab US TIPS ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VYMI",
-    "name": "Vanguard Internatl High Div Yield Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VTIP",
-    "name": "Vanguard Sht-Term Inflation-Protected Sec Idx",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "APLX",
-    "name": "Tradr 2X Long APLD Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FETH",
-    "name": "Fidelity Ethereum Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CGGR",
-    "name": "Capital Group Growth ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CRCG",
-    "name": "Leverage Shares 2X Long CRCL Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VIXY",
-    "name": "ProShares VIX Short-Term Futures ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "HDV",
-    "name": "iShares Core High Dividend ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FENY",
-    "name": "Fidelity MSCI Energy Index ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "XLG",
-    "name": "Invesco S&P 500 Top 50 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TBIL",
-    "name": "F/m US Treasury 3 Month Bill Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IDEV",
-    "name": "iShares Core MSCI International Developed Mkt ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "RDVY",
-    "name": "First Trust Rising Dividend Achievers ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AVDV",
-    "name": "Avantis International Small Cap Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AIA",
-    "name": "iShares Asia 50 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TSLZ",
-    "name": "T-Rex 2x Inverse Tesla Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "REET",
-    "name": "iShares Global REIT ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SVIX",
-    "name": "-1x Short VIX Futures ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NOBL",
-    "name": "ProShares S&P 500 Dividend Aristocrats ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NVDU",
-    "name": "Direxion Daily NVDA Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AVEM",
-    "name": "Avantis Emerging Markets Equity ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPEM",
-    "name": "State Street SPDR Portfolio Emerging Markets ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "OKLL",
-    "name": "Defiance Daily Target 2X Long OKLO ETF",
-    "exch": "US_ETF"
-  },
-  {
     "symbol": "PULS",
     "name": "PGIM Ultra Short Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IGM",
-    "name": "iShares Expanded Tech Sector ETF",
+    "symbol": "DYNF",
+    "name": "Ishares US Equity Factor Rotation Active ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "GOVT",
-    "name": "iShares US Treasury Bond ETF",
+    "symbol": "UVXY",
+    "name": "ProShares Ultra VIX Short-Term Futures ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "FXE",
-    "name": "Invesco CurrencyShares Euro Trust",
+    "symbol": "VTWO",
+    "name": "Vanguard Russell 2000 Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "USIG",
-    "name": "iShares Broad USD Investment Grade Corporate Bond",
+    "symbol": "TETH",
+    "name": "21Shares Ethereum ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "YLD",
-    "name": "Principal Active High Yield ETF",
+    "symbol": "DRAM",
+    "name": "Roundhill Memory ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "URNM",
-    "name": "Sprott Uranium Miners ETF",
+    "symbol": "TLH",
+    "name": "iShares 10-20 Year Treasury Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "BITU",
-    "name": "ProShares Ultra Bitcoin ETF",
+    "symbol": "SPLB",
+    "name": "State Street SPDR Portfolio Long Term Corp Bd ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "XAR",
-    "name": "State Street SPDR S&P Aerospace & Defense ETF",
+    "symbol": "BNDX",
+    "name": "Vanguard Total International Bond Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "PPLT",
-    "name": "abrdn Physical Platinum Shares ETF",
+    "symbol": "BITX",
+    "name": "2x Bitcoin Strategy ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "AIQ",
-    "name": "Global X Artificial Intelligence & Technology ETF",
+    "symbol": "ETHU",
+    "name": "2X Ether ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SVXY",
-    "name": "ProShares Short VIX Short-Term Futures ETF",
+    "symbol": "SPSM",
+    "name": "State Street SPDR Portfolio S&P 600 Small Cap ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IUSB",
-    "name": "iShares Core Universal USD Bond Market ETF",
+    "symbol": "PTIR",
+    "name": "GraniteShares 2x Long PLTR Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SPSB",
-    "name": "State Street SPDR Portfolio Short Trm Corp Bd ETF",
+    "symbol": "SCHH",
+    "name": "Schwab US REIT ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "FWD",
-    "name": "AB Disruptors ETF",
+    "symbol": "CIBR",
+    "name": "First Trust NASDAQ Cybersecurity ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SRTY",
-    "name": "ProShares UltraPro Short Russell2000",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "JPIE",
-    "name": "JPMorgan Income ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BWX",
-    "name": "SPDR Bloomberg International Treasury Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CORN",
-    "name": "Teucrium Corn Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FDL",
-    "name": "First Tr Morningstar Dividend Leaders Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCHE",
-    "name": "Schwab Emerging Markets Equity ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "UUP",
-    "name": "Invesco DB US Dollar Index Bullish Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CRCD",
-    "name": "T-Rex 2X Inverse CRCL Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DXD",
-    "name": "ProShares UltraShort Dow30",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ERX",
-    "name": "Direxion Daily Energy Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ETHE",
-    "name": "Grayscale Ethereum Staking ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SJNK",
-    "name": "State Street SPDR Bloomberg Shrt Trm Hg Yld Bd ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IUSV",
-    "name": "iShares Core S&P US Value ETF",
+    "symbol": "MGK",
+    "name": "Vanguard Mega Cap Growth Index Fund",
     "exch": "US_ETF"
   },
   {
@@ -14415,473 +17890,198 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "XOVR",
-    "name": "ERShares Private-Public Crossover ETF",
+    "symbol": "SGOL",
+    "name": "abrdn Physical Gold Shares ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "LABD",
-    "name": "Direxion Daily S&P Biotech Bear 3X ETF",
+    "symbol": "IYW",
+    "name": "iShares US Technology ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VONV",
-    "name": "Vanguard Russell 1000 Value Index Fund",
+    "symbol": "QUAL",
+    "name": "iShares MSCI USA Quality Factor ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "FDN",
-    "name": "First Trust Dow Jones Internet Index Fund",
+    "symbol": "MSTU",
+    "name": "T-Rex 2X Long MSTR Daily Target ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "CHAT",
-    "name": "Roundhill Generative AI & Technology ETF",
+    "symbol": "IWR",
+    "name": "iShares Russell Mid-Cap ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "THRO",
-    "name": "Ishares US Thematic Rotation Active ETF",
+    "symbol": "VDE",
+    "name": "Vanguard Energy Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "RGTZ",
-    "name": "Defiance Daily Target 2X Short RGTI ETF",
+    "symbol": "EFV",
+    "name": "iShares MSCI EAFE Value ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ICLN",
-    "name": "iShares Global Clean Energy ETF",
+    "symbol": "IEI",
+    "name": "iShares 3-7 Year Treasury Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VGLT",
-    "name": "Vanguard Long-Term Treasury Index Fund",
+    "symbol": "UUP",
+    "name": "Invesco DB US Dollar Index Bullish Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "PVAL",
-    "name": "Putnam Focused Large Cap Value ETF",
+    "symbol": "SPYV",
+    "name": "State Street SPDR Portfolio S&P 500 Value ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "GUSH",
-    "name": "Direxion Daily S&P Oil & Gas Exp & Prod Bl 2X ETF",
+    "symbol": "PLTZ",
+    "name": "Defiance Daily Target 2x Short PLTR ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SCZ",
-    "name": "iShares MSCI EAFE Small Cap ETF",
+    "symbol": "KIE",
+    "name": "State Street SPDR S&P Insurance ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "AAPU",
-    "name": "Direxion Daily AAPL Bull 2X ETF",
+    "symbol": "DRIP",
+    "name": "Direxion Daily S&P Oil & Gas Exp & Prod Br 2X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ICVT",
-    "name": "iShares Convertible Bond ETF",
+    "symbol": "ASHR",
+    "name": "Xtrackers Hvst CSI 300 China A Shs ETF Class A",
     "exch": "US_ETF"
   },
   {
-    "symbol": "GRNY",
-    "name": "Fundstrat Granny Shots US Large Cap ETF",
+    "symbol": "FNDX",
+    "name": "Schwab Fundamental US Large Company ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IYT",
-    "name": "iShares US Transportation ETF",
+    "symbol": "SHLD",
+    "name": "Global X Defense Tech ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "AIRR",
-    "name": "First Trust RBA Amer Industrial Renaissance ETF",
+    "symbol": "CWVX",
+    "name": "Tradr 2X Long Crwv Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SBIT",
-    "name": "ProShares UltraShort Bitcoin ETF",
+    "symbol": "VONG",
+    "name": "Vanguard Russell 1000 Growth Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "HIMZ",
-    "name": "Defiance Daily Target 2X Long HIMS ETF",
+    "symbol": "VGIT",
+    "name": "Vanguard Intermediate-Term Treasury Index Fd",
     "exch": "US_ETF"
   },
   {
-    "symbol": "COHX",
-    "name": "Tradr 2X Long COHR Daily ETF",
+    "symbol": "MSTZ",
+    "name": "T-Rex 2X Inverse MSTR Daily Target ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "GPIQ",
-    "name": "Goldman Sachs Nasdaq-100 Premium Income ETF",
+    "symbol": "SIVR",
+    "name": "abrdn Physical Silver Shares ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "PAVE",
-    "name": "Global X US Infrastructure Development ETF",
+    "symbol": "FAS",
+    "name": "Direxion Daily Financial Bull 3X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IAGG",
-    "name": "iShares Core International Aggregate Bond ETF",
+    "symbol": "SDOW",
+    "name": "ProShares UltraPro Short Dow30 ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "NOWL",
-    "name": "GraniteShares 2x Long NOW Daily ETF",
+    "symbol": "ITB",
+    "name": "iShares US Home Construction ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "BBJP",
-    "name": "JPMorgan BetaBuilders Japan ETF",
+    "symbol": "TBIL",
+    "name": "F/m US Treasury 3 Month Bill Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "EFG",
-    "name": "iShares MSCI EAFE Growth ETF",
+    "symbol": "BAI",
+    "name": "iShares AI Innovation and Tech Active ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "BINC",
-    "name": "Ishares Flexible Income Active ETF",
+    "symbol": "MSFU",
+    "name": "Direxion Daily MSFT Bull 2X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "AKRE",
-    "name": "Akre Focus ETF",
+    "symbol": "KBWB",
+    "name": "Invesco KBW Bank ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "URTY",
-    "name": "ProShares UltraPro Russell2000",
+    "symbol": "VB",
+    "name": "Vanguard Small-Cap Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SPMD",
-    "name": "State Street SPDR Portfolio S&P 400 Mid Cap ETF",
+    "symbol": "AMZD",
+    "name": "Direxion Daily AMZN Bear 1X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "EWG",
-    "name": "iShares MSCI Germany ETF",
+    "symbol": "BOIL",
+    "name": "ProShares Ultra Bloomberg Natural Gas ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "PBW",
-    "name": "Invesco WilderHill Clean Energy ETF",
+    "symbol": "SSO",
+    "name": "ProShares Ultra S&P500",
     "exch": "US_ETF"
   },
   {
-    "symbol": "DUST",
-    "name": "Direxion Daily Gold Miners Index Bear 2X ETF",
+    "symbol": "IRE",
+    "name": "Defiance Daily Target 2X Long IREN ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "WCLD",
-    "name": "WisdomTree Cloud Computing Fund",
+    "symbol": "FBND",
+    "name": "Fidelity Total Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "GBIL",
-    "name": "Goldman Sachs Access Treasury 0-1 Year ETF",
+    "symbol": "OIH",
+    "name": "VanEck Oil Services ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "FLOT",
-    "name": "iShares Floating Rate Bond ETF",
+    "symbol": "VYM",
+    "name": "Vanguard High Dividend Yield Index Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ARKG",
-    "name": "ARK Genomic Revolution ETF",
+    "symbol": "AMZU",
+    "name": "Direxion Daily AMZN Bull 2X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "LABX",
-    "name": "Tradr 2X Long ALAB Daily ETF",
+    "symbol": "IVE",
+    "name": "iShares S&P 500 Value ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "TSLT",
-    "name": "T-Rex 2x Long Tesla Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DFAC",
-    "name": "Dimensional U S Core Equity 2 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "PFF",
-    "name": "iShares Preferred and Income Securities ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VUSB",
-    "name": "Vanguard Ultra-Short Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AVDE",
-    "name": "Avantis International Equity ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CRWU",
-    "name": "T-REX 2X Long CRWV Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DVY",
-    "name": "iShares Select Dividend ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SPYD",
-    "name": "State Street SPDR Portfolio S&P 500 High Dvd ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IGLB",
-    "name": "iShares 10+ Year Investment Grade Corp Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ETHT",
-    "name": "ProShares Ultra Ether ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VBR",
-    "name": "Vanguard Small-Cap Value Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "HIDV",
-    "name": "AB US High Dividend ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "PPA",
-    "name": "Invesco Aerospace & Defense ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "GLL",
-    "name": "ProShares UltraShort Gold",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "EWC",
-    "name": "iShares MSCI Canada ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "JNUG",
-    "name": "Direxion Daily Junior Gold Miners Idx Bull 2X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NBIG",
-    "name": "Leverage Shares 2X Long NBIS Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "OUNZ",
-    "name": "VanEck Merk Gold ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VPL",
-    "name": "Vanguard Pacific Stock Index Fund ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TSLR",
-    "name": "GraniteShares 2x Long TSLA Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IREX",
-    "name": "Tradr 2X Long IREN Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "UFO",
-    "name": "Procure Space ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IWS",
-    "name": "iShares Russell Mid-Cap Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "MOO",
-    "name": "VanEck Agribusiness ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ETHW",
-    "name": "Bitwise Ethereum ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "GII",
-    "name": "State Street SPDR S&P Global Infrastructure ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "PSI",
-    "name": "Invesco Semiconductors ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ICSH",
-    "name": "iShares Ultra Short Duration Bond Active ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VOE",
-    "name": "Vanguard Mid-Cap Value Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DFIV",
-    "name": "Dimensional International Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SDY",
-    "name": "State Street SPDR S&P Dividend ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "RKLZ",
-    "name": "Defiance Daily Target 2X Short RKLB ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCYB",
-    "name": "Schwab High Yield Bond ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DFAR",
-    "name": "DFA Dimensional US Real Estate ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IWV",
-    "name": "iShares Russell 3000 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "FTSM",
-    "name": "First Trust Enhanced Short Maturity ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ETHD",
-    "name": "ProShares UltraShort Ether ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IHAK",
-    "name": "iShares Cybersecurity and Tech ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "TECS",
-    "name": "Direxion Daily Technology Bear 3X ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BITI",
-    "name": "ProShares Short Bitcoin ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CALF",
-    "name": "Pacer US Small Cap Cash Cows ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "APPX",
-    "name": "Tradr 2X Long APP Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "RPG",
-    "name": "Invesco S&P 500 Pure Growth ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VBK",
-    "name": "Vanguard Small-Cap Growth Index Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "CERY",
-    "name": "State Street SPDR Bbg En Rll Yld Cm Str No K-1 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "BEX",
-    "name": "Tradr 2X Long BE Daily ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NVDQ",
-    "name": "T-Rex 2X Inverse Nvidia Daily Target ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "PSC",
-    "name": "Principal U.S. Small-Cap ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IEUR",
-    "name": "iShares Core MSCI Europe ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "NLR",
-    "name": "VanEck Uranium and Nuclear ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "IQLT",
-    "name": "iShares MSCI Intl Quality Factor ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "ARTY",
-    "name": "iShares Future AI & Tech ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "DFSV",
-    "name": "DFA Dimensional US Small Cap Value ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "PRF",
-    "name": "Invesco RAFI US 1000 ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VMBS",
-    "name": "Vanguard Mortgage-Backed Secs Idx Fund",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "VONE",
-    "name": "Vanguard Russell 1000 Index Fund",
+    "symbol": "XHB",
+    "name": "State Street SPDR S&P Homebuilders ETF",
     "exch": "US_ETF"
   },
   {
@@ -14890,53 +18090,443 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "EWA",
-    "name": "iShares MSCI Australia ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "SCHO",
-    "name": "Schwab Short Term US Treasury ETF",
-    "exch": "US_ETF"
-  },
-  {
-    "symbol": "AMLP",
-    "name": "Alerian MLP ETF",
-    "exch": "US_ETF"
-  },
-  {
     "symbol": "PYLD",
     "name": "PIMCO Multisector Bond Active ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "MUD",
-    "name": "Direxion Daily MU Bear 1X ETF",
+    "symbol": "AVEM",
+    "name": "Avantis Emerging Markets Equity ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "JCPB",
-    "name": "JPMorgan Core Plus Bond ETF",
+    "symbol": "CONL",
+    "name": "GraniteShares 2x Long COIN Daily ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VXF",
-    "name": "Vanguard Extended Market Index Fund",
+    "symbol": "IAUM",
+    "name": "iShares Gold Trust Micro",
     "exch": "US_ETF"
   },
   {
-    "symbol": "MSFL",
-    "name": "GraniteShares 2x Long MSFT Daily ETF",
+    "symbol": "TECL",
+    "name": "Direxion Daily Technology Bull 3X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "DIVO",
-    "name": "Amplify CWP Enhanced Dividend Income ETF",
+    "symbol": "UGL",
+    "name": "ProShares Ultra Gold",
     "exch": "US_ETF"
   },
   {
-    "symbol": "FBL",
-    "name": "GraniteShares 2x Long META Daily ETF",
+    "symbol": "DGRO",
+    "name": "iShares Core Dividend Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ZSL",
+    "name": "ProShares UltraShort Silver ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FDN",
+    "name": "First Trust Dow Jones Internet Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VEU",
+    "name": "Vanguard FTSE All World ex US ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AAPD",
+    "name": "Direxion Daily AAPL Bear 1X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IUSG",
+    "name": "iShares Core S&P US Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EDV",
+    "name": "Vanguard Extended Duration Treasury Index Fd",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IGSB",
+    "name": "iShares 1-5 Year Investment Grade Corporate Bd ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "URA",
+    "name": "Global X Uranium ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "OEF",
+    "name": "iShares S&P 100 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "LABU",
+    "name": "Direxion Daily S&P Biotech Bull 3X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPTI",
+    "name": "State Street SPDR Portfolio Int Term Treasury ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AVUV",
+    "name": "Avantis US Small Cap Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ITA",
+    "name": "iShares US Aerospace & Defense ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GBTC",
+    "name": "Grayscale Bitcoin Trust ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IWP",
+    "name": "iShares Russell Mid-Cap Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EMLC",
+    "name": "VanEck JP Morgan EM Local Currency Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AIA",
+    "name": "iShares Asia 50 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GOVT",
+    "name": "iShares US Treasury Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PDBC",
+    "name": "Invesco Optimum Yld Dvsfd Cmd Str No K-1 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VONV",
+    "name": "Vanguard Russell 1000 Value Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SIL",
+    "name": "Global X Silver Miners ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWH",
+    "name": "iShares MSCI Hong Kong ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "CORD",
+    "name": "T-Rex 2X Inverse CRWV Daily Target ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VLUE",
+    "name": "iShares MSCI USA Value Factor ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ACWX",
+    "name": "iShares MSCI ACWI ex US ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHP",
+    "name": "Schwab US TIPS ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWS",
+    "name": "Ishares Msci Singapore Etf",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWC",
+    "name": "iShares MSCI Canada ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VPL",
+    "name": "Vanguard Pacific Stock Index Fund ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "REET",
+    "name": "iShares Global REIT ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VFH",
+    "name": "Vanguard Financials Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IXUS",
+    "name": "iShares Core MSCI Total International Stock ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IUSB",
+    "name": "iShares Core Universal USD Bond Market ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "MCHI",
+    "name": "iShares MSCI China ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "CWB",
+    "name": "State Street SPDR Bloomberg Convertible Sec ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IWN",
+    "name": "iShares Russell 2000 Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FTEC",
+    "name": "Fidelity MSCI Information Technology Index ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "INTW",
+    "name": "GraniteShares 2x Long INTC Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IREZ",
+    "name": "Tradr 2X Short IREN Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SILJ",
+    "name": "Amplify Junior Silver Miners ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "TFLO",
+    "name": "iShares Treasury Floating Rate Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IWY",
+    "name": "iShares Russell Top 200 Growth Index ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ASTX",
+    "name": "Tradr 2X Long Asts Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IHI",
+    "name": "iShares US Medical Devices ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BBJP",
+    "name": "JPMorgan BetaBuilders Japan ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPHQ",
+    "name": "Invesco S&P 500 Quality ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VOOG",
+    "name": "Vanguard S&P 500 Growth Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FDL",
+    "name": "First Tr Morningstar Dividend Leaders Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ICLN",
+    "name": "iShares Global Clean Energy ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SMCL",
+    "name": "Graniteshares 2X Long SMCI Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VYMI",
+    "name": "Vanguard Internatl High Div Yield Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EFG",
+    "name": "iShares MSCI EAFE Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "MOAT",
+    "name": "VanEck Morningstar Wide Moat ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IYE",
+    "name": "iShares US Energy ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DOG",
+    "name": "ProShares Short Dow30",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IWO",
+    "name": "iShares Russell 2000 Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BMNG",
+    "name": "Leverage Shares 2X Long BMNR Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "TMF",
+    "name": "Direxion Daily 20 Year Treasury Bull 3X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VIXY",
+    "name": "ProShares VIX Short-Term Futures ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "STIP",
+    "name": "iShares 0-5 Year TIPS Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NEBX",
+    "name": "Tradr 2X Long NBIS Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VSS",
+    "name": "Vanguard FTSE All-World ex-US Small-Cap Index",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "XLG",
+    "name": "Invesco S&P 500 Top 50 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VV",
+    "name": "Vanguard Large-Cap Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "QYLD",
+    "name": "Global X NASDAQ 100 Covered Call ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "COWZ",
+    "name": "Pacer US Cash Cows 100 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "KBE",
+    "name": "State Street SPDR S&P Bank ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SKYY",
+    "name": "First Trust Cloud Computing ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPSB",
+    "name": "State Street SPDR Portfolio Short Trm Corp Bd ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHE",
+    "name": "Schwab Emerging Markets Equity ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "UNG",
+    "name": "United States Natural Gas Fund LP",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "RDVY",
+    "name": "First Trust Rising Dividend Achievers ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "CGGR",
+    "name": "Capital Group Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IGIB",
+    "name": "iShares 5-10 Yr Investment Grade Corporate Bd ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "USIG",
+    "name": "iShares Broad USD Investment Grade Corporate Bond",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ICVT",
+    "name": "iShares Convertible Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "TSMX",
+    "name": "Direxion Daily TSM Bull 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IDEV",
+    "name": "iShares Core MSCI International Developed Mkt ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NVDY",
+    "name": "YieldMax NVDA Option Income Strategy ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ERY",
+    "name": "Direxion Daily Energy Bear 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SHYG",
+    "name": "iShares 0-5 Year High Yield Corporate Bond ETF",
     "exch": "US_ETF"
   },
   {
@@ -14945,18 +18535,148 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "SDVD",
-    "name": "FT Vest SMID Rising Dividend Achievers Tgt In",
+    "symbol": "ETH",
+    "name": "Grayscale Ethereum Staking Mini ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ROBN",
-    "name": "T-Rex 2X Long HOOD Daily Target ETF",
+    "symbol": "BINC",
+    "name": "Ishares Flexible Income Active ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IG",
-    "name": "Principal Investment Grade Corporate Active ETF",
+    "symbol": "FNDE",
+    "name": "Schwab Fundamental EM Equity ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VTIP",
+    "name": "Vanguard Sht-Term Inflation-Protected Sec Idx",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "JMST",
+    "name": "JPMorgan Ultra-Short Municipal Income ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "RKLX",
+    "name": "Defiance Daily Target 2X Long RKLB ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BTC",
+    "name": "Grayscale Bitcoin Mini Trust ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "KOLD",
+    "name": "ProShares UltraShort Bloomberg Natural Gas",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VWOB",
+    "name": "Vanguard Emerging Markets Govt Bd Idx ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCZ",
+    "name": "iShares MSCI EAFE Small Cap ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VGLT",
+    "name": "Vanguard Long-Term Treasury Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BTCZ",
+    "name": "T-Rex 2X Inverse Bitcoin Daily Target ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IWV",
+    "name": "iShares Russell 3000 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ARKB",
+    "name": "ARK 21Shares Bitcoin ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AVDV",
+    "name": "Avantis International Small Cap Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AAAU",
+    "name": "Goldman Sachs Physical Gold ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EZU",
+    "name": "iShares MSCI Eurozone ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PAAA",
+    "name": "PGIM AAA CLO ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DFAC",
+    "name": "Dimensional U S Core Equity 2 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BUG",
+    "name": "Global X Cybersecurity ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IQLT",
+    "name": "iShares MSCI Intl Quality Factor ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHA",
+    "name": "Schwab US Small-Cap ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPEM",
+    "name": "State Street SPDR Portfolio Emerging Markets ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ORCX",
+    "name": "Defiance Daily Target 2X Long ORCL ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VUSB",
+    "name": "Vanguard Ultra-Short Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NUGT",
+    "name": "Direxion Daily Gold Miners Index Bull 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWX",
+    "name": "State Street SPDR S&P Emerging Mkts Small Cap ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FTSM",
+    "name": "First Trust Enhanced Short Maturity ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "USD",
+    "name": "ProShares Ultra Semiconductors",
     "exch": "US_ETF"
   },
   {
@@ -14965,13 +18685,248 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "AVUS",
-    "name": "Avantis US Equity ETF",
+    "symbol": "SPMD",
+    "name": "State Street SPDR Portfolio S&P 400 Mid Cap ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "CPER",
-    "name": "United States Copper Index Fund",
+    "symbol": "AVDE",
+    "name": "Avantis International Equity ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "RPG",
+    "name": "Invesco S&P 500 Pure Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SOXQ",
+    "name": "Invesco PHLX Semiconductor ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IAGG",
+    "name": "iShares Core International Aggregate Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DFIV",
+    "name": "Dimensional International Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SVXY",
+    "name": "ProShares Short VIX Short-Term Futures ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GGLL",
+    "name": "Direxion Daily GOOGL Bull 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FENY",
+    "name": "Fidelity MSCI Energy Index ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FRNW",
+    "name": "Fidelity Clean Energy ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SJNK",
+    "name": "State Street SPDR Bloomberg Shrt Trm Hg Yld Bd ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "MSTX",
+    "name": "Defiance Daily Target 2x Long MSTR ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VBR",
+    "name": "Vanguard Small-Cap Value Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AIQ",
+    "name": "Global X Artificial Intelligence & Technology ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWG",
+    "name": "iShares MSCI Germany ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "MULL",
+    "name": "GraniteShares 2x Long MU Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DPST",
+    "name": "Direxion Daily Regional Banks Bull 3X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BITB",
+    "name": "Bitwise Bitcoin ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NOBL",
+    "name": "ProShares S&P 500 Dividend Aristocrats ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IGM",
+    "name": "iShares Expanded Tech Sector ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "METU",
+    "name": "Direxion Daily META Bull 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ANGL",
+    "name": "VanEck Fallen Angel High Yield Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHO",
+    "name": "Schwab Short Term US Treasury ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PVAL",
+    "name": "Putnam Focused Large Cap Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "TSLZ",
+    "name": "T-Rex 2x Inverse Tesla Daily Target ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GGLS",
+    "name": "Direxion Daily GOOGL Bear 1X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AVL",
+    "name": "Direxion Daily AVGO Bull 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "URTH",
+    "name": "iShares MSCI World ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SVIX",
+    "name": "-1x Short VIX Futures ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PFF",
+    "name": "iShares Preferred and Income Securities ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "MVLL",
+    "name": "GraniteShares 2x Long MRVL Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "JETS",
+    "name": "US Global Jets ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GSY",
+    "name": "Invesco Ultra Short Duration ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AIRR",
+    "name": "First Trust RBA Amer Industrial Renaissance ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IUSV",
+    "name": "iShares Core S&P US Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VMBS",
+    "name": "Vanguard Mortgage-Backed Secs Idx Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "YINN",
+    "name": "Direxion Daily FTSE China Bull 3X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "XHLF",
+    "name": "BondBloxx Bloomberg 6 Mo Tgt Duration US Trsy ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "REMX",
+    "name": "VanEck Rare Earth and Strategic Metals ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "HDV",
+    "name": "iShares Core High Dividend ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BBCA",
+    "name": "JPMorgan BetaBuilders Canada ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "JPIE",
+    "name": "JPMorgan Income ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ARKG",
+    "name": "ARK Genomic Revolution ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "RECS",
+    "name": "Columbia Research Enhanced Core ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IGF",
+    "name": "iShares Global Infrastructure ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "XAR",
+    "name": "State Street SPDR S&P Aerospace & Defense ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GLL",
+    "name": "ProShares UltraShort Gold",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DFAI",
+    "name": "DFA Dimensional International Core Equity Market",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DFAR",
+    "name": "DFA Dimensional US Real Estate ETF",
     "exch": "US_ETF"
   },
   {
@@ -14980,8 +18935,93 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "LIT",
-    "name": "Global X Lithium & Battery Tech ETF",
+    "symbol": "JCPB",
+    "name": "JPMorgan Core Plus Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GNR",
+    "name": "State Street SPDR S&P Global Nat Resources ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GBIL",
+    "name": "Goldman Sachs Access Treasury 0-1 Year ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PAVE",
+    "name": "Global X US Infrastructure Development ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FDVV",
+    "name": "Fidelity High Dividend ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "JTEK",
+    "name": "JPMorgan US Tech Leaders ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BILS",
+    "name": "State Street SPDR Bloomberg 3-12 Month T-Bill ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AAXJ",
+    "name": "iShares MSCI All Country Asia ex Japan ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWA",
+    "name": "iShares MSCI Australia ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FLOT",
+    "name": "iShares Floating Rate Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FETH",
+    "name": "Fidelity Ethereum Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NBIL",
+    "name": "Graniteshares 2X Long NBIS Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FTCS",
+    "name": "First Trust Capital Strength ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "CRCA",
+    "name": "ProShares Ultra CRCL ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DVY",
+    "name": "iShares Select Dividend ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ETHE",
+    "name": "Grayscale Ethereum Staking ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SMCX",
+    "name": "Defiance Daily Target 2X Long SMCI ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ICSH",
+    "name": "iShares Ultra Short Duration Bond Active ETF",
     "exch": "US_ETF"
   },
   {
@@ -14990,18 +19030,298 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "SGVT",
-    "name": "Schwab Government Money Market ETF",
+    "symbol": "LABD",
+    "name": "Direxion Daily S&P Biotech Bear 3X ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "VPU",
-    "name": "Vanguard Utilities Index Fund",
+    "symbol": "BOND",
+    "name": "PIMCO Active Bond Exchange-Traded Fund",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SCHM",
-    "name": "Schwab US Mid-Cap ETF",
+    "symbol": "AVLV",
+    "name": "Avantis US Large Cap Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FAZ",
+    "name": "Direxion Daily Financial Bear 3X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EIS",
+    "name": "Ishares Msci Israel ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NVDU",
+    "name": "Direxion Daily NVDA Bull 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GRNY",
+    "name": "Fundstrat Granny Shots US Large Cap ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BITU",
+    "name": "ProShares Ultra Bitcoin ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "QTEC",
+    "name": "First Trust NASDAQ-100-Technology Sector Index Fd",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWI",
+    "name": "Ishares Msci Italy ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AVGX",
+    "name": "Defiance Daily Target 2X Long AVGO ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "QUS",
+    "name": "State Street SPDR MSCI USA StrategicFactors ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "CORN",
+    "name": "Teucrium Corn Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SUB",
+    "name": "iShares Short-Term National Muni Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NAIL",
+    "name": "Direxion Daily Homebuilders & Supplies Bull 3X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ARTY",
+    "name": "iShares Future AI & Tech ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "RSPT",
+    "name": "Invesco S&P 500 Eql Wght Technology ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FENI",
+    "name": "Fidelity Enhanced International ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "APLX",
+    "name": "Tradr 2X Long APLD Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWU",
+    "name": "iShares MSCI United Kingdom ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NBIZ",
+    "name": "Tradr 2X Short NBIS Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "UFO",
+    "name": "Procure Space ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "CRCG",
+    "name": "Leverage Shares 2X Long CRCL Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VBK",
+    "name": "Vanguard Small-Cap Growth Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VXF",
+    "name": "Vanguard Extended Market Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "BIZD",
+    "name": "VanEck BDC Income ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PICK",
+    "name": "iShares MSCI Global Metals & Mining Producers ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "TAN",
+    "name": "Invesco Solar ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FNDF",
+    "name": "Schwab Fundamental Intl Equity ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPTM",
+    "name": "State Street SPDR Prft S&P 1500 Comp Stk Mkt ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "JQUA",
+    "name": "Jpmorgan US Quality Factor ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "EWP",
+    "name": "Ishares Msci Spain ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "COHX",
+    "name": "Tradr 2X Long COHR Daily ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FISR",
+    "name": "State Street SPDR SSGA Fixed Income Sctr Rtn ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ULTY",
+    "name": "YieldMax Ultra Option Income Strategy ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AKRE",
+    "name": "Akre Focus ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SBIT",
+    "name": "ProShares UltraShort Bitcoin ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SRTY",
+    "name": "ProShares UltraPro Short Russell2000",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "CHAT",
+    "name": "Roundhill Generative AI & Technology ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IYT",
+    "name": "iShares US Transportation ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "URTY",
+    "name": "ProShares UltraPro Russell2000",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHK",
+    "name": "Schwab 1000 Index ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DFUS",
+    "name": "DFA Dimensional US Equity Market ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "JIRE",
+    "name": "JPMorgan International Research Enhanced Eqty ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NLR",
+    "name": "VanEck Uranium and Nuclear ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "WEAT",
+    "name": "Teucrium Wheat Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IEUR",
+    "name": "iShares Core MSCI Europe ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DFIC",
+    "name": "DFA Dimensional International Core Equity 2 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DFEM",
+    "name": "DFA Dimensional Emerging Markets Core Equity 2 ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VOE",
+    "name": "Vanguard Mid-Cap Value Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PPLT",
+    "name": "abrdn Physical Platinum Shares ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DXD",
+    "name": "ProShares UltraShort Dow30",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "XOVR",
+    "name": "ERShares Private-Public Crossover ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FELC",
+    "name": "Fidelity Enhanced Large Cap Core ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GPIQ",
+    "name": "Goldman Sachs Nasdaq-100 Premium Income ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "MOO",
+    "name": "VanEck Agribusiness ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "PSI",
+    "name": "Invesco Semiconductors ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "AMLP",
+    "name": "Alerian MLP ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VOT",
+    "name": "Vanguard Mid-Cap Growth Index Fund",
     "exch": "US_ETF"
   },
   {
@@ -15010,8 +19330,98 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "IONX",
-    "name": "Defiance Daily Target 2X Long IONQ ETF",
+    "symbol": "FBCG",
+    "name": "Fidelity Blue Chip Growth ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "ERX",
+    "name": "Direxion Daily Energy Bull 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "CGUS",
+    "name": "Capital Group Core Equity ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "OUNZ",
+    "name": "VanEck Merk Gold ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DIVO",
+    "name": "Amplify CWP Enhanced Dividend Income ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IGLB",
+    "name": "iShares 10+ Year Investment Grade Corp Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "THRO",
+    "name": "Ishares US Thematic Rotation Active ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DGRW",
+    "name": "WisdomTree US Quality Dividend Growth Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FMDE",
+    "name": "Fidelity Enhanced Mid Cap ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SPYD",
+    "name": "State Street SPDR Portfolio S&P 500 High Dvd ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "SCHZ",
+    "name": "Schwab US Aggregate Bond ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "RGTZ",
+    "name": "Defiance Daily Target 2X Short RGTI ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "IWS",
+    "name": "iShares Russell Mid-Cap Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "FWD",
+    "name": "AB Disruptors ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "DFSV",
+    "name": "DFA Dimensional US Small Cap Value ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "NVDQ",
+    "name": "T-Rex 2X Inverse Nvidia Daily Target ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "GUSH",
+    "name": "Direxion Daily S&P Oil & Gas Exp & Prod Bl 2X ETF",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "VPU",
+    "name": "Vanguard Utilities Index Fund",
+    "exch": "US_ETF"
+  },
+  {
+    "symbol": "TFI",
+    "name": "State Street SPDR Nuveen ICE Municipal Bond ETF",
     "exch": "US_ETF"
   },
   {
