@@ -82,40 +82,37 @@
   /* ── 대시보드 상단 개편 (국가별 패널) ── */
   .dashboard-top { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1.5rem; flex-shrink: 0; }
   
-  /* 전역 요약 (가로 띠) */
   .global-summary { display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 20px; }
   .gs-item { display: flex; align-items: baseline; gap: 10px; }
   .gs-label { font-size: 12px; color: var(--text2); font-weight: 500; }
   .gs-val { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
   .gs-sub { font-size: 12px; color: var(--text3); font-family: var(--font-mono); }
 
-  /* 국가별 패널 컨테이너 */
   .country-panels { display: flex; gap: 15px; flex-wrap: wrap; }
   .country-panel { flex: 1; min-width: 320px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
   .cp-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
   .cp-title { font-size: 15px; font-weight: 700; color: var(--text); }
   
-  /* 국가별 총합 요약 */
   .cp-summary { display: flex; gap: 15px; }
   .cp-sum-box { flex: 1; }
   .cp-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
   
-  /* 국가별 차트 */
   .cp-chart-wrap { height: 140px; position: relative; }
 
   /* 국가별 계좌 리스트 테이블 */
-  .cp-accounts { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px; }
+  .cp-accounts { display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 4px; }
   .cp-accounts::-webkit-scrollbar { width: 4px; }
   .cp-accounts::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-  .acc-row { background: var(--bg3); border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
-  .acc-info { display: flex; flex-direction: column; gap: 3px; }
-  .acc-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .acc-row { background: var(--bg3); border-radius: 6px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; }
+  .acc-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+  .acc-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .acc-detail { font-size: 11px; color: var(--text2); font-family: var(--font-mono); }
   .acc-detail span { color: var(--text3); }
-  .acc-pnl { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+  .acc-pnl { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; flex-shrink: 0; }
   .acc-pnl.up { color: var(--green); } .acc-pnl.down { color: var(--red); }
+  .acc-pie-wrap { width: 40px; height: 40px; position: relative; flex-shrink: 0; }
 
   .section-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 15px 0 10px 0; flex-shrink: 0; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -403,7 +400,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v15'; 
+const STORE_KEY = 'stockwatch_real_v16'; 
 let state = loadState();
 
 let currentView = 'all';
@@ -415,6 +412,7 @@ let usdChartInst = null;
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
 const chartInstances = {};
+let accountPieChartInsts = []; // 계좌별 미니 도넛 차트들 저장
 let cachedMarketData = {}; 
 let localStockDB = []; 
 
@@ -435,7 +433,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v14'); 
+    let oldS = localStorage.getItem('stockwatch_real_v15'); 
     if(oldS) return JSON.parse(oldS);
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
@@ -939,11 +937,12 @@ async function render() {
   displayItems.forEach(item => {
     const prices = item.data.prices;
     const last = item.data.last;
+    const prev = item.data.prev;
     
     const sliceLen = getSliceLen(state.range);
     item.sliceLen = sliceLen; 
     
-    const pStart = prices[Math.max(0, prices.length - sliceLen)] || item.data.prev;
+    const pStart = prices[Math.max(0, prices.length - sliceLen)] || prev;
     item.activeChange = ((last - pStart) / pStart) * 100;
     
     item.evalAmt = item.qty * last;
@@ -1018,6 +1017,9 @@ function buildChart(canvasId, prices, dates, mini) {
 }
 
 function updateSummaryAndAllocation(displayItems) {
+  accountPieChartInsts.forEach(c => c.destroy());
+  accountPieChartInsts = [];
+
   let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
   let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
@@ -1030,20 +1032,21 @@ function updateSummaryAndAllocation(displayItems) {
       if(isKorean(item.symbol)) { 
         krwSummary.totalEval += eAmt;
         krwSummary.totalCost += cAmt;
-        if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0 };
+        if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
         krwSummary.accounts[broker].eval += eAmt;
         krwSummary.accounts[broker].cost += cAmt;
+        krwSummary.accounts[broker].items.push({ name: item.data.name, evalAmt: eAmt });
       } else { 
         usdSummary.totalEval += eAmt;
         usdSummary.totalCost += cAmt;
-        if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0 };
+        if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
         usdSummary.accounts[broker].eval += eAmt;
         usdSummary.accounts[broker].cost += cAmt;
+        usdSummary.accounts[broker].items.push({ name: item.data.name, evalAmt: eAmt });
       }
     }
   });
 
-  // 통합 자산 계산
   const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
   document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
   document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
@@ -1058,16 +1061,22 @@ function updateSummaryAndAllocation(displayItems) {
   elKrwPnl.textContent = `${krwPnl >= 0 ? '+' : ''}₩${Math.round(krwPnl).toLocaleString()} (${krwRoi.toFixed(2)}%)`;
   elKrwPnl.className = 'cp-sum-val ' + (krwPnl >= 0 ? 'up' : (krwSummary.totalCost > 0 ? 'down' : ''));
 
+  let krwPieConfigs = [];
   let krwAccHtml = Object.keys(krwSummary.accounts).map(b => {
     let d = krwSummary.accounts[b];
     let pnl = d.eval - d.cost;
     let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
     let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
     let sign = pnl >= 0 ? '+' : '';
+    let count = d.items.length;
+    let safeId = 'krw_pie_' + Math.random().toString(36).substring(7);
+    krwPieConfigs.push({ id: safeId, items: d.items, isUsd: false });
+
     return `
       <div class="acc-row">
+        <div class="acc-pie-wrap"><canvas id="${safeId}"></canvas></div>
         <div class="acc-info">
-          <div class="acc-name">${b}</div>
+          <div class="acc-name" title="${b}">${b} <span style="font-weight:normal; font-size:10px; color:var(--text3)">(${count}종목)</span></div>
           <div class="acc-detail"><span>투자</span> ₩${Math.round(d.cost).toLocaleString()}</div>
           <div class="acc-detail"><span>평가</span> ₩${Math.round(d.eval).toLocaleString()}</div>
         </div>
@@ -1087,16 +1096,22 @@ function updateSummaryAndAllocation(displayItems) {
   elUsdPnl.textContent = `${usdPnl >= 0 ? '+' : ''}$${usdPnl.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} (${usdRoi.toFixed(2)}%)`;
   elUsdPnl.className = 'cp-sum-val ' + (usdPnl >= 0 ? 'up' : (usdSummary.totalCost > 0 ? 'down' : ''));
 
+  let usdPieConfigs = [];
   let usdAccHtml = Object.keys(usdSummary.accounts).map(b => {
     let d = usdSummary.accounts[b];
     let pnl = d.eval - d.cost;
     let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
     let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
     let sign = pnl >= 0 ? '+' : '';
+    let count = d.items.length;
+    let safeId = 'usd_pie_' + Math.random().toString(36).substring(7);
+    usdPieConfigs.push({ id: safeId, items: d.items, isUsd: true });
+
     return `
       <div class="acc-row">
+        <div class="acc-pie-wrap"><canvas id="${safeId}"></canvas></div>
         <div class="acc-info">
-          <div class="acc-name">${b}</div>
+          <div class="acc-name" title="${b}">${b} <span style="font-weight:normal; font-size:10px; color:var(--text3)">(${count}종목)</span></div>
           <div class="acc-detail"><span>투자</span> $${d.cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
           <div class="acc-detail"><span>평가</span> $${d.eval.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
         </div>
@@ -1106,7 +1121,42 @@ function updateSummaryAndAllocation(displayItems) {
   }).join('');
   document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-  // ── KRW 차트 (계좌별 투자 vs 평가) ──
+  // ── 미니 파이 차트 그리기 ──
+  const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
+  [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
+    const ctx = document.getElementById(cfg.id);
+    if(!ctx) return;
+    cfg.items.sort((a,b) => b.evalAmt - a.evalAmt);
+    const c = new Chart(ctx.getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: cfg.items.map(i => i.name),
+        datasets: [{
+          data: cfg.items.map(i => i.evalAmt),
+          backgroundColor: pieColors.slice(0, cfg.items.length),
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                let v = context.raw;
+                return cfg.isUsd ? ' $' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : ' ₩' + Math.round(v).toLocaleString();
+              }
+            },
+            titleFont: { size: 10 }, bodyFont: { size: 10 }, padding: 6, boxWidth: 8
+          }
+        },
+        cutout: '60%', animation: { duration: 0 }
+      }
+    });
+    accountPieChartInsts.push(c);
+  });
+
   if(krwChartInst) krwChartInst.destroy();
   if(Object.keys(krwSummary.accounts).length > 0) {
     const krwLabels = Object.keys(krwSummary.accounts);
@@ -1125,16 +1175,12 @@ function updateSummaryAndAllocation(displayItems) {
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } } },
-        scales: {
-          x: { ticks: { color: '#8890a4', font: { size: 10 } }, grid: { display: false } },
-          y: { display: false }
-        },
+        scales: { x: { ticks: { color: '#8890a4', font: { size: 10 } }, grid: { display: false } }, y: { display: false } },
         animation: { duration: 0 }
       }
     });
   }
 
-  // ── USD 차트 (계좌별 투자 vs 평가) ──
   if(usdChartInst) usdChartInst.destroy();
   if(Object.keys(usdSummary.accounts).length > 0) {
     const usdLabels = Object.keys(usdSummary.accounts);
@@ -1153,10 +1199,7 @@ function updateSummaryAndAllocation(displayItems) {
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ' $' + ctx.raw.toLocaleString(undefined, {minimumFractionDigits:2}) } } },
-        scales: {
-          x: { ticks: { color: '#8890a4', font: { size: 10 } }, grid: { display: false } },
-          y: { display: false }
-        },
+        scales: { x: { ticks: { color: '#8890a4', font: { size: 10 } }, grid: { display: false } }, y: { display: false } },
         animation: { duration: 0 }
       }
     });
