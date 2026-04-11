@@ -111,6 +111,9 @@
   /* 파이 차트 크기 확대 */
   .acc-pie-wrap { width: 70px; height: 70px; position: relative; flex-shrink: 0; }
   
+  /* 계좌별 가로 막대 그래프 통합 */
+  .acc-bar-wrap { flex: 1; height: 40px; position: relative; flex-shrink: 0; }
+  
   .acc-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
   .acc-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .acc-detail { font-size: 11px; color: var(--text2); font-family: var(--font-mono); }
@@ -417,7 +420,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v17'; 
+const STORE_KEY = 'stockwatch_real_v18'; 
 let state = loadState();
 
 let currentView = 'all';
@@ -430,6 +433,7 @@ let modalChartInst = null;
 let divMonthlyChartInst = null; 
 const chartInstances = {};
 let accountPieChartInsts = []; 
+let accountBarChartInsts = []; // 계좌별 가로 막대 차트 인스턴스
 let cachedMarketData = {}; 
 let localStockDB = []; 
 
@@ -450,7 +454,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v16'); 
+    let oldS = localStorage.getItem('stockwatch_real_v17'); 
     if(oldS) return JSON.parse(oldS);
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
@@ -1035,6 +1039,8 @@ function buildChart(canvasId, prices, dates, mini) {
 function updateSummaryAndAllocation(displayItems) {
   accountPieChartInsts.forEach(c => c.destroy());
   accountPieChartInsts = [];
+  accountBarChartInsts.forEach(c => c.destroy()); // 기존 가로 막대 차트 파괴
+  accountBarChartInsts = [];
 
   let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
   let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
@@ -1051,14 +1057,14 @@ function updateSummaryAndAllocation(displayItems) {
         if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
         krwSummary.accounts[broker].eval += eAmt;
         krwSummary.accounts[broker].cost += cAmt;
-        krwSummary.accounts[broker].items.push({ name: item.data.name, evalAmt: eAmt });
+        krwSummary.accounts[broker].items.push({ name: item.data.name, costAmt: cAmt, evalAmt: eAmt }); // 가로 막대용 원금 추가
       } else { 
         usdSummary.totalEval += eAmt;
         usdSummary.totalCost += cAmt;
         if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
         usdSummary.accounts[broker].eval += eAmt;
         usdSummary.accounts[broker].cost += cAmt;
-        usdSummary.accounts[broker].items.push({ name: item.data.name, evalAmt: eAmt });
+        usdSummary.accounts[broker].items.push({ name: item.data.name, costAmt: cAmt, evalAmt: eAmt }); // 가로 막대용 원금 추가
       }
     }
   });
@@ -1084,7 +1090,7 @@ function updateSummaryAndAllocation(displayItems) {
   elKrwPnl.textContent = `${krwPnl >= 0 ? '+' : ''}₩${Math.round(krwPnl).toLocaleString()} (${krwRoi.toFixed(2)}%)`;
   elKrwPnl.className = 'cp-sum-val ' + (krwPnl >= 0 ? 'up' : (krwSummary.totalCost > 0 ? 'down' : ''));
 
-  let krwPieConfigs = [];
+  let krwChartConfigs = [];
   let krwAccHtml = Object.keys(krwSummary.accounts).map(b => {
     let d = krwSummary.accounts[b];
     let pnl = d.eval - d.cost;
@@ -1092,12 +1098,14 @@ function updateSummaryAndAllocation(displayItems) {
     let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
     let sign = pnl >= 0 ? '+' : '';
     let count = d.items.length;
-    let safeId = 'krw_pie_' + Math.random().toString(36).substring(7);
-    krwPieConfigs.push({ id: safeId, items: d.items, isUsd: false });
+    let pieId = 'krw_pie_' + Math.random().toString(36).substring(7);
+    let barId = 'krw_bar_' + Math.random().toString(36).substring(7);
+    krwChartConfigs.push({ pieId, barId, items: d.items, isUsd: false, broker: b, totalCost: d.cost, totalEval: d.eval });
 
     return `
       <div class="acc-row">
-        <div class="acc-pie-wrap"><canvas id="${safeId}"></canvas></div>
+        <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
+        <div class="acc-bar-wrap"><canvas id="${barId}"></canvas></div>
         <div class="acc-info">
           <div class="acc-name" title="${b}">${b} <span style="font-weight:normal; font-size:10px; color:var(--text3)">(${count}종목)</span></div>
           <div class="acc-detail"><span>투자</span> ₩${Math.round(d.cost).toLocaleString()}</div>
@@ -1118,7 +1126,7 @@ function updateSummaryAndAllocation(displayItems) {
   elUsdPnl.textContent = `${usdPnl >= 0 ? '+' : ''}$${usdPnl.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} (${usdRoi.toFixed(2)}%)`;
   elUsdPnl.className = 'cp-sum-val ' + (usdPnl >= 0 ? 'up' : (usdSummary.totalCost > 0 ? 'down' : ''));
 
-  let usdPieConfigs = [];
+  let usdChartConfigs = [];
   let usdAccHtml = Object.keys(usdSummary.accounts).map(b => {
     let d = usdSummary.accounts[b];
     let pnl = d.eval - d.cost;
@@ -1126,12 +1134,14 @@ function updateSummaryAndAllocation(displayItems) {
     let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
     let sign = pnl >= 0 ? '+' : '';
     let count = d.items.length;
-    let safeId = 'usd_pie_' + Math.random().toString(36).substring(7);
-    usdPieConfigs.push({ id: safeId, items: d.items, isUsd: true });
+    let pieId = 'usd_pie_' + Math.random().toString(36).substring(7);
+    let barId = 'usd_bar_' + Math.random().toString(36).substring(7);
+    usdChartConfigs.push({ pieId, barId, items: d.items, isUsd: true, broker: b, totalCost: d.cost, totalEval: d.eval });
 
     return `
       <div class="acc-row">
-        <div class="acc-pie-wrap"><canvas id="${safeId}"></canvas></div>
+        <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
+        <div class="acc-bar-wrap"><canvas id="${barId}"></canvas></div>
         <div class="acc-info">
           <div class="acc-name" title="${b}">${b} <span style="font-weight:normal; font-size:10px; color:var(--text3)">(${count}종목)</span></div>
           <div class="acc-detail"><span>투자</span> $${d.cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
@@ -1144,68 +1154,138 @@ function updateSummaryAndAllocation(displayItems) {
   document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
   const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
-  [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
-    const ctx = document.getElementById(cfg.id);
-    if(!ctx) return;
-    cfg.items.sort((a,b) => b.evalAmt - a.evalAmt);
-    const c = new Chart(ctx.getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: cfg.items.map(i => i.name),
-        datasets: [{
-          data: cfg.items.map(i => i.evalAmt),
-          backgroundColor: cfg.items.map((_, i) => pieColors[i % pieColors.length]),
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        layout: { padding: 4 },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            enabled: false,
-            external: function(context) {
-              let tooltipEl = document.getElementById('chartjs-tooltip');
-              if (!tooltipEl) {
-                tooltipEl = document.createElement('div');
-                tooltipEl.id = 'chartjs-tooltip';
-                document.body.appendChild(tooltipEl);
-              }
-              const tooltipModel = context.tooltip;
-              if (tooltipModel.opacity === 0) {
-                tooltipEl.style.opacity = 0;
-                return;
-              }
-              if (tooltipModel.body) {
-                const bodyLines = tooltipModel.body.map(b => b.lines);
-                let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
-                bodyLines.forEach(function(body, i) {
-                  const colors = tooltipModel.labelColors[i];
-                  const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
-                  let txt = body[0];
-                  let splitTxt = txt.split(': ');
-                  if(splitTxt.length === 2) {
-                    let val = parseFloat(splitTxt[1].replace(/,/g,''));
-                    let formatVal = cfg.isUsd ? '$' + val.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(val).toLocaleString();
-                    txt = `${splitTxt[0]}: ${formatVal}`;
-                  }
-                  innerHtml += `<div style="font-size:11px; display:flex; align-items:center; white-space:nowrap;">${span}${txt}</div>`;
-                });
-                innerHtml += '</div>';
-                tooltipEl.innerHTML = innerHtml;
-              }
-              const position = context.chart.canvas.getBoundingClientRect();
-              tooltipEl.style.opacity = 1;
-              tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-              tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
-            }
-          }
+  [...krwChartConfigs, ...usdChartConfigs].forEach(cfg => {
+    const pieCtx = document.getElementById(cfg.pieId);
+    if(pieCtx) {
+      cfg.items.sort((a,b) => b.evalAmt - a.evalAmt);
+      const c = new Chart(pieCtx.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: cfg.items.map(i => i.name),
+          datasets: [{
+            data: cfg.items.map(i => i.evalAmt),
+            backgroundColor: cfg.items.map((_, i) => pieColors[i % pieColors.length]),
+            borderWidth: 0
+          }]
         },
-        cutout: '60%', animation: { duration: 0 }
-      }
-    });
-    accountPieChartInsts.push(c);
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          layout: { padding: 4 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: false,
+              external: function(context) {
+                let tooltipEl = document.getElementById('chartjs-tooltip');
+                if (!tooltipEl) {
+                  tooltipEl = document.createElement('div');
+                  tooltipEl.id = 'chartjs-tooltip';
+                  document.body.appendChild(tooltipEl);
+                }
+                const tooltipModel = context.tooltip;
+                if (tooltipModel.opacity === 0) {
+                  tooltipEl.style.opacity = 0;
+                  return;
+                }
+                if (tooltipModel.body) {
+                  const bodyLines = tooltipModel.body.map(b => b.lines);
+                  let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
+                  bodyLines.forEach(function(body, i) {
+                    const colors = tooltipModel.labelColors[i];
+                    const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
+                    let txt = body[0];
+                    let splitTxt = txt.split(': ');
+                    if(splitTxt.length === 2) {
+                      let val = parseFloat(splitTxt[1].replace(/,/g,''));
+                      let formatVal = cfg.isUsd ? '$' + val.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(val).toLocaleString();
+                      txt = `${splitTxt[0]}: ${formatVal}`;
+                    }
+                    innerHtml += `<div style="font-size:11px; display:flex; align-items:center; white-space:nowrap;">${span}${txt}</div>`;
+                  });
+                  innerHtml += '</div>';
+                  tooltipEl.innerHTML = innerHtml;
+                }
+                const position = context.chart.canvas.getBoundingClientRect();
+                tooltipEl.style.opacity = 1;
+                tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+                tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+              }
+            }
+          },
+          cutout: '60%', animation: { duration: 0 }
+        }
+      });
+      accountPieChartInsts.push(c);
+    }
+
+    const barCtx = document.getElementById(cfg.barId);
+    if(barCtx) {
+      cfg.items.sort((a,b) => b.costAmt - a.costAmt); // 원금 순 정렬
+      const broker = cfg.broker;
+      const isUsd = cfg.isUsd;
+      const c = new Chart(barCtx.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: cfg.items.map(i => i.name),
+          datasets: [
+            { label: '투자', data: cfg.items.map(i => i.costAmt), backgroundColor: '#4d9fff', borderRadius: 2 },
+            { label: '평가', data: cfg.items.map(i => i.evalAmt), backgroundColor: '#7c6af7', borderRadius: 2 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          indexAxis: 'y', // 가로 막대 그래프
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: false,
+              external: function(context) {
+                let tooltipEl = document.getElementById('chartjs-tooltip');
+                if (!tooltipEl) {
+                  tooltipEl = document.createElement('div');
+                  tooltipEl.id = 'chartjs-tooltip';
+                  document.body.appendChild(tooltipEl);
+                }
+                const tooltipModel = context.tooltip;
+                if (tooltipModel.opacity === 0) {
+                  tooltipEl.style.opacity = 0;
+                  return;
+                }
+                if (tooltipModel.body) {
+                  const titleLines = tooltipModel.title || [];
+                  const bodyLines = tooltipModel.body.map(b => b.lines);
+                  let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
+                  titleLines.forEach(function(title) {
+                    innerHtml += `<div style="font-size:11px; font-weight:700; color:var(--text); margin-bottom:2px;">${broker} | ${title}</div>`;
+                  });
+                  bodyLines.forEach(function(body, i) {
+                    const colors = tooltipModel.labelColors[i];
+                    const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
+                    let txt = body[0];
+                    let splitTxt = txt.split(': ');
+                    if(splitTxt.length === 2) {
+                      let val = parseFloat(splitTxt[1].replace(/,/g,''));
+                      let formatVal = isUsd ? '$' + val.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(val).toLocaleString();
+                      txt = `${splitTxt[0]}: ${formatVal}`;
+                    }
+                    innerHtml += `<div style="font-size:11px; display:flex; align-items:center; white-space:nowrap;">${span}${txt}</div>`;
+                  });
+                  innerHtml += '</div>';
+                  tooltipEl.innerHTML = innerHtml;
+                }
+                const position = context.chart.canvas.getBoundingClientRect();
+                tooltipEl.style.opacity = 1;
+                tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+                tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+              }
+            }
+          },
+          scales: { x: { display: false }, y: { display: false } },
+          animation: { duration: 0 }
+        }
+      });
+      accountBarChartInsts.push(c);
+    }
   });
 
   if(krwChartInst) krwChartInst.destroy();
