@@ -3,45 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOCK WATCH — 내 포트폴리오</title>
+<title>STOCK WATCH — 거래 내역 대시보드</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #0d0f14; --bg2: #141720; --bg3: #1c2030; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14); --text: #e8eaf0; --text2: #8890a4; --text3: #555e72; --green: #00c87a; --green-bg: rgba(0,200,122,0.1); --red: #ff4d6a; --red-bg: rgba(255,77,106,0.1); --blue: #4d9fff; --accent: #7c6af7; --accent-bg: rgba(124,106,247,0.12); --radius: 10px; --radius-lg: 14px; --font-mono: 'Space Mono', monospace; --font-sans: 'Noto Sans KR', sans-serif; }
+  :root { --bg: #0d0f14; --bg2: #141720; --bg3: #1c2030; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14); --text: #e8eaf0; --text2: #8890a4; --text3: #555e72; --green: #00c87a; --green-bg: rgba(0,200,122,0.1); --red: #ff4d6a; --red-bg: rgba(255,77,106,0.1); --blue: #4d9fff; --accent: #7c6af7; --accent-bg: rgba(124,106,247,0.12); --radius: 8px; --radius-lg: 12px; --font-mono: 'Space Mono', monospace; --font-sans: 'Noto Sans KR', sans-serif; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   
-  /* 화면 전체 고정 및 스크롤 제어 */
-  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.6; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
   
-  /* ── NAV (V5 원본 완벽 복구) ── */
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; min-height: 64px; border-bottom: 1px solid var(--border); background: rgba(13,15,20,0.95); position: relative; z-index: 50; flex-shrink: 0; }
-  .logo { font-family: var(--font-mono); font-size: 16px; font-weight: 700; letter-spacing: 0.1em; color: var(--text); display: flex; align-items: center; gap: 8px; }
-  .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  
-  .view-tabs { display: flex; gap: 4px; background: var(--bg2); padding: 4px; border-radius: var(--radius); border: 1px solid var(--border); }
-  .vtab { padding: 6px 16px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 7px; transition: 0.2s; border:none; background:none; }
-  .vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  /* ── 1. 네비게이션 ── */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 50px; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; }
+  .logo { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
 
-  .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); }
+  .vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; }
+  .vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+  .nav-right { display: flex; align-items: center; gap: 8px; }
   .range-group { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px; }
-  .rtab { padding: 4px 10px; font-size: 11px; font-family: var(--font-mono); background: transparent; border: none; color: var(--text2); cursor: pointer; border-radius: 7px; transition: all 0.15s; letter-spacing: 0.05em; }
+  .rtab { padding: 4px 10px; font-size: 11px; font-family: var(--font-mono); background: transparent; border: none; color: var(--text2); cursor: pointer; border-radius: 6px; transition: all 0.15s; }
   .rtab.active { background: var(--accent); color: #fff; }
-  .rtab:hover:not(.active) { color: var(--text); background: var(--bg3); }
-  select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
-  
-  .btn { padding: 9px 18px; border-radius: var(--radius); border: 1px solid var(--border2); background: transparent; color: var(--text2); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-  .btn:hover:not(:disabled) { background: var(--bg3); color: var(--text); border-color: var(--border2); }
-  .btn-primary { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); font-weight: 500; }
-  .btn-primary:hover:not(:disabled) { background: var(--accent); color: #fff; }
-  .btn-icon { padding: 6px 10px; font-size: 12px; }
+  .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); font-family: var(--font-sans); }
+  .btn-sm:hover { background: var(--bg3); color: var(--text); }
+  select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); outline: none; cursor: pointer; }
 
-  /* ── 레이아웃 분할 (사이드바 + 메인 대시보드) ── */
+  /* ── 2. 메인 레이아웃 (사이드바 + 콘텐츠) ── */
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; }
-
-  /* ── 좌측 거래장부 사이드바 ── */
-  .ledger-sidebar { width: 320px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 40; }
+  
+  /* ── 3. 사이드바 (거래 내역 입력) ── */
+  .ledger-sidebar { width: 320px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; }
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); }
   
   .tx-form { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
@@ -63,17 +56,16 @@
   .tx-list::-webkit-scrollbar { width: 4px; }
   .tx-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
   .tx-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 12px; position: relative; }
-  .tx-card-head { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--text2); font-size: 11px; }
+  .tx-card-head { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--text2); font-size: 11px; }
   .tx-card-body { display: flex; justify-content: space-between; align-items: flex-end; }
-  .tx-sym { font-family: var(--font-mono); font-weight: 700; font-size: 14px; color: var(--text); }
+  .tx-sym { font-family: var(--font-sans); font-weight: 700; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; display: inline-block; }
   .tx-del { cursor: pointer; color: var(--text3); font-size: 12px; transition: color 0.2s; }
   .tx-del:hover { color: var(--red); }
 
-  /* ── 우측 메인 대시보드 (V5 원본 완벽 복구) ── */
-  .dashboard-main { flex: 1; padding: 1.5rem 2rem; overflow-y: auto; background: var(--bg); max-width: 100%; }
+  /* ── 4. 메인 콘텐츠 (대시보드) ── */
+  .dashboard-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 1.5rem 2rem; background: var(--bg); max-width: 100%; }
   
-  /* 메인 검색바 */
-  .add-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; align-items: center; flex-wrap: wrap; }
+  .add-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
   .search-container { position: relative; flex: 1; min-width: 220px; max-width: 400px; }
   .search-input { width: 100%; padding: 10px 16px; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); font-family: var(--font-sans); font-size: 13px; outline: none; transition: border-color 0.15s; }
   .search-input:focus { border-color: var(--accent); }
@@ -83,21 +75,29 @@
   .search-dropdown::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
   .search-item { padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s; }
   .search-item:hover { background: var(--bg2); }
+  .btn-primary { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; white-space: nowrap; }
+  .btn-primary:hover { background: var(--accent); color: #fff; }
 
-  /* 메인 요약 대시보드 */
-  .dashboard-top { display: flex; gap: 20px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .dashboard-top { display: flex; gap: 20px; margin-bottom: 1.5rem; flex-wrap: wrap; flex-shrink: 0; }
   .summary { flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
-  .allocation { flex: 1; min-width: 250px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; align-items: center; justify-content: center; height: 160px; }
   .sum-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; }
   .sum-label { font-size: 11px; color: var(--text3); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
   .sum-value { font-family: var(--font-mono); font-size: 20px; font-weight: 700; }
   .sum-value.up { color: var(--green); } .sum-value.down { color: var(--red); }
+  .allocation { flex: 1; min-width: 250px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; align-items: center; justify-content: center; height: 160px; }
+
+  .section-title { font-size: 12px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* 그리드 영역 스크롤 */
+  .grid-container { flex: 1; overflow-y: auto; padding-right: 5px; }
+  .grid-container::-webkit-scrollbar { width: 6px; }
+  .grid-container::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-content: start; }
   
-  /* 그리드 및 카드 */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
-  
-  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 12px; cursor: pointer; transition: border-color 0.2s, transform 0.15s; position: relative; overflow: hidden; }
-  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--line-color, var(--border)); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  /* 종목 카드 */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 12px; position: relative; cursor: pointer; transition: 0.15s; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   .card.up::before { background: var(--green); } .card.down::before { background: var(--red); }
   .card:hover { border-color: var(--border2); transform: translateY(-1px); }
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
@@ -107,20 +107,19 @@
   
   .card-price { font-family: var(--font-mono); font-size: 24px; font-weight: 700; margin-bottom: 2px; }
   .chart-wrap { height: 80px; position: relative; display: flex; align-items: center; justify-content: center; }
+  
   .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
   .holding-info { font-size: 11px; color: var(--text2); } .holding-info span { color: var(--text); font-weight: 500; }
-  .empty { grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--text3); border: 1px dashed var(--border2); border-radius: var(--radius-lg); }
   
-  /* ── MODALS ── */
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
-  .overlay.open { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg); width: 100%; max-width: 600px; animation: fadeUp 0.2s ease; }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-  .modal-header { padding: 20px 24px 0; display: flex; justify-content: space-between; align-items: flex-start; }
-  .modal-body { padding: 16px 24px 24px; }
-  .modal-chart-wrap { height: 220px; position: relative; margin: 14px 0; }
+  .empty { grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text3); border: 1px dashed var(--border2); border-radius: var(--radius-lg); font-size: 13px; }
   .btn-danger { color: var(--red); border-color: transparent; background: transparent; padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); border-radius: 4px; cursor: pointer; }
   .btn-danger:hover { background: var(--red-bg); border-color: var(--red); }
+
+  /* ── 5. 모달 ── */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .overlay.open { display: flex; }
+  .modal { background: var(--bg2); padding: 20px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 </style>
 </head>
 <body>
@@ -129,13 +128,11 @@
 
 <nav>
   <div class="logo"><div class="logo-dot"></div>STOCK&nbsp;WATCH</div>
-  
   <div class="view-tabs">
     <button class="vtab active" onclick="setView('all', this)">전체보기</button>
     <button class="vtab" onclick="setView('held', this)">보유종목</button>
     <button class="vtab" onclick="setView('watch', this)">관심종목</button>
   </div>
-
   <div class="nav-right">
     <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
       <option value="default">정렬: 기본순</option>
@@ -148,8 +145,8 @@
       <button class="rtab" onclick="setRange('6mo',this)">6M</button>
       <button class="rtab active" onclick="setRange('1y',this)">1Y</button>
     </div>
-    <button class="btn btn-icon" onclick="exportData()" title="데이터 백업">⬇️ 저장</button>
-    <button class="btn btn-icon" onclick="document.getElementById('importFile').click()" title="데이터 복원">⬆️ 불러오기</button>
+    <button class="btn-sm" onclick="exportData()" title="데이터 JSON 백업">⬇️ 저장</button>
+    <button class="btn-sm" onclick="document.getElementById('importFile').click()" title="JSON 불러오기">⬆️ 복원</button>
   </div>
 </nav>
 
@@ -172,7 +169,7 @@
           <input type="number" id="txQty" class="form-input" placeholder="0">
         </div>
         <div class="form-group" style="flex:1;">
-          <label>단가 (매입/매도액)</label>
+          <label>단가 (1주당 가격)</label>
           <input type="number" id="txPrice" class="form-input" placeholder="0" step="0.01">
         </div>
       </div>
@@ -184,7 +181,8 @@
     </div>
 
     <div class="tx-history-title">최근 거래 내역</div>
-    <ul class="tx-list" id="txList"></ul>
+    <ul class="tx-list" id="txList">
+      </ul>
   </aside>
 
   <main class="dashboard-main">
@@ -193,7 +191,7 @@
         <input type="text" id="tickerInput" class="search-input" placeholder="종목명 또는 코드 검색 (예: 애플, 삼성전자, TSLA)" autocomplete="off" />
         <ul id="searchDropdown" class="search-dropdown"></ul>
       </div>
-      <button class="btn btn-primary" id="addBtn" onclick="addManualTicker()">+ 관심종목 추가</button>
+      <button class="btn-primary" id="addBtn" onclick="addManualTicker()">+ 관심종목 추가</button>
     </div>
 
     <div class="dashboard-top" id="dashboardTop" style="display:none">
@@ -207,39 +205,42 @@
     </div>
 
     <div class="section-title" id="gridTitle" style="display:none">포트폴리오</div>
-    <div class="grid" id="grid"></div>
+    
+    <div class="grid-container">
+      <div class="grid" id="grid"></div>
+    </div>
   </main>
 </div>
 
 <div class="overlay" id="chartOverlay" onclick="closeChartModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding: 20px 24px 0;">
       <div>
-        <div id="mTicker" style="font-size:18px;font-weight:700;"></div>
-        <div id="mBroker" style="font-family:var(--font-mono);font-size:12px;color:var(--text3);margin-top:2px"></div>
+        <div id="mTicker" style="font-size:18px; font-weight:700;"></div>
+        <div id="mBroker" style="font-family:var(--font-mono); font-size:12px; color:var(--text3); margin-top:2px;"></div>
       </div>
-      <button class="btn" onclick="closeChartModal()" style="padding:6px 14px;font-size:12px">닫기</button>
+      <button class="btn-sm" onclick="closeChartModal()" style="padding:6px 14px;">닫기</button>
     </div>
-    <div class="modal-body">
-      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:4px">
-        <div id="mPrice" style="font-family:var(--font-mono);font-size:28px;font-weight:700"></div>
-        <div id="mChange" style="font-size:14px;font-weight:500;padding:3px 10px;border-radius:20px"></div>
+    <div style="padding: 16px 24px 24px;">
+      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
+        <div id="mPrice" style="font-family:var(--font-mono); font-size:28px; font-weight:700;"></div>
+        <div id="mChange" style="font-size:14px; font-weight:500; padding:3px 10px; border-radius:20px;"></div>
       </div>
-      <div id="mMeta" style="font-size:12px;color:var(--text3)"></div>
-      <div class="modal-chart-wrap"><canvas id="modalCanvas"></canvas></div>
+      <div id="mMeta" style="font-size:12px; color:var(--text3); margin-bottom:14px;"></div>
+      <div style="height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
     </div>
   </div>
 </div>
 
 <script>
-// ── 1. 데이터 및 상태 초기화 ──
+// ── 1. 데이터 상태 관리 ──
 const STORE_KEY = 'stockwatch_real_v6';
 let state = loadState();
 let currentView = 'all';
 let currentSortMode = 'default';
 let allocationChartInst = null;
-const chartInstances = {};
 let modalChartInst = null;
+const chartInstances = {};
 let cachedMarketData = {}; 
 let localStockDB = []; 
 
@@ -247,7 +248,8 @@ document.getElementById('txDate').valueAsDate = new Date();
 
 async function loadStockDB() {
   try {
-    const res = await fetch('data/stocks.json?t=' + new Date().getTime());
+    const url = 'data/stocks.json?t=' + new Date().getTime();
+    const res = await fetch(url);
     if (res.ok) localStockDB = await res.json();
   } catch(e) {}
 }
@@ -257,7 +259,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    // 이전 버전(V5) 호환 마이그레이션
+    // V5 -> V6 마이그레이션
     let oldS = localStorage.getItem('stockwatch_real_v5');
     if(oldS) {
       let parsed = JSON.parse(oldS);
@@ -275,15 +277,13 @@ function loadState() {
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
 }
 
-function saveState() {
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
-}
+function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
 function exportData() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
   const dl = document.createElement('a');
   dl.setAttribute("href", dataStr);
-  dl.setAttribute("download", `portfolio_${new Date().toISOString().slice(0,10)}.json`);
+  dl.setAttribute("download", `portfolio_ledger_${new Date().toISOString().split('T')[0]}.json`);
   document.body.appendChild(dl); dl.click(); dl.remove();
 }
 
@@ -356,8 +356,20 @@ function renderTxList() {
     return;
   }
   const reversed = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
+  
   listEl.innerHTML = reversed.map(tx => {
     const isBuy = tx.qty > 0;
+    
+    // 종목명 찾기 (로컬 DB 우선, 없으면 캐시된 데이터, 둘 다 없으면 심볼)
+    const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
+    const cachedMatch = cachedMarketData[tx.symbol];
+    const stockName = dbMatch ? dbMatch.name : (cachedMatch ? cachedMatch.name : tx.symbol);
+    
+    // 통화 및 총 금액 포맷
+    const isKRW = tx.symbol.endsWith('.KS') || tx.symbol.endsWith('.KQ');
+    const fmt = (n) => isKRW ? '₩' + Math.round(n).toLocaleString() : '$' + n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const totalAmt = Math.abs(tx.qty) * tx.price;
+
     return `
       <li class="tx-card">
         <div class="tx-card-head">
@@ -365,28 +377,31 @@ function renderTxList() {
           <span class="tx-del" onclick="deleteTransaction(${tx.id})">✕</span>
         </div>
         <div class="tx-card-body">
-          <div style="display:flex; flex-direction:column;">
-            <span class="tx-sym">${tx.symbol}</span>
-            <span style="color:${isBuy ? 'var(--red)' : 'var(--blue)'}; font-weight:700;">${isBuy ? '매수' : '매도'} ${Math.abs(tx.qty)}주</span>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span class="tx-sym" style="font-size:13px; font-family:var(--font-sans); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 140px;" title="${stockName}">${stockName}</span>
+            <span style="color:${isBuy ? 'var(--red)' : 'var(--blue)'}; font-weight:700; font-size:11px;">
+              ${isBuy ? '매수' : '매도'} ${Math.abs(tx.qty)}주
+            </span>
           </div>
-          <div style="font-family:var(--font-mono); font-weight:500;">@ ${tx.price.toLocaleString()}</div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+            <span style="font-weight:700; color:var(--text); font-size:13px;">${fmt(totalAmt)}</span>
+            <span style="font-family:var(--font-mono); font-weight:500; font-size:10px; color:var(--text2);">@ ${fmt(tx.price)}</span>
+          </div>
         </div>
       </li>
     `;
   }).join('');
 }
 
-// "카드에서 잔고 버튼 클릭 시" 사이드바 포커스
 function prepareTransaction(symbol) {
   document.getElementById('txSymbol').value = symbol;
   document.getElementById('txQty').focus();
-  // 사이드바가 살짝 깜빡이도록 효과 추가
   const sidebar = document.querySelector('.ledger-sidebar');
   sidebar.style.boxShadow = "inset 0 0 0 2px var(--accent)";
   setTimeout(() => sidebar.style.boxShadow = "none", 500);
 }
 
-// ── 3. 검색 자동완성 바인딩 ──
+// ── 3. 검색 자동완성 ──
 function setupSearch(inputId, dropdownId, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
@@ -400,8 +415,11 @@ function setupSearch(inputId, dropdownId, onSelect) {
 
     dropdown.innerHTML = results.map(q => `
       <li class="search-item" onclick="${onSelect}('${q.symbol}')">
-        <div class="si-left"><span class="si-name">${q.name}</span><span class="si-exch">${q.exch}</span></div>
-        <span class="si-ticker">${q.symbol}</span>
+        <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
+          <span style="font-weight:500; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
+          <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
+        </div>
+        <span style="color:var(--accent); font-family:var(--font-mono); font-size:12px; font-weight:700;">${q.symbol}</span>
       </li>
     `).join('');
     dropdown.style.display = 'block';
@@ -412,7 +430,6 @@ function setupSearch(inputId, dropdownId, onSelect) {
   });
 }
 
-// 메인 뷰 검색바 세팅
 setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult');
 function selectMainSearchResult(symbol) {
   document.getElementById('tickerInput').value = '';
@@ -425,7 +442,6 @@ function addManualTicker() {
 }
 document.getElementById('tickerInput').addEventListener('keydown', e => { if (e.key === 'Enter') addManualTicker(); });
 
-// 사이드바 검색바 세팅
 setupSearch('txSymbol', 'txDropdown', 'selectSidebarSearchResult');
 function selectSidebarSearchResult(symbol) {
   document.getElementById('txSymbol').value = symbol;
@@ -520,7 +536,6 @@ async function render() {
     return;
   }
 
-  // 티커가 하나라도 있으면 대시보드(도넛차트 영역)를 무조건 노출하여 "사라지는" 느낌 방지
   dash.style.display = 'flex';
   gridTitle.style.display = 'flex';
   
@@ -529,7 +544,10 @@ async function render() {
   }
 
   const promises = state.tickers.map(async t => {
-    if(!cachedMarketData[t]) cachedMarketData[t] = await fetchYahooData(t, state.range);
+    if(!cachedMarketData[t]) {
+      let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
+      cachedMarketData[t] = await fetchYahooData(fetchSym, state.range);
+    }
     return { symbol: t, data: cachedMarketData[t] };
   });
 
@@ -558,14 +576,14 @@ async function render() {
   Object.values(chartInstances).forEach(c => c.destroy());
   
   if(displayTickers.length === 0) {
-     grid.innerHTML = `<div class="empty"><p>조건에 맞는 종목이 없습니다.</p></div>`;
+     grid.innerHTML = `<div class="empty">조건에 맞는 종목이 없습니다.</div>`;
      updateSummaryAndAllocation(validTickers, currentHoldings);
      return;
   }
 
   grid.innerHTML = displayTickers.map(ticker => {
     const data = cachedMarketData[ticker];
-    const h = currentHoldings[ticker] || {qty:0, avg:0};
+    const h = currentHoldings[ticker] || { qty: 0, avg: 0 };
     const isHeld = h.qty > 0;
     
     const chgPct = ((data.last-data.prev)/data.prev*100).toFixed(2);
@@ -574,7 +592,7 @@ async function render() {
     
     const pnl = isHeld ? (data.last - h.avg) * h.qty : null;
     const pnlPct = isHeld && h.avg > 0 ? ((data.last-h.avg)/h.avg*100).toFixed(2) : null;
-    const fmt = (n) => data.currency === 'KRW' ? '₩'+Math.round(n).toLocaleString() : '$'+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    const fmt = (n) => data.currency === 'KRW' ? '₩'+Math.round(n).toLocaleString() : '$'+n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 
     return `
       <div class="card ${cls}" onclick="openChartModal('${ticker}')">
@@ -592,8 +610,10 @@ async function render() {
             <button class="btn-danger" onclick="event.stopPropagation();removeTicker('${ticker}')" title="목록 삭제">✕</button>
           </div>
         </div>
+        
         <div class="card-price">${fmt(data.last)}</div>
         <div class="chart-wrap"><canvas id="c_${ticker}"></canvas></div>
+        
         ${isHeld ? `
         <div class="card-footer">
           <div class="holding-info"><span>${h.qty.toLocaleString()}주</span> · 평단가 ${fmt(h.avg)}</div>
@@ -611,6 +631,7 @@ async function render() {
   updateSummaryAndAllocation(validTickers, currentHoldings);
 }
 
+// ── 7. 유틸 및 뷰 업데이트 ──
 function getColors(prices) {
   const last = prices[prices.length-1], first = prices[0];
   if (last > first) return { line:'#00c87a', fill:'rgba(0,200,122,0.12)' };
@@ -631,36 +652,47 @@ function buildChart(canvasId, prices, dates, mini) {
 
 function updateSummaryAndAllocation(validTickers, currentHoldings) {
   let totalEval = 0, totalCost = 0, heldCount = 0;
-  const allocData = [], allocLabels = [], allocColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623'];
+  const allocData = [], allocLabels = [], allocColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8'];
 
   validTickers.forEach(t => {
     const data = cachedMarketData[t];
     const h = currentHoldings[t] || {};
     if (h.qty > 0 && h.avg > 0) {
-      const eAmt = h.qty * data.last; totalEval += eAmt; totalCost += h.qty * h.avg;
+      const eAmt = h.qty * data.last; 
+      totalEval += eAmt; 
+      totalCost += h.qty * h.avg;
       if(eAmt > 0) { allocData.push(eAmt); allocLabels.push(data.name); heldCount++; }
     }
   });
   
   const pnl = totalEval - totalCost;
   const roi = totalCost > 0 ? (pnl/totalCost*100) : 0;
+  const dash = document.getElementById('dashboardTop');
 
-  document.getElementById('totalVal').textContent = totalEval > 0 ? Math.round(totalEval).toLocaleString() : '₩0';
-  const pnlEl = document.getElementById('totalPnl');
-  pnlEl.textContent = totalCost > 0 ? (pnl >= 0 ? '+' : '') + Math.round(pnl).toLocaleString() : '₩0';
-  pnlEl.className = 'sum-value ' + (pnl >= 0 ? 'up' : (totalCost>0?'down':''));
-  
-  const roiEl = document.getElementById('totalRoi');
-  roiEl.textContent = totalCost > 0 ? (roi >= 0 ? '+' : '') + roi.toFixed(2) + '%' : '0%';
-  roiEl.className = 'sum-value ' + (roi >= 0 ? 'up' : (totalCost>0?'down':''));
-  
-  document.getElementById('totalCount').textContent = heldCount + ' / ' + validTickers.length + '개';
+  if(totalEval > 0 && (currentView === 'all' || currentView === 'held')) {
+    dash.style.display = 'flex';
+    document.getElementById('totalVal').textContent = Math.round(totalEval).toLocaleString();
+    const pnlEl = document.getElementById('totalPnl');
+    pnlEl.textContent = (pnl >= 0 ? '+' : '') + Math.round(pnl).toLocaleString();
+    pnlEl.className = 'sum-value ' + (pnl >= 0 ? 'up' : 'down');
+    const roiEl = document.getElementById('totalRoi');
+    roiEl.textContent = (roi >= 0 ? '+' : '') + roi.toFixed(2) + '%';
+    roiEl.className = 'sum-value ' + (roi >= 0 ? 'up' : 'down');
+    document.getElementById('totalCount').textContent = heldCount + ' / ' + validTickers.length + '개';
 
-  if(allocationChartInst) allocationChartInst.destroy();
-  const ctx = document.getElementById('allocationCanvas');
-  if(allocData.length > 0 && ctx) {
+    if(allocationChartInst) allocationChartInst.destroy();
+    const ctx = document.getElementById('allocationCanvas').getContext('2d');
     allocationChartInst = new Chart(ctx, { type: 'doughnut', data: { labels: allocLabels, datasets: [{ data: allocData, backgroundColor: allocColors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#8890a4', font:{size:10}, boxWidth: 10 } } }, cutout: '70%' } });
-  } else if (ctx) {
+  } else {
+    document.getElementById('totalVal').textContent = '—';
+    document.getElementById('totalPnl').textContent = '—';
+    document.getElementById('totalPnl').className = 'sum-value';
+    document.getElementById('totalRoi').textContent = '—';
+    document.getElementById('totalRoi').className = 'sum-value';
+    document.getElementById('totalCount').textContent = '0 / ' + validTickers.length + '개';
+
+    if(allocationChartInst) allocationChartInst.destroy();
+    const ctx = document.getElementById('allocationCanvas').getContext('2d');
     allocationChartInst = new Chart(ctx, { type: 'doughnut', data: { labels: ['자산 없음'], datasets: [{ data: [1], backgroundColor: ['#1c2030'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, cutout: '70%' } });
   }
 }
