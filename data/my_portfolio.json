@@ -32,7 +32,8 @@
     "GOOGL",
     "META",
     "MSFT",
-    "NVDA"
+    "NVDA",
+    "ORCL"
   ],
   "transactions": [
     {
@@ -290,6 +291,14 @@
       "symbol": "NVDA",
       "qty": 87,
       "price": 12.2754
+    },
+    {
+      "id": 1775891794198,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "ORCL",
+      "qty": 13,
+      "price": 191.35
     }
   ],
   "range": "1y"
