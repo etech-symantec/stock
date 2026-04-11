@@ -24,14 +24,14 @@ def main():
     except Exception as e:
         print(f"미국 주식 가져오기 실패: {e}")
 
-    print("🇰🇷 2. 한국 주식 (KOSPI/KOSDAQ 시총 상위 2000개) 데이터를 가져옵니다...")
+    print("🇰🇷 2. 한국 주식 (KOSPI/KOSDAQ 시총 상위 3000개) 데이터를 가져옵니다...")
     try:
         krx = fdr.StockListing('KRX')
         # 시가총액(Marcap) 기준으로 내림차순 정렬
         if 'Marcap' in krx.columns:
             krx = krx.sort_values('Marcap', ascending=False)
             
-        for _, row in krx.head(2000).iterrows():
+        for _, row in krx.head(3000).iterrows():
             sym = str(row['Code'])
             market = str(row.get('Market', 'KRX'))
             # 코스닥은 .KQ, 코스피/기타는 .KS (야후 파이낸스 기준)
