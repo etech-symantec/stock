@@ -2,8 +2,18 @@
   "tickers": [
     "AAPL",
     "TSLA",
-    "005930.KS"
+    "005930.KS",
+    "005935.KS"
   ],
-  "transactions": [],
+  "transactions": [
+    {
+      "id": 1775889536043,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 101,
+      "price": 66918
+    }
+  ],
   "range": "1y"
 }
