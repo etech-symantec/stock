@@ -79,14 +79,15 @@
   .btn-primary { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; white-space: nowrap; }
   .btn-primary:hover { background: var(--accent); color: #fff; }
 
-  /* ── 대시보드 상단 개편 (국가별 패널) ── */
+  /* ── 대시보드 상단 개편 (통합 요약 띠) ── */
   .dashboard-top { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1.5rem; flex-shrink: 0; }
   
-  .global-summary { display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 20px; }
-  .gs-item { display: flex; align-items: baseline; gap: 10px; }
-  .gs-label { font-size: 12px; color: var(--text2); font-weight: 500; }
-  .gs-val { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
-  .gs-sub { font-size: 12px; color: var(--text3); font-family: var(--font-mono); }
+  .global-summary { display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 24px; flex-wrap: wrap; gap: 15px; }
+  .gs-group { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
+  .gs-item { display: flex; flex-direction: column; gap: 4px; }
+  .gs-label { font-size: 11px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .gs-val { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--text); }
+  .gs-sub { font-size: 13px; color: var(--text2); font-family: var(--font-mono); font-weight: 500; }
 
   .country-panels { display: flex; gap: 15px; flex-wrap: wrap; }
   .country-panel { flex: 1; min-width: 320px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
@@ -105,14 +106,17 @@
   .cp-accounts { display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 4px; }
   .cp-accounts::-webkit-scrollbar { width: 4px; }
   .cp-accounts::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-  .acc-row { background: var(--bg3); border-radius: 6px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; }
+  .acc-row { background: var(--bg3); border-radius: 6px; padding: 10px 12px; display: flex; align-items: center; gap: 15px; }
+  
+  /* 파이 차트 크기 확대 */
+  .acc-pie-wrap { width: 70px; height: 70px; position: relative; flex-shrink: 0; }
+  
   .acc-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
   .acc-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .acc-detail { font-size: 11px; color: var(--text2); font-family: var(--font-mono); }
   .acc-detail span { color: var(--text3); }
   .acc-pnl { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; flex-shrink: 0; }
   .acc-pnl.up { color: var(--green); } .acc-pnl.down { color: var(--red); }
-  .acc-pie-wrap { width: 40px; height: 40px; position: relative; flex-shrink: 0; }
 
   .section-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 15px 0 10px 0; flex-shrink: 0; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -160,6 +164,9 @@
   .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: var(--text2); border-radius: 50%; transition: .2s; }
   input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
   input:checked + .slider:before { transform: translateX(16px); background-color: #fff; }
+
+  /* 차트 툴팁 (잘림 방지용 커스텀 툴팁) */
+  #chartjs-tooltip { opacity: 0; position: absolute; background: rgba(20, 23, 32, 0.95); border: 1px solid var(--border2); border-radius: 6px; color: #fff; pointer-events: none; transform: translate(-50%, -110%); transition: all .1s ease; z-index: 99999; padding: 6px 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
 </style>
 </head>
 <body>
@@ -255,11 +262,21 @@
 
     <div class="dashboard-top" id="dashboardTop" style="display:none">
       <div class="global-summary">
-        <div class="gs-item">
-          <div class="gs-label">통합 평가 자산</div>
-          <div class="gs-val" id="globalTotalVal" style="color:var(--blue)">—</div>
+        <div class="gs-group">
+          <div class="gs-item">
+            <div class="gs-label">통합 투자 원금</div>
+            <div class="gs-val" id="globalTotalCost">—</div>
+          </div>
+          <div class="gs-item">
+            <div class="gs-label">통합 평가 자산</div>
+            <div class="gs-val" id="globalTotalVal" style="color:var(--blue)">—</div>
+          </div>
+          <div class="gs-item">
+            <div class="gs-label">통합 수익률</div>
+            <div class="gs-val" id="globalTotalRoi">—</div>
+          </div>
         </div>
-        <div class="gs-item">
+        <div class="gs-item" style="align-items:flex-end;">
           <div class="gs-label">실시간 환율</div>
           <div class="gs-sub" id="globalExchangeRate">조회 중...</div>
         </div>
@@ -400,7 +417,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v16'; 
+const STORE_KEY = 'stockwatch_real_v17'; 
 let state = loadState();
 
 let currentView = 'all';
@@ -412,7 +429,7 @@ let usdChartInst = null;
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
 const chartInstances = {};
-let accountPieChartInsts = []; // 계좌별 미니 도넛 차트들 저장
+let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
 let localStockDB = []; 
 
@@ -433,7 +450,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v15'); 
+    let oldS = localStorage.getItem('stockwatch_real_v16'); 
     if(oldS) return JSON.parse(oldS);
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
@@ -937,12 +954,11 @@ async function render() {
   displayItems.forEach(item => {
     const prices = item.data.prices;
     const last = item.data.last;
-    const prev = item.data.prev;
     
     const sliceLen = getSliceLen(state.range);
     item.sliceLen = sliceLen; 
     
-    const pStart = prices[Math.max(0, prices.length - sliceLen)] || prev;
+    const pStart = prices[Math.max(0, prices.length - sliceLen)] || item.data.prev;
     item.activeChange = ((last - pStart) / pStart) * 100;
     
     item.evalAmt = item.qty * last;
@@ -1047,11 +1063,18 @@ function updateSummaryAndAllocation(displayItems) {
     }
   });
 
+  const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
   const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
+  const globalRoi = globalCost > 0 ? ((globalEval - globalCost) / globalCost * 100) : 0;
+
+  document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
   document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
+  const gRoiEl = document.getElementById('globalTotalRoi');
+  gRoiEl.textContent = `${globalRoi >= 0 ? '+' : ''}${globalRoi.toFixed(2)}%`;
+  gRoiEl.style.color = globalRoi >= 0 ? 'var(--green)' : (globalCost > 0 ? 'var(--red)' : 'var(--text)');
+  
   document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-  // ── KRW 렌더링 ──
   const krwPnl = krwSummary.totalEval - krwSummary.totalCost;
   const krwRoi = krwSummary.totalCost > 0 ? (krwPnl / krwSummary.totalCost * 100) : 0;
   
@@ -1086,7 +1109,6 @@ function updateSummaryAndAllocation(displayItems) {
   }).join('');
   document.getElementById('krwAccountList').innerHTML = krwAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-  // ── USD 렌더링 ──
   const usdPnl = usdSummary.totalEval - usdSummary.totalCost;
   const usdRoi = usdSummary.totalCost > 0 ? (usdPnl / usdSummary.totalCost * 100) : 0;
 
@@ -1121,7 +1143,6 @@ function updateSummaryAndAllocation(displayItems) {
   }).join('');
   document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-  // ── 미니 파이 차트 그리기 ──
   const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
   [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
     const ctx = document.getElementById(cfg.id);
@@ -1133,22 +1154,52 @@ function updateSummaryAndAllocation(displayItems) {
         labels: cfg.items.map(i => i.name),
         datasets: [{
           data: cfg.items.map(i => i.evalAmt),
-          backgroundColor: pieColors.slice(0, cfg.items.length),
+          backgroundColor: cfg.items.map((_, i) => pieColors[i % pieColors.length]),
           borderWidth: 0
         }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
+        layout: { padding: 4 },
         plugins: {
           legend: { display: false },
           tooltip: {
-            callbacks: {
-              label: function(context) {
-                let v = context.raw;
-                return cfg.isUsd ? ' $' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : ' ₩' + Math.round(v).toLocaleString();
+            enabled: false,
+            external: function(context) {
+              let tooltipEl = document.getElementById('chartjs-tooltip');
+              if (!tooltipEl) {
+                tooltipEl = document.createElement('div');
+                tooltipEl.id = 'chartjs-tooltip';
+                document.body.appendChild(tooltipEl);
               }
-            },
-            titleFont: { size: 10 }, bodyFont: { size: 10 }, padding: 6, boxWidth: 8
+              const tooltipModel = context.tooltip;
+              if (tooltipModel.opacity === 0) {
+                tooltipEl.style.opacity = 0;
+                return;
+              }
+              if (tooltipModel.body) {
+                const bodyLines = tooltipModel.body.map(b => b.lines);
+                let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
+                bodyLines.forEach(function(body, i) {
+                  const colors = tooltipModel.labelColors[i];
+                  const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
+                  let txt = body[0];
+                  let splitTxt = txt.split(': ');
+                  if(splitTxt.length === 2) {
+                    let val = parseFloat(splitTxt[1].replace(/,/g,''));
+                    let formatVal = cfg.isUsd ? '$' + val.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(val).toLocaleString();
+                    txt = `${splitTxt[0]}: ${formatVal}`;
+                  }
+                  innerHtml += `<div style="font-size:11px; display:flex; align-items:center; white-space:nowrap;">${span}${txt}</div>`;
+                });
+                innerHtml += '</div>';
+                tooltipEl.innerHTML = innerHtml;
+              }
+              const position = context.chart.canvas.getBoundingClientRect();
+              tooltipEl.style.opacity = 1;
+              tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+              tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+            }
           }
         },
         cutout: '60%', animation: { duration: 0 }
