@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOCK WATCH — 거래 내역 대시보드</title>
+<title>STOCK WATCH — 클라우드 자동 동기화 장부</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -45,7 +45,7 @@
   .ledger-sidebar { width: 320px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; }
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); }
   
-  .tx-form { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+  .tx-form { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
   .form-group label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 5px; }
   .form-input { width: 100%; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 13px; font-family: var(--font-sans); outline: none; transition: border-color 0.2s; }
   .form-input:focus { border-color: var(--accent); }
@@ -57,7 +57,7 @@
   .search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
   .search-item:hover { background: var(--bg2); }
 
-  .tx-history-title { padding: 20px 20px 10px; font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; }
+  .tx-history-title { padding: 15px 20px 10px; font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; }
   .tx-list { flex: 1; overflow-y: auto; padding: 0 20px 20px; list-style: none; display: flex; flex-direction: column; gap: 10px; }
   .tx-list::-webkit-scrollbar { width: 4px; }
   .tx-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -78,7 +78,7 @@
   .btn-primary { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; white-space: nowrap; }
   .btn-primary:hover { background: var(--accent); color: #fff; }
 
-  /* 대시보드 탑 레이아웃 (새로운 구조) */
+  /* 대시보드 탑 레이아웃 */
   .dashboard-top { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1.5rem; flex-shrink: 0; }
   
   .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; width: 100%; }
@@ -95,7 +95,6 @@
   .account-summary-list::-webkit-scrollbar { width: 4px; }
   .account-summary-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-  /* 신규: 비교 막대 차트 영역 */
   .comparison-chart { flex: 1.5; min-width: 250px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; height: 160px; }
   
   .allocation { flex: 1; min-width: 200px; max-height: 160px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; align-items: center; justify-content: center; }
@@ -126,6 +125,13 @@
   .btn-danger { color: var(--text3); border-color: transparent; background: transparent; padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); border-radius: 4px; cursor: pointer; transition: 0.2s; }
   .btn-danger:hover { background: var(--red-bg); color: var(--red); }
 
+  /* ── 배당금 대시보드 ── */
+  #dividendDashboard { display: none; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; padding-right: 5px; }
+  .div-chart-area { flex: 1; min-height: 300px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
+  .div-list-area { flex: 1; min-height: 300px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
+  .div-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .div-item:last-child { border-bottom: none; }
+
   /* ── 5. 모달 ── */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .overlay.open { display: flex; }
@@ -151,6 +157,7 @@
     <button class="vtab active" onclick="setView('all', this)">전체보기</button>
     <button class="vtab" onclick="setView('held', this)">보유종목</button>
     <button class="vtab" onclick="setView('watch', this)">관심종목</button>
+    <button class="vtab" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
   </div>
   <div class="nav-right">
     <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
@@ -177,9 +184,19 @@
 <div class="layout-wrapper">
   <aside class="ledger-sidebar">
     <div class="sidebar-header">✏️ 거래 장부 (Ledger)</div>
+    
     <div class="tx-form">
+      <div class="form-group" style="display:flex; gap:15px; margin-bottom:5px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text); font-size:12px; font-weight:500;">
+          <input type="radio" name="txType" value="trade" checked onchange="toggleTxType()" style="accent-color:var(--accent)"> 주식 매매
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text); font-size:12px; font-weight:500;">
+          <input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="accent-color:var(--green)"> 배당금
+        </label>
+      </div>
+
       <div class="form-group">
-        <label>거래 일자</label>
+        <label>발생 일자</label>
         <input type="date" id="txDate" class="form-input">
       </div>
       <div class="form-group tx-search-container">
@@ -188,12 +205,12 @@
         <ul id="txDropdown" class="tx-dropdown"></ul>
       </div>
       <div style="display:flex; gap:10px;">
-        <div class="form-group" style="flex:1;">
+        <div class="form-group" style="flex:1;" id="txQtyWrap">
           <label>수량 (매도시 -)</label>
           <input type="number" id="txQty" class="form-input" placeholder="0">
         </div>
         <div class="form-group" style="flex:1;">
-          <label>단가 (1주당 가격)</label>
+          <label id="txPriceLabel">단가 (1주당 가격)</label>
           <input type="number" id="txPrice" class="form-input" placeholder="0" step="0.01">
         </div>
       </div>
@@ -209,7 +226,7 @@
   </aside>
 
   <main class="dashboard-main">
-    <div class="add-bar">
+    <div class="add-bar" id="mainAddBar">
       <div class="search-container">
         <input type="text" id="tickerInput" class="search-input" placeholder="종목명 또는 코드 검색 (예: 애플, 삼성전자, TSLA)" autocomplete="off" />
         <ul id="searchDropdown" class="search-dropdown"></ul>
@@ -255,6 +272,35 @@
     </div>
 
     <div class="grid-container" id="gridContainer"></div>
+
+    <div id="dividendDashboard">
+      <div class="summary">
+        <div class="sum-card" style="background:var(--green-bg); border-color:var(--green);">
+          <div class="sum-label" style="color:var(--green)">누적 배당금 총액 (환산)</div>
+          <div id="divTotalConverted" class="sum-val-krw" style="color:var(--green); font-size:24px;">—</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">국내주식 배당금</div>
+          <div id="divTotalKrw" class="sum-val-krw">—</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">해외주식 배당금</div>
+          <div id="divTotalUsd" class="sum-val-krw" style="color:var(--text)">—</div>
+        </div>
+      </div>
+      
+      <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:10px;">
+        <div class="div-chart-area" style="flex:1.5;">
+          <div class="sum-label" style="margin-bottom:15px;">월별 배당금 추이 (합산 ₩)</div>
+          <div style="flex:1; position:relative;"><canvas id="divMonthlyCanvas"></canvas></div>
+        </div>
+        <div class="div-list-area" style="flex:1; max-height:400px;">
+          <div class="sum-label" style="margin-bottom:15px;">효자 종목 (종목별 배당금)</div>
+          <div id="divStockList" style="flex:1; overflow-y:auto; padding-right:5px;"></div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -313,19 +359,20 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v10';
+const STORE_KEY = 'stockwatch_real_v11'; // 버전을 올려서 호환성 처리
 let state = loadState();
 let currentView = 'all';
 let currentSortMode = 'default';
 let allocationChartInst = null;
 let comparisonChartInst = null;
 let modalChartInst = null;
+let divMonthlyChartInst = null; // 배당금 월별 차트
 const chartInstances = {};
 let cachedMarketData = {}; 
 let localStockDB = []; 
 
 // 환율 연동 변수
-let currentUsdKrw = 1350; // 초기 대체값
+let currentUsdKrw = 1350; 
 let isExchangeRateFetched = false;
 
 document.getElementById('txDate').valueAsDate = new Date();
@@ -342,8 +389,13 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v9');
-    if(oldS) return JSON.parse(oldS);
+    let oldS = localStorage.getItem('stockwatch_real_v10'); // 이전 버전 마이그레이션
+    if(oldS) {
+      let parsed = JSON.parse(oldS);
+      // 기존 내역에 txType 이 없으면 'trade'로 강제 지정
+      parsed.transactions.forEach(t => { if(!t.txType) t.txType = 'trade'; });
+      return parsed;
+    }
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
 }
@@ -358,12 +410,30 @@ function formatPrice(val, symbol) {
   return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-// ── 2. 거래 장부 (Ledger) 로직 ──
+// ── 2. 폼 UI 제어 (매매 vs 배당) ──
+function toggleTxType() {
+  const type = document.querySelector('input[name="txType"]:checked').value;
+  if(type === 'dividend') {
+    document.getElementById('txQtyWrap').style.display = 'none';
+    document.getElementById('txPriceLabel').textContent = '총 배당금액';
+    document.getElementById('txPrice').placeholder = '받은 배당금 총액 (세후 권장)';
+    document.getElementById('txQty').value = 0; // 배당은 수량 변동 없음
+  } else {
+    document.getElementById('txQtyWrap').style.display = 'block';
+    document.getElementById('txPriceLabel').textContent = '단가 (1주당 가격)';
+    document.getElementById('txPrice').placeholder = '0';
+  }
+}
+
+// ── 3. 거래 장부 (Ledger) 로직 ──
 function calculateHoldings() {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
   
   sortedTx.forEach(tx => {
+    // 배당금 내역은 평단가 및 보유 수량 계산에서 완전히 제외!
+    if (tx.txType === 'dividend') return;
+
     let broker = tx.broker ? tx.broker.trim() : '미지정';
     let key = `${tx.symbol}::${broker}`;
 
@@ -386,16 +456,20 @@ function addTransaction() {
   const date = document.getElementById('txDate').value;
   const broker = document.getElementById('txBroker').value.trim();
   let symbol = document.getElementById('txSymbol').value.trim().toUpperCase();
-  const qty = parseFloat(document.getElementById('txQty').value);
+  const qty = parseFloat(document.getElementById('txQty').value) || 0;
   const price = parseFloat(document.getElementById('txPrice').value);
+  const txType = document.querySelector('input[name="txType"]:checked').value;
 
-  if(!date || !symbol || isNaN(qty) || isNaN(price) || qty === 0) {
-    alert("종목코드, 수량, 단가를 정확히 입력해주세요."); return;
+  if(!date || !symbol || isNaN(price)) {
+    alert("종목코드, 단가(배당금액)를 정확히 입력해주세요."); return;
+  }
+  if(txType === 'trade' && qty === 0) {
+    alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
   
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
-  state.transactions.push({ id: Date.now(), date, broker, symbol, qty, price });
+  state.transactions.push({ id: Date.now(), date, broker, symbol, qty, price, txType });
   if(!state.tickers.includes(symbol)) state.tickers.push(symbol);
 
   saveState();
@@ -423,10 +497,15 @@ function renderTxList() {
   
   listEl.innerHTML = reversed.map(tx => {
     const isBuy = tx.qty > 0;
+    const isDiv = tx.txType === 'dividend';
     const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
     const cachedMatch = cachedMarketData[tx.symbol];
     const stockName = dbMatch ? dbMatch.name : (cachedMatch ? cachedMatch.name : tx.symbol);
-    const totalAmt = Math.abs(tx.qty) * tx.price;
+    
+    // 배당금이면 총 금액 = price, 아니면 = 수량 * 단가
+    const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
+    const typeLabel = isDiv ? '💰 배당금' : (isBuy ? '매수' : '매도') + ` ${Math.abs(tx.qty)}주`;
+    const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
 
     return `
       <li class="tx-card">
@@ -437,13 +516,15 @@ function renderTxList() {
         <div class="tx-card-body">
           <div style="display:flex; flex-direction:column; gap:4px;">
             <span class="tx-sym" title="${stockName}">${stockName}</span>
-            <span style="color:${isBuy ? 'var(--red)' : 'var(--blue)'}; font-weight:700; font-size:11px;">
-              ${isBuy ? '매수' : '매도'} ${Math.abs(tx.qty)}주
+            <span style="color:${typeColor}; font-weight:700; font-size:11px;">
+              ${typeLabel}
             </span>
           </div>
           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
             <span style="font-weight:700; color:var(--text); font-size:13px;">${formatPrice(totalAmt, tx.symbol)}</span>
-            <span style="font-family:var(--font-mono); font-weight:500; font-size:10px; color:var(--text2);">@ ${formatPrice(tx.price, tx.symbol)}</span>
+            <span style="font-family:var(--font-mono); font-weight:500; font-size:10px; color:var(--text2);">
+              ${isDiv ? '입금액' : '@ ' + formatPrice(tx.price, tx.symbol)}
+            </span>
           </div>
         </div>
       </li>
@@ -454,13 +535,18 @@ function renderTxList() {
 function prepareTransaction(symbol, broker) {
   document.getElementById('txSymbol').value = symbol;
   if(broker) document.getElementById('txBroker').value = broker;
+  
+  // 기본적으로 매매 탭으로 이동
+  document.querySelector('input[name="txType"][value="trade"]').checked = true;
+  toggleTxType();
+  
   document.getElementById('txQty').focus();
   const sidebar = document.querySelector('.ledger-sidebar');
   sidebar.style.boxShadow = "inset 0 0 0 2px var(--accent)";
   setTimeout(() => sidebar.style.boxShadow = "none", 500);
 }
 
-// ── 3. 검색 자동완성 ──
+// ── 4. 검색 자동완성 ──
 function setupSearch(inputId, dropdownId, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
@@ -505,10 +591,14 @@ setupSearch('txSymbol', 'txDropdown', 'selectSidebarSearchResult');
 function selectSidebarSearchResult(symbol) {
   document.getElementById('txSymbol').value = symbol;
   document.getElementById('txDropdown').style.display = 'none';
-  document.getElementById('txQty').focus();
+  if(document.querySelector('input[name="txType"]:checked').value === 'trade') {
+    document.getElementById('txQty').focus();
+  } else {
+    document.getElementById('txPrice').focus();
+  }
 }
 
-// ── 4. API Fetch & Render ──
+// ── 5. API Fetch & Render ──
 async function fetchWithProxy(targetUrl, useCache = true) {
   const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
   const proxy = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
@@ -519,14 +609,10 @@ async function fetchWithProxy(targetUrl, useCache = true) {
   return null;
 }
 
-// 실시간 환율 로드
 async function fetchExchangeRate() {
   if (isExchangeRateFetched) return;
-  const data = await fetchYahooData('KRW=X', '1mo'); // 1달치 중 가장 최근값 (휴일 대비)
-  if (data && data.last) {
-    currentUsdKrw = data.last;
-    isExchangeRateFetched = true;
-  }
+  const data = await fetchYahooData('KRW=X', '1mo');
+  if (data && data.last) { currentUsdKrw = data.last; isExchangeRateFetched = true; }
 }
 
 async function fetchYahooData(symbol, range) {
@@ -553,11 +639,8 @@ async function fetchYahooData(symbol, range) {
   if(symbol === 'KRW=X') cName = 'USD/KRW 환율';
   
   return {
-    symbol: symbol,
-    name: cName,
-    currency: meta.currency || 'USD',
-    prices: validPrices,
-    dates: validDates,
+    symbol: symbol, name: cName, currency: meta.currency || 'USD',
+    prices: validPrices, dates: validDates,
     last: validPrices[validPrices.length-1],
     prev: validPrices[validPrices.length-2] || validPrices[validPrices.length-1]
   };
@@ -591,6 +674,7 @@ function setRange(rangeStr, el) {
 }
 
 function setSortMode(mode) { currentSortMode = mode; render(); }
+
 function setView(view, el) {
   currentView = view;
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
@@ -600,11 +684,9 @@ function setView(view, el) {
 function generateCardHtml(item) {
   const data = item.data;
   const isHeld = item.type === 'held';
-  
   const chgPct = ((data.last-data.prev)/data.prev*100).toFixed(2);
   const cls = chgPct > 0 ? 'up' : (chgPct < 0 ? 'down' : 'flat');
   const sign = chgPct > 0 ? '+' : '';
-  
   const pnl = isHeld ? (data.last - item.avg) * item.qty : null;
   const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
   const uniqueId = `c_${item.symbol}_${Math.random().toString(36).substring(7)}`;
@@ -612,7 +694,6 @@ function generateCardHtml(item) {
   return `
     <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
       <span class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}">${isHeld ? '보유' : '관심'}</span>
-      
       <div class="card-head" style="align-items:center;">
         <div style="flex:1; min-width:0; margin-right:10px;">
           <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
@@ -626,17 +707,11 @@ function generateCardHtml(item) {
           ${!isHeld ? `<button class="btn-danger" onclick="event.stopPropagation();removeTicker('${item.symbol}')" title="목록 삭제">✕</button>` : ''}
         </div>
       </div>
-      
       <div class="card-price">${formatPrice(data.last, item.symbol)}</div>
-      
       <div class="chart-wrap"><canvas id="${uniqueId}"></canvas></div>
-      
       ${isHeld ? `
       <div class="card-footer">
-        <div>
-          평단가 ${formatPrice(item.avg, item.symbol)}<br>
-          수량 <strong>${item.qty}</strong>주
-        </div>
+        <div>평단가 ${formatPrice(item.avg, item.symbol)}<br>수량 <strong>${item.qty}</strong>주</div>
         <div style="text-align:right">
           <span class="holding-val" style="color:var(--${pnl>=0?'green':'red'})">
             ${pnl>=0?'+':''}${formatPrice(Math.abs(pnl), item.symbol)}<br>(${pnl>=0?'+':''}${pnlPct}%)
@@ -647,21 +722,123 @@ function generateCardHtml(item) {
   `;
 }
 
+// ── 배당금 대시보드 렌더링 로직 ──
+function renderDividendDashboard() {
+  let krwTotal = 0, usdTotal = 0;
+  let monthlyKrw = {}, monthlyUsd = {};
+  let symTotals = {};
+
+  const divTxs = state.transactions.filter(t => t.txType === 'dividend');
+
+  divTxs.forEach(tx => {
+     const isKRW = isKorean(tx.symbol);
+     const amt = tx.price; // 배당금액
+     const month = tx.date.substring(0, 7); // YYYY-MM
+
+     if (!monthlyKrw[month]) monthlyKrw[month] = 0;
+     if (!monthlyUsd[month]) monthlyUsd[month] = 0;
+     if (!symTotals[tx.symbol]) symTotals[tx.symbol] = { krw: 0, usd: 0 };
+
+     if (isKRW) {
+       krwTotal += amt; monthlyKrw[month] += amt; symTotals[tx.symbol].krw += amt;
+     } else {
+       usdTotal += amt; monthlyUsd[month] += amt; symTotals[tx.symbol].usd += amt;
+     }
+  });
+
+  document.getElementById('divTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
+  document.getElementById('divTotalUsd').textContent = `$ ${usdTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
+  document.getElementById('divTotalConverted').textContent = `₩ ${Math.round(grandTotal).toLocaleString()}`;
+
+  // 효자 종목 리스트 생성
+  let symArr = Object.keys(symTotals).map(sym => {
+    return { symbol: sym, total: symTotals[sym].krw + (symTotals[sym].usd * currentUsdKrw) };
+  });
+  symArr.sort((a,b) => b.total - a.total); // 환산 총액 기준 내림차순 정렬
+
+  let listHtml = symArr.map(item => {
+    const isKRW = isKorean(item.symbol);
+    const originAmt = isKRW ? symTotals[item.symbol].krw : symTotals[item.symbol].usd;
+    const dbMatch = localStockDB.find(s => s.symbol === item.symbol);
+    const cName = dbMatch ? dbMatch.name : item.symbol;
+    return `
+      <div class="div-item">
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <span style="font-weight:700; color:var(--text); font-size:13px; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${cName}">${cName}</span>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--text3);">${item.symbol}</span>
+        </div>
+        <div style="font-family:var(--font-mono); font-weight:700; color:var(--green); font-size:14px;">
+          ${formatPrice(originAmt, item.symbol)}
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('divStockList').innerHTML = listHtml || '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">배당 내역이 없습니다.</div>';
+
+  // 월별 차트 렌더링
+  const allMonths = Array.from(new Set([...Object.keys(monthlyKrw), ...Object.keys(monthlyUsd)])).sort();
+  const krwData = allMonths.map(m => monthlyKrw[m] || 0);
+  const usdConvertedData = allMonths.map(m => (monthlyUsd[m] || 0) * currentUsdKrw);
+
+  if(divMonthlyChartInst) divMonthlyChartInst.destroy();
+  const ctx = document.getElementById('divMonthlyCanvas').getContext('2d');
+  divMonthlyChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: allMonths,
+      datasets: [
+        { label: '국내 (₩)', data: krwData, backgroundColor: '#00c87a', borderRadius: 4 },
+        { label: '해외 환산 (₩)', data: usdConvertedData, backgroundColor: '#7c6af7', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size:11} } },
+        tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } }
+      },
+      scales: {
+        x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } },
+        y: { stacked: true, ticks: { color: '#8890a4' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } }
+      }
+    }
+  });
+}
+
+// ── 메인 렌더 함수 ──
 async function render() {
+  if (!isExchangeRateFetched) await fetchExchangeRate();
+  
   const container = document.getElementById('gridContainer');
   const dash = document.getElementById('dashboardTop');
-  const currentHoldings = calculateHoldings();
+  const divDash = document.getElementById('dividendDashboard');
+  const mainAddBar = document.getElementById('mainAddBar');
 
+  // 1. 배당 통계 탭 제어
+  if (currentView === 'dividend') {
+    dash.style.display = 'none';
+    container.style.display = 'none';
+    mainAddBar.style.display = 'none';
+    divDash.style.display = 'flex';
+    renderDividendDashboard();
+    return;
+  } else {
+    dash.style.display = 'flex';
+    container.style.display = 'block';
+    mainAddBar.style.display = 'flex';
+    divDash.style.display = 'none';
+  }
+
+  // 2. 포트폴리오 렌더링
+  const currentHoldings = calculateHoldings();
+  
   if (state.tickers.length === 0 && Object.keys(currentHoldings).length === 0) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
     dash.style.display = 'none';
     return;
   }
 
-  // 필수: 환율 정보 로딩
-  if (!isExchangeRateFetched) await fetchExchangeRate();
-  dash.style.display = 'flex';
-  
   if(Object.keys(cachedMarketData).length === 0) {
     container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
   }
@@ -794,7 +971,6 @@ function updateSummaryAndAllocation(displayItems) {
     }
   });
 
-  // 계좌 요약 리스트
   let accHtml = Object.keys(evalByBroker).map(b => {
     let bData = evalByBroker[b];
     let text = [];
@@ -810,14 +986,12 @@ function updateSummaryAndAllocation(displayItems) {
   }).join('');
   document.getElementById('accountList').innerHTML = accHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">보유 계좌가 없습니다.</div>';
 
-  // 총합 환율 환산
   const totalCostConverted = costKRW + (costUSD * currentUsdKrw);
   const totalEvalConverted = evalKRW + (evalUSD * currentUsdKrw);
 
   document.getElementById('totalConverted').textContent = `₩ ${Math.round(totalEvalConverted).toLocaleString()}`;
   document.getElementById('exchangeRateDisplay').textContent = `환율: $1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-  // 비교 막대 차트 (투자 원금 vs 현재 평가액)
   if(comparisonChartInst) comparisonChartInst.destroy();
   const ctxComp = document.getElementById('comparisonCanvas').getContext('2d');
   comparisonChartInst = new Chart(ctxComp, {
@@ -827,20 +1001,18 @@ function updateSummaryAndAllocation(displayItems) {
       datasets: [{
         data: [totalCostConverted, totalEvalConverted],
         backgroundColor: [
-          'rgba(136,144,164,0.4)', // 원금: 회색빛
-          totalEvalConverted >= totalCostConverted ? 'rgba(0,200,122,0.5)' : 'rgba(255,77,106,0.5)' // 평가액: 수익/손실 색상
+          'rgba(136,144,164,0.4)', 
+          totalEvalConverted >= totalCostConverted ? 'rgba(0,200,122,0.5)' : 'rgba(255,77,106,0.5)' 
         ],
         borderColor: [
           '#8890a4',
           totalEvalConverted >= totalCostConverted ? '#00c87a' : '#ff4d6a'
         ],
-        borderWidth: 1,
-        borderRadius: 4
+        borderWidth: 1, borderRadius: 4
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } } },
       scales: {
         x: { ticks: { color: '#8890a4', font: { family: 'Noto Sans KR', size: 11 } }, grid: { display: false }, border: { display: false } },
@@ -850,7 +1022,6 @@ function updateSummaryAndAllocation(displayItems) {
     }
   });
 
-  // 전체 요약
   const pnlKRW = evalKRW - costKRW;
   const pnlUSD = evalUSD - costUSD;
   const roiKRW = costKRW > 0 ? (pnlKRW/costKRW*100) : 0;
@@ -888,6 +1059,24 @@ function updateSummaryAndAllocation(displayItems) {
   }
 }
 
+function openChartModal(ticker) {
+  const data = cachedMarketData[ticker]; if(!data) return;
+  const hi = Math.max(...data.prices), lo = Math.min(...data.prices);
+  
+  document.getElementById('mTicker').textContent = data.name;
+  document.getElementById('mBroker').textContent = data.symbol;
+  document.getElementById('mPrice').textContent = formatPrice(data.last, ticker);
+  const chgPct = ((data.last-data.prev)/data.prev*100).toFixed(2);
+  const chgEl = document.getElementById('mChange');
+  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(data.last-data.prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
+  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
+  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('mMeta').textContent = `최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
+  
+  document.getElementById('chartOverlay').classList.add('open');
+  if (modalChartInst) modalChartInst.destroy();
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', data.prices, data.dates, false); }, 50);
+}
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 // ── 8. 클라우드 자동 동기화 로직 ──
