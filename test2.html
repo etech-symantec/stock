@@ -21,10 +21,11 @@
   .vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; }
   .vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-  .nav-right { display: flex; align-items: center; gap: 8px; }
+  .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .range-group { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px; }
   .rtab { padding: 4px 10px; font-size: 11px; font-family: var(--font-mono); background: transparent; border: none; color: var(--text2); cursor: pointer; border-radius: 6px; transition: all 0.15s; }
   .rtab.active { background: var(--accent); color: #fff; }
+  .rtab:hover:not(.active) { background: var(--bg3); color: var(--text); }
   .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); font-family: var(--font-sans); transition: 0.15s; }
   .btn-sm:hover { background: var(--bg3); color: var(--text); }
   .btn-github { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); display: flex; align-items: center; gap: 6px; }
@@ -164,17 +165,16 @@
       <option value="default">정렬: 기본순</option>
       <option value="roiDesc">내 수익률 순</option>
       <option value="evalDesc">평가금액 순</option>
-      <option value="todayDesc">오늘 등락률 순</option>
-      <option value="1wDesc">1주일 등락률 순</option>
-      <option value="1mDesc">1개월 등락률 순</option>
-      <option value="6mDesc">6개월 등락률 순</option>
-      <option value="1yDesc">1년 등락률 순</option>
+      <option value="changeDesc">선택기간 등락률 순</option>
     </select>
     <div class="range-group">
-      <button class="rtab" onclick="setRange('1mo',this)">1M</button>
-      <button class="rtab" onclick="setRange('3mo',this)">3M</button>
-      <button class="rtab" onclick="setRange('6mo',this)">6M</button>
+      <button class="rtab" onclick="setRange('1d',this)">1D</button>
+      <button class="rtab" onclick="setRange('1w',this)">1W</button>
+      <button class="rtab" onclick="setRange('1m',this)">1M</button>
+      <button class="rtab" onclick="setRange('3m',this)">3M</button>
+      <button class="rtab" onclick="setRange('6m',this)">6M</button>
       <button class="rtab active" onclick="setRange('1y',this)">1Y</button>
+      <button class="rtab" onclick="setRange('3y',this)">3Y</button>
     </div>
     <div class="sync-status" id="syncStatus">
       <div class="sync-spinner" id="syncSpinner"></div>
@@ -364,10 +364,17 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v13'; 
+const STORE_KEY = 'stockwatch_real_v14'; 
 let state = loadState();
+
+// 기본 선택값 복구
 let currentView = 'all';
 let currentSortMode = 'default';
+// 이전 버전에서 '1mo' 형태로 저장되어 있을 수 있으므로 변환
+if(['1mo','3mo','6mo'].includes(state.range)) {
+  state.range = state.range.replace('mo','m');
+}
+
 let allocationChartInst = null;
 let comparisonChartInst = null;
 let modalChartInst = null;
@@ -394,11 +401,8 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v12'); 
-    if(oldS) {
-      let parsed = JSON.parse(oldS);
-      return parsed;
-    }
+    let oldS = localStorage.getItem('stockwatch_real_v13'); 
+    if(oldS) return JSON.parse(oldS);
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
 }
@@ -496,7 +500,7 @@ function renderTxList() {
     return;
   }
   
-  // 날짜 역순, 같은 날짜면 최신 입력(id)이 위로 오도록 정렬 보완
+  // 날짜 역순, 같은 날짜면 최신 입력(id)이 위로 오도록 정렬
   const reversed = [...state.transactions].sort((a,b) => {
     const dateDiff = new Date(b.date) - new Date(a.date);
     if (dateDiff !== 0) return dateDiff;
@@ -617,13 +621,13 @@ async function fetchWithProxy(targetUrl, useCache = true) {
 
 async function fetchExchangeRate() {
   if (isExchangeRateFetched) return;
-  const data = await fetchYahooData('KRW=X');
+  const data = await fetchYahooData('KRW=X'); 
   if (data && data.last) { currentUsdKrw = data.last; isExchangeRateFetched = true; }
 }
 
 async function fetchYahooData(symbol) {
-  // 항상 1년(1y) 단위로 캐싱하여 다양한 범위(1w, 1mo, 6mo) 등락률을 바로 계산합니다.
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1y&interval=1d`;
+  // 항상 최대 3년(3y) 단위로 데이터를 가져와 다양한 기간별로 자를 수 있게 캐싱합니다.
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=3y&interval=1d`;
   const json = await fetchWithProxy(url, false);
   
   if (!json || !json.chart || !json.chart.result) return null;
@@ -678,12 +682,11 @@ function setRange(rangeStr, el) {
   state.range = rangeStr; saveState();
   document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); 
-  // 데이터를 지우지 않고 즉시 리렌더링 (캐싱된 1y에서 slice 처리)
+  // 데이터를 다시 다운받지 않고 캐싱된 3년치에서 즉시 잘라서 보여줌
   render();
 }
 
 function setSortMode(mode) { currentSortMode = mode; render(); }
-
 function setView(view, el) {
   currentView = view;
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
@@ -694,10 +697,10 @@ function generateCardHtml(item) {
   const data = item.data;
   const isHeld = item.type === 'held';
   
-  // 사용자가 선택한 정렬/기간 탭에 맞는 등락률(activeChange)을 표기
-  const chgPct = (item.activeChange !== undefined ? item.activeChange : 0).toFixed(2);
-  const cls = chgPct > 0 ? 'up' : (chgPct < 0 ? 'down' : 'flat');
-  const sign = chgPct > 0 ? '+' : '';
+  // 선택된 범위에 따른 등락률 동적 표시
+  const chgPct = item.activeChange.toFixed(2);
+  const cls = item.activeChange > 0 ? 'up' : (item.activeChange < 0 ? 'down' : 'flat');
+  const sign = item.activeChange > 0 ? '+' : '';
   
   const pnl = isHeld ? (data.last - item.avg) * item.qty : null;
   const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
@@ -820,6 +823,11 @@ function renderDividendDashboard() {
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
+  // 현재 선택된 기간 버튼 활성화 처리 보장
+  document.querySelectorAll('.rtab').forEach(b => {
+    if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
+  });
+
   const container = document.getElementById('gridContainer');
   const dash = document.getElementById('dashboardTop');
   const divDash = document.getElementById('dividendDashboard');
@@ -888,41 +896,32 @@ async function render() {
     return true; 
   });
 
-  // 기간별 등락률 다중 계산 로직
+  // 기간별 슬라이스 길이 계산 함수
+  const getSliceLen = (range) => {
+    if (range === '1d') return 2;
+    if (range === '1w') return 6;
+    if (range === '1m') return 22;
+    if (range === '3m') return 63;
+    if (range === '6m') return 126;
+    if (range === '1y') return 252;
+    if (range === '3y') return 756;
+    return 252;
+  };
+
+  // 모든 종목에 대해 선택된 기간에 맞는 등락률 계산
   displayItems.forEach(item => {
     const prices = item.data.prices;
     const last = item.data.last;
-    const prev = item.data.prev;
     
-    // 거래일 기준 대략적 기간 산정
-    const p1w = prices[Math.max(0, prices.length - 6)] || prev;
-    const p1mo = prices[Math.max(0, prices.length - 22)] || prev;
-    const p3mo = prices[Math.max(0, prices.length - 63)] || prev;
-    const p6mo = prices[Math.max(0, prices.length - 126)] || prev;
-    const p1y = prices[0] || prev; // API가 1y를 보장하므로 인덱스 0을 1년전으로 사용
-
-    item.changeToday = ((last - prev) / prev) * 100;
-    item.change1w = ((last - p1w) / p1w) * 100;
-    item.change1mo = ((last - p1mo) / p1mo) * 100;
-    item.change3mo = ((last - p3mo) / p3mo) * 100;
-    item.change6mo = ((last - p6mo) / p6mo) * 100;
-    item.change1y = ((last - p1y) / p1y) * 100;
-
-    // 카드의 "표시용 등락률" (activeChange)을 정렬 모드 및 차트 탭에 따라 매핑
-    if (currentSortMode === 'todayDesc') item.activeChange = item.changeToday;
-    else if (currentSortMode === '1wDesc') item.activeChange = item.change1w;
-    else if (currentSortMode === '1mDesc') item.activeChange = item.change1mo;
-    else if (currentSortMode === '6mDesc') item.activeChange = item.change6mo;
-    else if (currentSortMode === '1yDesc') item.activeChange = item.change1y;
-    else {
-      // 명시적인 정렬 기준이 없다면 선택된 차트 탭(Range)을 따라감
-      if (state.range === '1mo') item.activeChange = item.change1mo;
-      else if (state.range === '3mo') item.activeChange = item.change3mo;
-      else if (state.range === '6mo') item.activeChange = item.change6mo;
-      else if (state.range === '1y') item.activeChange = item.change1y;
-      else item.activeChange = item.changeToday;
-    }
-
+    // 차트 표시를 위한 길이
+    const sliceLen = getSliceLen(state.range);
+    item.sliceLen = sliceLen; 
+    
+    // 정렬 모드가 등락률일 경우 선택된 범위에 맞게 계산
+    const pStart = prices[Math.max(0, prices.length - sliceLen)] || item.data.prev;
+    item.activeChange = ((last - pStart) / pStart) * 100;
+    
+    // 평가 자산 및 수익률
     item.evalAmt = item.qty * last;
     item.costAmt = item.qty * item.avg;
     item.roi = item.costAmt > 0 ? ((item.evalAmt - item.costAmt)/item.costAmt*100) : -9999;
@@ -931,11 +930,7 @@ async function render() {
   // 정렬 수행
   if(currentSortMode === 'roiDesc') displayItems.sort((a,b) => b.roi - a.roi);
   else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => b.evalAmt - a.evalAmt);
-  else if(currentSortMode === 'todayDesc') displayItems.sort((a,b) => b.changeToday - a.changeToday);
-  else if(currentSortMode === '1wDesc') displayItems.sort((a,b) => b.change1w - a.change1w);
-  else if(currentSortMode === '1mDesc') displayItems.sort((a,b) => b.change1mo - a.change1mo);
-  else if(currentSortMode === '6mDesc') displayItems.sort((a,b) => b.change6mo - a.change6mo);
-  else if(currentSortMode === '1yDesc') displayItems.sort((a,b) => b.change1y - a.change1y);
+  else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => b.activeChange - a.activeChange);
 
   Object.values(chartInstances).forEach(c => c.destroy());
   
@@ -971,11 +966,7 @@ async function render() {
     const symbol = canvas.id.split('_')[1];
     const data = cachedMarketData[symbol];
     if(data) {
-      let sliceLen = data.prices.length;
-      if (state.range === '1mo') sliceLen = 22;
-      else if (state.range === '3mo') sliceLen = 63;
-      else if (state.range === '6mo') sliceLen = 126;
-
+      const sliceLen = getSliceLen(state.range);
       const displayPrices = data.prices.slice(-sliceLen);
       const displayDates = data.dates.slice(-sliceLen);
       chartInstances[canvas.id] = buildChart(canvas.id, displayPrices, displayDates, true);
@@ -986,6 +977,7 @@ async function render() {
 }
 
 function getColors(prices) {
+  if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
   const last = prices[prices.length-1], first = prices[0];
   if (last > first) return { line:'#00c87a', fill:'rgba(0,200,122,0.12)' };
   if (last < first) return { line:'#ff4d6a', fill:'rgba(255,77,106,0.12)' };
@@ -1119,24 +1111,32 @@ function updateSummaryAndAllocation(displayItems) {
 function openChartModal(ticker) {
   const data = cachedMarketData[ticker]; if(!data) return;
   
-  // 모달 역시 현재 선택된 탭 범위에 맞게 잘라서 보여줍니다.
-  let sliceLen = data.prices.length;
-  if (state.range === '1mo') sliceLen = 22;
-  else if (state.range === '3mo') sliceLen = 63;
-  else if (state.range === '6mo') sliceLen = 126;
-
+  const getSliceLen = (range) => {
+    if (range === '1d') return 2;
+    if (range === '1w') return 6;
+    if (range === '1m') return 22;
+    if (range === '3m') return 63;
+    if (range === '6m') return 126;
+    if (range === '1y') return 252;
+    if (range === '3y') return 756;
+    return 252;
+  };
+  
+  let sliceLen = getSliceLen(state.range);
   const displayPrices = data.prices.slice(-sliceLen);
   const displayDates = data.dates.slice(-sliceLen);
   
+  if(displayPrices.length === 0) return;
+  
   const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
+  const last = displayPrices[displayPrices.length-1];
+  const prev = displayPrices[0]; 
+  const chgPct = ((last-prev)/prev*100).toFixed(2);
   
   document.getElementById('mTicker').textContent = data.name;
   document.getElementById('mBroker').textContent = data.symbol;
-  document.getElementById('mPrice').textContent = formatPrice(displayPrices[displayPrices.length-1], ticker);
+  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
   
-  const last = displayPrices[displayPrices.length-1];
-  const prev = displayPrices[0]; // 슬라이스된 범위의 첫 날 기준
-  const chgPct = ((last-prev)/prev*100).toFixed(2);
   const chgEl = document.getElementById('mChange');
   chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
   chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
@@ -1147,6 +1147,7 @@ function openChartModal(ticker) {
   if (modalChartInst) modalChartInst.destroy();
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
 }
+
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 // ── 8. 클라우드 자동 동기화 로직 ──
