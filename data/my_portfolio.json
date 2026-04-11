@@ -34,7 +34,8 @@
     "MSFT",
     "NVDA",
     "ORCL",
-    "PLTR"
+    "PLTR",
+    "UNH"
   ],
   "transactions": [
     {
@@ -316,6 +317,14 @@
       "symbol": "TSLA",
       "qty": 18,
       "price": 182.1095
+    },
+    {
+      "id": 1775891856916,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "UNH",
+      "qty": 4,
+      "price": 303.15
     }
   ],
   "range": "1y"
