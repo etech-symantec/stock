@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOCK WATCH — 멀티 유저 & 클라우드 장부</title>
+<title>주식 매니저</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@
   .btn-submit { width: 100%; padding: 12px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 5px; transition: 0.2s; }
   .btn-submit:hover { background: #6855e0; }
 
-  .btn-edit-owners { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; text-decoration: underline; margin-left: 6px; transition: color 0.2s; padding: 0; }
+  .btn-edit-owners { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; text-decoration: underline; margin-left: 6px; transition: color 0.2s; }
   .btn-edit-owners:hover { color: var(--accent); }
 
   .tx-search-container { position: relative; }
@@ -89,6 +89,8 @@
 
   /* ── 3분할 그리드 레이아웃 ── */
   .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 1.5rem; flex-shrink: 0; align-items: stretch; }
+  
+  /* 반응형: 화면이 좁아지면 2개, 1개로 줄어듦 */
   @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 900px) { .dashboard-top { grid-template-columns: 1fr; } }
 
@@ -102,16 +104,29 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
-  /* 국가별 계좌 리스트 테이블 */
+  /* 계좌 리스트 (내부 스크롤 제거, 자연스러운 높이 팽창) */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
   
-  /* 계좌 행 및 가로 막대 그래프 디자인 */
-  .acc-row { background: var(--bg3); border-radius: 8px; padding: 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: border-color 0.2s; }
+  .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: border-color 0.2s; }
   .acc-row:hover { border-color: var(--border2); }
   
-  .acc-pie-wrap { width: 70px; height: 70px; position: relative; flex-shrink: 0; }
-  .acc-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .acc-pie-wrap { width: 85px; height: 85px; position: relative; flex-shrink: 0; }
   
+  .acc-content { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .acc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px; }
+  .acc-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .acc-count { font-weight: normal; font-size: 11px; color: var(--text3); margin-left: 4px; }
+  .acc-pnl { display: flex; align-items: baseline; gap: 6px; font-family: var(--font-mono); font-size: 14px; font-weight: 700; }
+  .acc-pnl.up { color: var(--green); } .acc-pnl.down { color: var(--red); }
+  .acc-roi { font-size: 11px; font-weight: 500; }
+  
+  .acc-bars { display: flex; flex-direction: column; gap: 6px; }
+  .acc-bar-row { display: flex; align-items: center; gap: 8px; }
+  .acc-bar-label { font-size: 11px; color: var(--text2); width: 24px; flex-shrink: 0; }
+  .acc-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+  .acc-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+  .acc-bar-val { font-family: var(--font-mono); font-size: 11px; color: var(--text); width: 75px; text-align: right; flex-shrink: 0; }
+
   .section-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 15px 0 10px 0; flex-shrink: 0; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
@@ -208,32 +223,20 @@
       <div style="display:flex; gap:10px; margin-bottom:5px;">
         <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--text2); font-weight:700;">소유자</span>
+            <span style="font-size:10px; color:var(--text2); font-weight:700;">소유자</span>
             <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름 변경">이름 변경</button>
           </div>
-          <div style="display:flex; justify-content:space-around; align-items:center; width:100%; margin-top:4px;">
-            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
-              <input type="radio" name="txOwner" value="user1" checked style="margin:0; accent-color:var(--accent);"> <span id="radioUser1">보유자1</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
-              <input type="radio" name="txOwner" value="user2" style="margin:0; accent-color:var(--accent);"> <span id="radioUser2">보유자2</span>
-            </label>
+          <div style="display:flex; gap:10px;">
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txOwner" value="user1" checked style="accent-color:var(--accent)"> <span id="radioUser1">보유자1</span></label>
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txOwner" value="user2" style="accent-color:var(--accent)"> <span id="radioUser2">보유자2</span></label>
           </div>
         </div>
         <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--text2); font-weight:700;">유형</span>
-          </div>
-          <div style="display:flex; justify-content:space-around; align-items:center; width:100%; margin-top:4px;">
-            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
-              <input type="radio" name="txType" value="buy" checked onchange="toggleTxType()" style="margin:0; accent-color:var(--red);"> 매수
-            </label>
-            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
-              <input type="radio" name="txType" value="sell" onchange="toggleTxType()" style="margin:0; accent-color:var(--blue);"> 매도
-            </label>
-            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
-              <input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="margin:0; accent-color:var(--green);"> 배당
-            </label>
+          <span style="font-size:10px; color:var(--text2); font-weight:700;">유형</span>
+          <div style="display:flex; gap:6px;">
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="buy" checked onchange="toggleTxType()" style="accent-color:var(--red)"> 매수</label>
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="sell" onchange="toggleTxType()" style="accent-color:var(--blue)"> 매도</label>
+            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="accent-color:var(--green)"> 배당</label>
           </div>
         </div>
       </div>
@@ -294,11 +297,11 @@
             <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue)">—</div>
           </div>
           <div class="cp-sum-box">
-            <div class="cp-sum-label">수익금 (수익률)</div>
+            <div class="cp-sum-label">통합 수익금 (수익률)</div>
             <div class="cp-sum-val" id="globalTotalRoi">—</div>
           </div>
         </div>
-        <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
+        <div class="cp-accounts" style="flex:1;">
            <div class="sum-label" style="margin: 10px 0;">포트폴리오 비중</div>
            <div style="flex:1; position:relative; min-height: 180px;"><canvas id="allocationCanvas"></canvas></div>
         </div>
@@ -375,11 +378,11 @@
       </div>
       
       <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:10px;">
-        <div class="div-chart-area" style="flex:1.5;">
+        <div class="div-chart-area">
           <div class="sum-label" style="margin-bottom:15px;">월별 배당금 추이 (합산 ₩)</div>
           <div style="flex:1; position:relative;"><canvas id="divMonthlyCanvas"></canvas></div>
         </div>
-        <div class="div-list-area" style="flex:1; max-height:400px;">
+        <div class="div-list-area">
           <div class="sum-label" style="margin-bottom:15px;">효자 종목 (종목별 배당금)</div>
           <div id="divStockList" style="flex:1; overflow-y:auto; padding-right:5px;"></div>
         </div>
@@ -414,7 +417,7 @@
       <button class="btn-sm" onclick="closeModal('ownerOverlay')">닫기</button>
     </div>
     <div style="font-size:11px; color:var(--text2); margin-bottom:20px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px;">
-      장부와 대시보드에 표시될 소유자의 이름을 자유롭게 변경할 수 있습니다. 변경 시 기존 거래 내역의 이름도 모두 일괄 변경됩니다.
+      장부와 대시보드에 표시될 소유자의 이름을 변경할 수 있습니다. 변경 시 기존 거래 내역의 이름도 일괄 변경됩니다.
     </div>
     <div class="form-group" style="margin-bottom:12px;">
       <label>보유자1 이름</label>
@@ -468,8 +471,8 @@
 const STORE_KEY = 'stockwatch_real_v22'; 
 let state = loadState();
 
-let currentView = 'all'; 
-let currentDivFilter = 'all'; 
+let currentView = 'all'; // 'all', 'user1', 'user2', 'watch', 'dividend'
+let currentDivFilter = 'all'; // 'all', 'user1', 'user2'
 let currentSortMode = 'default';
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
@@ -505,6 +508,7 @@ function loadState() {
       parsed.transactions.forEach(t => { 
         if(!t.txType) t.txType = 'trade'; 
         if(!t.owner) t.owner = parsed.ownerNames.user1;
+        // 기존 trade를 buy/sell/trade 그대로 유지 (하위 호환성)
       });
       return parsed;
     }
@@ -514,7 +518,6 @@ function loadState() {
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// 초기 이름 세팅
 function updateOwnerLabels() {
   document.getElementById('tabUser1').textContent = state.ownerNames.user1;
   document.getElementById('tabUser2').textContent = state.ownerNames.user2;
@@ -643,10 +646,11 @@ function addTransaction() {
     alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
 
+  // 매도 선택시 수량을 자동으로 음수로 전환
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
   
-  const finalTxType = typeVal === 'dividend' ? 'dividend' : 'trade';
+  const finalTxType = typeVal === 'dividend' ? 'dividend' : 'trade'; // 저장용 타입
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
   state.transactions.push({ id: Date.now(), date, owner, broker, symbol, qty, price, txType: finalTxType });
@@ -1208,11 +1212,13 @@ function updateSummaryAndAllocation(rawHoldings) {
   accountPieChartInsts.forEach(c => c.destroy());
   accountPieChartInsts = [];
   
+  // 캔버스 초기화 (차트 중복 생성 방지)
   if(allocationChartInst) allocationChartInst.destroy();
 
   let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
   let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
+  // 글로벌 파이차트용 변수
   const allocData = [], allocLabels = [], allocColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703'];
 
   for(let key in rawHoldings) {
@@ -1238,7 +1244,7 @@ function updateSummaryAndAllocation(rawHoldings) {
         usdSummary.accounts[broker].eval += eAmt;
         usdSummary.accounts[broker].cost += cAmt;
         usdSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
-        allocData.push(eAmt * currentUsdKrw);
+        allocData.push(eAmt * currentUsdKrw); // 글로벌 차트용 달러 환산
       }
       allocLabels.push(`${data.name} ${broker!=='미지정'?`(${broker})`:''}`);
     }
@@ -1259,7 +1265,7 @@ function updateSummaryAndAllocation(rawHoldings) {
   
   document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-  // 글로벌 통합 차트 (커스텀 툴팁)
+  // 글로벌 통합 자산 차트 그리기
   const ctxGlobal = document.getElementById('allocationCanvas').getContext('2d');
   if (allocData.length > 0) {
     allocationChartInst = new Chart(ctxGlobal, {
@@ -1270,47 +1276,7 @@ function updateSummaryAndAllocation(rawHoldings) {
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        plugins: { 
-          legend: { display: false }, 
-          tooltip: { 
-            enabled: false,
-            external: function(context) {
-              let tooltipEl = document.getElementById('chartjs-tooltip');
-              if (!tooltipEl) {
-                tooltipEl = document.createElement('div');
-                tooltipEl.id = 'chartjs-tooltip';
-                document.body.appendChild(tooltipEl);
-              }
-              const tooltipModel = context.tooltip;
-              if (tooltipModel.opacity === 0) {
-                tooltipEl.style.opacity = 0;
-                return;
-              }
-              if (tooltipModel.body) {
-                const bodyLines = tooltipModel.body.map(b => b.lines);
-                let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
-                bodyLines.forEach(function(body, i) {
-                  const colors = tooltipModel.labelColors[i];
-                  const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
-                  let txt = body[0];
-                  let splitTxt = txt.split(': ');
-                  if(splitTxt.length === 2) {
-                    let val = parseFloat(splitTxt[1].replace(/,/g,''));
-                    let formatVal = '₩' + Math.round(val).toLocaleString();
-                    txt = `${splitTxt[0]}: ${formatVal}`;
-                  }
-                  innerHtml += `<div style="font-size:12px; display:flex; align-items:center; white-space:nowrap; padding:2px 0;">${span}${txt}</div>`;
-                });
-                innerHtml += '</div>';
-                tooltipEl.innerHTML = innerHtml;
-              }
-              const position = context.chart.canvas.getBoundingClientRect();
-              tooltipEl.style.opacity = 1;
-              tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-              tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
-            }
-          } 
-        },
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
         cutout: '70%'
       }
     });
@@ -1351,7 +1317,7 @@ function updateSummaryAndAllocation(rawHoldings) {
 
     let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
     let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
-    let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+    let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
 
     return `
       <div class="acc-row">
@@ -1408,7 +1374,7 @@ function updateSummaryAndAllocation(rawHoldings) {
 
     let costPct = maxUsdAccVal > 0 ? (d.cost / maxUsdAccVal * 100) : 0;
     let evalPct = maxUsdAccVal > 0 ? (d.eval / maxUsdAccVal * 100) : 0;
-    let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+    let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
 
     return `
       <div class="acc-row">
@@ -1436,7 +1402,7 @@ function updateSummaryAndAllocation(rawHoldings) {
   }).join('');
   document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-  // ── 미니 파이 차트 그리기 (HTML 커스텀 툴팁) ──
+  // ── 미니 파이 차트 그리기 ──
   const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
   [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
     const ctx = document.getElementById(cfg.id);
@@ -1497,7 +1463,7 @@ function updateSummaryAndAllocation(rawHoldings) {
             }
           }
         },
-        cutout: '60%', animation: { duration: 0 }
+        cutout: '55%', animation: { duration: 0 }
       }
     });
     accountPieChartInsts.push(c);
