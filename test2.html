@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOCK WATCH — 클라우드 자동 동기화 장부</title>
+<title>STOCK WATCH — 거래 내역 대시보드</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@
   
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); outline: none; cursor: pointer; }
 
-  /* ── 레이아웃 (사이드바 + 콘텐츠) ── */
+  /* ── 레이아웃 ── */
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; }
   
   /* ── 사이드바 ── */
@@ -78,10 +78,10 @@
   .btn-primary { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; white-space: nowrap; }
   .btn-primary:hover { background: var(--accent); color: #fff; }
 
-  /* 대시보드 탑 레이아웃 개편 (요약, 계좌, 차트) */
-  .dashboard-top { display: flex; gap: 20px; margin-bottom: 1.5rem; flex-wrap: wrap; flex-shrink: 0; align-items: stretch; }
+  /* 대시보드 탑 레이아웃 (새로운 구조) */
+  .dashboard-top { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1.5rem; flex-shrink: 0; }
   
-  .summary { flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; width: 100%; }
   .sum-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; }
   .sum-label { font-size: 11px; color: var(--text3); letter-spacing: 0.06em; margin-bottom: 8px; text-transform: uppercase; }
   .sum-val-krw { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text); }
@@ -89,12 +89,15 @@
   .sum-val-krw.up, .sum-val-usd.up { color: var(--green); }
   .sum-val-krw.down, .sum-val-usd.down { color: var(--red); }
 
-  /* 신규: 계좌별 요약 리스트 */
-  .account-summary { flex: 1.5; min-width: 220px; max-height: 160px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; }
+  .dashboard-charts { display: flex; gap: 15px; flex-wrap: wrap; width: 100%; }
+  .account-summary { flex: 1.2; min-width: 220px; max-height: 160px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; }
   .account-summary-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
   .account-summary-list::-webkit-scrollbar { width: 4px; }
   .account-summary-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
+  /* 신규: 비교 막대 차트 영역 */
+  .comparison-chart { flex: 1.5; min-width: 250px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; height: 160px; }
+  
   .allocation { flex: 1; min-width: 200px; max-height: 160px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; align-items: center; justify-content: center; }
 
   .section-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 15px 0 10px 0; flex-shrink: 0; }
@@ -123,14 +126,13 @@
   .btn-danger { color: var(--text3); border-color: transparent; background: transparent; padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); border-radius: 4px; cursor: pointer; transition: 0.2s; }
   .btn-danger:hover { background: var(--red-bg); color: var(--red); }
 
-  /* ── 모달 ── */
+  /* ── 5. 모달 ── */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .overlay.open { display: flex; }
   .modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
   .modal-sm { max-width: 400px; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
   
-  /* Toggle Switch */
   .toggle-switch { position: relative; display: inline-block; width: 34px; height: 18px; }
   .toggle-switch input { opacity: 0; width: 0; height: 0; }
   .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--bg3); border: 1px solid var(--border2); border-radius: 20px; transition: .2s; }
@@ -162,12 +164,10 @@
       <button class="rtab" onclick="setRange('6mo',this)">6M</button>
       <button class="rtab active" onclick="setRange('1y',this)">1Y</button>
     </div>
-    
     <div class="sync-status" id="syncStatus">
       <div class="sync-spinner" id="syncSpinner"></div>
       <span id="syncText"></span>
     </div>
-    
     <button class="btn-sm btn-github" onclick="openGithubModal()" title="GitHub 연동 설정">☁️ 설정</button>
     <button class="btn-sm" onclick="exportData()" title="로컬 백업">⬇️ 저장</button>
     <button class="btn-sm" onclick="document.getElementById('importFile').click()" title="로컬 복원">⬆️ 불러오기</button>
@@ -198,7 +198,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label>계좌명 (필수입력 권장)</label>
+        <label>계좌명 (선택)</label>
         <input type="text" id="txBroker" class="form-input" placeholder="예: 키움증권, 토스 등">
       </div>
       <button class="btn-submit" onclick="addTransaction()">내역 추가하기</button>
@@ -220,7 +220,7 @@
     <div class="dashboard-top" id="dashboardTop" style="display:none">
       <div class="summary" id="summary">
         <div class="sum-card">
-          <div class="sum-label">총 평가금액</div>
+          <div class="sum-label">국내/미국 평가액</div>
           <div id="totalValKrw" class="sum-val-krw">—</div>
           <div id="totalValUsd" class="sum-val-usd"></div>
         </div>
@@ -234,15 +234,24 @@
           <div id="totalRoiKrw" class="sum-val-krw">—</div>
           <div id="totalRoiUsd" class="sum-val-usd"></div>
         </div>
+        <div class="sum-card" style="background:var(--bg3); border-color:var(--border2);">
+          <div class="sum-label" style="color:var(--text2)">통합 자산 / 실시간 환율</div>
+          <div id="totalConverted" class="sum-val-krw" style="color:var(--blue)">—</div>
+          <div id="exchangeRateDisplay" class="sum-val-usd" style="color:var(--text3)">환율 조회 중...</div>
+        </div>
       </div>
 
-      <div class="account-summary sum-card">
-        <div class="sum-label" style="margin-bottom:10px;">계좌별 자산 현황</div>
-        <div id="accountList" class="account-summary-list">
-          </div>
+      <div class="dashboard-charts">
+        <div class="account-summary sum-card">
+          <div class="sum-label" style="margin-bottom:10px;">계좌별 자산 현황</div>
+          <div id="accountList" class="account-summary-list"></div>
+        </div>
+        <div class="comparison-chart sum-card">
+          <div class="sum-label" style="margin-bottom:10px;">투자 원금 vs 현재 평가액</div>
+          <div style="flex:1; position:relative;"><canvas id="comparisonCanvas"></canvas></div>
+        </div>
+        <div class="allocation" title="포트폴리오 비중"><canvas id="allocationCanvas"></canvas></div>
       </div>
-
-      <div class="allocation" title="포트폴리오 비중"><canvas id="allocationCanvas"></canvas></div>
     </div>
 
     <div class="grid-container" id="gridContainer"></div>
@@ -273,11 +282,9 @@
       <h3 style="font-size:16px;">☁️ GitHub 클라우드 설정</h3>
       <button class="btn-sm" onclick="closeModal('githubOverlay')">닫기</button>
     </div>
-    
     <div style="font-size:11px; color:var(--text2); margin-bottom:20px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px;">
       발급받은 Personal Access Token (Contents: Write 권한 필요)을 브라우저에 안전하게 저장합니다.
     </div>
-
     <div class="form-group" style="margin-bottom:12px;">
       <label>GitHub 사용자 이름 (Owner)</label>
       <input type="text" id="ghUser" class="form-input" placeholder="예: etech-symantec">
@@ -290,7 +297,6 @@
       <label>Personal Access Token (PAT)</label>
       <input type="password" id="ghToken" class="form-input" placeholder="ghp_... 또는 github_pat_...">
     </div>
-
     <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 10px; background:rgba(0,0,0,0.2); border-radius:6px; margin-bottom:20px;">
       <span style="font-size:12px; font-weight:500; color:var(--text);">🔄 거래내역 추가/삭제 시 자동 동기화</span>
       <label class="toggle-switch">
@@ -298,7 +304,6 @@
         <span class="slider"></span>
       </label>
     </div>
-
     <div style="display:flex; gap:10px;">
       <button class="btn-submit" style="background:var(--blue); flex:1;" onclick="pullFromGithub(false)">⬆️ 수동 불러오기</button>
       <button class="btn-submit" style="flex:1;" onclick="pushToGithub(false)">⬇️ 수동 저장하기</button>
@@ -308,15 +313,20 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v9';
+const STORE_KEY = 'stockwatch_real_v10';
 let state = loadState();
 let currentView = 'all';
 let currentSortMode = 'default';
 let allocationChartInst = null;
+let comparisonChartInst = null;
 let modalChartInst = null;
 const chartInstances = {};
 let cachedMarketData = {}; 
 let localStockDB = []; 
+
+// 환율 연동 변수
+let currentUsdKrw = 1350; // 초기 대체값
+let isExchangeRateFetched = false;
 
 document.getElementById('txDate').valueAsDate = new Date();
 
@@ -332,7 +342,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v8');
+    let oldS = localStorage.getItem('stockwatch_real_v9');
     if(oldS) return JSON.parse(oldS);
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
@@ -348,8 +358,7 @@ function formatPrice(val, symbol) {
   return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-// ── 2. 거래 장부 계좌별(Account) 로직 분리 ──
-// 계좌별로 평단가 및 수량을 개별 관리하기 위해 key를 'symbol::broker' 형태로 묶습니다.
+// ── 2. 거래 장부 (Ledger) 로직 ──
 function calculateHoldings() {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -510,6 +519,16 @@ async function fetchWithProxy(targetUrl, useCache = true) {
   return null;
 }
 
+// 실시간 환율 로드
+async function fetchExchangeRate() {
+  if (isExchangeRateFetched) return;
+  const data = await fetchYahooData('KRW=X', '1mo'); // 1달치 중 가장 최근값 (휴일 대비)
+  if (data && data.last) {
+    currentUsdKrw = data.last;
+    isExchangeRateFetched = true;
+  }
+}
+
 async function fetchYahooData(symbol, range) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=1d`;
   const json = await fetchWithProxy(url, false);
@@ -530,10 +549,12 @@ async function fetchYahooData(symbol, range) {
   
   const meta = result.meta;
   const localMatch = localStockDB.find(s => s.symbol === symbol);
+  let cName = localMatch ? localMatch.name : (meta.shortName || symbol);
+  if(symbol === 'KRW=X') cName = 'USD/KRW 환율';
   
   return {
     symbol: symbol,
-    name: localMatch ? localMatch.name : (meta.shortName || symbol),
+    name: cName,
     currency: meta.currency || 'USD',
     prices: validPrices,
     dates: validDates,
@@ -544,7 +565,7 @@ async function fetchYahooData(symbol, range) {
 
 async function addTickerToPortfolio(symbol) {
   let finalSym = /^\d{6}$/.test(symbol) ? symbol + '.KS' : symbol;
-  if (state.tickers.includes(finalSym)) { alert("이미 관심종목에 등록되어 있습니다."); return; }
+  if (state.tickers.includes(finalSym)) { alert("이미 등록된 종목입니다."); return; }
   
   document.getElementById('addBtn').textContent = "가져오는 중...";
   const data = await fetchYahooData(finalSym, '1mo');
@@ -576,7 +597,6 @@ function setView(view, el) {
   el.classList.add('active'); render();
 }
 
-// 개별 카드 HTML 생성 (계좌 분리 적용)
 function generateCardHtml(item) {
   const data = item.data;
   const isHeld = item.type === 'held';
@@ -638,13 +658,14 @@ async function render() {
     return;
   }
 
+  // 필수: 환율 정보 로딩
+  if (!isExchangeRateFetched) await fetchExchangeRate();
   dash.style.display = 'flex';
   
   if(Object.keys(cachedMarketData).length === 0) {
     container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
   }
 
-  // 거래장부에만 있고 관심종목 배열에 없는 티커들도 렌더링에 포함
   let allSymbols = new Set(state.tickers);
   for(let key in currentHoldings) {
     if(currentHoldings[key].qty > 0) allSymbols.add(currentHoldings[key].symbol);
@@ -661,9 +682,7 @@ async function render() {
 
   await Promise.all(promises);
 
-  // 1. 출력할 아이템 배열(displayItems) 생성 (계좌별 분리)
   let displayItems = [];
-  
   for(let key in currentHoldings) {
     let h = currentHoldings[key];
     if(h.qty > 0 && cachedMarketData[h.symbol]) {
@@ -678,14 +697,12 @@ async function render() {
     }
   });
 
-  // 2. 뷰 필터링
   displayItems = displayItems.filter(item => {
     if(currentView === 'held') return item.type === 'held';
     if(currentView === 'watch') return item.type === 'watch';
     return true; 
   });
 
-  // 3. 정렬 (수익률 / 자산 규모)
   displayItems.forEach(item => {
     const last = item.data.last;
     item.evalAmt = item.qty * last;
@@ -704,7 +721,6 @@ async function render() {
      return;
   }
 
-  // 4. 국가별 그룹화 (한국, 미국, 가상화폐)
   const krItems = displayItems.filter(item => isKorean(item.symbol));
   const usItems = displayItems.filter(item => !isKorean(item.symbol) && !isCrypto(item.symbol));
   const cryptoItems = displayItems.filter(item => isCrypto(item.symbol));
@@ -725,11 +741,9 @@ async function render() {
 
   container.innerHTML = html;
 
-  // 생성된 동적 ID 캔버스에 차트 그리기
   const canvasWrappers = container.querySelectorAll('.chart-wrap canvas');
   canvasWrappers.forEach((canvas, index) => {
-    const item = displayItems[index]; // DOM 구조와 displayItems 순서가 매칭되지 않으므로 ID 추출
-    const symbol = canvas.id.split('_')[1]; // c_AAPL_xxxx 에서 AAPL 추출
+    const symbol = canvas.id.split('_')[1];
     const data = cachedMarketData[symbol];
     if(data) chartInstances[canvas.id] = buildChart(canvas.id, data.prices, data.dates, true);
   });
@@ -772,7 +786,7 @@ function updateSummaryAndAllocation(displayItems) {
         evalKRW += eAmt; costKRW += cAmt; allocData.push(eAmt); 
         evalByBroker[broker].krw += eAmt;
       } else { 
-        evalUSD += eAmt; costUSD += cAmt; allocData.push(eAmt * 1400); // 도넛차트용 환산
+        evalUSD += eAmt; costUSD += cAmt; allocData.push(eAmt * currentUsdKrw); 
         evalByBroker[broker].usd += eAmt;
       }
       
@@ -780,7 +794,7 @@ function updateSummaryAndAllocation(displayItems) {
     }
   });
 
-  // 계좌별 요약 리스트 (대시보드 중앙) 렌더링
+  // 계좌 요약 리스트
   let accHtml = Object.keys(evalByBroker).map(b => {
     let bData = evalByBroker[b];
     let text = [];
@@ -796,7 +810,47 @@ function updateSummaryAndAllocation(displayItems) {
   }).join('');
   document.getElementById('accountList').innerHTML = accHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">보유 계좌가 없습니다.</div>';
 
-  // 전체 요약 (총합 / 수익률)
+  // 총합 환율 환산
+  const totalCostConverted = costKRW + (costUSD * currentUsdKrw);
+  const totalEvalConverted = evalKRW + (evalUSD * currentUsdKrw);
+
+  document.getElementById('totalConverted').textContent = `₩ ${Math.round(totalEvalConverted).toLocaleString()}`;
+  document.getElementById('exchangeRateDisplay').textContent = `환율: $1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
+
+  // 비교 막대 차트 (투자 원금 vs 현재 평가액)
+  if(comparisonChartInst) comparisonChartInst.destroy();
+  const ctxComp = document.getElementById('comparisonCanvas').getContext('2d');
+  comparisonChartInst = new Chart(ctxComp, {
+    type: 'bar',
+    data: {
+      labels: ['투자 원금', '현재 평가액'],
+      datasets: [{
+        data: [totalCostConverted, totalEvalConverted],
+        backgroundColor: [
+          'rgba(136,144,164,0.4)', // 원금: 회색빛
+          totalEvalConverted >= totalCostConverted ? 'rgba(0,200,122,0.5)' : 'rgba(255,77,106,0.5)' // 평가액: 수익/손실 색상
+        ],
+        borderColor: [
+          '#8890a4',
+          totalEvalConverted >= totalCostConverted ? '#00c87a' : '#ff4d6a'
+        ],
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } } },
+      scales: {
+        x: { ticks: { color: '#8890a4', font: { family: 'Noto Sans KR', size: 11 } }, grid: { display: false }, border: { display: false } },
+        y: { display: false, beginAtZero: true }
+      },
+      animation: { duration: 0 }
+    }
+  });
+
+  // 전체 요약
   const pnlKRW = evalKRW - costKRW;
   const pnlUSD = evalUSD - costUSD;
   const roiKRW = costKRW > 0 ? (pnlKRW/costKRW*100) : 0;
