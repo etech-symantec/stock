@@ -69,7 +69,7 @@
   .tx-del { cursor: pointer; color: var(--text3); font-size: 12px; transition: color 0.2s; }
   .tx-del:hover { color: var(--red); }
 
-  /* ── 대시보드 ── */
+  /* ── 대시보드 메인 ── */
   .dashboard-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 1.5rem 2rem; background: var(--bg); max-width: 100%; }
   
   .add-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
@@ -79,26 +79,43 @@
   .btn-primary { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; white-space: nowrap; }
   .btn-primary:hover { background: var(--accent); color: #fff; }
 
-  /* 대시보드 탑 레이아웃 */
+  /* ── 대시보드 상단 개편 (국가별 패널) ── */
   .dashboard-top { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1.5rem; flex-shrink: 0; }
   
-  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; width: 100%; }
-  .sum-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; }
-  .sum-label { font-size: 11px; color: var(--text3); letter-spacing: 0.06em; margin-bottom: 8px; text-transform: uppercase; }
-  .sum-val-krw { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text); }
-  .sum-val-usd { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text2); margin-top: 4px; }
-  .sum-val-krw.up, .sum-val-usd.up { color: var(--green); }
-  .sum-val-krw.down, .sum-val-usd.down { color: var(--red); }
+  /* 전역 요약 (가로 띠) */
+  .global-summary { display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 20px; }
+  .gs-item { display: flex; align-items: baseline; gap: 10px; }
+  .gs-label { font-size: 12px; color: var(--text2); font-weight: 500; }
+  .gs-val { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
+  .gs-sub { font-size: 12px; color: var(--text3); font-family: var(--font-mono); }
 
-  .dashboard-charts { display: flex; gap: 15px; flex-wrap: wrap; width: 100%; }
-  .account-summary { flex: 1.2; min-width: 220px; max-height: 160px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; }
-  .account-summary-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
-  .account-summary-list::-webkit-scrollbar { width: 4px; }
-  .account-summary-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-  .comparison-chart { flex: 1.5; min-width: 250px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; height: 160px; }
+  /* 국가별 패널 컨테이너 */
+  .country-panels { display: flex; gap: 15px; flex-wrap: wrap; }
+  .country-panel { flex: 1; min-width: 320px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+  .cp-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  .cp-title { font-size: 15px; font-weight: 700; color: var(--text); }
   
-  .allocation { flex: 1; min-width: 200px; max-height: 160px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; align-items: center; justify-content: center; }
+  /* 국가별 총합 요약 */
+  .cp-summary { display: flex; gap: 15px; }
+  .cp-sum-box { flex: 1; }
+  .cp-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
+  .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
+  
+  /* 국가별 차트 */
+  .cp-chart-wrap { height: 140px; position: relative; }
+
+  /* 국가별 계좌 리스트 테이블 */
+  .cp-accounts { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px; }
+  .cp-accounts::-webkit-scrollbar { width: 4px; }
+  .cp-accounts::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  .acc-row { background: var(--bg3); border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+  .acc-info { display: flex; flex-direction: column; gap: 3px; }
+  .acc-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .acc-detail { font-size: 11px; color: var(--text2); font-family: var(--font-mono); }
+  .acc-detail span { color: var(--text3); }
+  .acc-pnl { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+  .acc-pnl.up { color: var(--green); } .acc-pnl.down { color: var(--red); }
 
   .section-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 15px 0 10px 0; flex-shrink: 0; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -240,57 +257,79 @@
     </div>
 
     <div class="dashboard-top" id="dashboardTop" style="display:none">
-      <div class="summary" id="summary">
-        <div class="sum-card">
-          <div class="sum-label">국내/미국 평가액</div>
-          <div id="totalValKrw" class="sum-val-krw">—</div>
-          <div id="totalValUsd" class="sum-val-usd"></div>
+      <div class="global-summary">
+        <div class="gs-item">
+          <div class="gs-label">통합 평가 자산</div>
+          <div class="gs-val" id="globalTotalVal" style="color:var(--blue)">—</div>
         </div>
-        <div class="sum-card">
-          <div class="sum-label">총 평가손익</div>
-          <div id="totalPnlKrw" class="sum-val-krw">—</div>
-          <div id="totalPnlUsd" class="sum-val-usd"></div>
-        </div>
-        <div class="sum-card">
-          <div class="sum-label">수익률</div>
-          <div id="totalRoiKrw" class="sum-val-krw">—</div>
-          <div id="totalRoiUsd" class="sum-val-usd"></div>
-        </div>
-        <div class="sum-card" style="background:var(--bg3); border-color:var(--border2);">
-          <div class="sum-label" style="color:var(--text2)">통합 자산 / 실시간 환율</div>
-          <div id="totalConverted" class="sum-val-krw" style="color:var(--blue)">—</div>
-          <div id="exchangeRateDisplay" class="sum-val-usd" style="color:var(--text3)">환율 조회 중...</div>
+        <div class="gs-item">
+          <div class="gs-label">실시간 환율</div>
+          <div class="gs-sub" id="globalExchangeRate">조회 중...</div>
         </div>
       </div>
 
-      <div class="dashboard-charts">
-        <div class="account-summary sum-card">
-          <div class="sum-label" style="margin-bottom:10px;">계좌별 자산 현황</div>
-          <div id="accountList" class="account-summary-list"></div>
+      <div class="country-panels">
+        <div class="country-panel">
+          <div class="cp-header">
+            <div class="cp-title">🇰🇷 국내 주식</div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 투자액</div>
+              <div class="cp-sum-val" id="krwTotalCost">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 평가액</div>
+              <div class="cp-sum-val" id="krwTotalEval">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">수익금 (수익률)</div>
+              <div class="cp-sum-val" id="krwTotalPnl">—</div>
+            </div>
+          </div>
+          <div class="cp-chart-wrap"><canvas id="krwChartCanvas"></canvas></div>
+          <div class="cp-accounts" id="krwAccountList"></div>
         </div>
-        <div class="comparison-chart sum-card">
-          <div class="sum-label" style="margin-bottom:10px;">투자 원금 vs 현재 평가액</div>
-          <div style="flex:1; position:relative;"><canvas id="comparisonCanvas"></canvas></div>
+
+        <div class="country-panel">
+          <div class="cp-header">
+            <div class="cp-title">🇺🇸 미국 주식</div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 투자액</div>
+              <div class="cp-sum-val" id="usdTotalCost">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 평가액</div>
+              <div class="cp-sum-val" id="usdTotalEval">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">수익금 (수익률)</div>
+              <div class="cp-sum-val" id="usdTotalPnl">—</div>
+            </div>
+          </div>
+          <div class="cp-chart-wrap"><canvas id="usdChartCanvas"></canvas></div>
+          <div class="cp-accounts" id="usdAccountList"></div>
         </div>
-        <div class="allocation" title="포트폴리오 비중"><canvas id="allocationCanvas"></canvas></div>
       </div>
     </div>
 
     <div class="grid-container" id="gridContainer"></div>
 
     <div id="dividendDashboard">
-      <div class="summary">
-        <div class="sum-card" style="background:var(--green-bg); border-color:var(--green);">
+      <div class="summary" style="display:flex; gap:10px;">
+        <div class="sum-card" style="flex:1; background:var(--green-bg); border-color:var(--green);">
           <div class="sum-label" style="color:var(--green)">누적 배당금 총액 (환산)</div>
-          <div id="divTotalConverted" class="sum-val-krw" style="color:var(--green); font-size:24px;">—</div>
+          <div id="divTotalConverted" class="cp-sum-val" style="color:var(--green); font-size:24px;">—</div>
         </div>
-        <div class="sum-card">
+        <div class="sum-card" style="flex:1;">
           <div class="sum-label">국내주식 배당금</div>
-          <div id="divTotalKrw" class="sum-val-krw">—</div>
+          <div id="divTotalKrw" class="cp-sum-val">—</div>
         </div>
-        <div class="sum-card">
+        <div class="sum-card" style="flex:1;">
           <div class="sum-label">해외주식 배당금</div>
-          <div id="divTotalUsd" class="sum-val-krw" style="color:var(--text)">—</div>
+          <div id="divTotalUsd" class="cp-sum-val" style="color:var(--text)">—</div>
         </div>
       </div>
       
@@ -364,26 +403,21 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v14'; 
+const STORE_KEY = 'stockwatch_real_v15'; 
 let state = loadState();
 
-// 기본 선택값 복구
 let currentView = 'all';
 let currentSortMode = 'default';
-// 이전 버전에서 '1mo' 형태로 저장되어 있을 수 있으므로 변환
-if(['1mo','3mo','6mo'].includes(state.range)) {
-  state.range = state.range.replace('mo','m');
-}
+if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
-let allocationChartInst = null;
-let comparisonChartInst = null;
+let krwChartInst = null;
+let usdChartInst = null;
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
 const chartInstances = {};
 let cachedMarketData = {}; 
 let localStockDB = []; 
 
-// 환율 변수
 let currentUsdKrw = 1350; 
 let isExchangeRateFetched = false;
 
@@ -401,7 +435,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v13'); 
+    let oldS = localStorage.getItem('stockwatch_real_v14'); 
     if(oldS) return JSON.parse(oldS);
   } catch(e){}
   return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y' };
@@ -438,7 +472,7 @@ function calculateHoldings() {
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
   
   sortedTx.forEach(tx => {
-    if (tx.txType === 'dividend') return; // 배당금은 평단가에 영향 주지 않음
+    if (tx.txType === 'dividend') return;
 
     let broker = tx.broker ? tx.broker.trim() : '미지정';
     let key = `${tx.symbol}::${broker}`;
@@ -500,7 +534,6 @@ function renderTxList() {
     return;
   }
   
-  // 날짜 역순, 같은 날짜면 최신 입력(id)이 위로 오도록 정렬
   const reversed = [...state.transactions].sort((a,b) => {
     const dateDiff = new Date(b.date) - new Date(a.date);
     if (dateDiff !== 0) return dateDiff;
@@ -621,12 +654,11 @@ async function fetchWithProxy(targetUrl, useCache = true) {
 
 async function fetchExchangeRate() {
   if (isExchangeRateFetched) return;
-  const data = await fetchYahooData('KRW=X'); 
+  const data = await fetchYahooData('KRW=X');
   if (data && data.last) { currentUsdKrw = data.last; isExchangeRateFetched = true; }
 }
 
 async function fetchYahooData(symbol) {
-  // 항상 최대 3년(3y) 단위로 데이터를 가져와 다양한 기간별로 자를 수 있게 캐싱합니다.
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=3y&interval=1d`;
   const json = await fetchWithProxy(url, false);
   
@@ -682,7 +714,6 @@ function setRange(rangeStr, el) {
   state.range = rangeStr; saveState();
   document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); 
-  // 데이터를 다시 다운받지 않고 캐싱된 3년치에서 즉시 잘라서 보여줌
   render();
 }
 
@@ -697,7 +728,6 @@ function generateCardHtml(item) {
   const data = item.data;
   const isHeld = item.type === 'held';
   
-  // 선택된 범위에 따른 등락률 동적 표시
   const chgPct = item.activeChange.toFixed(2);
   const cls = item.activeChange > 0 ? 'up' : (item.activeChange < 0 ? 'down' : 'flat');
   const sign = item.activeChange > 0 ? '+' : '';
@@ -823,7 +853,6 @@ function renderDividendDashboard() {
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
-  // 현재 선택된 기간 버튼 활성화 처리 보장
   document.querySelectorAll('.rtab').forEach(b => {
     if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
   });
@@ -896,7 +925,6 @@ async function render() {
     return true; 
   });
 
-  // 기간별 슬라이스 길이 계산 함수
   const getSliceLen = (range) => {
     if (range === '1d') return 2;
     if (range === '1w') return 6;
@@ -908,26 +936,21 @@ async function render() {
     return 252;
   };
 
-  // 모든 종목에 대해 선택된 기간에 맞는 등락률 계산
   displayItems.forEach(item => {
     const prices = item.data.prices;
     const last = item.data.last;
     
-    // 차트 표시를 위한 길이
     const sliceLen = getSliceLen(state.range);
     item.sliceLen = sliceLen; 
     
-    // 정렬 모드가 등락률일 경우 선택된 범위에 맞게 계산
     const pStart = prices[Math.max(0, prices.length - sliceLen)] || item.data.prev;
     item.activeChange = ((last - pStart) / pStart) * 100;
     
-    // 평가 자산 및 수익률
     item.evalAmt = item.qty * last;
     item.costAmt = item.qty * item.avg;
     item.roi = item.costAmt > 0 ? ((item.evalAmt - item.costAmt)/item.costAmt*100) : -9999;
   });
 
-  // 정렬 수행
   if(currentSortMode === 'roiDesc') displayItems.sort((a,b) => b.roi - a.roi);
   else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => b.evalAmt - a.evalAmt);
   else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => b.activeChange - a.activeChange);
@@ -960,7 +983,6 @@ async function render() {
 
   container.innerHTML = html;
 
-  // 차트 기간 슬라이싱 렌더링
   const canvasWrappers = container.querySelectorAll('.chart-wrap canvas');
   canvasWrappers.forEach((canvas, index) => {
     const symbol = canvas.id.split('_')[1];
@@ -996,115 +1018,148 @@ function buildChart(canvasId, prices, dates, mini) {
 }
 
 function updateSummaryAndAllocation(displayItems) {
-  let evalKRW = 0, costKRW = 0;
-  let evalUSD = 0, costUSD = 0;
-  let evalByBroker = {}; 
-  const allocData = [], allocLabels = [], allocColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8'];
+  let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
+  let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
   displayItems.forEach(item => {
     if(item.type === 'held' && item.data) {
       const eAmt = item.evalAmt; 
       const cAmt = item.costAmt;
       let broker = item.broker || '미지정';
-      if(!evalByBroker[broker]) evalByBroker[broker] = { krw: 0, usd: 0 };
       
       if(isKorean(item.symbol)) { 
-        evalKRW += eAmt; costKRW += cAmt; allocData.push(eAmt); 
-        evalByBroker[broker].krw += eAmt;
+        krwSummary.totalEval += eAmt;
+        krwSummary.totalCost += cAmt;
+        if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0 };
+        krwSummary.accounts[broker].eval += eAmt;
+        krwSummary.accounts[broker].cost += cAmt;
       } else { 
-        evalUSD += eAmt; costUSD += cAmt; allocData.push(eAmt * currentUsdKrw); 
-        evalByBroker[broker].usd += eAmt;
+        usdSummary.totalEval += eAmt;
+        usdSummary.totalCost += cAmt;
+        if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0 };
+        usdSummary.accounts[broker].eval += eAmt;
+        usdSummary.accounts[broker].cost += cAmt;
       }
-      
-      if(eAmt > 0) { allocLabels.push(`${item.data.name} ${broker!=='미지정'?`(${broker})`:''}`); }
     }
   });
 
-  let accHtml = Object.keys(evalByBroker).map(b => {
-    let bData = evalByBroker[b];
-    let text = [];
-    if(bData.krw > 0) text.push(`₩${Math.round(bData.krw).toLocaleString()}`);
-    if(bData.usd > 0) text.push(`$${bData.usd.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`);
-    if(text.length === 0) text.push('₩0');
+  // 통합 자산 계산
+  const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
+  document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
+  document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
+
+  // ── KRW 렌더링 ──
+  const krwPnl = krwSummary.totalEval - krwSummary.totalCost;
+  const krwRoi = krwSummary.totalCost > 0 ? (krwPnl / krwSummary.totalCost * 100) : 0;
+  
+  document.getElementById('krwTotalCost').textContent = `₩${Math.round(krwSummary.totalCost).toLocaleString()}`;
+  document.getElementById('krwTotalEval').textContent = `₩${Math.round(krwSummary.totalEval).toLocaleString()}`;
+  const elKrwPnl = document.getElementById('krwTotalPnl');
+  elKrwPnl.textContent = `${krwPnl >= 0 ? '+' : ''}₩${Math.round(krwPnl).toLocaleString()} (${krwRoi.toFixed(2)}%)`;
+  elKrwPnl.className = 'cp-sum-val ' + (krwPnl >= 0 ? 'up' : (krwSummary.totalCost > 0 ? 'down' : ''));
+
+  let krwAccHtml = Object.keys(krwSummary.accounts).map(b => {
+    let d = krwSummary.accounts[b];
+    let pnl = d.eval - d.cost;
+    let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
+    let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
+    let sign = pnl >= 0 ? '+' : '';
     return `
-      <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:6px;">
-        <span style="color:var(--text2); font-weight:500;">${b}</span>
-        <span style="font-family:var(--font-mono); font-weight:700; color:var(--text);">${text.join(' <span style="color:var(--text3); font-weight:400">|</span> ')}</span>
+      <div class="acc-row">
+        <div class="acc-info">
+          <div class="acc-name">${b}</div>
+          <div class="acc-detail"><span>투자</span> ₩${Math.round(d.cost).toLocaleString()}</div>
+          <div class="acc-detail"><span>평가</span> ₩${Math.round(d.eval).toLocaleString()}</div>
+        </div>
+        <div class="acc-pnl ${cls}">${sign}₩${Math.round(Math.abs(pnl)).toLocaleString()}<br>(${sign}${roi.toFixed(2)}%)</div>
       </div>
     `;
   }).join('');
-  document.getElementById('accountList').innerHTML = accHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">보유 계좌가 없습니다.</div>';
+  document.getElementById('krwAccountList').innerHTML = krwAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-  const totalCostConverted = costKRW + (costUSD * currentUsdKrw);
-  const totalEvalConverted = evalKRW + (evalUSD * currentUsdKrw);
+  // ── USD 렌더링 ──
+  const usdPnl = usdSummary.totalEval - usdSummary.totalCost;
+  const usdRoi = usdSummary.totalCost > 0 ? (usdPnl / usdSummary.totalCost * 100) : 0;
 
-  document.getElementById('totalConverted').textContent = `₩ ${Math.round(totalEvalConverted).toLocaleString()}`;
-  document.getElementById('exchangeRateDisplay').textContent = `환율: $1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
+  document.getElementById('usdTotalCost').textContent = `$${usdSummary.totalCost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  document.getElementById('usdTotalEval').textContent = `$${usdSummary.totalEval.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  const elUsdPnl = document.getElementById('usdTotalPnl');
+  elUsdPnl.textContent = `${usdPnl >= 0 ? '+' : ''}$${usdPnl.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} (${usdRoi.toFixed(2)}%)`;
+  elUsdPnl.className = 'cp-sum-val ' + (usdPnl >= 0 ? 'up' : (usdSummary.totalCost > 0 ? 'down' : ''));
 
-  if(comparisonChartInst) comparisonChartInst.destroy();
-  const ctxComp = document.getElementById('comparisonCanvas').getContext('2d');
-  comparisonChartInst = new Chart(ctxComp, {
-    type: 'bar',
-    data: {
-      labels: ['투자 원금', '현재 평가액'],
-      datasets: [{
-        data: [totalCostConverted, totalEvalConverted],
-        backgroundColor: [
-          'rgba(136,144,164,0.4)', 
-          totalEvalConverted >= totalCostConverted ? 'rgba(0,200,122,0.5)' : 'rgba(255,77,106,0.5)' 
-        ],
-        borderColor: [
-          '#8890a4',
-          totalEvalConverted >= totalCostConverted ? '#00c87a' : '#ff4d6a'
-        ],
-        borderWidth: 1, borderRadius: 4
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } } },
-      scales: {
-        x: { ticks: { color: '#8890a4', font: { family: 'Noto Sans KR', size: 11 } }, grid: { display: false }, border: { display: false } },
-        y: { display: false, beginAtZero: true }
+  let usdAccHtml = Object.keys(usdSummary.accounts).map(b => {
+    let d = usdSummary.accounts[b];
+    let pnl = d.eval - d.cost;
+    let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
+    let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
+    let sign = pnl >= 0 ? '+' : '';
+    return `
+      <div class="acc-row">
+        <div class="acc-info">
+          <div class="acc-name">${b}</div>
+          <div class="acc-detail"><span>투자</span> $${d.cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+          <div class="acc-detail"><span>평가</span> $${d.eval.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+        </div>
+        <div class="acc-pnl ${cls}">${sign}$${Math.abs(pnl).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}<br>(${sign}${roi.toFixed(2)}%)</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
+
+  // ── KRW 차트 (계좌별 투자 vs 평가) ──
+  if(krwChartInst) krwChartInst.destroy();
+  if(Object.keys(krwSummary.accounts).length > 0) {
+    const krwLabels = Object.keys(krwSummary.accounts);
+    const krwCostData = krwLabels.map(b => krwSummary.accounts[b].cost);
+    const krwEvalData = krwLabels.map(b => krwSummary.accounts[b].eval);
+    const ctxKrw = document.getElementById('krwChartCanvas').getContext('2d');
+    krwChartInst = new Chart(ctxKrw, {
+      type: 'bar',
+      data: {
+        labels: krwLabels,
+        datasets: [
+          { label: '투자액', data: krwCostData, backgroundColor: 'rgba(136,144,164,0.4)', borderRadius: 2 },
+          { label: '평가액', data: krwEvalData, backgroundColor: krwEvalData.map((e,i) => e >= krwCostData[i] ? 'rgba(0,200,122,0.6)' : 'rgba(255,77,106,0.6)'), borderRadius: 2 }
+        ]
       },
-      animation: { duration: 0 }
-    }
-  });
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } } },
+        scales: {
+          x: { ticks: { color: '#8890a4', font: { size: 10 } }, grid: { display: false } },
+          y: { display: false }
+        },
+        animation: { duration: 0 }
+      }
+    });
+  }
 
-  const pnlKRW = evalKRW - costKRW;
-  const pnlUSD = evalUSD - costUSD;
-  const roiKRW = costKRW > 0 ? (pnlKRW/costKRW*100) : 0;
-  const roiUSD = costUSD > 0 ? (pnlUSD/costUSD*100) : 0;
-
-  const elValKrw = document.getElementById('totalValKrw'), elValUsd = document.getElementById('totalValUsd');
-  const elPnlKrw = document.getElementById('totalPnlKrw'), elPnlUsd = document.getElementById('totalPnlUsd');
-  const elRoiKrw = document.getElementById('totalRoiKrw'), elRoiUsd = document.getElementById('totalRoiUsd');
-
-  if (evalKRW > 0 || evalUSD > 0) {
-    elValKrw.textContent = `₩ ${Math.round(evalKRW).toLocaleString()}`;
-    elValUsd.textContent = `$ ${evalUSD.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    
-    elPnlKrw.textContent = (pnlKRW>=0?'+':'') + `₩ ${Math.round(pnlKRW).toLocaleString()}`;
-    elPnlKrw.className = 'sum-val-krw ' + (pnlKRW>=0?'up':'down');
-    elPnlUsd.textContent = (pnlUSD>=0?'+':'') + `$ ${pnlUSD.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    elPnlUsd.className = 'sum-val-usd ' + (pnlUSD>=0?'up':'down');
-
-    elRoiKrw.textContent = `국내: ${(roiKRW>=0?'+':'')}${roiKRW.toFixed(2)}%`;
-    elRoiKrw.className = 'sum-val-krw ' + (roiKRW>=0?'up':(costKRW>0?'down':''));
-    elRoiUsd.textContent = `미국: ${(roiUSD>=0?'+':'')}${roiUSD.toFixed(2)}%`;
-    elRoiUsd.className = 'sum-val-usd ' + (roiUSD>=0?'up':(costUSD>0?'down':''));
-
-    if(allocationChartInst) allocationChartInst.destroy();
-    const ctx = document.getElementById('allocationCanvas').getContext('2d');
-    allocationChartInst = new Chart(ctx, { type: 'doughnut', data: { labels: allocLabels, datasets: [{ data: allocData, backgroundColor: allocColors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#8890a4', font:{size:10}, boxWidth: 10 } } }, cutout: '70%' } });
-  } else {
-    elValKrw.textContent = '₩ 0'; elValUsd.textContent = '$ 0.00';
-    elPnlKrw.textContent = '₩ 0'; elPnlUsd.textContent = '$ 0.00'; elPnlKrw.className='sum-val-krw'; elPnlUsd.className='sum-val-usd';
-    elRoiKrw.textContent = '국내: 0%'; elRoiUsd.textContent = '미국: 0%'; elRoiKrw.className='sum-val-krw'; elRoiUsd.className='sum-val-usd';
-
-    if(allocationChartInst) allocationChartInst.destroy();
-    const ctx = document.getElementById('allocationCanvas').getContext('2d');
-    allocationChartInst = new Chart(ctx, { type: 'doughnut', data: { labels: ['자산 없음'], datasets: [{ data: [1], backgroundColor: ['#1c2030'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, cutout: '70%' } });
+  // ── USD 차트 (계좌별 투자 vs 평가) ──
+  if(usdChartInst) usdChartInst.destroy();
+  if(Object.keys(usdSummary.accounts).length > 0) {
+    const usdLabels = Object.keys(usdSummary.accounts);
+    const usdCostData = usdLabels.map(b => usdSummary.accounts[b].cost);
+    const usdEvalData = usdLabels.map(b => usdSummary.accounts[b].eval);
+    const ctxUsd = document.getElementById('usdChartCanvas').getContext('2d');
+    usdChartInst = new Chart(ctxUsd, {
+      type: 'bar',
+      data: {
+        labels: usdLabels,
+        datasets: [
+          { label: '투자액', data: usdCostData, backgroundColor: 'rgba(136,144,164,0.4)', borderRadius: 2 },
+          { label: '평가액', data: usdEvalData, backgroundColor: usdEvalData.map((e,i) => e >= usdCostData[i] ? 'rgba(0,200,122,0.6)' : 'rgba(255,77,106,0.6)'), borderRadius: 2 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ' $' + ctx.raw.toLocaleString(undefined, {minimumFractionDigits:2}) } } },
+        scales: {
+          x: { ticks: { color: '#8890a4', font: { size: 10 } }, grid: { display: false } },
+          y: { display: false }
+        },
+        animation: { duration: 0 }
+      }
+    });
   }
 }
 
