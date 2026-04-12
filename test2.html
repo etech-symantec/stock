@@ -1284,7 +1284,47 @@ function updateSummaryAndAllocation(rawHoldings) {
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        plugins: { 
+          legend: { display: false }, 
+          tooltip: { 
+            enabled: false,
+            external: function(context) {
+              let tooltipEl = document.getElementById('chartjs-tooltip');
+              if (!tooltipEl) {
+                tooltipEl = document.createElement('div');
+                tooltipEl.id = 'chartjs-tooltip';
+                document.body.appendChild(tooltipEl);
+              }
+              const tooltipModel = context.tooltip;
+              if (tooltipModel.opacity === 0) {
+                tooltipEl.style.opacity = 0;
+                return;
+              }
+              if (tooltipModel.body) {
+                const bodyLines = tooltipModel.body.map(b => b.lines);
+                let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
+                bodyLines.forEach(function(body, i) {
+                  const colors = tooltipModel.labelColors[i];
+                  const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
+                  let txt = body[0];
+                  let splitTxt = txt.split(': ');
+                  if(splitTxt.length === 2) {
+                    let val = parseFloat(splitTxt[1].replace(/,/g,''));
+                    let formatVal = '₩' + Math.round(val).toLocaleString();
+                    txt = `${splitTxt[0]}: ${formatVal}`;
+                  }
+                  innerHtml += `<div style="font-size:12px; display:flex; align-items:center; white-space:nowrap; padding:2px 0;">${span}${txt}</div>`;
+                });
+                innerHtml += '</div>';
+                tooltipEl.innerHTML = innerHtml;
+              }
+              const position = context.chart.canvas.getBoundingClientRect();
+              tooltipEl.style.opacity = 1;
+              tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+              tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+            }
+          } 
+        },
         cutout: '70%'
       }
     });
