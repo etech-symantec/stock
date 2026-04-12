@@ -46,7 +46,7 @@
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
   /* ── 사이드바 ── */
-  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.3s ease; overflow-y: auto; overflow-x: hidden; }
+  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; overflow-x: hidden; }
   .ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
   
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
@@ -100,8 +100,8 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 플로팅 버튼 ── */
-  #btnOpenSidebar { position: absolute; left: 0; top: 0; width: 24px; height: 51px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; }
+  /* ── 사이드바 펼치기용 플로팅 버튼 (텍스트 없이 얇게) ── */
+  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 51px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
   /* ── 3. 대시보드 메인 ── */
@@ -535,7 +535,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v29'; 
+const STORE_KEY = 'stockwatch_real_v30'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -568,7 +568,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v28'); 
+    let oldS = localStorage.getItem('stockwatch_real_v29'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -580,7 +580,7 @@ function loadState() {
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// UI 토글 처리 (사이드바, 대시보드)
+// UI 토글 처리
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -630,7 +630,7 @@ function formatPrice(val, symbol) {
   return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-// ── 2. 폼 UI 제어 (매수/매도/배당) ──
+// ── 2. 폼 UI 제어 ──
 function toggleTxType() {
   const type = document.querySelector('input[name="txType"]:checked').value;
   if(type === 'dividend') {
@@ -734,7 +734,6 @@ function addTransaction() {
     alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
 
-  // 매도 선택시 수량을 자동으로 음수로 전환
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
   
@@ -1138,7 +1137,6 @@ async function render() {
     renderDividendDashboard();
     return;
   } else {
-    // block 이 아니라 flex로 해야 .collapsed 애니메이션이 깨지지 않음
     dash.style.display = 'flex';
     container.style.display = 'block';
     listOptions.style.display = 'flex';
@@ -1164,10 +1162,9 @@ async function render() {
     }
   }
 
-  // 비어있는 상태일지라도 대시보드는 보이도록 처리
   if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
-    updateSummaryAndAllocation(currentHoldings);
+    updateSummaryAndAllocation(currentHoldings); // 종목이 없어도 대시보드 렌더링 호출
     return;
   }
 
@@ -1248,8 +1245,8 @@ async function render() {
   Object.values(chartInstances).forEach(c => c.destroy());
   
   if(displayItems.length === 0) {
-     container.innerHTML = `<div class="empty">선택한 탭에 등록된 종목이 없습니다.</div>`;
-     updateSummaryAndAllocation(currentHoldings);
+     container.innerHTML = `<div class="empty">선택한 탭에 표시할 종목이 없습니다.</div>`;
+     updateSummaryAndAllocation(currentHoldings); // 종목이 없어도 대시보드 렌더링 호출
      return;
   }
 
@@ -1454,7 +1451,7 @@ function updateSummaryAndAllocation(rawHoldings) {
 
     let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
     let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
-    let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
+    let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
 
     return `
       <div class="acc-row">
