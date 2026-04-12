@@ -45,7 +45,7 @@
   /* ── 2. 레이아웃 (사이드바 + 콘텐츠) ── */
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
-  /* ── 사이드바 ── */
+  /* ── 사이드바 (슬라이딩 방식 적용) ── */
   .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; overflow-x: hidden; }
   .ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
   
@@ -100,7 +100,7 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 플로팅 버튼 (텍스트 없이 얇게) ── */
+  /* ── 사이드바 펼치기용 플로팅 버튼 ── */
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 51px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
@@ -109,11 +109,8 @@
   .dashboard-main::-webkit-scrollbar { width: 8px; }
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   
-  /* 대시보드 탑 (접기/펴기 영역) */
-  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease; max-height: 3000px; opacity: 1; overflow: hidden; }
-  .dashboard-top-wrapper.collapsed { max-height: 0 !important; opacity: 0; margin-bottom: 0; }
-  
-  .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
+  /* 대시보드 탑 (3분할 레이아웃 유지) */
+  .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 1.5rem; align-items: stretch; flex-shrink: 0; }
   @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 900px) { .dashboard-top { grid-template-columns: 1fr; } }
 
@@ -154,9 +151,6 @@
   .list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
   .list-title-wrap { display: flex; align-items: center; gap: 12px; }
   .section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
-  
-  .btn-toggle-dash { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; }
-  .btn-toggle-dash:hover { color: var(--text); border-color: var(--border2); }
   
   .list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
@@ -322,81 +316,79 @@
 
   <main class="dashboard-main">
 
-    <div id="dashboardTopWrapper" class="dashboard-top-wrapper">
-      <div class="dashboard-top">
-        <div class="country-panel">
-          <div class="cp-header">
-            <div class="cp-title">🌐 통합 자산</div>
-            <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
+    <div id="dashboardTop" class="dashboard-top" style="display:none;">
+      
+      <div class="country-panel">
+        <div class="cp-header">
+          <div class="cp-title">🌐 통합 자산</div>
+          <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
+        </div>
+        <div class="cp-summary">
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">통합 투자액</div>
+            <div class="cp-sum-val" id="globalTotalCost">—</div>
           </div>
-          <div class="cp-summary">
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">통합 투자액</div>
-              <div class="cp-sum-val" id="globalTotalCost">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">통합 평가액</div>
-              <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue)">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">통합 수익금 (수익률)</div>
-              <div class="cp-sum-val" id="globalTotalRoi">—</div>
-            </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">통합 평가액</div>
+            <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue)">—</div>
           </div>
-          <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
-             <div class="section-title" style="margin: 0 0 10px 0; font-size:12px; color:var(--text3)">포트폴리오 비중</div>
-             <div style="flex:1; position:relative; min-height: 160px;"><canvas id="allocationCanvas"></canvas></div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">통합 수익금 (수익률)</div>
+            <div class="cp-sum-val" id="globalTotalRoi">—</div>
           </div>
         </div>
+        <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
+           <div class="section-title" style="margin: 0 0 10px 0; font-size:12px; color:var(--text3)">포트폴리오 비중</div>
+           <div style="flex:1; position:relative; min-height: 160px;"><canvas id="allocationCanvas"></canvas></div>
+        </div>
+      </div>
 
-        <div class="country-panel">
-          <div class="cp-header">
-            <div class="cp-title">🇰🇷 국내 주식</div>
-          </div>
-          <div class="cp-summary">
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">총 투자액</div>
-              <div class="cp-sum-val" id="krwTotalCost">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">총 평가액</div>
-              <div class="cp-sum-val" id="krwTotalEval">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">수익금 (수익률)</div>
-              <div class="cp-sum-val" id="krwTotalPnl">—</div>
-            </div>
-          </div>
-          <div class="cp-accounts" id="krwAccountList"></div>
+      <div class="country-panel">
+        <div class="cp-header">
+          <div class="cp-title">🇰🇷 국내 주식</div>
         </div>
+        <div class="cp-summary">
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">총 투자액</div>
+            <div class="cp-sum-val" id="krwTotalCost">—</div>
+          </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">총 평가액</div>
+            <div class="cp-sum-val" id="krwTotalEval">—</div>
+          </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">수익금 (수익률)</div>
+            <div class="cp-sum-val" id="krwTotalPnl">—</div>
+          </div>
+        </div>
+        <div class="cp-accounts" id="krwAccountList"></div>
+      </div>
 
-        <div class="country-panel">
-          <div class="cp-header">
-            <div class="cp-title">🇺🇸 미국 주식</div>
-          </div>
-          <div class="cp-summary">
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">총 투자액</div>
-              <div class="cp-sum-val" id="usdTotalCost">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">총 평가액</div>
-              <div class="cp-sum-val" id="usdTotalEval">—</div>
-            </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">수익금 (수익률)</div>
-              <div class="cp-sum-val" id="usdTotalPnl">—</div>
-            </div>
-          </div>
-          <div class="cp-accounts" id="usdAccountList"></div>
+      <div class="country-panel">
+        <div class="cp-header">
+          <div class="cp-title">🇺🇸 미국 주식</div>
         </div>
+        <div class="cp-summary">
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">총 투자액</div>
+            <div class="cp-sum-val" id="usdTotalCost">—</div>
+          </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">총 평가액</div>
+            <div class="cp-sum-val" id="usdTotalEval">—</div>
+          </div>
+          <div class="cp-sum-box">
+            <div class="cp-sum-label">수익금 (수익률)</div>
+            <div class="cp-sum-val" id="usdTotalPnl">—</div>
+          </div>
+        </div>
+        <div class="cp-accounts" id="usdAccountList"></div>
       </div>
     </div>
 
     <div class="list-options-bar" id="listOptionsBar" style="display:none;">
       <div class="list-title-wrap">
         <h2 class="section-title">종목 리스트</h2>
-        <button class="btn-toggle-dash" id="btnToggleDash" onclick="toggleDashboard()">요약 패널 숨기기 ▴</button>
       </div>
       <div class="list-controls">
         <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
@@ -535,7 +527,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v30'; 
+const STORE_KEY = 'stockwatch_real_v31'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -568,7 +560,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v29'); 
+    let oldS = localStorage.getItem('stockwatch_real_v30'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -580,7 +572,7 @@ function loadState() {
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// UI 토글 처리
+// UI 토글 처리 (사이드바)
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -590,18 +582,6 @@ function toggleSidebar() {
   } else {
     sb.classList.add('collapsed');
     btn.style.display = 'flex';
-  }
-}
-
-function toggleDashboard() {
-  const dash = document.getElementById('dashboardTopWrapper');
-  const btn = document.getElementById('btnToggleDash');
-  if (dash.classList.contains('collapsed')) {
-    dash.classList.remove('collapsed');
-    btn.innerHTML = '요약 패널 숨기기 ▴';
-  } else {
-    dash.classList.add('collapsed');
-    btn.innerHTML = '요약 패널 보기 ▾';
   }
 }
 
@@ -704,7 +684,9 @@ function calculateHoldings(ownerFilter = 'all') {
     let h = holdings[key];
     
     if (tx.qty > 0) {
-      let totalValue = (h.qty * h.avg) + (tx.qty * tx.price);
+      let totalValue = (h.qty * h.avg) + (tx.qty * price);
+      // BUGFIX: should be (tx.qty * tx.price)
+      totalValue = (h.qty * h.avg) + (tx.qty * tx.price);
       h.qty += tx.qty;
       h.avg = totalValue / h.qty;
     } else {
@@ -734,6 +716,7 @@ function addTransaction() {
     alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
 
+  // 매도 선택시 수량을 자동으로 음수로 전환
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
   
@@ -1125,7 +1108,7 @@ async function render() {
   });
 
   const container = document.getElementById('gridContainer');
-  const dash = document.getElementById('dashboardTopWrapper');
+  const dash = document.getElementById('dashboardTop');
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
 
@@ -1137,7 +1120,7 @@ async function render() {
     renderDividendDashboard();
     return;
   } else {
-    dash.style.display = 'flex';
+    dash.style.display = 'grid'; // .dashboard-top 은 grid
     container.style.display = 'block';
     listOptions.style.display = 'flex';
     divDash.style.display = 'none';
@@ -1245,8 +1228,8 @@ async function render() {
   Object.values(chartInstances).forEach(c => c.destroy());
   
   if(displayItems.length === 0) {
-     container.innerHTML = `<div class="empty">선택한 탭에 표시할 종목이 없습니다.</div>`;
-     updateSummaryAndAllocation(currentHoldings); // 종목이 없어도 대시보드 렌더링 호출
+     container.innerHTML = `<div class="empty">선택한 탭에 등록된 종목이 없습니다.</div>`;
+     updateSummaryAndAllocation(currentHoldings);
      return;
   }
 
