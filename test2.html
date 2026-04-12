@@ -101,7 +101,7 @@
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
   /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
-  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 51px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
+  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 48px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
   /* ── 3. 대시보드 메인 ── */
@@ -109,9 +109,8 @@
   .dashboard-main::-webkit-scrollbar { width: 8px; }
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   
-  /* 대시보드 탑 래퍼 (접기 가능) */
-  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease; max-height: 3000px; opacity: 1; overflow: hidden; }
-  .dashboard-top-wrapper.collapsed { max-height: 0 !important; opacity: 0; margin-bottom: 0; }
+  /* 대시보드 탑 래퍼 */
+  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; }
   
   .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
   @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
@@ -154,9 +153,6 @@
   .list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
   .list-title-wrap { display: flex; align-items: center; gap: 12px; }
   .section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
-  
-  .btn-toggle-dash { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; }
-  .btn-toggle-dash:hover { color: var(--text); border-color: var(--border2); }
   
   .list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
@@ -396,7 +392,6 @@
     <div class="list-options-bar" id="listOptionsBar">
       <div class="list-title-wrap">
         <h2 class="section-title">종목 리스트</h2>
-        <button class="btn-toggle-dash" id="btnToggleDash" onclick="toggleDashboard()">요약 패널 숨기기 ▴</button>
       </div>
       <div class="list-controls">
         <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
@@ -535,7 +530,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v33'; // 캐시 갱신
+const STORE_KEY = 'stockwatch_real_v34'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -568,7 +563,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v32'); 
+    let oldS = localStorage.getItem('stockwatch_real_v33'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -590,18 +585,6 @@ function toggleSidebar() {
   } else {
     sb.classList.add('collapsed');
     btn.style.display = 'flex';
-  }
-}
-
-function toggleDashboard() {
-  const dash = document.getElementById('dashboardTopWrapper');
-  const btn = document.getElementById('btnToggleDash');
-  if (dash.classList.contains('collapsed')) {
-    dash.classList.remove('collapsed');
-    btn.innerHTML = '요약 패널 숨기기 ▴';
-  } else {
-    dash.classList.add('collapsed');
-    btn.innerHTML = '요약 패널 보기 ▾';
   }
 }
 
@@ -825,6 +808,7 @@ function prepareTransaction(symbol, broker) {
   
   document.getElementById('txQty').focus();
   
+  // 사이드바 열기
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
   
@@ -1138,7 +1122,7 @@ async function render() {
     renderDividendDashboard();
     return;
   } else {
-    // block이 아니라 flex로 해야 .collapsed 애니메이션이 깨지지 않고 3분할 유지됨
+    // block이 아니라 flex로 렌더해야 .collapsed 레이아웃이 유지됩니다.
     dash.style.display = 'flex';
     container.style.display = 'block';
     listOptions.style.display = 'flex';
@@ -1164,7 +1148,7 @@ async function render() {
     }
   }
 
-  // ── 변경된 부분: 종목이 없어도 요약 대시보드는 렌더링되게 호출합니다 ──
+  // ── 변경: 종목이 없어도 대시보드는 렌더링되게 호출합니다 ──
   if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
     updateSummaryAndAllocation(currentHoldings);
