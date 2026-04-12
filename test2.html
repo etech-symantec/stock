@@ -553,6 +553,7 @@ let localStockDB = [];
 
 let currentUsdKrw = 1350; 
 let isExchangeRateFetched = false;
+let renderVersion = 0; // 비동기 render 경쟁 조건 방지용 버전 카운터
 
 document.getElementById('txDate').valueAsDate = new Date();
 
@@ -1120,7 +1121,12 @@ function renderDividendDashboard() {
 
 // ── 메인 렌더 함수 ──
 async function render() {
+  const myVersion = ++renderVersion; // 이 렌더 호출의 고유 버전 번호
+
   if (!isExchangeRateFetched) await fetchExchangeRate();
+
+  // ── await 후 최신 렌더인지 확인 (구버전 렌더는 여기서 중단) ──
+  if (myVersion !== renderVersion) return;
   
   document.querySelectorAll('.rtab').forEach(b => {
     if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
@@ -1139,7 +1145,14 @@ async function render() {
     renderDividendDashboard();
     return;
   } else {
-    dash.style.display = 'flex';
+    // 인라인 스타일 제거 → CSS 클래스의 display:flex 가 정상 적용되도록
+    dash.style.display = '';
+    // collapsed 상태 초기화: 요약 패널 항상 보이도록 보장
+    if (dash.classList.contains('collapsed')) {
+      dash.classList.remove('collapsed');
+      const btn = document.getElementById('btnToggleDash');
+      if (btn) btn.innerHTML = '요약 패널 숨기기 ▴';
+    }
     container.style.display = 'block';
     listOptions.style.display = 'flex';
     divDash.style.display = 'none';
@@ -1190,6 +1203,9 @@ async function render() {
   });
 
   await Promise.all(promises);
+
+  // ── await 후 다시 한번 최신 렌더인지 확인 ──
+  if (myVersion !== renderVersion) return;
 
   let displayItems = [];
   for(let sym in symbolHoldings) {
