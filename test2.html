@@ -43,7 +43,7 @@
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; }
   
   /* ── 사이드바 ── */
-  .ledger-sidebar { width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; }
+  .ledger-sidebar { width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; overflow-y: auto; }
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); }
   
   .tx-form { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
@@ -53,8 +53,28 @@
   .btn-submit { width: 100%; padding: 12px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 5px; transition: 0.2s; }
   .btn-submit:hover { background: #6855e0; }
 
-  .btn-edit-owners { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; text-decoration: underline; margin-left: 6px; transition: color 0.2s; }
+  .btn-edit-owners { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; text-decoration: underline; transition: color 0.2s; padding: 0; }
   .btn-edit-owners:hover { color: var(--accent); }
+
+  /* ── 아이콘 버튼 스타일 (Segmented Controls) ── */
+  .hidden-radio { display: none; }
+  .toggle-group { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+  .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .toggle-btn:hover { color: var(--text2); background: rgba(255,255,255,0.05); }
+  
+  .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4; transition: 0.2s; }
+  
+  input[name="txOwner"]:checked + .toggle-btn { background: var(--bg3); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border-color: var(--border2); }
+  input[name="txOwner"]:checked + .toggle-btn .dot { opacity: 1; box-shadow: 0 0 6px currentColor; color: var(--accent); }
+
+  input#typeBuy:checked + .type-buy { background: var(--red-bg); color: var(--red); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,77,106,0.3); }
+  input#typeBuy:checked + .type-buy .dot { opacity: 1; box-shadow: 0 0 6px currentColor; }
+  
+  input#typeSell:checked + .type-sell { background: rgba(77, 159, 255, 0.15); color: var(--blue); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(77,159,255,0.3); }
+  input#typeSell:checked + .type-sell .dot { opacity: 1; box-shadow: 0 0 6px currentColor; }
+  
+  input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
+  input#typeDiv:checked + .type-div .dot { opacity: 1; box-shadow: 0 0 6px currentColor; }
 
   .tx-search-container { position: relative; }
   .tx-dropdown { position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; list-style: none; z-index: 100; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: none; }
@@ -220,32 +240,31 @@
     <div class="sidebar-header">✏️ 거래 장부 (Ledger)</div>
     
     <div class="tx-form">
-      <div style="display:flex; gap:10px; margin-bottom:5px;">
-        <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:10px; color:var(--text2); font-weight:700;">소유자</span>
-            <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름 변경">이름 변경</button>
-          </div>
-          <div style="display:flex; gap:10px;">
-            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txOwner" value="user1" checked style="accent-color:var(--accent)"> <span id="radioUser1">보유자1</span></label>
-            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txOwner" value="user2" style="accent-color:var(--accent)"> <span id="radioUser2">보유자2</span></label>
-          </div>
+      <div class="form-group" style="margin-bottom: 2px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label style="margin:0;">소유자</label>
+          <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름 변경">이름 변경</button>
         </div>
-        <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--text2); font-weight:700;">유형</span>
-          </div>
-          <div style="display:flex; justify-content:space-around; align-items:center; width:100%; margin-top:4px;">
-            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
-              <input type="radio" name="txType" value="buy" checked onchange="toggleTxType()" style="margin:0; accent-color:var(--red);"> 매수
-            </label>
-            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
-              <input type="radio" name="txType" value="sell" onchange="toggleTxType()" style="margin:0; accent-color:var(--blue);"> 매도
-            </label>
-            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
-              <input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="margin:0; accent-color:var(--green);"> 배당
-            </label>
-          </div>
+        <div class="toggle-group">
+          <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
+          <label for="owner1" class="toggle-btn" id="lblUser1"><i class="dot"></i>보유자1</label>
+          
+          <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
+          <label for="owner2" class="toggle-btn" id="lblUser2"><i class="dot"></i>보유자2</label>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 8px;">
+        <label style="margin-bottom:6px;">거래 유형</label>
+        <div class="toggle-group">
+          <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
+          <label for="typeBuy" class="toggle-btn type-buy"><i class="dot"></i>매수</label>
+          
+          <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
+          <label for="typeSell" class="toggle-btn type-sell"><i class="dot"></i>매도</label>
+          
+          <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
+          <label for="typeDiv" class="toggle-btn type-div"><i class="dot"></i>배당</label>
         </div>
       </div>
 
@@ -309,7 +328,7 @@
             <div class="cp-sum-val" id="globalTotalRoi">—</div>
           </div>
         </div>
-        <div class="cp-accounts" style="flex:1;">
+        <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
            <div class="sum-label" style="margin: 10px 0;">포트폴리오 비중</div>
            <div style="flex:1; position:relative; min-height: 180px;"><canvas id="allocationCanvas"></canvas></div>
         </div>
@@ -513,11 +532,6 @@ function loadState() {
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
-      parsed.transactions.forEach(t => { 
-        if(!t.txType) t.txType = 'trade'; 
-        if(!t.owner) t.owner = parsed.ownerNames.user1;
-        // 기존 trade를 buy/sell/trade 그대로 유지 (하위 호환성)
-      });
       return parsed;
     }
   } catch(e){}
@@ -529,8 +543,8 @@ function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 function updateOwnerLabels() {
   document.getElementById('tabUser1').textContent = state.ownerNames.user1;
   document.getElementById('tabUser2').textContent = state.ownerNames.user2;
-  document.getElementById('radioUser1').textContent = state.ownerNames.user1;
-  document.getElementById('radioUser2').textContent = state.ownerNames.user2;
+  document.getElementById('lblUser1').innerHTML = `<i class="dot"></i>${state.ownerNames.user1}`;
+  document.getElementById('lblUser2').innerHTML = `<i class="dot"></i>${state.ownerNames.user2}`;
   document.getElementById('divTabUser1').textContent = state.ownerNames.user1;
   document.getElementById('divTabUser2').textContent = state.ownerNames.user2;
 }
