@@ -448,10 +448,10 @@
       "qty": 6,
       "price": 86.999,
       "txType": "trade",
-      "owner": "끄니"
+      "owner": "미니"
     }
   ],
-  "range": "3y",
+  "range": "1m",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
