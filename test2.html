@@ -19,13 +19,11 @@
   .logo { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
 
-  /* 헤더 중앙 검색창 */
   .header-search { display: flex; align-items: center; position: relative; flex: 1; max-width: 320px; min-width: 200px; margin: 0 10px; }
   .header-search .search-input { width: 100%; padding: 8px 36px 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-family: var(--font-sans); outline: none; transition: 0.2s; }
   .header-search .search-input:focus { background: var(--bg2); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,106,247,0.2); }
   .header-search .btn-add-icon { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: var(--accent); border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; line-height: 1; transition: 0.2s; box-shadow: 0 2px 6px rgba(124,106,247,0.4); }
   .header-search .btn-add-icon:hover { background: #6855e0; transform: translateY(-50%) scale(1.05); }
-  
   .header-search .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; list-style: none; z-index: 99999; max-height: 280px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; }
   
   .view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); }
@@ -48,8 +46,9 @@
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
   /* ── 사이드바 ── */
-  .ledger-sidebar { width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s ease; overflow-y: auto; overflow-x: hidden; }
-  .ledger-sidebar.collapsed { margin-left: -330px; }
+  /* 찌그러짐 방지를 위해 min-width 추가 및 margin-left로 숨김 처리 */
+  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s ease; overflow-y: auto; overflow-x: hidden; }
+  .ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
   
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
   .btn-icon-sm { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; line-height: 1; padding: 0; transition: color 0.2s; }
@@ -102,8 +101,8 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 플로팅 버튼 ── */
-  #btnOpenSidebar { position: absolute; left: 0; top: 15px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 8px 8px 0; padding: 10px 12px; cursor: pointer; z-index: 45; color: var(--text); display: none; box-shadow: 2px 0 8px rgba(0,0,0,0.3); font-family: var(--font-sans); font-size: 12px; font-weight: 700; transition: 0.2s; }
+  /* ── 사이드바 펼치기용 플로팅 버튼 (텍스트 제거, 화살표만) ── */
+  #btnOpenSidebar { position: absolute; left: 0; top: 20px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 8px 8px 0; padding: 12px 10px; cursor: pointer; z-index: 45; color: var(--text); display: none; box-shadow: 2px 0 8px rgba(0,0,0,0.3); font-size: 12px; transition: 0.2s; }
   #btnOpenSidebar:hover { background: var(--bg3); color: var(--accent); }
 
   /* ── 3. 대시보드 메인 ── */
@@ -129,7 +128,6 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
-  /* 국가별 계좌 리스트 테이블 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
   
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: border-color 0.2s; }
@@ -175,16 +173,15 @@
   .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   .card.up::before { background: var(--green); } .card.down::before { background: var(--red); }
   .card:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   
-  /* 카드 내 뱃지 디자인 개편 */
+  /* 카드 내 보유/관심 뱃지 */
   .card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); }
   .tag-held { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(124,106,247,0.3); }
   .tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
   .card-tag .divider { margin: 0 6px; opacity: 0.5; font-weight: normal; }
   .card-tag .broker-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.95; max-width: 180px; }
   .card-tag .icon { margin-right: 4px; font-size: 12px; }
-
-  .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   
   .card-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.04em; }
   .badge-up { background: var(--green-bg); color: var(--green); } .badge-down { background: var(--red-bg); color: var(--red); } .badge-flat { background: var(--bg3); color: var(--text2); }
@@ -256,7 +253,7 @@
 </nav>
 
 <div class="layout-wrapper">
-  <button id="btnOpenSidebar" onclick="toggleSidebar()">▶ 장부 열기</button>
+  <button id="btnOpenSidebar" onclick="toggleSidebar()" title="장부 열기">▶</button>
 
   <aside class="ledger-sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -325,7 +322,7 @@
 
   <main class="dashboard-main">
 
-    <div id="dashboardTopWrapper" class="dashboard-top-wrapper" style="display:none">
+    <div id="dashboardTopWrapper" class="dashboard-top-wrapper">
       <div class="dashboard-top">
         <div class="country-panel">
           <div class="cp-header">
@@ -538,7 +535,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v26'; 
+const STORE_KEY = 'stockwatch_real_v27'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -571,7 +568,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v25'); 
+    let oldS = localStorage.getItem('stockwatch_real_v26'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -980,7 +977,6 @@ function setDivFilter(filter, el) {
   renderDividendDashboard();
 }
 
-// ── 카드 생성 함수 ──
 function generateCardHtml(item) {
   const data = item.data;
   const isHeld = item.type === 'held';
@@ -993,21 +989,16 @@ function generateCardHtml(item) {
   const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
   const uniqueId = `c_${item.symbol}_${Math.random().toString(36).substring(7)}`;
 
-  const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '';
-  const tagContent = isHeld ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` : `<span class="icon">⭐</span> 관심종목`;
+  const brokerDisp = isHeld && item.broker !== '미지정' ? `<span style="color:var(--text2); margin-left:6px; display:inline-block; max-width:120px; overflow:hidden; text-overflow:ellipsis; vertical-align:bottom;">[${item.broker}]</span>` : '';
 
   return `
     <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
-      
-      <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}">
-        ${tagContent}
-      </div>
-
+      <span class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}">${isHeld ? '보유' : '관심'}</span>
       <div class="card-head" style="align-items:center;">
         <div style="flex:1; min-width:0; margin-right:10px;">
           <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
           <div style="font-size:11px; font-family:var(--font-mono); color:var(--text3); margin-top:2px; white-space:nowrap;">
-            ${item.symbol}
+            ${item.symbol} ${brokerDisp}
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
@@ -1143,7 +1134,8 @@ async function render() {
     renderDividendDashboard();
     return;
   } else {
-    dash.style.display = 'block';
+    // block 이 아니라 flex로 렌더해야 레이아웃이 유지됨 (collapsed 처리용)
+    dash.style.display = 'flex';
     container.style.display = 'block';
     listOptions.style.display = 'flex';
     divDash.style.display = 'none';
@@ -1365,7 +1357,6 @@ function updateSummaryAndAllocation(rawHoldings) {
   
   document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-  // 글로벌 통합 차트
   const ctxGlobal = document.getElementById('allocationCanvas');
   if(ctxGlobal) {
     if (allocData.length > 0) {
@@ -1459,7 +1450,7 @@ function updateSummaryAndAllocation(rawHoldings) {
 
     let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
     let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
-    let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+    let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
 
     return `
       <div class="acc-row">
@@ -1544,7 +1535,6 @@ function updateSummaryAndAllocation(rawHoldings) {
   }).join('');
   document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-  // ── 미니 파이 차트 그리기 (HTML 커스텀 툴팁) ──
   const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
   [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
     const ctx = document.getElementById(cfg.id);
