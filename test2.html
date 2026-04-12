@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STOCK WATCH — 멀티 유저 & 클라우드 장부</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23141720'/><circle cx='28' cy='30' r='14' fill='%237c6af7'/><path d='M25,75 L45,45 L60,65 L85,25' fill='none' stroke='%2300c87a' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,32 +14,40 @@
   
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
   
-  /* ── 1. 네비게이션 ── */
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 50px; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; }
-  .logo { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  /* ── 1. 네비게이션 (헤더) ── */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 1.5rem; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; flex-wrap: wrap; gap: 10px; }
+  .logo { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
 
+  /* 헤더 중앙 검색창 */
+  .header-search { display: flex; align-items: center; position: relative; flex: 1; max-width: 320px; min-width: 200px; margin: 0 10px; }
+  .header-search .search-input { width: 100%; padding: 8px 36px 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-family: var(--font-sans); outline: none; transition: 0.2s; }
+  .header-search .search-input:focus { background: var(--bg2); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,106,247,0.2); }
+  .header-search .btn-add-icon { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: var(--accent); border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; line-height: 1; transition: 0.2s; box-shadow: 0 2px 6px rgba(124,106,247,0.4); }
+  .header-search .btn-add-icon:hover { background: #6855e0; transform: translateY(-50%) scale(1.05); }
+  
+  .header-search .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; list-style: none; z-index: 99999; max-height: 280px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; }
+  
   .view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); }
-  .vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; }
+  .vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; white-space: nowrap; }
   .vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-  .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); font-family: var(--font-sans); transition: 0.15s; }
+  .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); font-family: var(--font-sans); transition: 0.15s; white-space: nowrap; }
   .btn-sm:hover { background: var(--bg3); color: var(--text); }
   .btn-github { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); display: flex; align-items: center; gap: 6px; }
   .btn-github:hover { background: #fff; color: #000; }
   
-  .sync-status { font-size: 10px; font-family: var(--font-mono); color: var(--text3); display: flex; align-items: center; gap: 4px; padding: 0 8px; }
+  .sync-status { font-size: 10px; font-family: var(--font-mono); color: var(--text3); display: flex; align-items: center; gap: 4px; padding: 0 8px; white-space: nowrap; }
   .sync-status.active { color: var(--green); }
   .sync-status.error { color: var(--red); }
   .sync-spinner { width: 8px; height: 8px; border: 2px solid var(--text3); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  
+
   /* ── 2. 레이아웃 (사이드바 + 콘텐츠) ── */
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
   /* ── 사이드바 ── */
-  /* margin-left로 자연스럽게 밀어내는 방식으로 수정 */
   .ledger-sidebar { width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s ease; overflow-y: auto; overflow-x: hidden; }
   .ledger-sidebar.collapsed { margin-left: -330px; }
   
@@ -102,13 +111,6 @@
   .dashboard-main::-webkit-scrollbar { width: 8px; }
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   
-  .add-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; align-items: center; flex-wrap: wrap; }
-  .search-container { position: relative; flex: 1; min-width: 220px; max-width: 400px; }
-  .search-input { width: 100%; padding: 10px 16px; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); font-family: var(--font-sans); font-size: 13px; outline: none; transition: border-color 0.15s; }
-  .search-input:focus { border-color: var(--accent); }
-  .btn-primary { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; white-space: nowrap; }
-  .btn-primary:hover { background: var(--accent); color: #fff; }
-
   /* 대시보드 탑 (접기/펴기 영역) */
   .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease; max-height: 3000px; opacity: 1; overflow: hidden; }
   .dashboard-top-wrapper.collapsed { max-height: 0 !important; opacity: 0; margin-bottom: 0; }
@@ -127,7 +129,7 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
-  /* 국가별 계좌 리스트 테이블 (스크롤 제거, 높이 자동 팽창) */
+  /* 국가별 계좌 리스트 테이블 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
   
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: border-color 0.2s; }
@@ -173,6 +175,15 @@
   .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   .card.up::before { background: var(--green); } .card.down::before { background: var(--red); }
   .card:hover { border-color: var(--border2); transform: translateY(-1px); }
+  
+  /* 카드 내 뱃지 디자인 개편 */
+  .card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); }
+  .tag-held { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(124,106,247,0.3); }
+  .tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+  .card-tag .divider { margin: 0 6px; opacity: 0.5; font-weight: normal; }
+  .card-tag .broker-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.95; max-width: 180px; }
+  .card-tag .icon { margin-right: 4px; font-size: 12px; }
+
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   
   .card-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.04em; }
@@ -218,6 +229,13 @@
 
 <nav>
   <div class="logo"><div class="logo-dot"></div>STOCK&nbsp;WATCH</div>
+  
+  <div class="header-search">
+    <input type="text" id="tickerInput" class="search-input" placeholder="종목명 또는 코드 검색 (예: TSLA)" autocomplete="off" />
+    <button class="btn-add-icon" onclick="addManualTicker()" title="종목 추가">＋</button>
+    <ul id="searchDropdown" class="search-dropdown"></ul>
+  </div>
+
   <div class="view-tabs">
     <button class="vtab active" onclick="setView('all', this)">전체보기</button>
     <button class="vtab" id="tabUser1" onclick="setView('user1', this)">보유자1</button>
@@ -225,6 +243,7 @@
     <button class="vtab" onclick="setView('watch', this)">관심종목</button>
     <button class="vtab" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
   </div>
+  
   <div class="nav-right">
     <div class="sync-status" id="syncStatus">
       <div class="sync-spinner" id="syncSpinner"></div>
@@ -305,13 +324,6 @@
   </aside>
 
   <main class="dashboard-main">
-    <div class="add-bar" id="mainAddBar">
-      <div class="search-container">
-        <input type="text" id="tickerInput" class="search-input" placeholder="종목명 또는 코드 검색 (예: 애플, 삼성전자, TSLA)" autocomplete="off" />
-        <ul id="searchDropdown" class="search-dropdown"></ul>
-      </div>
-      <button class="btn-primary" id="addBtn" onclick="addManualTicker()">+ 관심종목 추가</button>
-    </div>
 
     <div id="dashboardTopWrapper" class="dashboard-top-wrapper" style="display:none">
       <div class="dashboard-top">
@@ -526,7 +538,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v25'; 
+const STORE_KEY = 'stockwatch_real_v26'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -559,7 +571,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v24'); 
+    let oldS = localStorage.getItem('stockwatch_real_v25'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -928,9 +940,10 @@ async function addTickerToPortfolio(symbol) {
   let finalSym = /^\d{6}$/.test(symbol) ? symbol + '.KS' : symbol;
   if (state.tickers.includes(finalSym)) { alert("이미 등록된 종목입니다."); return; }
   
-  document.getElementById('addBtn').textContent = "가져오는 중...";
+  const addIcon = document.querySelector('.btn-add-icon');
+  addIcon.textContent = "⏳";
   const data = await fetchYahooData(finalSym);
-  document.getElementById('addBtn').textContent = "+ 관심종목 추가";
+  addIcon.textContent = "＋";
 
   if (data) {
     state.tickers.push(data.symbol); cachedMarketData = {}; saveState();
@@ -967,6 +980,7 @@ function setDivFilter(filter, el) {
   renderDividendDashboard();
 }
 
+// ── 카드 생성 함수 ──
 function generateCardHtml(item) {
   const data = item.data;
   const isHeld = item.type === 'held';
@@ -979,21 +993,26 @@ function generateCardHtml(item) {
   const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
   const uniqueId = `c_${item.symbol}_${Math.random().toString(36).substring(7)}`;
 
-  const brokerDisp = isHeld && item.broker !== '미지정' ? `<span style="color:var(--text2); margin-left:6px; display:inline-block; max-width:120px; overflow:hidden; text-overflow:ellipsis; vertical-align:bottom;">[${item.broker}]</span>` : '';
+  const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '';
+  const tagContent = isHeld ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` : `<span class="icon">⭐</span> 관심종목`;
 
   return `
     <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
-      <span class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}">${isHeld ? '보유' : '관심'}</span>
+      
+      <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}">
+        ${tagContent}
+      </div>
+
       <div class="card-head" style="align-items:center;">
         <div style="flex:1; min-width:0; margin-right:10px;">
           <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
           <div style="font-size:11px; font-family:var(--font-mono); color:var(--text3); margin-top:2px; white-space:nowrap;">
-            ${item.symbol} ${brokerDisp}
+            ${item.symbol}
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <span class="card-badge badge-${cls}">${sign}${chgPct}%</span>
-          <button class="btn-danger" onclick="event.stopPropagation();prepareTransaction('${item.symbol}','${isHeld ? item.broker : ''}')" title="좌측 장부로 이동">잔고</button>
+          <button class="btn-danger" onclick="event.stopPropagation();prepareTransaction('${item.symbol}','${isHeld ? item.broker.split(',')[0].trim() : ''}')" title="좌측 장부로 이동">잔고</button>
           ${!isHeld ? `<button class="btn-danger" onclick="event.stopPropagation();removeTicker('${item.symbol}')" title="목록 삭제">✕</button>` : ''}
         </div>
       </div>
@@ -1114,13 +1133,11 @@ async function render() {
   const container = document.getElementById('gridContainer');
   const dash = document.getElementById('dashboardTopWrapper');
   const divDash = document.getElementById('dividendDashboard');
-  const mainAddBar = document.getElementById('mainAddBar');
   const listOptions = document.getElementById('listOptionsBar');
 
   if (currentView === 'dividend') {
     dash.style.display = 'none';
     container.style.display = 'none';
-    mainAddBar.style.display = 'none';
     listOptions.style.display = 'none';
     divDash.style.display = 'flex';
     renderDividendDashboard();
@@ -1128,7 +1145,6 @@ async function render() {
   } else {
     dash.style.display = 'block';
     container.style.display = 'block';
-    mainAddBar.style.display = 'flex';
     listOptions.style.display = 'flex';
     divDash.style.display = 'none';
   }
@@ -1236,7 +1252,7 @@ async function render() {
   Object.values(chartInstances).forEach(c => c.destroy());
   
   if(displayItems.length === 0) {
-     container.innerHTML = `<div class="empty">선택한 보유자의 등록된 종목이 없습니다.</div>`;
+     container.innerHTML = `<div class="empty">선택한 탭에 등록된 종목이 없습니다.</div>`;
      updateSummaryAndAllocation(currentHoldings);
      return;
   }
@@ -1349,6 +1365,7 @@ function updateSummaryAndAllocation(rawHoldings) {
   
   document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
+  // 글로벌 통합 차트
   const ctxGlobal = document.getElementById('allocationCanvas');
   if(ctxGlobal) {
     if (allocData.length > 0) {
@@ -1442,7 +1459,7 @@ function updateSummaryAndAllocation(rawHoldings) {
 
     let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
     let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
-    let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
+    let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
 
     return `
       <div class="acc-row">
@@ -1527,7 +1544,7 @@ function updateSummaryAndAllocation(rawHoldings) {
   }).join('');
   document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-  // ── 미니 파이 차트 그리기 ──
+  // ── 미니 파이 차트 그리기 (HTML 커스텀 툴팁) ──
   const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
   [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
     const ctx = document.getElementById(cfg.id);
