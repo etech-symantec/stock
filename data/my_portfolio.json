@@ -37,7 +37,8 @@
     "UNH",
     "368590.KS",
     "379780.KS",
-    "SMR"
+    "SMR",
+    "000660.KS"
   ],
   "transactions": [
     {
@@ -451,7 +452,7 @@
       "owner": "끄니"
     }
   ],
-  "range": "1m",
+  "range": "1w",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
