@@ -46,8 +46,7 @@
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
   /* ── 사이드바 ── */
-  /* min-width 적용 및 margin-left로 슬라이드 처리하여 내용이 찌그러지지 않도록 함 */
-  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; overflow-x: hidden; }
+  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; overflow-x: hidden; }
   .ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
   
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
@@ -102,7 +101,7 @@
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
   /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
-  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 48px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
+  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 51px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
   /* ── 3. 대시보드 메인 ── */
@@ -394,7 +393,7 @@
       </div>
     </div>
 
-    <div class="list-options-bar" id="listOptionsBar" style="display:none;">
+    <div class="list-options-bar" id="listOptionsBar">
       <div class="list-title-wrap">
         <h2 class="section-title">종목 리스트</h2>
         <button class="btn-toggle-dash" id="btnToggleDash" onclick="toggleDashboard()">요약 패널 숨기기 ▴</button>
@@ -536,7 +535,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v32'; 
+const STORE_KEY = 'stockwatch_real_v33'; // 캐시 갱신
 let state = loadState();
 
 let currentView = 'all'; 
@@ -569,7 +568,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v31'); 
+    let oldS = localStorage.getItem('stockwatch_real_v32'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -1139,6 +1138,7 @@ async function render() {
     renderDividendDashboard();
     return;
   } else {
+    // block이 아니라 flex로 해야 .collapsed 애니메이션이 깨지지 않고 3분할 유지됨
     dash.style.display = 'flex';
     container.style.display = 'block';
     listOptions.style.display = 'flex';
@@ -1164,6 +1164,7 @@ async function render() {
     }
   }
 
+  // ── 변경된 부분: 종목이 없어도 요약 대시보드는 렌더링되게 호출합니다 ──
   if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
     updateSummaryAndAllocation(currentHoldings);
