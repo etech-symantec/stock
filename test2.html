@@ -232,11 +232,19 @@
           </div>
         </div>
         <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-          <span style="font-size:10px; color:var(--text2); font-weight:700;">유형</span>
-          <div style="display:flex; gap:6px;">
-            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="buy" checked onchange="toggleTxType()" style="accent-color:var(--red)"> 매수</label>
-            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="sell" onchange="toggleTxType()" style="accent-color:var(--blue)"> 매도</label>
-            <label style="font-size:11px; cursor:pointer; color:var(--text); font-weight:500;"><input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="accent-color:var(--green)"> 배당</label>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:11px; color:var(--text2); font-weight:700;">유형</span>
+          </div>
+          <div style="display:flex; justify-content:space-around; align-items:center; width:100%; margin-top:4px;">
+            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
+              <input type="radio" name="txType" value="buy" checked onchange="toggleTxType()" style="margin:0; accent-color:var(--red);"> 매수
+            </label>
+            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
+              <input type="radio" name="txType" value="sell" onchange="toggleTxType()" style="margin:0; accent-color:var(--blue);"> 매도
+            </label>
+            <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text); font-size:12px; font-weight:700; white-space:nowrap;">
+              <input type="radio" name="txType" value="dividend" onchange="toggleTxType()" style="margin:0; accent-color:var(--green);"> 배당
+            </label>
           </div>
         </div>
       </div>
