@@ -82,6 +82,7 @@
   input#typeSell:checked + .type-sell { background: rgba(77, 159, 255, 0.15); color: var(--blue); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(77,159,255,0.3); }
   input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
 
+  /* 브로커 퀵 태그 */
   .broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
   .broker-tag:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.05); }
 
@@ -134,11 +135,13 @@
 
   /* 국가별 계좌 리스트 테이블 및 필터 표시 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
+  
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
   .acc-row:hover { border-color: var(--border2); }
   .acc-row.active-filter { border-color: var(--accent); background: rgba(124,106,247,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
   
   .acc-pie-wrap { width: 85px; height: 85px; position: relative; flex-shrink: 0; }
+  
   .acc-content { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .acc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px; }
   .acc-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -453,9 +456,9 @@
       <div class="list-controls">
         <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
           <option value="default">정렬 기준 (기본)</option>
-          <option value="roiDesc">수익률 순</option>
-          <option value="evalDesc">평가금액 순</option>
-          <option value="changeDesc">등락률 순</option>
+          <option value="roiDesc">내 수익률 높은 순</option>
+          <option value="evalDesc">평가금액 큰 순</option>
+          <option value="changeDesc">등락률 (선택 기간) 높은 순</option>
         </select>
         <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 반전">⬇️</button>
         
@@ -613,13 +616,13 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v51'; 
+const STORE_KEY = 'stockwatch_real_v52'; 
 let state = loadState();
 
 let currentView = 'all'; 
 let currentDivFilter = 'all'; 
 let currentSortMode = 'default';
-let sortDirection = -1; // 🆕 -1: 내림차순(디폴트), 1: 오름차순
+let sortDirection = -1; // -1: 내림차순(디폴트), 1: 오름차순
 let activeAccountFilter = null; 
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
@@ -648,7 +651,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v50'); 
+    let oldS = localStorage.getItem('stockwatch_real_v51'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -659,6 +662,46 @@ function loadState() {
 }
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+// ── 로컬 백업(내보내기) 기능 ──
+function exportData() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "stock_manager_backup.json");
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  document.body.removeChild(dlAnchorElem);
+}
+
+// ── 로컬 복원(가져오기) 기능 ──
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(data.tickers && data.transactions) {
+        state = data;
+        saveState();
+        cachedMarketData = {};
+        updateOwnerLabels();
+        renderTxList();
+        if (currentView === 'history') renderHistoryDashboard();
+        else render();
+        triggerAutoSync();
+        alert('데이터를 성공적으로 복원했습니다.');
+      } else {
+        alert('올바른 백업 파일 형식이 아닙니다.');
+      }
+    } catch(err) {
+      alert('파일을 읽는 중 오류가 발생했습니다.');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
 
 // UI 토글 처리 (사이드바)
 function toggleSidebar() {
@@ -673,7 +716,7 @@ function toggleSidebar() {
   }
 }
 
-// 🆕 사이드바 내부 탭(장부 vs 수익률) 토글 로직
+// 사이드바 내부 탭(장부 vs 수익률) 토글 로직
 function setSidebarView(view) {
   const vLedger = document.getElementById('sidebarLedgerView');
   const vYield = document.getElementById('sidebarYieldView');
@@ -690,6 +733,7 @@ function setSidebarView(view) {
     vYield.style.display = 'flex';
     tLedger.classList.remove('active');
     tYield.classList.add('active');
+    render(); // 수익률 탭을 열 때 목록을 렌더링하기 위해 호출
   }
 }
 
@@ -725,7 +769,7 @@ function formatPrice(val, symbol) {
   return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-// ── 🆕 CSV 템플릿 다운로드 ──
+// ── CSV 템플릿 다운로드 ──
 function downloadCsvSample() {
   const csvContent = "일자,소유자,계좌,유형,종목,수량,단가\n2026-04-10,보유자1,키움증권,매수,005930,10,80000\n2026-04-12,보유자2,토스증권,배당,AAPL,0,15.5\n2026-04-14,보유자1,미래에셋,매도,TSLA,-5,170.2";
   const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1250,7 +1294,6 @@ function setRange(rangeStr, el) {
 
 function setSortMode(mode) { currentSortMode = mode; render(); }
 
-// 🆕 정렬 방향 반전 함수
 function toggleSortDirection() {
   sortDirection = sortDirection === -1 ? 1 : -1;
   document.getElementById('btnSortDir').textContent = sortDirection === -1 ? '⬇️' : '⬆️';
@@ -1289,7 +1332,6 @@ function generateCardHtml(item) {
   const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '';
   const tagContent = isHeld ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` : `<span class="icon">⭐</span> 관심종목`;
 
-  // 🆕 국가별 뱃지
   const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
 
   return `
@@ -1600,7 +1642,6 @@ async function render() {
     displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
   }
 
-  // 🆕 오름차순/내림차순 토글 연동 정렬
   if(currentSortMode === 'roiDesc') displayItems.sort((a,b) => (b.roi - a.roi) * sortDirection);
   else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => (b.evalAmt - a.evalAmt) * sortDirection);
   else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => (b.activeChange - a.activeChange) * sortDirection);
@@ -1674,8 +1715,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
     
-    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
-
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
@@ -1831,6 +1870,41 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     if(tooltipEl) tooltipEl.style.opacity = 0;
                 });
             });
+        }
+    }
+
+    // ── 🏆 전체 수익률 목록 (사이드바) 렌더링 ──
+    const yieldContainer = document.getElementById('sidebarYieldList');
+    if (yieldContainer && fullDisplayItems) {
+        let validItems = fullDisplayItems.filter(item => item.type === 'held' && item.roi !== -9999 && item.costAmt > 0);
+        validItems.sort((a, b) => b.roi - a.roi); // 수익률 높은 순 정렬
+
+        if (validItems.length === 0) {
+            yieldContainer.innerHTML = '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">보유한 자산이 없습니다.</div>';
+        } else {
+            yieldContainer.innerHTML = validItems.map((item, idx) => {
+                let sign = item.roi > 0 ? '+' : '';
+                let color = item.roi > 0 ? 'var(--green)' : (item.roi < 0 ? 'var(--red)' : 'var(--text)');
+                let rankColor = idx === 0 ? '#ffb703' : (idx === 1 ? '#a259ff' : (idx === 2 ? '#4d9fff' : 'var(--text3)'));
+                let brokerText = item.broker !== '미지정' ? `<span style="font-size:10px; color:var(--text3); margin-left:6px;">[${item.broker}]</span>` : '';
+                let name = item.data ? item.data.name : item.symbol;
+                
+                return `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); padding:12px; border-radius:6px; border:1px solid var(--border); transition:0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+                    <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; margin-right:10px;">
+                        <span style="font-weight:900; font-style:italic; color:${rankColor}; width:18px; text-align:center; flex-shrink:0;">${idx+1}</span>
+                        <div style="min-width:0; overflow:hidden;">
+                            <div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${name} ${brokerText}</div>
+                            <div style="font-size:10px; font-family:var(--font-mono); color:var(--text2);">${item.symbol}</div>
+                        </div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                        <div style="font-size:14px; font-family:var(--font-mono); font-weight:700; color:${color};">${sign}${item.roi.toFixed(2)}%</div>
+                        <div style="font-size:10px; color:var(--text3);">${sign}${formatPrice(item.evalAmt - item.costAmt, item.symbol)}</div>
+                    </div>
+                </div>
+                `;
+            }).join('');
         }
     }
 
