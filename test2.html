@@ -46,14 +46,19 @@
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
   /* ── 사이드바 ── */
-  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; overflow-x: hidden; }
+  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; }
   .ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
   
-  .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
+  .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
+  .sidebar-tabs { display: flex; gap: 6px; }
+  .s-tab { background: transparent; border: none; color: var(--text3); font-size: 14px; font-weight: 700; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; font-family: var(--font-sans); }
+  .s-tab:hover { color: var(--text2); }
+  .s-tab.active { color: var(--text); background: rgba(255,255,255,0.05); }
+
   .btn-icon-sm { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; line-height: 1; padding: 0; transition: color 0.2s; }
   .btn-icon-sm:hover { color: var(--text); }
   
-  .tx-form { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+  .tx-form { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
   .form-group label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 5px; }
   .form-input { width: 100%; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 13px; font-family: var(--font-sans); outline: none; transition: border-color 0.2s; }
   .form-input:focus { border-color: var(--accent); }
@@ -65,7 +70,7 @@
 
   .hidden-radio { display: none; }
   .toggle-group { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
-  .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+  .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
   .toggle-btn:hover { color: var(--text2); background: rgba(255,255,255,0.05); }
   
   input[name="txOwner"]:checked + .toggle-btn { background: var(--bg3); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border-color: var(--border2); }
@@ -95,7 +100,7 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
+  /* ── 사이드바 펼치기용 화살표 버튼 ── */
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
@@ -104,11 +109,10 @@
   .dashboard-main::-webkit-scrollbar { width: 8px; }
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   
-  /* 대시보드 탑 래퍼 (4분할 레이아웃으로 변경) */
+  /* 대시보드 3분할 래퍼 */
   .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; flex-shrink: 0; }
-  
-  .dashboard-top { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: stretch; }
-  @media (max-width: 1600px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
+  .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
+  @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 900px) { .dashboard-top { grid-template-columns: 1fr; } }
 
   .country-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
@@ -121,7 +125,7 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
-  /* 국가별 계좌 리스트 테이블 및 필터 표시 */
+  /* 국가별 계좌 리스트 테이블 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
   
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
@@ -150,9 +154,6 @@
   .list-title-wrap { display: flex; align-items: center; gap: 12px; }
   .section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
   
-  .btn-toggle-dash { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; }
-  .btn-toggle-dash:hover { color: var(--text); border-color: var(--border2); }
-  
   .list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
   
@@ -170,7 +171,6 @@
   .card:hover { border-color: var(--border2); transform: translateY(-1px); }
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   
-  /* 카드 내 뱃지 디자인 */
   .card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); }
   .tag-held { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(124,106,247,0.3); }
   .tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
@@ -272,72 +272,81 @@
   <button id="btnOpenSidebar" onclick="toggleSidebar()" title="장부 열기">▶</button>
 
   <aside class="ledger-sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <span>✏️ 거래 장부</span>
+    <div class="sidebar-header" style="padding: 10px 20px;">
+      <div class="sidebar-tabs">
+        <button class="s-tab active" id="tabLedger" onclick="setSidebarView('ledger')">✏️ 거래 장부</button>
+        <button class="s-tab" id="tabYield" onclick="setSidebarView('yield')">🏆 수익률 목록</button>
+      </div>
       <button class="btn-icon-sm" onclick="toggleSidebar()" title="장부 접기">◀</button>
     </div>
     
-    <div class="tx-form">
-      <div style="display:flex; gap:10px; margin-bottom:5px;">
-        <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--text2); font-weight:700;">소유자</span>
-            <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름 변경">이름 변경</button>
+    <div id="sidebarLedgerView" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+      <div class="tx-form">
+        <div style="display:flex; gap:10px; margin-bottom:5px;">
+          <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--text2); font-weight:700;">소유자</span>
+              <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름 변경">이름 변경</button>
+            </div>
+            <div class="toggle-group" style="margin-top:2px;">
+              <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
+              <label for="owner1" class="toggle-btn" id="lblUser1">보유자1</label>
+              <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
+              <label for="owner2" class="toggle-btn" id="lblUser2">보유자2</label>
+            </div>
           </div>
-          <div class="toggle-group" style="margin-top:2px;">
-            <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
-            <label for="owner1" class="toggle-btn" id="lblUser1">보유자1</label>
-            <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
-            <label for="owner2" class="toggle-btn" id="lblUser2">보유자2</label>
+          <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--text2); font-weight:700;">유형</span>
+            </div>
+            <div class="toggle-group" style="margin-top:2px;">
+              <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
+              <label for="typeBuy" class="toggle-btn type-buy" style="padding:8px 2px;">매수</label>
+              <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
+              <label for="typeSell" class="toggle-btn type-sell" style="padding:8px 2px;">매도</label>
+              <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
+              <label for="typeDiv" class="toggle-btn type-div" style="padding:8px 2px;">배당</label>
+            </div>
           </div>
         </div>
-        <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--text2); font-weight:700;">유형</span>
+
+        <div class="form-group">
+          <label>발생 일자</label>
+          <input type="date" id="txDate" class="form-input">
+        </div>
+        <div class="form-group tx-search-container">
+          <label>종목 (티커 또는 회사명)</label>
+          <input type="text" id="txSymbol" class="form-input" placeholder="예: AAPL, 삼성전자..." autocomplete="off">
+          <ul id="txDropdown" class="tx-dropdown"></ul>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;" id="txQtyWrap">
+            <label>수량</label>
+            <input type="number" id="txQty" class="form-input" placeholder="0">
           </div>
-          <div class="toggle-group" style="margin-top:2px;">
-            <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
-            <label for="typeBuy" class="toggle-btn type-buy" style="padding:8px 2px;">매수</label>
-            <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
-            <label for="typeSell" class="toggle-btn type-sell" style="padding:8px 2px;">매도</label>
-            <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
-            <label for="typeDiv" class="toggle-btn type-div" style="padding:8px 2px;">배당</label>
+          <div class="form-group" style="flex:1;">
+            <label id="txPriceLabel">단가 (1주당 가격)</label>
+            <input type="number" id="txPrice" class="form-input" placeholder="0" step="0.01">
           </div>
         </div>
+        <div class="form-group">
+          <label>계좌명 (선택)</label>
+          <input type="text" id="txBroker" class="form-input" placeholder="예: 키움증권, 토스 등">
+          <div id="brokerTags" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+        </div>
+        <button class="btn-submit" onclick="addTransaction()">내역 추가하기</button>
       </div>
 
-      <div class="form-group">
-        <label>발생 일자</label>
-        <input type="date" id="txDate" class="form-input">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px 20px 10px;">
+        <div class="tx-history-title" style="padding:0;">최근 거래 내역</div>
+        <button class="btn-sm" onclick="setView('history')" style="padding: 2px 8px; border-color:var(--border2);">전체 보기</button>
       </div>
-      <div class="form-group tx-search-container">
-        <label>종목 (티커 또는 회사명)</label>
-        <input type="text" id="txSymbol" class="form-input" placeholder="예: AAPL, 삼성전자..." autocomplete="off">
-        <ul id="txDropdown" class="tx-dropdown"></ul>
-      </div>
-      <div style="display:flex; gap:10px;">
-        <div class="form-group" style="flex:1;" id="txQtyWrap">
-          <label>수량</label>
-          <input type="number" id="txQty" class="form-input" placeholder="0">
-        </div>
-        <div class="form-group" style="flex:1;">
-          <label id="txPriceLabel">단가 (1주당 가격)</label>
-          <input type="number" id="txPrice" class="form-input" placeholder="0" step="0.01">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>계좌명 (선택)</label>
-        <input type="text" id="txBroker" class="form-input" placeholder="예: 키움증권, 토스 등">
-        <div id="brokerTags" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
-      </div>
-      <button class="btn-submit" onclick="addTransaction()">내역 추가하기</button>
+      <ul class="tx-list" id="txList" style="padding-top:0;"></ul>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px 20px 10px;">
-      <div class="tx-history-title" style="padding:0;">최근 거래 내역</div>
-      <button class="btn-sm" onclick="setView('history')" style="padding: 2px 8px; border-color:var(--border2);">전체 보기</button>
+    <div id="sidebarYieldView" style="display: none; flex-direction: column; flex: 1; overflow-y: auto; padding: 15px 20px;">
+      <div id="sidebarYieldList" style="display:flex; flex-direction:column; gap:6px;"></div>
     </div>
-    <ul class="tx-list" id="txList" style="padding-top:0;"></ul>
   </aside>
 
   <main class="dashboard-main">
@@ -416,14 +425,6 @@
           </div>
           <div class="cp-accounts" id="usdAccountList"></div>
         </div>
-
-        <div class="country-panel">
-          <div class="cp-header" style="border-bottom:none; padding-bottom:0;">
-            <div class="cp-title">🏆 수익률 TOP 10</div>
-          </div>
-          <div id="top10List" style="display:flex; flex-direction:column; gap:6px; margin-top:15px; flex:1; overflow-y:auto;"></div>
-        </div>
-
       </div>
     </div>
 
@@ -592,7 +593,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v48'; 
+const STORE_KEY = 'stockwatch_real_v49'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -601,6 +602,7 @@ let currentSortMode = 'default';
 let activeAccountFilter = null; 
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
+let allocationChartInst = null; 
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
 const chartInstances = {};
@@ -625,7 +627,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v47'); 
+    let oldS = localStorage.getItem('stockwatch_real_v48'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -650,6 +652,26 @@ function toggleSidebar() {
   }
 }
 
+// 🆕 사이드바 내부 탭(장부 vs 수익률) 토글 로직
+function setSidebarView(view) {
+  const vLedger = document.getElementById('sidebarLedgerView');
+  const vYield = document.getElementById('sidebarYieldView');
+  const tLedger = document.getElementById('tabLedger');
+  const tYield = document.getElementById('tabYield');
+
+  if (view === 'ledger') {
+    vLedger.style.display = 'flex';
+    vYield.style.display = 'none';
+    tLedger.classList.add('active');
+    tYield.classList.remove('active');
+  } else {
+    vLedger.style.display = 'none';
+    vYield.style.display = 'flex';
+    tLedger.classList.remove('active');
+    tYield.classList.add('active');
+  }
+}
+
 // 초기 이름 세팅
 function updateOwnerLabels() {
   document.getElementById('tabUser1').textContent = state.ownerNames.user1;
@@ -660,7 +682,7 @@ function updateOwnerLabels() {
   document.getElementById('divTabUser2').textContent = state.ownerNames.user2;
 }
 
-// 🆕 계좌 필터 토글 기능
+// 계좌 필터 토글 기능
 function toggleAccountFilter(broker) {
   if (activeAccountFilter === broker) activeAccountFilter = null;
   else activeAccountFilter = broker;
@@ -682,7 +704,7 @@ function formatPrice(val, symbol) {
   return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-// ── 🆕 CSV 업로드 파서 ──
+// ── CSV 업로드 파서 ──
 function importCsvData(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -934,7 +956,7 @@ function renderTxList() {
   }).join('');
 }
 
-// ── 🆕 전체 거래 내역 (History) 렌더링 ──
+// ── 전체 거래 내역 (History) 렌더링 ──
 function renderHistoryDashboard() {
   const tbody = document.getElementById('historyTableBody');
   const sorted = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
@@ -1349,6 +1371,16 @@ async function render() {
     }
   }
 
+  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
+    updateSummaryAndAllocation(currentHoldings, []); 
+    return;
+  }
+
+  if(Object.keys(cachedMarketData).length === 0) {
+    container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
+  }
+
   let allSymbols = new Set(state.tickers);
   for(let sym in symbolHoldings) {
     allSymbols.add(sym);
@@ -1493,11 +1525,16 @@ function getHeatmapColor(change) {
 
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
   try {
+    accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
+    accountPieChartInsts = [];
+    
+    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
+
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
     let treemapDataMap = {};
-    if (fullDisplayItems && fullDisplayItems.length > 0) {
+    if (fullDisplayItems) {
       fullDisplayItems.forEach(item => {
         if(item.type === 'held' && item.evalAmt > 0) {
           let sym = item.symbol;
@@ -1651,17 +1688,16 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
         }
     }
 
-    // ── 🏆 TOP 10 렌더링 ──
-    const top10Container = document.getElementById('top10List');
-    if (top10Container && fullDisplayItems) {
+    // ── 🏆 전체 수익률 목록 (사이드바) 렌더링 ──
+    const yieldContainer = document.getElementById('sidebarYieldList');
+    if (yieldContainer && fullDisplayItems) {
         let validItems = fullDisplayItems.filter(item => item.type === 'held' && item.roi !== -9999 && item.costAmt > 0);
-        validItems.sort((a, b) => b.roi - a.roi);
-        let top10 = validItems.slice(0, 10);
+        validItems.sort((a, b) => b.roi - a.roi); // 수익률 높은 순 정렬
 
-        if (top10.length === 0) {
-            top10Container.innerHTML = '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 자산이 없습니다.</div>';
+        if (validItems.length === 0) {
+            yieldContainer.innerHTML = '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">보유한 자산이 없습니다.</div>';
         } else {
-            top10Container.innerHTML = top10.map((item, idx) => {
+            yieldContainer.innerHTML = validItems.map((item, idx) => {
                 let sign = item.roi > 0 ? '+' : '';
                 let color = item.roi > 0 ? 'var(--green)' : (item.roi < 0 ? 'var(--red)' : 'var(--text)');
                 let rankColor = idx === 0 ? '#ffb703' : (idx === 1 ? '#a259ff' : (idx === 2 ? '#4d9fff' : 'var(--text3)'));
@@ -1669,9 +1705,9 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                 let name = item.data ? item.data.name : item.symbol;
                 
                 return `
-                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg3); padding:10px 12px; border-radius:6px; border:1px solid transparent; transition:0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='transparent'">
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); padding:12px; border-radius:6px; border:1px solid var(--border); transition:0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
                     <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; margin-right:10px;">
-                        <span style="font-weight:900; font-style:italic; color:${rankColor}; width:16px; text-align:center; flex-shrink:0;">${idx+1}</span>
+                        <span style="font-weight:900; font-style:italic; color:${rankColor}; width:18px; text-align:center; flex-shrink:0;">${idx+1}</span>
                         <div style="min-width:0; overflow:hidden;">
                             <div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${name} ${brokerText}</div>
                             <div style="font-size:10px; font-family:var(--font-mono); color:var(--text2);">${item.symbol}</div>
@@ -1715,7 +1751,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
       let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
       let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
-      let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
+      let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
       
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
@@ -1803,7 +1839,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     }).join('');
     document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-    // ── 미니 파이 차트 그리기 ──
     const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
     [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
       const ctx = document.getElementById(cfg.id);
