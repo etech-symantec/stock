@@ -444,15 +444,15 @@
     {
       "id": 1775893841822,
       "date": "2026-04-11",
+      "owner": "끄니",
       "broker": "키움",
       "symbol": "SMR",
       "qty": 6,
-      "price": 86.999,
-      "txType": "trade",
-      "owner": "끄니"
+      "price": 86.99,
+      "txType": "trade"
     }
   ],
-  "range": "1w",
+  "range": "3m",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
