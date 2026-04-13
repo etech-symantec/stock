@@ -104,8 +104,8 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
-  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 48px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
+  /* ── 사이드바 펼치기용 플로팅 버튼 ── */
+  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
   /* ── 3. 대시보드 메인 ── */
@@ -114,7 +114,8 @@
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   
   /* 대시보드 탑 래퍼 */
-  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; }
+  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease; max-height: 3000px; opacity: 1; overflow: hidden; }
+  .dashboard-top-wrapper.collapsed { max-height: 0 !important; opacity: 0; margin-bottom: 0; padding: 0; border: none; }
   
   .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
   @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
@@ -130,10 +131,10 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
-  /* 국가별 계좌 리스트 테이블 및 필터 표시 */
+  /* 계좌 리스트 테이블 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
   
-  .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
+  .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: border-color 0.2s; cursor: pointer; }
   .acc-row:hover { border-color: var(--border2); }
   .acc-row.active-filter { border-color: var(--accent); background: rgba(124,106,247,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
   
@@ -159,6 +160,9 @@
   .list-title-wrap { display: flex; align-items: center; gap: 12px; }
   .section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
   
+  .btn-toggle-dash { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; }
+  .btn-toggle-dash:hover { color: var(--text); border-color: var(--border2); }
+  
   .list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
   
@@ -176,7 +180,6 @@
   .card:hover { border-color: var(--border2); transform: translateY(-1px); }
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   
-  /* 카드 내 보유/관심 뱃지 */
   .card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); }
   .tag-held { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(124,106,247,0.3); }
   .tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
@@ -219,6 +222,10 @@
 
   /* 차트 커스텀 툴팁 */
   #chartjs-tooltip { opacity: 0; position: absolute; background: rgba(20, 23, 32, 0.95); border: 1px solid var(--border2); border-radius: 6px; color: #fff; pointer-events: none; transform: translate(-50%, -110%); transition: all .1s ease; z-index: 999999; padding: 8px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); font-family: var(--font-sans); white-space: nowrap; }
+
+  /* Treemap CSS */
+  .treemap-cell { position: absolute; border: 1px solid var(--bg2); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 2px; box-sizing: border-box; color: #fff; cursor: pointer; transition: 0.2s; border-radius: 4px; }
+  .treemap-cell:hover { opacity: 0.85; transform: scale(0.98); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
 </style>
 </head>
 <body>
@@ -352,8 +359,8 @@
             </div>
           </div>
           <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
-             <div class="section-title" style="margin: 0 0 10px 0; font-size:12px; color:var(--text3)">포트폴리오 비중</div>
-             <div style="flex:1; position:relative; min-height: 160px;"><canvas id="allocationCanvas"></canvas></div>
+             <div class="section-title" style="margin: 0 0 10px 0; font-size:12px; color:var(--text3)">포트폴리오 맵</div>
+             <div id="allocationTreemap" style="flex:1; position:relative; min-height: 180px; width: 100%; border-radius: 8px; overflow: hidden; background:var(--bg3);"></div>
           </div>
         </div>
 
@@ -404,6 +411,7 @@
     <div class="list-options-bar" id="listOptionsBar" style="display:none;">
       <div class="list-title-wrap">
         <h2 class="section-title">종목 리스트</h2>
+        <button class="btn-toggle-dash" id="btnToggleDash" onclick="toggleDashboard()">요약 패널 숨기기 ▴</button>
       </div>
       <div class="list-controls">
         <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
@@ -542,18 +550,17 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v37'; 
+const STORE_KEY = 'stockwatch_real_v38'; 
 let state = loadState();
 
 let currentView = 'all'; 
 let currentDivFilter = 'all'; 
 let currentSortMode = 'default';
-let activeAccountFilter = null; // 🆕 클릭된 계좌 필터 상태
+let activeAccountFilter = null; 
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
-let allocationChartInst = null;
 const chartInstances = {};
 let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
@@ -576,7 +583,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v36'); 
+    let oldS = localStorage.getItem('stockwatch_real_v37'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -601,6 +608,18 @@ function toggleSidebar() {
   }
 }
 
+function toggleDashboard() {
+  const dash = document.getElementById('dashboardTopWrapper');
+  const btn = document.getElementById('btnToggleDash');
+  if (dash.classList.contains('collapsed')) {
+    dash.classList.remove('collapsed');
+    btn.innerHTML = '요약 패널 숨기기 ▴';
+  } else {
+    dash.classList.add('collapsed');
+    btn.innerHTML = '요약 패널 보기 ▾';
+  }
+}
+
 // 초기 이름 세팅
 function updateOwnerLabels() {
   document.getElementById('tabUser1').textContent = state.ownerNames.user1;
@@ -611,7 +630,6 @@ function updateOwnerLabels() {
   document.getElementById('divTabUser2').textContent = state.ownerNames.user2;
 }
 
-// 🆕 계좌 필터 토글 기능
 function toggleAccountFilter(broker) {
   if (activeAccountFilter === broker) activeAccountFilter = null;
   else activeAccountFilter = broker;
@@ -737,7 +755,6 @@ function addTransaction() {
     alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
 
-  // 매도 선택시 수량을 자동으로 음수로 전환
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
   
@@ -765,7 +782,6 @@ function deleteTransaction(id) {
 function renderTxList() {
   const listEl = document.getElementById('txList');
   
-  // 🆕 등록된 계좌명을 태그로 렌더링
   const uniqueBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b))];
   const tagsHtml = uniqueBrokers.map(b => `<button type="button" class="broker-tag" onclick="document.getElementById('txBroker').value='${b}'">${b}</button>`).join('');
   document.getElementById('brokerTags').innerHTML = tagsHtml;
@@ -834,7 +850,6 @@ function prepareTransaction(symbol, broker) {
   
   document.getElementById('txQty').focus();
   
-  // 사이드바 열기
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
   
@@ -974,7 +989,7 @@ function setRange(rangeStr, el) {
 function setSortMode(mode) { currentSortMode = mode; render(); }
 function setView(view, el) {
   currentView = view;
-  activeAccountFilter = null; // 🆕 탭 변경 시 필터 초기화
+  activeAccountFilter = null; 
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); 
   render();
@@ -1117,7 +1132,45 @@ function renderDividendDashboard() {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size:11} } },
-        tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } }
+        tooltip: { 
+          mode: 'index', intersect: false, 
+          // 배당금 차트 툴팁 포맷 분리
+          external: function(context) {
+            let tooltipEl = document.getElementById('chartjs-tooltip');
+            if (!tooltipEl) {
+              tooltipEl = document.createElement('div');
+              tooltipEl.id = 'chartjs-tooltip';
+              document.body.appendChild(tooltipEl);
+            }
+            const tooltipModel = context.tooltip;
+            if (tooltipModel.opacity === 0) { tooltipEl.style.opacity = 0; return; }
+            if (tooltipModel.body) {
+              const bodyLines = tooltipModel.body.map(b => b.lines);
+              let innerHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
+              bodyLines.forEach(function(body, i) {
+                const colors = tooltipModel.labelColors[i];
+                const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
+                let txt = body[0];
+                let splitTxt = txt.split(': ');
+                if(splitTxt.length === 2) {
+                  let name = splitTxt[0];
+                  let val = parseFloat(splitTxt[1].replace(/,/g,''));
+                  let formatVal = '₩' + Math.round(val).toLocaleString();
+                  innerHtml += `<div style="font-size:12px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
+                  innerHtml += `<div style="font-size:12px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
+                } else {
+                  innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
+                }
+              });
+              innerHtml += '</div>';
+              tooltipEl.innerHTML = innerHtml;
+            }
+            const position = context.chart.canvas.getBoundingClientRect();
+            tooltipEl.style.opacity = 1;
+            tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+            tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY - 10 + 'px';
+          }
+        }
       },
       scales: {
         x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } },
@@ -1174,16 +1227,16 @@ async function render() {
     }
   }
 
-  // 데이터가 없어도 대시보드는 렌더링되게 호출
-  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
-    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
-    updateSummaryAndAllocation(currentHoldings);
-    return;
-  }
-
-  if(Object.keys(cachedMarketData).length === 0) {
-    container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
-  }
+  const getSliceLen = (range) => {
+    if (range === '1d') return 2;
+    if (range === '1w') return 6;
+    if (range === '1m') return 22;
+    if (range === '3m') return 63;
+    if (range === '6m') return 126;
+    if (range === '1y') return 252;
+    if (range === '3y') return 756;
+    return 252;
+  };
 
   let allSymbols = new Set(state.tickers);
   for(let sym in symbolHoldings) {
@@ -1225,31 +1278,13 @@ async function render() {
     return true; 
   });
 
-  // 🆕 계좌 클릭 시 해당 종목만 필터링
-  if (activeAccountFilter) {
-    displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
-  }
-
-  const getSliceLen = (range) => {
-    if (range === '1d') return 2;
-    if (range === '1w') return 6;
-    if (range === '1m') return 22;
-    if (range === '3m') return 63;
-    if (range === '6m') return 126;
-    if (range === '1y') return 252;
-    if (range === '3y') return 756;
-    return 252;
-  };
-
   displayItems.forEach(item => {
     item.uniqueId = 'chart_' + Math.random().toString(36).substring(2, 10);
-    
     if(item.data && item.data.prices) {
       const prices = item.data.prices;
       const last = item.data.last;
       const sliceLen = getSliceLen(state.range);
       item.sliceLen = sliceLen; 
-      
       const pStart = prices[Math.max(0, prices.length - sliceLen)] || item.data.prev;
       item.activeChange = ((last - pStart) / pStart) * 100;
       item.evalAmt = item.qty * last;
@@ -1260,6 +1295,13 @@ async function render() {
     }
   });
 
+  // ── 변경: 필터링 전의 원본 displayItems를 대시보드 요약에 넘겨야 데이터가 유지됨 ──
+  updateSummaryAndAllocation(currentHoldings, displayItems);
+
+  if (activeAccountFilter) {
+    displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
+  }
+
   if(currentSortMode === 'roiDesc') displayItems.sort((a,b) => b.roi - a.roi);
   else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => b.evalAmt - a.evalAmt);
   else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => b.activeChange - a.activeChange);
@@ -1269,8 +1311,7 @@ async function render() {
   
   if(displayItems.length === 0) {
      if(activeAccountFilter) container.innerHTML = `<div class="empty">해당 계좌에 종목이 없습니다.</div>`;
-     else container.innerHTML = `<div class="empty">선택한 탭에 표시할 종목이 없습니다.</div>`;
-     updateSummaryAndAllocation(currentHoldings);
+     else container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
      return;
   }
 
@@ -1300,8 +1341,6 @@ async function render() {
       chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
     }
   });
-
-  updateSummaryAndAllocation(currentHoldings);
 }
 
 function getColors(prices) {
@@ -1323,17 +1362,37 @@ function buildChart(canvasId, prices, dates, mini) {
   });
 }
 
-function updateSummaryAndAllocation(rawHoldings) {
+// 수익률 기반의 Heatmap 컬러 로직
+function getHeatmapColor(change) {
+  if (change >= 3) return 'rgba(0, 200, 122, 0.9)';
+  if (change > 0) return 'rgba(0, 200, 122, 0.5)';
+  if (change <= -3) return 'rgba(255, 77, 106, 0.9)';
+  if (change < 0) return 'rgba(255, 77, 106, 0.5)';
+  return 'rgba(136, 144, 164, 0.4)';
+}
+
+function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
   try {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
-    
-    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
 
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
-    const allocData = [], allocLabels = [], allocColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703'];
+    // ── 글로벌 Treemap용 데이터 추출 ──
+    let treemapDataMap = {};
+    if (fullDisplayItems) {
+      fullDisplayItems.forEach(item => {
+        if(item.type === 'held' && item.evalAmt > 0) {
+          let sym = item.symbol;
+          if(!treemapDataMap[sym]) {
+             treemapDataMap[sym] = { symbol: sym, name: item.data.name, value: 0, change: item.activeChange };
+          }
+          treemapDataMap[sym].value += (isKorean(sym) ? item.evalAmt : item.evalAmt * currentUsdKrw);
+        }
+      });
+    }
+    let treemapData = Object.values(treemapDataMap);
 
     for(let key in rawHoldings) {
       if(!rawHoldings.hasOwnProperty(key)) continue;
@@ -1351,7 +1410,6 @@ function updateSummaryAndAllocation(rawHoldings) {
           krwSummary.accounts[broker].eval += eAmt;
           krwSummary.accounts[broker].cost += cAmt;
           krwSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
-          allocData.push(eAmt);
         } else { 
           usdSummary.totalEval += eAmt;
           usdSummary.totalCost += cAmt;
@@ -1359,13 +1417,10 @@ function updateSummaryAndAllocation(rawHoldings) {
           usdSummary.accounts[broker].eval += eAmt;
           usdSummary.accounts[broker].cost += cAmt;
           usdSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
-          allocData.push(eAmt * currentUsdKrw); 
         }
-        allocLabels.push(`${data.name} ${broker!=='미지정'?`(${broker})`:''}`);
       }
     }
 
-    // ── 누적 배당금 계산 ──
     let krwDiv = 0, usdDiv = 0;
     let filterName = 'all';
     if (currentView === 'user1') filterName = state.ownerNames.user1;
@@ -1380,7 +1435,6 @@ function updateSummaryAndAllocation(rawHoldings) {
       }
     });
     const globalDiv = krwDiv + (usdDiv * currentUsdKrw);
-
     const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
     const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
     const globalRoi = globalCost > 0 ? ((globalEval - globalCost) / globalCost * 100) : 0;
@@ -1397,72 +1451,86 @@ function updateSummaryAndAllocation(rawHoldings) {
     
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-    // ── 글로벌 통합 차트 ──
-    const ctxGlobal = document.getElementById('allocationCanvas');
-    if(ctxGlobal) {
-      if (allocData.length > 0) {
-        allocationChartInst = new Chart(ctxGlobal.getContext('2d'), {
-          type: 'doughnut',
-          data: {
-            labels: allocLabels,
-            datasets: [{ data: allocData, backgroundColor: allocColors, borderWidth: 0 }]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { 
-              legend: { display: false }, 
-              // 🆕 종목명이 툴팁에 제대로 전달되도록 label 콜백 세팅
-              tooltip: { 
-                enabled: false,
-                callbacks: {
-                  label: function(context) {
-                    let v = context.raw;
-                    let formatVal = '₩' + Math.round(v).toLocaleString();
-                    return context.label + ': ' + formatVal;
-                  }
-                },
-                external: function(context) {
-                  let tooltipEl = document.getElementById('chartjs-tooltip');
-                  if (!tooltipEl) {
-                    tooltipEl = document.createElement('div');
-                    tooltipEl.id = 'chartjs-tooltip';
-                    document.body.appendChild(tooltipEl);
-                  }
-                  const tooltipModel = context.tooltip;
-                  if (tooltipModel.opacity === 0) {
-                    tooltipEl.style.opacity = 0;
+    // ── 🌐 글로벌 Treemap 렌더링 (HTML) ──
+    const tmContainer = document.getElementById('allocationTreemap');
+    if (tmContainer) {
+        if (treemapData.length === 0) {
+            tmContainer.innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text3); font-size:12px;">보유 자산 없음</div>';
+        } else {
+            tmContainer.innerHTML = '';
+            let x = 0, y = 0, w = 100, h = 100;
+            treemapData.sort((a,b)=> b.value - a.value);
+
+            let html = '';
+            function slice(items, x, y, w, h) {
+                if(items.length === 0) return;
+                if(items.length === 1) {
+                    let it = items[0];
+                    let bg = getHeatmapColor(it.change);
+                    let sign = it.change > 0 ? '+' : '';
+                    let fontSz = (w < 15 || h < 25) ? 9 : 12;
+                    let nameDisp = (w > 20 && h > 30) ? `<div style="font-size:${fontSz-2}px; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90%; text-align:center;">${it.name}</div>` : '';
+
+                    html += `
+                      <div class="treemap-cell" style="left:${x}%; top:${y}%; width:${w}%; height:${h}%; background:${bg};" 
+                           data-name="${it.name}" data-val="₩${Math.round(it.value).toLocaleString()}">
+                        <div style="font-weight:bold; font-size:${fontSz}px; white-space:nowrap;">${it.symbol.split('.')[0]}</div>
+                        ${nameDisp}
+                        <div style="font-size:${fontSz-1}px;">${sign}${it.change.toFixed(2)}%</div>
+                      </div>`;
                     return;
-                  }
-                  if (tooltipModel.body) {
-                    const bodyLines = tooltipModel.body.map(b => b.lines);
-                    let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
-                    bodyLines.forEach(function(body, i) {
-                      const colors = tooltipModel.labelColors[i];
-                      const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
-                      let txt = body[0];
-                      innerHtml += `<div style="font-size:12px; display:flex; align-items:center; white-space:nowrap; padding:2px 0;">${span}${txt}</div>`;
-                    });
-                    innerHtml += '</div>';
-                    tooltipEl.innerHTML = innerHtml;
-                  }
-                  const position = context.chart.canvas.getBoundingClientRect();
-                  tooltipEl.style.opacity = 1;
-                  tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-                  tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
                 }
-              } 
-            },
-            cutout: '70%'
-          }
-        });
-      } else {
-        allocationChartInst = new Chart(ctxGlobal.getContext('2d'), {
-          type: 'doughnut',
-          data: { labels: ['자산 없음'], datasets: [{ data: [1], backgroundColor: ['#1c2030'], borderWidth: 0 }] },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, cutout: '70%' }
-        });
-      }
-    }
+                let totalItems = items.reduce((sum, i)=>sum+i.value, 0);
+                let half = totalItems / 2;
+                let sum = 0; let splitIdx = 0;
+                for(let i=0; i<items.length; i++){
+                    sum += items[i].value;
+                    if(sum >= half && i < items.length-1) { splitIdx = i; break; }
+                }
+                if(splitIdx === 0 && items.length > 1) splitIdx = 0; 
+
+                let leftItems = items.slice(0, splitIdx+1);
+                let rightItems = items.slice(splitIdx+1);
+                let leftRatio = leftItems.reduce((sum, i)=>sum+i.value, 0) / totalItems;
+
+                if (w > h) {
+                    let lw = w * leftRatio;
+                    slice(leftItems, x, y, lw, h);
+                    slice(rightItems, x + lw, y, w - lw, h);
+                } else {
+                    let lh = h * leftRatio;
+                    slice(leftItems, x, y, w, lh);
+                    slice(rightItems, x, y + lh, w, h - lh);
+                }
+            }
+            slice(treemapData, x, y, w, h);
+            tmContainer.innerHTML = html;
+
+            // Treemap 툴팁 이벤트
+            document.querySelectorAll('.treemap-cell').forEach(cell => {
+                cell.addEventListener('mouseenter', (e) => {
+                    let tooltipEl = document.getElementById('chartjs-tooltip');
+                    if (!tooltipEl) {
+                        tooltipEl = document.createElement('div');
+                        tooltipEl.id = 'chartjs-tooltip';
+                        document.body.appendChild(tooltipEl);
+                    }
+                    let name = cell.getAttribute('data-name');
+                    let val = cell.getAttribute('data-val');
+                    tooltipEl.innerHTML = `<div style="font-size:13px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:13px; text-align:center;">${val}</div>`;
+                    tooltipEl.style.opacity = 1;
+                });
+                cell.addEventListener('mousemove', (e) => {
+                    let tooltipEl = document.getElementById('chartjs-tooltip');
+                    tooltipEl.style.left = e.pageX + 'px';
+                    tooltipEl.style.top = (e.pageY - 10) + 'px';
+                });
+                cell.addEventListener('mouseleave', () => {
+                    let tooltipEl = document.getElementById('chartjs-tooltip');
+                    if(tooltipEl) tooltipEl.style.opacity = 0;
+                });
+            });
+        }
 
     // ── KRW 렌더링 ──
     const krwPnl = krwSummary.totalEval - krwSummary.totalCost;
@@ -1493,7 +1561,7 @@ function updateSummaryAndAllocation(rawHoldings) {
 
       let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
       let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
-      let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
       
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
@@ -1582,7 +1650,7 @@ function updateSummaryAndAllocation(rawHoldings) {
     }).join('');
     document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-    // ── 미니 파이 차트 그리기 ──
+    // ── 미니 파이 차트 그리기 (HTML 커스텀 툴팁: 1줄 이름, 2줄 금액) ──
     const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
     [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
       const ctx = document.getElementById(cfg.id);
@@ -1626,12 +1694,21 @@ function updateSummaryAndAllocation(rawHoldings) {
                 }
                 if (tooltipModel.body) {
                   const bodyLines = tooltipModel.body.map(b => b.lines);
-                  let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
+                  let innerHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
                   bodyLines.forEach(function(body, i) {
                     const colors = tooltipModel.labelColors[i];
                     const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
-                    let txt = body[0]; 
-                    innerHtml += `<div style="font-size:12px; display:flex; align-items:center; white-space:nowrap; padding:2px 0;">${span}${txt}</div>`;
+                    let txt = body[0];
+                    let splitTxt = txt.split(': ');
+                    if(splitTxt.length === 2) {
+                      let name = splitTxt[0];
+                      let val = parseFloat(splitTxt[1].replace(/,/g,''));
+                      let formatVal = cfg.isUsd ? '$' + val.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(val).toLocaleString();
+                      innerHtml += `<div style="font-size:13px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
+                      innerHtml += `<div style="font-size:13px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
+                    } else {
+                      innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
+                    }
                   });
                   innerHtml += '</div>';
                   tooltipEl.innerHTML = innerHtml;
