@@ -104,8 +104,8 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 플로팅 버튼 ── */
-  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 48px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
+  /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
+  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 48px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
   /* ── 3. 대시보드 메인 ── */
@@ -114,8 +114,7 @@
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   
   /* 대시보드 탑 래퍼 */
-  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease; max-height: 3000px; opacity: 1; overflow: hidden; }
-  .dashboard-top-wrapper.collapsed { max-height: 0 !important; opacity: 0; margin-bottom: 0; }
+  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; }
   
   .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
   @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
@@ -131,7 +130,7 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
-  /* 국가별 계좌 리스트 테이블 */
+  /* 국가별 계좌 리스트 테이블 및 필터 표시 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
   
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
@@ -160,9 +159,6 @@
   .list-title-wrap { display: flex; align-items: center; gap: 12px; }
   .section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
   
-  .btn-toggle-dash { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; }
-  .btn-toggle-dash:hover { color: var(--text); border-color: var(--border2); }
-  
   .list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
   
@@ -180,7 +176,7 @@
   .card:hover { border-color: var(--border2); transform: translateY(-1px); }
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   
-  /* 카드 내 뱃지 디자인 */
+  /* 카드 내 보유/관심 뱃지 */
   .card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); }
   .tag-held { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(124,106,247,0.3); }
   .tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
@@ -550,17 +546,18 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v40'; 
+const STORE_KEY = 'stockwatch_real_v41'; 
 let state = loadState();
 
 let currentView = 'all'; 
 let currentDivFilter = 'all'; 
 let currentSortMode = 'default';
-let activeAccountFilter = null; 
+let activeAccountFilter = null; // 클릭된 계좌 필터 상태
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
+let allocationChartInst = null;
 const chartInstances = {};
 let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
@@ -583,7 +580,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v39'); 
+    let oldS = localStorage.getItem('stockwatch_real_v40'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -744,7 +741,6 @@ function addTransaction() {
     alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
 
-  // 매도 선택시 수량을 자동으로 음수로 전환
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
   
@@ -1143,9 +1139,10 @@ function renderDividendDashboard() {
                 let splitTxt = txt.split(': ');
                 if(splitTxt.length === 2) {
                   let name = splitTxt[0];
-                  let formatVal = splitTxt[1];
-                  innerHtml += `<div style="font-size:12px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
-                  innerHtml += `<div style="font-size:12px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
+                  let val = parseFloat(splitTxt[1].replace(/,/g,''));
+                  let formatVal = '₩' + Math.round(val || 0).toLocaleString();
+                  innerHtml += `<div style="font-size:13px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
+                  innerHtml += `<div style="font-size:13px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
                 } else {
                   innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
                 }
@@ -1278,7 +1275,6 @@ async function render() {
 
   displayItems.forEach(item => {
     item.uniqueId = 'chart_' + Math.random().toString(36).substring(2, 10);
-    
     if(item.data && item.data.prices) {
       const prices = item.data.prices;
       const last = item.data.last;
@@ -1294,7 +1290,6 @@ async function render() {
     }
   });
 
-  // ── 변경: 필터링 전의 원본 displayItems를 대시보드 요약에 넘겨야 데이터가 유지됨 ──
   updateSummaryAndAllocation(currentHoldings, displayItems);
 
   if (activeAccountFilter) {
@@ -1361,7 +1356,6 @@ function buildChart(canvasId, prices, dates, mini) {
   });
 }
 
-// 수익률 기반의 Heatmap 컬러 로직
 function getHeatmapColor(change) {
   if (change >= 3) return 'rgba(0, 200, 122, 0.9)';
   if (change > 0) return 'rgba(0, 200, 122, 0.5)';
@@ -1374,11 +1368,12 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
   try {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
+    
+    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
 
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
-    // ── 글로벌 Treemap용 데이터 추출 ──
     let treemapDataMap = {};
     if (fullDisplayItems) {
       fullDisplayItems.forEach(item => {
@@ -1450,7 +1445,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-    // ── 🌐 글로벌 Treemap 렌더링 (HTML) ──
     const tmContainer = document.getElementById('allocationTreemap');
     if (tmContainer) {
         if (treemapData.length === 0) {
@@ -1461,7 +1455,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
             treemapData.sort((a,b)=> b.value - a.value);
 
             let html = '';
-            function slice(items, x, y, w, h) {
+            function renderTreemapNode(items, x, y, w, h) {
                 if(items.length === 0) return;
                 if(items.length === 1) {
                     let it = items[0];
@@ -1494,18 +1488,17 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
                 if (w > h) {
                     let lw = w * leftRatio;
-                    slice(leftItems, x, y, lw, h);
-                    slice(rightItems, x + lw, y, w - lw, h);
+                    renderTreemapNode(leftItems, x, y, lw, h);
+                    renderTreemapNode(rightItems, x + lw, y, w - lw, h);
                 } else {
                     let lh = h * leftRatio;
-                    slice(leftItems, x, y, w, lh);
-                    slice(rightItems, x, y + lh, w, h - lh);
+                    renderTreemapNode(leftItems, x, y, w, lh);
+                    renderTreemapNode(rightItems, x, y + lh, w, h - lh);
                 }
             }
-            slice(treemapData, x, y, w, h);
+            renderTreemapNode(treemapData, x, y, w, h);
             tmContainer.innerHTML = html;
 
-            // Treemap 툴팁 이벤트
             document.querySelectorAll('.treemap-cell').forEach(cell => {
                 cell.addEventListener('mouseenter', (e) => {
                     let tooltipEl = document.getElementById('chartjs-tooltip');
@@ -1534,7 +1527,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
         }
     }
 
-    // ── KRW 렌더링 ──
     const krwPnl = krwSummary.totalEval - krwSummary.totalCost;
     const krwRoi = krwSummary.totalCost > 0 ? (krwPnl / krwSummary.totalCost * 100) : 0;
     
@@ -1593,7 +1585,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     }).join('');
     document.getElementById('krwAccountList').innerHTML = krwAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-    // ── USD 렌더링 ──
     const usdPnl = usdSummary.totalEval - usdSummary.totalCost;
     const usdRoi = usdSummary.totalCost > 0 ? (usdPnl / usdSummary.totalCost * 100) : 0;
 
@@ -1652,7 +1643,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     }).join('');
     document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-    // ── 미니 파이 차트 그리기 (HTML 커스텀 툴팁: 1줄 이름, 2줄 금액) ──
     const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
     [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
       const ctx = document.getElementById(cfg.id);
@@ -1678,7 +1668,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
               callbacks: {
                 label: function(context) {
                   let v = context.raw;
-                  let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v).toLocaleString();
+                  let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v || 0).toLocaleString();
                   return context.label + ': ' + formatVal;
                 }
               },
@@ -1696,7 +1686,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                 }
                 if (tooltipModel.body) {
                   const bodyLines = tooltipModel.body.map(b => b.lines);
-                  let innerHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
+                  let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
                   bodyLines.forEach(function(body, i) {
                     const colors = tooltipModel.labelColors[i];
                     const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
@@ -1704,7 +1694,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     let splitTxt = txt.split(': ');
                     if(splitTxt.length === 2) {
                       let name = splitTxt[0];
-                      let formatVal = splitTxt[1]; // Label callback에서 이미 예쁘게 콤마가 찍힌 값을 그대로 씁니다.
+                      let formatVal = splitTxt[1];
                       innerHtml += `<div style="font-size:13px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
                       innerHtml += `<div style="font-size:13px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
                     } else {
