@@ -65,7 +65,7 @@
 
   .hidden-radio { display: none; }
   .toggle-group { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
-  .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+  .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
   .toggle-btn:hover { color: var(--text2); background: rgba(255,255,255,0.05); }
   
   input[name="txOwner"]:checked + .toggle-btn { background: var(--bg3); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border-color: var(--border2); }
@@ -96,7 +96,7 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
+  /* ── 사이드바 펼치기용 화살표 버튼 ── */
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
@@ -580,7 +580,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v44'; 
+const STORE_KEY = 'stockwatch_real_v45'; // 캐시 초기화
 let state = loadState();
 
 let currentView = 'all'; 
@@ -613,7 +613,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v43'); 
+    let oldS = localStorage.getItem('stockwatch_real_v44'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -625,7 +625,7 @@ function loadState() {
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// UI 토글 처리 (사이드바)
+// UI 토글 처리
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -776,6 +776,7 @@ function addTransaction() {
     alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
 
+  // 매도 선택시 수량을 자동으로 음수로 전환
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
   
@@ -921,6 +922,7 @@ function prepareTransaction(symbol, broker) {
   
   document.getElementById('txQty').focus();
   
+  // 사이드바 열기
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
   
@@ -1251,7 +1253,6 @@ async function render() {
     renderHistoryDashboard();
     return;
   } else {
-    // block이 아니라 flex로 렌더해야 레이아웃(CSS Grid)이 유지됩니다.
     dash.style.display = 'flex';
     container.style.display = 'block';
     listOptions.style.display = 'flex';
@@ -1357,7 +1358,6 @@ async function render() {
     }
   });
 
-  // ── 버그 수정 구역: 수익률 등 수치 계산이 모두 끝난 "뒤에" 대시보드 업데이트 함수를 호출합니다! ──
   updateSummaryAndAllocation(currentHoldings, displayItems);
 
   if (activeAccountFilter) {
@@ -1436,8 +1436,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
   try {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
-    
-    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
 
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
@@ -1513,7 +1511,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-    // ── 🌐 글로벌 Treemap 렌더링 (HTML) ──
     const tmContainer = document.getElementById('allocationTreemap');
     if (tmContainer) {
         if (treemapData.length === 0) {
