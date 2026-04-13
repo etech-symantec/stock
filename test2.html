@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOCK WATCH — 멀티 유저 & 클라우드 장부</title>
+<title>주식 매니저 — 멀티 유저 & 클라우드 장부</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23141720'/><circle cx='28' cy='30' r='14' fill='%237c6af7'/><path d='M25,75 L45,45 L60,65 L85,25' fill='none' stroke='%2300c87a' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,8 +16,8 @@
   
   /* ── 1. 네비게이션 (헤더) ── */
   nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 1.5rem; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; flex-wrap: wrap; gap: 10px; }
-  .logo { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-  .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+  .logo { font-family: var(--font-sans); font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; white-space: nowrap; letter-spacing: -0.02em; }
+  .logo svg { display: block; }
 
   .header-search { display: flex; align-items: center; position: relative; flex: 1; max-width: 320px; min-width: 200px; margin: 0 10px; }
   .header-search .search-input { width: 100%; padding: 8px 36px 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-family: var(--font-sans); outline: none; transition: 0.2s; }
@@ -65,21 +65,14 @@
 
   .hidden-radio { display: none; }
   .toggle-group { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
-  .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+  .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
   .toggle-btn:hover { color: var(--text2); background: rgba(255,255,255,0.05); }
-  .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4; transition: 0.2s; }
   
   input[name="txOwner"]:checked + .toggle-btn { background: var(--bg3); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border-color: var(--border2); }
-  input[name="txOwner"]:checked + .toggle-btn .dot { opacity: 1; box-shadow: 0 0 6px currentColor; color: var(--accent); }
-
+  
   input#typeBuy:checked + .type-buy { background: var(--red-bg); color: var(--red); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,77,106,0.3); }
-  input#typeBuy:checked + .type-buy .dot { opacity: 1; box-shadow: 0 0 6px currentColor; }
-  
   input#typeSell:checked + .type-sell { background: rgba(77, 159, 255, 0.15); color: var(--blue); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(77,159,255,0.3); }
-  input#typeSell:checked + .type-sell .dot { opacity: 1; box-shadow: 0 0 6px currentColor; }
-  
   input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
-  input#typeDiv:checked + .type-div .dot { opacity: 1; box-shadow: 0 0 6px currentColor; }
 
   /* 브로커 퀵 태그 */
   .broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
@@ -90,7 +83,7 @@
   .search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
   .search-item:hover { background: var(--bg2); }
 
-  .tx-history-title { padding: 15px 20px 10px; font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; }
+  .tx-history-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; }
   .tx-list { flex: 1; overflow-y: auto; padding: 0 20px 20px; list-style: none; display: flex; flex-direction: column; gap: 10px; }
   .tx-list::-webkit-scrollbar { width: 4px; }
   .tx-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -105,7 +98,7 @@
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
   /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
-  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 48px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
+  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
   /* ── 3. 대시보드 메인 ── */
@@ -197,11 +190,19 @@
   .btn-danger:hover { background: var(--red-bg); color: var(--red); }
 
   /* ── 배당금 대시보드 ── */
-  #dividendDashboard { display: none; flex-direction: column; gap: 15px; padding-bottom: 40px; }
+  #dividendDashboard { display: none; flex-direction: column; gap: 15px; padding-bottom: 40px; height: 100%; }
   .div-chart-area { flex: 1.5; min-height: 300px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
   .div-list-area { flex: 1; height: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
   .div-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
   .div-item:last-child { border-bottom: none; }
+
+  /* ── 전체 거래 내역 화면 (History) ── */
+  #historyDashboard { display: none; flex-direction: column; gap: 15px; padding-bottom: 40px; height: 100%; }
+  .history-table-container { flex: 1; overflow-y: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); }
+  .history-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+  .history-table th { padding: 12px 16px; color: var(--text3); font-weight: 700; background: var(--bg3); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .history-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .history-table tr:hover td { background: rgba(255,255,255,0.02); }
 
   /* ── 모달 ── */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
@@ -230,7 +231,14 @@
 <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
 
 <nav>
-  <div class="logo"><div class="logo-dot"></div>STOCK&nbsp;WATCH</div>
+  <div class="logo">
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='22' height='22'>
+      <rect width='100' height='100' rx='22' fill='#1c2030'/>
+      <circle cx='28' cy='30' r='14' fill='#7c6af7'/>
+      <path d='M25,75 L45,45 L60,65 L85,25' fill='none' stroke='#00c87a' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/>
+    </svg>
+    주식 매니저
+  </div>
   
   <div class="header-search">
     <input type="text" id="tickerInput" class="search-input" placeholder="종목명 또는 코드 검색 (예: TSLA)" autocomplete="off" />
@@ -275,9 +283,9 @@
           </div>
           <div class="toggle-group" style="margin-top:2px;">
             <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
-            <label for="owner1" class="toggle-btn" id="lblUser1"><i class="dot"></i>보유자1</label>
+            <label for="owner1" class="toggle-btn" id="lblUser1">보유자1</label>
             <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
-            <label for="owner2" class="toggle-btn" id="lblUser2"><i class="dot"></i>보유자2</label>
+            <label for="owner2" class="toggle-btn" id="lblUser2">보유자2</label>
           </div>
         </div>
         <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
@@ -286,11 +294,11 @@
           </div>
           <div class="toggle-group" style="margin-top:2px;">
             <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
-            <label for="typeBuy" class="toggle-btn type-buy" style="padding:8px 2px;"><i class="dot"></i>매수</label>
+            <label for="typeBuy" class="toggle-btn type-buy" style="padding:8px 2px;">매수</label>
             <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
-            <label for="typeSell" class="toggle-btn type-sell" style="padding:8px 2px;"><i class="dot"></i>매도</label>
+            <label for="typeSell" class="toggle-btn type-sell" style="padding:8px 2px;">매도</label>
             <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
-            <label for="typeDiv" class="toggle-btn type-div" style="padding:8px 2px;"><i class="dot"></i>배당</label>
+            <label for="typeDiv" class="toggle-btn type-div" style="padding:8px 2px;">배당</label>
           </div>
         </div>
       </div>
@@ -322,8 +330,11 @@
       <button class="btn-submit" onclick="addTransaction()">내역 추가하기</button>
     </div>
 
-    <div class="tx-history-title">최근 거래 내역</div>
-    <ul class="tx-list" id="txList"></ul>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px 20px 10px;">
+      <div class="tx-history-title" style="padding:0;">최근 거래 내역</div>
+      <button class="btn-sm" onclick="setView('history')" style="padding: 2px 8px; border-color:var(--border2);">전체 보기</button>
+    </div>
+    <ul class="tx-list" id="txList" style="padding-top:0;"></ul>
   </aside>
 
   <main class="dashboard-main">
@@ -467,6 +478,30 @@
       </div>
     </div>
 
+    <div id="historyDashboard">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 class="section-title" style="margin:0;">📜 전체 거래 내역</h2>
+      </div>
+      <div class="history-table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>일자</th>
+              <th>소유자</th>
+              <th>계좌</th>
+              <th>유형</th>
+              <th>종목</th>
+              <th style="text-align:right;">수량</th>
+              <th style="text-align:right;">단가/배당</th>
+              <th style="text-align:right;">총액</th>
+              <th style="text-align:center;">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -546,18 +581,17 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v41'; 
+const STORE_KEY = 'stockwatch_real_v42'; 
 let state = loadState();
 
 let currentView = 'all'; 
 let currentDivFilter = 'all'; 
 let currentSortMode = 'default';
-let activeAccountFilter = null; // 클릭된 계좌 필터 상태
+let activeAccountFilter = null; 
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
-let allocationChartInst = null;
 const chartInstances = {};
 let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
@@ -580,7 +614,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v40'); 
+    let oldS = localStorage.getItem('stockwatch_real_v41'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -605,12 +639,12 @@ function toggleSidebar() {
   }
 }
 
-// 초기 이름 세팅
+// 초기 이름 세팅 (동그라미 제거 적용)
 function updateOwnerLabels() {
   document.getElementById('tabUser1').textContent = state.ownerNames.user1;
   document.getElementById('tabUser2').textContent = state.ownerNames.user2;
-  document.getElementById('lblUser1').innerHTML = `<i class="dot"></i>${state.ownerNames.user1}`;
-  document.getElementById('lblUser2').innerHTML = `<i class="dot"></i>${state.ownerNames.user2}`;
+  document.getElementById('lblUser1').innerHTML = state.ownerNames.user1;
+  document.getElementById('lblUser2').innerHTML = state.ownerNames.user2;
   document.getElementById('divTabUser1').textContent = state.ownerNames.user1;
   document.getElementById('divTabUser2').textContent = state.ownerNames.user2;
 }
@@ -675,7 +709,8 @@ function saveOwnerNames() {
   saveState();
   updateOwnerLabels();
   renderTxList();
-  render();
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
   closeModal('ownerOverlay');
   triggerAutoSync();
 }
@@ -690,7 +725,8 @@ function toggleTxOwner(id) {
   }
   saveState();
   renderTxList();
-  render();
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
   triggerAutoSync();
 }
 
@@ -741,6 +777,7 @@ function addTransaction() {
     alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
   }
 
+  // 매도 선택시 수량을 자동으로 음수로 전환
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
   
@@ -755,13 +792,18 @@ function addTransaction() {
   document.getElementById('txQty').value = '';
   document.getElementById('txPrice').value = '';
   
-  renderTxList(); render();
+  renderTxList(); 
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
   triggerAutoSync();
 }
 
 function deleteTransaction(id) {
   state.transactions = state.transactions.filter(t => t.id !== id);
-  saveState(); renderTxList(); render();
+  saveState(); 
+  renderTxList(); 
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
   triggerAutoSync();
 }
 
@@ -823,6 +865,50 @@ function renderTxList() {
   }).join('');
 }
 
+// ── 🆕 전체 거래 내역 (History) 렌더링 ──
+function renderHistoryDashboard() {
+  const tbody = document.getElementById('historyTableBody');
+  const sorted = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+  
+  if(sorted.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--text3);">등록된 거래 내역이 없습니다.</td></tr>`;
+      return;
+  }
+
+  tbody.innerHTML = sorted.map(tx => {
+      const isBuy = tx.qty > 0;
+      const isDiv = tx.txType === 'dividend';
+      const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
+      const typeLabel = isDiv ? '배당' : (isBuy ? '매수' : '매도');
+      const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
+      
+      const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
+      const stockName = dbMatch ? dbMatch.name : (cachedMarketData[tx.symbol] ? cachedMarketData[tx.symbol].name : tx.symbol);
+
+      return `
+      <tr style="border-bottom: 1px solid var(--border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:12px 16px; color:var(--text2);">${tx.date}</td>
+          <td style="padding:12px 16px;">
+              <span class="tx-owner-badge" onclick="toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="margin:0;">${tx.owner} ⇄</span>
+          </td>
+          <td style="padding:12px 16px; color:var(--text2);">${tx.broker || '-'}</td>
+          <td style="padding:12px 16px; font-weight:700; color:${typeColor};">${typeLabel}</td>
+          <td style="padding:12px 16px;">
+              <div style="font-weight:700; color:var(--text);">${stockName}</div>
+              <div style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${tx.symbol}</div>
+          </td>
+          <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : Math.abs(tx.qty)}</td>
+          <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : formatPrice(tx.price, tx.symbol)}</td>
+          <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:var(--text);">${formatPrice(totalAmt, tx.symbol)}</td>
+          <td style="padding:12px 16px; text-align:center;">
+              <button class="btn-danger" style="padding:4px 8px;" onclick="deleteTransaction(${tx.id})">✕</button>
+          </td>
+      </tr>
+      `;
+  }).join('');
+}
+
+
 function prepareTransaction(symbol, broker) {
   document.getElementById('txSymbol').value = symbol;
   
@@ -836,6 +922,7 @@ function prepareTransaction(symbol, broker) {
   
   document.getElementById('txQty').focus();
   
+  // 사이드바 열기
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
   
@@ -876,11 +963,15 @@ setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult');
 function selectMainSearchResult(symbol) {
   document.getElementById('tickerInput').value = '';
   document.getElementById('searchDropdown').style.display = 'none';
+  if(currentView === 'history') setView('all'); // 추가 후 전체보기 탭으로 이동
   addTickerToPortfolio(symbol);
 }
 function addManualTicker() {
   const val = document.getElementById('tickerInput').value.trim().toUpperCase();
-  if (val) addTickerToPortfolio(val);
+  if (val) {
+    if(currentView === 'history') setView('all');
+    addTickerToPortfolio(val);
+  }
 }
 document.getElementById('tickerInput').addEventListener('keydown', e => { if (e.key === 'Enter') addManualTicker(); });
 
@@ -977,7 +1068,10 @@ function setView(view, el) {
   currentView = view;
   activeAccountFilter = null; 
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
-  el.classList.add('active'); 
+  if(el) el.classList.add('active'); 
+  if(view === 'history') {
+    renderHistoryDashboard();
+  }
   render();
 }
 
@@ -1140,9 +1234,9 @@ function renderDividendDashboard() {
                 if(splitTxt.length === 2) {
                   let name = splitTxt[0];
                   let val = parseFloat(splitTxt[1].replace(/,/g,''));
-                  let formatVal = '₩' + Math.round(val || 0).toLocaleString();
-                  innerHtml += `<div style="font-size:13px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
-                  innerHtml += `<div style="font-size:13px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
+                  let formatVal = '₩' + Math.round(val).toLocaleString();
+                  innerHtml += `<div style="font-size:12px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
+                  innerHtml += `<div style="font-size:12px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
                 } else {
                   innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
                 }
@@ -1177,19 +1271,30 @@ async function render() {
   const dash = document.getElementById('dashboardTopWrapper');
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
+  const histDash = document.getElementById('historyDashboard'); // 전체 거래 내역 뷰
 
   if (currentView === 'dividend') {
     dash.style.display = 'none';
     container.style.display = 'none';
     listOptions.style.display = 'none';
+    histDash.style.display = 'none';
     divDash.style.display = 'flex';
     renderDividendDashboard();
+    return;
+  } else if (currentView === 'history') {
+    dash.style.display = 'none';
+    container.style.display = 'none';
+    listOptions.style.display = 'none';
+    divDash.style.display = 'none';
+    histDash.style.display = 'flex';
+    renderHistoryDashboard();
     return;
   } else {
     dash.style.display = 'flex';
     container.style.display = 'block';
     listOptions.style.display = 'flex';
     divDash.style.display = 'none';
+    histDash.style.display = 'none';
   }
 
   let ownerFilter = 'all';
@@ -1445,6 +1550,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
+    // ── 🌐 글로벌 Treemap 렌더링 (HTML) ──
     const tmContainer = document.getElementById('allocationTreemap');
     if (tmContainer) {
         if (treemapData.length === 0) {
@@ -1882,7 +1988,7 @@ async function pullFromGithub(silent = false) {
 
   const path = 'data/my_portfolio.json';
   try {
-    const fileInfo = await getGithubFileSha({user, repo, token}, path);
+    const fileInfo = await getGithubFileSha({user, token, repo}, path);
     if (fileInfo && fileInfo.content) {
       const dataStr = b64_to_utf8(fileInfo.content);
       const data = JSON.parse(dataStr);
