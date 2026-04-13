@@ -59,14 +59,12 @@
   .btn-icon-sm:hover { color: var(--text); }
   
   .tx-form { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; position: relative; }
-  /* 수정 모드 오버레이 방지용 relative 추가 */
   .form-group label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 5px; }
   .form-input { width: 100%; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 13px; font-family: var(--font-sans); outline: none; transition: border-color 0.2s; }
   .form-input:focus { border-color: var(--accent); }
   .btn-submit { width: 100%; padding: 12px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 5px; transition: 0.2s; }
   .btn-submit:hover { background: #6855e0; }
 
-  /* 🆕 수정 모드 표시용 스타일 */
   .edit-mode-banner { position: absolute; top: 0; left: 0; right: 0; background: var(--accent-bg); color: var(--accent); font-size: 11px; font-weight: bold; text-align: center; padding: 4px; display: none; z-index: 10; border-bottom: 1px solid var(--accent); }
   .btn-cancel-edit { position: absolute; right: 8px; top: 4px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; font-weight: bold; }
   .btn-cancel-edit:hover { text-decoration: underline; }
@@ -119,9 +117,7 @@
   .dashboard-main::-webkit-scrollbar { width: 8px; }
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   
-  /* 대시보드 탑 래퍼 (기본 노출 고정) */
   .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; flex-shrink: 0; }
-  
   .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
   @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 900px) { .dashboard-top { grid-template-columns: 1fr; } }
@@ -138,13 +134,11 @@
 
   /* 국가별 계좌 리스트 테이블 및 필터 표시 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
-  
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
   .acc-row:hover { border-color: var(--border2); }
   .acc-row.active-filter { border-color: var(--accent); background: rgba(124,106,247,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
   
   .acc-pie-wrap { width: 85px; height: 85px; position: relative; flex-shrink: 0; }
-  
   .acc-content { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .acc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px; }
   .acc-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -168,6 +162,10 @@
   .list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
   
+  /* 정렬 방향 버튼 */
+  .btn-sort-dir { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); border-radius: 6px; padding: 4px 8px; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 32px; }
+  .btn-sort-dir:hover { background: var(--bg3); color: var(--text); }
+
   .range-group { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
   .rtab { padding: 4px 12px; font-size: 11px; font-family: var(--font-mono); background: transparent; border: none; color: var(--text2); cursor: pointer; border-radius: 4px; transition: all 0.15s; }
   .rtab.active { background: var(--accent); color: #fff; }
@@ -182,10 +180,11 @@
   .card:hover { border-color: var(--border2); transform: translateY(-1px); }
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   
-  /* 카드 내 뱃지 디자인 */
+  /* 카드 내 뱃지 디자인 (국가 구분 추가) */
   .card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); }
   .tag-held { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(124,106,247,0.3); }
   .tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+  .country-badge { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 6px; color: #fff; font-family: var(--font-mono); }
   .card-tag .divider { margin: 0 6px; opacity: 0.5; font-weight: normal; }
   .card-tag .broker-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.95; max-width: 180px; }
   .card-tag .icon { margin-right: 4px; font-size: 12px; }
@@ -274,6 +273,7 @@
       <span id="syncText"></span>
     </div>
     <button class="btn-sm btn-github" onclick="openGithubModal()" title="GitHub 연동 설정">☁️ 설정</button>
+    <button class="btn-sm" onclick="downloadCsvSample()" title="샘플 양식 다운로드">⬇️ 샘플</button>
     <button class="btn-sm" onclick="document.getElementById('importCsvFile').click()" title="CSV 형식 거래내역 추가">📄 CSV 업로드</button>
     <button class="btn-sm" onclick="exportData()" title="로컬 백업">⬇️ 백업</button>
     <button class="btn-sm" onclick="document.getElementById('importFile').click()" title="로컬 복원">⬆️ 복원</button>
@@ -453,10 +453,12 @@
       <div class="list-controls">
         <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
           <option value="default">정렬 기준 (기본)</option>
-          <option value="roiDesc">내 수익률 높은 순</option>
-          <option value="evalDesc">평가금액 큰 순</option>
-          <option value="changeDesc">등락률 (선택 기간) 높은 순</option>
+          <option value="roiDesc">수익률 순</option>
+          <option value="evalDesc">평가금액 순</option>
+          <option value="changeDesc">등락률 순</option>
         </select>
+        <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 반전">⬇️</button>
+        
         <div class="range-group">
           <button class="rtab" onclick="setRange('1d',this)">1D</button>
           <button class="rtab" onclick="setRange('1w',this)">1W</button>
@@ -611,12 +613,13 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v50'; 
+const STORE_KEY = 'stockwatch_real_v51'; 
 let state = loadState();
 
 let currentView = 'all'; 
 let currentDivFilter = 'all'; 
 let currentSortMode = 'default';
+let sortDirection = -1; // 🆕 -1: 내림차순(디폴트), 1: 오름차순
 let activeAccountFilter = null; 
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
@@ -645,7 +648,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v49'); 
+    let oldS = localStorage.getItem('stockwatch_real_v50'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -720,6 +723,19 @@ function isCrypto(symbol) { return symbol.endsWith('-USD'); }
 function formatPrice(val, symbol) {
   if (isKorean(symbol)) return '₩' + Math.round(val).toLocaleString();
   return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+// ── 🆕 CSV 템플릿 다운로드 ──
+function downloadCsvSample() {
+  const csvContent = "일자,소유자,계좌,유형,종목,수량,단가\n2026-04-10,보유자1,키움증권,매수,005930,10,80000\n2026-04-12,보유자2,토스증권,배당,AAPL,0,15.5\n2026-04-14,보유자1,미래에셋,매도,TSLA,-5,170.2";
+  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'sample_transactions.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 // ── CSV 업로드 파서 ──
@@ -839,24 +855,21 @@ function toggleTxOwner(id) {
   triggerAutoSync();
 }
 
-// ── 🆕 거래 장부 (Ledger) 수정 로직 ──
+// ── 거래 장부 수정 로직 ──
 function editTransaction(id) {
   const tx = state.transactions.find(t => t.id === id);
   if (!tx) return;
 
-  // 사이드바 장부 탭으로 전환
   setSidebarView('ledger');
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
 
-  // 값 채우기
   document.getElementById('txDate').value = tx.date;
   document.getElementById('txSymbol').value = tx.symbol.replace('.KS', '');
   document.getElementById('txQty').value = Math.abs(tx.qty);
   document.getElementById('txPrice').value = tx.price;
   document.getElementById('txBroker').value = tx.broker || '';
   
-  // 라디오 버튼 세팅
   const isUser1 = tx.owner === state.ownerNames.user1;
   document.getElementById('owner1').checked = isUser1;
   document.getElementById('owner2').checked = !isUser1;
@@ -867,7 +880,6 @@ function editTransaction(id) {
   
   toggleTxType();
 
-  // 수정 모드 UI 활성화
   document.getElementById('editingTxId').value = id;
   document.getElementById('btnSubmitTx').textContent = '내역 수정하기';
   document.getElementById('btnSubmitTx').style.background = 'var(--blue)';
@@ -941,14 +953,12 @@ function addOrUpdateTransaction() {
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
   if (editId) {
-    // 수정 로직
     const idx = state.transactions.findIndex(t => t.id == editId);
     if (idx !== -1) {
       state.transactions[idx] = { id: parseInt(editId), date, owner, broker, symbol, qty, price, txType: finalTxType };
     }
-    cancelEdit(); // 폼 초기화
+    cancelEdit(); 
   } else {
-    // 신규 추가 로직
     state.transactions.push({ id: Date.now(), date, owner, broker, symbol, qty, price, txType: finalTxType });
     document.getElementById('txSymbol').value = '';
     document.getElementById('txQty').value = '';
@@ -1042,7 +1052,7 @@ function renderHistoryDashboard() {
   const sorted = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
   
   if(sorted.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:40px; color:var(--text3);">등록된 거래 내역이 없습니다.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--text3);">등록된 거래 내역이 없습니다.</td></tr>`;
       return;
   }
 
@@ -1239,6 +1249,14 @@ function setRange(rangeStr, el) {
 }
 
 function setSortMode(mode) { currentSortMode = mode; render(); }
+
+// 🆕 정렬 방향 반전 함수
+function toggleSortDirection() {
+  sortDirection = sortDirection === -1 ? 1 : -1;
+  document.getElementById('btnSortDir').textContent = sortDirection === -1 ? '⬇️' : '⬆️';
+  render();
+}
+
 function setView(view, el) {
   currentView = view;
   activeAccountFilter = null; 
@@ -1271,14 +1289,20 @@ function generateCardHtml(item) {
   const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '';
   const tagContent = isHeld ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` : `<span class="icon">⭐</span> 관심종목`;
 
+  // 🆕 국가별 뱃지
+  const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
+
   return `
     <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
       
-      <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}">
-        ${tagContent}
+      <div style="display:flex; align-items:center;">
+        ${countryBadge}
+        <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}" style="margin-bottom:0;">
+          ${tagContent}
+        </div>
       </div>
 
-      <div class="card-head" style="align-items:center;">
+      <div class="card-head" style="align-items:center; margin-top:12px;">
         <div style="flex:1; min-width:0; margin-right:10px;">
           <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
           <div style="font-size:11px; font-family:var(--font-mono); color:var(--text3); margin-top:2px; white-space:nowrap;">
@@ -1387,7 +1411,44 @@ function renderDividendDashboard() {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size:11} } },
-        tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } }
+        tooltip: { 
+          mode: 'index', intersect: false, 
+          external: function(context) {
+            let tooltipEl = document.getElementById('chartjs-tooltip');
+            if (!tooltipEl) {
+              tooltipEl = document.createElement('div');
+              tooltipEl.id = 'chartjs-tooltip';
+              document.body.appendChild(tooltipEl);
+            }
+            const tooltipModel = context.tooltip;
+            if (tooltipModel.opacity === 0) { tooltipEl.style.opacity = 0; return; }
+            if (tooltipModel.body) {
+              const bodyLines = tooltipModel.body.map(b => b.lines);
+              let innerHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
+              bodyLines.forEach(function(body, i) {
+                const colors = tooltipModel.labelColors[i];
+                const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
+                let txt = body[0];
+                let splitTxt = txt.split(': ');
+                if(splitTxt.length === 2) {
+                  let name = splitTxt[0];
+                  let val = parseFloat(splitTxt[1].replace(/,/g,''));
+                  let formatVal = '₩' + Math.round(val).toLocaleString();
+                  innerHtml += `<div style="font-size:12px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
+                  innerHtml += `<div style="font-size:12px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
+                } else {
+                  innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
+                }
+              });
+              innerHtml += '</div>';
+              tooltipEl.innerHTML = innerHtml;
+            }
+            const position = context.chart.canvas.getBoundingClientRect();
+            tooltipEl.style.opacity = 1;
+            tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+            tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY - 10 + 'px';
+          }
+        }
       },
       scales: {
         x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } },
@@ -1539,9 +1600,10 @@ async function render() {
     displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
   }
 
-  if(currentSortMode === 'roiDesc') displayItems.sort((a,b) => b.roi - a.roi);
-  else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => b.evalAmt - a.evalAmt);
-  else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => b.activeChange - a.activeChange);
+  // 🆕 오름차순/내림차순 토글 연동 정렬
+  if(currentSortMode === 'roiDesc') displayItems.sort((a,b) => (b.roi - a.roi) * sortDirection);
+  else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => (b.evalAmt - a.evalAmt) * sortDirection);
+  else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => (b.activeChange - a.activeChange) * sortDirection);
 
   Object.values(chartInstances).forEach(c => { if(c && typeof c.destroy === 'function') c.destroy(); });
   for(let key in chartInstances) delete chartInstances[key];
@@ -1769,41 +1831,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     if(tooltipEl) tooltipEl.style.opacity = 0;
                 });
             });
-        }
-    }
-
-    // ── 🏆 전체 수익률 목록 (사이드바) 렌더링 ──
-    const yieldContainer = document.getElementById('sidebarYieldList');
-    if (yieldContainer && fullDisplayItems) {
-        let validItems = fullDisplayItems.filter(item => item.type === 'held' && item.roi !== -9999 && item.costAmt > 0);
-        validItems.sort((a, b) => b.roi - a.roi); // 수익률 높은 순 정렬
-
-        if (validItems.length === 0) {
-            yieldContainer.innerHTML = '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">보유한 자산이 없습니다.</div>';
-        } else {
-            yieldContainer.innerHTML = validItems.map((item, idx) => {
-                let sign = item.roi > 0 ? '+' : '';
-                let color = item.roi > 0 ? 'var(--green)' : (item.roi < 0 ? 'var(--red)' : 'var(--text)');
-                let rankColor = idx === 0 ? '#ffb703' : (idx === 1 ? '#a259ff' : (idx === 2 ? '#4d9fff' : 'var(--text3)'));
-                let brokerText = item.broker !== '미지정' ? `<span style="font-size:10px; color:var(--text3); margin-left:6px;">[${item.broker}]</span>` : '';
-                let name = item.data ? item.data.name : item.symbol;
-                
-                return `
-                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); padding:12px; border-radius:6px; border:1px solid var(--border); transition:0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
-                    <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; margin-right:10px;">
-                        <span style="font-weight:900; font-style:italic; color:${rankColor}; width:18px; text-align:center; flex-shrink:0;">${idx+1}</span>
-                        <div style="min-width:0; overflow:hidden;">
-                            <div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${name} ${brokerText}</div>
-                            <div style="font-size:10px; font-family:var(--font-mono); color:var(--text2);">${item.symbol}</div>
-                        </div>
-                    </div>
-                    <div style="text-align:right; flex-shrink:0;">
-                        <div style="font-size:14px; font-family:var(--font-mono); font-weight:700; color:${color};">${sign}${item.roi.toFixed(2)}%</div>
-                        <div style="font-size:10px; color:var(--text3);">${sign}${formatPrice(item.evalAmt - item.costAmt, item.symbol)}</div>
-                    </div>
-                </div>
-                `;
-            }).join('');
         }
     }
 
