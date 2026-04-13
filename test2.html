@@ -63,18 +63,17 @@
   .btn-edit-owners { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; text-decoration: underline; transition: color 0.2s; padding: 0; }
   .btn-edit-owners:hover { color: var(--accent); }
 
+  /* 토글 그룹에서 동그라미(dot) 제거하고 텍스트만 깔끔하게 유지 */
   .hidden-radio { display: none; }
   .toggle-group { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
   .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
   .toggle-btn:hover { color: var(--text2); background: rgba(255,255,255,0.05); }
   
   input[name="txOwner"]:checked + .toggle-btn { background: var(--bg3); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border-color: var(--border2); }
-  
   input#typeBuy:checked + .type-buy { background: var(--red-bg); color: var(--red); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,77,106,0.3); }
   input#typeSell:checked + .type-sell { background: rgba(77, 159, 255, 0.15); color: var(--blue); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(77,159,255,0.3); }
   input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
 
-  /* 브로커 퀵 태그 */
   .broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
   .broker-tag:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.05); }
 
@@ -97,7 +96,7 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
+  /* ── 사이드바 펼치기용 화살표 버튼 ── */
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
@@ -106,8 +105,8 @@
   .dashboard-main::-webkit-scrollbar { width: 8px; }
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
   
-  /* 대시보드 탑 래퍼 */
-  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; }
+  /* 대시보드 탑 래퍼 (기본 노출) */
+  .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; flex-shrink: 0; }
   
   .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
   @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
@@ -148,7 +147,7 @@
   .acc-bar-val { font-family: var(--font-mono); font-size: 11px; color: var(--text); width: 75px; text-align: right; flex-shrink: 0; }
 
   /* ── 4. 리스트 옵션 바 ── */
-  .list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+  .list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
   .list-title-wrap { display: flex; align-items: center; gap: 12px; }
   .section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
   
@@ -581,7 +580,7 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v42'; 
+const STORE_KEY = 'stockwatch_real_v43'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -614,7 +613,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v41'); 
+    let oldS = localStorage.getItem('stockwatch_real_v42'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -639,7 +638,7 @@ function toggleSidebar() {
   }
 }
 
-// 초기 이름 세팅 (동그라미 제거 적용)
+// 초기 이름 세팅
 function updateOwnerLabels() {
   document.getElementById('tabUser1').textContent = state.ownerNames.user1;
   document.getElementById('tabUser2').textContent = state.ownerNames.user2;
@@ -883,7 +882,8 @@ function renderHistoryDashboard() {
       const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
       
       const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
-      const stockName = dbMatch ? dbMatch.name : (cachedMarketData[tx.symbol] ? cachedMarketData[tx.symbol].name : tx.symbol);
+      const cachedMatch = cachedMarketData[tx.symbol];
+      const stockName = dbMatch ? dbMatch.name : (cachedMatch ? cachedMatch.name : tx.symbol);
 
       return `
       <tr style="border-bottom: 1px solid var(--border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
@@ -922,7 +922,6 @@ function prepareTransaction(symbol, broker) {
   
   document.getElementById('txQty').focus();
   
-  // 사이드바 열기
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
   
@@ -963,7 +962,7 @@ setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult');
 function selectMainSearchResult(symbol) {
   document.getElementById('tickerInput').value = '';
   document.getElementById('searchDropdown').style.display = 'none';
-  if(currentView === 'history') setView('all'); // 추가 후 전체보기 탭으로 이동
+  if(currentView === 'history') setView('all');
   addTickerToPortfolio(symbol);
 }
 function addManualTicker() {
@@ -1212,44 +1211,7 @@ function renderDividendDashboard() {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size:11} } },
-        tooltip: { 
-          mode: 'index', intersect: false, 
-          external: function(context) {
-            let tooltipEl = document.getElementById('chartjs-tooltip');
-            if (!tooltipEl) {
-              tooltipEl = document.createElement('div');
-              tooltipEl.id = 'chartjs-tooltip';
-              document.body.appendChild(tooltipEl);
-            }
-            const tooltipModel = context.tooltip;
-            if (tooltipModel.opacity === 0) { tooltipEl.style.opacity = 0; return; }
-            if (tooltipModel.body) {
-              const bodyLines = tooltipModel.body.map(b => b.lines);
-              let innerHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
-              bodyLines.forEach(function(body, i) {
-                const colors = tooltipModel.labelColors[i];
-                const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
-                let txt = body[0];
-                let splitTxt = txt.split(': ');
-                if(splitTxt.length === 2) {
-                  let name = splitTxt[0];
-                  let val = parseFloat(splitTxt[1].replace(/,/g,''));
-                  let formatVal = '₩' + Math.round(val).toLocaleString();
-                  innerHtml += `<div style="font-size:12px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
-                  innerHtml += `<div style="font-size:12px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
-                } else {
-                  innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
-                }
-              });
-              innerHtml += '</div>';
-              tooltipEl.innerHTML = innerHtml;
-            }
-            const position = context.chart.canvas.getBoundingClientRect();
-            tooltipEl.style.opacity = 1;
-            tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-            tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY - 10 + 'px';
-          }
-        }
+        tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } }
       },
       scales: {
         x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } },
@@ -1271,7 +1233,7 @@ async function render() {
   const dash = document.getElementById('dashboardTopWrapper');
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
-  const histDash = document.getElementById('historyDashboard'); // 전체 거래 내역 뷰
+  const histDash = document.getElementById('historyDashboard');
 
   if (currentView === 'dividend') {
     dash.style.display = 'none';
@@ -1315,16 +1277,6 @@ async function render() {
       symbolHoldings[h.symbol].totalCost += (h.qty * h.avg);
       symbolHoldings[h.symbol].brokers.add(h.broker);
     }
-  }
-
-  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
-    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
-    updateSummaryAndAllocation(currentHoldings, []); 
-    return;
-  }
-
-  if(Object.keys(cachedMarketData).length === 0) {
-    container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
   }
 
   let allSymbols = new Set(state.tickers);
@@ -1395,6 +1347,7 @@ async function render() {
     }
   });
 
+  // 안전하게 데이터를 먼저 요약 패널로 넘김
   updateSummaryAndAllocation(currentHoldings, displayItems);
 
   if (activeAccountFilter) {
@@ -1485,7 +1438,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
         if(item.type === 'held' && item.evalAmt > 0) {
           let sym = item.symbol;
           if(!treemapDataMap[sym]) {
-             treemapDataMap[sym] = { symbol: sym, name: item.data.name, value: 0, change: item.activeChange };
+             treemapDataMap[sym] = { symbol: sym, name: item.data ? item.data.name : sym, value: 0, change: item.activeChange };
           }
           treemapDataMap[sym].value += (isKorean(sym) ? item.evalAmt : item.evalAmt * currentUsdKrw);
         }
@@ -1580,6 +1533,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     return;
                 }
                 let totalItems = items.reduce((sum, i)=>sum+i.value, 0);
+                if(totalItems <= 0) return;
                 let half = totalItems / 2;
                 let sum = 0; let splitIdx = 0;
                 for(let i=0; i<items.length; i++){
