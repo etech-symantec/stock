@@ -46,7 +46,7 @@
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
   /* ── 사이드바 ── */
-  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; overflow-x: hidden; }
+  .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; overflow-x: hidden; }
   .ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
   
   .sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
@@ -81,6 +81,10 @@
   input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
   input#typeDiv:checked + .type-div .dot { opacity: 1; box-shadow: 0 0 6px currentColor; }
 
+  /* 브로커 퀵 태그 */
+  .broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
+  .broker-tag:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.05); }
+
   .tx-search-container { position: relative; }
   .tx-dropdown { position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; list-style: none; z-index: 100; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: none; }
   .search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
@@ -100,8 +104,8 @@
   .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); }
   .tx-owner-badge:hover { background: var(--accent); color: #fff; }
 
-  /* ── 사이드바 펼치기용 얇고 작아진 화살표 버튼 ── */
-  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
+  /* ── 사이드바 펼치기용 얇은 화살표 버튼 ── */
+  #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 24px; height: 48px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
   /* ── 3. 대시보드 메인 ── */
@@ -126,11 +130,12 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
-  /* 국가별 계좌 리스트 테이블 */
+  /* 국가별 계좌 리스트 테이블 및 필터 표시 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
   
-  .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: border-color 0.2s; }
+  .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
   .acc-row:hover { border-color: var(--border2); }
+  .acc-row.active-filter { border-color: var(--accent); background: rgba(124,106,247,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
   
   .acc-pie-wrap { width: 85px; height: 85px; position: relative; flex-shrink: 0; }
   
@@ -308,6 +313,7 @@
       <div class="form-group">
         <label>계좌명 (선택)</label>
         <input type="text" id="txBroker" class="form-input" placeholder="예: 키움증권, 토스 등">
+        <div id="brokerTags" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
       </div>
       <button class="btn-submit" onclick="addTransaction()">내역 추가하기</button>
     </div>
@@ -325,14 +331,20 @@
             <div class="cp-title">🌐 통합 자산</div>
             <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
           </div>
-          <div class="cp-summary">
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">통합 투자액</div>
-              <div class="cp-sum-val" id="globalTotalCost">—</div>
+          <div class="gs-group" style="display:flex; gap:15px; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:-5px;">
+            <div style="flex:1;">
+              <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">통합 투자 원금</div>
+              <div id="globalTotalCost" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--text);">—</div>
             </div>
-            <div class="cp-sum-box">
-              <div class="cp-sum-label">통합 평가액</div>
-              <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue)">—</div>
+            <div style="flex:1;">
+              <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">누적 배당금</div>
+              <div id="globalTotalDiv" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--green);">—</div>
+            </div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box" style="flex:1.2;">
+              <div class="cp-sum-label">통합 평가 자산</div>
+              <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue); font-size:22px;">—</div>
             </div>
             <div class="cp-sum-box">
               <div class="cp-sum-label">통합 수익금 (수익률)</div>
@@ -389,7 +401,7 @@
       </div>
     </div>
 
-    <div class="list-options-bar" id="listOptionsBar">
+    <div class="list-options-bar" id="listOptionsBar" style="display:none;">
       <div class="list-title-wrap">
         <h2 class="section-title">종목 리스트</h2>
       </div>
@@ -530,12 +542,13 @@
 
 <script>
 // ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v36'; 
+const STORE_KEY = 'stockwatch_real_v37'; 
 let state = loadState();
 
 let currentView = 'all'; 
 let currentDivFilter = 'all'; 
 let currentSortMode = 'default';
+let activeAccountFilter = null; // 🆕 클릭된 계좌 필터 상태
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
 let modalChartInst = null;
@@ -563,7 +576,7 @@ function loadState() {
   try {
     const s = localStorage.getItem(STORE_KEY);
     if (s) return JSON.parse(s);
-    let oldS = localStorage.getItem('stockwatch_real_v35'); 
+    let oldS = localStorage.getItem('stockwatch_real_v36'); 
     if(oldS) {
       let parsed = JSON.parse(oldS);
       if(!parsed.ownerNames) parsed.ownerNames = { user1: '보유자1', user2: '보유자2' };
@@ -575,7 +588,7 @@ function loadState() {
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// UI 토글 처리
+// UI 토글 처리 (사이드바)
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -596,6 +609,13 @@ function updateOwnerLabels() {
   document.getElementById('lblUser2').innerHTML = `<i class="dot"></i>${state.ownerNames.user2}`;
   document.getElementById('divTabUser1').textContent = state.ownerNames.user1;
   document.getElementById('divTabUser2').textContent = state.ownerNames.user2;
+}
+
+// 🆕 계좌 필터 토글 기능
+function toggleAccountFilter(broker) {
+  if (activeAccountFilter === broker) activeAccountFilter = null;
+  else activeAccountFilter = broker;
+  render();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -744,6 +764,12 @@ function deleteTransaction(id) {
 
 function renderTxList() {
   const listEl = document.getElementById('txList');
+  
+  // 🆕 등록된 계좌명을 태그로 렌더링
+  const uniqueBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b))];
+  const tagsHtml = uniqueBrokers.map(b => `<button type="button" class="broker-tag" onclick="document.getElementById('txBroker').value='${b}'">${b}</button>`).join('');
+  document.getElementById('brokerTags').innerHTML = tagsHtml;
+
   if(state.transactions.length === 0) {
     listEl.innerHTML = `<li style="text-align:center; padding:20px; color:var(--text3); font-size:11px;">등록된 내역이 없습니다.</li>`;
     return;
@@ -808,6 +834,7 @@ function prepareTransaction(symbol, broker) {
   
   document.getElementById('txQty').focus();
   
+  // 사이드바 열기
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
   
@@ -947,6 +974,7 @@ function setRange(rangeStr, el) {
 function setSortMode(mode) { currentSortMode = mode; render(); }
 function setView(view, el) {
   currentView = view;
+  activeAccountFilter = null; // 🆕 탭 변경 시 필터 초기화
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); 
   render();
@@ -1120,7 +1148,6 @@ async function render() {
     renderDividendDashboard();
     return;
   } else {
-    // block이 아니라 flex로 렌더해야 .collapsed 레이아웃 애니메이션이 깨지지 않음
     dash.style.display = 'flex';
     container.style.display = 'block';
     listOptions.style.display = 'flex';
@@ -1147,7 +1174,7 @@ async function render() {
     }
   }
 
-  // ── 변경: 종목이 없어도 요약 패널을 에러 없이 안전하게 출력합니다 ──
+  // 데이터가 없어도 대시보드는 렌더링되게 호출
   if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
     updateSummaryAndAllocation(currentHoldings);
@@ -1198,6 +1225,11 @@ async function render() {
     return true; 
   });
 
+  // 🆕 계좌 클릭 시 해당 종목만 필터링
+  if (activeAccountFilter) {
+    displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
+  }
+
   const getSliceLen = (range) => {
     if (range === '1d') return 2;
     if (range === '1w') return 6;
@@ -1210,19 +1242,16 @@ async function render() {
   };
 
   displayItems.forEach(item => {
-    // ── 개선: DOM 의존성 없이 고유 ID를 생성하여 차트를 안전하게 바인딩 ──
     item.uniqueId = 'chart_' + Math.random().toString(36).substring(2, 10);
     
     if(item.data && item.data.prices) {
       const prices = item.data.prices;
       const last = item.data.last;
-      
       const sliceLen = getSliceLen(state.range);
       item.sliceLen = sliceLen; 
       
       const pStart = prices[Math.max(0, prices.length - sliceLen)] || item.data.prev;
       item.activeChange = ((last - pStart) / pStart) * 100;
-      
       item.evalAmt = item.qty * last;
       item.costAmt = item.qty * item.avg;
       item.roi = item.costAmt > 0 ? ((item.evalAmt - item.costAmt)/item.costAmt*100) : -9999;
@@ -1235,12 +1264,12 @@ async function render() {
   else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => b.evalAmt - a.evalAmt);
   else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => b.activeChange - a.activeChange);
 
-  // 기존 차트 안전하게 메모리 해제
   Object.values(chartInstances).forEach(c => { if(c && typeof c.destroy === 'function') c.destroy(); });
   for(let key in chartInstances) delete chartInstances[key];
   
   if(displayItems.length === 0) {
-     container.innerHTML = `<div class="empty">선택한 탭에 표시할 종목이 없습니다.</div>`;
+     if(activeAccountFilter) container.innerHTML = `<div class="empty">해당 계좌에 종목이 없습니다.</div>`;
+     else container.innerHTML = `<div class="empty">선택한 탭에 표시할 종목이 없습니다.</div>`;
      updateSummaryAndAllocation(currentHoldings);
      return;
   }
@@ -1264,7 +1293,6 @@ async function render() {
 
   container.innerHTML = html;
 
-  // ── 개선: DOM에 의존하지 않고 안전하게 차트 렌더링 ──
   displayItems.forEach(item => {
     if (item.data && item.data.prices) {
       const displayPrices = item.data.prices.slice(-item.sliceLen);
@@ -1296,7 +1324,6 @@ function buildChart(canvasId, prices, dates, mini) {
 }
 
 function updateSummaryAndAllocation(rawHoldings) {
-  // ── 개선: 모든 에러를 완벽 차단하는 Try-Catch 및 안전 장치 적용 ──
   try {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
@@ -1338,6 +1365,22 @@ function updateSummaryAndAllocation(rawHoldings) {
       }
     }
 
+    // ── 누적 배당금 계산 ──
+    let krwDiv = 0, usdDiv = 0;
+    let filterName = 'all';
+    if (currentView === 'user1') filterName = state.ownerNames.user1;
+    if (currentView === 'user2') filterName = state.ownerNames.user2;
+
+    state.transactions.forEach(tx => {
+      if (tx.txType === 'dividend') {
+         if (filterName === 'all' || tx.owner === filterName) {
+           if (isKorean(tx.symbol)) krwDiv += tx.price;
+           else usdDiv += tx.price;
+         }
+      }
+    });
+    const globalDiv = krwDiv + (usdDiv * currentUsdKrw);
+
     const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
     const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
     const globalRoi = globalCost > 0 ? ((globalEval - globalCost) / globalCost * 100) : 0;
@@ -1345,6 +1388,7 @@ function updateSummaryAndAllocation(rawHoldings) {
 
     document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
     document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
+    document.getElementById('globalTotalDiv').textContent = `₩ ${Math.round(globalDiv).toLocaleString()}`;
     
     const gRoiEl = document.getElementById('globalTotalRoi');
     const signG = globalPnl >= 0 ? '+' : '';
@@ -1353,6 +1397,7 @@ function updateSummaryAndAllocation(rawHoldings) {
     
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
+    // ── 글로벌 통합 차트 ──
     const ctxGlobal = document.getElementById('allocationCanvas');
     if(ctxGlobal) {
       if (allocData.length > 0) {
@@ -1366,8 +1411,16 @@ function updateSummaryAndAllocation(rawHoldings) {
             responsive: true, maintainAspectRatio: false,
             plugins: { 
               legend: { display: false }, 
+              // 🆕 종목명이 툴팁에 제대로 전달되도록 label 콜백 세팅
               tooltip: { 
                 enabled: false,
+                callbacks: {
+                  label: function(context) {
+                    let v = context.raw;
+                    let formatVal = '₩' + Math.round(v).toLocaleString();
+                    return context.label + ': ' + formatVal;
+                  }
+                },
                 external: function(context) {
                   let tooltipEl = document.getElementById('chartjs-tooltip');
                   if (!tooltipEl) {
@@ -1387,12 +1440,6 @@ function updateSummaryAndAllocation(rawHoldings) {
                       const colors = tooltipModel.labelColors[i];
                       const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
                       let txt = body[0];
-                      let splitTxt = txt.split(': ');
-                      if(splitTxt.length === 2) {
-                        let val = parseFloat(splitTxt[1].replace(/,/g,''));
-                        let formatVal = '₩' + Math.round(val || 0).toLocaleString();
-                        txt = `${splitTxt[0]}: ${formatVal}`;
-                      }
                       innerHtml += `<div style="font-size:12px; display:flex; align-items:center; white-space:nowrap; padding:2px 0;">${span}${txt}</div>`;
                     });
                     innerHtml += '</div>';
@@ -1446,10 +1493,12 @@ function updateSummaryAndAllocation(rawHoldings) {
 
       let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
       let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
-      let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
+      let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      
+      let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
-        <div class="acc-row">
+        <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')">
           <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
           <div class="acc-content">
               <div class="acc-header">
@@ -1504,9 +1553,11 @@ function updateSummaryAndAllocation(rawHoldings) {
       let costPct = maxUsdAccVal > 0 ? (d.cost / maxUsdAccVal * 100) : 0;
       let evalPct = maxUsdAccVal > 0 ? (d.eval / maxUsdAccVal * 100) : 0;
       let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
+      
+      let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
-        <div class="acc-row">
+        <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')">
           <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
           <div class="acc-content">
               <div class="acc-header">
@@ -1579,7 +1630,7 @@ function updateSummaryAndAllocation(rawHoldings) {
                   bodyLines.forEach(function(body, i) {
                     const colors = tooltipModel.labelColors[i];
                     const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
-                    let txt = body[0];
+                    let txt = body[0]; 
                     innerHtml += `<div style="font-size:12px; display:flex; align-items:center; white-space:nowrap; padding:2px 0;">${span}${txt}</div>`;
                   });
                   innerHtml += '</div>';
