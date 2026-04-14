@@ -232,6 +232,9 @@
   /* ⚙️ 통합 설정 모달 내 그룹 박스 */
   .settings-section { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
   .settings-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  
+  /* 전역 오버레이 z-index 보정 */
+  .overlay { z-index: 999999; }
 </style>
 </head>
 <body>
@@ -464,7 +467,7 @@
           <option value="evalDesc">평가금액 순</option>
           <option value="changeDesc">등락률 순</option>
         </select>
-        <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 전환">⬇️</button>
+        <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 반전">⬇️</button>
         
         <div class="range-group">
           <button class="rtab" onclick="setRange('1d',this)">1D</button>
@@ -669,7 +672,7 @@
 
 <script>
 // ==========================================
-// 1. 단일 Script 블록 통합 (Scope 에러 원천 방지)
+// 1. 단일 Script 블록 (모든 함수 포함, Scope 고정)
 // ==========================================
 
 // ── 렌더링 호출 (메인 진입점) ──
@@ -920,7 +923,7 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// ── UI 토글 / 모달 / 사이드바 등 ──
+// ── UI 토글 및 모달 (전역 스코프 유지) ──
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -984,6 +987,7 @@ function toggleTxType() {
     document.getElementById('divTaxWrap').style.display = 'block';
     if(!isEditing) document.getElementById('applyDivTax').checked = true;
     else document.getElementById('applyDivTax').checked = false; 
+
   } else {
     document.getElementById('txQtyWrap').style.display = 'block';
     document.getElementById('txPriceLabel').textContent = '단가 (1주당 가격)';
@@ -992,7 +996,6 @@ function toggleTxType() {
   }
 }
 
-// 🔥 모달 열기/닫기 함수 선언 (전역 스코프 유지)
 function openOwnerModal() {
   document.getElementById('inputOwner1Name').value = state.owners.user1.name;
   document.getElementById('inputOwner1Icon').value = state.owners.user1.icon;
@@ -1161,7 +1164,7 @@ function addOrUpdateTransaction() {
 
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
-  // 📉 폼 내 배당 세금 차감 로직
+  // 📉 폼 내 배당 세금 차감 로직 (세전 체크 시)
   if (typeVal === 'dividend' && document.getElementById('applyDivTax').checked) {
       const taxRate = isKorean(symbol) ? 0.154 : 0.15;
       price = price * (1 - taxRate);
@@ -1314,6 +1317,7 @@ function renderHistoryDashboard() {
   }).join('');
 }
 
+
 function prepareTransaction(symbol, broker) {
   document.getElementById('txSymbol').value = symbol;
   
@@ -1335,7 +1339,7 @@ function prepareTransaction(symbol, broker) {
   setTimeout(() => sb.style.boxShadow = "none", 500);
 }
 
-// ── 4. 검색 로직 ──
+// ── 4. 검색 자동완성 ──
 function setupSearch(inputId, dropdownId, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
@@ -1507,6 +1511,7 @@ function setDivFilter(filter, el) {
   renderDividendDashboard();
 }
 
+// ── 6. 렌더링 세부 함수 ──
 function renderSidebarYieldList(currentHoldings) {
   const container = document.getElementById('sidebarYieldList');
   if (!container) return;
@@ -2198,13 +2203,6 @@ function saveGhSettings(settings) {
   localStorage.setItem('gh_settings', JSON.stringify(settings));
 }
 
-document.getElementById('ghAutoSync').addEventListener('change', function(e) {
-  let s = getGhSettings();
-  s.autoSync = e.target.checked;
-  saveGhSettings(s);
-  if(s.autoSync) triggerAutoSync();
-});
-
 function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
 function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
@@ -2263,7 +2261,7 @@ async function pushToGithub(silent = false) {
     
     if(putRes.ok) { 
       updateSyncStatus('success');
-      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
+      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('masterSettingsOverlay'); }
     } else { 
       updateSyncStatus('error');
       if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
@@ -2306,13 +2304,147 @@ async function pullFromGithub(silent = false) {
         renderTxList();
         render();
         updateSyncStatus('success');
-        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('githubOverlay'); }
+        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('masterSettingsOverlay'); }
       } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
     } else if(!silent) alert('저장소에 파일이 없습니다.');
   } catch(e) { if(!silent) alert('가져오기 실패'); }
 }
 
-// ── 6. 메인 렌더 함수 ──
+// ── 렌더링 세부 함수들 (메인 render 함수에서 호출됨) ──
+function renderDividendDashboard() {
+  let krwTotal = 0, usdTotal = 0;
+  let monthlyKrw = {}, monthlyUsd = {};
+  let symTotals = {};
+  let divYields = {}; 
+
+  const divTxs = state.transactions.filter(t => {
+    if(t.txType !== 'dividend') return false;
+    let filterName = 'all';
+    if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
+    if(currentDivFilter === 'user2') filterName = state.owners.user2.name;
+    if(filterName !== 'all' && t.owner !== filterName) return false;
+    return true;
+  });
+
+  divTxs.forEach(tx => {
+     const isKRW = isKorean(tx.symbol);
+     const amt = tx.price; 
+     const month = tx.date.substring(0, 7); 
+     const sym = tx.symbol;
+
+     if (!monthlyKrw[month]) monthlyKrw[month] = 0;
+     if (!monthlyUsd[month]) monthlyUsd[month] = 0;
+     if (!symTotals[sym]) symTotals[sym] = { krw: 0, usd: 0 };
+     if (!divYields[sym]) divYields[sym] = { totalDiv: 0, totalEvalAtDiv: 0 };
+
+     if (isKRW) {
+       krwTotal += amt; monthlyKrw[month] += amt; symTotals[sym].krw += amt;
+     } else {
+       usdTotal += amt; monthlyUsd[month] += amt; symTotals[sym].usd += amt;
+     }
+     
+     divYields[sym].totalDiv += amt;
+     
+     let qtyAtDiv = 0;
+     let filterName = 'all';
+     if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
+     if(currentDivFilter === 'user2') filterName = state.owners.user2.name;
+
+     state.transactions.forEach(t => {
+         if (t.symbol === sym && t.txType !== 'dividend' && t.date <= tx.date) {
+             if (filterName === 'all' || t.owner === filterName) {
+                 qtyAtDiv += t.qty;
+             }
+         }
+     });
+     
+     let priceAtDiv = 0;
+     if (cachedMarketData[sym] && cachedMarketData[sym].rawDates) {
+         let pIdx = cachedMarketData[sym].rawDates.indexOf(tx.date);
+         if (pIdx !== -1 && cachedMarketData[sym].prices[pIdx] !== null) {
+             priceAtDiv = cachedMarketData[sym].prices[pIdx];
+         } else {
+             for (let k = cachedMarketData[sym].rawDates.length - 1; k >= 0; k--) {
+                 if (cachedMarketData[sym].rawDates[k] <= tx.date && cachedMarketData[sym].prices[k] !== null) {
+                     priceAtDiv = cachedMarketData[sym].prices[k];
+                     break;
+                 }
+             }
+         }
+     }
+     divYields[sym].totalEvalAtDiv += (qtyAtDiv * priceAtDiv);
+  });
+
+  document.getElementById('divTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
+  document.getElementById('divTotalUsd').textContent = `$ ${usdTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
+  document.getElementById('divTotalConverted').textContent = `₩ ${Math.round(grandTotal).toLocaleString()}`;
+
+  let symArr = Object.keys(symTotals).map(sym => {
+    return { symbol: sym, total: symTotals[sym].krw + (symTotals[sym].usd * currentUsdKrw) };
+  });
+  symArr.sort((a,b) => b.total - a.total); 
+
+  let listHtml = symArr.map(item => {
+    const isKRW = isKorean(item.symbol);
+    const originAmt = isKRW ? symTotals[item.symbol].krw : symTotals[item.symbol].usd;
+    const dbMatch = localStockDB.find(s => s.symbol === item.symbol);
+    const cName = dbMatch ? dbMatch.name : item.symbol;
+
+    let yieldHtml = '';
+    let yData = divYields[item.symbol];
+    if (yData && yData.totalEvalAtDiv > 0) {
+        let yPct = (yData.totalDiv / yData.totalEvalAtDiv) * 100;
+        yieldHtml = `<span style="font-size:11px; color:var(--text2); margin-right:12px; border:1px solid var(--border2); padding:2px 6px; border-radius:4px;">실질 배당률 ${yPct.toFixed(2)}%</span>`;
+    }
+
+    return `
+      <div class="div-item">
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <span style="font-weight:700; color:var(--text); font-size:13px; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${cName}">${cName}</span>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--text3);">${item.symbol}</span>
+        </div>
+        <div style="display:flex; align-items:center;">
+          ${yieldHtml}
+          <div style="font-family:var(--font-mono); font-weight:700; color:var(--green); font-size:14px; text-align:right;">
+            ${formatPrice(originAmt, item.symbol)}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('divStockList').innerHTML = listHtml || '<div style="color:var(--text3); font-size:12px; text-align:center; padding:40px;">조회된 배당 내역이 없습니다.</div>';
+
+  const allMonths = Array.from(new Set([...Object.keys(monthlyKrw), ...Object.keys(monthlyUsd)])).sort();
+  const krwData = allMonths.map(m => monthlyKrw[m] || 0);
+  const usdConvertedData = allMonths.map(m => (monthlyUsd[m] || 0) * currentUsdKrw);
+
+  if(divMonthlyChartInst) divMonthlyChartInst.destroy();
+  const ctx = document.getElementById('divMonthlyCanvas').getContext('2d');
+  divMonthlyChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: allMonths,
+      datasets: [
+        { label: '국내 (₩)', data: krwData, backgroundColor: '#00c87a', borderRadius: 4 },
+        { label: '해외 환산 (₩)', data: usdConvertedData, backgroundColor: '#7c6af7', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size:11} } },
+        tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } }
+      },
+      scales: {
+        x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } },
+        y: { stacked: true, ticks: { color: '#8890a4' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } }
+      }
+    }
+  });
+}
+
+// ── 6. 메인 렌더 함수 (최하단) ──
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
