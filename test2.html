@@ -225,6 +225,7 @@
   input:checked + .slider:before { transform: translateX(16px); background-color: #fff; }
 
   #chartjs-tooltip { opacity: 0; position: absolute; background: rgba(20, 23, 32, 0.95); border: 1px solid var(--border2); border-radius: 6px; color: #fff; pointer-events: none; transform: translate(-50%, -110%); transition: all .1s ease; z-index: 999999; padding: 8px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); font-family: var(--font-sans); white-space: nowrap; }
+
   .treemap-cell { position: absolute; border: 1px solid var(--bg2); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; box-sizing: border-box; color: #fff; cursor: pointer; transition: 0.2s; border-radius: 4px; padding: 4px; }
   .treemap-cell:hover { opacity: 0.85; transform: scale(0.98); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
 
@@ -600,7 +601,6 @@
          <input type="color" id="inputOwner2Color" style="width:100%; height:38px; padding:0; border:none; border-radius:6px; cursor:pointer;">
       </div>
     </div>
-
     <button class="btn-submit" style="background:var(--accent); width:100%; margin-top:10px;" onclick="saveOwnerNames()">변경 사항 저장</button>
   </div>
 </div>
@@ -666,7 +666,11 @@
 </div>
 
 <script>
-// ── 1. 핵심 유틸 함수 ──
+// ==========================================
+// 1. 단일 Script 블록 (모든 함수 포함)
+// ==========================================
+
+// ── 유틸리티 함수 ──
 function getColors(prices) {
   if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
   const last = prices[prices.length-1], first = prices[0];
@@ -707,8 +711,8 @@ function getOwnerInfo(ownerName) {
   return { name: ownerName, color: '#8890a4', icon: '👤' };
 }
 
-// ── 2. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v66'; 
+// ── 데이터 상태 관리 ──
+const STORE_KEY = 'stockwatch_real_v65'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -743,7 +747,7 @@ function loadState() {
   try {
     let s = localStorage.getItem(STORE_KEY);
     if (!s) {
-      let oldS = localStorage.getItem('stockwatch_real_v65'); 
+      let oldS = localStorage.getItem('stockwatch_real_v64'); 
       if(oldS) s = oldS;
     }
     if (s) {
@@ -771,7 +775,7 @@ function loadState() {
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// ── 3. 주요 액션 ──
+// ── 로컬 및 클라우드 데이터 기능 ──
 function resetAllTransactions() {
   if(confirm("🚨 경고: 모든 거래 내역이 영구적으로 삭제됩니다.\n정말로 전체 데이터를 초기화하시겠습니까?")) {
     state.transactions = [];
@@ -786,6 +790,126 @@ function resetAllTransactions() {
   }
 }
 
+function exportData() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "stock_manager_backup.json");
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  document.body.removeChild(dlAnchorElem);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(data.tickers && data.transactions) {
+        state = data;
+        if(!state.owners) {
+           state.owners = {
+             user1: { name: state.ownerNames?.user1 || '보유자1', color: '#7c6af7', icon: '👤' },
+             user2: { name: state.ownerNames?.user2 || '보유자2', color: '#00c87a', icon: '👤' }
+           };
+        }
+        saveState();
+        cachedMarketData = {};
+        updateOwnerLabels();
+        renderTxList();
+        if (currentView === 'history') renderHistoryDashboard();
+        else render();
+        triggerAutoSync();
+        alert('데이터를 성공적으로 복원했습니다.');
+      } else {
+        alert('올바른 백업 파일 형식이 아닙니다.');
+      }
+    } catch(err) {
+      alert('파일을 읽는 중 오류가 발생했습니다.');
+    }
+    event.target.value = '';
+    closeModal('masterSettingsOverlay');
+  };
+  reader.readAsText(file);
+}
+
+function downloadCsvSample() {
+  const csvContent = "일자,소유자,계좌,유형,종목,수량,단가,세금(세전/세후)\n2026-04-10,보유자1,키움증권,매수,005930,10,80000,\n2026-04-12,보유자2,토스증권,배당,AAPL,0,15.5,세전\n2026-04-14,보유자1,미래에셋,매도,TSLA,-5,170.2,세후";
+  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'sample_transactions.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function importCsvData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const lines = text.split('\n');
+    let addedCount = 0;
+    
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, '').trim());
+      if (parts.length >= 7) {
+        const date = parts[0];
+        let owner = parts[1];
+        const broker = parts[2];
+        const typeStr = parts[3];
+        let symbol = parts[4].toUpperCase();
+        let qty = parseFloat(parts[5].replace(/,/g, '')) || 0;
+        let price = parseFloat(parts[6].replace(/,/g, '')) || 0;
+        const taxStatus = parts.length > 7 ? parts[7] : '';
+
+        if (!date || !symbol || isNaN(price)) continue;
+
+        let txType = 'trade';
+        if (typeStr.includes('배당') || typeStr.toLowerCase() === 'dividend') { txType = 'dividend'; qty = 0; }
+        else if (typeStr.includes('매도') || typeStr.toLowerCase() === 'sell') { txType = 'sell'; qty = -Math.abs(qty); }
+        else if (typeStr.includes('매수') || typeStr.toLowerCase() === 'buy') { txType = 'buy'; qty = Math.abs(qty); }
+
+        if (/^\d{6}$/.test(symbol)) symbol += '.KS';
+
+        if (txType === 'dividend' && taxStatus === '세전') {
+            const taxRate = isKorean(symbol) ? 0.154 : 0.15;
+            price = price * (1 - taxRate);
+        }
+
+        if (owner === '보유자1') owner = state.owners.user1.name;
+        else if (owner === '보유자2') owner = state.owners.user2.name;
+
+        state.transactions.push({ id: Date.now() + i, date, owner, broker, symbol, qty: (txType === 'dividend' ? 0 : qty), price, txType });
+        if (!state.tickers.includes(symbol)) state.tickers.push(symbol);
+        addedCount++;
+      }
+    }
+    if (addedCount > 0) {
+      saveState();
+      renderTxList();
+      if (currentView === 'history') renderHistoryDashboard();
+      else render();
+      triggerAutoSync();
+      closeModal('masterSettingsOverlay');
+      alert(addedCount + "건의 거래내역이 추가되었습니다.");
+    } else {
+      alert("추가된 내역이 없습니다.\nCSV 형식을 확인해주세요.");
+    }
+    event.target.value = ''; 
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ── UI 토글 및 모달 ──
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -821,6 +945,7 @@ function setSidebarView(view) {
 function updateOwnerLabels() {
   const o1 = state.owners.user1;
   const o2 = state.owners.user2;
+
   document.getElementById('tabUser1').textContent = `${o1.icon} ${o1.name}`;
   document.getElementById('tabUser2').textContent = `${o2.icon} ${o2.name}`;
   document.getElementById('lblUser1').innerHTML = `${o1.icon} ${o1.name}`;
@@ -834,12 +959,6 @@ function toggleAccountFilter(broker) {
   else activeAccountFilter = broker;
   render();
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-  updateOwnerLabels();
-  renderTxList();
-  render();
-});
 
 function toggleTxType() {
   const type = document.querySelector('input[name="txType"]:checked').value;
@@ -876,11 +995,20 @@ function openOwnerModal() {
 function saveOwnerNames() {
   const old1 = state.owners.user1.name;
   const old2 = state.owners.user2.name;
+  
   const new1 = document.getElementById('inputOwner1Name').value.trim() || '보유자1';
   const new2 = document.getElementById('inputOwner2Name').value.trim() || '보유자2';
   
-  state.owners.user1 = { name: new1, icon: document.getElementById('inputOwner1Icon').value.trim() || '👤', color: document.getElementById('inputOwner1Color').value || '#7c6af7' };
-  state.owners.user2 = { name: new2, icon: document.getElementById('inputOwner2Icon').value.trim() || '👤', color: document.getElementById('inputOwner2Color').value || '#00c87a' };
+  state.owners.user1 = {
+     name: new1,
+     icon: document.getElementById('inputOwner1Icon').value.trim() || '👤',
+     color: document.getElementById('inputOwner1Color').value || '#7c6af7'
+  };
+  state.owners.user2 = {
+     name: new2,
+     icon: document.getElementById('inputOwner2Icon').value.trim() || '👤',
+     color: document.getElementById('inputOwner2Color').value || '#00c87a'
+  };
   
   state.transactions.forEach(tx => {
     if (tx.owner === old1) tx.owner = new1;
@@ -908,6 +1036,20 @@ function toggleTxOwner(id) {
   triggerAutoSync();
 }
 
+function openMasterSettingsModal() {
+  let s = getGhSettings();
+  document.getElementById('ghUser').value = s.user;
+  document.getElementById('ghRepo').value = s.repo;
+  document.getElementById('ghToken').value = s.token;
+  document.getElementById('ghAutoSync').checked = s.autoSync;
+  document.getElementById('masterSettingsOverlay').classList.add('open');
+}
+
+function closeModal(id) { 
+  document.getElementById(id).classList.remove('open'); 
+}
+
+// ── 3. 거래 장부 로직 ──
 function calculateHoldings(ownerFilter = 'all') {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -952,6 +1094,7 @@ function editTransaction(id) {
   const isUser1 = tx.owner === state.owners.user1.name;
   document.getElementById('owner1').checked = isUser1;
   document.getElementById('owner2').checked = !isUser1;
+
   document.getElementById('editingTxId').value = id;
 
   if (tx.txType === 'dividend') document.getElementById('typeDiv').checked = true;
@@ -959,9 +1102,11 @@ function editTransaction(id) {
   else document.getElementById('typeBuy').checked = true;
   
   toggleTxType();
+
   document.getElementById('btnSubmitTx').textContent = '내역 수정하기';
   document.getElementById('btnSubmitTx').style.background = 'var(--blue)';
   document.getElementById('editModeBanner').style.display = 'block';
+  
   document.getElementById('txPrice').focus();
 }
 
@@ -999,6 +1144,7 @@ function addOrUpdateTransaction() {
 
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
+  
   const finalTxType = typeVal === 'dividend' ? 'dividend' : 'trade'; 
 
   if (editId) {
@@ -1013,8 +1159,11 @@ function addOrUpdateTransaction() {
   }
 
   if(!state.tickers.includes(symbol)) state.tickers.push(symbol);
-  saveState(); renderTxList(); 
-  if (currentView === 'history') renderHistoryDashboard(); else render();
+
+  saveState();
+  renderTxList(); 
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
   triggerAutoSync();
 }
 
@@ -1022,7 +1171,8 @@ function deleteTransaction(id) {
   state.transactions = state.transactions.filter(t => t.id !== id);
   if(document.getElementById('editingTxId').value == id) cancelEdit();
   saveState(); renderTxList(); 
-  if (currentView === 'history') renderHistoryDashboard(); else render();
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
   triggerAutoSync();
 }
 
@@ -1045,7 +1195,9 @@ function renderTxList() {
     const isBuy = tx.qty > 0;
     const isDiv = tx.txType === 'dividend';
     const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
-    const stockName = dbMatch ? dbMatch.name : (cachedMarketData[tx.symbol] ? cachedMarketData[tx.symbol].name : tx.symbol);
+    const cachedMatch = cachedMarketData[tx.symbol];
+    const stockName = dbMatch ? dbMatch.name : (cachedMatch ? cachedMatch.name : tx.symbol);
+    
     const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
     const typeLabel = isDiv ? '💰 배당금' : (isBuy ? '매수' : '매도') + ` ${Math.abs(tx.qty)}주`;
     const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
@@ -1094,8 +1246,10 @@ function renderHistoryDashboard() {
       const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
       const typeLabel = isDiv ? '배당' : (isBuy ? '매수' : '매도');
       const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
+      
       const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
-      const stockName = dbMatch ? dbMatch.name : (cachedMarketData[tx.symbol] ? cachedMarketData[tx.symbol].name : tx.symbol);
+      const cachedMatch = cachedMarketData[tx.symbol];
+      const stockName = dbMatch ? dbMatch.name : (cachedMatch ? cachedMatch.name : tx.symbol);
       const oInfo = getOwnerInfo(tx.owner);
 
       return `
@@ -1124,7 +1278,6 @@ function renderHistoryDashboard() {
   }).join('');
 }
 
-// ── 검색 및 종목 관련 추가 함수 ──
 function prepareTransaction(symbol, broker) {
   document.getElementById('txSymbol').value = symbol;
   if(broker) document.getElementById('txBroker').value = broker.replace(/\s*\([^)]*\)$/, '');
@@ -1138,6 +1291,7 @@ function prepareTransaction(symbol, broker) {
   setTimeout(() => sb.style.boxShadow = "none", 500);
 }
 
+// ── 4. 검색 로직 ──
 function setupSearch(inputId, dropdownId, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
@@ -1161,6 +1315,7 @@ function setupSearch(inputId, dropdownId, onSelect) {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
   });
 }
+
 setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult');
 function selectMainSearchResult(symbol) {
   document.getElementById('tickerInput').value = '';
@@ -1222,6 +1377,7 @@ async function fetchYahooData(symbol) {
     }
   }
   if(validPrices.length === 0) return null;
+  
   const meta = result.meta;
   let cName = symbol;
   if (localStockDB) {
@@ -1292,7 +1448,7 @@ function setDivFilter(filter, el) {
   renderDividendDashboard();
 }
 
-// ── 렌더링 세부 함수들 ──
+// ── 6. 대시보드 렌더링 세부 함수들 ──
 function renderSidebarYieldList(currentHoldings) {
   const container = document.getElementById('sidebarYieldList');
   if (!container) return;
@@ -1732,6 +1888,13 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
             legend: { display: false },
             tooltip: {
               enabled: false,
+              callbacks: {
+                label: function(context) {
+                  let v = context.raw;
+                  let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v || 0).toLocaleString();
+                  return context.label + ': ' + formatVal;
+                }
+              },
               external: function(context) {
                 let tooltipEl = document.getElementById('chartjs-tooltip');
                 if (!tooltipEl) { tooltipEl = document.createElement('div'); tooltipEl.id = 'chartjs-tooltip'; document.body.appendChild(tooltipEl); }
@@ -1765,6 +1928,122 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     });
 }
 
+function renderDividendDashboard() {
+  let krwTotal = 0, usdTotal = 0;
+  let monthlyKrw = {}, monthlyUsd = {};
+  let symTotals = {};
+  let divYields = {};
+
+  const divTxs = state.transactions.filter(t => {
+    if(t.txType !== 'dividend') return false;
+    let filterName = 'all';
+    if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
+    if(currentDivFilter === 'user2') filterName = state.owners.user2.name;
+    if(filterName !== 'all' && t.owner !== filterName) return false;
+    return true;
+  });
+
+  divTxs.forEach(tx => {
+     const isKRW = isKorean(tx.symbol);
+     const amt = tx.price; 
+     const month = tx.date.substring(0, 7); 
+     const sym = tx.symbol;
+
+     if (!monthlyKrw[month]) monthlyKrw[month] = 0;
+     if (!monthlyUsd[month]) monthlyUsd[month] = 0;
+     if (!symTotals[sym]) symTotals[sym] = { krw: 0, usd: 0 };
+     if (!divYields[sym]) divYields[sym] = { totalDiv: 0, totalEvalAtDiv: 0 };
+
+     if (isKRW) { krwTotal += amt; monthlyKrw[month] += amt; symTotals[sym].krw += amt; }
+     else { usdTotal += amt; monthlyUsd[month] += amt; symTotals[sym].usd += amt; }
+     
+     divYields[sym].totalDiv += amt;
+     
+     let qtyAtDiv = 0;
+     let filterName = 'all';
+     if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
+     if(currentDivFilter === 'user2') filterName = state.owners.user2.name;
+
+     state.transactions.forEach(t => {
+         if (t.symbol === sym && t.txType !== 'dividend' && t.date <= tx.date) {
+             if (filterName === 'all' || t.owner === filterName) qtyAtDiv += t.qty;
+         }
+     });
+     
+     let priceAtDiv = 0;
+     if (cachedMarketData[sym] && cachedMarketData[sym].rawDates) {
+         let pIdx = cachedMarketData[sym].rawDates.indexOf(tx.date);
+         if (pIdx !== -1 && cachedMarketData[sym].prices[pIdx] !== null) priceAtDiv = cachedMarketData[sym].prices[pIdx];
+         else {
+             for (let k = cachedMarketData[sym].rawDates.length - 1; k >= 0; k--) {
+                 if (cachedMarketData[sym].rawDates[k] <= tx.date && cachedMarketData[sym].prices[k] !== null) { priceAtDiv = cachedMarketData[sym].prices[k]; break; }
+             }
+         }
+     }
+     divYields[sym].totalEvalAtDiv += (qtyAtDiv * priceAtDiv);
+  });
+
+  document.getElementById('divTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
+  document.getElementById('divTotalUsd').textContent = `$ ${usdTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
+  document.getElementById('divTotalConverted').textContent = `₩ ${Math.round(grandTotal).toLocaleString()}`;
+
+  let symArr = Object.keys(symTotals).map(sym => { return { symbol: sym, total: symTotals[sym].krw + (symTotals[sym].usd * currentUsdKrw) }; });
+  symArr.sort((a,b) => b.total - a.total); 
+
+  let listHtml = symArr.map(item => {
+    const isKRW = isKorean(item.symbol);
+    const originAmt = isKRW ? symTotals[item.symbol].krw : symTotals[item.symbol].usd;
+    const dbMatch = localStockDB.find(s => s.symbol === item.symbol);
+    const cName = dbMatch ? dbMatch.name : item.symbol;
+
+    let yieldHtml = '';
+    let yData = divYields[item.symbol];
+    if (yData && yData.totalEvalAtDiv > 0) {
+        let yPct = (yData.totalDiv / yData.totalEvalAtDiv) * 100;
+        yieldHtml = `<span style="font-size:11px; color:var(--text2); margin-right:12px; border:1px solid var(--border2); padding:2px 6px; border-radius:4px;">실질 배당률 ${yPct.toFixed(2)}%</span>`;
+    }
+
+    return `
+      <div class="div-item">
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <span style="font-weight:700; color:var(--text); font-size:13px; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${cName}">${cName}</span>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--text3);">${item.symbol}</span>
+        </div>
+        <div style="display:flex; align-items:center;">
+          ${yieldHtml}
+          <div style="font-family:var(--font-mono); font-weight:700; color:var(--green); font-size:14px; text-align:right;">
+            ${formatPrice(originAmt, item.symbol)}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('divStockList').innerHTML = listHtml || '<div style="color:var(--text3); font-size:12px; text-align:center; padding:40px;">조회된 배당 내역이 없습니다.</div>';
+
+  const allMonths = Array.from(new Set([...Object.keys(monthlyKrw), ...Object.keys(monthlyUsd)])).sort();
+  const krwData = allMonths.map(m => monthlyKrw[m] || 0);
+  const usdConvertedData = allMonths.map(m => (monthlyUsd[m] || 0) * currentUsdKrw);
+
+  if(divMonthlyChartInst) divMonthlyChartInst.destroy();
+  const ctx = document.getElementById('divMonthlyCanvas').getContext('2d');
+  divMonthlyChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: allMonths,
+      datasets: [
+        { label: '국내 (₩)', data: krwData, backgroundColor: '#00c87a', borderRadius: 4 },
+        { label: '해외 환산 (₩)', data: usdConvertedData, backgroundColor: '#7c6af7', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size:11} } }, tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } } },
+      scales: { x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } }, y: { stacked: true, ticks: { color: '#8890a4' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } } }
+    }
+  });
+}
+
 function openChartModal(ticker) {
   const data = cachedMarketData[ticker]; if(!data) return;
   const getSliceLen = (range) => {
@@ -1796,7 +2075,115 @@ function openChartModal(ticker) {
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
 }
 
-// ── 렌더링 호출 (메인) ──
+function getGhSettings() {
+  const stored = localStorage.getItem('gh_settings');
+  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
+  return JSON.parse(stored);
+}
+
+function saveGhSettings(settings) {
+  localStorage.setItem('gh_settings', JSON.stringify(settings));
+}
+
+document.getElementById('ghAutoSync').addEventListener('change', function(e) {
+  let s = getGhSettings();
+  s.autoSync = e.target.checked;
+  saveGhSettings(s);
+  if(s.autoSync) triggerAutoSync();
+});
+
+function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
+function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
+
+async function getGithubFileSha(settings, path) {
+  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
+  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
+  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
+  return null;
+}
+
+function updateSyncStatus(status) {
+  const el = document.getElementById('syncStatus');
+  const spinner = document.getElementById('syncSpinner');
+  const text = document.getElementById('syncText');
+  el.className = 'sync-status';
+  if(status === 'syncing') {
+    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
+  } else if(status === 'success') {
+    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
+  } else if(status === 'error') {
+    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
+  } else {
+    spinner.style.display = 'none'; text.textContent = '';
+  }
+}
+
+async function pushToGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  if(!silent) {
+    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+  updateSyncStatus('syncing');
+  const path = 'data/my_portfolio.json';
+  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+  try {
+    const fileInfo = await getGithubFileSha({user, repo, token}, path);
+    const content = utf8_to_b64(JSON.stringify(state, null, 2));
+    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
+    if (fileInfo) body.sha = fileInfo.sha;
+    const putRes = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }, body: JSON.stringify(body) });
+    if(putRes.ok) { 
+      updateSyncStatus('success');
+      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
+    } else { 
+      updateSyncStatus('error');
+      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
+    }
+  } catch(e) { 
+    updateSyncStatus('error');
+    if(!silent) alert('네트워크 에러 발생'); 
+  }
+}
+
+function triggerAutoSync() {
+  const s = getGhSettings();
+  if(s.autoSync && s.token) pushToGithub(true);
+}
+
+async function pullFromGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  if(!silent) {
+    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+  const path = 'data/my_portfolio.json';
+  try {
+    const fileInfo = await getGithubFileSha({user, token, repo}, path);
+    if (fileInfo && fileInfo.content) {
+      const dataStr = b64_to_utf8(fileInfo.content);
+      const data = JSON.parse(dataStr);
+      if(data.tickers && data.transactions) {
+        state = data; saveState(); cachedMarketData = {};
+        updateOwnerLabels(); renderTxList(); render();
+        updateSyncStatus('success');
+        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('githubOverlay'); }
+      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
+    } else if(!silent) alert('저장소에 파일이 없습니다.');
+  } catch(e) { if(!silent) alert('가져오기 실패'); }
+}
+
+// ── 6. 메인 렌더 로직 (최하단) ──
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
@@ -1812,30 +2199,15 @@ async function render() {
   const histDash = document.getElementById('historyDashboard');
 
   if (currentView === 'dividend') {
-    dash.style.display = 'none';
-    pChartWrap.style.display = 'none';
-    container.style.display = 'none';
-    listOptions.style.display = 'none';
-    histDash.style.display = 'none';
-    divDash.style.display = 'flex';
+    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; divDash.style.display = 'flex';
     renderDividendDashboard();
     return;
   } else if (currentView === 'history') {
-    dash.style.display = 'none';
-    pChartWrap.style.display = 'none';
-    container.style.display = 'none';
-    listOptions.style.display = 'none';
-    divDash.style.display = 'none';
-    histDash.style.display = 'flex';
+    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'flex';
     renderHistoryDashboard();
     return;
   } else {
-    dash.style.display = 'flex';
-    pChartWrap.style.display = 'flex';
-    container.style.display = 'block';
-    listOptions.style.display = 'flex';
-    divDash.style.display = 'none';
-    histDash.style.display = 'none';
+    dash.style.display = 'flex'; pChartWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none';
   }
 
   let ownerFilter = 'all';
@@ -1849,9 +2221,7 @@ async function render() {
     if(!currentHoldings.hasOwnProperty(key)) continue;
     let h = currentHoldings[key];
     if(h.qty > 0) {
-      if(!symbolHoldings[h.symbol]) {
-        symbolHoldings[h.symbol] = { qty: 0, totalCost: 0, brokers: new Set() };
-      }
+      if(!symbolHoldings[h.symbol]) symbolHoldings[h.symbol] = { qty: 0, totalCost: 0, brokers: new Set() };
       symbolHoldings[h.symbol].qty += h.qty;
       symbolHoldings[h.symbol].totalCost += (h.qty * h.avg);
       symbolHoldings[h.symbol].brokers.add(h.broker);
@@ -1859,14 +2229,9 @@ async function render() {
   }
 
   const getSliceLen = (range) => {
-    if (range === '1d') return 2;
-    if (range === '1w') return 6;
-    if (range === '1m') return 22;
-    if (range === '3m') return 63;
-    if (range === '6m') return 126;
-    if (range === '1y') return 252;
-    if (range === '3y') return 756;
-    return 252;
+    if (range === '1d') return 2; if (range === '1w') return 6; if (range === '1m') return 22;
+    if (range === '3m') return 63; if (range === '6m') return 126; if (range === '1y') return 252;
+    if (range === '3y') return 756; return 252;
   };
   const currentSliceLen = getSliceLen(state.range);
 
@@ -1883,9 +2248,7 @@ async function render() {
   }
 
   let allSymbols = new Set(state.tickers);
-  for(let sym in symbolHoldings) {
-    allSymbols.add(sym);
-  }
+  for(let sym in symbolHoldings) allSymbols.add(sym);
   allSymbols = Array.from(allSymbols);
 
   const promises = allSymbols.map(async t => {
