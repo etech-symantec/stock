@@ -35,14 +35,14 @@ def main():
     except Exception as e:
         print(f"미국 주식 가져오기 실패: {e}")
 
-    print("🇰🇷 2. 한국 주식 (KOSPI/KOSDAQ 시총 상위 6000개) 데이터를 가져옵니다...")
+    print("🇰🇷 2. 한국 주식 (KOSPI/KOSDAQ 시총 상위 8000개) 데이터를 가져옵니다...")
     try:
         krx = fdr.StockListing('KRX')
         # 시가총액(Marcap) 기준으로 내림차순 정렬
         if 'Marcap' in krx.columns:
             krx = krx.sort_values('Marcap', ascending=False)
             
-        for _, row in krx.head(6000).iterrows():
+        for _, row in krx.head(8000).iterrows():
             sym = str(row['Code'])
             market = str(row.get('Market', 'KRX'))
             # 코스닥은 .KQ, 코스피/기타는 .KS (야후 파이낸스 기준)
@@ -51,26 +51,26 @@ def main():
     except Exception as e:
         print(f"한국 주식 가져오기 실패: {e}")
 
-    print("🦅 3. 미국 ETF (거래량 상위 2000개) 데이터를 가져옵니다...")
+    print("🦅 3. 미국 ETF (거래량 상위 4000개) 데이터를 가져옵니다...")
     try:
         us_etfs = fdr.StockListing('ETF/US')
         # 거래량이 높은 순서대로 주요 ETF 추출
         if 'Volume' in us_etfs.columns:
             us_etfs = us_etfs.sort_values('Volume', ascending=False)
             
-        for _, row in us_etfs.head(2000).iterrows():
+        for _, row in us_etfs.head(4000).iterrows():
             add_to_db(row['Symbol'], row['Name'], "US_ETF")
     except Exception as e:
         print(f"미국 ETF 가져오기 실패: {e}")
 
-    print("🐯 4. 한국 ETF (거래량 상위 500개) 데이터를 가져옵니다...")
+    print("🐯 4. 한국 ETF (거래량 상위 1500개) 데이터를 가져옵니다...")
     try:
         kr_etfs = fdr.StockListing('ETF/KR')
         # 거래량이 높은 순서대로 주요 ETF 추출
         if 'Volume' in kr_etfs.columns:
             kr_etfs = kr_etfs.sort_values('Volume', ascending=False)
             
-        for _, row in kr_etfs.head(500).iterrows():
+        for _, row in kr_etfs.head(1500).iterrows():
             sym = str(row['Symbol'])
             # 한국 ETF는 야후 파이낸스에서 모두 코스피(.KS)로 취급됨
             add_to_db(f"{sym}.KS", row['Name'], "KR_ETF")
