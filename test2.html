@@ -15,9 +15,7 @@
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
   
   /* ── 1. 네비게이션 (헤더) ── */
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 1.5rem; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; }
-  
-  /* 🆕 네비게이션 좌측 (로고 + 검색창) */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 1.5rem; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; flex-wrap: wrap; gap: 10px; }
   .nav-left { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 0; }
   .logo { font-family: var(--font-sans); font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; white-space: nowrap; letter-spacing: -0.02em; }
   .logo svg { display: block; flex-shrink: 0; }
@@ -29,12 +27,10 @@
   .header-search .btn-add-icon:hover { background: #6855e0; transform: translateY(-50%) scale(1.05); }
   .header-search .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; list-style: none; z-index: 99999; max-height: 280px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; }
   
-  /* 🆕 중앙 탭 고정 */
   .view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); justify-content: center; flex-shrink: 0; }
   .vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; white-space: nowrap; }
   .vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-  /* 🆕 우측 메뉴 공간 채우기 */
   .nav-right { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
   .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border2); background: rgba(255,255,255,0.05); color: var(--text); font-family: var(--font-sans); transition: 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; font-weight: 500; }
   .btn-sm:hover { background: var(--bg3); border-color: rgba(255,255,255,0.3); }
@@ -111,7 +107,6 @@
   .tx-owner-badge { cursor: pointer; padding: 2px 8px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; font-weight: bold; }
   .tx-owner-badge:hover { filter: brightness(1.2); }
 
-  /* ── 사이드바 펼치기용 화살표 버튼 ── */
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
@@ -301,7 +296,7 @@
           <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-size:11px; color:var(--text2); font-weight:700;">소유자</span>
-              <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자/아이콘 변경">설정 ⚙️</button>
+              <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름/테마 설정">설정 ⚙️</button>
             </div>
             <div class="toggle-group" style="margin-top:2px;">
               <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
@@ -468,7 +463,7 @@
           <option value="evalDesc">평가금액 순</option>
           <option value="changeDesc">등락률 순</option>
         </select>
-        <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 전환">⬇️</button>
+        <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 반전">⬇️</button>
         
         <div class="range-group">
           <button class="rtab" onclick="setRange('1d',this)">1D</button>
@@ -915,7 +910,7 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// ── UI 토글 ──
+// ── UI 제어 ──
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -994,7 +989,7 @@ function toggleTxType() {
   }
 }
 
-// ── 모달 호출 함수 (ReferenceError 방지용 확실한 선언) ──
+// ── 모달 호출 ──
 function openOwnerModal() {
   document.getElementById('inputOwner1Name').value = state.owners.user1.name;
   document.getElementById('inputOwner1Icon').value = state.owners.user1.icon;
@@ -1005,19 +1000,6 @@ function openOwnerModal() {
   document.getElementById('inputOwner2Color').value = state.owners.user2.color;
   
   document.getElementById('ownerOverlay').classList.add('open');
-}
-
-function closeModal(id) { 
-  document.getElementById(id).classList.remove('open'); 
-}
-
-function openMasterSettingsModal() {
-  let s = getGhSettings();
-  document.getElementById('ghUser').value = s.user;
-  document.getElementById('ghRepo').value = s.repo;
-  document.getElementById('ghToken').value = s.token;
-  document.getElementById('ghAutoSync').checked = s.autoSync;
-  document.getElementById('masterSettingsOverlay').classList.add('open');
 }
 
 function saveOwnerNames() {
@@ -1065,6 +1047,19 @@ function toggleTxOwner(id) {
   if (currentView === 'history') renderHistoryDashboard();
   else render();
   triggerAutoSync();
+}
+
+function openMasterSettingsModal() {
+  let s = getGhSettings();
+  document.getElementById('ghUser').value = s.user;
+  document.getElementById('ghRepo').value = s.repo;
+  document.getElementById('ghToken').value = s.token;
+  document.getElementById('ghAutoSync').checked = s.autoSync;
+  document.getElementById('masterSettingsOverlay').classList.add('open');
+}
+
+function closeModal(id) { 
+  document.getElementById(id).classList.remove('open'); 
 }
 
 // ── 3. 거래 장부 로직 ──
@@ -1162,6 +1157,7 @@ function addOrUpdateTransaction() {
 
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
+  // 📉 폼 내 배당 세금 차감 로직
   if (typeVal === 'dividend' && document.getElementById('applyDivTax').checked) {
       const taxRate = isKorean(symbol) ? 0.154 : 0.15;
       price = price * (1 - taxRate);
@@ -1337,6 +1333,7 @@ function setupSearch(inputId, dropdownId, onSelect) {
   input.addEventListener('input', (e) => {
     const query = e.target.value.trim().toLowerCase();
     if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
+    
     const results = localStockDB.filter(s => s.symbol.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)).slice(0, 6);
     if (results.length === 0) { dropdown.style.display = 'none'; return; }
 
@@ -1498,7 +1495,6 @@ function setDivFilter(filter, el) {
   renderDividendDashboard();
 }
 
-// ── 핵심 함수 ──
 function renderSidebarYieldList(currentHoldings) {
   const container = document.getElementById('sidebarYieldList');
   if (!container) return;
@@ -1636,7 +1632,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-    // ── 🌐 글로벌 Treemap 렌더링 ──
     const tmContainer = document.getElementById('allocationTreemap');
     if (tmContainer) {
         if (treemapData.length === 0) {
@@ -1911,167 +1906,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     });
 }
 
-function openChartModal(ticker) {
-  const data = cachedMarketData[ticker]; if(!data) return;
-  const getSliceLen = (range) => {
-    if (range === '1d') return 2;
-    if (range === '1w') return 6;
-    if (range === '1m') return 22;
-    if (range === '3m') return 63;
-    if (range === '6m') return 126;
-    if (range === '1y') return 252;
-    if (range === '3y') return 756;
-    return 252;
-  };
-  let sliceLen = getSliceLen(state.range);
-  const displayPrices = data.prices.slice(-sliceLen);
-  const displayDates = data.dates.slice(-sliceLen);
-  
-  if(displayPrices.length === 0) return;
-  const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
-  const last = displayPrices[displayPrices.length-1];
-  const prev = displayPrices[0]; 
-  const chgPct = ((last-prev)/prev*100).toFixed(2);
-  
-  document.getElementById('mTicker').textContent = data.name;
-  document.getElementById('mBroker').textContent = data.symbol;
-  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
-  
-  const chgEl = document.getElementById('mChange');
-  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
-  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
-  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
-  
-  document.getElementById('chartOverlay').classList.add('open');
-  if (modalChartInst) modalChartInst.destroy();
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
-}
-
-function getGhSettings() {
-  const stored = localStorage.getItem('gh_settings');
-  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
-  return JSON.parse(stored);
-}
-
-function saveGhSettings(settings) {
-  localStorage.setItem('gh_settings', JSON.stringify(settings));
-}
-
-document.getElementById('ghAutoSync').addEventListener('change', function(e) {
-  let s = getGhSettings();
-  s.autoSync = e.target.checked;
-  saveGhSettings(s);
-  if(s.autoSync) triggerAutoSync();
-});
-
-function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
-function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
-
-async function getGithubFileSha(settings, path) {
-  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
-  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
-  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
-  return null;
-}
-
-function updateSyncStatus(status) {
-  const el = document.getElementById('syncStatus');
-  const spinner = document.getElementById('syncSpinner');
-  const text = document.getElementById('syncText');
-  el.className = 'sync-status';
-  if(status === 'syncing') {
-    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
-  } else if(status === 'success') {
-    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
-  } else if(status === 'error') {
-    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
-  } else {
-    spinner.style.display = 'none'; text.textContent = '';
-  }
-}
-
-async function pushToGithub(silent = false) {
-  let user = document.getElementById('ghUser').value.trim();
-  let repo = document.getElementById('ghRepo').value.trim();
-  let token = document.getElementById('ghToken').value.trim();
-  
-  if(!silent) {
-    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
-    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
-  } else {
-    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
-    if(!user || !repo || !token) return;
-  }
-
-  updateSyncStatus('syncing');
-  const path = 'data/my_portfolio.json';
-  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-  
-  try {
-    const fileInfo = await getGithubFileSha({user, repo, token}, path);
-    const content = utf8_to_b64(JSON.stringify(state, null, 2));
-    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
-    if (fileInfo) body.sha = fileInfo.sha;
-
-    const putRes = await fetch(url, {
-      method: 'PUT',
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
-      body: JSON.stringify(body)
-    });
-    
-    if(putRes.ok) { 
-      updateSyncStatus('success');
-      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
-    } else { 
-      updateSyncStatus('error');
-      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
-    }
-  } catch(e) { 
-    updateSyncStatus('error');
-    if(!silent) alert('네트워크 에러 발생'); 
-  }
-}
-
-function triggerAutoSync() {
-  const s = getGhSettings();
-  if(s.autoSync && s.token) {
-    pushToGithub(true);
-  }
-}
-
-async function pullFromGithub(silent = false) {
-  let user = document.getElementById('ghUser').value.trim();
-  let repo = document.getElementById('ghRepo').value.trim();
-  let token = document.getElementById('ghToken').value.trim();
-  
-  if(!silent) {
-    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
-    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
-  } else {
-    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
-    if(!user || !repo || !token) return;
-  }
-
-  const path = 'data/my_portfolio.json';
-  try {
-    const fileInfo = await getGithubFileSha({user, token, repo}, path);
-    if (fileInfo && fileInfo.content) {
-      const dataStr = b64_to_utf8(fileInfo.content);
-      const data = JSON.parse(dataStr);
-      if(data.tickers && data.transactions) {
-        state = data; saveState(); cachedMarketData = {};
-        updateOwnerLabels();
-        renderTxList();
-        render();
-        updateSyncStatus('success');
-        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('githubOverlay'); }
-      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
-    } else if(!silent) alert('저장소에 파일이 없습니다.');
-  } catch(e) { if(!silent) alert('가져오기 실패'); }
-}
-
-// ── 메인 렌더 함수 (마지막 배치) ──
+// ── 메인 렌더링 호출 ──
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
@@ -2149,7 +1984,7 @@ async function render() {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
     updateSummaryAndAllocation(currentHoldings, []); 
     renderPortfolioChart(ownerFilter, currentSliceLen);
-    renderSidebarYieldList(currentHoldings);
+    renderSidebarYieldList(currentHoldings); 
     return;
   }
 
