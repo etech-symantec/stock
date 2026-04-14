@@ -105,9 +105,11 @@
   .tx-action-btn:hover.tx-edit { color: var(--accent); }
   .tx-action-btn:hover.tx-del { color: var(--red); }
   
+  /* 커스텀 테마 반영 뱃지 */
   .tx-owner-badge { cursor: pointer; padding: 2px 8px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; font-weight: bold; }
   .tx-owner-badge:hover { filter: brightness(1.2); }
 
+  /* ── 사이드바 펼치기용 화살표 버튼 ── */
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
@@ -587,7 +589,7 @@
       </div>
     </div>
 
-    <div class="form-group" style="margin-bottom:20px; display:flex; gap:10px;">
+    <div class="form-group" style="margin-bottom:10px; display:flex; gap:10px;">
       <div style="flex:1">
          <label>보유자2 이름</label>
          <input type="text" id="inputOwner2Name" class="form-input" placeholder="예: 엄마">
@@ -602,7 +604,14 @@
       </div>
     </div>
 
-    <button class="btn-submit" style="background:var(--accent); width:100%;" onclick="saveOwnerNames()">변경 사항 저장</button>
+    <div class="form-group" style="margin-top:20px; padding-top:20px; border-top:1px dashed var(--border2); display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-size:11px; color:var(--text2); line-height:1.3;">
+        <strong style="color:var(--red);">⚠️ 모든 데이터 삭제 (초기화)</strong><br>모든 내역을 지우고 처음 상태로 되돌립니다.
+      </div>
+      <button class="btn-danger" style="background:var(--red-bg); color:var(--red); border:1px solid rgba(255,77,106,0.3); padding:8px 12px; border-radius:6px; font-weight:bold;" onclick="resetAllTransactions()">초기화</button>
+    </div>
+
+    <button class="btn-submit" style="background:var(--accent); width:100%; margin-top:20px;" onclick="saveOwnerNames()">변경 사항 저장</button>
   </div>
 </div>
 
@@ -642,7 +651,7 @@
 </div>
 
 <script>
-// ── 1. 핵심 유틸 함수 ──
+// ── 핵심 유틸리티 함수 (스코프 최상단) ──
 function getColors(prices) {
   if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
   const last = prices[prices.length-1], first = prices[0];
@@ -683,8 +692,8 @@ function getOwnerInfo(ownerName) {
   return { name: ownerName, color: '#8890a4', icon: '👤' };
 }
 
-// ── 2. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v62'; 
+// ── 데이터 상태 관리 ──
+const STORE_KEY = 'stockwatch_real_v63'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -702,7 +711,6 @@ const chartInstances = {};
 let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
 let localStockDB = []; 
-
 let currentUsdKrw = 1350; 
 let isExchangeRateFetched = false;
 
@@ -720,10 +728,9 @@ function loadState() {
   try {
     let s = localStorage.getItem(STORE_KEY);
     if (!s) {
-      let oldS = localStorage.getItem('stockwatch_real_v61'); 
+      let oldS = localStorage.getItem('stockwatch_real_v62'); 
       if(oldS) s = oldS;
     }
-    
     if (s) {
       let parsed = JSON.parse(s);
       if(!parsed.owners) {
@@ -748,6 +755,21 @@ function loadState() {
 }
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+// ── 로컬 초기화 기능 추가 ──
+function resetAllTransactions() {
+  if(confirm("🚨 경고: 모든 거래 내역이 영구적으로 삭제됩니다.\n정말로 전체 데이터를 초기화하시겠습니까?")) {
+    state.transactions = [];
+    state.tickers = ['AAPL','TSLA','005930.KS']; // 빈 화면 방지용 기본 티커 복구
+    saveState();
+    renderTxList();
+    if(currentView === 'history') renderHistoryDashboard();
+    else render();
+    triggerAutoSync();
+    closeModal('ownerOverlay');
+    alert("데이터 초기화가 완료되었습니다.");
+  }
+}
 
 // ── 로컬 백업/복원, CSV 다운로드 등 ──
 function exportData() {
@@ -1005,7 +1027,6 @@ function toggleTxOwner(id) {
   triggerAutoSync();
 }
 
-// ── 3. 거래 장부 로직 ──
 function calculateHoldings(ownerFilter = 'all') {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -1100,7 +1121,7 @@ function addOrUpdateTransaction() {
 
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
-  // 📉 폼 내 배당 세금 자동 차감
+  // 📉 폼 내 배당 세금 차감 로직
   if (typeVal === 'dividend' && document.getElementById('applyDivTax').checked) {
       const taxRate = isKorean(symbol) ? 0.154 : 0.15;
       price = price * (1 - taxRate);
@@ -1274,7 +1295,6 @@ function prepareTransaction(symbol, broker) {
   setTimeout(() => sb.style.boxShadow = "none", 500);
 }
 
-// ── 4. 검색 자동완성 ──
 function setupSearch(inputId, dropdownId, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
@@ -1330,7 +1350,7 @@ function selectSidebarSearchResult(symbol) {
   }
 }
 
-// ── 5. API Fetch ──
+// ── 5. API Fetch 및 렌더링 ──
 async function fetchWithProxy(targetUrl, useCache = true) {
   const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
   const proxy = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
@@ -1446,6 +1466,64 @@ function setDivFilter(filter, el) {
   renderDividendDashboard();
 }
 
+function renderSidebarYieldList(currentHoldings) {
+  const container = document.getElementById('sidebarYieldList');
+  if (!container) return;
+
+  let yieldItems = [];
+
+  for (let key in currentHoldings) {
+      let h = currentHoldings[key];
+      if (h.qty > 0 && cachedMarketData[h.symbol] && cachedMarketData[h.symbol].last) {
+          let evalAmt = h.qty * cachedMarketData[h.symbol].last;
+          let costAmt = h.qty * h.avg;
+          let roi = costAmt > 0 ? ((evalAmt - costAmt) / costAmt) * 100 : -9999;
+          
+          if (roi !== -9999) {
+              yieldItems.push({
+                  symbol: h.symbol,
+                  name: cachedMarketData[h.symbol].name,
+                  broker: h.broker,
+                  roi: roi,
+                  pnl: evalAmt - costAmt,
+                  owner: state.transactions.filter(t => t.symbol===h.symbol && (t.broker+' ('+t.owner+')'===h.broker || t.broker===h.broker) && t.txType!=='dividend').pop()?.owner || '보유'
+              });
+          }
+      }
+  }
+
+  yieldItems.sort((a, b) => b.roi - a.roi);
+
+  if (yieldItems.length === 0) {
+      container.innerHTML = '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">보유한 자산이 없습니다.</div>';
+      return;
+  }
+
+  container.innerHTML = yieldItems.map((item, idx) => {
+      let sign = item.roi > 0 ? '+' : '';
+      let color = item.roi > 0 ? 'var(--green)' : (item.roi < 0 ? 'var(--red)' : 'var(--text)');
+      let rankColor = idx === 0 ? '#ffb703' : (idx === 1 ? '#a259ff' : (idx === 2 ? '#4d9fff' : 'var(--text3)'));
+      let cleanBroker = item.broker.split(' (')[0];
+      let brokerText = cleanBroker !== '미지정' ? `<span style="font-size:10px; color:var(--text3); margin-left:6px;">[${cleanBroker}]</span>` : '';
+      
+      return `
+      <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); padding:12px; border-radius:6px; border:1px solid var(--border); transition:0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; margin-right:10px;">
+              <span style="font-weight:900; font-style:italic; color:${rankColor}; width:18px; text-align:center; flex-shrink:0;">${idx+1}</span>
+              <div style="min-width:0; overflow:hidden;">
+                  <div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name} ${brokerText}</div>
+                  <div style="font-size:10px; font-family:var(--font-mono); color:var(--text2);">${item.symbol}</div>
+              </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+              <div style="font-size:14px; font-family:var(--font-mono); font-weight:700; color:${color};">${sign}${item.roi.toFixed(2)}%</div>
+              <div style="font-size:10px; color:var(--text3);">${sign}${formatPrice(Math.abs(item.pnl), item.symbol)}</div>
+          </div>
+      </div>
+      `;
+  }).join('');
+}
+
 function generateCardHtml(item) {
   const data = item.data;
   const isHeld = item.type === 'held';
@@ -1511,7 +1589,6 @@ function generateCardHtml(item) {
   `;
 }
 
-// ── 📈 자산 성장 추이(Area Chart) ──
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
     if (currentView === 'dividend' || currentView === 'history' || state.transactions.length === 0) {
@@ -1676,6 +1753,11 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
 }
 
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
+    accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
+    accountPieChartInsts = [];
+    
+    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
+
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
@@ -1950,9 +2032,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     }).join('');
     document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-    accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
-    accountPieChartInsts = [];
-
     const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
     [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
       const ctx = document.getElementById(cfg.id);
@@ -2028,46 +2107,13 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     });
 }
 
+// ── 렌더링 호출 (메인) ──
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
   document.querySelectorAll('.rtab').forEach(b => {
     if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
   });
-
-  const container = document.getElementById('gridContainer');
-  const dash = document.getElementById('dashboardTopWrapper');
-  const pChartWrap = document.getElementById('portfolioChartWrapper'); 
-  const divDash = document.getElementById('dividendDashboard');
-  const listOptions = document.getElementById('listOptionsBar');
-  const histDash = document.getElementById('historyDashboard');
-
-  if (currentView === 'dividend') {
-    dash.style.display = 'none';
-    pChartWrap.style.display = 'none';
-    container.style.display = 'none';
-    listOptions.style.display = 'none';
-    histDash.style.display = 'none';
-    divDash.style.display = 'flex';
-    renderDividendDashboard();
-    return;
-  } else if (currentView === 'history') {
-    dash.style.display = 'none';
-    pChartWrap.style.display = 'none';
-    container.style.display = 'none';
-    listOptions.style.display = 'none';
-    divDash.style.display = 'none';
-    histDash.style.display = 'flex';
-    renderHistoryDashboard();
-    return;
-  } else {
-    dash.style.display = 'flex';
-    pChartWrap.style.display = 'flex';
-    container.style.display = 'block';
-    listOptions.style.display = 'flex';
-    divDash.style.display = 'none';
-    histDash.style.display = 'none';
-  }
 
   let ownerFilter = 'all';
   if (currentView === 'user1') ownerFilter = state.owners.user1.name;
@@ -2100,17 +2146,6 @@ async function render() {
     return 252;
   };
   const currentSliceLen = getSliceLen(state.range);
-
-  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
-    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
-    updateSummaryAndAllocation(currentHoldings, []); 
-    renderPortfolioChart(ownerFilter, currentSliceLen);
-    return;
-  }
-
-  if(Object.keys(cachedMarketData).length === 0) {
-    container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
-  }
 
   let allSymbols = new Set(state.tickers);
   for(let sym in symbolHoldings) {
@@ -2168,6 +2203,50 @@ async function render() {
     }
   });
 
+  // 데이터 로딩 완료 후 사이드바 수익률 목록 강제 렌더링
+  renderSidebarYieldList(currentHoldings);
+
+  const container = document.getElementById('gridContainer');
+  const dash = document.getElementById('dashboardTopWrapper');
+  const pChartWrap = document.getElementById('portfolioChartWrapper'); 
+  const divDash = document.getElementById('dividendDashboard');
+  const listOptions = document.getElementById('listOptionsBar');
+  const histDash = document.getElementById('historyDashboard');
+
+  if (currentView === 'dividend') {
+    dash.style.display = 'none';
+    pChartWrap.style.display = 'none';
+    container.style.display = 'none';
+    listOptions.style.display = 'none';
+    histDash.style.display = 'none';
+    divDash.style.display = 'flex';
+    renderDividendDashboard();
+    return;
+  } else if (currentView === 'history') {
+    dash.style.display = 'none';
+    pChartWrap.style.display = 'none';
+    container.style.display = 'none';
+    listOptions.style.display = 'none';
+    divDash.style.display = 'none';
+    histDash.style.display = 'flex';
+    renderHistoryDashboard();
+    return;
+  } else {
+    dash.style.display = 'flex';
+    pChartWrap.style.display = 'flex';
+    container.style.display = 'block';
+    listOptions.style.display = 'flex';
+    divDash.style.display = 'none';
+    histDash.style.display = 'none';
+  }
+
+  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
+    updateSummaryAndAllocation(currentHoldings, []); 
+    renderPortfolioChart(ownerFilter, currentSliceLen);
+    return;
+  }
+
   updateSummaryAndAllocation(currentHoldings, displayItems);
   renderPortfolioChart(ownerFilter, currentSliceLen);
 
@@ -2215,181 +2294,6 @@ async function render() {
       chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
     }
   });
-}
-
-function openChartModal(ticker) {
-  const data = cachedMarketData[ticker]; if(!data) return;
-  
-  const getSliceLen = (range) => {
-    if (range === '1d') return 2;
-    if (range === '1w') return 6;
-    if (range === '1m') return 22;
-    if (range === '3m') return 63;
-    if (range === '6m') return 126;
-    if (range === '1y') return 252;
-    if (range === '3y') return 756;
-    return 252;
-  };
-  
-  let sliceLen = getSliceLen(state.range);
-  const displayPrices = data.prices.slice(-sliceLen);
-  const displayDates = data.dates.slice(-sliceLen);
-  
-  if(displayPrices.length === 0) return;
-  
-  const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
-  const last = displayPrices[displayPrices.length-1];
-  const prev = displayPrices[0]; 
-  const chgPct = ((last-prev)/prev*100).toFixed(2);
-  
-  document.getElementById('mTicker').textContent = data.name;
-  document.getElementById('mBroker').textContent = data.symbol;
-  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
-  
-  const chgEl = document.getElementById('mChange');
-  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
-  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
-  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
-  
-  document.getElementById('chartOverlay').classList.add('open');
-  if (modalChartInst) modalChartInst.destroy();
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
-}
-
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-function getGhSettings() {
-  const stored = localStorage.getItem('gh_settings');
-  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
-  return JSON.parse(stored);
-}
-
-function saveGhSettings(settings) {
-  localStorage.setItem('gh_settings', JSON.stringify(settings));
-}
-
-function openGithubModal() {
-  let s = getGhSettings();
-  document.getElementById('ghUser').value = s.user;
-  document.getElementById('ghRepo').value = s.repo;
-  document.getElementById('ghToken').value = s.token;
-  document.getElementById('ghAutoSync').checked = s.autoSync;
-  document.getElementById('githubOverlay').classList.add('open');
-}
-
-document.getElementById('ghAutoSync').addEventListener('change', function(e) {
-  let s = getGhSettings();
-  s.autoSync = e.target.checked;
-  saveGhSettings(s);
-  if(s.autoSync) triggerAutoSync();
-});
-
-function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
-function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
-
-async function getGithubFileSha(settings, path) {
-  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
-  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
-  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
-  return null;
-}
-
-function updateSyncStatus(status) {
-  const el = document.getElementById('syncStatus');
-  const spinner = document.getElementById('syncSpinner');
-  const text = document.getElementById('syncText');
-  
-  el.className = 'sync-status';
-  if(status === 'syncing') {
-    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
-  } else if(status === 'success') {
-    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
-  } else if(status === 'error') {
-    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
-  } else {
-    spinner.style.display = 'none'; text.textContent = '';
-  }
-}
-
-async function pushToGithub(silent = false) {
-  let user = document.getElementById('ghUser').value.trim();
-  let repo = document.getElementById('ghRepo').value.trim();
-  let token = document.getElementById('ghToken').value.trim();
-  
-  if(!silent) {
-    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
-    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
-  } else {
-    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
-    if(!user || !repo || !token) return;
-  }
-
-  updateSyncStatus('syncing');
-  const path = 'data/my_portfolio.json';
-  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-  
-  try {
-    const fileInfo = await getGithubFileSha({user, repo, token}, path);
-    const content = utf8_to_b64(JSON.stringify(state, null, 2));
-    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
-    if (fileInfo) body.sha = fileInfo.sha;
-
-    const putRes = await fetch(url, {
-      method: 'PUT',
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
-      body: JSON.stringify(body)
-    });
-    
-    if(putRes.ok) { 
-      updateSyncStatus('success');
-      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
-    } else { 
-      updateSyncStatus('error');
-      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
-    }
-  } catch(e) { 
-    updateSyncStatus('error');
-    if(!silent) alert('네트워크 에러 발생'); 
-  }
-}
-
-function triggerAutoSync() {
-  const s = getGhSettings();
-  if(s.autoSync && s.token) {
-    pushToGithub(true);
-  }
-}
-
-async function pullFromGithub(silent = false) {
-  let user = document.getElementById('ghUser').value.trim();
-  let repo = document.getElementById('ghRepo').value.trim();
-  let token = document.getElementById('ghToken').value.trim();
-  
-  if(!silent) {
-    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
-    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
-  } else {
-    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
-    if(!user || !repo || !token) return;
-  }
-
-  const path = 'data/my_portfolio.json';
-  try {
-    const fileInfo = await getGithubFileSha({user, token, repo}, path);
-    if (fileInfo && fileInfo.content) {
-      const dataStr = b64_to_utf8(fileInfo.content);
-      const data = JSON.parse(dataStr);
-      if(data.tickers && data.transactions) {
-        state = data; saveState(); cachedMarketData = {};
-        updateOwnerLabels();
-        renderTxList();
-        render();
-        updateSyncStatus('success');
-        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('githubOverlay'); }
-      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
-    } else if(!silent) alert('저장소에 파일이 없습니다.');
-  } catch(e) { if(!silent) alert('가져오기 실패'); }
 }
 </script>
 </body>
