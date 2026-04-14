@@ -1267,7 +1267,8 @@ function renderTxList() {
     const isBuy = tx.qty > 0;
     const isDiv = tx.txType === 'dividend';
     const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
-    const stockName = dbMatch ? dbMatch.name : (cachedMarketData[tx.symbol] ? cachedMarketData[tx.symbol].name : tx.symbol);
+    const cachedMatch = cachedMarketData[tx.symbol];
+    const stockName = dbMatch ? dbMatch.name : (cachedMatch && !cachedMatch._failed && cachedMatch.name ? cachedMatch.name : tx.symbol);
     const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
     const typeLabel = isDiv ? '💰 배당금' : (isBuy ? '매수' : '매도') + ` ${Math.abs(tx.qty)}주`;
     const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
@@ -1315,7 +1316,8 @@ function renderHistoryDashboard() {
       const typeLabel = isDiv ? '배당' : (isBuy ? '매수' : '매도');
       const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
       const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
-      const stockName = dbMatch ? dbMatch.name : (cachedMarketData[tx.symbol] ? cachedMarketData[tx.symbol].name : tx.symbol);
+      const cachedMatch = cachedMarketData[tx.symbol];
+      const stockName = dbMatch ? dbMatch.name : (cachedMatch && !cachedMatch._failed && cachedMatch.name ? cachedMatch.name : tx.symbol);
       const oInfo = getOwnerInfo(tx.owner);
 
       return `
