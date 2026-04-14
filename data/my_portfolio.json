@@ -452,9 +452,21 @@
       "txType": "trade"
     }
   ],
-  "range": "3m",
+  "range": "1d",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
+  },
+  "owners": {
+    "user1": {
+      "name": "끄니",
+      "icon": "🐯",
+      "color": "#69f7b5"
+    },
+    "user2": {
+      "name": "미니",
+      "icon": "👤",
+      "color": "#bac700"
+    }
   }
 }
