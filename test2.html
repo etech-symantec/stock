@@ -11,10 +11,8 @@
 <style>
   :root { --bg: #0d0f14; --bg2: #141720; --bg3: #1c2030; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14); --text: #e8eaf0; --text2: #8890a4; --text3: #555e72; --green: #00c87a; --green-bg: rgba(0,200,122,0.1); --red: #ff4d6a; --red-bg: rgba(255,77,106,0.1); --blue: #4d9fff; --accent: #7c6af7; --accent-bg: rgba(124,106,247,0.12); --radius: 8px; --radius-lg: 12px; --font-mono: 'Space Mono', monospace; --font-sans: 'Noto Sans KR', sans-serif; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
   
-  /* ── 1. 네비게이션 (헤더) ── */
   nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 1.5rem; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; flex-wrap: wrap; gap: 10px; }
   .logo { font-family: var(--font-sans); font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; white-space: nowrap; letter-spacing: -0.02em; }
   .logo svg { display: block; }
@@ -23,7 +21,6 @@
   .header-search .search-input { width: 100%; padding: 8px 36px 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-family: var(--font-sans); outline: none; transition: 0.2s; }
   .header-search .search-input:focus { background: var(--bg2); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,106,247,0.2); }
   .header-search .btn-add-icon { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: var(--accent); border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; line-height: 1; transition: 0.2s; box-shadow: 0 2px 6px rgba(124,106,247,0.4); }
-  .header-search .btn-add-icon:hover { background: #6855e0; transform: translateY(-50%) scale(1.05); }
   .header-search .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; list-style: none; z-index: 99999; max-height: 280px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; }
   
   .view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); }
@@ -33,19 +30,13 @@
   .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); font-family: var(--font-sans); transition: 0.15s; white-space: nowrap; }
   .btn-sm:hover { background: var(--bg3); color: var(--text); }
-  .btn-github { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); display: flex; align-items: center; gap: 6px; }
-  .btn-github:hover { background: #fff; color: #000; }
   
   .sync-status { font-size: 10px; font-family: var(--font-mono); color: var(--text3); display: flex; align-items: center; gap: 4px; padding: 0 8px; white-space: nowrap; }
   .sync-status.active { color: var(--green); }
   .sync-status.error { color: var(--red); }
-  .sync-spinner { width: 8px; height: 8px; border: 2px solid var(--text3); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
-  @keyframes spin { 100% { transform: rotate(360deg); } }
 
-  /* ── 2. 레이아웃 (사이드바 + 콘텐츠) ── */
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
-  /* ── 사이드바 ── */
   .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; }
   .ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
   
@@ -63,15 +54,10 @@
   .form-input { width: 100%; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 13px; font-family: var(--font-sans); outline: none; transition: border-color 0.2s; }
   .form-input:focus { border-color: var(--accent); }
   .btn-submit { width: 100%; padding: 12px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 5px; transition: 0.2s; }
-  .btn-submit:hover { background: #6855e0; }
-
+  
   .edit-mode-banner { position: absolute; top: 0; left: 0; right: 0; background: var(--accent-bg); color: var(--accent); font-size: 11px; font-weight: bold; text-align: center; padding: 4px; display: none; z-index: 10; border-bottom: 1px solid var(--accent); }
   .btn-cancel-edit { position: absolute; right: 8px; top: 4px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; font-weight: bold; }
-  .btn-cancel-edit:hover { text-decoration: underline; }
-
-  .btn-edit-owners { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; text-decoration: underline; transition: color 0.2s; padding: 0; }
-  .btn-edit-owners:hover { color: var(--accent); }
-
+  
   .hidden-radio { display: none; }
   .toggle-group { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
   .toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
@@ -83,8 +69,6 @@
   input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
 
   .broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
-  .broker-tag:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.05); }
-
   .tx-search-container { position: relative; }
   .tx-dropdown { position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; list-style: none; z-index: 100; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: none; }
   .search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
@@ -104,15 +88,10 @@
   .tx-action-btn { cursor: pointer; color: var(--text3); font-size: 12px; transition: color 0.2s; background: none; border: none; padding: 0; }
   .tx-action-btn:hover.tx-edit { color: var(--accent); }
   .tx-action-btn:hover.tx-del { color: var(--red); }
-  
-  /* 커스텀 테마 반영 뱃지 */
   .tx-owner-badge { cursor: pointer; padding: 2px 8px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; font-weight: bold; }
-  .tx-owner-badge:hover { filter: brightness(1.2); }
-
-  /* ── 사이드바 펼치기용 화살표 버튼 ── */
+  
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
-  #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
-
+  
   /* ── 3. 대시보드 메인 ── */
   .dashboard-main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 1.5rem 2rem; background: var(--bg); position: relative; }
   .dashboard-main::-webkit-scrollbar { width: 8px; }
@@ -126,7 +105,6 @@
   .country-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
   .cp-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
   .cp-title { font-size: 15px; font-weight: 700; color: var(--text); }
-  
   .cp-summary { display: flex; gap: 15px; }
   .cp-sum-box { flex: 1; }
   .cp-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
@@ -161,10 +139,8 @@
   
   .list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
-  
   .btn-sort-dir { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); border-radius: 6px; padding: 4px 8px; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 32px; }
   .btn-sort-dir:hover { background: var(--bg3); color: var(--text); }
-
   .range-group { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
   .rtab { padding: 4px 12px; font-size: 11px; font-family: var(--font-mono); background: transparent; border: none; color: var(--text2); cursor: pointer; border-radius: 4px; transition: all 0.15s; }
   .rtab.active { background: var(--accent); color: #fff; }
@@ -192,7 +168,6 @@
   
   .card-price { font-family: var(--font-mono); font-size: 24px; font-weight: 700; margin-bottom: 2px; }
   .chart-wrap { height: 80px; position: relative; display: flex; align-items: center; justify-content: center; }
-  
   .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text2); line-height: 1.4; }
   
   .empty { grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text3); border: 1px dashed var(--border2); border-radius: var(--radius-lg); font-size: 13px; }
@@ -651,7 +626,7 @@
 </div>
 
 <script>
-// ── 핵심 유틸리티 함수 (스코프 최상단) ──
+// ── 1. 핵심 유틸 함수 ──
 function getColors(prices) {
   if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
   const last = prices[prices.length-1], first = prices[0];
@@ -692,8 +667,8 @@ function getOwnerInfo(ownerName) {
   return { name: ownerName, color: '#8890a4', icon: '👤' };
 }
 
-// ── 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v63'; 
+// ── 2. 데이터 상태 관리 ──
+const STORE_KEY = 'stockwatch_real_v64'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -728,7 +703,7 @@ function loadState() {
   try {
     let s = localStorage.getItem(STORE_KEY);
     if (!s) {
-      let oldS = localStorage.getItem('stockwatch_real_v62'); 
+      let oldS = localStorage.getItem('stockwatch_real_v63'); 
       if(oldS) s = oldS;
     }
     if (s) {
@@ -756,11 +731,11 @@ function loadState() {
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-// ── 로컬 초기화 기능 추가 ──
+// ── 로컬 초기화 기능 ──
 function resetAllTransactions() {
   if(confirm("🚨 경고: 모든 거래 내역이 영구적으로 삭제됩니다.\n정말로 전체 데이터를 초기화하시겠습니까?")) {
     state.transactions = [];
-    state.tickers = ['AAPL','TSLA','005930.KS']; // 빈 화면 방지용 기본 티커 복구
+    state.tickers = ['AAPL','TSLA','005930.KS']; 
     saveState();
     renderTxList();
     if(currentView === 'history') renderHistoryDashboard();
@@ -1027,6 +1002,7 @@ function toggleTxOwner(id) {
   triggerAutoSync();
 }
 
+// ── 3. 거래 장부 (Ledger) 로직 ──
 function calculateHoldings(ownerFilter = 'all') {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -1121,7 +1097,6 @@ function addOrUpdateTransaction() {
 
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
-  // 📉 폼 내 배당 세금 차감 로직
   if (typeVal === 'dividend' && document.getElementById('applyDivTax').checked) {
       const taxRate = isKorean(symbol) ? 0.154 : 0.15;
       price = price * (1 - taxRate);
@@ -1295,6 +1270,7 @@ function prepareTransaction(symbol, broker) {
   setTimeout(() => sb.style.boxShadow = "none", 500);
 }
 
+// ── 4. 검색 자동완성 ──
 function setupSearch(inputId, dropdownId, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
@@ -1350,7 +1326,7 @@ function selectSidebarSearchResult(symbol) {
   }
 }
 
-// ── 5. API Fetch 및 렌더링 ──
+// ── 5. API Fetch ──
 async function fetchWithProxy(targetUrl, useCache = true) {
   const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
   const proxy = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
@@ -1752,6 +1728,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     });
 }
 
+// ── 핵심 함수 ──
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
@@ -1832,7 +1809,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-    // ── 🌐 글로벌 Treemap 렌더링 ──
     const tmContainer = document.getElementById('allocationTreemap');
     if (tmContainer) {
         if (treemapData.length === 0) {
@@ -2107,13 +2083,47 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     });
 }
 
-// ── 렌더링 호출 (메인) ──
+// ── 메인 렌더링 호출 ──
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
   document.querySelectorAll('.rtab').forEach(b => {
     if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
   });
+
+  const container = document.getElementById('gridContainer');
+  const dash = document.getElementById('dashboardTopWrapper');
+  const pChartWrap = document.getElementById('portfolioChartWrapper'); 
+  const divDash = document.getElementById('dividendDashboard');
+  const listOptions = document.getElementById('listOptionsBar');
+  const histDash = document.getElementById('historyDashboard');
+
+  if (currentView === 'dividend') {
+    dash.style.display = 'none';
+    pChartWrap.style.display = 'none';
+    container.style.display = 'none';
+    listOptions.style.display = 'none';
+    histDash.style.display = 'none';
+    divDash.style.display = 'flex';
+    renderDividendDashboard();
+    return;
+  } else if (currentView === 'history') {
+    dash.style.display = 'none';
+    pChartWrap.style.display = 'none';
+    container.style.display = 'none';
+    listOptions.style.display = 'none';
+    divDash.style.display = 'none';
+    histDash.style.display = 'flex';
+    renderHistoryDashboard();
+    return;
+  } else {
+    dash.style.display = 'flex';
+    pChartWrap.style.display = 'flex';
+    container.style.display = 'block';
+    listOptions.style.display = 'flex';
+    divDash.style.display = 'none';
+    histDash.style.display = 'none';
+  }
 
   let ownerFilter = 'all';
   if (currentView === 'user1') ownerFilter = state.owners.user1.name;
@@ -2146,6 +2156,18 @@ async function render() {
     return 252;
   };
   const currentSliceLen = getSliceLen(state.range);
+
+  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
+    updateSummaryAndAllocation(currentHoldings, []); 
+    renderPortfolioChart(ownerFilter, currentSliceLen);
+    renderSidebarYieldList(currentHoldings); // 사이드바 호출 추가
+    return;
+  }
+
+  if(Object.keys(cachedMarketData).length === 0) {
+    container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
+  }
 
   let allSymbols = new Set(state.tickers);
   for(let sym in symbolHoldings) {
@@ -2203,52 +2225,11 @@ async function render() {
     }
   });
 
-  // 데이터 로딩 완료 후 사이드바 수익률 목록 강제 렌더링
-  renderSidebarYieldList(currentHoldings);
-
-  const container = document.getElementById('gridContainer');
-  const dash = document.getElementById('dashboardTopWrapper');
-  const pChartWrap = document.getElementById('portfolioChartWrapper'); 
-  const divDash = document.getElementById('dividendDashboard');
-  const listOptions = document.getElementById('listOptionsBar');
-  const histDash = document.getElementById('historyDashboard');
-
-  if (currentView === 'dividend') {
-    dash.style.display = 'none';
-    pChartWrap.style.display = 'none';
-    container.style.display = 'none';
-    listOptions.style.display = 'none';
-    histDash.style.display = 'none';
-    divDash.style.display = 'flex';
-    renderDividendDashboard();
-    return;
-  } else if (currentView === 'history') {
-    dash.style.display = 'none';
-    pChartWrap.style.display = 'none';
-    container.style.display = 'none';
-    listOptions.style.display = 'none';
-    divDash.style.display = 'none';
-    histDash.style.display = 'flex';
-    renderHistoryDashboard();
-    return;
-  } else {
-    dash.style.display = 'flex';
-    pChartWrap.style.display = 'flex';
-    container.style.display = 'block';
-    listOptions.style.display = 'flex';
-    divDash.style.display = 'none';
-    histDash.style.display = 'none';
-  }
-
-  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
-    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
-    updateSummaryAndAllocation(currentHoldings, []); 
-    renderPortfolioChart(ownerFilter, currentSliceLen);
-    return;
-  }
-
   updateSummaryAndAllocation(currentHoldings, displayItems);
   renderPortfolioChart(ownerFilter, currentSliceLen);
+  
+  // ── 🌟 데이터 로딩 후 사이드바 수익률 목록 업데이트 ──
+  renderSidebarYieldList(currentHoldings);
 
   if (activeAccountFilter) {
     displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
@@ -2294,6 +2275,181 @@ async function render() {
       chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
     }
   });
+}
+
+function openChartModal(ticker) {
+  const data = cachedMarketData[ticker]; if(!data) return;
+  
+  const getSliceLen = (range) => {
+    if (range === '1d') return 2;
+    if (range === '1w') return 6;
+    if (range === '1m') return 22;
+    if (range === '3m') return 63;
+    if (range === '6m') return 126;
+    if (range === '1y') return 252;
+    if (range === '3y') return 756;
+    return 252;
+  };
+  
+  let sliceLen = getSliceLen(state.range);
+  const displayPrices = data.prices.slice(-sliceLen);
+  const displayDates = data.dates.slice(-sliceLen);
+  
+  if(displayPrices.length === 0) return;
+  
+  const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
+  const last = displayPrices[displayPrices.length-1];
+  const prev = displayPrices[0]; 
+  const chgPct = ((last-prev)/prev*100).toFixed(2);
+  
+  document.getElementById('mTicker').textContent = data.name;
+  document.getElementById('mBroker').textContent = data.symbol;
+  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
+  
+  const chgEl = document.getElementById('mChange');
+  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
+  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
+  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
+  
+  document.getElementById('chartOverlay').classList.add('open');
+  if (modalChartInst) modalChartInst.destroy();
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function getGhSettings() {
+  const stored = localStorage.getItem('gh_settings');
+  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
+  return JSON.parse(stored);
+}
+
+function saveGhSettings(settings) {
+  localStorage.setItem('gh_settings', JSON.stringify(settings));
+}
+
+function openGithubModal() {
+  let s = getGhSettings();
+  document.getElementById('ghUser').value = s.user;
+  document.getElementById('ghRepo').value = s.repo;
+  document.getElementById('ghToken').value = s.token;
+  document.getElementById('ghAutoSync').checked = s.autoSync;
+  document.getElementById('githubOverlay').classList.add('open');
+}
+
+document.getElementById('ghAutoSync').addEventListener('change', function(e) {
+  let s = getGhSettings();
+  s.autoSync = e.target.checked;
+  saveGhSettings(s);
+  if(s.autoSync) triggerAutoSync();
+});
+
+function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
+function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
+
+async function getGithubFileSha(settings, path) {
+  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
+  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
+  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
+  return null;
+}
+
+function updateSyncStatus(status) {
+  const el = document.getElementById('syncStatus');
+  const spinner = document.getElementById('syncSpinner');
+  const text = document.getElementById('syncText');
+  
+  el.className = 'sync-status';
+  if(status === 'syncing') {
+    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
+  } else if(status === 'success') {
+    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
+  } else if(status === 'error') {
+    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
+  } else {
+    spinner.style.display = 'none'; text.textContent = '';
+  }
+}
+
+async function pushToGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  
+  if(!silent) {
+    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+
+  updateSyncStatus('syncing');
+  const path = 'data/my_portfolio.json';
+  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+  
+  try {
+    const fileInfo = await getGithubFileSha({user, repo, token}, path);
+    const content = utf8_to_b64(JSON.stringify(state, null, 2));
+    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
+    if (fileInfo) body.sha = fileInfo.sha;
+
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+    
+    if(putRes.ok) { 
+      updateSyncStatus('success');
+      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
+    } else { 
+      updateSyncStatus('error');
+      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
+    }
+  } catch(e) { 
+    updateSyncStatus('error');
+    if(!silent) alert('네트워크 에러 발생'); 
+  }
+}
+
+function triggerAutoSync() {
+  const s = getGhSettings();
+  if(s.autoSync && s.token) {
+    pushToGithub(true);
+  }
+}
+
+async function pullFromGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  
+  if(!silent) {
+    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+
+  const path = 'data/my_portfolio.json';
+  try {
+    const fileInfo = await getGithubFileSha({user, token, repo}, path);
+    if (fileInfo && fileInfo.content) {
+      const dataStr = b64_to_utf8(fileInfo.content);
+      const data = JSON.parse(dataStr);
+      if(data.tickers && data.transactions) {
+        state = data; saveState(); cachedMarketData = {};
+        updateOwnerLabels();
+        renderTxList();
+        render();
+        updateSyncStatus('success');
+        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('githubOverlay'); }
+      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
+    } else if(!silent) alert('저장소에 파일이 없습니다.');
+  } catch(e) { if(!silent) alert('가져오기 실패'); }
 }
 </script>
 </body>
