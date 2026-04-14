@@ -642,7 +642,7 @@
 </div>
 
 <script>
-// ── 1. 핵심 유틸 함수 (최상단 스코프 고정) ──
+// ── 1. 핵심 유틸 함수 ──
 function getColors(prices) {
   if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
   const last = prices[prices.length-1], first = prices[0];
@@ -678,13 +678,13 @@ function formatPrice(val, symbol) {
 }
 
 function getOwnerInfo(ownerName) {
-  if (ownerName === state.owners.user1.name) return state.owners.user1;
-  if (ownerName === state.owners.user2.name) return state.owners.user2;
+  if (state.owners && ownerName === state.owners.user1.name) return state.owners.user1;
+  if (state.owners && ownerName === state.owners.user2.name) return state.owners.user2;
   return { name: ownerName, color: '#8890a4', icon: '👤' };
 }
 
 // ── 2. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v60'; 
+const STORE_KEY = 'stockwatch_real_v62'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -720,9 +720,10 @@ function loadState() {
   try {
     let s = localStorage.getItem(STORE_KEY);
     if (!s) {
-      let oldS = localStorage.getItem('stockwatch_real_v59'); 
+      let oldS = localStorage.getItem('stockwatch_real_v61'); 
       if(oldS) s = oldS;
     }
+    
     if (s) {
       let parsed = JSON.parse(s);
       if(!parsed.owners) {
@@ -866,7 +867,7 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// ── UI 토글 / 모달 / 사이드바 등 ──
+// ── UI 토글 ──
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -1004,7 +1005,7 @@ function toggleTxOwner(id) {
   triggerAutoSync();
 }
 
-// ── 3. 거래 장부 (Ledger) 로직 ──
+// ── 3. 거래 장부 로직 ──
 function calculateHoldings(ownerFilter = 'all') {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -1099,6 +1100,7 @@ function addOrUpdateTransaction() {
 
   if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
+  // 📉 폼 내 배당 세금 자동 차감
   if (typeVal === 'dividend' && document.getElementById('applyDivTax').checked) {
       const taxRate = isKorean(symbol) ? 0.154 : 0.15;
       price = price * (1 - taxRate);
@@ -2026,7 +2028,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     });
 }
 
-// ── 렌더링 호출 (메인) ──
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
@@ -2214,6 +2215,181 @@ async function render() {
       chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
     }
   });
+}
+
+function openChartModal(ticker) {
+  const data = cachedMarketData[ticker]; if(!data) return;
+  
+  const getSliceLen = (range) => {
+    if (range === '1d') return 2;
+    if (range === '1w') return 6;
+    if (range === '1m') return 22;
+    if (range === '3m') return 63;
+    if (range === '6m') return 126;
+    if (range === '1y') return 252;
+    if (range === '3y') return 756;
+    return 252;
+  };
+  
+  let sliceLen = getSliceLen(state.range);
+  const displayPrices = data.prices.slice(-sliceLen);
+  const displayDates = data.dates.slice(-sliceLen);
+  
+  if(displayPrices.length === 0) return;
+  
+  const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
+  const last = displayPrices[displayPrices.length-1];
+  const prev = displayPrices[0]; 
+  const chgPct = ((last-prev)/prev*100).toFixed(2);
+  
+  document.getElementById('mTicker').textContent = data.name;
+  document.getElementById('mBroker').textContent = data.symbol;
+  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
+  
+  const chgEl = document.getElementById('mChange');
+  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
+  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
+  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
+  
+  document.getElementById('chartOverlay').classList.add('open');
+  if (modalChartInst) modalChartInst.destroy();
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function getGhSettings() {
+  const stored = localStorage.getItem('gh_settings');
+  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
+  return JSON.parse(stored);
+}
+
+function saveGhSettings(settings) {
+  localStorage.setItem('gh_settings', JSON.stringify(settings));
+}
+
+function openGithubModal() {
+  let s = getGhSettings();
+  document.getElementById('ghUser').value = s.user;
+  document.getElementById('ghRepo').value = s.repo;
+  document.getElementById('ghToken').value = s.token;
+  document.getElementById('ghAutoSync').checked = s.autoSync;
+  document.getElementById('githubOverlay').classList.add('open');
+}
+
+document.getElementById('ghAutoSync').addEventListener('change', function(e) {
+  let s = getGhSettings();
+  s.autoSync = e.target.checked;
+  saveGhSettings(s);
+  if(s.autoSync) triggerAutoSync();
+});
+
+function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
+function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
+
+async function getGithubFileSha(settings, path) {
+  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
+  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
+  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
+  return null;
+}
+
+function updateSyncStatus(status) {
+  const el = document.getElementById('syncStatus');
+  const spinner = document.getElementById('syncSpinner');
+  const text = document.getElementById('syncText');
+  
+  el.className = 'sync-status';
+  if(status === 'syncing') {
+    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
+  } else if(status === 'success') {
+    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
+  } else if(status === 'error') {
+    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
+  } else {
+    spinner.style.display = 'none'; text.textContent = '';
+  }
+}
+
+async function pushToGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  
+  if(!silent) {
+    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+
+  updateSyncStatus('syncing');
+  const path = 'data/my_portfolio.json';
+  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+  
+  try {
+    const fileInfo = await getGithubFileSha({user, repo, token}, path);
+    const content = utf8_to_b64(JSON.stringify(state, null, 2));
+    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
+    if (fileInfo) body.sha = fileInfo.sha;
+
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+    
+    if(putRes.ok) { 
+      updateSyncStatus('success');
+      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
+    } else { 
+      updateSyncStatus('error');
+      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
+    }
+  } catch(e) { 
+    updateSyncStatus('error');
+    if(!silent) alert('네트워크 에러 발생'); 
+  }
+}
+
+function triggerAutoSync() {
+  const s = getGhSettings();
+  if(s.autoSync && s.token) {
+    pushToGithub(true);
+  }
+}
+
+async function pullFromGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  
+  if(!silent) {
+    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+
+  const path = 'data/my_portfolio.json';
+  try {
+    const fileInfo = await getGithubFileSha({user, token, repo}, path);
+    if (fileInfo && fileInfo.content) {
+      const dataStr = b64_to_utf8(fileInfo.content);
+      const data = JSON.parse(dataStr);
+      if(data.tickers && data.transactions) {
+        state = data; saveState(); cachedMarketData = {};
+        updateOwnerLabels();
+        renderTxList();
+        render();
+        updateSyncStatus('success');
+        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('githubOverlay'); }
+      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
+    } else if(!silent) alert('저장소에 파일이 없습니다.');
+  } catch(e) { if(!silent) alert('가져오기 실패'); }
 }
 </script>
 </body>
