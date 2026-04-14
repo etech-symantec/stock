@@ -875,7 +875,19 @@ function importCsvData(event) {
         let owner = parts[1];
         const broker = parts[2];
         const typeStr = parts[3];
-        let symbol = parts[4].toUpperCase();
+        let rawSymbol = parts[4];
+        let symbol = rawSymbol.toUpperCase();
+        if (localStockDB && localStockDB.length > 0) {
+            // 한글 이름이나 심볼과 일치하는 항목 찾기
+            let matched = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === symbol);
+            if (matched) {
+                symbol = matched.symbol; // DB에 있으면 정확한 티커 코드로 변경
+            } else if (/^\d{6}$/.test(symbol)) {
+                symbol += '.KS'; // DB에 없는데 6자리 숫자면 한국 주식 처리
+            }
+        } else if (/^\d{6}$/.test(symbol)) {
+            symbol += '.KS';
+        }
         let qty = parseFloat(parts[5].replace(/,/g, '')) || 0;
         let price = parseFloat(parts[6].replace(/,/g, '')) || 0;
         const taxStatus = parts.length > 7 ? parts[7] : '';
