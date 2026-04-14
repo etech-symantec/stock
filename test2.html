@@ -82,6 +82,7 @@
   input#typeSell:checked + .type-sell { background: rgba(77, 159, 255, 0.15); color: var(--blue); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(77,159,255,0.3); }
   input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
 
+  /* 브로커 퀵 태그 */
   .broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
   .broker-tag:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.05); }
 
@@ -105,10 +106,10 @@
   .tx-action-btn:hover.tx-edit { color: var(--accent); }
   .tx-action-btn:hover.tx-del { color: var(--red); }
   
-  /* 커스텀 테마 반영 뱃지 */
-  .tx-owner-badge { cursor: pointer; padding: 2px 8px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; font-weight: bold; }
+  .tx-owner-badge { cursor: pointer; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; color: var(--text); font-weight: bold; }
   .tx-owner-badge:hover { filter: brightness(1.2); }
 
+  /* ── 사이드바 펼치기용 화살표 버튼 ── */
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
@@ -132,12 +133,15 @@
   .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
   .cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
 
+  /* 국가별 계좌 리스트 테이블 및 필터 표시 */
   .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
+  
   .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
   .acc-row:hover { border-color: var(--border2); }
   .acc-row.active-filter { border-color: var(--accent); background: rgba(124,106,247,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
   
   .acc-pie-wrap { width: 85px; height: 85px; position: relative; flex-shrink: 0; }
+  
   .acc-content { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .acc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px; }
   .acc-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -161,6 +165,7 @@
   .list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
   
+  /* 정렬 방향 버튼 */
   .btn-sort-dir { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); border-radius: 6px; padding: 4px 8px; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 32px; }
   .btn-sort-dir:hover { background: var(--bg3); color: var(--text); }
 
@@ -178,8 +183,9 @@
   .card:hover { border-color: var(--border2); transform: translateY(-1px); }
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   
-  .card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); }
-  .tag-held { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(124,106,247,0.3); }
+  /* 카드 내 뱃지 디자인 (국가 구분 추가) */
+  .card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); border: 1px solid rgba(0,0,0,0.2); }
+  .tag-held { box-shadow: 0 2px 8px rgba(0,0,0,0.3); } /* 배경색은 인라인으로 적용 */
   .tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
   .country-badge { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 6px; color: #fff; font-family: var(--font-mono); }
   .card-tag .divider { margin: 0 6px; opacity: 0.5; font-weight: normal; }
@@ -227,8 +233,10 @@
   input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
   input:checked + .slider:before { transform: translateX(16px); background-color: #fff; }
 
+  /* 차트 커스텀 툴팁 */
   #chartjs-tooltip { opacity: 0; position: absolute; background: rgba(20, 23, 32, 0.95); border: 1px solid var(--border2); border-radius: 6px; color: #fff; pointer-events: none; transform: translate(-50%, -110%); transition: all .1s ease; z-index: 999999; padding: 8px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); font-family: var(--font-sans); white-space: nowrap; }
 
+  /* Treemap CSS */
   .treemap-cell { position: absolute; border: 1px solid var(--bg2); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; box-sizing: border-box; color: #fff; cursor: pointer; transition: 0.2s; border-radius: 4px; padding: 4px; }
   .treemap-cell:hover { opacity: 0.85; transform: scale(0.98); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
 </style>
@@ -643,8 +651,35 @@
 </div>
 
 <script>
-// ── 1. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v54'; 
+// ── 1. 데이터 상태 관리 및 핵심 렌더링 함수 위로 배치 ──
+function getColors(prices) {
+  if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
+  const last = prices[prices.length-1], first = prices[0];
+  if (last > first) return { line:'#00c87a', fill:'rgba(0,200,122,0.12)' };
+  if (last < first) return { line:'#ff4d6a', fill:'rgba(255,77,106,0.12)' };
+  return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
+}
+
+function buildChart(canvasId, prices, dates, mini) {
+  const {line, fill} = getColors(prices);
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+  return new Chart(canvas, {
+    type: 'line',
+    data: { labels: dates, datasets: [{ data: prices, borderColor: line, backgroundColor: fill, borderWidth: mini ? 1.5 : 2, pointRadius: 0, tension: 0.1, fill: true }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, displayColors: false } }, scales: { x: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { display: false }, border: { display: false } }, y: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { color:'rgba(255,255,255,0.04)' }, border: { display: false } } }, interaction: { mode: 'index', intersect: false }, animation: { duration: 0 } }
+  });
+}
+
+function getHeatmapColor(change) {
+  if (change >= 3) return 'rgba(0, 200, 122, 0.9)';
+  if (change > 0) return 'rgba(0, 200, 122, 0.5)';
+  if (change <= -3) return 'rgba(255, 77, 106, 0.9)';
+  if (change < 0) return 'rgba(255, 77, 106, 0.5)';
+  return 'rgba(136, 144, 164, 0.4)';
+}
+
+const STORE_KEY = 'stockwatch_real_v55'; 
 let state = loadState();
 
 let currentView = 'all'; 
@@ -680,14 +715,12 @@ function loadState() {
   try {
     let s = localStorage.getItem(STORE_KEY);
     if (!s) {
-      // 이전 버전 마이그레이션
-      let oldS = localStorage.getItem('stockwatch_real_v53'); 
+      let oldS = localStorage.getItem('stockwatch_real_v54'); 
       if(oldS) s = oldS;
     }
     
     if (s) {
       let parsed = JSON.parse(s);
-      // 구버전(ownerNames만 있던 시절) -> 신버전(owners 테마) 마이그레이션
       if(!parsed.owners) {
          parsed.owners = {
            user1: { name: parsed.ownerNames?.user1 || '보유자1', color: '#7c6af7', icon: '👤' },
@@ -790,7 +823,6 @@ function setSidebarView(view) {
   }
 }
 
-// 초기 이름 세팅 및 라디오/탭 렌더링
 function updateOwnerLabels() {
   const o1 = state.owners.user1;
   const o2 = state.owners.user2;
@@ -874,7 +906,6 @@ function importCsvData(event) {
 
         if (/^\d{6}$/.test(symbol)) symbol += '.KS';
 
-        // CSV의 소유자를 현재 테마명과 매칭 시도
         if (owner === '보유자1') owner = state.owners.user1.name;
         else if (owner === '보유자2') owner = state.owners.user2.name;
 
@@ -909,11 +940,9 @@ function toggleTxType() {
     document.getElementById('txPrice').placeholder = '받은 배당금 총액';
     document.getElementById('txQty').value = 0; 
     
-    // 배당 세금 옵션 보이기 (새로 추가일때만 기본 체크)
     document.getElementById('divTaxWrap').style.display = 'block';
     if(!isEditing) document.getElementById('applyDivTax').checked = true;
-    else document.getElementById('applyDivTax').checked = false; // 수정 시 이중과세 방지
-
+    else document.getElementById('applyDivTax').checked = false; 
   } else {
     document.getElementById('txQtyWrap').style.display = 'block';
     document.getElementById('txPriceLabel').textContent = '단가 (1주당 가격)';
@@ -1440,12 +1469,24 @@ function generateCardHtml(item) {
 
   const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
 
+  // 🎨 소유자 뱃지 적용
+  let ownerBadgeHtml = '';
+  if (isHeld) {
+      let mainOwner = '보유';
+      const holdingTxs = state.transactions.filter(t => t.symbol === item.symbol && t.broker === item.broker && t.txType !== 'dividend');
+      if(holdingTxs.length > 0) mainOwner = holdingTxs[holdingTxs.length-1].owner; // 가장 마지막 소유자 기준
+      
+      const oInfo = getOwnerInfo(mainOwner);
+      ownerBadgeHtml = `<span class="card-badge" style="margin-right:6px; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40; padding:3px 8px; font-size:10px;">${oInfo.icon} ${oInfo.name}</span>`;
+  }
+
   return `
     <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
       
       <div style="display:flex; align-items:center;">
         ${countryBadge}
-        <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}" style="margin-bottom:0;">
+        ${ownerBadgeHtml}
+        <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}" style="margin-bottom:0; background:var(--bg3); color:var(--text2); border:1px solid var(--border);">
           ${tagContent}
         </div>
       </div>
@@ -1512,11 +1553,11 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         let dailyCost = 0;
         let dailyEval = 0;
         
-        const pastTxs = state.transactions.filter(t => t.date <= dateStr && (ownerFilter === 'all' || t.owner === ownerFilter || t.owner === state.owners[ownerFilter]?.name || (ownerFilter==='all' ? true : false) ));
-        // ownerFilter fix
+        const pastTxs = state.transactions.filter(t => t.date <= dateStr);
+        
         let filteredTxs = pastTxs;
         if(ownerFilter !== 'all') {
-           filteredTxs = pastTxs.filter(t => t.owner === ownerFilter);
+           filteredTxs = pastTxs.filter(t => t.owner === ownerFilter || t.owner === state.owners[ownerFilter]?.name);
         }
         
         let holdings = {};
@@ -1641,293 +1682,15 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     });
 }
 
-// ── 배당금 대시보드 렌더링 ──
-function renderDividendDashboard() {
-  let krwTotal = 0, usdTotal = 0;
-  let monthlyKrw = {}, monthlyUsd = {};
-  let symTotals = {};
 
-  const divTxs = state.transactions.filter(t => {
-    if(t.txType !== 'dividend') return false;
-    
-    let filterName = 'all';
-    if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
-    if(currentDivFilter === 'user2') filterName = state.owners.user2.name;
-
-    if(filterName !== 'all' && t.owner !== filterName) return false;
-    return true;
-  });
-
-  divTxs.forEach(tx => {
-     const isKRW = isKorean(tx.symbol);
-     const amt = tx.price; 
-     const month = tx.date.substring(0, 7); 
-
-     if (!monthlyKrw[month]) monthlyKrw[month] = 0;
-     if (!monthlyUsd[month]) monthlyUsd[month] = 0;
-     if (!symTotals[tx.symbol]) symTotals[tx.symbol] = { krw: 0, usd: 0 };
-
-     if (isKRW) {
-       krwTotal += amt; monthlyKrw[month] += amt; symTotals[tx.symbol].krw += amt;
-     } else {
-       usdTotal += amt; monthlyUsd[month] += amt; symTotals[tx.symbol].usd += amt;
-     }
-  });
-
-  document.getElementById('divTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
-  document.getElementById('divTotalUsd').textContent = `$ ${usdTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-  const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
-  document.getElementById('divTotalConverted').textContent = `₩ ${Math.round(grandTotal).toLocaleString()}`;
-
-  let symArr = Object.keys(symTotals).map(sym => {
-    return { symbol: sym, total: symTotals[sym].krw + (symTotals[sym].usd * currentUsdKrw) };
-  });
-  symArr.sort((a,b) => b.total - a.total); 
-
-  let listHtml = symArr.map(item => {
-    const isKRW = isKorean(item.symbol);
-    const originAmt = isKRW ? symTotals[item.symbol].krw : symTotals[item.symbol].usd;
-    const dbMatch = localStockDB.find(s => s.symbol === item.symbol);
-    const cName = dbMatch ? dbMatch.name : item.symbol;
-    return `
-      <div class="div-item">
-        <div style="display:flex; flex-direction:column; gap:2px;">
-          <span style="font-weight:700; color:var(--text); font-size:13px; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${cName}">${cName}</span>
-          <span style="font-family:var(--font-mono); font-size:10px; color:var(--text3);">${item.symbol}</span>
-        </div>
-        <div style="font-family:var(--font-mono); font-weight:700; color:var(--green); font-size:14px;">
-          ${formatPrice(originAmt, item.symbol)}
-        </div>
-      </div>
-    `;
-  }).join('');
-  document.getElementById('divStockList').innerHTML = listHtml || '<div style="color:var(--text3); font-size:12px; text-align:center; padding:40px;">조회된 배당 내역이 없습니다.</div>';
-
-  const allMonths = Array.from(new Set([...Object.keys(monthlyKrw), ...Object.keys(monthlyUsd)])).sort();
-  const krwData = allMonths.map(m => monthlyKrw[m] || 0);
-  const usdConvertedData = allMonths.map(m => (monthlyUsd[m] || 0) * currentUsdKrw);
-
-  if(divMonthlyChartInst) divMonthlyChartInst.destroy();
-  const ctx = document.getElementById('divMonthlyCanvas').getContext('2d');
-  divMonthlyChartInst = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: allMonths,
-      datasets: [
-        { label: '국내 (₩)', data: krwData, backgroundColor: '#00c87a', borderRadius: 4 },
-        { label: '해외 환산 (₩)', data: usdConvertedData, backgroundColor: '#7c6af7', borderRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size:11} } },
-        tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => ' ₩' + Math.round(ctx.raw).toLocaleString() } }
-      },
-      scales: {
-        x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } },
-        y: { stacked: true, ticks: { color: '#8890a4' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } }
-      }
-    }
-  });
-}
-
-// ── 메인 렌더 함수 ──
-async function render() {
-  if (!isExchangeRateFetched) await fetchExchangeRate();
-  
-  document.querySelectorAll('.rtab').forEach(b => {
-    if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
-  });
-
-  const container = document.getElementById('gridContainer');
-  const dash = document.getElementById('dashboardTopWrapper');
-  const pChartWrap = document.getElementById('portfolioChartWrapper'); 
-  const divDash = document.getElementById('dividendDashboard');
-  const listOptions = document.getElementById('listOptionsBar');
-  const histDash = document.getElementById('historyDashboard');
-
-  if (currentView === 'dividend') {
-    dash.style.display = 'none';
-    pChartWrap.style.display = 'none';
-    container.style.display = 'none';
-    listOptions.style.display = 'none';
-    histDash.style.display = 'none';
-    divDash.style.display = 'flex';
-    renderDividendDashboard();
-    return;
-  } else if (currentView === 'history') {
-    dash.style.display = 'none';
-    pChartWrap.style.display = 'none';
-    container.style.display = 'none';
-    listOptions.style.display = 'none';
-    divDash.style.display = 'none';
-    histDash.style.display = 'flex';
-    renderHistoryDashboard();
-    return;
-  } else {
-    dash.style.display = 'flex';
-    pChartWrap.style.display = 'flex';
-    container.style.display = 'block';
-    listOptions.style.display = 'flex';
-    divDash.style.display = 'none';
-    histDash.style.display = 'none';
-  }
-
-  let ownerFilter = 'all';
-  if (currentView === 'user1') ownerFilter = state.owners.user1.name;
-  if (currentView === 'user2') ownerFilter = state.owners.user2.name;
-
-  const currentHoldings = calculateHoldings(ownerFilter);
-  
-  let symbolHoldings = {};
-  for(let key in currentHoldings) {
-    if(!currentHoldings.hasOwnProperty(key)) continue;
-    let h = currentHoldings[key];
-    if(h.qty > 0) {
-      if(!symbolHoldings[h.symbol]) {
-        symbolHoldings[h.symbol] = { qty: 0, totalCost: 0, brokers: new Set() };
-      }
-      symbolHoldings[h.symbol].qty += h.qty;
-      symbolHoldings[h.symbol].totalCost += (h.qty * h.avg);
-      symbolHoldings[h.symbol].brokers.add(h.broker);
-    }
-  }
-
-  const getSliceLen = (range) => {
-    if (range === '1d') return 2;
-    if (range === '1w') return 6;
-    if (range === '1m') return 22;
-    if (range === '3m') return 63;
-    if (range === '6m') return 126;
-    if (range === '1y') return 252;
-    if (range === '3y') return 756;
-    return 252;
-  };
-  const currentSliceLen = getSliceLen(state.range);
-
-  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
-    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
-    updateSummaryAndAllocation(currentHoldings, []); 
-    renderPortfolioChart(ownerFilter, currentSliceLen);
-    return;
-  }
-
-  if(Object.keys(cachedMarketData).length === 0) {
-    container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
-  }
-
-  let allSymbols = new Set(state.tickers);
-  for(let sym in symbolHoldings) {
-    allSymbols.add(sym);
-  }
-  allSymbols = Array.from(allSymbols);
-
-  const promises = allSymbols.map(async t => {
-    if(!cachedMarketData[t]) {
-      let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
-      cachedMarketData[t] = await fetchYahooData(fetchSym);
-    }
-    return { symbol: t, data: cachedMarketData[t] };
-  });
-
-  await Promise.all(promises);
-
-  let displayItems = [];
-  for(let sym in symbolHoldings) {
-    let sh = symbolHoldings[sym];
-    let avg = sh.qty > 0 ? sh.totalCost / sh.qty : 0;
-    let brokerStr = Array.from(sh.brokers).join(', ');
-    if (cachedMarketData[sym]) {
-      displayItems.push({ type: 'held', symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, data: cachedMarketData[sym] });
-    }
-  }
-
-  let heldSymbols = new Set(displayItems.map(item => item.symbol));
-  state.tickers.forEach(sym => {
-    if(!heldSymbols.has(sym) && cachedMarketData[sym]) {
-      displayItems.push({ type: 'watch', symbol: sym, broker: '', qty: 0, avg: 0, data: cachedMarketData[sym] });
-    }
-  });
-
-  displayItems = displayItems.filter(item => {
-    if(currentView === 'all') return true;
-    if(currentView === 'user1' || currentView === 'user2') return item.type === 'held';
-    if(currentView === 'watch') return item.type === 'watch';
-    return true; 
-  });
-
-  displayItems.forEach(item => {
-    item.uniqueId = 'chart_' + Math.random().toString(36).substring(2, 10);
-    if(item.data && item.data.prices) {
-      const prices = item.data.prices;
-      const last = item.data.last;
-      item.sliceLen = currentSliceLen; 
-      const pStart = prices[Math.max(0, prices.length - currentSliceLen)] || item.data.prev;
-      item.activeChange = ((last - pStart) / pStart) * 100;
-      item.evalAmt = item.qty * last;
-      item.costAmt = item.qty * item.avg;
-      item.roi = item.costAmt > 0 ? ((item.evalAmt - item.costAmt)/item.costAmt*100) : -9999;
-    } else {
-      item.activeChange = 0; item.evalAmt = 0; item.costAmt = 0; item.roi = -9999; item.sliceLen = 0;
-    }
-  });
-
-  updateSummaryAndAllocation(currentHoldings, displayItems);
-  renderPortfolioChart(ownerFilter, currentSliceLen);
-
-  if (activeAccountFilter) {
-    displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
-  }
-
-  if(currentSortMode === 'roiDesc') displayItems.sort((a,b) => (b.roi - a.roi) * sortDirection);
-  else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => (b.evalAmt - a.evalAmt) * sortDirection);
-  else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => (b.activeChange - a.activeChange) * sortDirection);
-
-  Object.values(chartInstances).forEach(c => { if(c && typeof c.destroy === 'function') c.destroy(); });
-  for(let key in chartInstances) delete chartInstances[key];
-  
-  if(displayItems.length === 0) {
-     if(activeAccountFilter) container.innerHTML = `<div class="empty">해당 계좌에 표시할 종목이 없습니다.</div>`;
-     else container.innerHTML = `<div class="empty">선택한 탭에 표시할 종목이 없습니다.</div>`;
-     return;
-  }
-
-  const krItems = displayItems.filter(item => isKorean(item.symbol));
-  const usItems = displayItems.filter(item => !isKorean(item.symbol) && !isCrypto(item.symbol));
-  const cryptoItems = displayItems.filter(item => isCrypto(item.symbol));
-
-  // ── 국가별 헤더 추가하여 그리드 렌더링 ──
-  let html = '';
-  if(krItems.length > 0) {
-    html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇰🇷 국내 주식</h3>`;
-    html += `<div class="grid">${krItems.map(t => generateCardHtml(t)).join('')}</div>`;
-  }
-  if(usItems.length > 0) {
-    html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇺🇸 미국 주식</h3>`;
-    html += `<div class="grid">${usItems.map(t => generateCardHtml(t)).join('')}</div>`;
-  }
-  if(cryptoItems.length > 0) {
-    html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🪙 암호화폐</h3>`;
-    html += `<div class="grid">${cryptoItems.map(t => generateCardHtml(t)).join('')}</div>`;
-  }
-
-  container.innerHTML = html;
-
-  displayItems.forEach(item => {
-    if (item.data && item.data.prices) {
-      const displayPrices = item.data.prices.slice(-item.sliceLen);
-      const displayDates = item.data.dates.slice(-item.sliceLen);
-      chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
-    }
-  });
-}
-
+// ── 렌더러 (업데이트, 차트 병합) ──
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
   try {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
     
+    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
+
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
 
@@ -2316,9 +2079,67 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
   }
 }
 
-function openChartModal(ticker) {
-  const data = cachedMarketData[ticker]; if(!data) return;
+async function render() {
+  if (!isExchangeRateFetched) await fetchExchangeRate();
   
+  document.querySelectorAll('.rtab').forEach(b => {
+    if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
+  });
+
+  const container = document.getElementById('gridContainer');
+  const dash = document.getElementById('dashboardTopWrapper');
+  const pChartWrap = document.getElementById('portfolioChartWrapper'); 
+  const divDash = document.getElementById('dividendDashboard');
+  const listOptions = document.getElementById('listOptionsBar');
+  const histDash = document.getElementById('historyDashboard');
+
+  if (currentView === 'dividend') {
+    dash.style.display = 'none';
+    pChartWrap.style.display = 'none';
+    container.style.display = 'none';
+    listOptions.style.display = 'none';
+    histDash.style.display = 'none';
+    divDash.style.display = 'flex';
+    renderDividendDashboard();
+    return;
+  } else if (currentView === 'history') {
+    dash.style.display = 'none';
+    pChartWrap.style.display = 'none';
+    container.style.display = 'none';
+    listOptions.style.display = 'none';
+    divDash.style.display = 'none';
+    histDash.style.display = 'flex';
+    renderHistoryDashboard();
+    return;
+  } else {
+    dash.style.display = 'flex';
+    pChartWrap.style.display = 'flex';
+    container.style.display = 'block';
+    listOptions.style.display = 'flex';
+    divDash.style.display = 'none';
+    histDash.style.display = 'none';
+  }
+
+  let ownerFilter = 'all';
+  if (currentView === 'user1') ownerFilter = state.owners.user1.name;
+  if (currentView === 'user2') ownerFilter = state.owners.user2.name;
+
+  const currentHoldings = calculateHoldings(ownerFilter);
+  
+  let symbolHoldings = {};
+  for(let key in currentHoldings) {
+    if(!currentHoldings.hasOwnProperty(key)) continue;
+    let h = currentHoldings[key];
+    if(h.qty > 0) {
+      if(!symbolHoldings[h.symbol]) {
+        symbolHoldings[h.symbol] = { qty: 0, totalCost: 0, brokers: new Set() };
+      }
+      symbolHoldings[h.symbol].qty += h.qty;
+      symbolHoldings[h.symbol].totalCost += (h.qty * h.avg);
+      symbolHoldings[h.symbol].brokers.add(h.broker);
+    }
+  }
+
   const getSliceLen = (range) => {
     if (range === '1d') return 2;
     if (range === '1w') return 6;
@@ -2329,167 +2150,122 @@ function openChartModal(ticker) {
     if (range === '3y') return 756;
     return 252;
   };
-  
-  let sliceLen = getSliceLen(state.range);
-  const displayPrices = data.prices.slice(-sliceLen);
-  const displayDates = data.dates.slice(-sliceLen);
-  
-  if(displayPrices.length === 0) return;
-  
-  const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
-  const last = displayPrices[displayPrices.length-1];
-  const prev = displayPrices[0]; 
-  const chgPct = ((last-prev)/prev*100).toFixed(2);
-  
-  document.getElementById('mTicker').textContent = data.name;
-  document.getElementById('mBroker').textContent = data.symbol;
-  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
-  
-  const chgEl = document.getElementById('mChange');
-  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
-  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
-  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
-  
-  document.getElementById('chartOverlay').classList.add('open');
-  if (modalChartInst) modalChartInst.destroy();
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
-}
+  const currentSliceLen = getSliceLen(state.range);
 
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-// ── 8. 클라우드 자동 동기화 로직 ──
-function getGhSettings() {
-  const stored = localStorage.getItem('gh_settings');
-  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
-  return JSON.parse(stored);
-}
-
-function saveGhSettings(settings) {
-  localStorage.setItem('gh_settings', JSON.stringify(settings));
-}
-
-function openGithubModal() {
-  let s = getGhSettings();
-  document.getElementById('ghUser').value = s.user;
-  document.getElementById('ghRepo').value = s.repo;
-  document.getElementById('ghToken').value = s.token;
-  document.getElementById('ghAutoSync').checked = s.autoSync;
-  document.getElementById('githubOverlay').classList.add('open');
-}
-
-document.getElementById('ghAutoSync').addEventListener('change', function(e) {
-  let s = getGhSettings();
-  s.autoSync = e.target.checked;
-  saveGhSettings(s);
-  if(s.autoSync) triggerAutoSync();
-});
-
-function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
-function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
-
-async function getGithubFileSha(settings, path) {
-  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
-  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
-  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
-  return null;
-}
-
-function updateSyncStatus(status) {
-  const el = document.getElementById('syncStatus');
-  const spinner = document.getElementById('syncSpinner');
-  const text = document.getElementById('syncText');
-  
-  el.className = 'sync-status';
-  if(status === 'syncing') {
-    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
-  } else if(status === 'success') {
-    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
-  } else if(status === 'error') {
-    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
-  } else {
-    spinner.style.display = 'none'; text.textContent = '';
-  }
-}
-
-async function pushToGithub(silent = false) {
-  let user = document.getElementById('ghUser').value.trim();
-  let repo = document.getElementById('ghRepo').value.trim();
-  let token = document.getElementById('ghToken').value.trim();
-  
-  if(!silent) {
-    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
-    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
-  } else {
-    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
-    if(!user || !repo || !token) return;
+  if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
+    updateSummaryAndAllocation(currentHoldings, []); 
+    renderPortfolioChart(ownerFilter, currentSliceLen);
+    return;
   }
 
-  updateSyncStatus('syncing');
-  const path = 'data/my_portfolio.json';
-  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-  
-  try {
-    const fileInfo = await getGithubFileSha({user, repo, token}, path);
-    const content = utf8_to_b64(JSON.stringify(state, null, 2));
-    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
-    if (fileInfo) body.sha = fileInfo.sha;
+  if(Object.keys(cachedMarketData).length === 0) {
+    container.innerHTML = `<div class="empty" style="border:none">데이터 로딩 중...</div>`;
+  }
 
-    const putRes = await fetch(url, {
-      method: 'PUT',
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
-      body: JSON.stringify(body)
-    });
-    
-    if(putRes.ok) { 
-      updateSyncStatus('success');
-      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('githubOverlay'); }
-    } else { 
-      updateSyncStatus('error');
-      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
+  let allSymbols = new Set(state.tickers);
+  for(let sym in symbolHoldings) {
+    allSymbols.add(sym);
+  }
+  allSymbols = Array.from(allSymbols);
+
+  const promises = allSymbols.map(async t => {
+    if(!cachedMarketData[t]) {
+      let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
+      cachedMarketData[t] = await fetchYahooData(fetchSym);
     }
-  } catch(e) { 
-    updateSyncStatus('error');
-    if(!silent) alert('네트워크 에러 발생'); 
-  }
-}
+    return { symbol: t, data: cachedMarketData[t] };
+  });
 
-function triggerAutoSync() {
-  const s = getGhSettings();
-  if(s.autoSync && s.token) {
-    pushToGithub(true);
-  }
-}
+  await Promise.all(promises);
 
-async function pullFromGithub(silent = false) {
-  let user = document.getElementById('ghUser').value.trim();
-  let repo = document.getElementById('ghRepo').value.trim();
-  let token = document.getElementById('ghToken').value.trim();
+  let displayItems = [];
+  for(let sym in symbolHoldings) {
+    let sh = symbolHoldings[sym];
+    let avg = sh.qty > 0 ? sh.totalCost / sh.qty : 0;
+    let brokerStr = Array.from(sh.brokers).join(', ');
+    if (cachedMarketData[sym]) {
+      displayItems.push({ type: 'held', symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, data: cachedMarketData[sym] });
+    }
+  }
+
+  let heldSymbols = new Set(displayItems.map(item => item.symbol));
+  state.tickers.forEach(sym => {
+    if(!heldSymbols.has(sym) && cachedMarketData[sym]) {
+      displayItems.push({ type: 'watch', symbol: sym, broker: '', qty: 0, avg: 0, data: cachedMarketData[sym] });
+    }
+  });
+
+  displayItems = displayItems.filter(item => {
+    if(currentView === 'all') return true;
+    if(currentView === 'user1' || currentView === 'user2') return item.type === 'held';
+    if(currentView === 'watch') return item.type === 'watch';
+    return true; 
+  });
+
+  displayItems.forEach(item => {
+    item.uniqueId = 'chart_' + Math.random().toString(36).substring(2, 10);
+    if(item.data && item.data.prices) {
+      const prices = item.data.prices;
+      const last = item.data.last;
+      item.sliceLen = currentSliceLen; 
+      const pStart = prices[Math.max(0, prices.length - currentSliceLen)] || item.data.prev;
+      item.activeChange = ((last - pStart) / pStart) * 100;
+      item.evalAmt = item.qty * last;
+      item.costAmt = item.qty * item.avg;
+      item.roi = item.costAmt > 0 ? ((item.evalAmt - item.costAmt)/item.costAmt*100) : -9999;
+    } else {
+      item.activeChange = 0; item.evalAmt = 0; item.costAmt = 0; item.roi = -9999; item.sliceLen = 0;
+    }
+  });
+
+  updateSummaryAndAllocation(currentHoldings, displayItems);
+  renderPortfolioChart(ownerFilter, currentSliceLen);
+
+  if (activeAccountFilter) {
+    displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
+  }
+
+  if(currentSortMode === 'roiDesc') displayItems.sort((a,b) => (b.roi - a.roi) * sortDirection);
+  else if(currentSortMode === 'evalDesc') displayItems.sort((a,b) => (b.evalAmt - a.evalAmt) * sortDirection);
+  else if(currentSortMode === 'changeDesc') displayItems.sort((a,b) => (b.activeChange - a.activeChange) * sortDirection);
+
+  Object.values(chartInstances).forEach(c => { if(c && typeof c.destroy === 'function') c.destroy(); });
+  for(let key in chartInstances) delete chartInstances[key];
   
-  if(!silent) {
-    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
-    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
-  } else {
-    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
-    if(!user || !repo || !token) return;
+  if(displayItems.length === 0) {
+     if(activeAccountFilter) container.innerHTML = `<div class="empty">해당 계좌에 표시할 종목이 없습니다.</div>`;
+     else container.innerHTML = `<div class="empty">선택한 탭에 표시할 종목이 없습니다.</div>`;
+     return;
   }
 
-  const path = 'data/my_portfolio.json';
-  try {
-    const fileInfo = await getGithubFileSha({user, token, repo}, path);
-    if (fileInfo && fileInfo.content) {
-      const dataStr = b64_to_utf8(fileInfo.content);
-      const data = JSON.parse(dataStr);
-      if(data.tickers && data.transactions) {
-        state = data; saveState(); cachedMarketData = {};
-        updateOwnerLabels();
-        renderTxList();
-        render();
-        updateSyncStatus('success');
-        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('githubOverlay'); }
-      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
-    } else if(!silent) alert('저장소에 파일이 없습니다.');
-  } catch(e) { if(!silent) alert('가져오기 실패'); }
+  const krItems = displayItems.filter(item => isKorean(item.symbol));
+  const usItems = displayItems.filter(item => !isKorean(item.symbol) && !isCrypto(item.symbol));
+  const cryptoItems = displayItems.filter(item => isCrypto(item.symbol));
+
+  let html = '';
+  if(krItems.length > 0) {
+    html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇰🇷 국내 주식</h3>`;
+    html += `<div class="grid">${krItems.map(t => generateCardHtml(t)).join('')}</div>`;
+  }
+  if(usItems.length > 0) {
+    html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇺🇸 미국 주식</h3>`;
+    html += `<div class="grid">${usItems.map(t => generateCardHtml(t)).join('')}</div>`;
+  }
+  if(cryptoItems.length > 0) {
+    html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🪙 암호화폐</h3>`;
+    html += `<div class="grid">${cryptoItems.map(t => generateCardHtml(t)).join('')}</div>`;
+  }
+
+  container.innerHTML = html;
+
+  displayItems.forEach(item => {
+    if (item.data && item.data.prices) {
+      const displayPrices = item.data.prices.slice(-item.sliceLen);
+      const displayDates = item.data.dates.slice(-item.sliceLen);
+      chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
+    }
+  });
 }
 </script>
 </body>
