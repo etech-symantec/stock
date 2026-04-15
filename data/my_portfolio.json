@@ -21824,6 +21824,7206 @@
       "qty": 0,
       "price": 0,
       "txType": "dividend"
+    },
+    {
+      "id": 1776219180102,
+      "date": "2020. 4. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "씨엠에스에듀",
+      "qty": 10,
+      "price": 4450,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180104,
+      "date": "2020. 4. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "씨엠에스에듀",
+      "qty": 3,
+      "price": 4250,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180105,
+      "date": "2020. 4. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "씨엠에스에듀",
+      "qty": 3,
+      "price": 4200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180107,
+      "date": "2020. 4. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "190510.KQ",
+      "qty": 5,
+      "price": 15200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180108,
+      "date": "2020. 4. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "190510.KQ",
+      "qty": -5,
+      "price": 16500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180109,
+      "date": "2020. 4. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "017180.KS",
+      "qty": 11,
+      "price": 6760,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180111,
+      "date": "2020. 4. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "017180.KS",
+      "qty": 28,
+      "price": 6540,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180112,
+      "date": "2020. 4. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "태평양물산",
+      "qty": 34,
+      "price": 1960,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180113,
+      "date": "2020. 4. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "태평양물산",
+      "qty": 16,
+      "price": 1860,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180115,
+      "date": "2020. 4. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "씨엠에스에듀",
+      "qty": -16,
+      "price": 4200,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180116,
+      "date": "2020. 4. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "017180.KS",
+      "qty": -39,
+      "price": 5480,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180118,
+      "date": "2020. 4. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "라이브파이낸셜",
+      "qty": 48,
+      "price": 1775,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180119,
+      "date": "2020. 4. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "라이브파이낸셜",
+      "qty": 37,
+      "price": 1700,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180120,
+      "date": "2020. 4. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "032850.KQ",
+      "qty": 9,
+      "price": 7150,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180122,
+      "date": "2020. 4. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "206640.KQ",
+      "qty": 2,
+      "price": 20900,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180123,
+      "date": "2020. 4. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "032850.KQ",
+      "qty": -9,
+      "price": 8500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180124,
+      "date": "2020. 4. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "206640.KQ",
+      "qty": 3,
+      "price": 19700,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180125,
+      "date": "2020. 4. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "038290.KQ",
+      "qty": 3,
+      "price": 39200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180126,
+      "date": "2020. 4. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "294140.KQ",
+      "qty": 6,
+      "price": 15700,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180128,
+      "date": "2020. 4. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "294140.KQ",
+      "qty": 8,
+      "price": 14800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180129,
+      "date": "2020. 4. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "038290.KQ",
+      "qty": -3,
+      "price": 41000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180130,
+      "date": "2020. 4. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔에스",
+      "qty": 20,
+      "price": 6180,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180132,
+      "date": "2020. 4. 20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "매직마이크로",
+      "qty": 41,
+      "price": 710,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180133,
+      "date": "2020. 4. 21",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "084650.KQ",
+      "qty": 13,
+      "price": 19500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180134,
+      "date": "2020. 4. 22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "206640.KQ",
+      "qty": -5,
+      "price": 22800,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180136,
+      "date": "2020. 4. 22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "매직마이크로",
+      "qty": -41,
+      "price": 616,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180137,
+      "date": "2020. 4. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "294140.KQ",
+      "qty": -14,
+      "price": 16700,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180138,
+      "date": "2020. 4. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "026150.KQ",
+      "qty": 4,
+      "price": 8100,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180140,
+      "date": "2020. 4. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "026150.KQ",
+      "qty": 24,
+      "price": 7700,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180141,
+      "date": "2020. 4. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "094940.KQ",
+      "qty": 10,
+      "price": 16300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180142,
+      "date": "2020. 4. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005690.KS",
+      "qty": 13,
+      "price": 18500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180143,
+      "date": "2020. 4. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005500.KS",
+      "qty": 11,
+      "price": 25300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180145,
+      "date": "2020. 5. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "950130.KQ",
+      "qty": 15,
+      "price": 4495,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180146,
+      "date": "2020. 5. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "046440.KQ",
+      "qty": 14,
+      "price": 8800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180147,
+      "date": "2020. 5. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "000910.KS",
+      "qty": 31,
+      "price": 4760,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180149,
+      "date": "2020. 5. 15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "032850.KQ",
+      "qty": 353,
+      "price": 11600,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180150,
+      "date": "2020. 5. 15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "253840.KQ",
+      "qty": 126,
+      "price": 32100,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180152,
+      "date": "2020. 5. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "라이브파이낸셜",
+      "qty": 100,
+      "price": 1550,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180153,
+      "date": "2020. 5. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "950130.KQ",
+      "qty": 354,
+      "price": 4510,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180155,
+      "date": "2020. 5. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "042510.KQ",
+      "qty": 1,
+      "price": 3360,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180156,
+      "date": "2020. 5. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "017180.KS",
+      "qty": 449,
+      "price": 6890,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180158,
+      "date": "2020. 5. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔에스",
+      "qty": -20,
+      "price": 6900,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180159,
+      "date": "2020. 5. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "084650.KQ",
+      "qty": -13,
+      "price": 28200,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180160,
+      "date": "2020. 5. 20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "042510.KQ",
+      "qty": 256,
+      "price": 4280,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180161,
+      "date": "2020. 6. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "125210.KQ",
+      "qty": 67,
+      "price": 13900,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180163,
+      "date": "2020. 6. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "태평양물산",
+      "qty": -50,
+      "price": 2130,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180164,
+      "date": "2020. 6. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005690.KS",
+      "qty": -13,
+      "price": 23000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180165,
+      "date": "2020. 6. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005500.KS",
+      "qty": -11,
+      "price": 27900,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180167,
+      "date": "2020. 6. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "셀트리온헬스케어",
+      "qty": 12,
+      "price": 93300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180168,
+      "date": "2020. 6. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "058400.KQ",
+      "qty": 247,
+      "price": 1480,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180169,
+      "date": "2020. 6. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "247540.KQ",
+      "qty": 6,
+      "price": 126000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180170,
+      "date": "2020. 6. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "060720.KQ",
+      "qty": 49,
+      "price": 23050,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180172,
+      "date": "2020. 6. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "000910.KS",
+      "qty": -31,
+      "price": 5520,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180173,
+      "date": "2020. 6. 16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "046440.KQ",
+      "qty": -14,
+      "price": 12450,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180174,
+      "date": "2020. 6. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "058400.KQ",
+      "qty": 833,
+      "price": 1535,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180175,
+      "date": "2020. 6. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "032850.KQ",
+      "qty": -53,
+      "price": 13300,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180177,
+      "date": "2020. 6. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "032850.KQ",
+      "qty": -176,
+      "price": 13700,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180178,
+      "date": "2020. 6. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "032850.KQ",
+      "qty": -62,
+      "price": 14100,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180179,
+      "date": "2020. 6. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "032850.KQ",
+      "qty": -62,
+      "price": 14800,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180180,
+      "date": "2020. 6. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "058400.KQ",
+      "qty": -324,
+      "price": 1620,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180181,
+      "date": "2020. 6. 26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "253840.KQ",
+      "qty": 21,
+      "price": 25800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180182,
+      "date": "2020. 6. 26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 1,
+      "price": 46800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180184,
+      "date": "2020. 6. 29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "017180.KS",
+      "qty": 32,
+      "price": 5830,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180185,
+      "date": "2020. 6. 29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "026150.KQ",
+      "qty": 30,
+      "price": 6060,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180186,
+      "date": "2020. 6. 29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "950130.KQ",
+      "qty": 144,
+      "price": 3355,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180187,
+      "date": "2020. 7. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "253840.KQ",
+      "qty": 16,
+      "price": 24150,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180189,
+      "date": "2020. 7. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "058400.KQ",
+      "qty": -151,
+      "price": 1680,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180190,
+      "date": "2020. 7. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "058400.KQ",
+      "qty": -181,
+      "price": 1790,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180191,
+      "date": "2020. 7. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "058400.KQ",
+      "qty": -127,
+      "price": 1900,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180192,
+      "date": "2020. 7. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "051915.KS",
+      "qty": 10,
+      "price": 254500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180193,
+      "date": "2020. 7. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "058400.KQ",
+      "qty": -89,
+      "price": 1950,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180194,
+      "date": "2020. 7. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "017180.KS",
+      "qty": 50,
+      "price": 5380,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180196,
+      "date": "2020. 7. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035900.KQ",
+      "qty": 38,
+      "price": 26500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180197,
+      "date": "2020. 7. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "026150.KQ",
+      "qty": -29,
+      "price": 7870,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180198,
+      "date": "2020. 7. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "950130.KQ",
+      "qty": 31,
+      "price": 3235,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180199,
+      "date": "2020. 7. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035720.KS",
+      "qty": 2,
+      "price": 342500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180200,
+      "date": "2020. 7. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "017180.KS",
+      "qty": -200,
+      "price": 7050,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180201,
+      "date": "2020. 7. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035720.KS",
+      "qty": 5,
+      "price": 327000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180203,
+      "date": "2020. 7. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "950130.KQ",
+      "qty": -272,
+      "price": 4930,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180204,
+      "date": "2020. 7. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "950130.KQ",
+      "qty": -272,
+      "price": 5020,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180205,
+      "date": "2020. 7. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "042510.KQ",
+      "qty": 274,
+      "price": 3660,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180206,
+      "date": "2020. 7. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "253840.KQ",
+      "qty": -81,
+      "price": 40800,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180207,
+      "date": "2020. 7. 31",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 2,
+      "price": 50000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180208,
+      "date": "2020. 7. 31",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 20,
+      "price": 49800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180209,
+      "date": "2020. 7. 31",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "253840.KQ",
+      "qty": -82,
+      "price": 50500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180211,
+      "date": "2020. 8. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코엔텍",
+      "qty": 100,
+      "price": 9400,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180212,
+      "date": "2020. 8. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "067900.KQ",
+      "qty": 100,
+      "price": 12700,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180213,
+      "date": "2020. 8. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "285130.KS",
+      "qty": 20,
+      "price": 270000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180214,
+      "date": "2020. 8. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "093370.KS",
+      "qty": 50,
+      "price": 8780,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180215,
+      "date": "2020. 8. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "001820.KS",
+      "qty": 15,
+      "price": 62500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180217,
+      "date": "2020. 8. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코엔텍",
+      "qty": -100,
+      "price": 9630,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180218,
+      "date": "2020. 8. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "067900.KQ",
+      "qty": -100,
+      "price": 13700,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180219,
+      "date": "2020. 8. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "라이브파이낸셜",
+      "qty": 100,
+      "price": 1320,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180221,
+      "date": "2020. 8. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "026150.KQ",
+      "qty": -29,
+      "price": 8220,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180222,
+      "date": "2020. 8. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "058400.KQ",
+      "qty": -208,
+      "price": 1830,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180223,
+      "date": "2020. 8. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "051915.KS",
+      "qty": 3,
+      "price": 372500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180224,
+      "date": "2020. 8. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "950130.KQ",
+      "qty": 70,
+      "price": 36000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180226,
+      "date": "2020. 8. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035900.KQ",
+      "qty": -38,
+      "price": 36400,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180227,
+      "date": "2020. 8. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "051915.KS",
+      "qty": 3,
+      "price": 343000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180228,
+      "date": "2020. 8. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "251270.KS",
+      "qty": 10,
+      "price": 149000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180229,
+      "date": "2020. 8. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131090.KQ",
+      "qty": 326,
+      "price": 1380,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180231,
+      "date": "2020. 8. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "950130.KQ",
+      "qty": -70,
+      "price": 43550,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180232,
+      "date": "2020. 8. 20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "057030.KQ",
+      "qty": 128,
+      "price": 11250,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180233,
+      "date": "2020. 8. 21",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "067170.KQ",
+      "qty": 64,
+      "price": 14550,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180234,
+      "date": "2020. 8. 21",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "247540.KQ",
+      "qty": -6,
+      "price": 155000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180236,
+      "date": "2020. 8. 21",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "067170.KQ",
+      "qty": -64,
+      "price": 14950,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180237,
+      "date": "2020. 8. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "150900.KQ",
+      "qty": 131,
+      "price": 7250,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180238,
+      "date": "2020. 8. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 54,
+      "price": 18500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180240,
+      "date": "2020. 8. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "셀트리온헬스케어",
+      "qty": -12,
+      "price": 104000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180241,
+      "date": "2020. 8. 31",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109820.KQ",
+      "qty": 64,
+      "price": 19150,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180242,
+      "date": "2020. 9. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": 466,
+      "price": 7140,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180243,
+      "date": "2020. 9. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "017180.KS",
+      "qty": -331,
+      "price": 6810,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180245,
+      "date": "2020. 9. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "093370.KS",
+      "qty": -50,
+      "price": 11000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180246,
+      "date": "2020. 9. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131090.KQ",
+      "qty": -326,
+      "price": 1575,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180247,
+      "date": "2020. 9. 17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": 1,
+      "price": 4040,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180248,
+      "date": "2020. 9. 21",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "051915.KS",
+      "qty": -16,
+      "price": 294500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180249,
+      "date": "2020. 9. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "051915.KS",
+      "qty": 15,
+      "price": 305000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180251,
+      "date": "2020. 9. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "150900.KQ",
+      "qty": -131,
+      "price": 7900,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180252,
+      "date": "2020. 10. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "057030.KQ",
+      "qty": 60,
+      "price": 9000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180253,
+      "date": "2020. 10. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "251270.KS",
+      "qty": -10,
+      "price": 151500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180254,
+      "date": "2020. 10. 15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 15,
+      "price": 14700,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180255,
+      "date": "2020. 10. 15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109820.KQ",
+      "qty": 16,
+      "price": 15300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180257,
+      "date": "2020. 10. 15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "라이브파이낸셜",
+      "qty": -285,
+      "price": 1695,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180258,
+      "date": "2020. 10. 16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "057030.KQ",
+      "qty": 60,
+      "price": 8170,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180259,
+      "date": "2020. 10. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "010170.KQ",
+      "qty": 142,
+      "price": 4000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180260,
+      "date": "2020. 10. 29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 27,
+      "price": 52200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180261,
+      "date": "2020. 10. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "285130.KS",
+      "qty": -20,
+      "price": 356000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180262,
+      "date": "2020. 10. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 19,
+      "price": 50700,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180263,
+      "date": "2020. 11. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "014710.KS",
+      "qty": 114,
+      "price": 6300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180264,
+      "date": "2020. 11. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "057030.KQ",
+      "qty": -248,
+      "price": 8060,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180266,
+      "date": "2020. 11. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "003310.KQ",
+      "qty": 288,
+      "price": 2710,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180267,
+      "date": "2020. 11. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035200.KQ",
+      "qty": 168,
+      "price": 5820,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180268,
+      "date": "2020. 11. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "003310.KQ",
+      "qty": 324,
+      "price": 2850,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180269,
+      "date": "2020. 11. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035200.KQ",
+      "qty": 69,
+      "price": 5710,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180270,
+      "date": "2020. 11. 12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "079970.KQ",
+      "qty": 98,
+      "price": 3350,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180271,
+      "date": "2020. 11. 12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "014710.KS",
+      "qty": -114,
+      "price": 6700,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180273,
+      "date": "2020. 11. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109820.KQ",
+      "qty": -80,
+      "price": 33000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180274,
+      "date": "2020. 11. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 11,
+      "price": 61600,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180275,
+      "date": "2020. 11. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "285130.KS",
+      "qty": 6,
+      "price": 434000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180276,
+      "date": "2020. 11. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 8,
+      "price": 60800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180277,
+      "date": "2020. 11. 26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 14,
+      "price": 15800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180278,
+      "date": "2020. 12. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "285130.KS",
+      "qty": 1,
+      "price": 410000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180279,
+      "date": "2020. 12. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "079970.KQ",
+      "qty": -98,
+      "price": 3490,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180281,
+      "date": "2020. 12. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "125210.KQ",
+      "qty": -67,
+      "price": 14150,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180282,
+      "date": "2020. 12. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 5,
+      "price": 64600,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180283,
+      "date": "2020. 12. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 17,
+      "price": 64500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180284,
+      "date": "2020. 12. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "010170.KQ",
+      "qty": -142,
+      "price": 4060,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180285,
+      "date": "2020. 12. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "285130.KS",
+      "qty": 3,
+      "price": 404000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180286,
+      "date": "2020. 12. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 17,
+      "price": 15100,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180287,
+      "date": "2020. 12. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "037230.KQ",
+      "qty": 79,
+      "price": 6300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180289,
+      "date": "2020. 12. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "037230.KQ",
+      "qty": -79,
+      "price": 6400,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180290,
+      "date": "2020. 12. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 72,
+      "price": 6220,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180291,
+      "date": "2020. 12. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": -72,
+      "price": 6360,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180292,
+      "date": "2020. 12. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "285130.KS",
+      "qty": 1,
+      "price": 390000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180293,
+      "date": "2020. 12. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "060720.KQ",
+      "qty": 3,
+      "price": 17800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180294,
+      "date": "2020. 12. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 11,
+      "price": 15000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180295,
+      "date": "2020. 12. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 65,
+      "price": 6100,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180297,
+      "date": "2020. 12. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 5,
+      "price": 4630,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180298,
+      "date": "2020. 12. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035200.KQ",
+      "qty": 23,
+      "price": 4460,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180299,
+      "date": "2020. 12. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": 1,
+      "price": 3000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180300,
+      "date": "2020. 12. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "003310.KQ",
+      "qty": 38,
+      "price": 2050,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180301,
+      "date": "2020. 12. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "001820.KS",
+      "qty": -15,
+      "price": 66500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180302,
+      "date": "2021. 1. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 20,
+      "price": 4320,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180303,
+      "date": "2021. 1. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 20,
+      "price": 74500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180305,
+      "date": "2021. 1. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 10,
+      "price": 3940,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180306,
+      "date": "2021. 1. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 8,
+      "price": 78600,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180307,
+      "date": "2021. 1. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 30,
+      "price": 75200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180308,
+      "date": "2021. 1. 29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 40,
+      "price": 75000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180309,
+      "date": "2021. 2. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "285130.KS",
+      "qty": -11,
+      "price": 435000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180310,
+      "date": "2021. 2. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 60,
+      "price": 9850,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180311,
+      "date": "2021. 2. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "012860.KQ",
+      "qty": 217,
+      "price": 3200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180313,
+      "date": "2021. 2. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 100,
+      "price": 22500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180314,
+      "date": "2021. 2. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "TIGER KRX2차전지K-뉴딜",
+      "qty": 100,
+      "price": 17950,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180315,
+      "date": "2021. 2. 15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 100,
+      "price": 10200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180316,
+      "date": "2021. 2. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "094940.KQ",
+      "qty": 10,
+      "price": 12300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180317,
+      "date": "2021. 3. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "012860.KQ",
+      "qty": -217,
+      "price": 3500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180319,
+      "date": "2021. 3. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "094940.KQ",
+      "qty": 3,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180320,
+      "date": "2021. 3. 15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "042510.KQ",
+      "qty": -531,
+      "price": 4115,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180321,
+      "date": "2021. 4. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": 1,
+      "price": 2330,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180322,
+      "date": "2021. 4. 15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035720.KS",
+      "qty": 28,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180323,
+      "date": "2021. 4. 16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 20,
+      "price": 3890,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180324,
+      "date": "2021. 4. 16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 40,
+      "price": 9800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180326,
+      "date": "2021. 4. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035200.KQ",
+      "qty": -260,
+      "price": 6900,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180327,
+      "date": "2021. 5. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 38,
+      "price": 74300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180328,
+      "date": "2021. 5. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": 1,
+      "price": 2070,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180329,
+      "date": "2021. 5. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "001250.KS",
+      "qty": 1,
+      "price": 2775,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180330,
+      "date": "2021. 5. 21",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "094940.KQ",
+      "qty": -23,
+      "price": 15200,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180331,
+      "date": "2021. 6. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035720.KS",
+      "qty": -35,
+      "price": 150000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180332,
+      "date": "2021. 6. 22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": 1,
+      "price": 2350,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180334,
+      "date": "2021. 6. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 15,
+      "price": 3980,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180335,
+      "date": "2021. 6. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": 2,
+      "price": 2350,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180336,
+      "date": "2021. 6. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 15,
+      "price": 73600,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180337,
+      "date": "2021. 7. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 100,
+      "price": 4400,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180338,
+      "date": "2021. 7. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 69,
+      "price": 10300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180339,
+      "date": "2021. 7. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": 3,
+      "price": 2410,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180341,
+      "date": "2021. 7. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": 90,
+      "price": 2390,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180342,
+      "date": "2021. 7. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": 70,
+      "price": 4250,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180343,
+      "date": "2021. 7. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "033230.KQ",
+      "qty": -100,
+      "price": 2980,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180344,
+      "date": "2021. 7. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "057030.KQ",
+      "qty": 269,
+      "price": 10450,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180346,
+      "date": "2021. 7. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "045660.KQ",
+      "qty": 49,
+      "price": 31700,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180347,
+      "date": "2021. 7. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "003310.KQ",
+      "qty": -650,
+      "price": 2860,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180348,
+      "date": "2021. 8. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "323410.KS",
+      "qty": 8,
+      "price": 39000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180349,
+      "date": "2021. 8. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "185490.KQ",
+      "qty": 10,
+      "price": 38200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180350,
+      "date": "2021. 8. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 64,
+      "price": 10000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180352,
+      "date": "2021. 8. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "060720.KQ",
+      "qty": 28,
+      "price": 21000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180353,
+      "date": "2021. 8. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 27,
+      "price": 69300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180354,
+      "date": "2021. 8. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "089860.KS",
+      "qty": 6,
+      "price": 59000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180355,
+      "date": "2021. 8. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "089860.KS",
+      "qty": 6,
+      "price": 55000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180357,
+      "date": "2021. 8. 20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "185490.KQ",
+      "qty": -10,
+      "price": 44800,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180358,
+      "date": "2021. 8. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "060720.KQ",
+      "qty": -80,
+      "price": 23200,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180359,
+      "date": "2021. 8. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "051915.KS",
+      "qty": 3,
+      "price": 371000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180360,
+      "date": "2021. 8. 26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "036570.KS",
+      "qty": 1,
+      "price": 720000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180361,
+      "date": "2021. 9. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "271940.KS",
+      "qty": 3,
+      "price": 34300,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180362,
+      "date": "2021. 9. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "036570.KS",
+      "qty": 1,
+      "price": 630000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180364,
+      "date": "2021. 9. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "395400.KS",
+      "qty": 7,
+      "price": 5000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180365,
+      "date": "2021. 9. 17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "현대중공업",
+      "qty": 2,
+      "price": 60000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180366,
+      "date": "2021. 10. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "051915.KS",
+      "qty": -18,
+      "price": 372000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180367,
+      "date": "2021. 10. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "045660.KQ",
+      "qty": 6,
+      "price": 25000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180368,
+      "date": "2021. 10. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "395400.KS",
+      "qty": -7,
+      "price": 5970,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180370,
+      "date": "2021. 10. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "045660.KQ",
+      "qty": 5,
+      "price": 22500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180371,
+      "date": "2021. 10. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "045660.KQ",
+      "qty": 5,
+      "price": 21500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180372,
+      "date": "2021. 10. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "045660.KQ",
+      "qty": 35,
+      "price": 26200,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180373,
+      "date": "2021. 11. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "포스코케미칼",
+      "qty": 10,
+      "price": 145000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180374,
+      "date": "2021. 11. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "377300.KS",
+      "qty": 3,
+      "price": 90000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180375,
+      "date": "2021. 11. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "036570.KS",
+      "qty": 1,
+      "price": 600000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180377,
+      "date": "2021. 11. 11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "036570.KS",
+      "qty": -3,
+      "price": 750000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180378,
+      "date": "2021. 11. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "377300.KS",
+      "qty": -3,
+      "price": 231000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180379,
+      "date": "2022. 1. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "045660.KQ",
+      "qty": -100,
+      "price": 31500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180380,
+      "date": "2022. 1. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "현대중공업",
+      "qty": -2,
+      "price": 112000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180381,
+      "date": "2022. 1. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "373220.KS",
+      "qty": 2,
+      "price": 300000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180382,
+      "date": "2022. 1. 27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "373220.KS",
+      "qty": -1,
+      "price": 500000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180383,
+      "date": "2022. 2. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "373220.KS",
+      "qty": -1,
+      "price": 540000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180385,
+      "date": "2022. 3. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "263020.KQ",
+      "qty": 200,
+      "price": 3840,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180386,
+      "date": "2022. 3. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "140410.KQ",
+      "qty": 10,
+      "price": 75000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180387,
+      "date": "2022. 4. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "140410.KQ",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180388,
+      "date": "2022. 5. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": -344,
+      "price": 4950,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180389,
+      "date": "2022. 5. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "109610.KQ",
+      "qty": -305,
+      "price": 3120,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180390,
+      "date": "2022. 5. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "323410.KS",
+      "qty": -8,
+      "price": 39700,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180391,
+      "date": "2022. 5. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "089860.KS",
+      "qty": -12,
+      "price": 40300,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180393,
+      "date": "2022. 5. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "271940.KS",
+      "qty": -3,
+      "price": 39300,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180394,
+      "date": "2022. 5. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "057030.KQ",
+      "qty": -269,
+      "price": 5250,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180395,
+      "date": "2022. 8. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "포스코케미칼",
+      "qty": -10,
+      "price": 165000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180396,
+      "date": "2023. 3. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "417010.KQ",
+      "qty": 1,
+      "price": 13000,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180397,
+      "date": "2023. 4. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "417010.KQ",
+      "qty": -1,
+      "price": 24200,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180398,
+      "date": "2023. 4. 26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "424980.KQ",
+      "qty": 1,
+      "price": 15500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180400,
+      "date": "2023. 4. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "424980.KQ",
+      "qty": -1,
+      "price": 26850,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180401,
+      "date": "2023. 7. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "140410.KQ",
+      "qty": -30,
+      "price": 38000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180402,
+      "date": "2023. 7. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "TIGER KRX2차전지K-뉴딜",
+      "qty": -100,
+      "price": 19150,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180403,
+      "date": "2023. 11. 29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": -5,
+      "price": 5700,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180404,
+      "date": "2023. 11. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": -50,
+      "price": 14010,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180406,
+      "date": "2023. 11. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "263020.KQ",
+      "qty": -100,
+      "price": 3010,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180407,
+      "date": "2023. 11. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": -144,
+      "price": 57900,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180408,
+      "date": "2023. 12. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": -25,
+      "price": 13740,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180409,
+      "date": "2023. 12. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": -50,
+      "price": 8375,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180410,
+      "date": "2025. 4. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "360750.KS",
+      "qty": 11,
+      "price": 18750,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180412,
+      "date": "2025. 6. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "263020.KQ",
+      "qty": 100,
+      "price": 2870,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180413,
+      "date": "2025. 7. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": -50,
+      "price": 10600,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180414,
+      "date": "2025. 8. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "487230.KS",
+      "qty": 64,
+      "price": 17115,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180415,
+      "date": "2025. 9. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "487230.KS",
+      "qty": 30,
+      "price": 16030,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180416,
+      "date": "2025. 9. 16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "161890.KS",
+      "qty": 10,
+      "price": 78500,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180417,
+      "date": "2025. 11. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": -43,
+      "price": 79000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180419,
+      "date": "2025. 12. 29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": -230,
+      "price": 4840,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180420,
+      "date": "2025. 12. 29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": -69,
+      "price": 5220,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180421,
+      "date": "2025. 12. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": -48,
+      "price": 6400,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180422,
+      "date": "2026. 1. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": -34,
+      "price": 8340,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180423,
+      "date": "2026. 1. 8",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": -80,
+      "price": 7150,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180424,
+      "date": "2026. 1. 13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "487230.KS",
+      "qty": 68,
+      "price": 18190,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180426,
+      "date": "2026. 3. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "161890.KS",
+      "qty": -10,
+      "price": 79500,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180427,
+      "date": "2020. 7. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 12,
+      "price": 96.27,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180428,
+      "date": "2020. 7. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 1,
+      "price": 179.85,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180429,
+      "date": "2020. 7. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": 5,
+      "price": 277.8,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180431,
+      "date": "2020. 7. 31",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 1,
+      "price": 162.22,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180432,
+      "date": "2020. 7. 31",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 1,
+      "price": 203.3,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180433,
+      "date": "2020. 8. 12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 2,
+      "price": 444.94,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180434,
+      "date": "2020. 8. 12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 1,
+      "price": 445.2,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180436,
+      "date": "2020. 9. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": -5,
+      "price": 450,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180437,
+      "date": "2020. 9. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 2,
+      "price": 118.98,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180438,
+      "date": "2020. 9. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": 5,
+      "price": 383.9,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180439,
+      "date": "2020. 9. 30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 1,
+      "price": 165,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180441,
+      "date": "2020. 10. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": 4,
+      "price": 424,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180442,
+      "date": "2020. 10. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "배터리 ETF",
+      "qty": 25,
+      "price": 40.7,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180444,
+      "date": "2020. 10. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 20,
+      "price": 114,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180445,
+      "date": "2020. 10. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 2,
+      "price": 560,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180447,
+      "date": "2020. 10. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 4,
+      "price": 209.65,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180448,
+      "date": "2020. 10. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "소셜 ETF",
+      "qty": 25,
+      "price": 50.35,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180450,
+      "date": "2020. 11. 2",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 4,
+      "price": 204.3,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180451,
+      "date": "2020. 11. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 10,
+      "price": 120.9,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180452,
+      "date": "2020. 11. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": 7,
+      "price": 446,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180454,
+      "date": "2020. 11. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "소셜 ETF",
+      "qty": 24,
+      "price": 55.5,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180455,
+      "date": "2020. 11. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "아마존",
+      "qty": 2,
+      "price": 3240,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180457,
+      "date": "2020. 11. 18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 5,
+      "price": 215,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180458,
+      "date": "2020. 11. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "배터리 ETF",
+      "qty": 39,
+      "price": 52.78,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180460,
+      "date": "2021. 2. 26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": -8,
+      "price": 700,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180461,
+      "date": "2021. 4. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "ARKX",
+      "qty": 107,
+      "price": 20.85,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180462,
+      "date": "2021. 6. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 4,
+      "price": 243.9,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180464,
+      "date": "2021. 7. 20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 15,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180465,
+      "date": "2021. 8. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 1,
+      "price": 225.5,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180467,
+      "date": "2021. 8. 3",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "카니발",
+      "qty": 21,
+      "price": 21.85,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180468,
+      "date": "2021. 8. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "중국 인터넷 ETF",
+      "qty": 18,
+      "price": 51,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180469,
+      "date": "2021. 8. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "중국 인터넷 ETF",
+      "qty": 5,
+      "price": 44,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180471,
+      "date": "2021. 10. 26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": 3,
+      "price": 313,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180472,
+      "date": "2021. 11. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 4,
+      "price": 214,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180473,
+      "date": "2021. 11. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "중국 인터넷 ETF",
+      "qty": 18,
+      "price": 49,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180475,
+      "date": "2021. 11. 12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "디즈니",
+      "qty": 7,
+      "price": 159,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180476,
+      "date": "2021. 11. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "카니발",
+      "qty": 50,
+      "price": 21,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180478,
+      "date": "2021. 12. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "소파이",
+      "qty": 32,
+      "price": 15,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180479,
+      "date": "2022. 1. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "중국 인터넷 ETF",
+      "qty": 12,
+      "price": 36,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180481,
+      "date": "2022. 1. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": -4,
+      "price": 1000,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180482,
+      "date": "2022. 1. 10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "소파이",
+      "qty": 30,
+      "price": 13,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180483,
+      "date": "2022. 2. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": 4,
+      "price": 225,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180485,
+      "date": "2022. 2. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "디즈니",
+      "qty": 3,
+      "price": 145,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180486,
+      "date": "2022. 2. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": 2,
+      "price": 800,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180488,
+      "date": "2022. 2. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "소파이",
+      "qty": 8,
+      "price": 11,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180489,
+      "date": "2022. 2. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": 2,
+      "price": 205,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180491,
+      "date": "2022. 2. 23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "ARKX",
+      "qty": 6,
+      "price": 16,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180492,
+      "date": "2022. 2. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "카니발",
+      "qty": 18,
+      "price": 20,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180493,
+      "date": "2022. 3. 24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "중국 인터넷 ETF",
+      "qty": 10,
+      "price": 32,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180495,
+      "date": "2022. 4. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 3,
+      "price": 150,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180496,
+      "date": "2022. 4. 28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "소파이",
+      "qty": 20,
+      "price": 6,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180497,
+      "date": "2022. 5. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "ARKX",
+      "qty": -113,
+      "price": 14,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180498,
+      "date": "2022. 5. 9",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "소셜 ETF",
+      "qty": -49,
+      "price": 36,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180500,
+      "date": "2022. 5. 19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": 4,
+      "price": 127,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180501,
+      "date": "2022. 5. 20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "배터리 ETF",
+      "qty": -64,
+      "price": 70,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180502,
+      "date": "2022. 6. 6",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "아마존",
+      "qty": 38,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180503,
+      "date": "2022. 8. 25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "테슬라",
+      "qty": 12,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180505,
+      "date": "2023. 2. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "카니발",
+      "qty": 30,
+      "price": 12,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180506,
+      "date": "2023. 2. 7",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 14,
+      "price": 61,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180507,
+      "date": "2023. 8. 4",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "디즈니",
+      "qty": 10,
+      "price": 86,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180509,
+      "date": "2023. 9. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": -10,
+      "price": 482,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180510,
+      "date": "2023. 9. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": -9,
+      "price": 299,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180511,
+      "date": "2023. 9. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": -9,
+      "price": 333,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180513,
+      "date": "2023. 9. 5",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "아마존",
+      "qty": -20,
+      "price": 137,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180514,
+      "date": "2023. 9. 14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "중국 인터넷 ETF",
+      "qty": -63,
+      "price": 28,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180515,
+      "date": "2023. 12. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "아마존",
+      "qty": -3,
+      "price": 146,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180516,
+      "date": "2023. 12. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "아마존",
+      "qty": -7,
+      "price": 146,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180518,
+      "date": "2023. 12. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "카니발",
+      "qty": -59,
+      "price": 15,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180519,
+      "date": "2023. 12. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "소파이",
+      "qty": -45,
+      "price": 7,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180520,
+      "date": "2024-06-10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 90,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180521,
+      "date": "2024-10-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": -13,
+      "price": 139,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180523,
+      "date": "2025-06-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": -10,
+      "price": 214,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180524,
+      "date": "2025-07-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": -7,
+      "price": 229,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180525,
+      "date": "2025-07-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "알파벳 A",
+      "qty": 8,
+      "price": 185,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180526,
+      "date": "2025-07-25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "백트홀딩스",
+      "qty": 20,
+      "price": 19,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180528,
+      "date": "2025-08-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "백트홀딩스",
+      "qty": 20,
+      "price": 10,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180529,
+      "date": "2025-08-06",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": -8,
+      "price": 212,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180530,
+      "date": "2025-08-07",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "백트홀딩스",
+      "qty": 20,
+      "price": 9,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180531,
+      "date": "2025-08-20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "백트홀딩스",
+      "qty": 30,
+      "price": 10,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180533,
+      "date": "2025-08-20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "유나이티드헬스그룹",
+      "qty": 3,
+      "price": 309,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180534,
+      "date": "2025-08-28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": -3,
+      "price": 233,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180535,
+      "date": "2025-09-15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "보잉",
+      "qty": -4,
+      "price": 217,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180536,
+      "date": "2025-09-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "백트홀딩스",
+      "qty": 30,
+      "price": 9,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180537,
+      "date": "2025-09-21",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코인베이스글로벌",
+      "qty": 6,
+      "price": 326,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180539,
+      "date": "2025-10-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "백트홀딩스",
+      "qty": -10,
+      "price": 32,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180540,
+      "date": "2025-10-06",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "백트홀딩스",
+      "qty": -10,
+      "price": 44,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180541,
+      "date": "2025-10-13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코인베이스글로벌",
+      "qty": 3,
+      "price": 348,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180542,
+      "date": "2025-10-21",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "백트홀딩스",
+      "qty": -50,
+      "price": 38,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180544,
+      "date": "2025-10-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": 1,
+      "price": 731,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180545,
+      "date": "2025-11-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코인베이스글로벌",
+      "qty": -2,
+      "price": 262,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180546,
+      "date": "2025-11-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코인베이스글로벌",
+      "qty": -2,
+      "price": 245,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180547,
+      "date": "2025-12-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코인베이스글로벌",
+      "qty": -2,
+      "price": 254,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180549,
+      "date": "2025-12-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코인베이스글로벌",
+      "qty": -1,
+      "price": 258,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180550,
+      "date": "2025-12-19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": 1,
+      "price": 664,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180551,
+      "date": "2025-12-19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "아마존",
+      "qty": 1,
+      "price": 227,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180552,
+      "date": "2025-12-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "오라클",
+      "qty": 5,
+      "price": 196,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180554,
+      "date": "2025-12-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "브로드컴",
+      "qty": 3,
+      "price": 339,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180555,
+      "date": "2025-12-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "뉴스케일 파워",
+      "qty": 40,
+      "price": 17,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180556,
+      "date": "2025-12-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코인베이스글로벌",
+      "qty": -2,
+      "price": 240,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180558,
+      "date": "2025-12-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "오라클",
+      "qty": 2,
+      "price": 194,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180559,
+      "date": "2025-12-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "아마존",
+      "qty": 4,
+      "price": 231,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180560,
+      "date": "2025-12-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "뉴스케일 파워",
+      "qty": 20,
+      "price": 16,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180561,
+      "date": "2025-12-30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": -4,
+      "price": 657,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180563,
+      "date": "2025-12-30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "뉴스케일 파워",
+      "qty": -60,
+      "price": 14,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180564,
+      "date": "2026-01-05",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "팔란티어 테크",
+      "qty": 12,
+      "price": 174,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180565,
+      "date": "2026-01-05",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": 2,
+      "price": 648,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180566,
+      "date": "2026-01-06",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "오라클",
+      "qty": 4,
+      "price": 193,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180568,
+      "date": "2026-01-06",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "브로드컴",
+      "qty": 3,
+      "price": 343,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180569,
+      "date": "2026-01-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "오라클",
+      "qty": 1,
+      "price": 173,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180570,
+      "date": "2026-01-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "브로드컴",
+      "qty": 1,
+      "price": 315,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180571,
+      "date": "2026-01-28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "오라클",
+      "qty": 1,
+      "price": 176,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180573,
+      "date": "2026-01-28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "뉴스케일 파워",
+      "qty": 1,
+      "price": 18,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180574,
+      "date": "2026-01-28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "유나이티드헬스 그룹",
+      "qty": 1,
+      "price": 286,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180575,
+      "date": "2026-01-30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "아마존",
+      "qty": 5,
+      "price": 240,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180576,
+      "date": "2026-01-30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": -14,
+      "price": 74,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180578,
+      "date": "2026-01-30",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 5,
+      "price": 435,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180579,
+      "date": "2026-02-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "뉴스케일 파워",
+      "qty": 1,
+      "price": 17,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180580,
+      "date": "2026-02-06",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "뉴스케일 파워",
+      "qty": 1,
+      "price": 14,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180582,
+      "date": "2026-02-26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "뉴스케일 파워",
+      "qty": 1,
+      "price": 13,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180583,
+      "date": "2020-08-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 2.09,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180584,
+      "date": "2020-08-19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 354,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180586,
+      "date": "2020-09-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 0.43,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180590,
+      "date": "2020-09-28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.41,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180591,
+      "date": "2020-11-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 6902,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180592,
+      "date": "2020-11-17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 5.92,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180594,
+      "date": "2020-12-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 4.28,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180595,
+      "date": "2020-12-29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180597,
+      "date": "2021-01-12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "배터리 ETF",
+      "qty": 0,
+      "price": 4.78,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180598,
+      "date": "2021-02-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 7.67,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180600,
+      "date": "2021-03-12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 4.28,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180601,
+      "date": "2021-04-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180602,
+      "date": "2021-04-06",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035200.KQ",
+      "qty": 0,
+      "price": 11000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180603,
+      "date": "2021-04-12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "003310.KQ",
+      "qty": 0,
+      "price": 19260,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180605,
+      "date": "2021-04-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 179900,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180606,
+      "date": "2021-04-20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 0,
+      "price": 3330,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180607,
+      "date": "2021-04-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "051915.KS",
+      "qty": 0,
+      "price": 127540,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180608,
+      "date": "2021-04-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "001820.KS",
+      "qty": 0,
+      "price": 4500,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180610,
+      "date": "2021-04-27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "035720.KS",
+      "qty": 0,
+      "price": 1050,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180611,
+      "date": "2021-04-27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "285130.KS",
+      "qty": 0,
+      "price": 18620,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180612,
+      "date": "2021-05-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "TIGER KRX2차전지K-뉴딜",
+      "qty": 0,
+      "price": 13120,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180614,
+      "date": "2021-05-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 0,
+      "price": 500,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180615,
+      "date": "2021-05-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.23,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180617,
+      "date": "2021-05-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 63528,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180618,
+      "date": "2021-06-11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 4.28,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180619,
+      "date": "2021-07-01",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180620,
+      "date": "2021-07-08",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "배터리 ETF",
+      "qty": 0,
+      "price": 1.95,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180622,
+      "date": "2021-08-13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.23,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180623,
+      "date": "2021-08-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 79721,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180624,
+      "date": "2021-09-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 4.28,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180625,
+      "date": "2021-09-24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180627,
+      "date": "2021-11-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 0,
+      "price": 2000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180628,
+      "date": "2021-11-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 2500,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180629,
+      "date": "2021-11-15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.23,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180630,
+      "date": "2021-11-17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 87968,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180631,
+      "date": "2021-12-10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 4.74,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180633,
+      "date": "2021-12-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180634,
+      "date": "2022-01-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "중국 인터넷 ETF",
+      "qty": 0,
+      "price": 105.8,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180635,
+      "date": "2022-01-07",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "배터리 ETF",
+      "qty": 0,
+      "price": 8.03,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180636,
+      "date": "2022-02-11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.23,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180638,
+      "date": "2022-03-11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 4.74,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180639,
+      "date": "2022-03-24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180640,
+      "date": "2022-04-01",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "045660.KQ",
+      "qty": 0,
+      "price": 8460,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180641,
+      "date": "2022-04-07",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "131370.KQ",
+      "qty": 0,
+      "price": 11650,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180642,
+      "date": "2022-04-15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 88216,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180643,
+      "date": "2022-04-20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "포스코케미칼",
+      "qty": 0,
+      "price": 3000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180645,
+      "date": "2022-04-26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "057030.KQ",
+      "qty": 0,
+      "price": 22770,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180646,
+      "date": "2022-04-29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": 0,
+      "price": 19720,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180647,
+      "date": "2022-05-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 0,
+      "price": 27080,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180649,
+      "date": "2022-05-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "TIGER KRX2차전지K-뉴딜",
+      "qty": 0,
+      "price": 4000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180650,
+      "date": "2022-05-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 7000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180651,
+      "date": "2022-05-13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.6,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180652,
+      "date": "2022-05-17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 87968,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180654,
+      "date": "2022-06-10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 4.74,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180655,
+      "date": "2022-07-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180656,
+      "date": "2022-08-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 2500,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180658,
+      "date": "2022-08-12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.6,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180659,
+      "date": "2022-08-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 87968,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180660,
+      "date": "2022-09-13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 4.74,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180661,
+      "date": "2022-09-29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180662,
+      "date": "2022-11-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 0,
+      "price": 3000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180664,
+      "date": "2022-11-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 2500,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180665,
+      "date": "2022-11-11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.6,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180666,
+      "date": "2022-11-15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 87968,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180667,
+      "date": "2022-12-09",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 5.2,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180669,
+      "date": "2022-12-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180670,
+      "date": "2023-02-17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.6,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180671,
+      "date": "2023-03-10",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 5.2,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180672,
+      "date": "2023-03-29",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180673,
+      "date": "2023-04-05",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 5.47,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180675,
+      "date": "2023-04-12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "263020.KQ",
+      "qty": 0,
+      "price": 8460,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180676,
+      "date": "2023-04-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 88216,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180677,
+      "date": "2023-04-28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": 0,
+      "price": 19720,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180678,
+      "date": "2023-05-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 0,
+      "price": 21000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180679,
+      "date": "2023-05-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 15000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180681,
+      "date": "2023-05-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "TIGER KRX2차전지K-뉴딜",
+      "qty": 0,
+      "price": 6500,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180682,
+      "date": "2023-05-17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 0,
+      "price": 87968,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180683,
+      "date": "2023-05-19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.98,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180684,
+      "date": "2023-06-09",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 5.2,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180685,
+      "date": "2023-07-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.68,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180687,
+      "date": "2023-07-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 5.47,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180688,
+      "date": "2023-08-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 1500,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180689,
+      "date": "2023-08-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005930.KS",
+      "qty": 0,
+      "price": 87968,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180690,
+      "date": "2023-08-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.98,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180691,
+      "date": "2023-09-15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 5.2,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180693,
+      "date": "2023-11-20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005930.KS",
+      "qty": 0,
+      "price": 87968,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180694,
+      "date": "2023-12-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 5.47,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180695,
+      "date": "2023-12-28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.34,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180696,
+      "date": "2024-02-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 8.98,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180698,
+      "date": "2024-03-27",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.34,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180699,
+      "date": "2024-04-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180700,
+      "date": "2024-04-12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "263020.KQ",
+      "qty": 0,
+      "price": 5000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180701,
+      "date": "2024-04-19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005930.KS",
+      "qty": 0,
+      "price": 44118,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180702,
+      "date": "2024-04-26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": 0,
+      "price": 19510,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180704,
+      "date": "2024-05-15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 9.35,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180705,
+      "date": "2024-06-28",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.85,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180706,
+      "date": "2024-07-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180708,
+      "date": "2024-08-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 0,
+      "price": 625,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180709,
+      "date": "2024-08-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 1000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180711,
+      "date": "2024-08-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180712,
+      "date": "2024-08-20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005930.KS",
+      "qty": 0,
+      "price": 43994,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180713,
+      "date": "2024-10-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180715,
+      "date": "2024-10-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180716,
+      "date": "2024-11-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 0,
+      "price": 500,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180717,
+      "date": "2024-11-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 10000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180718,
+      "date": "2024-11-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180720,
+      "date": "2024-11-20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005930.KS",
+      "qty": 0,
+      "price": 43994,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180721,
+      "date": "2024-12-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180722,
+      "date": "2024-12-31",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180724,
+      "date": "2025-02-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "376410.KS",
+      "qty": 0,
+      "price": 1000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180725,
+      "date": "2025-02-17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180727,
+      "date": "2025-04-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180728,
+      "date": "2025-04-04",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 5.77,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180729,
+      "date": "2025-04-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "263020.KQ",
+      "qty": 0,
+      "price": 5000,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180730,
+      "date": "2025-04-18",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005930.KS",
+      "qty": 0,
+      "price": 44356,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180731,
+      "date": "2025-04-25",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "053700.KQ",
+      "qty": 0,
+      "price": 19510,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180733,
+      "date": "2025-05-19",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 9.72,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180734,
+      "date": "2025-07-01",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 6.07,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180735,
+      "date": "2025-07-03",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.74,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180737,
+      "date": "2025-08-14",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 7.96,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180738,
+      "date": "2025-09-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "알파벳 A",
+      "qty": 0,
+      "price": 1.43,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180739,
+      "date": "2025-09-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "유나이티드헬스그룹",
+      "qty": 0,
+      "price": 5.64,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180741,
+      "date": "2025-10-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 6.07,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180742,
+      "date": "2025-10-07",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.74,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180743,
+      "date": "2025-11-13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 7.96,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180745,
+      "date": "2025-12-15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "알파벳 A",
+      "qty": 0,
+      "price": 1.43,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180746,
+      "date": "2025-12-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "코카콜라",
+      "qty": 0,
+      "price": 6.07,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180747,
+      "date": "2025-12-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "유나이티드헬스그룹",
+      "qty": 0,
+      "price": 5.64,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180748,
+      "date": "2025-12-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": 0,
+      "price": 1.34,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180750,
+      "date": "2025-12-26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.74,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180751,
+      "date": "2026-01-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "오라클",
+      "qty": 0,
+      "price": 4.67,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180752,
+      "date": "2026-02-12",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "애플",
+      "qty": 0,
+      "price": 7.96,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180753,
+      "date": "2026-03-13",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "마이크로소프트",
+      "qty": 0,
+      "price": 3.87,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180755,
+      "date": "2026-03-17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "알파벳 A",
+      "qty": 0,
+      "price": 1.43,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180756,
+      "date": "2026-03-17",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "유나이티드헬스그룹",
+      "qty": 0,
+      "price": 7.51,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180757,
+      "date": "2026-03-26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "메타",
+      "qty": 0,
+      "price": 0.89,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180758,
+      "date": "2026-03-31",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "브로드컴",
+      "qty": 0,
+      "price": 3.87,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180760,
+      "date": "2026-04-02",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "엔비디아",
+      "qty": 0,
+      "price": 0.74,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180761,
+      "date": "2025. 4. 10",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 84,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180762,
+      "date": "2025. 4. 1",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "360750.KS",
+      "qty": 11,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180763,
+      "date": "2025. 4. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 87,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180765,
+      "date": "2025. 4. 18",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "379780.KS",
+      "qty": 60,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180766,
+      "date": "2025. 4. 18",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "368590.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180767,
+      "date": "2025. 4. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180768,
+      "date": "2025. 4. 23",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "379780.KS",
+      "qty": 60,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180769,
+      "date": "2025. 4. 23",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "368590.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180771,
+      "date": "2025. 5. 7",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180772,
+      "date": "2025. 5. 8",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 340,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180773,
+      "date": "2025. 5. 9",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 200,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180774,
+      "date": "2025. 5. 12",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 2671,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180776,
+      "date": "2025. 5. 13",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 1171,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180777,
+      "date": "2025. 5. 13",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "360750.KS",
+      "qty": 300,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180779,
+      "date": "2025. 5. 16",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180780,
+      "date": "2025. 6. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180782,
+      "date": "2025. 6. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180783,
+      "date": "2025. 6. 12",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 300,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180784,
+      "date": "2025. 6. 12",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "457480.KS",
+      "qty": 200,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180786,
+      "date": "2025. 6. 12",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180787,
+      "date": "2025. 6. 13",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "457480.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180789,
+      "date": "2025. 6. 16",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180790,
+      "date": "2025. 6. 30",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 200,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180792,
+      "date": "2025. 7. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180793,
+      "date": "2025. 7. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180794,
+      "date": "2025. 7. 2",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "368590.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180795,
+      "date": "2025. 7. 2",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "379780.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180797,
+      "date": "2025. 7. 10",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "487230.KS",
+      "qty": 200,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180798,
+      "date": "2025. 7. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180799,
+      "date": "2025. 7. 16",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180800,
+      "date": "2025. 7. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "133690.KS",
+      "qty": 7,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180802,
+      "date": "2025. 7. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 4,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180803,
+      "date": "2025. 7. 24",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 4,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180804,
+      "date": "2025. 7. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "133690.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180805,
+      "date": "2025. 7. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 8,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180807,
+      "date": "2025. 8. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "133690.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180808,
+      "date": "2025. 8. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "360750.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180809,
+      "date": "2025. 8. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180811,
+      "date": "2025. 8. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180812,
+      "date": "2025. 8. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "487230.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180813,
+      "date": "2025. 8. 8",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161890.KS",
+      "qty": 12,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180814,
+      "date": "2025. 8. 17",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180816,
+      "date": "2025. 8. 17",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180817,
+      "date": "2025. 8. 19",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": 30,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180818,
+      "date": "2025. 9. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180819,
+      "date": "2025. 9. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180820,
+      "date": "2025. 9. 11",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 80,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180822,
+      "date": "2025. 9. 16",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180823,
+      "date": "2025. 9. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180824,
+      "date": "2025. 9. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180825,
+      "date": "2025. 9. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "360750.KS",
+      "qty": 45,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180827,
+      "date": "2025. 9. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180828,
+      "date": "2025. 9. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 80,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180829,
+      "date": "2025. 10. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180830,
+      "date": "2025. 10. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180831,
+      "date": "2025. 10. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180833,
+      "date": "2025. 10. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180834,
+      "date": "2025. 10. 2",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "379780.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180835,
+      "date": "2025. 10. 2",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "368590.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180836,
+      "date": "2025. 10. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161890.KS",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180838,
+      "date": "2025. 10. 13",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "494840.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180839,
+      "date": "2025. 10. 15",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "012450.KS",
+      "qty": 3,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180840,
+      "date": "2025. 10. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180841,
+      "date": "2025. 10. 16",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180842,
+      "date": "2025. 10. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "03473K.KS",
+      "qty": 5,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180844,
+      "date": "2025. 10. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161890.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180845,
+      "date": "2025. 10. 24",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180846,
+      "date": "2025. 11. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": -10,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180847,
+      "date": "2025. 11. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "03473K.KS",
+      "qty": -5,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180848,
+      "date": "2025. 11. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "368590.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180850,
+      "date": "2025. 11. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "379780.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180851,
+      "date": "2025. 11. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "494840.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180852,
+      "date": "2025. 11. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "487230.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180853,
+      "date": "2025. 11. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180855,
+      "date": "2025. 11. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180856,
+      "date": "2025. 11. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180857,
+      "date": "2025. 11. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": -30,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180858,
+      "date": "2025. 11. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": -16,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180859,
+      "date": "2025. 11. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "457480.KS",
+      "qty": -100,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180860,
+      "date": "2025. 11. 6",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "009830.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180862,
+      "date": "2025. 11. 6",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "449450.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180863,
+      "date": "2025. 11. 6",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "483650.KS",
+      "qty": 15,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180864,
+      "date": "2025. 11. 6",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180865,
+      "date": "2025. 11. 6",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161890.KS",
+      "qty": 5,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180867,
+      "date": "2025. 11. 7",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "449450.KS",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180868,
+      "date": "2025. 9. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "TIMEFOLIO KOREA플러스배당액티브",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180869,
+      "date": "2025. 11. 11",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 12,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180870,
+      "date": "2025. 11. 17",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180871,
+      "date": "2025. 11. 17",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180873,
+      "date": "2025. 11. 27",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "449450.KS",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180874,
+      "date": "2025. 11. 28",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "487240.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180875,
+      "date": "2025. 12. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180877,
+      "date": "2025. 12. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180878,
+      "date": "2025. 12. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180879,
+      "date": "2025. 12. 12",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "483650.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180880,
+      "date": "2025. 12. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180881,
+      "date": "2025. 12. 19",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180882,
+      "date": "2025. 12. 19",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": 5,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180884,
+      "date": "2025. 12. 22",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "483650.KS",
+      "qty": -15,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180885,
+      "date": "2025. 12. 22",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "012450.KS",
+      "qty": 1,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180886,
+      "date": "2025. 12. 22",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180887,
+      "date": "2025. 12. 26",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "449450.KS",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180888,
+      "date": "2025. 12. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180890,
+      "date": "2025. 12. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "481180.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180891,
+      "date": "2026. 1. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180892,
+      "date": "2026. 1. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "457480.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180893,
+      "date": "2026. 1. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180895,
+      "date": "2026. 1. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180896,
+      "date": "2026. 1. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180897,
+      "date": "2026. 1. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161890.KS",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180898,
+      "date": "2026. 1. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": -15,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180900,
+      "date": "2026. 1. 6",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "487240.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180901,
+      "date": "2026. 1. 7",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "009830.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180902,
+      "date": "2026. 1. 7",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "009830.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180903,
+      "date": "2026. 1. 7",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "487240.KS",
+      "qty": 80,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180904,
+      "date": "2026. 1. 7",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180905,
+      "date": "2026. 1. 7",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "481180.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180906,
+      "date": "2026. 1. 11",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "012450.KS",
+      "qty": -4,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180908,
+      "date": "2026. 1. 13",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "449450.KS",
+      "qty": -50,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180909,
+      "date": "2026. 1. 13",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "229200.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180910,
+      "date": "2026. 1. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180911,
+      "date": "2026. 1. 16",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180913,
+      "date": "2026. 1. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "229200.KS",
+      "qty": 60,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180914,
+      "date": "2026. 1. 21",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "229200.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180915,
+      "date": "2026. 1. 22",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "229200.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180916,
+      "date": "2026. 1. 22",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180917,
+      "date": "2026. 1. 22",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 5,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180918,
+      "date": "2026. 1. 22",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "487240.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180920,
+      "date": "2026. 1. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 40,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180921,
+      "date": "2026. 1. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180922,
+      "date": "2026. 1. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "481180.KS",
+      "qty": 70,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180923,
+      "date": "2026. 1. 29",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": -40,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180925,
+      "date": "2026. 2. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "360750.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180926,
+      "date": "2026. 2. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180927,
+      "date": "2026. 2. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "494840.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180928,
+      "date": "2026. 2. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "368590.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180930,
+      "date": "2026. 2. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180931,
+      "date": "2026. 2. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180932,
+      "date": "2026. 2. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "487230.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180934,
+      "date": "2026. 2. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "481180.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180935,
+      "date": "2026. 2. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "457480.KS",
+      "qty": 46,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180936,
+      "date": "2026. 2. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "481180.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180937,
+      "date": "2026. 2. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180938,
+      "date": "2026. 2. 19",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180940,
+      "date": "2026. 2. 19",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "009830.KS",
+      "qty": -140,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180941,
+      "date": "2026. 2. 20",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "469070.KS",
+      "qty": 150,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180942,
+      "date": "2026. 2. 20",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "454910.KS",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180943,
+      "date": "2026. 2. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "494840.KS",
+      "qty": 30,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180945,
+      "date": "2026. 2. 25",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "478150.KS",
+      "qty": 90,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180946,
+      "date": "2026. 2. 25",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "494840.KS",
+      "qty": 60,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180947,
+      "date": "2026. 2. 25",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "481180.KS",
+      "qty": 90,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180949,
+      "date": "2026. 2. 25",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180950,
+      "date": "2026. 2. 26",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 100,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180951,
+      "date": "2026. 2. 26",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "122870.KQ",
+      "qty": 19,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180952,
+      "date": "2026. 3. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": 40,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180953,
+      "date": "2026. 3. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "122870.KQ",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180954,
+      "date": "2026. 3. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "469070.KS",
+      "qty": 60,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180956,
+      "date": "2026. 3. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 4,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180957,
+      "date": "2026. 3. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 150,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180958,
+      "date": "2026. 3. 3",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "457480.KS",
+      "qty": 148,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180959,
+      "date": "2026. 3. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": 5,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180960,
+      "date": "2026. 3. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "454910.KS",
+      "qty": 5,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180962,
+      "date": "2026. 3. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180963,
+      "date": "2026. 3. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180964,
+      "date": "2026. 3. 4",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180965,
+      "date": "2026. 3. 5",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "469070.KS",
+      "qty": 11,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180966,
+      "date": "2026. 3. 16",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180968,
+      "date": "2026. 3. 20",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "469070.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180969,
+      "date": "2026. 3. 20",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "263750.KQ",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180970,
+      "date": "2026. 3. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": -5,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180971,
+      "date": "2026. 3. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161890.KS",
+      "qty": -57,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180972,
+      "date": "2026. 3. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "122870.KQ",
+      "qty": 4,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180973,
+      "date": "2026. 3. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "469070.KS",
+      "qty": 20,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180975,
+      "date": "2026. 3. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": 5,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180976,
+      "date": "2026. 3. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 2,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180977,
+      "date": "2026. 3. 23",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180978,
+      "date": "2026. 3. 24",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "454910.KS",
+      "qty": 2,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180979,
+      "date": "2026. 3. 24",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": 8,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180980,
+      "date": "2026. 3. 24",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "263750.KQ",
+      "qty": 7,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180982,
+      "date": "2026. 3. 25",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "457480.KS",
+      "qty": 48,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180983,
+      "date": "2026. 4. 1",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "005380.KS",
+      "qty": 2,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180984,
+      "date": "2026. 4. 1",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0172V0.KS",
+      "qty": 50,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180986,
+      "date": "2026. 4. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "347700.KQ",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180987,
+      "date": "2026. 4. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180988,
+      "date": "2026. 4. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "263750.KQ",
+      "qty": -17,
+      "price": 0,
+      "txType": "sell"
+    },
+    {
+      "id": 1776219180990,
+      "date": "2026. 4. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180991,
+      "date": "2026. 4. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180992,
+      "date": "2026. 4. 2",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
+    },
+    {
+      "id": 1776219180993,
+      "date": "2026. 4. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180995,
+      "date": "2026. 4. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "457480.KS",
+      "qty": 10,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180996,
+      "date": "2026. 4. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "469070.KS",
+      "qty": 30,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180997,
+      "date": "2026. 4. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "454910.KS",
+      "qty": 3,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180998,
+      "date": "2026. 4. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "122870.KQ",
+      "qty": 5,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219180999,
+      "date": "2026. 4. 3",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 3,
+      "price": 0,
+      "txType": "buy"
+    },
+    {
+      "id": 1776219181000,
+      "date": "2026. 4. 8",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "012450.KS",
+      "qty": 0,
+      "price": 0,
+      "txType": "dividend"
     }
   ],
   "range": "1y",
