@@ -231,7 +231,8 @@ function importCsvData(event) {
       const line = lines[i].trim();
       if (!line) continue;
       
-      const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, '').trim());
+      // 💡 공백을 먼저 제거한 후 따옴표를 지우도록 수정하여 숫자가 정상적으로 파싱됩니다.
+      const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.trim().replace(/^"|"$/g, '').trim());
       if (parts.length >= 7) {
         const date = parts[0];
         let owner = parts[1];
