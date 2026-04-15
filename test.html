@@ -1498,6 +1498,7 @@ function renderSidebarYieldList(currentHoldings) {
   }).join('');
 }
 
+// ── 7. 상단 요약 패널 및 계좌별 트리맵 ──
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
@@ -1507,6 +1508,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let treemapDataMap = {};
     
+    // 트리맵 데이터 생성 (API 성공한 데이터만 포함)
     if (fullDisplayItems) {
       fullDisplayItems.forEach(item => {
         if(item.type === 'held' && item.evalAmt > 0) {
@@ -1518,36 +1520,58 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     }
     let treemapData = Object.values(treemapDataMap);
 
+    // 전체 투자 원금 및 평가액 합산
     for(let key in rawHoldings) {
       if(!rawHoldings.hasOwnProperty(key)) continue;
       let h = rawHoldings[key];
-      if(h.qty > 0 && cachedMarketData[h.symbol] && !cachedMarketData[h.symbol]._failed) {
-        const data = cachedMarketData[h.symbol];
-        const eAmt = h.qty * (data.last || 0); const cAmt = h.qty * (h.avg || 0); let broker = h.broker || '미지정'; 
+      
+      // 🌟 API 통신이 실패했어도 보유 수량이 있으면 원금(Cost)은 무조건 더하도록 조건문 수정!
+      if(h.qty > 0) {
+        let currentPrice = h.avg; // 기본 평가액은 내 투자 원금(평단가)으로 설정
+        let stockName = h.symbol;
+        
+        // API 데이터가 성공적으로 있으면 진짜 현재가 반영
+        if (cachedMarketData[h.symbol] && !cachedMarketData[h.symbol]._failed) {
+            currentPrice = cachedMarketData[h.symbol].last || h.avg;
+            stockName = cachedMarketData[h.symbol].name || h.symbol;
+        } else if (localStockDB && localStockDB.length > 0) {
+            let matched = localStockDB.find(s => s.symbol === h.symbol);
+            if(matched) stockName = matched.name;
+        }
+
+        const eAmt = h.qty * currentPrice; 
+        const cAmt = h.qty * h.avg;
+        let broker = h.broker || '미지정'; 
+        
         if(isKorean(h.symbol)) { 
           krwSummary.totalEval += eAmt; krwSummary.totalCost += cAmt;
           if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
           krwSummary.accounts[broker].eval += eAmt; krwSummary.accounts[broker].cost += cAmt;
-          krwSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
+          krwSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
         } else { 
           usdSummary.totalEval += eAmt; usdSummary.totalCost += cAmt;
           if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
           usdSummary.accounts[broker].eval += eAmt; usdSummary.accounts[broker].cost += cAmt;
-          usdSummary.accounts[broker].items.push({ name: data.name, costAmt: cAmt, evalAmt: eAmt });
+          usdSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
         }
       }
     }
 
-    let krwDiv = 0, usdDiv = 0; let filterName = 'all';
-    if (currentView === 'user1') filterName = state.owners.user1.name; if (currentView === 'user2') filterName = state.owners.user2.name;
+    let krwDiv = 0, usdDiv = 0;
+    let filterName = 'all';
+    if (currentView === 'user1') filterName = state.owners.user1.name;
+    if (currentView === 'user2') filterName = state.owners.user2.name;
 
+    // 🌟 배당금 합산 (API 조회 성공 여부와 무관하게 100% 합산)
     state.transactions.forEach(tx => {
       if (tx.txType === 'dividend') {
          if (filterName === 'all' || tx.owner === filterName) {
-           if (isKorean(tx.symbol)) krwDiv += tx.price; else usdDiv += tx.price;
+           if (isKorean(tx.symbol)) krwDiv += tx.price;
+           else usdDiv += tx.price;
          }
       }
     });
+
     const globalDiv = krwDiv + (usdDiv * currentUsdKrw);
     const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
     const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
@@ -1557,27 +1581,39 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
     document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
     document.getElementById('globalTotalDiv').textContent = `₩ ${Math.round(globalDiv).toLocaleString()}`;
-    const gRoiEl = document.getElementById('globalTotalRoi'); const signG = globalPnl >= 0 ? '+' : '';
+    const gRoiEl = document.getElementById('globalTotalRoi');
+    const signG = globalPnl >= 0 ? '+' : '';
     gRoiEl.innerHTML = `${signG}₩${Math.round(Math.abs(globalPnl)).toLocaleString()}<br><span style="font-size:12px; font-weight:500">(${signG}${globalRoi.toFixed(2)}%)</span>`;
     gRoiEl.style.color = globalPnl >= 0 ? 'var(--green)' : (globalCost > 0 ? 'var(--red)' : 'var(--text)');
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
+    // Treemap (코드 생략 방지)
     const tmContainer = document.getElementById('allocationTreemap');
     if (tmContainer) {
         if (treemapData.length === 0) tmContainer.innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text3); font-size:12px;">보유 자산 없음</div>';
         else {
             tmContainer.innerHTML = '';
-            let x = 0, y = 0, w = 100, h = 100; treemapData.sort((a,b)=> b.value - a.value);
+            let x = 0, y = 0, w = 100, h = 100;
+            treemapData.sort((a,b)=> b.value - a.value);
             let html = '';
             function renderTreemapNode(items, x, y, w, h) {
                 if(items.length === 0) return;
                 if(items.length === 1) {
-                    let it = items[0]; let bg = getHeatmapColor(it.change); let sign = it.change > 0 ? '+' : ''; let fontSz = (w < 15 || h < 25) ? 10 : 13; let tickerDisp = (w > 20 && h > 30) ? `<div style="font-size:${fontSz-3}px; opacity:0.7; margin-top:2px;">${it.symbol.split('.')[0]}</div>` : '';
-                    html += `<div class="treemap-cell" style="left:${x}%; top:${y}%; width:${w}%; height:${h}%; background:${bg};" data-name="${it.name}" data-val="₩${Math.round(it.value).toLocaleString()}"><div style="font-weight:bold; font-size:${fontSz}px; text-align:center; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${it.name}">${it.name}</div>${tickerDisp}<div style="font-size:${fontSz-1}px; margin-top:2px; opacity:0.9;">${sign}${it.change.toFixed(2)}%</div></div>`; return;
+                    let it = items[0];
+                    let bg = getHeatmapColor(it.change);
+                    let sign = it.change > 0 ? '+' : '';
+                    let fontSz = (w < 15 || h < 25) ? 10 : 13;
+                    let tickerDisp = (w > 20 && h > 30) ? `<div style="font-size:${fontSz-3}px; opacity:0.7; margin-top:2px;">${it.symbol.split('.')[0]}</div>` : '';
+                    html += `<div class="treemap-cell" style="left:${x}%; top:${y}%; width:${w}%; height:${h}%; background:${bg};" data-name="${it.name}" data-val="₩${Math.round(it.value).toLocaleString()}"><div style="font-weight:bold; font-size:${fontSz}px; text-align:center; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${it.name}">${it.name}</div>${tickerDisp}<div style="font-size:${fontSz-1}px; margin-top:2px; opacity:0.9;">${sign}${it.change.toFixed(2)}%</div></div>`;
+                    return;
                 }
-                let totalItems = items.reduce((sum, i)=>sum+i.value, 0); if(totalItems <= 0) return;
+                let totalItems = items.reduce((sum, i)=>sum+i.value, 0);
+                if(totalItems <= 0) return;
                 let half = totalItems / 2, sum = 0, splitIdx = 0;
-                for(let i=0; i<items.length; i++){ sum += items[i].value; if(sum >= half && i < items.length-1) { splitIdx = i; break; } }
+                for(let i=0; i<items.length; i++){
+                    sum += items[i].value;
+                    if(sum >= half && i < items.length-1) { splitIdx = i; break; }
+                }
                 if(splitIdx === 0 && items.length > 1) splitIdx = 0; 
                 let leftItems = items.slice(0, splitIdx+1), rightItems = items.slice(splitIdx+1);
                 let leftRatio = leftItems.reduce((sum, i)=>sum+i.value, 0) / totalItems;
@@ -1591,7 +1627,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     let tooltipEl = document.getElementById('chartjs-tooltip');
                     if (!tooltipEl) { tooltipEl = document.createElement('div'); tooltipEl.id = 'chartjs-tooltip'; document.body.appendChild(tooltipEl); }
                     let name = cell.getAttribute('data-name'), val = cell.getAttribute('data-val');
-                    tooltipEl.innerHTML = `<div style="font-size:13px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:13px; text-align:center; color:var(--text);">${val}</div>`; tooltipEl.style.opacity = 1;
+                    tooltipEl.innerHTML = `<div style="font-size:13px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:13px; text-align:center; color:var(--text);">${val}</div>`;
+                    tooltipEl.style.opacity = 1;
                 });
                 cell.addEventListener('mousemove', (e) => { let tooltipEl = document.getElementById('chartjs-tooltip'); if(tooltipEl) { tooltipEl.style.left = e.pageX + 'px'; tooltipEl.style.top = (e.pageY - 10) + 'px'; } });
                 cell.addEventListener('mouseleave', () => { let tooltipEl = document.getElementById('chartjs-tooltip'); if(tooltipEl) tooltipEl.style.opacity = 0; });
@@ -1705,11 +1742,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
             legend: { display: false },
             tooltip: {
               enabled: false,
-              callbacks: {
-                label: function(context) {
-                  let v = context.raw; let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v || 0).toLocaleString(); return context.label + ': ' + formatVal;
-                }
-              },
               external: function(context) {
                 let tooltipEl = document.getElementById('chartjs-tooltip');
                 if (!tooltipEl) { tooltipEl = document.createElement('div'); tooltipEl.id = 'chartjs-tooltip'; document.body.appendChild(tooltipEl); }
@@ -1743,6 +1775,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     });
 }
 
+// ── 8. 배당금 대시보드 ──
 function renderDividendDashboard() {
   let krwTotal = 0, usdTotal = 0;
   let monthlyKrw = {}, monthlyUsd = {};
@@ -1769,6 +1802,7 @@ function renderDividendDashboard() {
      if (!symTotals[sym]) symTotals[sym] = { krw: 0, usd: 0 };
      if (!divYields[sym]) divYields[sym] = { totalDiv: 0, totalEvalAtDiv: 0 };
 
+     // 🌟 API 통신 실패 여부와 무관하게 모든 배당금 합산!
      if (isKRW) { krwTotal += amt; monthlyKrw[month] += amt; symTotals[sym].krw += amt; }
      else { usdTotal += amt; monthlyUsd[month] += amt; symTotals[sym].usd += amt; }
      
@@ -1809,8 +1843,17 @@ function renderDividendDashboard() {
   let listHtml = symArr.map(item => {
     const isKRW = isKorean(item.symbol);
     const originAmt = isKRW ? symTotals[item.symbol].krw : symTotals[item.symbol].usd;
-    const dbMatch = localStockDB.find(s => s.symbol === item.symbol);
-    const cName = dbMatch ? dbMatch.name : item.symbol;
+    
+    // 로컬 DB에서 이름 매핑 시도
+    let cName = item.symbol;
+    if (localStockDB && localStockDB.length > 0) {
+        let dbMatch = localStockDB.find(s => s.symbol === item.symbol);
+        if (dbMatch) cName = dbMatch.name;
+    }
+    // 캐시 데이터가 있으면 캐시 이름 사용
+    if (cachedMarketData[item.symbol] && !cachedMarketData[item.symbol]._failed && cachedMarketData[item.symbol].name) {
+        cName = cachedMarketData[item.symbol].name;
+    }
 
     let yieldHtml = '';
     let yData = divYields[item.symbol];
@@ -1859,12 +1902,14 @@ function renderDividendDashboard() {
   });
 }
 
+// ── 6. 자산 성장 추이 차트 ──
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
     if (currentView === 'dividend' || currentView === 'history' || state.transactions.length === 0) {
         chartWrap.style.display = 'none'; return;
     }
     
+    // 기준 환율 데이터 확인
     let masterData = cachedMarketData['KRW=X'];
     if (!masterData || masterData._failed) {
         const keys = Object.keys(cachedMarketData);
@@ -1913,8 +1958,10 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         for (let sym in holdings) {
             if (holdings[sym].qty > 0) {
                 let h = holdings[sym];
+                // 🌟 투자 원금은 API 실패 여부와 상관없이 항상 더함
                 dailyCost += (h.qty * h.avg) * (isKorean(sym) ? 1 : fxRate);
-                let priceOnDate = h.avg; 
+                
+                let priceOnDate = h.avg; // 기본값은 내 평단가
                 if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
                     const pIdx = cachedMarketData[sym].rawDates.indexOf(dateStr);
                     if (pIdx !== -1 && cachedMarketData[sym].prices[pIdx] !== null) priceOnDate = cachedMarketData[sym].prices[pIdx];
@@ -1926,6 +1973,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                         if (closestPrice !== null) priceOnDate = closestPrice;
                     }
                 }
+                // API 데이터가 없으면 평단가(h.avg)로 평가액 계산
                 dailyEval += (h.qty * priceOnDate) * (isKorean(sym) ? 1 : fxRate);
             }
         }
@@ -1951,7 +1999,6 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     let endEval = finalEvalData[finalEvalData.length-1] || 0;
     let endCost = finalCostData[finalCostData.length-1] || 0;
     let pnl = endEval - endCost;
-    
     let evalColor = pnl >= 0 ? '#00c87a' : '#ff4d6a';
     let evalBg = pnl >= 0 ? 'rgba(0, 200, 122, 0.15)' : 'rgba(255, 77, 106, 0.15)';
 
@@ -2058,7 +2105,7 @@ function generateCardHtml(item) {
     </div>`;
 }
 
-// ── 메인 렌더 함수 ──
+// ── 9. 메인 렌더 함수 (전체 흐름 제어) ──
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
@@ -2096,7 +2143,9 @@ async function render() {
     if(!currentHoldings.hasOwnProperty(key)) continue;
     let h = currentHoldings[key];
     if(h.qty > 0) {
-      if(!symbolHoldings[h.symbol]) symbolHoldings[h.symbol] = { qty: 0, totalCost: 0, brokers: new Set() };
+      if(!symbolHoldings[h.symbol]) {
+        symbolHoldings[h.symbol] = { qty: 0, totalCost: 0, brokers: new Set() };
+      }
       symbolHoldings[h.symbol].qty += h.qty;
       symbolHoldings[h.symbol].totalCost += (h.qty * h.avg);
       symbolHoldings[h.symbol].brokers.add(h.broker);
@@ -2119,7 +2168,9 @@ async function render() {
   }
 
   let allSymbols = new Set(state.tickers);
-  for(let sym in symbolHoldings) allSymbols.add(sym);
+  for(let sym in symbolHoldings) {
+    allSymbols.add(sym);
+  }
   allSymbols = Array.from(allSymbols);
 
   // 🔥 병렬 + 지연 처리 (API 차단 방지)
@@ -2141,7 +2192,9 @@ async function render() {
         if (fetchedData) cachedMarketData[t] = fetchedData;
         else cachedMarketData[t] = { _failed: true };
       }));
-      if (i + batchSize < symbolsToFetch.length) await new Promise(res => setTimeout(res, 500)); 
+      if (i + batchSize < symbolsToFetch.length) {
+        await new Promise(res => setTimeout(res, 500)); 
+      }
     }
   }
 
@@ -2150,8 +2203,22 @@ async function render() {
     let sh = symbolHoldings[sym];
     let avg = sh.qty > 0 ? sh.totalCost / sh.qty : 0;
     let brokerStr = Array.from(sh.brokers).join(', ');
+    
+    // API 통신이 실패해도 내역이 보이게 강제로 추가
     if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
       displayItems.push({ type: 'held', symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, data: cachedMarketData[sym] });
+    } else {
+      // 🌟 실패한 종목은 가상의 빈 데이터를 생성해서 화면에 띄움
+      let fallbackName = sym;
+      if (localStockDB && localStockDB.length > 0) {
+          let match = localStockDB.find(s => s.symbol === sym);
+          if (match) fallbackName = match.name;
+      }
+      displayItems.push({ 
+        type: 'held', symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, 
+        data: { name: fallbackName, last: avg, prices: [avg, avg], dates: ['-','-'] }, 
+        _isFallback: true 
+      });
     }
   }
 
@@ -2177,6 +2244,8 @@ async function render() {
       item.sliceLen = currentSliceLen; 
       const pStart = prices[Math.max(0, prices.length - currentSliceLen)] || item.data.prev;
       item.activeChange = ((last - pStart) / pStart) * 100;
+      if(isNaN(item.activeChange)) item.activeChange = 0;
+      
       item.evalAmt = item.qty * last;
       item.costAmt = item.qty * item.avg;
       item.roi = item.costAmt > 0 ? ((item.evalAmt - item.costAmt)/item.costAmt*100) : -9999;
@@ -2227,7 +2296,8 @@ async function render() {
   container.innerHTML = html;
 
   displayItems.forEach(item => {
-    if (item.data && item.data.prices) {
+    // 대체(Fallback) 데이터인 경우 차트를 그리지 않음
+    if (item.data && item.data.prices && !item._isFallback) {
       const displayPrices = item.data.prices.slice(-item.sliceLen);
       const displayDates = item.data.dates.slice(-item.sliceLen);
       chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
