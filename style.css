@@ -1,0 +1,658 @@
+:root { --bg: #0d0f14; --bg2: #141720; --bg3: #1c2030; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14); --text: #e8eaf0; --text2: #8890a4; --text3: #555e72; --green: #00c87a; --green-bg: rgba(0,200,122,0.1); --red: #ff4d6a; --red-bg: rgba(255,77,106,0.1); --blue: #4d9fff; --accent: #7c6af7; --accent-bg: rgba(124,106,247,0.12); --radius: 8px; --radius-lg: 12px; --font-mono: 'Space Mono', monospace; --font-sans: 'Noto Sans KR', sans-serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
+
+/* ── 1. 네비게이션 (헤더) ── */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 1.5rem; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; flex-wrap: wrap; gap: 10px; }
+.nav-left { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 0; }
+.logo { font-family: var(--font-sans); font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; white-space: nowrap; letter-spacing: -0.02em; }
+.logo svg { display: block; flex-shrink: 0; }
+
+.header-search { display: flex; align-items: center; position: relative; max-width: 280px; width: 100%; }
+.header-search .search-input { width: 100%; padding: 8px 36px 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-family: var(--font-sans); outline: none; transition: 0.2s; }
+.header-search .search-input:focus { background: var(--bg2); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,106,247,0.2); }
+.header-search .btn-add-icon { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: var(--accent); border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; line-height: 1; transition: 0.2s; box-shadow: 0 2px 6px rgba(124,106,247,0.4); }
+.header-search .btn-add-icon:hover { background: #6855e0; transform: translateY(-50%) scale(1.05); }
+.header-search .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; list-style: none; z-index: 99999; max-height: 280px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; }
+
+.view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); justify-content: center; flex-shrink: 0; }
+.vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; white-space: nowrap; }
+.vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+.nav-right { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
+.btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border2); background: rgba(255,255,255,0.05); color: var(--text); font-family: var(--font-sans); transition: 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+.btn-sm:hover { background: var(--bg3); border-color: rgba(255,255,255,0.3); }
+
+.sync-status { font-size: 10px; font-family: var(--font-mono); color: var(--text3); display: flex; align-items: center; gap: 4px; padding: 0 8px; white-space: nowrap; }
+.sync-status.active { color: var(--green); }
+.sync-status.error { color: var(--red); }
+.sync-spinner { width: 8px; height: 8px; border: 2px solid var(--text3); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* ── 2. 레이아웃 (사이드바 + 콘텐츠) ── */
+.layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+/* ── 사이드바 ── */
+.ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; }
+.ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
+
+.sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
+.sidebar-tabs { display: flex; gap: 6px; }
+.s-tab { background: transparent; border: none; color: var(--text3); font-size: 14px; font-weight: 700; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; font-family: var(--font-sans); }
+.s-tab:hover { color: var(--text2); }
+.s-tab.active { color: var(--text); background: rgba(255,255,255,0.05); }
+
+.btn-icon-sm { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; line-height: 1; padding: 0; transition: color 0.2s; }
+.btn-icon-sm:hover { color: var(--text); }
+
+.tx-form { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; position: relative; }
+.form-group label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 5px; }
+.form-input { width: 100%; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 13px; font-family: var(--font-sans); outline: none; transition: border-color 0.2s; }
+.form-input:focus { border-color: var(--accent); }
+.btn-submit { width: 100%; padding: 12px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 5px; transition: 0.2s; }
+.btn-submit:hover { background: #6855e0; }
+
+.edit-mode-banner { position: absolute; top: 0; left: 0; right: 0; background: var(--accent-bg); color: var(--accent); font-size: 11px; font-weight: bold; text-align: center; padding: 4px; display: none; z-index: 10; border-bottom: 1px solid var(--accent); }
+.btn-cancel-edit { position: absolute; right: 8px; top: 4px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; font-weight: bold; }
+.btn-cancel-edit:hover { text-decoration: underline; }
+
+.btn-edit-owners { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; text-decoration: underline; transition: color 0.2s; padding: 0; }
+.btn-edit-owners:hover { color: var(--accent); }
+
+.hidden-radio { display: none; }
+.toggle-group { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+.toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.toggle-btn:hover { color: var(--text2); background: rgba(255,255,255,0.05); }
+
+input[name="txOwner"]:checked + .toggle-btn { background: var(--bg3); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border-color: var(--border2); }
+input#typeBuy:checked + .type-buy { background: var(--red-bg); color: var(--red); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,77,106,0.3); }
+input#typeSell:checked + .type-sell { background: rgba(77, 159, 255, 0.15); color: var(--blue); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(77,159,255,0.3); }
+input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
+
+.broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
+.broker-tag:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.05); }
+
+.tx-search-container { position: relative; }
+.tx-dropdown { position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; list-style: none; z-index: 100; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: none; }
+.search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+.search-item:hover { background: var(--bg2); }
+
+.tx-history-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; }
+.tx-list { flex: 1; overflow-y: auto; padding: 0 20px 20px; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tx-list::-webkit-scrollbar { width: 4px; }
+.tx-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.tx-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 12px; position: relative; transition: border-color 0.2s;}
+.tx-card:hover { border-color: var(--border2); }
+.tx-card-head { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--text2); font-size: 11px; }
+.tx-card-body { display: flex; justify-content: space-between; align-items: flex-end; }
+.tx-sym { font-family: var(--font-sans); font-weight: 700; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; display: inline-block; }
+
+.tx-actions { display: flex; gap: 8px; }
+.tx-action-btn { cursor: pointer; color: var(--text3); font-size: 12px; transition: color 0.2s; background: none; border: none; padding: 0; }
+.tx-action-btn:hover.tx-edit { color: var(--accent); }
+.tx-action-btn:hover.tx-del { color: var(--red); }
+
+.tx-owner-badge { cursor: pointer; padding: 2px 8px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; font-weight: bold; }
+.tx-owner-badge:hover { filter: brightness(1.2); }
+
+/* ── 사이드바 펼치기용 화살표 버튼 ── */
+#btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
+#btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
+
+/* ── 3. 대시보드 메인 ── */
+.dashboard-main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 1.5rem 2rem; background: var(--bg); position: relative; }
+.dashboard-main::-webkit-scrollbar { width: 8px; }
+.dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+.dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; flex-shrink: 0; }
+.dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
+@media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) { .dashboard-top { grid-template-columns: 1fr; } }
+
+.country-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
+.cp-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.cp-title { font-size: 15px; font-weight: 700; color: var(--text); }
+
+.cp-summary { display: flex; gap: 15px; }
+.cp-sum-box { flex: 1; }
+.cp-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
+.cp-sum-val.up { color: var(--green); } .cp-sum-val.down { color: var(--red); }
+
+.cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
+.acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
+.acc-row:hover { border-color: var(--border2); }
+.acc-row.active-filter { border-color: var(--accent); background: rgba(124,106,247,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+.acc-pie-wrap { width: 85px; height: 85px; position: relative; flex-shrink: 0; }
+.acc-content { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.acc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px; }
+.acc-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acc-count { font-weight: normal; font-size: 11px; color: var(--text3); margin-left: 4px; }
+.acc-pnl { display: flex; align-items: baseline; gap: 6px; font-family: var(--font-mono); font-size: 14px; font-weight: 700; }
+.acc-pnl.up { color: var(--green); } .acc-pnl.down { color: var(--red); }
+.acc-roi { font-size: 11px; font-weight: 500; }
+
+.acc-bars { display: flex; flex-direction: column; gap: 6px; }
+.acc-bar-row { display: flex; align-items: center; gap: 8px; }
+.acc-bar-label { font-size: 11px; color: var(--text2); width: 24px; flex-shrink: 0; }
+.acc-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+.acc-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.acc-bar-val { font-family: var(--font-mono); font-size: 11px; color: var(--text); width: 75px; text-align: right; flex-shrink: 0; }
+
+/* ── 4. 리스트 옵션 바 ── */
+.list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
+.list-title-wrap { display: flex; align-items: center; gap: 12px; }
+.section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
+
+.list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
+.btn-sort-dir { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); border-radius: 6px; padding: 4px 8px; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 32px; }
+.btn-sort-dir:hover { background: var(--bg3); color: var(--text); }
+
+.range-group { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
+.rtab { padding: 4px 12px; font-size: 11px; font-family: var(--font-mono); background: transparent; border: none; color: var(--text2); cursor: pointer; border-radius: 4px; transition: all 0.15s; }
+.rtab.active { background: var(--accent); color: #fff; }
+.rtab:hover:not(.active) { background: var(--bg3); color: var(--text); }
+
+.grid-container { padding-bottom: 40px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-content: start; }
+
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 12px; position: relative; cursor: pointer; transition: 0.15s; overflow: hidden; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.card.up::before { background: var(--green); } .card.down::before { background: var(--red); }
+.card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+
+.card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); border: 1px solid rgba(0,0,0,0.2); }
+.tag-held { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+.country-badge { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 6px; color: #fff; font-family: var(--font-mono); }
+.card-tag .divider { margin: 0 6px; opacity: 0.5; font-weight: normal; }
+.card-tag .broker-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.95; max-width: 180px; }
+.card-tag .icon { margin-right: 4px; font-size: 12px; }
+
+.card-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.04em; }
+.badge-up { background: var(--green-bg); color: var(--green); } .badge-down { background: var(--red-bg); color: var(--red); } .badge-flat { background: var(--bg3); color: var(--text2); }
+
+.card-price { font-family: var(--font-mono); font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+.chart-wrap { height: 80px; position: relative; display: flex; align-items: center; justify-content: center; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+.empty { grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text3); border: 1px dashed var(--border2); border-radius: var(--radius-lg); font-size: 13px; }
+.btn-danger { color: var(--text3); border-color: transparent; background: transparent; padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); border-radius: 4px; cursor: pointer; transition: 0.2s; }
+.btn-danger:hover { background: var(--red-bg); color: var(--red); }
+
+/* ── 배당금 대시보드 ── */
+#dividendDashboard { display: none; flex-direction: column; gap: 15px; padding-bottom: 40px; height: 100%; }
+.div-chart-area { flex: 1.5; min-height: 300px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
+.div-list-area { flex: 1; height: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
+.div-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.div-item:last-child { border-bottom: none; }
+
+/* ── 전체 거래 내역 화면 (History) ── */
+#historyDashboard { display: none; flex-direction: column; gap: 15px; padding-bottom: 40px; height: 100%; }
+.history-table-container { flex: 1; overflow-y: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); }
+.history-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+.history-table th { padding: 12px 16px; color: var(--text3); font-weight: 700; background: var(--bg3); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.history-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.history-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ── 모달 ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.overlay.open { display: flex; }
+.modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
+.modal-sm { max-width: 400px; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+.toggle-switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--bg3); border: 1px solid var(--border2); border-radius: 20px; transition: .2s; }
+.slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: var(--text2); border-radius: 50%; transition: .2s; }
+input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
+input:checked + .slider:before { transform: translateX(16px); background-color: #fff; }
+
+#chartjs-tooltip { opacity: 0; position: absolute; background: rgba(20, 23, 32, 0.95); border: 1px solid var(--border2); border-radius: 6px; color: #fff; pointer-events: none; transform: translate(-50%, -110%); transition: all .1s ease; z-index: 999999; padding: 8px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); font-family: var(--font-sans); white-space: nowrap; }
+
+.treemap-cell { position: absolute; border: 1px solid var(--bg2); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; box-sizing: border-box; color: #fff; cursor: pointer; transition: 0.2s; border-radius: 4px; padding: 4px; }
+.treemap-cell:hover { opacity: 0.85; transform: scale(0.98); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+
+.settings-section { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.settings-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+</style>
+</head>
+<body>
+
+<input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+<input type="file" id="importCsvFile" accept=".csv" style="display: none;" onchange="importCsvData(event)">
+
+<nav>
+  <div class="nav-left">
+    <div class="logo">
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='22' height='22'>
+        <rect width='100' height='100' rx='22' fill='#1c2030'/>
+        <circle cx='28' cy='30' r='14' fill='#7c6af7'/>
+        <path d='M25,75 L45,45 L60,65 L85,25' fill='none' stroke='#00c87a' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/>
+      </svg>
+      주식 매니저
+    </div>
+    
+    <div class="header-search">
+      <input type="text" id="tickerInput" class="search-input" placeholder="종목명 또는 코드 검색 (예: TSLA)" autocomplete="off" />
+      <button class="btn-add-icon" onclick="addManualTicker()" title="종목 추가">＋</button>
+      <ul id="searchDropdown" class="search-dropdown"></ul>
+    </div>
+  </div>
+
+  <div class="view-tabs">
+    <button class="vtab active" onclick="setView('all', this)">전체보기</button>
+    <button class="vtab" id="tabUser1" onclick="setView('user1', this)">보유자1</button>
+    <button class="vtab" id="tabUser2" onclick="setView('user2', this)">보유자2</button>
+    <button class="vtab" onclick="setView('watch', this)">관심종목</button>
+    <button class="vtab" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
+  </div>
+  
+  <div class="nav-right">
+    <div class="sync-status" id="syncStatus">
+      <div class="sync-spinner" id="syncSpinner"></div>
+      <span id="syncText"></span>
+    </div>
+    <button class="btn-sm" onclick="openMasterSettingsModal()" title="전체 설정 및 데이터 관리">⚙️ 설정</button>
+  </div>
+</nav>
+
+<div class="layout-wrapper">
+  <button id="btnOpenSidebar" onclick="toggleSidebar()" title="장부 열기">▶</button>
+
+  <aside class="ledger-sidebar" id="sidebar">
+    <div class="sidebar-header" style="padding: 10px 20px;">
+      <div class="sidebar-tabs">
+        <button class="s-tab active" id="tabLedger" onclick="setSidebarView('ledger')">✏️ 거래 장부</button>
+        <button class="s-tab" id="tabYield" onclick="setSidebarView('yield')">🏆 수익률 목록</button>
+      </div>
+      <button class="btn-icon-sm" onclick="toggleSidebar()" title="장부 접기">◀</button>
+    </div>
+    
+    <div id="sidebarLedgerView" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+      <div class="tx-form">
+        <div id="editModeBanner" class="edit-mode-banner">
+          수정 모드 활성화 중
+          <button class="btn-cancel-edit" onclick="cancelEdit()">취소 ✕</button>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-bottom:5px;">
+          <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--text2); font-weight:700;">소유자</span>
+              <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름/테마 설정">설정 ⚙️</button>
+            </div>
+            <div class="toggle-group" style="margin-top:2px;">
+              <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
+              <label for="owner1" class="toggle-btn" id="lblUser1">보유자1</label>
+              <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
+              <label for="owner2" class="toggle-btn" id="lblUser2">보유자2</label>
+            </div>
+          </div>
+          <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--text2); font-weight:700;">유형</span>
+            </div>
+            <div class="toggle-group" style="margin-top:2px;">
+              <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
+              <label for="typeBuy" class="toggle-btn type-buy" style="padding:8px 2px;">매수</label>
+              <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
+              <label for="typeSell" class="toggle-btn type-sell" style="padding:8px 2px;">매도</label>
+              <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
+              <label for="typeDiv" class="toggle-btn type-div" style="padding:8px 2px;">배당</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>발생 일자</label>
+          <input type="date" id="txDate" class="form-input">
+        </div>
+        <div class="form-group tx-search-container">
+          <label>종목 (티커 또는 회사명)</label>
+          <input type="text" id="txSymbol" class="form-input" placeholder="예: AAPL, 삼성전자..." autocomplete="off">
+          <ul id="txDropdown" class="tx-dropdown"></ul>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;" id="txQtyWrap">
+            <label>수량</label>
+            <input type="number" id="txQty" class="form-input" placeholder="0">
+          </div>
+          <div class="form-group" style="flex:1; position:relative;">
+            <label id="txPriceLabel">단가 (1주당 가격)</label>
+            <input type="number" id="txPrice" class="form-input" placeholder="0" step="0.01">
+            <div id="divTaxWrap" style="display:none; margin-top:6px;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="checkbox" id="applyDivTax" checked>
+                <span style="font-size:10px; color:var(--text2); text-transform:none;">세전 금액 (저장 시 세금 자동 차감)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>계좌명 (선택)</label>
+          <input type="text" id="txBroker" class="form-input" placeholder="예: 키움증권, 토스 등">
+          <div id="brokerTags" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+        </div>
+        <input type="hidden" id="editingTxId" value="">
+        <button class="btn-submit" id="btnSubmitTx" onclick="addOrUpdateTransaction()">내역 추가하기</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px 20px 10px;">
+        <div class="tx-history-title" style="padding:0;">최근 거래 내역</div>
+        <button class="btn-sm" onclick="setView('history')" style="padding: 2px 8px; border-color:var(--border2);">전체 보기</button>
+      </div>
+      <ul class="tx-list" id="txList" style="padding-top:0;"></ul>
+    </div>
+
+    <div id="sidebarYieldView" style="display: none; flex-direction: column; flex: 1; overflow-y: auto; padding: 15px 20px;">
+      <div id="sidebarYieldList" style="display:flex; flex-direction:column; gap:6px;"></div>
+    </div>
+  </aside>
+
+  <main class="dashboard-main">
+    <div id="dashboardTopWrapper" class="dashboard-top-wrapper">
+      <div class="dashboard-top">
+        <div class="country-panel">
+          <div class="cp-header">
+            <div class="cp-title">🌐 통합 자산</div>
+            <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
+          </div>
+          <div class="gs-group" style="display:flex; gap:15px; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:-5px;">
+            <div style="flex:1;">
+              <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">통합 투자 원금</div>
+              <div id="globalTotalCost" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--text);">—</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">누적 배당금</div>
+              <div id="globalTotalDiv" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--green);">—</div>
+            </div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box" style="flex:1.2;">
+              <div class="cp-sum-label">통합 평가 자산</div>
+              <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue); font-size:22px;">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">통합 수익금 (수익률)</div>
+              <div class="cp-sum-val" id="globalTotalRoi">—</div>
+            </div>
+          </div>
+          <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
+             <div class="section-title" style="margin: 0 0 10px 0; font-size:12px; color:var(--text3)">포트폴리오 맵</div>
+             <div id="allocationTreemap" style="flex:1; position:relative; min-height: 180px; width: 100%; border-radius: 8px; overflow: hidden; background:var(--bg3);"></div>
+          </div>
+        </div>
+
+        <div class="country-panel">
+          <div class="cp-header">
+            <div class="cp-title">🇰🇷 국내 주식</div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 투자액</div>
+              <div class="cp-sum-val" id="krwTotalCost">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 평가액</div>
+              <div class="cp-sum-val" id="krwTotalEval">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">수익금 (수익률)</div>
+              <div class="cp-sum-val" id="krwTotalPnl">—</div>
+            </div>
+          </div>
+          <div class="cp-accounts" id="krwAccountList"></div>
+        </div>
+
+        <div class="country-panel">
+          <div class="cp-header">
+            <div class="cp-title">🇺🇸 미국 주식</div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 투자액</div>
+              <div class="cp-sum-val" id="usdTotalCost">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 평가액</div>
+              <div class="cp-sum-val" id="usdTotalEval">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">수익금 (수익률)</div>
+              <div class="cp-sum-val" id="usdTotalPnl">—</div>
+            </div>
+          </div>
+          <div class="cp-accounts" id="usdAccountList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="portfolioChartWrapper" style="display:none; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px; flex-direction:column; flex-shrink:0;">
+      <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+          📈 자산 성장 추이 <span style="font-size:11px; font-weight:normal; color:var(--text3);">(투자 원금 대비 평가액)</span>
+      </div>
+      <div style="height:220px; position:relative;"><canvas id="portfolioChartCanvas"></canvas></div>
+    </div>
+
+    <div class="list-options-bar" id="listOptionsBar" style="display:none;">
+      <div class="list-title-wrap">
+        <h2 class="section-title">종목 리스트</h2>
+      </div>
+      <div class="list-controls">
+        <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
+          <option value="default">정렬 기준 (기본)</option>
+          <option value="roiDesc">내 수익률 순</option>
+          <option value="evalDesc">평가금액 순</option>
+          <option value="changeDesc">등락률 순</option>
+        </select>
+        <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 반전">⬇️</button>
+        
+        <div class="range-group">
+          <button class="rtab" onclick="setRange('1d',this)">1D</button>
+          <button class="rtab" onclick="setRange('1w',this)">1W</button>
+          <button class="rtab" onclick="setRange('1m',this)">1M</button>
+          <button class="rtab" onclick="setRange('3m',this)">3M</button>
+          <button class="rtab" onclick="setRange('6m',this)">6M</button>
+          <button class="rtab active" onclick="setRange('1y',this)">1Y</button>
+          <button class="rtab" onclick="setRange('3y',this)">3Y</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-container" id="gridContainer"></div>
+
+    <div id="dividendDashboard">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+        <h2 class="section-title" style="margin:0;">💰 배당금 현황</h2>
+        <div class="view-tabs" style="background:var(--bg3);">
+          <button class="vtab active div-filter" onclick="setDivFilter('all', this)">전체 합산</button>
+          <button class="vtab div-filter" id="divTabUser1" onclick="setDivFilter('user1', this)">보유자1</button>
+          <button class="vtab div-filter" id="divTabUser2" onclick="setDivFilter('user2', this)">보유자2</button>
+        </div>
+      </div>
+
+      <div class="summary" style="display:flex; gap:10px;">
+        <div class="sum-card" style="flex:1; background:var(--green-bg); border-color:var(--green);">
+          <div class="sum-label" style="color:var(--green)">누적 배당금 총액 (환산)</div>
+          <div id="divTotalConverted" class="cp-sum-val" style="color:var(--green); font-size:24px;">—</div>
+        </div>
+        <div class="sum-card" style="flex:1;">
+          <div class="sum-label">국내주식 배당금</div>
+          <div id="divTotalKrw" class="cp-sum-val">—</div>
+        </div>
+        <div class="sum-card" style="flex:1;">
+          <div class="sum-label">해외주식 배당금</div>
+          <div id="divTotalUsd" class="cp-sum-val" style="color:var(--text)">—</div>
+        </div>
+      </div>
+      
+      <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:10px;">
+        <div class="div-chart-area">
+          <div class="sum-label" style="margin-bottom:15px;">월별 배당금 추이 (합산 ₩)</div>
+          <div style="flex:1; position:relative;"><canvas id="divMonthlyCanvas"></canvas></div>
+        </div>
+        <div class="div-list-area">
+          <div class="sum-label" style="margin-bottom:15px;">효자 종목 (종목별 배당금)</div>
+          <div id="divStockList" style="flex:1; overflow-y:auto; padding-right:5px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="historyDashboard">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+        <h2 class="section-title" style="margin:0;">📜 전체 거래 내역</h2>
+      </div>
+      <div class="history-table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>일자</th>
+              <th>소유자</th>
+              <th>계좌</th>
+              <th>유형</th>
+              <th>종목</th>
+              <th style="text-align:right;">수량</th>
+              <th style="text-align:right;">단가/배당</th>
+              <th style="text-align:right;">총액</th>
+              <th style="text-align:center;">작업</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="overlay" id="chartOverlay" onclick="closeModal('chartOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+      <div>
+        <div id="mTicker" style="font-size:18px; font-weight:700;"></div>
+        <div id="mBroker" style="font-family:var(--font-mono); font-size:12px; color:var(--text3); margin-top:2px;"></div>
+      </div>
+      <button class="btn-sm" onclick="closeModal('chartOverlay')">닫기</button>
+    </div>
+    <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
+      <div id="mPrice" style="font-family:var(--font-mono); font-size:28px; font-weight:700;"></div>
+      <div id="mChange" style="font-size:14px; font-weight:500; padding:3px 10px; border-radius:20px;"></div>
+    </div>
+    <div id="mMeta" style="font-size:12px; color:var(--text3); margin-bottom:14px;"></div>
+    <div style="height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
+  </div>
+</div>
+
+<div class="overlay" id="ownerOverlay" onclick="closeModal('ownerOverlay')">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 style="font-size:16px;">👥 소유자 설정</h3>
+      <button class="btn-sm" onclick="closeModal('ownerOverlay')">닫기</button>
+    </div>
+    <div style="font-size:11px; color:var(--text2); margin-bottom:20px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px;">
+      장부와 대시보드에 표시될 소유자의 이름, 고유 아이콘 및 테마 색상을 변경할 수 있습니다.
+    </div>
+    
+    <div class="form-group" style="margin-bottom:12px; display:flex; gap:10px;">
+      <div style="flex:1">
+         <label>보유자1 이름</label>
+         <input type="text" id="inputOwner1Name" class="form-input" placeholder="예: 아빠">
+      </div>
+      <div style="width: 60px;">
+         <label>아이콘</label>
+         <input type="text" id="inputOwner1Icon" class="form-input" placeholder="👤" style="text-align:center;">
+      </div>
+      <div style="width: 50px;">
+         <label>색상</label>
+         <input type="color" id="inputOwner1Color" style="width:100%; height:38px; padding:0; border:none; border-radius:6px; cursor:pointer;">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:20px; display:flex; gap:10px;">
+      <div style="flex:1">
+         <label>보유자2 이름</label>
+         <input type="text" id="inputOwner2Name" class="form-input" placeholder="예: 엄마">
+      </div>
+      <div style="width: 60px;">
+         <label>아이콘</label>
+         <input type="text" id="inputOwner2Icon" class="form-input" placeholder="👤" style="text-align:center;">
+      </div>
+      <div style="width: 50px;">
+         <label>색상</label>
+         <input type="color" id="inputOwner2Color" style="width:100%; height:38px; padding:0; border:none; border-radius:6px; cursor:pointer;">
+      </div>
+    </div>
+
+    <button class="btn-submit" style="background:var(--accent); width:100%; margin-top:10px;" onclick="saveOwnerNames()">변경 사항 저장</button>
+  </div>
+</div>
+
+<div class="overlay" id="masterSettingsOverlay" onclick="closeModal('masterSettingsOverlay')">
+  <div class="modal" style="max-width: 500px;" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="font-size:18px;">⚙️ 주식 매니저 설정</h3>
+      <button class="btn-sm" onclick="closeModal('masterSettingsOverlay')">닫기</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">☁️ GitHub 클라우드 동기화</div>
+      <div style="font-size:11px; color:var(--text2); margin-bottom:15px;">
+        개인 GitHub 저장소를 연결하여 모든 기기에서 장부를 안전하게 동기화합니다.
+      </div>
+      <div class="form-group" style="margin-bottom:10px; display:flex; gap:10px;">
+        <div style="flex:1;">
+          <input type="text" id="ghUser" class="form-input" placeholder="GitHub 아이디 (예: username)">
+        </div>
+        <div style="flex:1;">
+          <input type="text" id="ghRepo" class="form-input" placeholder="저장소 이름 (예: stock-data)">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:15px;">
+        <input type="password" id="ghToken" class="form-input" placeholder="Personal Access Token (ghp_...)">
+      </div>
+      
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; background:var(--bg); border-radius:6px; border:1px solid var(--border); margin-bottom:15px;">
+        <span style="font-size:12px; font-weight:700;">🔄 내역 수정 시 자동 저장(Sync)</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="ghAutoSync">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="pullFromGithub(false)">⬆️ 클라우드에서 불러오기</button>
+        <button class="btn-submit" style="background:var(--accent);" onclick="pushToGithub(false)">⬇️ 클라우드에 지금 저장</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">💻 기기 로컬 데이터 및 CSV 관리</div>
+      <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="exportData()">⬇️ JSON 로컬 백업</button>
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="document.getElementById('importFile').click()">⬆️ JSON 로컬 복원</button>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="downloadCsvSample()">⬇️ CSV 양식 받기</button>
+        <button class="btn-submit" style="flex:1; background:rgba(0, 200, 122, 0.15); border:1px solid rgba(0, 200, 122, 0.4); color:var(--green);" onclick="document.getElementById('importCsvFile').click()">📄 CSV 일괄 업로드</button>
+      </div>
+    </div>
+
+    <div class="settings-section" style="border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); margin-bottom:0;">
+      <div class="settings-section-title" style="color:var(--red);">🚨 모든 데이터 영구 삭제 (초기화)</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11px; color:var(--text2);">저장된 모든 장부 내역을 완전히 비웁니다.</span>
+        <button class="btn-danger" style="background:var(--red); color:#fff; padding:6px 12px; font-weight:bold; border:none;" onclick="resetAllTransactions()">전체 초기화 실행</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
