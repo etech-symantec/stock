@@ -14,6 +14,7 @@
   
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
   
+  /* ── 1. 네비게이션 (헤더) ── */
   nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 1.5rem; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; flex-wrap: wrap; gap: 10px; }
   .nav-left { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 0; }
   .logo { font-family: var(--font-sans); font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; white-space: nowrap; letter-spacing: -0.02em; }
@@ -40,8 +41,10 @@
   .sync-spinner { width: 8px; height: 8px; border: 2px solid var(--text3); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
 
+  /* ── 2. 레이아웃 (사이드바 + 콘텐츠) ── */
   .layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
   
+  /* ── 사이드바 ── */
   .ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; }
   .ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
   
@@ -104,9 +107,11 @@
   .tx-owner-badge { cursor: pointer; padding: 2px 8px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; font-weight: bold; }
   .tx-owner-badge:hover { filter: brightness(1.2); }
 
+  /* ── 사이드바 펼치기용 화살표 버튼 ── */
   #btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
   #btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
 
+  /* ── 3. 대시보드 메인 ── */
   .dashboard-main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 1.5rem 2rem; background: var(--bg); position: relative; }
   .dashboard-main::-webkit-scrollbar { width: 8px; }
   .dashboard-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
@@ -147,6 +152,7 @@
   .acc-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
   .acc-bar-val { font-family: var(--font-mono); font-size: 11px; color: var(--text); width: 75px; text-align: right; flex-shrink: 0; }
 
+  /* ── 4. 리스트 옵션 바 ── */
   .list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
   .list-title-wrap { display: flex; align-items: center; gap: 12px; }
   .section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
@@ -189,12 +195,14 @@
   .btn-danger { color: var(--text3); border-color: transparent; background: transparent; padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); border-radius: 4px; cursor: pointer; transition: 0.2s; }
   .btn-danger:hover { background: var(--red-bg); color: var(--red); }
 
+  /* ── 배당금 대시보드 ── */
   #dividendDashboard { display: none; flex-direction: column; gap: 15px; padding-bottom: 40px; height: 100%; }
   .div-chart-area { flex: 1.5; min-height: 300px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
   .div-list-area { flex: 1; height: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
   .div-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
   .div-item:last-child { border-bottom: none; }
 
+  /* ── 전체 거래 내역 화면 (History) ── */
   #historyDashboard { display: none; flex-direction: column; gap: 15px; padding-bottom: 40px; height: 100%; }
   .history-table-container { flex: 1; overflow-y: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); }
   .history-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
@@ -202,6 +210,7 @@
   .history-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   .history-table tr:hover td { background: rgba(255,255,255,0.02); }
 
+  /* ── 모달 ── */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .overlay.open { display: flex; }
   .modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
@@ -223,6 +232,152 @@
   .settings-section { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
   .settings-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
 </style>
+
+<script>
+const STORE_KEY = 'stockwatch_real_v68'; 
+
+function loadState() {
+  try {
+    let s = localStorage.getItem(STORE_KEY);
+    if (!s) { let oldS = localStorage.getItem('stockwatch_real_v67'); if(oldS) s = oldS; }
+    if (s) {
+      let parsed = JSON.parse(s);
+      if(!parsed.owners) {
+         parsed.owners = {
+           user1: { name: parsed.ownerNames?.user1 || '보유자1', color: '#7c6af7', icon: '👤' },
+           user2: { name: parsed.ownerNames?.user2 || '보유자2', color: '#00c87a', icon: '👤' }
+         };
+      }
+      // 날짜 데이터 포맷 강제 변환
+      if(parsed.transactions) {
+          parsed.transactions.forEach(tx => {
+              tx.date = formatDate(tx.date);
+          });
+      }
+      return parsed;
+    }
+  } catch(e){}
+  return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y', owners: { user1: { name: '보유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '보유자2', color: '#00c87a', icon: '👤' } } };
+}
+
+let state = loadState();
+
+function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+let currentView = 'all'; 
+let currentDivFilter = 'all'; 
+let currentSortMode = 'default';
+let sortDirection = -1; 
+let activeAccountFilter = null; 
+if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
+
+let allocationChartInst = null; 
+let modalChartInst = null;
+let divMonthlyChartInst = null; 
+let portfolioChartInst = null; 
+const chartInstances = {};
+let accountPieChartInsts = []; 
+let cachedMarketData = {}; 
+let localStockDB = []; 
+let currentUsdKrw = 1350; 
+let isExchangeRateFetched = false;
+
+// 🌟 YYYY-MM-DD 날짜 포맷 변환 함수
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    let d = dateStr.replace(/[^0-9]/g, '');
+    if (d.length === 8) {
+        return `${d.substring(0,4)}-${d.substring(4,6)}-${d.substring(6,8)}`;
+    }
+    const parts = dateStr.split(/[\.\-\/]/);
+    if (parts.length >= 3) {
+        let year = parts[0].trim();
+        let month = parts[1].trim().padStart(2, '0');
+        let day = parts[2].trim().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    return dateStr;
+}
+
+async function loadStockDB() {
+  try {
+    const res = await fetch('data/stocks.json?t=' + new Date().getTime());
+    if (res.ok) localStockDB = await res.json();
+  } catch(e) {}
+}
+loadStockDB();
+
+function getGhSettings() {
+  const stored = localStorage.getItem('gh_settings');
+  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
+  return JSON.parse(stored);
+}
+function saveGhSettings(settings) { localStorage.setItem('gh_settings', JSON.stringify(settings)); }
+
+function openMasterSettingsModal() {
+  let s = getGhSettings();
+  document.getElementById('ghUser').value = s.user;
+  document.getElementById('ghRepo').value = s.repo;
+  document.getElementById('ghToken').value = s.token;
+  document.getElementById('ghAutoSync').checked = s.autoSync;
+  document.getElementById('masterSettingsOverlay').classList.add('open');
+}
+
+function openOwnerModal() {
+  document.getElementById('inputOwner1Name').value = state.owners.user1.name;
+  document.getElementById('inputOwner1Icon').value = state.owners.user1.icon;
+  document.getElementById('inputOwner1Color').value = state.owners.user1.color;
+  document.getElementById('inputOwner2Name').value = state.owners.user2.name;
+  document.getElementById('inputOwner2Icon').value = state.owners.user2.icon;
+  document.getElementById('inputOwner2Color').value = state.owners.user2.color;
+  document.getElementById('ownerOverlay').classList.add('open');
+}
+
+function closeModal(id) { 
+  const el = document.getElementById(id);
+  if(el) el.classList.remove('open'); 
+}
+
+function getColors(prices) {
+  if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
+  const last = prices[prices.length-1], first = prices[0];
+  if (last > first) return { line:'#00c87a', fill:'rgba(0,200,122,0.12)' };
+  if (last < first) return { line:'#ff4d6a', fill:'rgba(255,77,106,0.12)' };
+  return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
+}
+
+function buildChart(canvasId, prices, dates, mini) {
+  const {line, fill} = getColors(prices);
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+  return new Chart(canvas, {
+    type: 'line',
+    data: { labels: dates, datasets: [{ data: prices, borderColor: line, backgroundColor: fill, borderWidth: mini ? 1.5 : 2, pointRadius: 0, tension: 0.1, fill: true }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, displayColors: false } }, scales: { x: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { display: false }, border: { display: false } }, y: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { color:'rgba(255,255,255,0.04)' }, border: { display: false } } }, interaction: { mode: 'index', intersect: false }, animation: { duration: 0 } }
+  });
+}
+
+function getHeatmapColor(change) {
+  if (change >= 3) return 'rgba(0, 200, 122, 0.9)';
+  if (change > 0) return 'rgba(0, 200, 122, 0.5)';
+  if (change <= -3) return 'rgba(255, 77, 106, 0.9)';
+  if (change < 0) return 'rgba(255, 77, 106, 0.5)';
+  return 'rgba(136, 144, 164, 0.4)';
+}
+
+function isKorean(symbol) { return symbol.endsWith('.KS') || symbol.endsWith('.KQ') || /^\d{6}$/.test(symbol); }
+function isCrypto(symbol) { return symbol.endsWith('-USD'); }
+function formatPrice(val, symbol) {
+  if (isKorean(symbol)) return '₩' + Math.round(val).toLocaleString();
+  return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function getOwnerInfo(ownerName) {
+  if (state.owners && ownerName === state.owners.user1.name) return state.owners.user1;
+  if (state.owners && ownerName === state.owners.user2.name) return state.owners.user2;
+  return { name: ownerName, color: '#8890a4', icon: '👤' };
+}
+</script>
 </head>
 <body>
 
@@ -358,6 +513,7 @@
   </aside>
 
   <main class="dashboard-main">
+
     <div id="dashboardTopWrapper" class="dashboard-top-wrapper">
       <div class="dashboard-top">
         <div class="country-panel">
@@ -453,7 +609,7 @@
           <option value="evalDesc">평가금액 순</option>
           <option value="changeDesc">등락률 순</option>
         </select>
-        <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 전환">⬇️</button>
+        <button id="btnSortDir" class="btn-sort-dir" onclick="toggleSortDirection()" title="정렬 방향 반전">⬇️</button>
         
         <div class="range-group">
           <button class="rtab" onclick="setRange('1d',this)">1D</button>
@@ -652,430 +808,38 @@
         <button class="btn-danger" style="background:var(--red); color:#fff; padding:6px 12px; font-weight:bold; border:none;" onclick="resetAllTransactions()">전체 초기화 실행</button>
       </div>
     </div>
+
   </div>
 </div>
 
 <script>
 // ==========================================
-// 전체 애플리케이션 스크립트
+// 2. 이벤트 리스너 및 나머지 로직
 // ==========================================
-
-// ── 1. 핵심 유틸리티 함수 ──
-function getColors(prices) {
-  if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
-  const last = prices[prices.length-1], first = prices[0];
-  if (last > first) return { line:'#00c87a', fill:'rgba(0,200,122,0.12)' };
-  if (last < first) return { line:'#ff4d6a', fill:'rgba(255,77,106,0.12)' };
-  return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
-}
-
-function buildChart(canvasId, prices, dates, mini) {
-  const {line, fill} = getColors(prices);
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return null;
-  return new Chart(canvas, {
-    type: 'line',
-    data: { labels: dates, datasets: [{ data: prices, borderColor: line, backgroundColor: fill, borderWidth: mini ? 1.5 : 2, pointRadius: 0, tension: 0.1, fill: true }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, displayColors: false } }, scales: { x: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { display: false }, border: { display: false } }, y: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { color:'rgba(255,255,255,0.04)' }, border: { display: false } } }, interaction: { mode: 'index', intersect: false }, animation: { duration: 0 } }
-  });
-}
-
-function getHeatmapColor(change) {
-  if (change >= 3) return 'rgba(0, 200, 122, 0.9)';
-  if (change > 0) return 'rgba(0, 200, 122, 0.5)';
-  if (change <= -3) return 'rgba(255, 77, 106, 0.9)';
-  if (change < 0) return 'rgba(255, 77, 106, 0.5)';
-  return 'rgba(136, 144, 164, 0.4)';
-}
-
-function isKorean(symbol) { return symbol.endsWith('.KS') || symbol.endsWith('.KQ') || /^\d{6}$/.test(symbol); }
-function isCrypto(symbol) { return symbol.endsWith('-USD'); }
-function formatPrice(val, symbol) {
-  if (isKorean(symbol)) return '₩' + Math.round(val).toLocaleString();
-  return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-}
-
-function getOwnerInfo(ownerName) {
-  if (state.owners && ownerName === state.owners.user1.name) return state.owners.user1;
-  if (state.owners && ownerName === state.owners.user2.name) return state.owners.user2;
-  return { name: ownerName, color: '#8890a4', icon: '👤' };
-}
-
-// ── 2. 데이터 상태 관리 ──
-const STORE_KEY = 'stockwatch_real_v68'; 
-
-function loadState() {
-  try {
-    let s = localStorage.getItem(STORE_KEY);
-    if (!s) { let oldS = localStorage.getItem('stockwatch_real_v67'); if(oldS) s = oldS; }
-    if (s) {
-      let parsed = JSON.parse(s);
-      if(!parsed.owners) {
-         parsed.owners = {
-           user1: { name: parsed.ownerNames?.user1 || '보유자1', color: '#7c6af7', icon: '👤' },
-           user2: { name: parsed.ownerNames?.user2 || '보유자2', color: '#00c87a', icon: '👤' }
-         };
-      }
-      return parsed;
-    }
-  } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y', owners: { user1: { name: '보유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '보유자2', color: '#00c87a', icon: '👤' } } };
-}
-let state = loadState();
-
-function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-
-let currentView = 'all'; 
-let currentDivFilter = 'all'; 
-let currentSortMode = 'default';
-let sortDirection = -1; 
-let activeAccountFilter = null; 
-if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
-
-let allocationChartInst = null; 
-let modalChartInst = null;
-let divMonthlyChartInst = null; 
-let portfolioChartInst = null; 
-const chartInstances = {};
-let accountPieChartInsts = []; 
-let cachedMarketData = {}; 
-let localStockDB = []; 
-let currentUsdKrw = 1350; 
-let isExchangeRateFetched = false;
 
 document.getElementById('txDate').valueAsDate = new Date();
 
-async function loadStockDB() {
-  try {
-    const res = await fetch('data/stocks.json?t=' + new Date().getTime());
-    if (res.ok) localStockDB = await res.json();
-  } catch(e) {}
-}
-loadStockDB();
-
-// ── 3. 설정 및 모달 함수 (클라우드/로컬 관리) ──
-function getGhSettings() {
-  const stored = localStorage.getItem('gh_settings');
-  if(!stored) return { user: '', repo: '', token: '', autoSync: false };
-  return JSON.parse(stored);
-}
-function saveGhSettings(settings) { localStorage.setItem('gh_settings', JSON.stringify(settings)); }
-
-function openMasterSettingsModal() {
-  let s = getGhSettings();
-  document.getElementById('ghUser').value = s.user;
-  document.getElementById('ghRepo').value = s.repo;
-  document.getElementById('ghToken').value = s.token;
-  document.getElementById('ghAutoSync').checked = s.autoSync;
-  document.getElementById('masterSettingsOverlay').classList.add('open');
-}
-
-function openOwnerModal() {
-  document.getElementById('inputOwner1Name').value = state.owners.user1.name;
-  document.getElementById('inputOwner1Icon').value = state.owners.user1.icon;
-  document.getElementById('inputOwner1Color').value = state.owners.user1.color;
-  document.getElementById('inputOwner2Name').value = state.owners.user2.name;
-  document.getElementById('inputOwner2Icon').value = state.owners.user2.icon;
-  document.getElementById('inputOwner2Color').value = state.owners.user2.color;
-  document.getElementById('ownerOverlay').classList.add('open');
-}
-
-function closeModal(id) { 
-  const el = document.getElementById(id);
-  if(el) el.classList.remove('open'); 
-}
-
-function resetAllTransactions() {
-  if(confirm("🚨 경고: 모든 거래 내역이 영구적으로 삭제됩니다.\n정말로 전체 데이터를 초기화하시겠습니까?")) {
-    state.transactions = [];
-    state.tickers = ['AAPL','TSLA','005930.KS']; 
-    saveState();
-    renderTxList();
-    if(currentView === 'history') renderHistoryDashboard();
-    else render();
-    triggerAutoSync();
-    closeModal('masterSettingsOverlay');
-    alert("데이터 초기화가 완료되었습니다.");
-  }
-}
-
-function exportData() {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-  const dlAnchorElem = document.createElement('a');
-  dlAnchorElem.setAttribute("href", dataStr);
-  dlAnchorElem.setAttribute("download", "stock_manager_backup.json");
-  document.body.appendChild(dlAnchorElem);
-  dlAnchorElem.click();
-  document.body.removeChild(dlAnchorElem);
-}
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      if(data.tickers && data.transactions) {
-        state = data;
-        if(!state.owners) {
-           state.owners = {
-             user1: { name: state.ownerNames?.user1 || '보유자1', color: '#7c6af7', icon: '👤' },
-             user2: { name: state.ownerNames?.user2 || '보유자2', color: '#00c87a', icon: '👤' }
-           };
-        }
-        saveState();
-        cachedMarketData = {};
-        updateOwnerLabels();
-        renderTxList();
-        if (currentView === 'history') renderHistoryDashboard();
-        else render();
-        triggerAutoSync();
-        alert('데이터를 성공적으로 복원했습니다.');
-      } else {
-        alert('올바른 백업 파일 형식이 아닙니다.');
-      }
-    } catch(err) {
-      alert('파일을 읽는 중 오류가 발생했습니다.');
-    }
-    event.target.value = '';
-    closeModal('masterSettingsOverlay');
-  };
-  reader.readAsText(file);
-}
-
-function downloadCsvSample() {
-  const csvContent = "일자,소유자,계좌,유형,종목,수량,단가,세금(세전/세후)\n2026-04-10,보유자1,키움증권,매수,005930,10,80000,\n2026-04-12,보유자2,토스증권,배당,AAPL,0,15.5,세전\n2026-04-14,보유자1,미래에셋,매도,TSLA,-5,170.2,세후";
-  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'sample_transactions.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-function importCsvData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const text = e.target.result;
-    const lines = text.split('\n');
-    let addedCount = 0;
-    
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-      
-      const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, '').trim());
-      if (parts.length >= 7) {
-        const date = parts[0];
-        let owner = parts[1];
-        const broker = parts[2];
-        const typeStr = parts[3];
-        let rawSymbol = parts[4];
-        let symbol = rawSymbol.toUpperCase();
-        if (localStockDB && localStockDB.length > 0) {
-            // 한글 이름이나 심볼과 일치하는 항목 찾기
-            let matched = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === symbol);
-            if (matched) {
-                symbol = matched.symbol; // DB에 있으면 정확한 티커 코드로 변경
-            } else if (/^\d{6}$/.test(symbol)) {
-                symbol += '.KS'; // DB에 없는데 6자리 숫자면 한국 주식 처리
-            }
-        } else if (/^\d{6}$/.test(symbol)) {
-            symbol += '.KS';
-        }
-        let qty = parseFloat(parts[5].replace(/,/g, '')) || 0;
-        let price = parseFloat(parts[6].replace(/,/g, '')) || 0;
-        const taxStatus = parts.length > 7 ? parts[7] : '';
-
-        if (!date || !symbol || isNaN(price)) continue;
-
-        let txType = 'trade';
-        if (typeStr.includes('배당') || typeStr.toLowerCase() === 'dividend') { txType = 'dividend'; qty = 0; }
-        else if (typeStr.includes('매도') || typeStr.toLowerCase() === 'sell') { txType = 'sell'; qty = -Math.abs(qty); }
-        else if (typeStr.includes('매수') || typeStr.toLowerCase() === 'buy') { txType = 'buy'; qty = Math.abs(qty); }
-
-        if (/^\d{6}$/.test(symbol)) symbol += '.KS';
-
-        if (txType === 'dividend' && taxStatus === '세전') {
-            const taxRate = isKorean(symbol) ? 0.154 : 0.15;
-            price = price * (1 - taxRate);
-        }
-
-        if (owner === '보유자1') owner = state.owners.user1.name;
-        else if (owner === '보유자2') owner = state.owners.user2.name;
-
-        state.transactions.push({ id: Date.now() + i, date, owner, broker, symbol, qty: (txType === 'dividend' ? 0 : qty), price, txType });
-        if (!state.tickers.includes(symbol)) state.tickers.push(symbol);
-        addedCount++;
-      }
-    }
-    if (addedCount > 0) {
-      saveState();
-      renderTxList();
-      if (currentView === 'history') renderHistoryDashboard();
-      else render();
-      triggerAutoSync();
-      closeModal('masterSettingsOverlay');
-      alert(addedCount + "건의 거래내역이 추가되었습니다.");
-    } else {
-      alert("추가된 내역이 없습니다.\nCSV 형식을 확인해주세요.");
-    }
-    event.target.value = ''; 
-  };
-  reader.readAsText(file, 'UTF-8');
-}
-
-function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
-function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
-
-async function getGithubFileSha(settings, path) {
-  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
-  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
-  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
-  return null;
-}
-
-function updateSyncStatus(status) {
-  const el = document.getElementById('syncStatus');
-  const spinner = document.getElementById('syncSpinner');
-  const text = document.getElementById('syncText');
-  el.className = 'sync-status';
-  if(status === 'syncing') {
-    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
-  } else if(status === 'success') {
-    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
-  } else if(status === 'error') {
-    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
-  } else {
-    spinner.style.display = 'none'; text.textContent = '';
-  }
-}
-
-async function pushToGithub(silent = false) {
-  let user = document.getElementById('ghUser').value.trim();
-  let repo = document.getElementById('ghRepo').value.trim();
-  let token = document.getElementById('ghToken').value.trim();
+window.addEventListener('DOMContentLoaded', () => {
+  updateOwnerLabels();
+  renderTxList();
+  render(); // 🔥 페이지 로드 즉시 렌더링
   
-  if(!silent) {
-    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
-    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
-  } else {
-    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
-    if(!user || !repo || !token) return;
+  const ghAutoSyncCheckbox = document.getElementById('ghAutoSync');
+  if (ghAutoSyncCheckbox) {
+      ghAutoSyncCheckbox.addEventListener('change', function(e) {
+        let s = getGhSettings();
+        s.autoSync = e.target.checked;
+        saveGhSettings(s);
+        if(s.autoSync) triggerAutoSync();
+      });
   }
+});
 
-  updateSyncStatus('syncing');
-  const path = 'data/my_portfolio.json';
-  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-  
-  try {
-    const fileInfo = await getGithubFileSha({user, repo, token}, path);
-    const content = utf8_to_b64(JSON.stringify(state, null, 2));
-    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
-    if (fileInfo) body.sha = fileInfo.sha;
-
-    const putRes = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }, body: JSON.stringify(body) });
-    if(putRes.ok) { 
-      updateSyncStatus('success');
-      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('masterSettingsOverlay'); }
-    } else { 
-      updateSyncStatus('error');
-      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
-    }
-  } catch(e) { 
-    updateSyncStatus('error');
-    if(!silent) alert('네트워크 에러 발생'); 
-  }
-}
-
-function triggerAutoSync() {
-  const s = getGhSettings();
-  if(s.autoSync && s.token) pushToGithub(true);
-}
-
-async function pullFromGithub(silent = false) {
-  let user = document.getElementById('ghUser').value.trim();
-  let repo = document.getElementById('ghRepo').value.trim();
-  let token = document.getElementById('ghToken').value.trim();
-  
-  if(!silent) {
-    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
-    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
-  } else {
-    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
-    if(!user || !repo || !token) return;
-  }
-
-  const path = 'data/my_portfolio.json';
-  try {
-    const fileInfo = await getGithubFileSha({user, token, repo}, path);
-    if (fileInfo && fileInfo.content) {
-      const dataStr = b64_to_utf8(fileInfo.content);
-      const data = JSON.parse(dataStr);
-      if(data.tickers && data.transactions) {
-        state = data; saveState(); cachedMarketData = {};
-        updateOwnerLabels(); renderTxList(); render();
-        updateSyncStatus('success');
-        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('masterSettingsOverlay'); }
-      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
-    } else if(!silent) alert('저장소에 파일이 없습니다.');
-  } catch(e) { if(!silent) alert('가져오기 실패'); }
-}
-
-// ── 4. UI 탭 및 메뉴 제어 ──
-function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const btn = document.getElementById('btnOpenSidebar');
-  if (sb.classList.contains('collapsed')) {
-    sb.classList.remove('collapsed');
-    btn.style.display = 'none';
-  } else {
-    sb.classList.add('collapsed');
-    btn.style.display = 'flex';
-  }
-}
-
-function setSidebarView(view) {
-  const vLedger = document.getElementById('sidebarLedgerView');
-  const vYield = document.getElementById('sidebarYieldView');
-  const tLedger = document.getElementById('tabLedger');
-  const tYield = document.getElementById('tabYield');
-
-  if (view === 'ledger') {
-    vLedger.style.display = 'flex'; vYield.style.display = 'none';
-    tLedger.classList.add('active'); tYield.classList.remove('active');
-  } else {
-    vLedger.style.display = 'none'; vYield.style.display = 'flex';
-    tLedger.classList.remove('active'); tYield.classList.add('active');
-    render(); 
-  }
-}
-
-function updateOwnerLabels() {
-  const o1 = state.owners.user1;
-  const o2 = state.owners.user2;
-  document.getElementById('tabUser1').textContent = `${o1.icon} ${o1.name}`;
-  document.getElementById('tabUser2').textContent = `${o2.icon} ${o2.name}`;
-  document.getElementById('lblUser1').innerHTML = `${o1.icon} ${o1.name}`;
-  document.getElementById('lblUser2').innerHTML = `${o2.icon} ${o2.name}`;
-  document.getElementById('divTabUser1').textContent = `${o1.icon} ${o1.name}`;
-  document.getElementById('divTabUser2').textContent = `${o2.icon} ${o2.name}`;
-}
-
-function toggleAccountFilter(broker) {
-  if (activeAccountFilter === broker) activeAccountFilter = null;
-  else activeAccountFilter = broker;
-  render();
-}
-
+// ── UI 로직 ──
 function toggleTxType() {
   const type = document.querySelector('input[name="txType"]:checked').value;
   const isEditing = document.getElementById('editingTxId').value !== '';
+  
   if(type === 'dividend') {
     document.getElementById('txQtyWrap').style.display = 'none';
     document.getElementById('txPriceLabel').textContent = '총 배당금액';
@@ -1092,38 +856,6 @@ function toggleTxType() {
   }
 }
 
-function saveOwnerNames() {
-  const old1 = state.owners.user1.name;
-  const old2 = state.owners.user2.name;
-  const new1 = document.getElementById('inputOwner1Name').value.trim() || '보유자1';
-  const new2 = document.getElementById('inputOwner2Name').value.trim() || '보유자2';
-  
-  state.owners.user1 = { name: new1, icon: document.getElementById('inputOwner1Icon').value.trim() || '👤', color: document.getElementById('inputOwner1Color').value || '#7c6af7' };
-  state.owners.user2 = { name: new2, icon: document.getElementById('inputOwner2Icon').value.trim() || '👤', color: document.getElementById('inputOwner2Color').value || '#00c87a' };
-  
-  state.transactions.forEach(tx => {
-    if (tx.owner === old1) tx.owner = new1;
-    else if (tx.owner === old2) tx.owner = new2;
-  });
-  
-  saveState();
-  updateOwnerLabels(); renderTxList();
-  if (currentView === 'history') renderHistoryDashboard(); else render();
-  closeModal('ownerOverlay');
-  triggerAutoSync();
-}
-
-function toggleTxOwner(id) {
-  const tx = state.transactions.find(t => t.id === id);
-  if(!tx) return;
-  if (tx.owner === state.owners.user1.name) tx.owner = state.owners.user2.name;
-  else tx.owner = state.owners.user1.name;
-  saveState(); renderTxList();
-  if (currentView === 'history') renderHistoryDashboard(); else render();
-  triggerAutoSync();
-}
-
-// ── 5. 거래 장부 처리 로직 ──
 function calculateHoldings(ownerFilter = 'all') {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -1141,7 +873,8 @@ function calculateHoldings(ownerFilter = 'all') {
     
     if (tx.qty > 0) {
       let totalValue = (h.qty * h.avg) + (tx.qty * tx.price);
-      h.qty += tx.qty; h.avg = totalValue / h.qty;
+      h.qty += tx.qty;
+      h.avg = totalValue / h.qty;
     } else {
       h.qty += tx.qty;
       if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
@@ -1153,6 +886,7 @@ function calculateHoldings(ownerFilter = 'all') {
 function editTransaction(id) {
   const tx = state.transactions.find(t => t.id === id);
   if (!tx) return;
+
   setSidebarView('ledger');
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
@@ -1166,6 +900,7 @@ function editTransaction(id) {
   const isUser1 = tx.owner === state.owners.user1.name;
   document.getElementById('owner1').checked = isUser1;
   document.getElementById('owner2').checked = !isUser1;
+
   document.getElementById('editingTxId').value = id;
 
   if (tx.txType === 'dividend') document.getElementById('typeDiv').checked = true;
@@ -1173,9 +908,11 @@ function editTransaction(id) {
   else document.getElementById('typeBuy').checked = true;
   
   toggleTxType();
+
   document.getElementById('btnSubmitTx').textContent = '내역 수정하기';
   document.getElementById('btnSubmitTx').style.background = 'var(--blue)';
   document.getElementById('editModeBanner').style.display = 'block';
+  
   document.getElementById('txPrice').focus();
 }
 
@@ -1184,6 +921,7 @@ function cancelEdit() {
   document.getElementById('btnSubmitTx').textContent = '내역 추가하기';
   document.getElementById('btnSubmitTx').style.background = 'var(--accent)';
   document.getElementById('editModeBanner').style.display = 'none';
+  
   document.getElementById('txSymbol').value = '';
   document.getElementById('txQty').value = '';
   document.getElementById('txPrice').value = '';
@@ -1202,13 +940,19 @@ function addOrUpdateTransaction() {
   let qty = parseFloat(document.getElementById('txQty').value) || 0;
   let price = parseFloat(document.getElementById('txPrice').value);
 
-  if(!date || !symbol || isNaN(price)) { alert("종목코드, 단가(배당금액)를 정확히 입력해주세요."); return; }
-  if(typeVal !== 'dividend' && qty === 0) { alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return; }
+  if(!date || !symbol || isNaN(price)) {
+    alert("종목코드, 단가(배당금액)를 정확히 입력해주세요."); return;
+  }
   
+  if(typeVal !== 'dividend' && qty === 0) {
+    alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return;
+  }
+
+  // 🌟 DB에서 한글 이름 검색 후 심볼로 자동 변환 (에러 방지)
   let rawSymbol = symbol;
   if (localStockDB && localStockDB.length > 0) {
-      let matched = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === rawSymbol);
-      if(matched) symbol = matched.symbol;
+      let matchedStock = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === rawSymbol);
+      if (matchedStock) symbol = matchedStock.symbol;
       else if (/^\d{6}$/.test(symbol)) symbol += '.KS';
   } else {
       if (/^\d{6}$/.test(symbol)) symbol += '.KS';
@@ -1221,37 +965,48 @@ function addOrUpdateTransaction() {
 
   if (typeVal === 'sell') qty = -Math.abs(qty);
   else if (typeVal === 'buy') qty = Math.abs(qty);
+  
   const finalTxType = typeVal === 'dividend' ? 'dividend' : 'trade'; 
 
   if (editId) {
     const idx = state.transactions.findIndex(t => t.id == editId);
-    if (idx !== -1) state.transactions[idx] = { id: parseInt(editId), date, owner, broker, symbol, qty, price, txType: finalTxType };
+    if (idx !== -1) {
+      state.transactions[idx] = { id: parseInt(editId), date: formatDate(date), owner, broker, symbol, qty, price, txType: finalTxType };
+    }
     cancelEdit(); 
   } else {
-    state.transactions.push({ id: Date.now(), date, owner, broker, symbol, qty, price, txType: finalTxType });
+    state.transactions.push({ id: Date.now(), date: formatDate(date), owner, broker, symbol, qty, price, txType: finalTxType });
     document.getElementById('txSymbol').value = '';
     document.getElementById('txQty').value = '';
     document.getElementById('txPrice').value = '';
   }
 
   if(!state.tickers.includes(symbol)) state.tickers.push(symbol);
-  saveState(); renderTxList(); 
-  if (currentView === 'history') renderHistoryDashboard(); else render();
+
+  saveState();
+  renderTxList(); 
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
   triggerAutoSync();
 }
 
 function deleteTransaction(id) {
   state.transactions = state.transactions.filter(t => t.id !== id);
   if(document.getElementById('editingTxId').value == id) cancelEdit();
-  saveState(); renderTxList(); 
-  if (currentView === 'history') renderHistoryDashboard(); else render();
+  
+  saveState(); 
+  renderTxList(); 
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
   triggerAutoSync();
 }
 
 function renderTxList() {
   const listEl = document.getElementById('txList');
+  
   const uniqueBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b))];
-  document.getElementById('brokerTags').innerHTML = uniqueBrokers.map(b => `<button type="button" class="broker-tag" onclick="document.getElementById('txBroker').value='${b}'">${b}</button>`).join('');
+  const tagsHtml = uniqueBrokers.map(b => `<button type="button" class="broker-tag" onclick="document.getElementById('txBroker').value='${b}'">${b}</button>`).join('');
+  document.getElementById('brokerTags').innerHTML = tagsHtml;
 
   if(state.transactions.length === 0) {
     listEl.innerHTML = `<li style="text-align:center; padding:20px; color:var(--text3); font-size:11px;">등록된 내역이 없습니다.</li>`;
@@ -1260,7 +1015,8 @@ function renderTxList() {
   
   const reversed = [...state.transactions].sort((a,b) => {
     const dateDiff = new Date(b.date) - new Date(a.date);
-    return dateDiff !== 0 ? dateDiff : b.id - a.id; 
+    if (dateDiff !== 0) return dateDiff;
+    return b.id - a.id; 
   });
   
   listEl.innerHTML = reversed.map(tx => {
@@ -1269,6 +1025,7 @@ function renderTxList() {
     const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
     const cachedMatch = cachedMarketData[tx.symbol];
     const stockName = dbMatch ? dbMatch.name : (cachedMatch && !cachedMatch._failed && cachedMatch.name ? cachedMatch.name : tx.symbol);
+    
     const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
     const typeLabel = isDiv ? '💰 배당금' : (isBuy ? '매수' : '매도') + ` ${Math.abs(tx.qty)}주`;
     const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
@@ -1290,11 +1047,15 @@ function renderTxList() {
         <div class="tx-card-body">
           <div style="display:flex; flex-direction:column; gap:4px;">
             <span class="tx-sym" title="${stockName}">${stockName}</span>
-            <span style="color:${typeColor}; font-weight:700; font-size:11px;">${typeLabel}</span>
+            <span style="color:${typeColor}; font-weight:700; font-size:11px;">
+              ${typeLabel}
+            </span>
           </div>
           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
             <span style="font-weight:700; color:var(--text); font-size:13px;">${formatPrice(totalAmt, tx.symbol)}</span>
-            <span style="font-family:var(--font-mono); font-weight:500; font-size:10px; color:var(--text2);">${isDiv ? '입금액' : '@ ' + formatPrice(tx.price, tx.symbol)}</span>
+            <span style="font-family:var(--font-mono); font-weight:500; font-size:10px; color:var(--text2);">
+              ${isDiv ? '입금액' : '@ ' + formatPrice(tx.price, tx.symbol)}
+            </span>
           </div>
         </div>
       </li>
@@ -1305,16 +1066,19 @@ function renderTxList() {
 function renderHistoryDashboard() {
   const tbody = document.getElementById('historyTableBody');
   const sorted = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+  
   if(sorted.length === 0) {
       tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--text3);">등록된 거래 내역이 없습니다.</td></tr>`;
       return;
   }
+
   tbody.innerHTML = sorted.map(tx => {
       const isBuy = tx.qty > 0;
       const isDiv = tx.txType === 'dividend';
       const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
       const typeLabel = isDiv ? '배당' : (isBuy ? '매수' : '매도');
       const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
+      
       const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
       const cachedMatch = cachedMarketData[tx.symbol];
       const stockName = dbMatch ? dbMatch.name : (cachedMatch && !cachedMatch._failed && cachedMatch.name ? cachedMatch.name : tx.symbol);
@@ -1323,40 +1087,62 @@ function renderHistoryDashboard() {
       return `
       <tr style="border-bottom: 1px solid var(--border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
           <td style="padding:12px 16px; color:var(--text2);">${tx.date}</td>
-          <td style="padding:12px 16px;"><span class="tx-owner-badge" onclick="toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="margin:0; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span></td>
+          <td style="padding:12px 16px;">
+              <span class="tx-owner-badge" onclick="toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="margin:0; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span>
+          </td>
           <td style="padding:12px 16px; color:var(--text2);">${tx.broker || '-'}</td>
           <td style="padding:12px 16px; font-weight:700; color:${typeColor};">${typeLabel}</td>
-          <td style="padding:12px 16px;"><div style="font-weight:700; color:var(--text);">${stockName}</div><div style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${tx.symbol}</div></td>
+          <td style="padding:12px 16px;">
+              <div style="font-weight:700; color:var(--text);">${stockName}</div>
+              <div style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${tx.symbol}</div>
+          </td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : Math.abs(tx.qty)}</td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : formatPrice(tx.price, tx.symbol)}</td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:var(--text);">${formatPrice(totalAmt, tx.symbol)}</td>
-          <td style="padding:12px 16px; text-align:center;"><div class="tx-actions" style="justify-content:center;"><button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button><button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button></div></td>
-      </tr>`;
+          <td style="padding:12px 16px; text-align:center;">
+              <div class="tx-actions" style="justify-content:center;">
+                <button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button>
+                <button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button>
+              </div>
+          </td>
+      </tr>
+      `;
   }).join('');
 }
 
 function prepareTransaction(symbol, broker) {
   document.getElementById('txSymbol').value = symbol;
-  if(broker) document.getElementById('txBroker').value = broker.replace(/\s*\([^)]*\)$/, '');
+  
+  if(broker) {
+    let cleanBroker = broker.replace(/\s*\([^)]*\)$/, '');
+    document.getElementById('txBroker').value = cleanBroker;
+  }
+  
   document.querySelector('input[name="txType"][value="buy"]').checked = true;
   toggleTxType();
+  
   document.getElementById('txQty').focus();
+  
   setSidebarView('ledger');
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
+  
   sb.style.boxShadow = "inset 0 0 0 2px var(--accent)";
   setTimeout(() => sb.style.boxShadow = "none", 500);
 }
 
-// ── 6. 검색 자동완성 ──
+// ── 4. 검색 자동완성 ──
 function setupSearch(inputId, dropdownId, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
+  
   input.addEventListener('input', (e) => {
     const query = e.target.value.trim().toLowerCase();
     if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
+    
     const results = localStockDB.filter(s => s.symbol.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)).slice(0, 6);
     if (results.length === 0) { dropdown.style.display = 'none'; return; }
+
     dropdown.innerHTML = results.map(q => `
       <li class="search-item" onclick="${onSelect}('${q.symbol}')">
         <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
@@ -1368,13 +1154,13 @@ function setupSearch(inputId, dropdownId, onSelect) {
     `).join('');
     dropdown.style.display = 'block';
   });
+
   document.addEventListener('click', (e) => {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
   });
 }
-setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult');
-setupSearch('txSymbol', 'txDropdown', 'selectSidebarSearchResult');
 
+setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult');
 function selectMainSearchResult(symbol) {
   document.getElementById('tickerInput').value = '';
   document.getElementById('searchDropdown').style.display = 'none';
@@ -1388,6 +1174,7 @@ function addManualTicker() {
   if (val) {
     if(currentView === 'history') setView('all');
     let symbolToAdd = val;
+    // 🌟 한글 종목명 자동 매핑
     if (localStockDB && localStockDB.length > 0) {
         let matched = localStockDB.find(s => s.name === rawVal || s.symbol.toUpperCase() === val);
         if(matched) symbolToAdd = matched.symbol;
@@ -1397,14 +1184,18 @@ function addManualTicker() {
 }
 document.getElementById('tickerInput').addEventListener('keydown', e => { if (e.key === 'Enter') addManualTicker(); });
 
+setupSearch('txSymbol', 'txDropdown', 'selectSidebarSearchResult');
 function selectSidebarSearchResult(symbol) {
   document.getElementById('txSymbol').value = symbol;
   document.getElementById('txDropdown').style.display = 'none';
-  if(document.querySelector('input[name="txType"]:checked').value !== 'dividend') document.getElementById('txQty').focus();
-  else document.getElementById('txPrice').focus();
+  if(document.querySelector('input[name="txType"]:checked').value !== 'dividend') {
+    document.getElementById('txQty').focus();
+  } else {
+    document.getElementById('txPrice').focus();
+  }
 }
 
-// ── 7. API 및 메인 렌더링 세부 함수 ──
+// ── 5. API Fetch 및 차단 회피 로직 ──
 async function fetchWithProxy(targetUrl, useCache = true) {
   const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
   const proxy = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
@@ -1425,11 +1216,14 @@ async function fetchYahooData(symbol) {
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=3y&interval=1d`;
     const json = await fetchWithProxy(url, false);
+    
     if (!json || !json.chart || !json.chart.result || json.chart.result.length === 0) return null;
     const result = json.chart.result[0];
     if (!result || !result.timestamp || !result.indicators || !result.indicators.quote || !result.indicators.quote[0] || !result.indicators.quote[0].close) return null;
+    
     const quotes = result.indicators.quote[0].close;
     let validPrices = [], validDates = [], rawDates = [];
+    
     for(let i=0; i<result.timestamp.length; i++) {
       if(quotes[i] !== null && quotes[i] !== undefined) {
         validPrices.push(quotes[i]);
@@ -1442,15 +1236,24 @@ async function fetchYahooData(symbol) {
       }
     }
     if(validPrices.length === 0) return null;
+    
     const meta = result.meta || {};
     let cName = symbol;
     if (localStockDB && localStockDB.length > 0) {
         const localMatch = localStockDB.find(s => s.symbol === symbol);
         if (localMatch) cName = localMatch.name;
         else if (meta.shortName) cName = meta.shortName;
-    } else if (meta.shortName) cName = meta.shortName;
+    } else if (meta.shortName) {
+        cName = meta.shortName;
+    }
     if(symbol === 'KRW=X') cName = 'USD/KRW 환율';
-    return { symbol: symbol, name: cName, currency: meta.currency || 'USD', prices: validPrices, dates: validDates, rawDates: rawDates, last: validPrices[validPrices.length-1], prev: validPrices[validPrices.length-2] || validPrices[validPrices.length-1] };
+    
+    return {
+      symbol: symbol, name: cName, currency: meta.currency || 'USD',
+      prices: validPrices, dates: validDates, rawDates: rawDates,
+      last: validPrices[validPrices.length-1],
+      prev: validPrices[validPrices.length-2] || validPrices[validPrices.length-1]
+    };
   } catch (e) {
     return null;
   }
@@ -1459,10 +1262,12 @@ async function fetchYahooData(symbol) {
 async function addTickerToPortfolio(symbol) {
   let finalSym = /^\d{6}$/.test(symbol) ? symbol + '.KS' : symbol;
   if (state.tickers.includes(finalSym)) { alert("이미 등록된 종목입니다."); return; }
+  
   const addIcon = document.querySelector('.btn-add-icon');
   addIcon.textContent = "⏳";
   const data = await fetchYahooData(finalSym);
   addIcon.textContent = "＋";
+
   if (data) {
     state.tickers.push(data.symbol); cachedMarketData = {}; saveState();
     document.getElementById('tickerInput').value = ''; render();
@@ -1470,67 +1275,373 @@ async function addTickerToPortfolio(symbol) {
   } else { alert("차트 데이터를 불러올 수 없는 종목입니다."); }
 }
 
-function removeTicker(t) { state.tickers = state.tickers.filter(x => x !== t); delete cachedMarketData[t]; saveState(); render(); triggerAutoSync(); }
-function setRange(rangeStr, el) { state.range = rangeStr; saveState(); document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active')); el.classList.add('active'); render(); }
-function setSortMode(mode) { currentSortMode = mode; render(); }
-function toggleSortDirection() { sortDirection = sortDirection === -1 ? 1 : -1; document.getElementById('btnSortDir').textContent = sortDirection === -1 ? '⬇️' : '⬆️'; render(); }
-function setView(view, el) { currentView = view; activeAccountFilter = null; document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active')); if(el) el.classList.add('active'); if(view === 'history') renderHistoryDashboard(); const pChartWrap = document.getElementById('portfolioChartWrapper'); if (view === 'dividend' || view === 'history') pChartWrap.style.display = 'none'; else pChartWrap.style.display = 'flex'; render(); }
-function setDivFilter(filter, el) { currentDivFilter = filter; document.querySelectorAll('.div-filter').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderDividendDashboard(); }
+function removeTicker(t) {
+  state.tickers = state.tickers.filter(x => x !== t);
+  delete cachedMarketData[t]; saveState(); render();
+  triggerAutoSync();
+}
 
+function setRange(rangeStr, el) {
+  state.range = rangeStr; saveState();
+  document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); 
+  render();
+}
+
+function setSortMode(mode) { currentSortMode = mode; render(); }
+
+function toggleSortDirection() {
+  sortDirection = sortDirection === -1 ? 1 : -1;
+  document.getElementById('btnSortDir').textContent = sortDirection === -1 ? '⬇️' : '⬆️';
+  render();
+}
+
+function setView(view, el) {
+  currentView = view;
+  activeAccountFilter = null; 
+  document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
+  if(el) el.classList.add('active'); 
+  if(view === 'history') {
+    renderHistoryDashboard();
+  }
+  
+  const pChartWrap = document.getElementById('portfolioChartWrapper');
+  if (view === 'dividend' || view === 'history') {
+      pChartWrap.style.display = 'none';
+  } else {
+      pChartWrap.style.display = 'flex';
+  }
+  
+  render();
+}
+
+function setDivFilter(filter, el) {
+  currentDivFilter = filter;
+  document.querySelectorAll('.div-filter').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderDividendDashboard();
+}
+
+// ── 6. 데이터 렌더링 ──
 function renderSidebarYieldList(currentHoldings) {
   const container = document.getElementById('sidebarYieldList');
   if (!container) return;
+
   let yieldItems = [];
+
   for (let key in currentHoldings) {
       let h = currentHoldings[key];
       if (h.qty > 0 && cachedMarketData[h.symbol] && !cachedMarketData[h.symbol]._failed && cachedMarketData[h.symbol].last) {
           let evalAmt = h.qty * cachedMarketData[h.symbol].last;
           let costAmt = h.qty * h.avg;
           let roi = costAmt > 0 ? ((evalAmt - costAmt) / costAmt) * 100 : -9999;
-          if (roi !== -9999) yieldItems.push({ symbol: h.symbol, name: cachedMarketData[h.symbol].name, broker: h.broker, roi: roi, pnl: evalAmt - costAmt, owner: state.transactions.filter(t => t.symbol===h.symbol && (t.broker+' ('+t.owner+')'===h.broker || t.broker===h.broker) && t.txType!=='dividend').pop()?.owner || '보유' });
+          
+          if (roi !== -9999) {
+              yieldItems.push({
+                  symbol: h.symbol,
+                  name: cachedMarketData[h.symbol].name,
+                  broker: h.broker,
+                  roi: roi,
+                  pnl: evalAmt - costAmt,
+                  owner: state.transactions.filter(t => t.symbol===h.symbol && (t.broker+' ('+t.owner+')'===h.broker || t.broker===h.broker) && t.txType!=='dividend').pop()?.owner || '보유'
+              });
+          }
       }
   }
+
   yieldItems.sort((a, b) => b.roi - a.roi);
-  if (yieldItems.length === 0) { container.innerHTML = '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">보유한 자산이 없습니다.</div>'; return; }
+
+  if (yieldItems.length === 0) {
+      container.innerHTML = '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">보유한 자산이 없습니다.</div>';
+      return;
+  }
+
   container.innerHTML = yieldItems.map((item, idx) => {
-      let sign = item.roi > 0 ? '+' : ''; let color = item.roi > 0 ? 'var(--green)' : (item.roi < 0 ? 'var(--red)' : 'var(--text)'); let rankColor = idx === 0 ? '#ffb703' : (idx === 1 ? '#a259ff' : (idx === 2 ? '#4d9fff' : 'var(--text3)')); let cleanBroker = item.broker.split(' (')[0]; let brokerText = cleanBroker !== '미지정' ? `<span style="font-size:10px; color:var(--text3); margin-left:6px;">[${cleanBroker}]</span>` : '';
-      return `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); padding:12px; border-radius:6px; border:1px solid var(--border); transition:0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; margin-right:10px;"><span style="font-weight:900; font-style:italic; color:${rankColor}; width:18px; text-align:center; flex-shrink:0;">${idx+1}</span><div style="min-width:0; overflow:hidden;"><div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name} ${brokerText}</div><div style="font-size:10px; font-family:var(--font-mono); color:var(--text2);">${item.symbol}</div></div></div><div style="text-align:right; flex-shrink:0;"><div style="font-size:14px; font-family:var(--font-mono); font-weight:700; color:${color};">${sign}${item.roi.toFixed(2)}%</div><div style="font-size:10px; color:var(--text3);">${sign}${formatPrice(Math.abs(item.pnl), item.symbol)}</div></div></div>`;
+      let sign = item.roi > 0 ? '+' : '';
+      let color = item.roi > 0 ? 'var(--green)' : (item.roi < 0 ? 'var(--red)' : 'var(--text)');
+      let rankColor = idx === 0 ? '#ffb703' : (idx === 1 ? '#a259ff' : (idx === 2 ? '#4d9fff' : 'var(--text3)'));
+      let cleanBroker = item.broker.split(' (')[0];
+      let brokerText = cleanBroker !== '미지정' ? `<span style="font-size:10px; color:var(--text3); margin-left:6px;">[${cleanBroker}]</span>` : '';
+      
+      return `
+      <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); padding:12px; border-radius:6px; border:1px solid var(--border); transition:0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; margin-right:10px;">
+              <span style="font-weight:900; font-style:italic; color:${rankColor}; width:18px; text-align:center; flex-shrink:0;">${idx+1}</span>
+              <div style="min-width:0; overflow:hidden;">
+                  <div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name} ${brokerText}</div>
+                  <div style="font-size:10px; font-family:var(--font-mono); color:var(--text2);">${item.symbol}</div>
+              </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+              <div style="font-size:14px; font-family:var(--font-mono); font-weight:700; color:${color};">${sign}${item.roi.toFixed(2)}%</div>
+              <div style="font-size:10px; color:var(--text3);">${sign}${formatPrice(Math.abs(item.pnl), item.symbol)}</div>
+          </div>
+      </div>
+      `;
   }).join('');
 }
 
-// ── 7. 상단 요약 패널 및 계좌별 트리맵 ──
+function generateCardHtml(item) {
+  const data = item.data;
+  const isHeld = item.type === 'held';
+  
+  const chgPct = item.activeChange.toFixed(2);
+  const cls = item.activeChange > 0 ? 'up' : (item.activeChange < 0 ? 'down' : 'flat');
+  const sign = item.activeChange > 0 ? '+' : '';
+  
+  const pnl = isHeld ? (data.last - item.avg) * item.qty : null;
+  const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
+
+  const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '';
+  const tagContent = isHeld ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` : `<span class="icon">⭐</span> 관심종목`;
+
+  const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
+
+  let ownerBadgeHtml = '';
+  if (isHeld) {
+      let mainOwner = '보유';
+      const holdingTxs = state.transactions.filter(t => t.symbol === item.symbol && t.broker === item.broker && t.txType !== 'dividend');
+      if(holdingTxs.length > 0) mainOwner = holdingTxs[holdingTxs.length-1].owner; 
+      
+      const oInfo = getOwnerInfo(mainOwner);
+      ownerBadgeHtml = `<span class="card-badge" style="margin-right:6px; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40; padding:3px 8px; font-size:10px;">${oInfo.icon} ${oInfo.name}</span>`;
+  }
+
+  return `
+    <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
+      
+      <div style="display:flex; align-items:center;">
+        ${countryBadge}
+        ${ownerBadgeHtml}
+        <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}" style="margin-bottom:0; background:var(--bg3); color:var(--text2); border:1px solid var(--border);">
+          ${tagContent}
+        </div>
+      </div>
+
+      <div class="card-head" style="align-items:center; margin-top:12px;">
+        <div style="flex:1; min-width:0; margin-right:10px;">
+          <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
+          <div style="font-size:11px; font-family:var(--font-mono); color:var(--text3); margin-top:2px; white-space:nowrap;">
+            ${item.symbol}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="card-badge badge-${cls}">${sign}${chgPct}%</span>
+          <button class="btn-danger" onclick="event.stopPropagation();prepareTransaction('${item.symbol}','${isHeld ? item.broker.split(',')[0].trim() : ''}')" title="좌측 장부로 이동">잔고</button>
+          ${!isHeld ? `<button class="btn-danger" onclick="event.stopPropagation();removeTicker('${item.symbol}')" title="목록 삭제">✕</button>` : ''}
+        </div>
+      </div>
+      <div class="card-price">${formatPrice(data.last, item.symbol)}</div>
+      <div class="chart-wrap"><canvas id="${item.uniqueId}"></canvas></div>
+      ${isHeld ? `
+      <div class="card-footer">
+        <div>평단가 ${formatPrice(item.avg, item.symbol)}<br>수량 <strong>${item.qty}</strong>주</div>
+        <div style="text-align:right">
+          <span class="holding-val" style="color:var(--${pnl>=0?'green':'red'})">
+            ${pnl>=0?'+':''}${formatPrice(Math.abs(pnl), item.symbol)}<br>(${pnl>=0?'+':''}${pnlPct}%)
+          </span>
+        </div>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function renderPortfolioChart(ownerFilter, sliceLen) {
+    const chartWrap = document.getElementById('portfolioChartWrapper');
+    if (currentView === 'dividend' || currentView === 'history' || state.transactions.length === 0) {
+        chartWrap.style.display = 'none';
+        return;
+    }
+    
+    let masterData = cachedMarketData['KRW=X'];
+    if (!masterData || masterData._failed) {
+        const keys = Object.keys(cachedMarketData);
+        if(keys.length > 0) masterData = cachedMarketData[keys[0]];
+    }
+    if (!masterData || masterData._failed || !masterData.rawDates) {
+        chartWrap.style.display = 'none';
+        return;
+    }
+
+    chartWrap.style.display = 'flex';
+    
+    const rawDates = masterData.rawDates;
+    const displayDates = masterData.dates;
+    
+    const startIndex = Math.max(0, rawDates.length - sliceLen);
+    const slicedRawDates = rawDates.slice(startIndex);
+    const slicedDisplayDates = displayDates.slice(startIndex);
+    
+    const evalData = [];
+    const costData = [];
+    
+    slicedRawDates.forEach((dateStr, idx) => {
+        let dailyCost = 0;
+        let dailyEval = 0;
+        
+        const pastTxs = state.transactions.filter(t => t.date <= dateStr);
+        
+        let filteredTxs = pastTxs;
+        if(ownerFilter !== 'all') {
+           filteredTxs = pastTxs.filter(t => t.owner === ownerFilter || t.owner === state.owners[ownerFilter]?.name);
+        }
+        
+        let holdings = {};
+        filteredTxs.forEach(tx => {
+            if (tx.txType === 'dividend') return;
+            if (!holdings[tx.symbol]) holdings[tx.symbol] = { qty: 0, avg: 0 };
+            let h = holdings[tx.symbol];
+            if (tx.qty > 0) {
+                let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
+                h.qty += tx.qty;
+                h.avg = totalVal / h.qty;
+            } else {
+                h.qty += tx.qty;
+                if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+            }
+        });
+
+        let fxRate = currentUsdKrw;
+        if(cachedMarketData['KRW=X'] && !cachedMarketData['KRW=X']._failed) {
+            const fxIdx = cachedMarketData['KRW=X'].rawDates.indexOf(dateStr);
+            if(fxIdx !== -1) fxRate = cachedMarketData['KRW=X'].prices[fxIdx];
+        }
+
+        for (let sym in holdings) {
+            if (holdings[sym].qty > 0) {
+                let h = holdings[sym];
+                // 🌟 투자 원금은 API 실패 여부와 상관없이 항상 더함
+                dailyCost += (h.qty * h.avg) * (isKorean(sym) ? 1 : fxRate);
+                
+                let priceOnDate = h.avg; 
+                if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
+                    const pIdx = cachedMarketData[sym].rawDates.indexOf(dateStr);
+                    if (pIdx !== -1 && cachedMarketData[sym].prices[pIdx] !== null) {
+                        priceOnDate = cachedMarketData[sym].prices[pIdx];
+                    } else {
+                        let closestPrice = null;
+                        for(let k = cachedMarketData[sym].rawDates.length - 1; k >= 0; k--) {
+                            if (cachedMarketData[sym].rawDates[k] <= dateStr && cachedMarketData[sym].prices[k] !== null) {
+                                closestPrice = cachedMarketData[sym].prices[k];
+                                break;
+                            }
+                        }
+                        if (closestPrice !== null) priceOnDate = closestPrice;
+                    }
+                }
+                dailyEval += (h.qty * priceOnDate) * (isKorean(sym) ? 1 : fxRate);
+            }
+        }
+        
+        costData.push(dailyCost);
+        evalData.push(dailyEval);
+    });
+
+    let firstNonZeroIdx = evalData.findIndex(v => v > 0);
+    let finalDisplayDates = slicedDisplayDates;
+    let finalEvalData = evalData;
+    let finalCostData = costData;
+
+    if (firstNonZeroIdx > 0 && sliceLen >= 756) { 
+        finalDisplayDates = slicedDisplayDates.slice(firstNonZeroIdx);
+        finalEvalData = evalData.slice(firstNonZeroIdx);
+        finalCostData = costData.slice(firstNonZeroIdx);
+    }
+
+    const canvas = document.getElementById('portfolioChartCanvas');
+    if (!canvas) return; 
+    if (portfolioChartInst) portfolioChartInst.destroy();
+
+    let endEval = finalEvalData[finalEvalData.length-1] || 0;
+    let endCost = finalCostData[finalCostData.length-1] || 0;
+    let pnl = endEval - endCost;
+    
+    let evalColor = pnl >= 0 ? '#00c87a' : '#ff4d6a';
+    let evalBg = pnl >= 0 ? 'rgba(0, 200, 122, 0.15)' : 'rgba(255, 77, 106, 0.15)';
+
+    portfolioChartInst = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: finalDisplayDates,
+            datasets: [
+                {
+                    label: '평가액',
+                    data: finalEvalData,
+                    borderColor: evalColor,
+                    backgroundColor: evalBg,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.1,
+                    order: 1
+                },
+                {
+                    label: '투자 원금',
+                    data: finalCostData,
+                    borderColor: '#8890a4',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.1,
+                    order: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size: 11}, usePointStyle: true, boxWidth:8 } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ₩' + Math.round(context.raw).toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#555e72', maxTicksLimit: 10 }, grid: { display: false } },
+                y: { ticks: { color: '#555e72', callback: function(val) { return '₩' + (val/10000).toLocaleString() + '만'; } }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } }
+            }
+        }
+    });
+}
+
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
+    
     if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
 
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
+
     let treemapDataMap = {};
-    
-    // 트리맵 데이터 생성 (API 성공한 데이터만 포함)
     if (fullDisplayItems) {
       fullDisplayItems.forEach(item => {
         if(item.type === 'held' && item.evalAmt > 0) {
           let sym = item.symbol;
-          if(!treemapDataMap[sym]) treemapDataMap[sym] = { symbol: sym, name: item.data ? item.data.name : sym, value: 0, change: item.activeChange || 0 };
+          if(!treemapDataMap[sym]) {
+             treemapDataMap[sym] = { symbol: sym, name: item.data ? item.data.name : sym, value: 0, change: item.activeChange || 0 };
+          }
           treemapDataMap[sym].value += (isKorean(sym) ? item.evalAmt : item.evalAmt * currentUsdKrw);
         }
       });
     }
     let treemapData = Object.values(treemapDataMap);
 
-    // 전체 투자 원금 및 평가액 합산
     for(let key in rawHoldings) {
       if(!rawHoldings.hasOwnProperty(key)) continue;
       let h = rawHoldings[key];
       
-      // 🌟 API 통신이 실패했어도 보유 수량이 있으면 원금(Cost)은 무조건 더하도록 조건문 수정!
+      // 🌟 API 통신 실패했어도 원금은 무조건 더함
       if(h.qty > 0) {
-        let currentPrice = h.avg; // 기본 평가액은 내 투자 원금(평단가)으로 설정
+        let currentPrice = h.avg; 
         let stockName = h.symbol;
         
-        // API 데이터가 성공적으로 있으면 진짜 현재가 반영
         if (cachedMarketData[h.symbol] && !cachedMarketData[h.symbol]._failed) {
             currentPrice = cachedMarketData[h.symbol].last || h.avg;
             stockName = cachedMarketData[h.symbol].name || h.symbol;
@@ -1544,14 +1655,18 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
         let broker = h.broker || '미지정'; 
         
         if(isKorean(h.symbol)) { 
-          krwSummary.totalEval += eAmt; krwSummary.totalCost += cAmt;
+          krwSummary.totalEval += eAmt;
+          krwSummary.totalCost += cAmt;
           if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
-          krwSummary.accounts[broker].eval += eAmt; krwSummary.accounts[broker].cost += cAmt;
+          krwSummary.accounts[broker].eval += eAmt;
+          krwSummary.accounts[broker].cost += cAmt;
           krwSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
         } else { 
-          usdSummary.totalEval += eAmt; usdSummary.totalCost += cAmt;
+          usdSummary.totalEval += eAmt;
+          usdSummary.totalCost += cAmt;
           if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
-          usdSummary.accounts[broker].eval += eAmt; usdSummary.accounts[broker].cost += cAmt;
+          usdSummary.accounts[broker].eval += eAmt;
+          usdSummary.accounts[broker].cost += cAmt;
           usdSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
         }
       }
@@ -1562,7 +1677,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     if (currentView === 'user1') filterName = state.owners.user1.name;
     if (currentView === 'user2') filterName = state.owners.user2.name;
 
-    // 🌟 배당금 합산 (API 조회 성공 여부와 무관하게 100% 합산)
+    // 배당 합산
     state.transactions.forEach(tx => {
       if (tx.txType === 'dividend') {
          if (filterName === 'all' || tx.owner === filterName) {
@@ -1571,7 +1686,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
          }
       }
     });
-
     const globalDiv = krwDiv + (usdDiv * currentUsdKrw);
     const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
     const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
@@ -1581,20 +1695,24 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
     document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
     document.getElementById('globalTotalDiv').textContent = `₩ ${Math.round(globalDiv).toLocaleString()}`;
+    
     const gRoiEl = document.getElementById('globalTotalRoi');
     const signG = globalPnl >= 0 ? '+' : '';
     gRoiEl.innerHTML = `${signG}₩${Math.round(Math.abs(globalPnl)).toLocaleString()}<br><span style="font-size:12px; font-weight:500">(${signG}${globalRoi.toFixed(2)}%)</span>`;
     gRoiEl.style.color = globalPnl >= 0 ? 'var(--green)' : (globalCost > 0 ? 'var(--red)' : 'var(--text)');
+    
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-    // Treemap (코드 생략 방지)
+    // ── 🌐 글로벌 Treemap 렌더링 ──
     const tmContainer = document.getElementById('allocationTreemap');
     if (tmContainer) {
-        if (treemapData.length === 0) tmContainer.innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text3); font-size:12px;">보유 자산 없음</div>';
-        else {
+        if (treemapData.length === 0) {
+            tmContainer.innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text3); font-size:12px;">보유 자산 없음</div>';
+        } else {
             tmContainer.innerHTML = '';
             let x = 0, y = 0, w = 100, h = 100;
             treemapData.sort((a,b)=> b.value - a.value);
+
             let html = '';
             function renderTreemapNode(items, x, y, w, h) {
                 if(items.length === 0) return;
@@ -1604,40 +1722,74 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     let sign = it.change > 0 ? '+' : '';
                     let fontSz = (w < 15 || h < 25) ? 10 : 13;
                     let tickerDisp = (w > 20 && h > 30) ? `<div style="font-size:${fontSz-3}px; opacity:0.7; margin-top:2px;">${it.symbol.split('.')[0]}</div>` : '';
-                    html += `<div class="treemap-cell" style="left:${x}%; top:${y}%; width:${w}%; height:${h}%; background:${bg};" data-name="${it.name}" data-val="₩${Math.round(it.value).toLocaleString()}"><div style="font-weight:bold; font-size:${fontSz}px; text-align:center; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${it.name}">${it.name}</div>${tickerDisp}<div style="font-size:${fontSz-1}px; margin-top:2px; opacity:0.9;">${sign}${it.change.toFixed(2)}%</div></div>`;
+
+                    html += `
+                      <div class="treemap-cell" style="left:${x}%; top:${y}%; width:${w}%; height:${h}%; background:${bg};" 
+                           data-name="${it.name}" data-val="₩${Math.round(it.value).toLocaleString()}">
+                        <div style="font-weight:bold; font-size:${fontSz}px; text-align:center; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${it.name}">${it.name}</div>
+                        ${tickerDisp}
+                        <div style="font-size:${fontSz-1}px; margin-top:2px; opacity:0.9;">${sign}${it.change.toFixed(2)}%</div>
+                      </div>`;
                     return;
                 }
                 let totalItems = items.reduce((sum, i)=>sum+i.value, 0);
                 if(totalItems <= 0) return;
-                let half = totalItems / 2, sum = 0, splitIdx = 0;
+                let half = totalItems / 2;
+                let sum = 0; let splitIdx = 0;
                 for(let i=0; i<items.length; i++){
                     sum += items[i].value;
                     if(sum >= half && i < items.length-1) { splitIdx = i; break; }
                 }
                 if(splitIdx === 0 && items.length > 1) splitIdx = 0; 
-                let leftItems = items.slice(0, splitIdx+1), rightItems = items.slice(splitIdx+1);
+
+                let leftItems = items.slice(0, splitIdx+1);
+                let rightItems = items.slice(splitIdx+1);
                 let leftRatio = leftItems.reduce((sum, i)=>sum+i.value, 0) / totalItems;
-                if (w > h) { let lw = w * leftRatio; renderTreemapNode(leftItems, x, y, lw, h); renderTreemapNode(rightItems, x + lw, y, w - lw, h); } 
-                else { let lh = h * leftRatio; renderTreemapNode(leftItems, x, y, w, lh); renderTreemapNode(rightItems, x, y + lh, w, h - lh); }
+
+                if (w > h) {
+                    let lw = w * leftRatio;
+                    renderTreemapNode(leftItems, x, y, lw, h);
+                    renderTreemapNode(rightItems, x + lw, y, w - lw, h);
+                } else {
+                    let lh = h * leftRatio;
+                    renderTreemapNode(leftItems, x, y, w, lh);
+                    renderTreemapNode(rightItems, x, y + lh, w, h - lh);
+                }
             }
             renderTreemapNode(treemapData, x, y, w, h);
             tmContainer.innerHTML = html;
+
             document.querySelectorAll('.treemap-cell').forEach(cell => {
                 cell.addEventListener('mouseenter', (e) => {
                     let tooltipEl = document.getElementById('chartjs-tooltip');
-                    if (!tooltipEl) { tooltipEl = document.createElement('div'); tooltipEl.id = 'chartjs-tooltip'; document.body.appendChild(tooltipEl); }
-                    let name = cell.getAttribute('data-name'), val = cell.getAttribute('data-val');
+                    if (!tooltipEl) {
+                        tooltipEl = document.createElement('div');
+                        tooltipEl.id = 'chartjs-tooltip';
+                        document.body.appendChild(tooltipEl);
+                    }
+                    let name = cell.getAttribute('data-name');
+                    let val = cell.getAttribute('data-val');
                     tooltipEl.innerHTML = `<div style="font-size:13px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:13px; text-align:center; color:var(--text);">${val}</div>`;
                     tooltipEl.style.opacity = 1;
                 });
-                cell.addEventListener('mousemove', (e) => { let tooltipEl = document.getElementById('chartjs-tooltip'); if(tooltipEl) { tooltipEl.style.left = e.pageX + 'px'; tooltipEl.style.top = (e.pageY - 10) + 'px'; } });
-                cell.addEventListener('mouseleave', () => { let tooltipEl = document.getElementById('chartjs-tooltip'); if(tooltipEl) tooltipEl.style.opacity = 0; });
+                cell.addEventListener('mousemove', (e) => {
+                    let tooltipEl = document.getElementById('chartjs-tooltip');
+                    if(tooltipEl) {
+                      tooltipEl.style.left = e.pageX + 'px';
+                      tooltipEl.style.top = (e.pageY - 10) + 'px';
+                    }
+                });
+                cell.addEventListener('mouseleave', () => {
+                    let tooltipEl = document.getElementById('chartjs-tooltip');
+                    if(tooltipEl) tooltipEl.style.opacity = 0;
+                });
             });
         }
     }
 
     const krwPnl = krwSummary.totalEval - krwSummary.totalCost;
     const krwRoi = krwSummary.totalCost > 0 ? (krwPnl / krwSummary.totalCost * 100) : 0;
+    
     document.getElementById('krwTotalCost').textContent = `₩${Math.round(krwSummary.totalCost).toLocaleString()}`;
     document.getElementById('krwTotalEval').textContent = `₩${Math.round(krwSummary.totalEval).toLocaleString()}`;
     const elKrwPnl = document.getElementById('krwTotalPnl');
@@ -1645,18 +1797,28 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     elKrwPnl.className = 'cp-sum-val ' + (krwPnl >= 0 ? 'up' : (krwSummary.totalCost > 0 ? 'down' : ''));
 
     let maxKrwAccVal = 0;
-    Object.values(krwSummary.accounts).forEach(d => { if(d.cost > maxKrwAccVal) maxKrwAccVal = d.cost; if(d.eval > maxKrwAccVal) maxKrwAccVal = d.eval; });
+    Object.values(krwSummary.accounts).forEach(d => {
+      if(d.cost > maxKrwAccVal) maxKrwAccVal = d.cost;
+      if(d.eval > maxKrwAccVal) maxKrwAccVal = d.eval;
+    });
+
     let krwPieConfigs = [];
     let krwAccHtml = Object.keys(krwSummary.accounts).map(b => {
       let d = krwSummary.accounts[b];
-      let pnl = d.eval - d.cost; let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
-      let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : ''); let sign = pnl >= 0 ? '+' : '';
-      let count = d.items.length; let pieId = 'krw_pie_' + Math.random().toString(36).substring(2, 9);
+      let pnl = d.eval - d.cost;
+      let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
+      let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
+      let sign = pnl >= 0 ? '+' : '';
+      let count = d.items.length;
+      let pieId = 'krw_pie_' + Math.random().toString(36).substring(2, 9);
       krwPieConfigs.push({ id: pieId, items: d.items, isUsd: false });
+
       let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
       let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
       let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
+
       return `
         <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')">
           <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
@@ -1678,12 +1840,14 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                   </div>
               </div>
           </div>
-        </div>`;
+        </div>
+      `;
     }).join('');
     document.getElementById('krwAccountList').innerHTML = krwAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
     const usdPnl = usdSummary.totalEval - usdSummary.totalCost;
     const usdRoi = usdSummary.totalCost > 0 ? (usdPnl / usdSummary.totalCost * 100) : 0;
+
     document.getElementById('usdTotalCost').textContent = `$${usdSummary.totalCost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
     document.getElementById('usdTotalEval').textContent = `$${usdSummary.totalEval.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
     const elUsdPnl = document.getElementById('usdTotalPnl');
@@ -1691,18 +1855,28 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     elUsdPnl.className = 'cp-sum-val ' + (usdPnl >= 0 ? 'up' : (usdSummary.totalCost > 0 ? 'down' : ''));
 
     let maxUsdAccVal = 0;
-    Object.values(usdSummary.accounts).forEach(d => { if(d.cost > maxUsdAccVal) maxUsdAccVal = d.cost; if(d.eval > maxUsdAccVal) maxUsdAccVal = d.eval; });
+    Object.values(usdSummary.accounts).forEach(d => {
+      if(d.cost > maxUsdAccVal) maxUsdAccVal = d.cost;
+      if(d.eval > maxUsdAccVal) maxUsdAccVal = d.eval;
+    });
+
     let usdPieConfigs = [];
     let usdAccHtml = Object.keys(usdSummary.accounts).map(b => {
       let d = usdSummary.accounts[b];
-      let pnl = d.eval - d.cost; let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
-      let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : ''); let sign = pnl >= 0 ? '+' : '';
-      let count = d.items.length; let pieId = 'usd_pie_' + Math.random().toString(36).substring(2, 9);
+      let pnl = d.eval - d.cost;
+      let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
+      let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
+      let sign = pnl >= 0 ? '+' : '';
+      let count = d.items.length;
+      let pieId = 'usd_pie_' + Math.random().toString(36).substring(2, 9);
       usdPieConfigs.push({ id: pieId, items: d.items, isUsd: true });
+
       let costPct = maxUsdAccVal > 0 ? (d.cost / maxUsdAccVal * 100) : 0;
       let evalPct = maxUsdAccVal > 0 ? (d.eval / maxUsdAccVal * 100) : 0;
       let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
+      
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
+
       return `
         <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')">
           <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
@@ -1724,7 +1898,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                   </div>
               </div>
           </div>
-        </div>`;
+        </div>
+      `;
     }).join('');
     document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
@@ -1735,29 +1910,56 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       cfg.items.sort((a,b) => b.evalAmt - a.evalAmt);
       const c = new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
-        data: { labels: cfg.items.map(i => i.name), datasets: [{ data: cfg.items.map(i => i.evalAmt), backgroundColor: cfg.items.map((_, i) => pieColors[i % pieColors.length]), borderWidth: 0 }] },
+        data: {
+          labels: cfg.items.map(i => i.name),
+          datasets: [{
+            data: cfg.items.map(i => i.evalAmt),
+            backgroundColor: cfg.items.map((_, i) => pieColors[i % pieColors.length]),
+            borderWidth: 0
+          }]
+        },
         options: {
-          responsive: true, maintainAspectRatio: false, layout: { padding: 4 },
+          responsive: true, maintainAspectRatio: false,
+          layout: { padding: 4 },
           plugins: {
             legend: { display: false },
             tooltip: {
               enabled: false,
+              callbacks: {
+                label: function(context) {
+                  let v = context.raw;
+                  let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v || 0).toLocaleString();
+                  return context.label + ': ' + formatVal;
+                }
+              },
               external: function(context) {
                 let tooltipEl = document.getElementById('chartjs-tooltip');
-                if (!tooltipEl) { tooltipEl = document.createElement('div'); tooltipEl.id = 'chartjs-tooltip'; document.body.appendChild(tooltipEl); }
+                if (!tooltipEl) {
+                  tooltipEl = document.createElement('div');
+                  tooltipEl.id = 'chartjs-tooltip';
+                  document.body.appendChild(tooltipEl);
+                }
                 const tooltipModel = context.tooltip;
-                if (tooltipModel.opacity === 0) { tooltipEl.style.opacity = 0; return; }
+                if (tooltipModel.opacity === 0) {
+                  tooltipEl.style.opacity = 0;
+                  return;
+                }
                 if (tooltipModel.body) {
                   const bodyLines = tooltipModel.body.map(b => b.lines);
                   let innerHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
                   bodyLines.forEach(function(body, i) {
                     const colors = tooltipModel.labelColors[i];
                     const span = `<span style="background:${colors.backgroundColor}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px;"></span>`;
-                    let txt = body[0]; let splitTxt = txt.split(': ');
+                    let txt = body[0];
+                    let splitTxt = txt.split(': ');
                     if(splitTxt.length === 2) {
-                      let name = splitTxt[0], formatVal = splitTxt[1]; 
-                      innerHtml += `<div style="font-size:13px; font-weight:700; display:flex; align-items:center;">${span}${name}</div><div style="font-size:13px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
-                    } else innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
+                      let name = splitTxt[0];
+                      let formatVal = splitTxt[1]; 
+                      innerHtml += `<div style="font-size:13px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
+                      innerHtml += `<div style="font-size:13px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
+                    } else {
+                      innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
+                    }
                   });
                   innerHtml += '</div>';
                   tooltipEl.innerHTML = innerHtml;
@@ -1768,11 +1970,52 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                 tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
               }
             }
-          }, cutout: '55%', animation: { duration: 0 }
+          },
+          cutout: '55%', animation: { duration: 0 }
         }
       });
       accountPieChartInsts.push(c);
     });
+}
+
+function openChartModal(ticker) {
+  const data = cachedMarketData[ticker]; if(!data || data._failed) return;
+  
+  const getSliceLen = (range) => {
+    if (range === '1d') return 2;
+    if (range === '1w') return 6;
+    if (range === '1m') return 22;
+    if (range === '3m') return 63;
+    if (range === '6m') return 126;
+    if (range === '1y') return 252;
+    if (range === '3y') return 756;
+    return 252;
+  };
+  
+  let sliceLen = getSliceLen(state.range);
+  const displayPrices = data.prices.slice(-sliceLen);
+  const displayDates = data.dates.slice(-sliceLen);
+  
+  if(displayPrices.length === 0) return;
+  
+  const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
+  const last = displayPrices[displayPrices.length-1];
+  const prev = displayPrices[0]; 
+  const chgPct = ((last-prev)/prev*100).toFixed(2);
+  
+  document.getElementById('mTicker').textContent = data.name;
+  document.getElementById('mBroker').textContent = data.symbol;
+  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
+  
+  const chgEl = document.getElementById('mChange');
+  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
+  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
+  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
+  
+  document.getElementById('chartOverlay').classList.add('open');
+  if (modalChartInst) modalChartInst.destroy();
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
 }
 
 // ── 8. 배당금 대시보드 ──
@@ -1802,7 +2045,7 @@ function renderDividendDashboard() {
      if (!symTotals[sym]) symTotals[sym] = { krw: 0, usd: 0 };
      if (!divYields[sym]) divYields[sym] = { totalDiv: 0, totalEvalAtDiv: 0 };
 
-     // 🌟 API 통신 실패 여부와 무관하게 모든 배당금 합산!
+     // 🌟 API 조회 실패 여부 상관없이 모든 배당금 합산
      if (isKRW) { krwTotal += amt; monthlyKrw[month] += amt; symTotals[sym].krw += amt; }
      else { usdTotal += amt; monthlyUsd[month] += amt; symTotals[sym].usd += amt; }
      
@@ -1844,13 +2087,12 @@ function renderDividendDashboard() {
     const isKRW = isKorean(item.symbol);
     const originAmt = isKRW ? symTotals[item.symbol].krw : symTotals[item.symbol].usd;
     
-    // 로컬 DB에서 이름 매핑 시도
+    // 이름 매핑
     let cName = item.symbol;
     if (localStockDB && localStockDB.length > 0) {
         let dbMatch = localStockDB.find(s => s.symbol === item.symbol);
         if (dbMatch) cName = dbMatch.name;
     }
-    // 캐시 데이터가 있으면 캐시 이름 사용
     if (cachedMarketData[item.symbol] && !cachedMarketData[item.symbol]._failed && cachedMarketData[item.symbol].name) {
         cName = cachedMarketData[item.symbol].name;
     }
@@ -1900,209 +2142,6 @@ function renderDividendDashboard() {
       scales: { x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } }, y: { stacked: true, ticks: { color: '#8890a4' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } } }
     }
   });
-}
-
-// ── 6. 자산 성장 추이 차트 ──
-function renderPortfolioChart(ownerFilter, sliceLen) {
-    const chartWrap = document.getElementById('portfolioChartWrapper');
-    if (currentView === 'dividend' || currentView === 'history' || state.transactions.length === 0) {
-        chartWrap.style.display = 'none'; return;
-    }
-    
-    // 기준 환율 데이터 확인
-    let masterData = cachedMarketData['KRW=X'];
-    if (!masterData || masterData._failed) {
-        const keys = Object.keys(cachedMarketData);
-        if(keys.length > 0) masterData = cachedMarketData[keys[0]];
-    }
-    if (!masterData || masterData._failed || !masterData.rawDates) {
-        chartWrap.style.display = 'none'; return;
-    }
-
-    chartWrap.style.display = 'flex';
-    const rawDates = masterData.rawDates;
-    const displayDates = masterData.dates;
-    const startIndex = Math.max(0, rawDates.length - sliceLen);
-    const slicedRawDates = rawDates.slice(startIndex);
-    const slicedDisplayDates = displayDates.slice(startIndex);
-    
-    const evalData = [];
-    const costData = [];
-    
-    slicedRawDates.forEach((dateStr) => {
-        let dailyCost = 0, dailyEval = 0;
-        const pastTxs = state.transactions.filter(t => t.date <= dateStr);
-        let filteredTxs = pastTxs;
-        if(ownerFilter !== 'all') filteredTxs = pastTxs.filter(t => t.owner === ownerFilter || t.owner === state.owners[ownerFilter]?.name);
-        
-        let holdings = {};
-        filteredTxs.forEach(tx => {
-            if (tx.txType === 'dividend') return;
-            if (!holdings[tx.symbol]) holdings[tx.symbol] = { qty: 0, avg: 0 };
-            let h = holdings[tx.symbol];
-            if (tx.qty > 0) {
-                let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
-                h.qty += tx.qty; h.avg = totalVal / h.qty;
-            } else {
-                h.qty += tx.qty;
-                if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
-            }
-        });
-
-        let fxRate = currentUsdKrw;
-        if(cachedMarketData['KRW=X'] && !cachedMarketData['KRW=X']._failed) {
-            const fxIdx = cachedMarketData['KRW=X'].rawDates.indexOf(dateStr);
-            if(fxIdx !== -1) fxRate = cachedMarketData['KRW=X'].prices[fxIdx];
-        }
-
-        for (let sym in holdings) {
-            if (holdings[sym].qty > 0) {
-                let h = holdings[sym];
-                // 🌟 투자 원금은 API 실패 여부와 상관없이 항상 더함
-                dailyCost += (h.qty * h.avg) * (isKorean(sym) ? 1 : fxRate);
-                
-                let priceOnDate = h.avg; // 기본값은 내 평단가
-                if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
-                    const pIdx = cachedMarketData[sym].rawDates.indexOf(dateStr);
-                    if (pIdx !== -1 && cachedMarketData[sym].prices[pIdx] !== null) priceOnDate = cachedMarketData[sym].prices[pIdx];
-                    else {
-                        let closestPrice = null;
-                        for(let k = cachedMarketData[sym].rawDates.length - 1; k >= 0; k--) {
-                            if (cachedMarketData[sym].rawDates[k] <= dateStr && cachedMarketData[sym].prices[k] !== null) { closestPrice = cachedMarketData[sym].prices[k]; break; }
-                        }
-                        if (closestPrice !== null) priceOnDate = closestPrice;
-                    }
-                }
-                // API 데이터가 없으면 평단가(h.avg)로 평가액 계산
-                dailyEval += (h.qty * priceOnDate) * (isKorean(sym) ? 1 : fxRate);
-            }
-        }
-        costData.push(dailyCost);
-        evalData.push(dailyEval);
-    });
-
-    let firstNonZeroIdx = evalData.findIndex(v => v > 0);
-    let finalDisplayDates = slicedDisplayDates;
-    let finalEvalData = evalData;
-    let finalCostData = costData;
-
-    if (firstNonZeroIdx > 0 && sliceLen >= 756) { 
-        finalDisplayDates = slicedDisplayDates.slice(firstNonZeroIdx);
-        finalEvalData = evalData.slice(firstNonZeroIdx);
-        finalCostData = costData.slice(firstNonZeroIdx);
-    }
-
-    const canvas = document.getElementById('portfolioChartCanvas');
-    if (!canvas) return; 
-    if (portfolioChartInst) portfolioChartInst.destroy();
-
-    let endEval = finalEvalData[finalEvalData.length-1] || 0;
-    let endCost = finalCostData[finalCostData.length-1] || 0;
-    let pnl = endEval - endCost;
-    let evalColor = pnl >= 0 ? '#00c87a' : '#ff4d6a';
-    let evalBg = pnl >= 0 ? 'rgba(0, 200, 122, 0.15)' : 'rgba(255, 77, 106, 0.15)';
-
-    portfolioChartInst = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: finalDisplayDates,
-            datasets: [
-                { label: '평가액', data: finalEvalData, borderColor: evalColor, backgroundColor: evalBg, borderWidth: 2, pointRadius: 0, fill: true, tension: 0.1, order: 1 },
-                { label: '투자 원금', data: finalCostData, borderColor: '#8890a4', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, tension: 0.1, order: 2 }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size: 11}, usePointStyle: true, boxWidth:8 } }, tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ₩' + Math.round(context.raw).toLocaleString(); } } } },
-            scales: { x: { ticks: { color: '#555e72', maxTicksLimit: 10 }, grid: { display: false } }, y: { ticks: { color: '#555e72', callback: function(val) { return '₩' + (val/10000).toLocaleString() + '만'; } }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } } }
-        }
-    });
-}
-
-function openChartModal(ticker) {
-  const data = cachedMarketData[ticker]; if(!data || data._failed) return;
-  const getSliceLen = (range) => {
-    if (range === '1d') return 2; if (range === '1w') return 6; if (range === '1m') return 22;
-    if (range === '3m') return 63; if (range === '6m') return 126; if (range === '1y') return 252;
-    if (range === '3y') return 756; return 252;
-  };
-  let sliceLen = getSliceLen(state.range);
-  const displayPrices = data.prices.slice(-sliceLen);
-  const displayDates = data.dates.slice(-sliceLen);
-  if(displayPrices.length === 0) return;
-  
-  const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
-  const last = displayPrices[displayPrices.length-1], prev = displayPrices[0]; 
-  const chgPct = ((last-prev)/prev*100).toFixed(2);
-  
-  document.getElementById('mTicker').textContent = data.name;
-  document.getElementById('mBroker').textContent = data.symbol;
-  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
-  
-  const chgEl = document.getElementById('mChange');
-  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
-  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
-  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
-  
-  document.getElementById('chartOverlay').classList.add('open');
-  if (modalChartInst) modalChartInst.destroy();
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
-}
-
-function generateCardHtml(item) {
-  const data = item.data;
-  const isHeld = item.type === 'held';
-  const chgPct = item.activeChange.toFixed(2);
-  const cls = item.activeChange > 0 ? 'up' : (item.activeChange < 0 ? 'down' : 'flat');
-  const sign = item.activeChange > 0 ? '+' : '';
-  const pnl = isHeld ? (data.last - item.avg) * item.qty : null;
-  const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
-  const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '';
-  const tagContent = isHeld ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` : `<span class="icon">⭐</span> 관심종목`;
-  const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
-
-  let ownerBadgeHtml = '';
-  if (isHeld) {
-      let mainOwner = '보유';
-      const holdingTxs = state.transactions.filter(t => t.symbol === item.symbol && t.broker === item.broker && t.txType !== 'dividend');
-      if(holdingTxs.length > 0) mainOwner = holdingTxs[holdingTxs.length-1].owner; 
-      const oInfo = getOwnerInfo(mainOwner);
-      ownerBadgeHtml = `<span class="card-badge" style="margin-right:6px; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40; padding:3px 8px; font-size:10px;">${oInfo.icon} ${oInfo.name}</span>`;
-  }
-
-  return `
-    <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
-      <div style="display:flex; align-items:center;">
-        ${countryBadge}
-        ${ownerBadgeHtml}
-        <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}" style="margin-bottom:0; background:var(--bg3); color:var(--text2); border:1px solid var(--border);">
-          ${tagContent}
-        </div>
-      </div>
-      <div class="card-head" style="align-items:center; margin-top:12px;">
-        <div style="flex:1; min-width:0; margin-right:10px;">
-          <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
-          <div style="font-size:11px; font-family:var(--font-mono); color:var(--text3); margin-top:2px; white-space:nowrap;">${item.symbol}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span class="card-badge badge-${cls}">${sign}${chgPct}%</span>
-          <button class="btn-danger" onclick="event.stopPropagation();prepareTransaction('${item.symbol}','${isHeld ? item.broker.split(',')[0].trim() : ''}')" title="좌측 장부로 이동">잔고</button>
-          ${!isHeld ? `<button class="btn-danger" onclick="event.stopPropagation();removeTicker('${item.symbol}')" title="목록 삭제">✕</button>` : ''}
-        </div>
-      </div>
-      <div class="card-price">${formatPrice(data.last, item.symbol)}</div>
-      <div class="chart-wrap"><canvas id="${item.uniqueId}"></canvas></div>
-      ${isHeld ? `
-      <div class="card-footer">
-        <div>평단가 ${formatPrice(item.avg, item.symbol)}<br>수량 <strong>${item.qty}</strong>주</div>
-        <div style="text-align:right">
-          <span class="holding-val" style="color:var(--${pnl>=0?'green':'red'})">
-            ${pnl>=0?'+':''}${formatPrice(Math.abs(pnl), item.symbol)}<br>(${pnl>=0?'+':''}${pnlPct}%)
-          </span>
-        </div>
-      </div>` : ''}
-    </div>`;
 }
 
 // ── 9. 메인 렌더 함수 (전체 흐름 제어) ──
@@ -2176,7 +2215,7 @@ async function render() {
   // 🔥 병렬 + 지연 처리 (API 차단 방지)
   let symbolsToFetch = allSymbols.filter(t => !cachedMarketData[t]);
   if (symbolsToFetch.length > 0) {
-    const batchSize = 5;
+    const batchSize = 3; // 야후 파이낸스 차단 방지를 위해 3개씩으로 낮춤
     for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
       if(container) {
         container.innerHTML = `<div class="empty" style="border:none; line-height:1.6;">
@@ -2193,7 +2232,7 @@ async function render() {
         else cachedMarketData[t] = { _failed: true };
       }));
       if (i + batchSize < symbolsToFetch.length) {
-        await new Promise(res => setTimeout(res, 500)); 
+        await new Promise(res => setTimeout(res, 1500)); // 지연 시간을 1.5초로 늘림
       }
     }
   }
@@ -2204,11 +2243,9 @@ async function render() {
     let avg = sh.qty > 0 ? sh.totalCost / sh.qty : 0;
     let brokerStr = Array.from(sh.brokers).join(', ');
     
-    // API 통신이 실패해도 내역이 보이게 강제로 추가
     if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
       displayItems.push({ type: 'held', symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, data: cachedMarketData[sym] });
     } else {
-      // 🌟 실패한 종목은 가상의 빈 데이터를 생성해서 화면에 띄움
       let fallbackName = sym;
       if (localStockDB && localStockDB.length > 0) {
           let match = localStockDB.find(s => s.symbol === sym);
@@ -2238,12 +2275,12 @@ async function render() {
 
   displayItems.forEach(item => {
     item.uniqueId = 'chart_' + Math.random().toString(36).substring(2, 10);
-    if(item.data && item.data.prices) {
+    if(item.data && item.data.prices && item.data.prices.length > 0) {
       const prices = item.data.prices;
       const last = item.data.last;
       item.sliceLen = currentSliceLen; 
-      const pStart = prices[Math.max(0, prices.length - currentSliceLen)] || item.data.prev;
-      item.activeChange = ((last - pStart) / pStart) * 100;
+      const pStart = prices[Math.max(0, prices.length - currentSliceLen)] || item.data.prev || last;
+      item.activeChange = pStart > 0 ? ((last - pStart) / pStart) * 100 : 0;
       if(isNaN(item.activeChange)) item.activeChange = 0;
       
       item.evalAmt = item.qty * last;
@@ -2296,7 +2333,6 @@ async function render() {
   container.innerHTML = html;
 
   displayItems.forEach(item => {
-    // 대체(Fallback) 데이터인 경우 차트를 그리지 않음
     if (item.data && item.data.prices && !item._isFallback) {
       const displayPrices = item.data.prices.slice(-item.sliceLen);
       const displayDates = item.data.dates.slice(-item.sliceLen);
