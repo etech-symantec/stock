@@ -1193,6 +1193,3 @@ async function render() {
     }
   });
 }
-</script>
-</body>
-</html>
