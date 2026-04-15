@@ -835,6 +835,295 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
+function resetAllTransactions() {
+  if(confirm("🚨 경고: 모든 거래 내역이 영구적으로 삭제됩니다.\n정말로 전체 데이터를 초기화하시겠습니까?")) {
+    state.transactions = [];
+    state.tickers = ['AAPL','TSLA','005930.KS']; 
+    saveState();
+    renderTxList();
+    if(currentView === 'history') renderHistoryDashboard();
+    else render();
+    triggerAutoSync();
+    closeModal('masterSettingsOverlay');
+    alert("데이터 초기화가 완료되었습니다.");
+  }
+}
+
+function exportData() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "stock_manager_backup.json");
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  document.body.removeChild(dlAnchorElem);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(data.tickers && data.transactions) {
+        state = data;
+        if(!state.owners) {
+           state.owners = {
+             user1: { name: state.ownerNames?.user1 || '보유자1', color: '#7c6af7', icon: '👤' },
+             user2: { name: state.ownerNames?.user2 || '보유자2', color: '#00c87a', icon: '👤' }
+           };
+        }
+        saveState();
+        cachedMarketData = {};
+        updateOwnerLabels();
+        renderTxList();
+        if (currentView === 'history') renderHistoryDashboard();
+        else render();
+        triggerAutoSync();
+        alert('데이터를 성공적으로 복원했습니다.');
+      } else {
+        alert('올바른 백업 파일 형식이 아닙니다.');
+      }
+    } catch(err) {
+      alert('파일을 읽는 중 오류가 발생했습니다.');
+    }
+    event.target.value = '';
+    closeModal('masterSettingsOverlay');
+  };
+  reader.readAsText(file);
+}
+
+function downloadCsvSample() {
+  const csvContent = "일자,소유자,계좌,유형,종목,수량,단가,세금(세전/세후)\n2026-04-10,보유자1,키움증권,매수,005930,10,80000,\n2026-04-12,보유자2,토스증권,배당,AAPL,0,15.5,세전\n2026-04-14,보유자1,미래에셋,매도,TSLA,-5,170.2,세후";
+  const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'sample_transactions.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function importCsvData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const lines = text.split('\n');
+    let addedCount = 0;
+    
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, '').trim());
+      if (parts.length >= 7) {
+        const date = parts[0];
+        let owner = parts[1];
+        const broker = parts[2];
+        const typeStr = parts[3];
+        let rawSymbol = parts[4];
+        let symbol = rawSymbol.toUpperCase();
+        if (localStockDB && localStockDB.length > 0) {
+            // 한글 이름이나 심볼과 일치하는 항목 찾기
+            let matched = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === symbol);
+            if (matched) {
+                symbol = matched.symbol; // DB에 있으면 정확한 티커 코드로 변경
+            } else if (/^\d{6}$/.test(symbol)) {
+                symbol += '.KS'; // DB에 없는데 6자리 숫자면 한국 주식 처리
+            }
+        } else if (/^\d{6}$/.test(symbol)) {
+            symbol += '.KS';
+        }
+        let qty = parseFloat(parts[5].replace(/,/g, '')) || 0;
+        let price = parseFloat(parts[6].replace(/,/g, '')) || 0;
+        const taxStatus = parts.length > 7 ? parts[7] : '';
+
+        if (!date || !symbol || isNaN(price)) continue;
+
+        let txType = 'trade';
+        if (typeStr.includes('배당') || typeStr.toLowerCase() === 'dividend') { txType = 'dividend'; qty = 0; }
+        else if (typeStr.includes('매도') || typeStr.toLowerCase() === 'sell') { txType = 'sell'; qty = -Math.abs(qty); }
+        else if (typeStr.includes('매수') || typeStr.toLowerCase() === 'buy') { txType = 'buy'; qty = Math.abs(qty); }
+
+        if (/^\d{6}$/.test(symbol)) symbol += '.KS';
+
+        if (txType === 'dividend' && taxStatus === '세전') {
+            const taxRate = isKorean(symbol) ? 0.154 : 0.15;
+            price = price * (1 - taxRate);
+        }
+
+        if (owner === '보유자1') owner = state.owners.user1.name;
+        else if (owner === '보유자2') owner = state.owners.user2.name;
+
+        state.transactions.push({ id: Date.now() + i, date, owner, broker, symbol, qty: (txType === 'dividend' ? 0 : qty), price, txType });
+        if (!state.tickers.includes(symbol)) state.tickers.push(symbol);
+        addedCount++;
+      }
+    }
+    if (addedCount > 0) {
+      saveState();
+      renderTxList();
+      if (currentView === 'history') renderHistoryDashboard();
+      else render();
+      triggerAutoSync();
+      closeModal('masterSettingsOverlay');
+      alert(addedCount + "건의 거래내역이 추가되었습니다.");
+    } else {
+      alert("추가된 내역이 없습니다.\nCSV 형식을 확인해주세요.");
+    }
+    event.target.value = ''; 
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
+function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
+
+async function getGithubFileSha(settings, path) {
+  const url = `https://api.github.com/repos/${settings.user}/${settings.repo}/contents/${path}`;
+  const res = await fetch(url, { headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' } });
+  if (res.ok) { const json = await res.json(); return { sha: json.sha, content: json.content }; }
+  return null;
+}
+
+function updateSyncStatus(status) {
+  const el = document.getElementById('syncStatus');
+  const spinner = document.getElementById('syncSpinner');
+  const text = document.getElementById('syncText');
+  el.className = 'sync-status';
+  if(status === 'syncing') {
+    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
+  } else if(status === 'success') {
+    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
+  } else if(status === 'error') {
+    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
+  } else {
+    spinner.style.display = 'none'; text.textContent = '';
+  }
+}
+
+async function pushToGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  
+  if(!silent) {
+    if(!user || !repo || !token) { alert('GitHub 연동 정보를 모두 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+
+  updateSyncStatus('syncing');
+  const path = 'data/my_portfolio.json';
+  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+  
+  try {
+    const fileInfo = await getGithubFileSha({user, repo, token}, path);
+    const content = utf8_to_b64(JSON.stringify(state, null, 2));
+    const body = { message: `🗂️ 거래장부 자동 동기화 (${new Date().toLocaleString()})`, content: content };
+    if (fileInfo) body.sha = fileInfo.sha;
+
+    const putRes = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }, body: JSON.stringify(body) });
+    if(putRes.ok) { 
+      updateSyncStatus('success');
+      if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('masterSettingsOverlay'); }
+    } else { 
+      updateSyncStatus('error');
+      if(!silent) alert('저장 실패. 토큰 권한과 정보를 확인하세요.'); 
+    }
+  } catch(e) { 
+    updateSyncStatus('error');
+    if(!silent) alert('네트워크 에러 발생'); 
+  }
+}
+
+function triggerAutoSync() {
+  const s = getGhSettings();
+  if(s.autoSync && s.token) pushToGithub(true);
+}
+
+async function pullFromGithub(silent = false) {
+  let user = document.getElementById('ghUser').value.trim();
+  let repo = document.getElementById('ghRepo').value.trim();
+  let token = document.getElementById('ghToken').value.trim();
+  
+  if(!silent) {
+    if(!user || !repo || !token) { alert('정보를 입력해주세요.'); return; }
+    let s = getGhSettings(); s.user = user; s.repo = repo; s.token = token; saveGhSettings(s);
+  } else {
+    let s = getGhSettings(); user = s.user; repo = s.repo; token = s.token;
+    if(!user || !repo || !token) return;
+  }
+
+  const path = 'data/my_portfolio.json';
+  try {
+    const fileInfo = await getGithubFileSha({user, token, repo}, path);
+    if (fileInfo && fileInfo.content) {
+      const dataStr = b64_to_utf8(fileInfo.content);
+      const data = JSON.parse(dataStr);
+      if(data.tickers && data.transactions) {
+        state = data; saveState(); cachedMarketData = {};
+        updateOwnerLabels(); renderTxList(); render();
+        updateSyncStatus('success');
+        if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('masterSettingsOverlay'); }
+      } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
+    } else if(!silent) alert('저장소에 파일이 없습니다.');
+  } catch(e) { if(!silent) alert('가져오기 실패'); }
+}
+
+// ── 4. UI 탭 및 메뉴 제어 ──
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const btn = document.getElementById('btnOpenSidebar');
+  if (sb.classList.contains('collapsed')) {
+    sb.classList.remove('collapsed');
+    btn.style.display = 'none';
+  } else {
+    sb.classList.add('collapsed');
+    btn.style.display = 'flex';
+  }
+}
+
+function setSidebarView(view) {
+  const vLedger = document.getElementById('sidebarLedgerView');
+  const vYield = document.getElementById('sidebarYieldView');
+  const tLedger = document.getElementById('tabLedger');
+  const tYield = document.getElementById('tabYield');
+
+  if (view === 'ledger') {
+    vLedger.style.display = 'flex'; vYield.style.display = 'none';
+    tLedger.classList.add('active'); tYield.classList.remove('active');
+  } else {
+    vLedger.style.display = 'none'; vYield.style.display = 'flex';
+    tLedger.classList.remove('active'); tYield.classList.add('active');
+    render(); 
+  }
+}
+
+function updateOwnerLabels() {
+  const o1 = state.owners.user1;
+  const o2 = state.owners.user2;
+  document.getElementById('tabUser1').textContent = `${o1.icon} ${o1.name}`;
+  document.getElementById('tabUser2').textContent = `${o2.icon} ${o2.name}`;
+  document.getElementById('lblUser1').innerHTML = `${o1.icon} ${o1.name}`;
+  document.getElementById('lblUser2').innerHTML = `${o2.icon} ${o2.name}`;
+  document.getElementById('divTabUser1').textContent = `${o1.icon} ${o1.name}`;
+  document.getElementById('divTabUser2').textContent = `${o2.icon} ${o2.name}`;
+}
+
+function toggleAccountFilter(broker) {
+  if (activeAccountFilter === broker) activeAccountFilter = null;
+  else activeAccountFilter = broker;
+  render();
+}
+
 // ── UI 로직 ──
 function toggleTxType() {
   const type = document.querySelector('input[name="txType"]:checked').value;
