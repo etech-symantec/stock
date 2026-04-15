@@ -211,4 +211,3 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 
 .settings-section { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
 .settings-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-</style>
