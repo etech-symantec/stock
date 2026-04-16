@@ -1172,34 +1172,40 @@ function generateCardHtml(item) {
   const pnl = isHeld ? (data.last - item.avg) * item.qty : null;
   const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
   const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '';
-  
-  // 🌟 [수정] 관심종목 태그에 클릭 이벤트(removeTickerConfirm) 추가
-  const tagContent = isHeld 
-    ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` 
-    : `<span class="icon" style="font-style:normal;">⭐</span> 관심종목 (클릭 시 삭제)`;
 
-  const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
-
-  let ownerBadgeHtml = '';
+  // 🌟 [수정] 카드에 표시될 소유자 정보를 먼저 가져옵니다.
+  let oInfo = { icon: '💼', name: '보유' };
   if (isHeld) {
       let mainOwner = '보유';
       const holdingTxs = state.transactions.filter(t => t.symbol === item.symbol && t.broker === item.broker && t.txType !== 'dividend');
       if(holdingTxs.length > 0) mainOwner = holdingTxs[holdingTxs.length-1].owner; 
-      const oInfo = getOwnerInfo(mainOwner);
-      ownerBadgeHtml = `<span class="card-badge" style="margin-right:6px; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40; padding:3px 8px; font-size:10px;">${oInfo.icon} ${oInfo.name}</span>`;
+      oInfo = getOwnerInfo(mainOwner);
   }
 
-  // 🌟 [추가] 커스텀 태그(메모) UI 생성
+  // 🌟 [수정] 불필요한 오너 뱃지 버튼을 없애고, 기본 보유 태그 안에 [아이콘 + 소유자 이름 | 계좌명]을 합쳤습니다.
+  const tagContent = isHeld 
+    ? `<span class="icon">${oInfo.icon}</span> ${oInfo.name} <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` 
+    : `<span class="icon" style="font-style:normal;">⭐</span> 관심종목 <span style="margin-left:4px; font-weight:bold; opacity:0.7;">✕</span>`;
+
+  const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
+
+  // 🌟 [수정] 태그 텍스트를 쉼표(,)로 쪼개서 최대 5개까지만 배열로 만듭니다.
   const customTagText = state.tags && state.tags[item.symbol] ? state.tags[item.symbol] : '';
-  const customTagHtml = customTagText 
-      ? `<div class="custom-tag-badge" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name}')" title="태그 수정/삭제">💬 ${customTagText}</div>`
-      : `<div class="add-tag-btn" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name}')" title="메모나 태그를 추가하세요">+ 태그 추가</div>`;
+  const tagsArray = customTagText.split(',').map(t => t.trim()).filter(t => t).slice(0, 5);
+  
+  let tagsHtml = '';
+  if (tagsArray.length > 0) {
+      tagsHtml = `<div class="tags-container" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name}')" title="태그 수정/삭제">` + 
+                 tagsArray.map(t => `<div class="custom-tag-badge">${t}</div>`).join('') +
+                 `</div>`;
+  } else {
+      tagsHtml = `<div class="tags-container"><div class="add-tag-btn" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name}')" title="메모나 태그를 추가하세요">+ 태그 추가</div></div>`;
+  }
 
   return `
     <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
       <div style="display:flex; align-items:center;">
         ${countryBadge}
-        ${ownerBadgeHtml}
         <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" 
              title="${isHeld ? '보유 | ' + brokerDisp : '관심종목 삭제'}" 
              style="margin-bottom:0; background:var(--bg3); color:var(--text2); border:1px solid var(--border); ${!isHeld ? 'cursor:pointer;' : ''}"
@@ -1207,8 +1213,6 @@ function generateCardHtml(item) {
           ${tagContent}
         </div>
       </div>
-      
-      ${customTagHtml}
 
       <div class="card-head" style="align-items:center; margin-top:12px;">
         <div style="flex:1; min-width:0; margin-right:10px;">
@@ -1222,8 +1226,13 @@ function generateCardHtml(item) {
           <button class="btn-danger" onclick="event.stopPropagation();prepareTransaction('${item.symbol}','${isHeld ? item.broker.split(',')[0].trim() : ''}')" title="좌측 장부로 이동">잔고</button>
         </div>
       </div>
+      
       <div class="card-price">${formatPrice(data.last, item.symbol)}</div>
+      
       <div class="chart-wrap"><canvas id="${item.uniqueId}"></canvas></div>
+      
+      ${tagsHtml}
+
       ${isHeld ? `
       <div class="card-footer">
         <div>평단가 ${formatPrice(item.avg, item.symbol)}<br>수량 <strong>${item.qty}</strong>주</div>
