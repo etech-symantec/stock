@@ -21,7 +21,7 @@ function loadState() {
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y', owners: { user1: { name: '보유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '보유자2', color: '#00c87a', icon: '👤' } } };
+  return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '보유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '보유자2', color: '#00c87a', icon: '👤' } } };
 }
 
 let state = loadState();
@@ -1172,7 +1172,12 @@ function generateCardHtml(item) {
   const pnl = isHeld ? (data.last - item.avg) * item.qty : null;
   const pnlPct = isHeld && item.avg > 0 ? ((data.last-item.avg)/item.avg*100).toFixed(2) : null;
   const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '';
-  const tagContent = isHeld ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` : `<span class="icon">⭐</span> 관심종목`;
+  
+  // 🌟 [수정] 관심종목 태그에 클릭 이벤트(removeTickerConfirm) 추가
+  const tagContent = isHeld 
+    ? `<span class="icon">💼</span> 보유 <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` 
+    : `<span class="icon" style="font-style:normal;">⭐</span> 관심종목 (클릭 시 삭제)`;
+
   const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
 
   let ownerBadgeHtml = '';
@@ -1184,15 +1189,27 @@ function generateCardHtml(item) {
       ownerBadgeHtml = `<span class="card-badge" style="margin-right:6px; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40; padding:3px 8px; font-size:10px;">${oInfo.icon} ${oInfo.name}</span>`;
   }
 
+  // 🌟 [추가] 커스텀 태그(메모) UI 생성
+  const customTagText = state.tags && state.tags[item.symbol] ? state.tags[item.symbol] : '';
+  const customTagHtml = customTagText 
+      ? `<div class="custom-tag-badge" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name}')" title="태그 수정/삭제">💬 ${customTagText}</div>`
+      : `<div class="add-tag-btn" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name}')" title="메모나 태그를 추가하세요">+ 태그 추가</div>`;
+
   return `
     <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
       <div style="display:flex; align-items:center;">
         ${countryBadge}
         ${ownerBadgeHtml}
-        <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" title="${isHeld ? '보유 | ' + brokerDisp : '관심종목'}" style="margin-bottom:0; background:var(--bg3); color:var(--text2); border:1px solid var(--border);">
+        <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" 
+             title="${isHeld ? '보유 | ' + brokerDisp : '관심종목 삭제'}" 
+             style="margin-bottom:0; background:var(--bg3); color:var(--text2); border:1px solid var(--border); ${!isHeld ? 'cursor:pointer;' : ''}"
+             ${!isHeld ? `onclick="event.stopPropagation(); removeTickerConfirm('${item.symbol}', '${data.name}')"` : ''}>
           ${tagContent}
         </div>
       </div>
+      
+      ${customTagHtml}
+
       <div class="card-head" style="align-items:center; margin-top:12px;">
         <div style="flex:1; min-width:0; margin-right:10px;">
           <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
@@ -1203,7 +1220,6 @@ function generateCardHtml(item) {
         <div style="display:flex;align-items:center;gap:6px">
           <span class="card-badge badge-${cls}">${sign}${chgPct}%</span>
           <button class="btn-danger" onclick="event.stopPropagation();prepareTransaction('${item.symbol}','${isHeld ? item.broker.split(',')[0].trim() : ''}')" title="좌측 장부로 이동">잔고</button>
-          ${!isHeld ? `<button class="btn-danger" onclick="event.stopPropagation();removeTicker('${item.symbol}')" title="목록 삭제">✕</button>` : ''}
         </div>
       </div>
       <div class="card-price">${formatPrice(data.last, item.symbol)}</div>
@@ -2211,4 +2227,44 @@ function processPendingCsv() {
     if (currentView === 'history') renderHistoryDashboard(); else render();
     triggerAutoSync();
     alert(addedCount + "건의 거래내역이 정상적으로 추가되었습니다.");
+}
+
+// ── 🌟 [추가] 관심종목 삭제 경고창 함수 ──
+function removeTickerConfirm(symbol, name) {
+    if (confirm(`'${name || symbol}' 종목을 관심종목에서 삭제하시겠습니까?`)) {
+        removeTicker(symbol);
+    }
+}
+
+// ── 🌟 [추가] 태그/메모 모달 열기 및 저장 로직 ──
+function openTagModal(symbol, name) {
+    document.getElementById('tagModalSymbol').value = symbol;
+    document.getElementById('tagModalTickerLabel').textContent = `${name} (${symbol})`;
+    
+    // 기존 태그가 있으면 불러오기
+    const currentTag = (state.tags && state.tags[symbol]) ? state.tags[symbol] : '';
+    document.getElementById('inputStockTag').value = currentTag;
+    
+    document.getElementById('tagOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('inputStockTag').focus(), 100);
+}
+
+function saveStockTag(forcedValue) {
+    const symbol = document.getElementById('tagModalSymbol').value;
+    if (!symbol) return;
+
+    if (!state.tags) state.tags = {};
+
+    let newTag = forcedValue !== undefined ? forcedValue : document.getElementById('inputStockTag').value.trim();
+
+    if (newTag === '') {
+        delete state.tags[symbol]; // 빈 값이면 태그 삭제
+    } else {
+        state.tags[symbol] = newTag;
+    }
+
+    saveState();
+    closeModal('tagOverlay');
+    render(); // 화면 즉시 새로고침
+    triggerAutoSync(); // 클라우드 동기화
 }
