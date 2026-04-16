@@ -1,5 +1,5 @@
 // ==========================================
-// 1. 핵심 유틸 및 데이터 로드
+// 1. 핵심 유틸 및 데이터 초기화
 // ==========================================
 const STORE_KEY = 'stockwatch_real_v69'; 
 
@@ -16,9 +16,7 @@ function loadState() {
          };
       }
       if(parsed.transactions) {
-          parsed.transactions.forEach(tx => {
-              tx.date = formatDate(tx.date);
-          });
+          parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
       return parsed;
     }
@@ -45,6 +43,10 @@ let localStockDB = [];
 let currentUsdKrw = 1350; 
 let isExchangeRateFetched = false;
 
+// 🌟 CSV 수동 매핑을 위한 임시 저장 변수
+let pendingCsvData = [];
+let unmatchedSymbols = [];
+
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
 function formatDate(dateStr) {
@@ -53,7 +55,7 @@ function formatDate(dateStr) {
     if (d.length === 8) {
         return `${d.substring(0,4)}-${d.substring(4,6)}-${d.substring(6,8)}`;
     }
-    const parts = dateStr.split(/[\.\-\/]/);
+   const parts = dateStr.split(/[\.\-\/]/);
     if (parts.length >= 3) {
         let year = parts[0].trim();
         let month = parts[1].trim().padStart(2, '0');
@@ -253,16 +255,27 @@ function importCsvData(event) {
     
     const syncText = document.getElementById('syncText');
     const syncSpinner = document.getElementById('syncSpinner');
-    syncText.textContent = `데이터 준비 중... (0 / ${totalLines})`;
-    syncSpinner.style.display = 'block';
-
+    if(syncText && syncSpinner) {
+        syncText.textContent = `데이터 준비 중... (0 / ${totalLines})`;
+        syncSpinner.style.display = 'block';
+    }
     await new Promise(resolve => setTimeout(resolve, 10));
+
+    // 기본적인 단축키 매핑 (여기에 없으면 모달로 이동)
+    const manualMap = {
+        "소파이": "SOFI", "알파벳A": "GOOGL", "구글": "GOOGL",
+        "백트홀딩스": "BKKT", "유나이티드헬스그룹": "UNH",
+        "애플": "AAPL", "테슬라": "TSLA", "마이크로소프트": "MSFT", 
+        "엔비디아": "NVDA", "아마존": "AMZN", "메타": "META",
+        "삼성전자우": "005935.KS", "현대차우": "005385.KS",
+        "TIGER미국배당다우존스": "458730.KS", "TIGER미국S&P500": "360750.KS"
+    };
 
     for (let i = 1; i < totalLines; i++) {
       const line = lines[i].trim();
       if (!line) continue;
       
-      if (i % 10 === 0) {
+      if (i % 10 === 0 && syncText) {
           syncText.textContent = `데이터 처리 중... (${i} / ${totalLines})`;
           await new Promise(resolve => setTimeout(resolve, 0)); 
       }
@@ -280,8 +293,14 @@ function importCsvData(event) {
         let matched = false;
         let finalSymbol = rawSymbol;
 
-        // 1. 로컬 DB 검색
-        if (localStockDB && localStockDB.length > 0) {
+        // 1. 하드코딩 매핑 우선
+        if (manualMap[cleanRaw]) {
+            finalSymbol = manualMap[cleanRaw];
+            matched = true;
+        }
+
+        // 2. 로컬 DB에서 공백 무시하고 검색
+        if (!matched && localStockDB && localStockDB.length > 0) {
             let m = localStockDB.find(s => 
                 s.name.replace(/\s+/g, '').toUpperCase() === cleanRaw || 
                 s.symbol.replace(/\s+/g, '').toUpperCase() === cleanRaw
@@ -292,15 +311,22 @@ function importCsvData(event) {
             }
         }
 
-        // 2. 숫자로만 이루어져 있으면 KOSPI로 간주
-        if (!matched && /^\d{6}$/.test(finalSymbol)) {
-            finalSymbol += '.KS';
-            matched = true;
+        // 3. 야후 파이낸스에서 정상 인식하는 완벽한 영문/숫자 티커인지 확인
+        if (!matched) {
+            if (/^\d{6}$/.test(cleanRaw)) {
+                finalSymbol = cleanRaw + '.KS';
+                matched = true;
+            } else if (/^[A-Za-z0-9.=^-]+$/.test(cleanRaw)) {
+                finalSymbol = cleanRaw;
+                matched = true;
+            }
         }
 
-        // 3. 매칭 실패 시 수동 매핑 리스트에 추가
-        if (!matched && !unmatchedSymbols.includes(rawSymbol)) {
-            unmatchedSymbols.push(rawSymbol);
+        // 4. 매칭이 안 된 한글/특수문자 포함 종목 -> 수동 매핑 모달로 보냄!
+        if (!matched) {
+            if (!unmatchedSymbols.includes(rawSymbol)) {
+                unmatchedSymbols.push(rawSymbol);
+            }
         }
 
         let qtyStr = parts[5] ? parts[5].replace(/[^0-9.-]/g, '') : '';
@@ -336,10 +362,10 @@ function importCsvData(event) {
       }
     }
     
-    syncSpinner.style.display = 'none';
-    syncText.textContent = '';
+    if(syncSpinner) syncSpinner.style.display = 'none';
+    if(syncText) syncText.textContent = '';
 
-    // 🌟 여기서 매핑할 종목이 있으면 모달창 띄우기
+    // 🌟 여기서 매핑할 종목이 있으면 무조건 모달창 띄우기
     if (pendingCsvData.length > 0) {
         if (unmatchedSymbols.length > 0) {
             openCsvMappingModal(); 
@@ -353,6 +379,117 @@ function importCsvData(event) {
   };
   reader.readAsText(file, 'UTF-8');
 }
+
+// 🌟 CSV 모달 창 열기
+function openCsvMappingModal() {
+    const container = document.getElementById('unmatchedContainer');
+    if(!container) {
+        alert("HTML 파일에 매핑 모달 UI가 없습니다. index.html을 업데이트 해주세요.");
+        return;
+    }
+    container.innerHTML = unmatchedSymbols.map((sym, idx) => `
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:6px; margin-bottom:0;">
+          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px;">📌 원본: <span style="color:var(--accent);">${sym}</span></label>
+          <div style="position:relative;">
+             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 직접 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
+             <ul id="mapDropdown_${idx}" class="search-dropdown" style="max-height:150px; z-index:99999;"></ul>
+          </div>
+        </div>
+    `).join('');
+    document.getElementById('csvMappingOverlay').classList.add('open');
+}
+
+// 🌟 CSV 모달 내부 검색기능
+function handleMapSearch(inputElem, idx) {
+   const query = inputElem.value.trim().toLowerCase();
+   const dropdown = document.getElementById(`mapDropdown_${idx}`);
+   if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
+   
+   const results = localStockDB.filter(s => s.symbol.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)).slice(0, 6);
+   if (results.length === 0) { dropdown.style.display = 'none'; return; }
+   
+   dropdown.innerHTML = results.map(q => `
+     <li class="search-item" style="padding:10px;" onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
+       <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
+         <span style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
+         <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
+       </div>
+       <span style="color:var(--accent); font-family:var(--font-mono); font-size:12px; font-weight:700;">${q.symbol}</span>
+     </li>
+   `).join('');
+   dropdown.style.display = 'block';
+}
+
+function selectMapResult(idx, symbol, name) {
+   const input = document.getElementById(`mapInput_${idx}`);
+   input.value = `${name} (${symbol})`; 
+   input.dataset.mappedSymbol = symbol;
+   document.getElementById(`mapDropdown_${idx}`).style.display = 'none';
+}
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-dropdown') && !e.target.closest('.form-input')) {
+        document.querySelectorAll('[id^="mapDropdown_"]').forEach(el => el.style.display = 'none');
+    }
+});
+
+function cancelCsvImport() {
+    pendingCsvData = [];
+    unmatchedSymbols = [];
+    closeModal('csvMappingOverlay');
+}
+
+// 🌟 사용자가 입력한 매핑 데이터로 최종 저장
+function processPendingCsv() {
+    const mappingDict = {};
+    for(let i=0; i<unmatchedSymbols.length; i++) {
+        const raw = unmatchedSymbols[i];
+        const input = document.getElementById(`mapInput_${i}`);
+        if(input) {
+            // 사용자가 검색해서 선택한 티커가 있으면 1순위, 없으면 직접 입력한 텍스트 2순위, 둘 다 없으면 원본
+            const mapped = input.dataset.mappedSymbol || input.value.trim().toUpperCase() || raw;
+            mappingDict[raw] = mapped;
+        } else {
+            mappingDict[raw] = raw;
+        }
+    }
+
+    let addedCount = 0;
+    pendingCsvData.forEach(tx => {
+        let finalSym = tx.isMatched ? tx.matchedSymbol : mappingDict[tx.originalSymbol];
+        
+        let finalPrice = tx.rawPrice;
+        if (tx.txType === 'dividend' && tx.taxStatus === '세전') {
+            const taxRate = isKorean(finalSym) ? 0.154 : 0.15;
+            finalPrice = finalPrice * (1 - taxRate);
+        }
+
+        state.transactions.push({
+            id: tx.id,
+            date: tx.date,
+            owner: tx.owner,
+            broker: tx.broker,
+            symbol: finalSym.toUpperCase(),
+            qty: tx.qty,
+            price: finalPrice,
+            txType: tx.txType
+        });
+        if (!state.tickers.includes(finalSym.toUpperCase())) state.tickers.push(finalSym.toUpperCase());
+        addedCount++;
+    });
+
+    pendingCsvData = [];
+    unmatchedSymbols = [];
+    closeModal('csvMappingOverlay');
+    closeModal('masterSettingsOverlay');
+    
+    saveState();
+    renderTxList();
+    if (currentView === 'history') renderHistoryDashboard(); else render();
+    triggerAutoSync();
+    alert(addedCount + "건의 거래내역이 정상적으로 추가되었습니다.");
+}
+
 function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
 function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
@@ -453,7 +590,6 @@ async function pullFromGithub(silent = false) {
 // ==========================================
 // 3. UI 탭 및 거래 관리 로직
 // ==========================================
-
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const btn = document.getElementById('btnOpenSidebar');
@@ -636,8 +772,9 @@ function addOrUpdateTransaction() {
   if(typeVal !== 'dividend' && qty === 0) { alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return; }
   
   let rawSymbol = symbol;
+  let cleanRaw = rawSymbol.replace(/\s+/g, '').toUpperCase();
   if (localStockDB && localStockDB.length > 0) {
-      let matched = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === rawSymbol);
+      let matched = localStockDB.find(s => s.name.replace(/\s+/g,'').toUpperCase() === cleanRaw || s.symbol.toUpperCase() === rawSymbol);
       if(matched) symbol = matched.symbol;
       else if (/^\d{6}$/.test(symbol)) symbol += '.KS';
   } else {
@@ -825,7 +962,7 @@ function addManualTicker() {
     if(currentView === 'history') setView('all');
     let symbolToAdd = val;
     if (localStockDB && localStockDB.length > 0) {
-        let matched = localStockDB.find(s => s.name === rawVal || s.symbol.toUpperCase() === val);
+        let matched = localStockDB.find(s => s.name.replace(/\s+/g, '') === rawVal.replace(/\s+/g, '') || s.symbol.toUpperCase() === val);
         if(matched) symbolToAdd = matched.symbol;
     }
     addTickerToPortfolio(symbolToAdd);
@@ -863,9 +1000,8 @@ async function fetchExchangeRate() {
 }
 
 async function fetchYahooData(symbol) {
-  // 🌟 [핵심 개선] 야후가 인식 못하는 한글, 띄어쓰기 등 이상한 문자가 있으면 아예 API 요청을 차단하여 404를 원천 방지
+  // 🌟 [안전 차단] 야후가 인식 못하는 한글, 특수문자가 있으면 워닝 로그 없이 조용히 실패 처리
   if (!/^[A-Za-z0-9.=^-]+$/.test(symbol)) {
-    console.warn(`[Skip API Request] Invalid format for Yahoo Finance: ${symbol}`);
     return { _failed: true };
   }
   
@@ -1202,8 +1338,28 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         data: {
             labels: finalDisplayDates,
             datasets: [
-                { label: '평가액', data: finalEvalData, borderColor: evalColor, backgroundColor: evalBg, borderWidth: 2, pointRadius: 0, fill: true, tension: 0.1, order: 1 },
-                { label: '투자 원금', data: finalCostData, borderColor: '#8890a4', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, tension: 0.1, order: 2 }
+                {
+                    label: '평가액',
+                    data: finalEvalData,
+                    borderColor: evalColor,
+                    backgroundColor: evalBg,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.1,
+                    order: 1
+                },
+                {
+                    label: '투자 원금',
+                    data: finalCostData,
+                    borderColor: '#8890a4',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.1,
+                    order: 2
+                }
             ]
         },
         options: {
@@ -1224,13 +1380,12 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
-    
     if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
 
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
-
     let treemapDataMap = {};
+    
     if (fullDisplayItems) {
       fullDisplayItems.forEach(item => {
         if(item.type === 'held' && item.evalAmt > 0) {
@@ -1263,18 +1418,14 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
         let broker = h.broker || '미지정'; 
         
         if(isKorean(h.symbol)) { 
-          krwSummary.totalEval += eAmt;
-          krwSummary.totalCost += cAmt;
+          krwSummary.totalEval += eAmt; krwSummary.totalCost += cAmt;
           if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
-          krwSummary.accounts[broker].eval += eAmt;
-          krwSummary.accounts[broker].cost += cAmt;
+          krwSummary.accounts[broker].eval += eAmt; krwSummary.accounts[broker].cost += cAmt;
           krwSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
         } else { 
-          usdSummary.totalEval += eAmt;
-          usdSummary.totalCost += cAmt;
+          usdSummary.totalEval += eAmt; usdSummary.totalCost += cAmt;
           if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
-          usdSummary.accounts[broker].eval += eAmt;
-          usdSummary.accounts[broker].cost += cAmt;
+          usdSummary.accounts[broker].eval += eAmt; usdSummary.accounts[broker].cost += cAmt;
           usdSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
         }
       }
@@ -1302,14 +1453,12 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
     document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
     document.getElementById('globalTotalDiv').textContent = `₩ ${Math.round(globalDiv).toLocaleString()}`;
-    
     const gRoiEl = document.getElementById('globalTotalRoi');
     const signG = globalPnl >= 0 ? '+' : '';
     gRoiEl.innerHTML = `${signG}₩${Math.round(Math.abs(globalPnl)).toLocaleString()}<br><span style="font-size:12px; font-weight:500">(${signG}${globalRoi.toFixed(2)}%)</span>`;
     gRoiEl.style.color = globalPnl >= 0 ? 'var(--green)' : (globalCost > 0 ? 'var(--red)' : 'var(--text)');
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
-    // ── 🌐 글로벌 Treemap 렌더링 ──
     const tmContainer = document.getElementById('allocationTreemap');
     if (tmContainer) {
         if (treemapData.length === 0) {
@@ -1422,7 +1571,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
       let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
       let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
-      
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
@@ -1480,7 +1628,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let costPct = maxUsdAccVal > 0 ? (d.cost / maxUsdAccVal * 100) : 0;
       let evalPct = maxUsdAccVal > 0 ? (d.eval / maxUsdAccVal * 100) : 0;
       let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
-      
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
@@ -1940,6 +2087,7 @@ async function render() {
   container.innerHTML = html;
 
   displayItems.forEach(item => {
+    // 대체(Fallback) 데이터인 경우 차트를 그리지 않음
     if (item.data && item.data.prices && !item._isFallback) {
       const displayPrices = item.data.prices.slice(-item.sliceLen);
       const displayDates = item.data.dates.slice(-item.sliceLen);
@@ -1951,18 +2099,20 @@ async function render() {
 // ==========================================
 // 6. CSV 알 수 없는 종목 수동 매핑 모달 로직
 // ==========================================
-let pendingCsvData = [];
-let unmatchedSymbols = [];
-
-// CSV 업로드 중 매핑 모달 열기
+// CSV 모달 창 열기
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
+    if(!container) {
+        alert("HTML 파일에 매핑 모달 UI가 없습니다. index.html을 업데이트 해주세요.");
+        return;
+    }
+    // 중복 제거된 unmatchedSymbols 리스트를 화면에 그림
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
-        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:10px; border:1px solid var(--border); border-radius:6px; margin-bottom:0;">
-          <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:6px;">원본: ${sym}</label>
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:6px; margin-bottom:10px;">
+          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
           <div style="position:relative;">
-             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
-             <ul id="mapDropdown_${idx}" class="search-dropdown" style="max-height:150px;"></ul>
+             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="이 종목의 정확한 이름이나 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
+             <ul id="mapDropdown_${idx}" class="search-dropdown" style="max-height:150px; z-index:99999; display:none;"></ul>
           </div>
         </div>
     `).join('');
@@ -1979,12 +2129,12 @@ function handleMapSearch(inputElem, idx) {
    if (results.length === 0) { dropdown.style.display = 'none'; return; }
    
    dropdown.innerHTML = results.map(q => `
-     <li class="search-item" onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
+     <li class="search-item" style="padding:10px;" onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
        <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
-         <span style="font-weight:500; font-size:12px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
+         <span style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
          <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
        </div>
-       <span style="color:var(--accent); font-family:var(--font-mono); font-size:11px; font-weight:700;">${q.symbol}</span>
+       <span style="color:var(--accent); font-family:var(--font-mono); font-size:12px; font-weight:700;">${q.symbol}</span>
      </li>
    `).join('');
    dropdown.style.display = 'block';
@@ -2000,7 +2150,9 @@ function selectMapResult(idx, symbol, name) {
 // 드롭다운 바깥 클릭 시 닫기
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.search-dropdown') && !e.target.closest('.form-input')) {
-        document.querySelectorAll('[id^="mapDropdown_"]').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('[id^="mapDropdown_"]').forEach(el => {
+            if(el) el.style.display = 'none';
+        });
     }
 });
 
@@ -2016,8 +2168,13 @@ function processPendingCsv() {
     for(let i=0; i<unmatchedSymbols.length; i++) {
         const raw = unmatchedSymbols[i];
         const input = document.getElementById(`mapInput_${i}`);
-        const mapped = input.dataset.mappedSymbol || input.value.trim().toUpperCase() || raw;
-        mappingDict[raw] = mapped;
+        if(input) {
+            // 사용자가 검색해서 선택한 티커가 있으면 1순위, 없으면 직접 입력한 텍스트 2순위, 둘 다 없으면 원본
+            const mapped = input.dataset.mappedSymbol || input.value.trim().toUpperCase() || raw;
+            mappingDict[raw] = mapped;
+        } else {
+            mappingDict[raw] = raw;
+        }
     }
 
     let addedCount = 0;
