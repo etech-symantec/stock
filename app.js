@@ -218,21 +218,48 @@ function downloadCsvSample() {
   document.body.removeChild(a);
 }
 
+// ── 🌟 구글 번역 API를 활용한 한글 -> 영어 변환 함수 (캐시 적용) ──
+const translationCache = {};
+
+async function translateKoToEn(text) {
+  // 이미 번역한 종목명은 캐시에서 바로 가져옴 (서버 차단 방지 및 속도 향상)
+  if (translationCache[text]) return translationCache[text];
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const translated = data[0][0][0].trim();
+    translationCache[text] = translated; // 결과 캐싱
+    return translated;
+  } catch (error) {
+    console.error("번역 실패:", error);
+    return text; // 번역 실패 시 원본 텍스트 반환
+  }
+}
+
+// ── 🌟 수정된 CSV 업로드 함수 ──
 function importCsvData(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
+  
+  // 비동기 처리(async/await)를 위해 reader.onload 함수를 async로 변경
+  reader.onload = async function(e) {
     const text = e.target.result;
     const lines = text.split('\n');
     let addedCount = 0;
     
+    // 대량 데이터 처리 시 UI가 멈춘 것처럼 보이지 않게 로딩 상태 표시
+    document.getElementById('syncText').textContent = '종목명 번역 및 데이터 저장 중...';
+    document.getElementById('syncSpinner').style.display = 'block';
+
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
       
-      // 💡 공백을 먼저 제거한 후 따옴표를 지우도록 수정하여 숫자가 정상적으로 파싱됩니다.
+      // 단가의 쉼표와 따옴표를 완벽하게 분리하는 정규식 파싱
       const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.trim().replace(/^"|"$/g, '').trim());
+      
       if (parts.length >= 7) {
         const date = parts[0];
         let owner = parts[1];
@@ -241,12 +268,43 @@ function importCsvData(event) {
         let rawSymbol = parts[4];
         let symbol = rawSymbol.toUpperCase();
         
-        // 🌟 로컬 DB 우선 매핑
+        let matched = false;
+
+        // 1. 로컬 DB에서 원본 이름 그대로 1차 검색
         if (localStockDB && localStockDB.length > 0) {
-            let matched = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === symbol);
-            if (matched) symbol = matched.symbol;
-            else if (/^\d{6}$/.test(symbol)) symbol += '.KS';
-        } else if (/^\d{6}$/.test(symbol)) {
+            let m = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === symbol);
+            if (m) {
+                symbol = m.symbol;
+                matched = true;
+            }
+        }
+
+        // 2. 검색 실패 & 종목명에 한글이 포함되어 있다면? -> 영어로 번역 후 2차 검색
+        if (!matched && /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(rawSymbol)) {
+            const translatedEn = await translateKoToEn(rawSymbol);
+            
+            if (translatedEn && translatedEn !== rawSymbol) {
+                const transUpper = translatedEn.toUpperCase();
+                
+                if (localStockDB && localStockDB.length > 0) {
+                    // 번역된 영어 단어(예: "APPLE")가 포함된 종목 찾기
+                    let possibleMatches = localStockDB.filter(s => 
+                        s.name.toUpperCase().includes(transUpper) || 
+                        s.symbol.toUpperCase() === transUpper
+                    );
+                    
+                    if (possibleMatches.length > 0) {
+                        // 일치하는 종목 중 이름이 가장 짧은 것 우선 선택 (예: "Apple Inc"를 파생 ETF보다 우선 선택)
+                        possibleMatches.sort((a, b) => a.name.length - b.name.length);
+                        symbol = possibleMatches[0].symbol;
+                        matched = true;
+                    }
+                }
+            }
+        }
+
+        // 3. 그래도 매칭이 안 되고 6자리 숫자(한국 티커)만 있는 경우 '.KS' 자동 추가
+        if (!matched && /^\d{6}$/.test(symbol)) {
             symbol += '.KS';
         }
 
@@ -256,7 +314,7 @@ function importCsvData(event) {
         let price = parseFloat(priceStr) || 0;
         const taxStatus = parts.length > 7 ? parts[7] : '';
 
-        if (!date || !symbol) continue;
+        if (!date || !symbol) continue; 
 
         let txType = 'trade';
         if (typeStr.includes('배당') || typeStr.toLowerCase() === 'dividend') { txType = 'dividend'; qty = 0; }
@@ -276,6 +334,11 @@ function importCsvData(event) {
         addedCount++;
       }
     }
+    
+    // 작업 완료 후 로딩 표시 제거
+    document.getElementById('syncSpinner').style.display = 'none';
+    document.getElementById('syncText').textContent = '';
+
     if (addedCount > 0) {
       saveState();
       renderTxList();
