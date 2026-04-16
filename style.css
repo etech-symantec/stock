@@ -211,3 +211,51 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 
 .settings-section { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
 .settings-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+/* 🌟 [추가] 종목 카드 태그(메모) 스타일 */
+.custom-tag-badge {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffd166;
+    border: 1px dashed rgba(255, 209, 102, 0.3);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: normal;
+    margin-top: 6px;
+    display: inline-block;
+    cursor: pointer;
+    transition: 0.2s;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.custom-tag-badge:hover {
+    background: rgba(255, 209, 102, 0.15);
+    border-color: rgba(255, 209, 102, 0.6);
+}
+.add-tag-btn {
+    background: transparent;
+    color: var(--text3);
+    border: 1px dashed var(--border2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-top: 6px;
+    display: inline-block;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.add-tag-btn:hover {
+    color: var(--text);
+    border-color: var(--text3);
+    background: rgba(255,255,255,0.05);
+}
+
+/* 관심종목 뱃지 클릭 유도를 위한 호버 효과 */
+.tag-watch:hover {
+    background: rgba(255, 77, 106, 0.1) !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
+}
+.tag-watch:hover .icon { content: '✕'; }
