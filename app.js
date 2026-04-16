@@ -237,27 +237,37 @@ async function translateKoToEn(text) {
   }
 }
 
-// ── 🌟 수정된 CSV 업로드 함수 ──
+// ── 🌟 수정된 CSV 업로드 함수 (실시간 진행률 표시) ──
 function importCsvData(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   
-  // 비동기 처리(async/await)를 위해 reader.onload 함수를 async로 변경
   reader.onload = async function(e) {
     const text = e.target.result;
     const lines = text.split('\n');
+    const totalLines = lines.length;
     let addedCount = 0;
     
     // 대량 데이터 처리 시 UI가 멈춘 것처럼 보이지 않게 로딩 상태 표시
-    document.getElementById('syncText').textContent = '종목명 번역 및 데이터 저장 중...';
-    document.getElementById('syncSpinner').style.display = 'block';
+    const syncText = document.getElementById('syncText');
+    const syncSpinner = document.getElementById('syncSpinner');
+    syncText.textContent = `데이터 준비 중... (0 / ${totalLines})`;
+    syncSpinner.style.display = 'block';
 
-    for (let i = 1; i < lines.length; i++) {
+    // 브라우저가 로딩 UI를 화면에 먼저 그릴 수 있도록 아주 짧게 대기 (화면 멈춤 방지)
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    for (let i = 1; i < totalLines; i++) {
       const line = lines[i].trim();
       if (!line) continue;
       
-      // 단가의 쉼표와 따옴표를 완벽하게 분리하는 정규식 파싱
+      // 🌟 10줄마다 진행 상황 화면 업데이트 및 메인 스레드 양보
+      if (i % 10 === 0) {
+          syncText.textContent = `데이터 처리 중... (${i} / ${totalLines})`;
+          await new Promise(resolve => setTimeout(resolve, 0)); 
+      }
+      
       const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.trim().replace(/^"|"$/g, '').trim());
       
       if (parts.length >= 7) {
@@ -281,23 +291,24 @@ function importCsvData(event) {
 
         // 2. 검색 실패 & 종목명에 한글이 포함되어 있다면? -> 영어로 번역 후 2차 검색
         if (!matched && /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(rawSymbol)) {
-            const translatedEn = await translateKoToEn(rawSymbol);
-            
-            if (translatedEn && translatedEn !== rawSymbol) {
-                const transUpper = translatedEn.toUpperCase();
+            // translateKoToEn 함수는 기존에 추가하신 것을 그대로 사용합니다.
+            if (typeof translateKoToEn === 'function') {
+                const translatedEn = await translateKoToEn(rawSymbol);
                 
-                if (localStockDB && localStockDB.length > 0) {
-                    // 번역된 영어 단어(예: "APPLE")가 포함된 종목 찾기
-                    let possibleMatches = localStockDB.filter(s => 
-                        s.name.toUpperCase().includes(transUpper) || 
-                        s.symbol.toUpperCase() === transUpper
-                    );
+                if (translatedEn && translatedEn !== rawSymbol) {
+                    const transUpper = translatedEn.toUpperCase();
                     
-                    if (possibleMatches.length > 0) {
-                        // 일치하는 종목 중 이름이 가장 짧은 것 우선 선택 (예: "Apple Inc"를 파생 ETF보다 우선 선택)
-                        possibleMatches.sort((a, b) => a.name.length - b.name.length);
-                        symbol = possibleMatches[0].symbol;
-                        matched = true;
+                    if (localStockDB && localStockDB.length > 0) {
+                        let possibleMatches = localStockDB.filter(s => 
+                            s.name.toUpperCase().includes(transUpper) || 
+                            s.symbol.toUpperCase() === transUpper
+                        );
+                        
+                        if (possibleMatches.length > 0) {
+                            possibleMatches.sort((a, b) => a.name.length - b.name.length);
+                            symbol = possibleMatches[0].symbol;
+                            matched = true;
+                        }
                     }
                 }
             }
@@ -335,9 +346,9 @@ function importCsvData(event) {
       }
     }
     
-    // 작업 완료 후 로딩 표시 제거
-    document.getElementById('syncSpinner').style.display = 'none';
-    document.getElementById('syncText').textContent = '';
+    // 🌟 작업 완료 후 로딩 표시 제거
+    syncSpinner.style.display = 'none';
+    syncText.textContent = '';
 
     if (addedCount > 0) {
       saveState();
@@ -354,7 +365,6 @@ function importCsvData(event) {
   };
   reader.readAsText(file, 'UTF-8');
 }
-
 function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
 function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
