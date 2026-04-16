@@ -1182,24 +1182,27 @@ function generateCardHtml(item) {
       oInfo = getOwnerInfo(mainOwner);
   }
 
-  // 🌟 [수정] 불필요한 오너 뱃지 버튼을 없애고, 기본 보유 태그 안에 [아이콘 + 소유자 이름 | 계좌명]을 합쳤습니다.
+  // 🌟 [수정] 불필요한 오너 뱃지 버튼을 없애고, 기본 태그 안에 [아이콘 + 소유자 이름 | 계좌명]을 합쳤습니다.
   const tagContent = isHeld 
     ? `<span class="icon">${oInfo.icon}</span> ${oInfo.name} <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` 
     : `<span class="icon" style="font-style:normal;">⭐</span> 관심종목 <span style="margin-left:4px; font-weight:bold; opacity:0.7;">✕</span>`;
 
-  const countryBadge = isKorean(item.symbol) ? `<span class="country-badge" style="background:rgba(77, 159, 255, 0.2); color:var(--blue);">🇰🇷 KR</span>` : `<span class="country-badge" style="background:rgba(255, 77, 106, 0.2); color:var(--red);">🇺🇸 US</span>`;
+  // 🌟 [수정] 국가 배지를 텍스트 박스 없이 🇰🇷, 🇺🇸 국기 이모지로만 심플하게 표시합니다.
+  const countryBadge = isKorean(item.symbol) 
+    ? `<span style="font-size:16px; margin-right:6px; line-height:1;" title="한국 주식">🇰🇷</span>` 
+    : `<span style="font-size:16px; margin-right:6px; line-height:1;" title="미국 주식">🇺🇸</span>`;
 
-  // 🌟 [수정] 태그 텍스트를 쉼표(,)로 쪼개서 최대 5개까지만 배열로 만듭니다.
+  // 🌟 [유지] 태그 텍스트를 쉼표(,)로 쪼개서 최대 5개까지만 배열로 만듭니다.
   const customTagText = state.tags && state.tags[item.symbol] ? state.tags[item.symbol] : '';
   const tagsArray = customTagText.split(',').map(t => t.trim()).filter(t => t).slice(0, 5);
   
   let tagsHtml = '';
   if (tagsArray.length > 0) {
-      tagsHtml = `<div class="tags-container" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name}')" title="태그 수정/삭제">` + 
+      tagsHtml = `<div class="tags-container" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name.replace(/'/g, "\\'")}')" title="태그 수정/삭제">` + 
                  tagsArray.map(t => `<div class="custom-tag-badge">${t}</div>`).join('') +
                  `</div>`;
   } else {
-      tagsHtml = `<div class="tags-container"><div class="add-tag-btn" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name}')" title="메모나 태그를 추가하세요">+ 태그 추가</div></div>`;
+      tagsHtml = `<div class="tags-container"><div class="add-tag-btn" onclick="event.stopPropagation(); openTagModal('${item.symbol}', '${data.name.replace(/'/g, "\\'")}')" title="메모나 태그를 추가하세요">+ 태그 추가</div></div>`;
   }
 
   return `
@@ -1209,7 +1212,7 @@ function generateCardHtml(item) {
         <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" 
              title="${isHeld ? '보유 | ' + brokerDisp : '관심종목 삭제'}" 
              style="margin-bottom:0; background:var(--bg3); color:var(--text2); border:1px solid var(--border); ${!isHeld ? 'cursor:pointer;' : ''}"
-             ${!isHeld ? `onclick="event.stopPropagation(); removeTickerConfirm('${item.symbol}', '${data.name}')"` : ''}>
+             ${!isHeld ? `onclick="event.stopPropagation(); removeTickerConfirm('${item.symbol}', '${data.name.replace(/'/g, "\\'")}')"` : ''}>
           ${tagContent}
         </div>
       </div>
