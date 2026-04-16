@@ -247,22 +247,21 @@ function importCsvData(event) {
     const text = e.target.result;
     const lines = text.split('\n');
     const totalLines = lines.length;
-    let addedCount = 0;
     
-    // 대량 데이터 처리 시 UI가 멈춘 것처럼 보이지 않게 로딩 상태 표시
+    pendingCsvData = [];
+    unmatchedSymbols = [];
+    
     const syncText = document.getElementById('syncText');
     const syncSpinner = document.getElementById('syncSpinner');
     syncText.textContent = `데이터 준비 중... (0 / ${totalLines})`;
     syncSpinner.style.display = 'block';
 
-    // 브라우저가 로딩 UI를 화면에 먼저 그릴 수 있도록 아주 짧게 대기 (화면 멈춤 방지)
     await new Promise(resolve => setTimeout(resolve, 10));
 
     for (let i = 1; i < totalLines; i++) {
       const line = lines[i].trim();
       if (!line) continue;
       
-      // 🌟 10줄마다 진행 상황 화면 업데이트 및 메인 스레드 양보
       if (i % 10 === 0) {
           syncText.textContent = `데이터 처리 중... (${i} / ${totalLines})`;
           await new Promise(resolve => setTimeout(resolve, 0)); 
@@ -276,47 +275,32 @@ function importCsvData(event) {
         const broker = parts[2];
         const typeStr = parts[3];
         let rawSymbol = parts[4];
-        let symbol = rawSymbol.toUpperCase();
+        let cleanRaw = rawSymbol.replace(/\s+/g, '').toUpperCase();
         
         let matched = false;
+        let finalSymbol = rawSymbol;
 
-        // 1. 로컬 DB에서 원본 이름 그대로 1차 검색
+        // 1. 로컬 DB 검색
         if (localStockDB && localStockDB.length > 0) {
-            let m = localStockDB.find(s => s.name === rawSymbol || s.symbol.toUpperCase() === symbol);
+            let m = localStockDB.find(s => 
+                s.name.replace(/\s+/g, '').toUpperCase() === cleanRaw || 
+                s.symbol.replace(/\s+/g, '').toUpperCase() === cleanRaw
+            );
             if (m) {
-                symbol = m.symbol;
+                finalSymbol = m.symbol;
                 matched = true;
             }
         }
 
-        // 2. 검색 실패 & 종목명에 한글이 포함되어 있다면? -> 영어로 번역 후 2차 검색
-        if (!matched && /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(rawSymbol)) {
-            // translateKoToEn 함수는 기존에 추가하신 것을 그대로 사용합니다.
-            if (typeof translateKoToEn === 'function') {
-                const translatedEn = await translateKoToEn(rawSymbol);
-                
-                if (translatedEn && translatedEn !== rawSymbol) {
-                    const transUpper = translatedEn.toUpperCase();
-                    
-                    if (localStockDB && localStockDB.length > 0) {
-                        let possibleMatches = localStockDB.filter(s => 
-                            s.name.toUpperCase().includes(transUpper) || 
-                            s.symbol.toUpperCase() === transUpper
-                        );
-                        
-                        if (possibleMatches.length > 0) {
-                            possibleMatches.sort((a, b) => a.name.length - b.name.length);
-                            symbol = possibleMatches[0].symbol;
-                            matched = true;
-                        }
-                    }
-                }
-            }
+        // 2. 숫자로만 이루어져 있으면 KOSPI로 간주
+        if (!matched && /^\d{6}$/.test(finalSymbol)) {
+            finalSymbol += '.KS';
+            matched = true;
         }
 
-        // 3. 그래도 매칭이 안 되고 6자리 숫자(한국 티커)만 있는 경우 '.KS' 자동 추가
-        if (!matched && /^\d{6}$/.test(symbol)) {
-            symbol += '.KS';
+        // 3. 매칭 실패 시 수동 매핑 리스트에 추가
+        if (!matched && !unmatchedSymbols.includes(rawSymbol)) {
+            unmatchedSymbols.push(rawSymbol);
         }
 
         let qtyStr = parts[5] ? parts[5].replace(/[^0-9.-]/g, '') : '';
@@ -325,41 +309,45 @@ function importCsvData(event) {
         let price = parseFloat(priceStr) || 0;
         const taxStatus = parts.length > 7 ? parts[7] : '';
 
-        if (!date || !symbol) continue; 
+        if (!date || !rawSymbol) continue; 
 
         let txType = 'trade';
         if (typeStr.includes('배당') || typeStr.toLowerCase() === 'dividend') { txType = 'dividend'; qty = 0; }
         else if (typeStr.includes('매도') || typeStr.toLowerCase() === 'sell') { txType = 'sell'; qty = -Math.abs(qty); }
         else if (typeStr.includes('매수') || typeStr.toLowerCase() === 'buy') { txType = 'buy'; qty = Math.abs(qty); }
 
-        if (txType === 'dividend' && taxStatus === '세전') {
-            const taxRate = isKorean(symbol) ? 0.154 : 0.15;
-            price = price * (1 - taxRate);
-        }
+        let ownerMapped = owner;
+        if (owner === '보유자1') ownerMapped = state.owners.user1.name;
+        else if (owner === '보유자2') ownerMapped = state.owners.user2.name;
 
-        if (owner === '보유자1') owner = state.owners.user1.name;
-        else if (owner === '보유자2') owner = state.owners.user2.name;
-
-        state.transactions.push({ id: Date.now() + i, date: formatDate(date), owner, broker, symbol, qty: (txType === 'dividend' ? 0 : qty), price, txType });
-        if (!state.tickers.includes(symbol)) state.tickers.push(symbol);
-        addedCount++;
+        pendingCsvData.push({
+            id: Date.now() + i,
+            date: formatDate(date),
+            owner: ownerMapped,
+            broker: broker,
+            originalSymbol: rawSymbol,
+            matchedSymbol: matched ? finalSymbol : null,
+            isMatched: matched,
+            qty: qty,
+            rawPrice: price,
+            txType: txType,
+            taxStatus: taxStatus
+        });
       }
     }
     
-    // 🌟 작업 완료 후 로딩 표시 제거
     syncSpinner.style.display = 'none';
     syncText.textContent = '';
 
-    if (addedCount > 0) {
-      saveState();
-      renderTxList();
-      if (currentView === 'history') renderHistoryDashboard();
-      else render();
-      triggerAutoSync();
-      closeModal('masterSettingsOverlay');
-      alert(addedCount + "건의 거래내역이 추가되었습니다.");
+    // 🌟 여기서 매핑할 종목이 있으면 모달창 띄우기
+    if (pendingCsvData.length > 0) {
+        if (unmatchedSymbols.length > 0) {
+            openCsvMappingModal(); 
+        } else {
+            processPendingCsv(); 
+        }
     } else {
-      alert("추가된 내역이 없습니다.\nCSV 형식을 확인해주세요.");
+        alert("추가할 수 있는 유효한 내역이 없습니다.");
     }
     event.target.value = ''; 
   };
@@ -1958,4 +1946,112 @@ async function render() {
       chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
     }
   });
+}
+
+// ==========================================
+// 6. CSV 알 수 없는 종목 수동 매핑 모달 로직
+// ==========================================
+let pendingCsvData = [];
+let unmatchedSymbols = [];
+
+// CSV 업로드 중 매핑 모달 열기
+function openCsvMappingModal() {
+    const container = document.getElementById('unmatchedContainer');
+    container.innerHTML = unmatchedSymbols.map((sym, idx) => `
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:10px; border:1px solid var(--border); border-radius:6px; margin-bottom:0;">
+          <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:6px;">원본: ${sym}</label>
+          <div style="position:relative;">
+             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
+             <ul id="mapDropdown_${idx}" class="search-dropdown" style="max-height:150px;"></ul>
+          </div>
+        </div>
+    `).join('');
+    document.getElementById('csvMappingOverlay').classList.add('open');
+}
+
+// 모달 내부에서 종목 검색하기
+function handleMapSearch(inputElem, idx) {
+   const query = inputElem.value.trim().toLowerCase();
+   const dropdown = document.getElementById(`mapDropdown_${idx}`);
+   if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
+   
+   const results = localStockDB.filter(s => s.symbol.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)).slice(0, 6);
+   if (results.length === 0) { dropdown.style.display = 'none'; return; }
+   
+   dropdown.innerHTML = results.map(q => `
+     <li class="search-item" onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
+       <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
+         <span style="font-weight:500; font-size:12px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
+         <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
+       </div>
+       <span style="color:var(--accent); font-family:var(--font-mono); font-size:11px; font-weight:700;">${q.symbol}</span>
+     </li>
+   `).join('');
+   dropdown.style.display = 'block';
+}
+
+function selectMapResult(idx, symbol, name) {
+   const input = document.getElementById(`mapInput_${idx}`);
+   input.value = `${name} (${symbol})`; 
+   input.dataset.mappedSymbol = symbol;
+   document.getElementById(`mapDropdown_${idx}`).style.display = 'none';
+}
+
+// 드롭다운 바깥 클릭 시 닫기
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-dropdown') && !e.target.closest('.form-input')) {
+        document.querySelectorAll('[id^="mapDropdown_"]').forEach(el => el.style.display = 'none');
+    }
+});
+
+function cancelCsvImport() {
+    pendingCsvData = [];
+    unmatchedSymbols = [];
+    closeModal('csvMappingOverlay');
+}
+
+// 사용자가 짝지어준 데이터로 최종 장부 반영
+function processPendingCsv() {
+    const mappingDict = {};
+    for(let i=0; i<unmatchedSymbols.length; i++) {
+        const raw = unmatchedSymbols[i];
+        const input = document.getElementById(`mapInput_${i}`);
+        const mapped = input.dataset.mappedSymbol || input.value.trim().toUpperCase() || raw;
+        mappingDict[raw] = mapped;
+    }
+
+    let addedCount = 0;
+    pendingCsvData.forEach(tx => {
+        let finalSym = tx.isMatched ? tx.matchedSymbol : mappingDict[tx.originalSymbol];
+        
+        let finalPrice = tx.rawPrice;
+        if (tx.txType === 'dividend' && tx.taxStatus === '세전') {
+            const taxRate = isKorean(finalSym) ? 0.154 : 0.15;
+            finalPrice = finalPrice * (1 - taxRate);
+        }
+
+        state.transactions.push({
+            id: tx.id,
+            date: tx.date,
+            owner: tx.owner,
+            broker: tx.broker,
+            symbol: finalSym.toUpperCase(),
+            qty: tx.qty,
+            price: finalPrice,
+            txType: tx.txType
+        });
+        if (!state.tickers.includes(finalSym.toUpperCase())) state.tickers.push(finalSym.toUpperCase());
+        addedCount++;
+    });
+
+    pendingCsvData = [];
+    unmatchedSymbols = [];
+    closeModal('csvMappingOverlay');
+    closeModal('masterSettingsOverlay');
+    
+    saveState();
+    renderTxList();
+    if (currentView === 'history') renderHistoryDashboard(); else render();
+    triggerAutoSync();
+    alert(addedCount + "건의 거래내역이 정상적으로 추가되었습니다.");
 }
