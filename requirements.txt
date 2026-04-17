@@ -3,3 +3,7 @@ requests>=2.31.0
 pandas>=2.0.0
 playwright>=1.40.0
 finance-datareader>=0.9.50
+lxml
+tqdm
+FinanceDataReader
+beautifulsoup4
