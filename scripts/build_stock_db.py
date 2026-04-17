@@ -3,6 +3,7 @@ import os
 import requests
 import urllib3
 import FinanceDataReader as fdr
+from tqdm import tqdm
 
 # 공공데이터포털 SSL 인증서 경고 무시 (한국 공공 API 특성상 가끔 발생하는 에러 방지)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -23,16 +24,17 @@ def main():
     print("🇺🇸 1. 미국 주식/ETF 데이터를 수집합니다...")
     try:
         sp500 = fdr.StockListing('S&P500')
-        for _, row in sp500.iterrows():
+        # 🌟 tqdm() 으로 감싸서 진행률 그래프 출력
+        for _, row in tqdm(sp500.iterrows(), total=len(sp500), desc="S&P500"):
             add_to_db(row['Symbol'], row['Name'], "US_STOCK")
 
         for market in ['NASDAQ', 'NYSE', 'AMEX']:
             df = fdr.StockListing(market)
-            for _, row in df.iterrows():
+            for _, row in tqdm(df.iterrows(), total=len(df), desc=market):
                 add_to_db(row['Symbol'], row['Name'], "US_STOCK")
                 
         us_etfs = fdr.StockListing('ETF/US')
-        for _, row in us_etfs.iterrows():
+        for _, row in tqdm(us_etfs.iterrows(), total=len(us_etfs), desc="US ETF"):
             add_to_db(row['Symbol'], row['Name'], "US_ETF")
     except Exception as e:
         print(f"미국 데이터 가져오기 실패: {e}")
@@ -40,14 +42,14 @@ def main():
     print("🇰🇷 2. 한국 주식/ETF 데이터를 1차 수집합니다 (FDR 기본)...")
     try:
         krx = fdr.StockListing('KRX')
-        for _, row in krx.iterrows():
+        for _, row in tqdm(krx.iterrows(), total=len(krx), desc="KRX (KOSPI/KOSDAQ)"):
             sym = str(row['Code'])
             market = str(row.get('Market', 'KRX'))
             suffix = ".KQ" if "KOSDAQ" in market else ".KS"
             add_to_db(f"{sym}{suffix}", row['Name'], market)
 
         kr_etfs = fdr.StockListing('ETF/KR')
-        for _, row in kr_etfs.iterrows():
+        for _, row in tqdm(kr_etfs.iterrows(), total=len(kr_etfs), desc="KR ETF"):
             add_to_db(f"{str(row['Symbol'])}.KS", row['Name'], "KR_ETF")
     except Exception as e:
         print(f"한국 데이터 1차 가져오기 실패: {e}")
@@ -58,8 +60,8 @@ def main():
     
     if PUBLIC_API_KEY:
         try:
-            # numOfRows=5000 으로 한 번의 호출로 한국 주식시장 전체 데이터를 가져옵니다.
-            url = f"https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey={PUBLIC_API_KEY}&numOfRows=5000&pageNo=1&resultType=json"
+            # numOfRows=10000 으로 한 번의 호출로 한국 주식시장 전체 데이터를 가져옵니다.
+            url = f"https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey={PUBLIC_API_KEY}&numOfRows=10000&pageNo=1&resultType=json"
             res = requests.get(url, verify=False, timeout=15)
             
             if res.status_code == 200:
@@ -67,13 +69,12 @@ def main():
                 items = data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
                 
                 added_from_public = 0
-                for item in items:
+                for item in tqdm(items, desc="공공데이터 매핑 중"):
                     sym = str(item.get('srtnCd'))
                     name = str(item.get('itmsNm'))
                     market = str(item.get('mrktCtg'))
                     suffix = ".KQ" if "KOSDAQ" in market else ".KS"
                     
-                    # 아직 DB에 없는 종목만 추가 (누락분 채우기)
                     target_sym = f"{sym}{suffix}"
                     if target_sym not in added_symbols:
                         add_to_db(target_sym, name, market)
