@@ -980,11 +980,36 @@ function setupSearch(inputId, dropdownId, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
   if(!input || !dropdown) return;
+  
   input.addEventListener('input', (e) => {
-    const query = e.target.value.trim().toLowerCase();
+    let query = e.target.value.trim().toLowerCase();
     if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
-    const results = localStockDB.filter(s => s.symbol.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)).slice(0, 6);
+    
+    // 🌟 사용자가 앞이나 뒤에 * 기호를 붙였는지 확인 (포함 검색)
+    const isIncludesSearch = query.startsWith('*') || query.endsWith('*');
+    let cleanQuery = query.replace(/\*/g, '').trim();
+    
+    if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
+
+    // 🌟 영문 ETF 브랜드를 한글 공식 명칭으로 자동 변환
+    const etfBrandMap = { "timefolio": "타임폴리오", "koact": "코액트", "mighty": "마이티", "woori": "우리", "focus": "포커스", "treyn": "트레인", "vnam": "브이남", "hk": "흥국" };
+    for (const [eng, kor] of Object.entries(etfBrandMap)) {
+        if (cleanQuery.startsWith(eng)) { cleanQuery = cleanQuery.replace(eng, kor); break; }
+    }
+
+    let results = [];
+    if (isIncludesSearch) {
+        // 💡 * 포함: 검색어가 포함된 모든 종목
+        results = localStockDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
+    } else {
+        // 💡 기본: 검색어로 시작하는 종목만 (예: NC -> NC로 시작하는 종목만)
+        results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
+    }
+
+    results = results.slice(0, 6); // 상단/좌측 검색창은 최대 6개까지만 표시
+    
     if (results.length === 0) { dropdown.style.display = 'none'; return; }
+    
     dropdown.innerHTML = results.map(q => `
       <li class="search-item" onclick="${onSelect}('${q.symbol}')">
         <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
@@ -996,10 +1021,12 @@ function setupSearch(inputId, dropdownId, onSelect) {
     `).join('');
     dropdown.style.display = 'block';
   });
+
   document.addEventListener('click', (e) => {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
   });
 }
+
 setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult');
 setupSearch('txSymbol', 'txDropdown', 'selectSidebarSearchResult');
 
