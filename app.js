@@ -383,33 +383,56 @@ function importCsvData(event) {
 // 🌟 CSV 모달 창 열기
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
-    if(!container) {
-        alert("HTML 파일에 매핑 모달 UI가 없습니다. index.html을 업데이트 해주세요.");
-        return;
-    }
+    if(!container) return;
+    
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
-        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:6px; margin-bottom:0;">
-          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px;">📌 원본: <span style="color:var(--accent);">${sym}</span></label>
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:6px; margin-bottom:0px; position:relative;">
+          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
           <div style="position:relative;">
-             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 직접 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
-             <ul id="mapDropdown_${idx}" class="search-dropdown" style="max-height:150px; z-index:99999;"></ul>
+             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 (예: *삼성*)" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
+             <ul id="mapDropdown_${idx}" class="search-dropdown" style="max-height: 180px; overflow-y: auto; z-index: 999999; display: none;"></ul>
           </div>
         </div>
     `).join('');
     document.getElementById('csvMappingOverlay').classList.add('open');
 }
 
-// 🌟 CSV 모달 내부 검색기능
+// 🌟 CSV 모달 내부 검색기능 (시작어 / 와일드카드 지원)
 function handleMapSearch(inputElem, idx) {
-   const query = inputElem.value.trim().toLowerCase();
+   let query = inputElem.value.trim().toLowerCase();
    const dropdown = document.getElementById(`mapDropdown_${idx}`);
    if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
    
-   const results = localStockDB.filter(s => s.symbol.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)).slice(0, 6);
+   // 사용자가 양쪽에 *를 입력했는지 확인 (예: *nc*)
+   const isIncludesSearch = query.startsWith('*') || query.endsWith('*');
+   // 검색어에서 * 제거 (순수 검색어만 추출)
+   const cleanQuery = query.replace(/\*/g, '').trim();
+   
+   if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
+
+   let results = [];
+   
+   if (isIncludesSearch) {
+       // *가 붙어있으면: 이름이나 심볼의 "어디에든 포함"된 종목 검색
+       results = localStockDB.filter(s => 
+           s.symbol.toLowerCase().includes(cleanQuery) || 
+           s.name.toLowerCase().includes(cleanQuery)
+       );
+   } else {
+       // 기본: 이름이나 심볼이 입력한 검색어로 "시작"하는 종목만 검색
+       results = localStockDB.filter(s => 
+           s.symbol.toLowerCase().startsWith(cleanQuery) || 
+           s.name.toLowerCase().startsWith(cleanQuery)
+       );
+   }
+
+   // 결과를 최대 10개까지만 가져옴 (3개가 넘어가면 자동으로 스크롤 생성됨)
+   results = results.slice(0, 10);
+   
    if (results.length === 0) { dropdown.style.display = 'none'; return; }
    
    dropdown.innerHTML = results.map(q => `
-     <li class="search-item" style="padding:10px;" onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
+     <li class="search-item" style="padding:10px; border-bottom:1px solid var(--border2);" onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
        <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
          <span style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
          <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
@@ -417,6 +440,7 @@ function handleMapSearch(inputElem, idx) {
        <span style="color:var(--accent); font-family:var(--font-mono); font-size:12px; font-weight:700;">${q.symbol}</span>
      </li>
    `).join('');
+   
    dropdown.style.display = 'block';
 }
 
