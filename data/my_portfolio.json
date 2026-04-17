@@ -1,5 +1,7 @@
 {
-  "tickers": [],
+  "tickers": [
+    "TPR"
+  ],
   "transactions": [],
   "range": "1w",
   "ownerNames": {
