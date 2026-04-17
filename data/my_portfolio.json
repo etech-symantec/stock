@@ -2,7 +2,8 @@
   "tickers": [
     "AAPL",
     "TSLA",
-    "005930.KS"
+    "005930.KS",
+    "NC"
   ],
   "transactions": [],
   "range": "1w",
@@ -21,5 +22,6 @@
       "icon": "👤",
       "color": "#bac700"
     }
-  }
+  },
+  "oldNames": {}
 }
