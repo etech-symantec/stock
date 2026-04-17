@@ -394,7 +394,7 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// 🌟 CSV 모달 창 열기 (검색 목록이 아래 항목을 밀어내어 절대 겹치지 않는 구조)
+// 🌟 CSV 모달 창 열기 (검색 목록 최대 3개 높이 & 스크롤바)
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
     if(!container) return;
@@ -408,10 +408,10 @@ function openCsvMappingModal() {
              <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'"> ☠️ 상장폐지</label>
           </div>
 
-          <div id="mappingInputArea_${idx}" style="position:relative;">
+          <div id="mappingInputArea_${idx}">
              <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 (예: *삼성*)" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
              <ul id="mapDropdown_${idx}" class="search-dropdown" 
-                 style="position:absolute; left:0; right:0; top:calc(100% + 4px); z-index:999; max-height:200px; overflow-y:auto; display:none; margin-top:0; box-shadow:0 4px 12px rgba(0,0,0,0.4); border: 1px solid var(--border2); border-radius: 6px; background: var(--bg2);">
+                 style="position:relative; width:100%; max-height:145px; overflow-y:auto; display:none; margin-top:5px; box-shadow:none; border: 1px solid var(--border2); border-radius: 6px; background: var(--bg2);">
              </ul>
           </div>
         </div>
@@ -419,7 +419,7 @@ function openCsvMappingModal() {
     document.getElementById('csvMappingOverlay').classList.add('open');
 }
 
-// 🌟 CSV 모달 내부 검색기능 (결과 리스트 3개 제한)
+// 🌟 CSV 모달 내부 검색기능 (결과가 3개를 넘어가면 스크롤 처리)
 function handleMapSearch(inputElem, idx) {
    let query = inputElem.value.trim().toLowerCase();
    const dropdown = document.getElementById(`mapDropdown_${idx}`);
@@ -442,8 +442,8 @@ function handleMapSearch(inputElem, idx) {
        results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
    }
 
-   // 🌟 [수정] результатов를 최대 3개까지만 가져옵니다.
-   results = results.slice(0, 3);
+   // 🌟 15개까지 넉넉하게 찾고, 창 높이(145px)를 넘으면 알아서 스크롤바가 생깁니다.
+   results = results.slice(0, 15);
    
    if (results.length === 0) { dropdown.style.display = 'none'; return; }
    
