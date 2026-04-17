@@ -24,7 +24,10 @@ jobs:
           pip install -r requirements.txt
           pip install finance-datareader  # 명시적 설치
 
-      - name: DB 생성 스크립트 실행
+      - name: Build Stock DB (종목 DB 갱신)
+        env:
+          # GitHub Secrets에 등록한 API 키를 파이썬 스크립트로 전달합니다.
+          PUBLIC_DATA_API_KEY: ${{ secrets.PUBLIC_DATA_API_KEY }}
         run: python scripts/build_stock_db.py
 
       - name: 완성된 JSON 파일 커밋 및 푸시
