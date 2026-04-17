@@ -2,21 +2,471 @@
   "tickers": [
     "AAPL",
     "TSLA",
-    "005930.KS"
+    "005935.KS",
+    "139250.KS",
+    "360750.KS",
+    "487230.KS",
+    "0047R0.KS",
+    "005380.KS",
+    "015760.KS",
+    "0172V0.KS",
+    "122870.KQ",
+    "133690.KS",
+    "161510.KS",
+    "179900.KQ",
+    "229200.KS",
+    "347700.KQ",
+    "352820.KS",
+    "454910.KS",
+    "457480.KS",
+    "458730.KS",
+    "469070.KS",
+    "478150.KS",
+    "481180.KS",
+    "487240.KS",
+    "490490.KS",
+    "494840.KS",
+    "263020.KQ",
+    "AVGO",
+    "GOOGL",
+    "META",
+    "MSFT",
+    "NVDA",
+    "ORCL",
+    "PLTR",
+    "UNH",
+    "368590.KS",
+    "379780.KS",
+    "SMR",
+    "000660.KS"
   ],
-  "transactions": [],
-  "range": "1y",
+  "transactions": [
+    {
+      "id": 1775889536043,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 101,
+      "price": 66918,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889555171,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "139250.KS",
+      "qty": 25,
+      "price": 22500,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889578144,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "360750.KS",
+      "qty": 11,
+      "price": 18750,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889594406,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "487230.KS",
+      "qty": 162,
+      "price": 17365,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889713850,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 580,
+      "price": 13001,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889728130,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "005380.KS",
+      "qty": 2,
+      "price": 483000,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889746620,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": 63,
+      "price": 49879,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889760256,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "0172V0.KS",
+      "qty": 50,
+      "price": 10535,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889774268,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "122870.KQ",
+      "qty": 38,
+      "price": 66245,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889795220,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "133690.KS",
+      "qty": 27,
+      "price": 143513,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889809156,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 190,
+      "price": 20651,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889822386,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "179900.KQ",
+      "qty": 60,
+      "price": 21283,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889836347,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "229200.KS",
+      "qty": 200,
+      "price": 15665,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889849565,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "347700.KQ",
+      "qty": 10,
+      "price": 47300,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889862408,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 26,
+      "price": 315038,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889875956,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "454910.KS",
+      "qty": 20,
+      "price": 93300,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889890957,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "457480.KS",
+      "qty": 256,
+      "price": 15618,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889906136,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 3582,
+      "price": 11593,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889918234,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "469070.KS",
+      "qty": 291,
+      "price": 16234,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889931013,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "478150.KS",
+      "qty": 90,
+      "price": 22620,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889945763,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "481180.KS",
+      "qty": 510,
+      "price": 13239,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889967421,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "487230.KS",
+      "qty": 200,
+      "price": 15100,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775889988493,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "487240.KS",
+      "qty": 200,
+      "price": 24503,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775890001619,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "490490.KS",
+      "qty": 300,
+      "price": 9707,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775890012849,
+      "date": "2026-04-11",
+      "broker": "미래에셋",
+      "symbol": "494840.KS",
+      "qty": 190,
+      "price": 13666,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891678344,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "263020.KQ",
+      "qty": 200,
+      "price": 3355,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891714821,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "AAPL",
+      "qty": 36,
+      "price": 110.9597,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891732238,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "AVGO",
+      "qty": 7,
+      "price": 337.0928,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891745140,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "GOOGL",
+      "qty": 8,
+      "price": 184.5,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891756351,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "META",
+      "qty": 2,
+      "price": 648,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891765585,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "MSFT",
+      "qty": 5,
+      "price": 435,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891778085,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "NVDA",
+      "qty": 87,
+      "price": 12.2754,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891794198,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "ORCL",
+      "qty": 13,
+      "price": 191.35,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891805434,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "PLTR",
+      "qty": 12,
+      "price": 173.75,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891844868,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "TSLA",
+      "qty": 18,
+      "price": 182.1095,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775891856916,
+      "date": "2026-04-11",
+      "broker": "키움",
+      "symbol": "UNH",
+      "qty": 4,
+      "price": 303.15,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775893641841,
+      "date": "2026-04-11",
+      "broker": "KB",
+      "symbol": "368590.KS",
+      "qty": 100,
+      "price": 19525,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775893659107,
+      "date": "2026-04-11",
+      "broker": "KB",
+      "symbol": "379780.KS",
+      "qty": 120,
+      "price": 16550,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775893675762,
+      "date": "2026-04-11",
+      "broker": "KB",
+      "symbol": "457480.KS",
+      "qty": 196,
+      "price": 21338,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775893690771,
+      "date": "2026-04-11",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 200,
+      "price": 9840,
+      "txType": "trade",
+      "owner": "끄니"
+    },
+    {
+      "id": 1775893841822,
+      "date": "2026-04-11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "SMR",
+      "qty": 6,
+      "price": 86.99,
+      "txType": "trade"
+    }
+  ],
+  "range": "1d",
+  "ownerNames": {
+    "user1": "끄니",
+    "user2": "미니"
+  },
   "owners": {
     "user1": {
-      "name": "ㅋㅋ",
+      "name": "끄니",
       "icon": "🐯",
-      "color": "#f769c3"
+      "color": "#69f7b5"
     },
     "user2": {
-      "name": "보유자2",
+      "name": "미니",
       "icon": "👤",
-      "color": "#00c87a"
+      "color": "#bac700"
     }
-  },
-  "oldNames": {}
+  }
 }
