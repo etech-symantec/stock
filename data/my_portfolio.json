@@ -2,8 +2,7 @@
   "tickers": [
     "AAPL",
     "TSLA",
-    "005930.KS",
-    "000660.KS"
+    "005930.KS"
   ],
   "transactions": [],
   "range": "6m",
