@@ -981,28 +981,24 @@ function setupSearch(inputId, dropdownId, onSelect) {
   const dropdown = document.getElementById(dropdownId);
   if(!input || !dropdown) return;
   
+  dropdown.style.maxHeight = '200px';
+  dropdown.style.overflowY = 'auto';
+  
   input.addEventListener('input', (e) => {
     let query = e.target.value.trim().toLowerCase();
     if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
     
-    // 🌟 사용자가 앞이나 뒤에 * 기호를 붙였는지 확인 (포함 검색)
     const isIncludesSearch = query.startsWith('*') || query.endsWith('*');
     let cleanQuery = query.replace(/\*/g, '').trim();
     
     if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
 
-    // 🌟 영문/한글 자동 변환 없이, 입력한 단어 그대로 검색합니다.
     let results = [];
     if (isIncludesSearch) {
-        // 💡 * 포함: 검색어가 '포함'된 종목
         results = localStockDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
     } else {
-        // 💡 기본: 검색어로 '시작'하는 종목
         results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
-    }
-
-    results = results.slice(0, 6); // 최대 6개까지만 표시
-    
+    }    
     if (results.length === 0) { dropdown.style.display = 'none'; return; }
     
     dropdown.innerHTML = results.map(q => `
@@ -2346,7 +2342,7 @@ function openCsvMappingModal() {
     document.getElementById('csvMappingOverlay').classList.add('open');
 }
 
-// 🌟 CSV 모달 내부 검색기능 (자동 변환 제거, 있는 그대로 검색)
+// 🌟 CSV 모달 내부 검색기능 (결과 제한 해제)
 function handleMapSearch(inputElem, idx) {
    let query = inputElem.value.trim().toLowerCase();
    const dropdown = document.getElementById(`mapDropdown_${idx}`);
@@ -2357,16 +2353,12 @@ function handleMapSearch(inputElem, idx) {
    
    if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
 
-   // 🌟 영문/한글 자동 변환 없이, 입력한 단어 그대로 검색합니다.
    let results = [];
    if (isIncludesSearch) {
        results = localStockDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
    } else {
        results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
    }
-
-   // 넉넉하게 15개까지 가져오고, 넘어가면 스크롤바가 생깁니다.
-   results = results.slice(0, 15);
    
    if (results.length === 0) { dropdown.style.display = 'none'; return; }
    
