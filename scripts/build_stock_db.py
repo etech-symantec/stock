@@ -1,94 +1,91 @@
 import json
 import os
+import requests
+import urllib3
 import FinanceDataReader as fdr
+
+# 공공데이터포털 SSL 인증서 경고 무시 (한국 공공 API 특성상 가끔 발생하는 에러 방지)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def main():
     db = []
     added_symbols = set()  # 중복 등록 방지용
 
     def add_to_db(symbol, name, exch):
-        # 문자열인지 확인하고, 빈 값이나 중복 심볼 제외
         if isinstance(symbol, str) and symbol.strip() and symbol not in added_symbols:
             db.append({
                 "symbol": symbol.strip(),
                 "name": str(name).strip(),
                 "exch": exch
             })
-            added_symbols.add(symbol)
+            added_symbols.add(symbol.strip())
 
-    print("🇺🇸 1. 미국 주식 (S&P500 + NASDAQ + NYSE + AMEX 전체) 데이터를 가져옵니다...")
+    print("🇺🇸 1. 미국 주식/ETF 데이터를 수집합니다...")
     try:
-        # 가장 중요한 S&P 500 기업 500개를 우선적으로 검색망 상단에 배치하기 위해 먼저 추가
         sp500 = fdr.StockListing('S&P500')
         for _, row in sp500.iterrows():
             add_to_db(row['Symbol'], row['Name'], "US_STOCK")
 
-        # 나스닥(NASDAQ), 뉴욕증권거래소(NYSE), 아멕스(AMEX) 상장 종목 전체 수집
-        nasdaq = fdr.StockListing('NASDAQ')
-        nyse = fdr.StockListing('NYSE')
-        amex = fdr.StockListing('AMEX')
-        
-        for df in [nasdaq, nyse, amex]:
+        for market in ['NASDAQ', 'NYSE', 'AMEX']:
+            df = fdr.StockListing(market)
             for _, row in df.iterrows():
-                # S&P500에 이미 들어간 종목은 add_to_db 내부의 set에 의해 자동으로 중복 제외됨
                 add_to_db(row['Symbol'], row['Name'], "US_STOCK")
                 
-    except Exception as e:
-        print(f"미국 주식 가져오기 실패: {e}")
-
-    print("🇰🇷 2. 한국 주식 (KOSPI/KOSDAQ 전체) 데이터를 가져옵니다...")
-    try:
-        krx = fdr.StockListing('KRX')
-        # 시가총액(Marcap) 기준으로 내림차순 정렬 (데이터가 있을 경우)
-        if 'Marcap' in krx.columns:
-            krx = krx.sort_values('Marcap', ascending=False)
-            
-        # 제한 없이 전체 종목 순회
-        for _, row in krx.iterrows():
-            sym = str(row['Code'])
-            market = str(row.get('Market', 'KRX'))
-            # 코스닥은 .KQ, 코스피/기타는 .KS (야후 파이낸스 기준)
-            suffix = ".KQ" if "KOSDAQ" in market else ".KS"
-            add_to_db(f"{sym}{suffix}", row['Name'], market)
-    except Exception as e:
-        print(f"한국 주식 가져오기 실패: {e}")
-
-    print("🦅 3. 미국 ETF (전체) 데이터를 가져옵니다...")
-    try:
         us_etfs = fdr.StockListing('ETF/US')
-        # 거래량이 높은 순서대로 정렬 (데이터가 있을 경우)
-        if 'Volume' in us_etfs.columns:
-            us_etfs = us_etfs.sort_values('Volume', ascending=False)
-            
-        # 제한 없이 전체 종목 순회
         for _, row in us_etfs.iterrows():
             add_to_db(row['Symbol'], row['Name'], "US_ETF")
     except Exception as e:
-        print(f"미국 ETF 가져오기 실패: {e}")
+        print(f"미국 데이터 가져오기 실패: {e}")
 
-    print("🐯 4. 한국 ETF (전체) 데이터를 가져옵니다...")
+    print("🇰🇷 2. 한국 주식/ETF 데이터를 1차 수집합니다 (FDR 기본)...")
     try:
-        kr_etfs = fdr.StockListing('ETF/KR')
-        # 거래량이 높은 순서대로 정렬 (데이터가 있을 경우)
-        if 'Volume' in kr_etfs.columns:
-            kr_etfs = kr_etfs.sort_values('Volume', ascending=False)
-            
-        # 제한 없이 전체 종목 순회
-        for _, row in kr_etfs.iterrows():
-            sym = str(row['Symbol'])
-            # 한국 ETF는 야후 파이낸스에서 모두 코스피(.KS)로 취급됨
-            add_to_db(f"{sym}.KS", row['Name'], "KR_ETF")
-    except Exception as e:
-        print(f"한국 ETF 가져오기 실패: {e}")
+        krx = fdr.StockListing('KRX')
+        for _, row in krx.iterrows():
+            sym = str(row['Code'])
+            market = str(row.get('Market', 'KRX'))
+            suffix = ".KQ" if "KOSDAQ" in market else ".KS"
+            add_to_db(f"{sym}{suffix}", row['Name'], market)
 
-    print("🪙 5. 암호화폐 및 커스텀 추가 데이터를 가져옵니다...")
-    extras = [
-        {"symbol": "BTC-USD", "name": "Bitcoin (비트코인)", "exch": "CRYPTO"},
-        {"symbol": "ETH-USD", "name": "Ethereum (이더리움)", "exch": "CRYPTO"},
-        {"symbol": "SOL-USD", "name": "Solana (솔라나)", "exch": "CRYPTO"}
-    ]
-    for item in extras:
-        add_to_db(item['symbol'], item['name'], item['exch'])
+        kr_etfs = fdr.StockListing('ETF/KR')
+        for _, row in kr_etfs.iterrows():
+            add_to_db(f"{str(row['Symbol'])}.KS", row['Name'], "KR_ETF")
+    except Exception as e:
+        print(f"한국 데이터 1차 가져오기 실패: {e}")
+
+    print("🏛️ 3. 공공데이터포털 API로 누락된 한국 종목을 2차 싹쓸이합니다...")
+    # 🌟 보안을 위해 환경변수(GitHub Secrets)에서 API 키를 가져옵니다.
+    PUBLIC_API_KEY = os.environ.get('PUBLIC_DATA_API_KEY', '')
+    
+    if PUBLIC_API_KEY:
+        try:
+            # numOfRows=5000 으로 한 번의 호출로 한국 주식시장 전체 데이터를 가져옵니다.
+            url = f"https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey={PUBLIC_API_KEY}&numOfRows=5000&pageNo=1&resultType=json"
+            res = requests.get(url, verify=False, timeout=15)
+            
+            if res.status_code == 200:
+                data = res.json()
+                items = data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
+                
+                added_from_public = 0
+                for item in items:
+                    sym = str(item.get('srtnCd'))
+                    name = str(item.get('itmsNm'))
+                    market = str(item.get('mrktCtg'))
+                    suffix = ".KQ" if "KOSDAQ" in market else ".KS"
+                    
+                    # 아직 DB에 없는 종목만 추가 (누락분 채우기)
+                    target_sym = f"{sym}{suffix}"
+                    if target_sym not in added_symbols:
+                        add_to_db(target_sym, name, market)
+                        added_from_public += 1
+                        
+                print(f"   -> 공공데이터포털에서 {added_from_public}개의 누락 종목을 추가로 찾아냈습니다!")
+            else:
+                print(f"   -> 공공데이터포털 API 에러 (상태코드: {res.status_code})")
+        except Exception as e:
+            print(f"   -> 공공데이터포털 수집 에러: {e}")
+    else:
+        print("   -> ⚠️ PUBLIC_DATA_API_KEY가 설정되지 않아 공공데이터 수집은 건너뜁니다.")
 
     # data 폴더가 없으면 생성
     os.makedirs('data', exist_ok=True)
