@@ -44,7 +44,8 @@
     <button class="vtab" id="tabUser1" onclick="setView('user1', this)">소유자1</button>
     <button class="vtab" id="tabUser2" onclick="setView('user2', this)">소유자2</button>
     <button class="vtab" onclick="setView('watch', this)">관심종목</button>
-    <button class="vtab" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
+    <button class="vtab" onclick="setView('history', this)">거래 내역</button>
+    <button class="vtab" id="tabDividend" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
   </div>
   
   <div class="nav-right">
@@ -148,7 +149,6 @@
 
       <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px 20px 10px;">
         <div class="tx-history-title" style="padding:0;">최근 거래 내역</div>
-        <button class="btn-sm" onclick="setView('history')" style="padding: 2px 8px; border-color:var(--border2);">전체 보기</button>
       </div>
       <ul class="tx-list" id="txList" style="padding-top:0;"></ul>
     </div>
