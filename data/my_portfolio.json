@@ -1,5 +1,7 @@
 {
-  "tickers": [],
+  "tickers": [
+    "036570.KS"
+  ],
   "transactions": [],
   "range": "1w",
   "ownerNames": {
