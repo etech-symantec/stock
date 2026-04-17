@@ -381,13 +381,13 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// 🌟 CSV 모달 창 열기 (스타일 보정)
+// 🌟 CSV 모달 창 열기 (검색 드롭다운 겹침 문제 완벽 해결)
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
     if(!container) return;
 
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
-        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:0; position:relative;">
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:0; position:relative; z-index:${9999 - idx};">
           <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:8px; display:block;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
           
           <div style="display: flex; gap: 15px; margin-bottom: 10px; font-size: 12px; color: var(--text2);">
@@ -398,7 +398,7 @@ function openCsvMappingModal() {
           <div id="mappingInputArea_${idx}" style="position:relative;">
              <input type="text" id="mapInput_${idx}" class="form-input" placeholder="현재 종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
              <ul id="mapDropdown_${idx}" class="search-dropdown" 
-                 style="position:absolute; bottom:100%; left:0; width:100%; max-height:160px; overflow-y:auto; z-index:9999; display:none; margin-bottom:5px; box-shadow: 0 -4px 12px rgba(0,0,0,0.3);">
+                 style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:180px; overflow-y:auto; z-index:9999; display:none; box-shadow: 0 4px 16px rgba(0,0,0,0.8); border: 1px solid var(--border2); border-radius: 6px;">
              </ul>
           </div>
         </div>
