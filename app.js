@@ -976,16 +976,17 @@ function prepareTransaction(symbol, broker) {
 // ==========================================
 // 4. 검색, 자동완성 및 API Fetch 
 // ==========================================
-function setupSearch(inputId, dropdownId, onSelect) {
+function setupSearch(inputId, dropdownId, onSelect, filterId) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
+  const filter = document.getElementById(filterId);
   if(!input || !dropdown) return;
   
-  dropdown.style.maxHeight = '200px';
+  dropdown.style.maxHeight = '300px';
   dropdown.style.overflowY = 'auto';
   
-  input.addEventListener('input', (e) => {
-    let query = e.target.value.trim().toLowerCase();
+  const performSearch = () => {
+    let query = input.value.trim().toLowerCase();
     if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
     
     const isIncludesSearch = query.startsWith('*') || query.endsWith('*');
@@ -993,12 +994,21 @@ function setupSearch(inputId, dropdownId, onSelect) {
     
     if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
 
+    // 🌟 국가 필터링 적용 (한국: .KS, .KQ, 숫자6자리 / 미국: 한국과 암호화폐가 아닌 것)
+    let filteredDB = localStockDB;
+    if (filter && filter.value === 'kr') {
+        filteredDB = localStockDB.filter(s => isKorean(s.symbol));
+    } else if (filter && filter.value === 'us') {
+        filteredDB = localStockDB.filter(s => !isKorean(s.symbol) && !isCrypto(s.symbol));
+    }
+
     let results = [];
     if (isIncludesSearch) {
-        results = localStockDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
+        results = filteredDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
     } else {
-        results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
-    }    
+        results = filteredDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
+    }
+    
     if (results.length === 0) { dropdown.style.display = 'none'; return; }
     
     dropdown.innerHTML = results.map(q => `
@@ -1011,15 +1021,19 @@ function setupSearch(inputId, dropdownId, onSelect) {
       </li>
     `).join('');
     dropdown.style.display = 'block';
-  });
+  };
+
+  input.addEventListener('input', performSearch);
+  if (filter) filter.addEventListener('change', performSearch); // 🌟 필터를 바꿀 때도 즉시 검색 결과 갱신
 
   document.addEventListener('click', (e) => {
-    if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
+    if (!input.contains(e.target) && !dropdown.contains(e.target) && (!filter || !filter.contains(e.target))) dropdown.style.display = 'none';
   });
 }
 
-setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult');
-setupSearch('txSymbol', 'txDropdown', 'selectSidebarSearchResult');
+// 🌟 필터 ID를 포함하여 검색 기능 초기화
+setupSearch('tickerInput', 'searchDropdown', 'selectMainSearchResult', 'mainSearchFilter');
+setupSearch('txSymbol', 'txDropdown', 'selectSidebarSearchResult', 'sideSearchFilter');
 
 function selectMainSearchResult(symbol) {
   document.getElementById('tickerInput').value = '';
@@ -2322,30 +2336,43 @@ async function render() {
 // ==========================================
 // 6. CSV 알 수 없는 종목 수동 매핑 모달 로직
 // ==========================================
-// CSV 모달 창 열기
+// 🌟 CSV 모달 창 열기 (필터 드롭다운 적용)
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
-    if(!container) {
-        alert("HTML 파일에 매핑 모달 UI가 없습니다. index.html을 업데이트 해주세요.");
-        return;
-    }
-    // 중복 제거된 unmatchedSymbols 리스트를 화면에 그림
+    if(!container) return;
+
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
-        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:6px; margin-bottom:10px;">
-          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
-          <div style="position:relative;">
-             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="이 종목의 정확한 이름이나 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
-             <ul id="mapDropdown_${idx}" class="search-dropdown" style="max-height:150px; z-index:99999; display:none;"></ul>
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:0; position:relative; z-index:${9999 - idx};">
+          <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:8px; display:block;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
+          
+          <div style="display: flex; gap: 15px; margin-bottom: 10px; font-size: 12px; color: var(--text2);">
+             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="rename" checked onchange="document.getElementById('mappingInputArea_${idx}').style.display='flex'"> 🔄 종목명/티커 변경</label>
+             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'"> ☠️ 상장폐지</label>
+          </div>
+
+          <div id="mappingInputArea_${idx}" style="display:flex; gap:5px; position:relative;">
+             <select id="mapFilter_${idx}" class="form-input" style="width:85px; padding:0 5px; font-size:12px; cursor:pointer;" onchange="handleMapSearch(document.getElementById('mapInput_${idx}'), ${idx})">
+                 <option value="all">🌐 전체</option>
+                 <option value="kr">🇰🇷 한국</option>
+                 <option value="us">🇺🇸 미국</option>
+             </select>
+             <div style="position:relative; flex:1;">
+                 <input type="text" id="mapInput_${idx}" class="form-input" placeholder="현재 종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
+                 <ul id="mapDropdown_${idx}" class="search-dropdown" 
+                     style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:180px; overflow-y:auto; z-index:9999; display:none; box-shadow: 0 4px 16px rgba(0,0,0,0.8); border: 1px solid var(--border2); border-radius: 6px;">
+                 </ul>
+             </div>
           </div>
         </div>
     `).join('');
     document.getElementById('csvMappingOverlay').classList.add('open');
 }
 
-// 🌟 CSV 모달 내부 검색기능 (결과 제한 해제)
+// 🌟 CSV 모달 내부 검색기능 (국가 필터링 반영)
 function handleMapSearch(inputElem, idx) {
    let query = inputElem.value.trim().toLowerCase();
    const dropdown = document.getElementById(`mapDropdown_${idx}`);
+   const filterElem = document.getElementById(`mapFilter_${idx}`);
    if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
    
    const isIncludesSearch = query.startsWith('*') || query.endsWith('*');
@@ -2353,13 +2380,21 @@ function handleMapSearch(inputElem, idx) {
    
    if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
 
+   // 🌟 필터링 적용 로직
+   let filteredDB = localStockDB;
+   if (filterElem && filterElem.value === 'kr') {
+       filteredDB = localStockDB.filter(s => isKorean(s.symbol));
+   } else if (filterElem && filterElem.value === 'us') {
+       filteredDB = localStockDB.filter(s => !isKorean(s.symbol) && !isCrypto(s.symbol));
+   }
+
    let results = [];
    if (isIncludesSearch) {
-       results = localStockDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
+       results = filteredDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
    } else {
-       results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
+       results = filteredDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
    }
-   
+
    if (results.length === 0) { dropdown.style.display = 'none'; return; }
    
    dropdown.innerHTML = results.map(q => `
@@ -2376,7 +2411,6 @@ function handleMapSearch(inputElem, idx) {
    
    dropdown.style.display = 'block';
 }
-
 function selectMapResult(idx, symbol, name) {
    const input = document.getElementById(`mapInput_${idx}`);
    input.value = `${name} (${symbol})`; 
