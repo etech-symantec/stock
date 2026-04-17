@@ -15,6 +15,7 @@ function loadState() {
            user2: { name: parsed.ownerNames?.user2 || '보유자2', color: '#00c87a', icon: '👤' }
          };
       }
+      if(!parsed.oldNames) parsed.oldNames = {}; // 🌟 구 종목명 저장용 객체 추가
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
@@ -388,8 +389,14 @@ function openCsvMappingModal() {
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
         <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:0; position:relative;">
           <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:8px; display:block;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
-          <div style="position:relative;">
-             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
+          
+          <div style="display: flex; gap: 15px; margin-bottom: 10px; font-size: 12px; color: var(--text2);">
+             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="rename" checked onchange="document.getElementById('mappingInputArea_${idx}').style.display='block'"> 🔄 종목명/티커 변경</label>
+             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'"> ☠️ 상장폐지</label>
+          </div>
+
+          <div id="mappingInputArea_${idx}" style="position:relative;">
+             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="현재 종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
              <ul id="mapDropdown_${idx}" class="search-dropdown" 
                  style="position:absolute; bottom:100%; left:0; width:100%; max-height:160px; overflow-y:auto; z-index:9999; display:none; margin-bottom:5px; box-shadow: 0 -4px 12px rgba(0,0,0,0.3);">
              </ul>
@@ -462,16 +469,29 @@ function cancelCsvImport() {
 
 // 🌟 사용자가 입력한 매핑 데이터로 최종 저장
 function processPendingCsv() {
+    if (!state.oldNames) state.oldNames = {}; // 🌟 구 종목명 객체 초기화 보장
     const mappingDict = {};
+
     for(let i=0; i<unmatchedSymbols.length; i++) {
         const raw = unmatchedSymbols[i];
-        const input = document.getElementById(`mapInput_${i}`);
-        if(input) {
-            // 사용자가 검색해서 선택한 티커가 있으면 1순위, 없으면 직접 입력한 텍스트 2순위, 둘 다 없으면 원본
-            const mapped = input.dataset.mappedSymbol || input.value.trim().toUpperCase() || raw;
-            mappingDict[raw] = mapped;
+        const status = document.querySelector(`input[name="status_${i}"]:checked`).value;
+        
+        // 🌟 상장폐지 선택 시 .DLST 꼬리표 붙임
+        if (status === 'delisted') {
+            mappingDict[raw] = raw + '.DLST';
+            state.oldNames[raw + '.DLST'] = '상장폐지';
         } else {
-            mappingDict[raw] = raw;
+            const input = document.getElementById(`mapInput_${i}`);
+            if(input) {
+                const mapped = input.dataset.mappedSymbol || input.value.trim().toUpperCase() || raw;
+                mappingDict[raw] = mapped;
+                // 🌟 원본 이름과 다르면 구 종목명으로 기억해둠
+                if (mapped !== raw) {
+                    state.oldNames[mapped] = raw; 
+                }
+            } else {
+                mappingDict[raw] = raw;
+            }
         }
     }
 
@@ -1162,6 +1182,9 @@ async function fetchYahooAPI(symbol) {
 // 🌟 3. 최종 데이터 라우터 (이 함수가 순서를 제어합니다)
 // 기존 앱 로직에서 이 함수를 호출하므로 이름은 그대로 유지합니다.
 async function fetchYahooData(symbol) {
+    // 🌟 [추가] 상장폐지 종목은 API 호출을 아예 스킵하고 즉시 실패처리
+    if (symbol.endsWith('.DLST')) return { _failed: true };
+  
     // 국내 주식 티커 형태 (예: 005930.KS) 인지 확인
     if (/^\d{6}\.K[SQ]$/.test(symbol)) {
         // 1순위: 공공데이터포털 호출
@@ -1323,6 +1346,18 @@ function generateCardHtml(item) {
   // 🌟 [유지] 태그 텍스트를 쉼표(,)로 쪼개서 최대 5개까지만 배열로 만듭니다.
   const customTagText = state.tags && state.tags[item.symbol] ? state.tags[item.symbol] : '';
   const tagsArray = customTagText.split(',').map(t => t.trim()).filter(t => t).slice(0, 5);
+
+  // 🌟 [추가됨] 구 종목명 또는 상장폐지 표시 처리
+  let displayName = data.name;
+  let displaySymbol = item.symbol;
+  if (state.oldNames && state.oldNames[item.symbol]) {
+      if (state.oldNames[item.symbol] === '상장폐지') {
+          displaySymbol = item.symbol.replace('.DLST', '');
+          displayName = `${displaySymbol} (상장폐지)`;
+      } else {
+          displayName = `${data.name} (구: ${state.oldNames[item.symbol]})`;
+      }
+  }
   
   let tagsHtml = '';
   if (tagsArray.length > 0) {
@@ -1347,9 +1382,9 @@ function generateCardHtml(item) {
 
       <div class="card-head" style="align-items:center; margin-top:12px;">
         <div style="flex:1; min-width:0; margin-right:10px;">
-          <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${data.name}">${data.name}</div>
+          <div style="font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);" title="${displayName}">${displayName}</div>
           <div style="font-size:11px; font-family:var(--font-mono); color:var(--text3); margin-top:2px; white-space:nowrap;">
-            ${item.symbol}
+            ${displaySymbol}
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
