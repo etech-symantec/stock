@@ -991,22 +991,17 @@ function setupSearch(inputId, dropdownId, onSelect) {
     
     if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
 
-    // 🌟 영문 ETF 브랜드를 한글 공식 명칭으로 자동 변환
-    const etfBrandMap = { "timefolio": "타임폴리오", "koact": "코액트", "mighty": "마이티", "woori": "우리", "focus": "포커스", "treyn": "트레인", "vnam": "브이남", "hk": "흥국" };
-    for (const [eng, kor] of Object.entries(etfBrandMap)) {
-        if (cleanQuery.startsWith(eng)) { cleanQuery = cleanQuery.replace(eng, kor); break; }
-    }
-
+    // 🌟 영문/한글 자동 변환 없이, 입력한 단어 그대로 검색합니다.
     let results = [];
     if (isIncludesSearch) {
-        // 💡 * 포함: 검색어가 포함된 모든 종목
+        // 💡 * 포함: 검색어가 '포함'된 종목
         results = localStockDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
     } else {
-        // 💡 기본: 검색어로 시작하는 종목만 (예: NC -> NC로 시작하는 종목만)
+        // 💡 기본: 검색어로 '시작'하는 종목
         results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
     }
 
-    results = results.slice(0, 6); // 상단/좌측 검색창은 최대 6개까지만 표시
+    results = results.slice(0, 6); // 최대 6개까지만 표시
     
     if (results.length === 0) { dropdown.style.display = 'none'; return; }
     
@@ -2351,24 +2346,42 @@ function openCsvMappingModal() {
     document.getElementById('csvMappingOverlay').classList.add('open');
 }
 
-// 모달 내부에서 종목 검색하기
+// 🌟 CSV 모달 내부 검색기능 (자동 변환 제거, 있는 그대로 검색)
 function handleMapSearch(inputElem, idx) {
-   const query = inputElem.value.trim().toLowerCase();
+   let query = inputElem.value.trim().toLowerCase();
    const dropdown = document.getElementById(`mapDropdown_${idx}`);
    if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
    
-   const results = localStockDB.filter(s => s.symbol.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)).slice(0, 6);
+   const isIncludesSearch = query.startsWith('*') || query.endsWith('*');
+   let cleanQuery = query.replace(/\*/g, '').trim();
+   
+   if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
+
+   // 🌟 영문/한글 자동 변환 없이, 입력한 단어 그대로 검색합니다.
+   let results = [];
+   if (isIncludesSearch) {
+       results = localStockDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
+   } else {
+       results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
+   }
+
+   // 넉넉하게 15개까지 가져오고, 넘어가면 스크롤바가 생깁니다.
+   results = results.slice(0, 15);
+   
    if (results.length === 0) { dropdown.style.display = 'none'; return; }
    
    dropdown.innerHTML = results.map(q => `
-     <li class="search-item" style="padding:10px;" onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
-       <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
+     <li class="search-item" style="padding:10px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" 
+         onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')"
+         onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+       <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
          <span style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
          <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
        </div>
-       <span style="color:var(--accent); font-family:var(--font-mono); font-size:12px; font-weight:700;">${q.symbol}</span>
+       <span style="color:var(--accent); font-family:var(--font-mono); font-size:11px; font-weight:700; margin-left:10px; flex-shrink:0;">${q.symbol}</span>
      </li>
    `).join('');
+   
    dropdown.style.display = 'block';
 }
 
