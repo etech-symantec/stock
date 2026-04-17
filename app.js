@@ -101,7 +101,18 @@ function getHeatmapColor(change) {
   return 'rgba(136, 144, 164, 0.4)';
 }
 
-function isKorean(symbol) { return symbol.endsWith('.KS') || symbol.endsWith('.KQ') || /^\d{6}$/.test(symbol); }
+// 🌟 상장폐지 꼬리표(.DLST)가 붙어도 한국 주식인지 인식할 수 있도록 수정
+function isKorean(symbol) { 
+    let s = symbol.replace('.KS.DLST', '.KS').replace('.DLST', ''); 
+    return s.endsWith('.KS') || s.endsWith('.KQ') || /^\d{6}$/.test(s); 
+}
+
+// 🌟 전체 거래내역 필터 상태 저장 변수 추가 (isKorean 함수 바로 아래에 추가하세요)
+let historyFilters = { market: 'all', type: 'all', search: '' };
+function updateHistoryFilter(key, value) {
+    historyFilters[key] = value;
+    renderHistoryDashboard();
+}
 function isCrypto(symbol) { return symbol.endsWith('-USD'); }
 function formatPrice(val, symbol) {
   if (isKorean(symbol)) return '₩' + Math.round(val).toLocaleString();
@@ -926,23 +937,95 @@ function renderTxList() {
   }).join('');
 }
 
+// 🌟 전체 거래 내역 렌더링 (필터 UI 자동 생성 및 필터링 로직 추가)
 function renderHistoryDashboard() {
   const tbody = document.getElementById('historyTableBody');
-  if(!tbody) return;
-  const sorted = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+  const dash = document.getElementById('historyDashboard');
+  if(!tbody || !dash) return;
+  
+  // 💡 HTML 수정 없이 JS가 알아서 필터 바를 만들어줍니다!
+  let filterBar = document.getElementById('historyFilterBar');
+  if (!filterBar) {
+      filterBar = document.createElement('div');
+      filterBar.id = 'historyFilterBar';
+      filterBar.style.cssText = "display:flex; gap:10px; margin-bottom:15px; padding:15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border); flex-wrap:wrap;";
+      filterBar.innerHTML = `
+          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('market', this.value)">
+              <option value="all">🌐 전체 국가</option>
+              <option value="kr">🇰🇷 한국 종목</option>
+              <option value="us">🇺🇸 미국 종목</option>
+          </select>
+          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('type', this.value)">
+              <option value="all">모든 거래</option>
+              <option value="buy">🔴 매수 내역</option>
+              <option value="sell">🔵 매도 내역</option>
+              <option value="dividend">🟢 배당 내역</option>
+          </select>
+          <input type="text" class="form-input" placeholder="종목명 또는 티커 검색..." style="flex:1; min-width:200px; padding:8px 12px; margin:0;" oninput="updateHistoryFilter('search', this.value)">
+      `;
+      const tableWrap = tbody.closest('div');
+      dash.insertBefore(filterBar, tableWrap);
+  }
+  
+  // 🌟 선택된 필터 조건에 맞게 데이터 걸러내기
+  let filtered = state.transactions.filter(tx => {
+      let pass = true;
+      const isKr = isKorean(tx.symbol);
+      
+      // 국가 필터
+      if (historyFilters.market === 'kr' && !isKr) pass = false;
+      if (historyFilters.market === 'us' && isKr) pass = false;
+      
+      // 거래 유형 필터
+      if (historyFilters.type === 'buy' && (tx.txType !== 'trade' || tx.qty <= 0)) pass = false;
+      if (historyFilters.type === 'sell' && (tx.txType !== 'trade' || tx.qty >= 0)) pass = false;
+      if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
+      
+      // 검색어 필터
+      if (historyFilters.search) {
+          let s = historyFilters.search.toLowerCase();
+          let stockName = tx.symbol;
+          const dbMatch = localStockDB.find(x => x.symbol === tx.symbol);
+          const cachedMatch = cachedMarketData[tx.symbol];
+          if (dbMatch) stockName = dbMatch.name;
+          else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+          
+          if (state.oldNames && state.oldNames[tx.symbol] && state.oldNames[tx.symbol] !== '상장폐지') {
+              stockName = state.oldNames[tx.symbol];
+          }
+          if (!tx.symbol.toLowerCase().includes(s) && !stockName.toLowerCase().includes(s)) pass = false;
+      }
+      return pass;
+  });
+
+  const sorted = filtered.sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+  
   if(sorted.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--text3);">등록된 거래 내역이 없습니다.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--text3);">조건에 맞는 거래 내역이 없습니다.</td></tr>`;
       return;
   }
+  
   tbody.innerHTML = sorted.map(tx => {
       const isBuy = tx.qty > 0;
       const isDiv = tx.txType === 'dividend';
       const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
       const typeLabel = isDiv ? '배당' : (isBuy ? '매수' : '매도');
       const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
+      
+      let stockName = tx.symbol;
       const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
       const cachedMatch = cachedMarketData[tx.symbol];
-      const stockName = dbMatch ? dbMatch.name : (cachedMatch && !cachedMatch._failed && cachedMatch.name ? cachedMatch.name : tx.symbol);
+      if (dbMatch) stockName = dbMatch.name;
+      else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+
+      if (state.oldNames && state.oldNames[tx.symbol]) {
+          if (state.oldNames[tx.symbol] === '상장폐지') {
+              stockName = `${tx.symbol.replace('.KS.DLST', '').replace('.DLST', '')} (상장폐지)`;
+          } else {
+              stockName = `${stockName} (구: ${state.oldNames[tx.symbol]})`;
+          }
+      }
+
       const oInfo = getOwnerInfo(tx.owner);
 
       return `
@@ -951,7 +1034,7 @@ function renderHistoryDashboard() {
           <td style="padding:12px 16px;"><span class="tx-owner-badge" onclick="toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="margin:0; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span></td>
           <td style="padding:12px 16px; color:var(--text2);">${tx.broker || '-'}</td>
           <td style="padding:12px 16px; font-weight:700; color:${typeColor};">${typeLabel}</td>
-          <td style="padding:12px 16px;"><div style="font-weight:700; color:var(--text);">${stockName}</div><div style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${tx.symbol}</div></td>
+          <td style="padding:12px 16px;"><div style="font-weight:700; color:var(--text);">${stockName}</div><div style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${tx.symbol.replace('.KS.DLST','').replace('.DLST','')}</div></td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : Math.abs(tx.qty)}</td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : formatPrice(tx.price, tx.symbol)}</td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:var(--text);">${formatPrice(totalAmt, tx.symbol)}</td>
@@ -2336,18 +2419,24 @@ async function render() {
 // ==========================================
 // 6. CSV 알 수 없는 종목 수동 매핑 모달 로직
 // ==========================================
-// 🌟 CSV 모달 창 열기 (필터 드롭다운 적용)
+// 🌟 CSV 모달 창 열기 (상장폐지 선택 시 국가 지정 옵션 추가)
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
     if(!container) return;
 
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
-        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:0; position:relative; z-index:${9999 - idx};">
-          <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:8px; display:block;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:6px; margin-bottom:10px; position:relative; z-index:${9999 - idx};">
+          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px; display:block;"><span style="color:var(--accent);">${sym}</span></label>
           
           <div style="display: flex; gap: 15px; margin-bottom: 10px; font-size: 12px; color: var(--text2);">
-             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="rename" checked onchange="document.getElementById('mappingInputArea_${idx}').style.display='flex'"> 🔄 종목명/티커 변경</label>
-             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'"> ☠️ 상장폐지</label>
+             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="rename" checked onchange="document.getElementById('mappingInputArea_${idx}').style.display='flex'; document.getElementById('delistedMarketArea_${idx}').style.display='none';"> 🔄 종목명/티커 변경</label>
+             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'; document.getElementById('delistedMarketArea_${idx}').style.display='block';"> ☠️ 상장폐지</label>
+          </div>
+
+          <div id="delistedMarketArea_${idx}" style="display:none; margin-bottom:10px; font-size:12px; color:var(--text); background:var(--bg3); padding:10px; border-radius:6px; border:1px solid var(--border2);">
+             <div style="margin-bottom:8px; font-weight:bold; color:var(--text2);">어느 국가 종목인가요? (환율 및 통화 계산용)</div>
+             <label style="margin-right:15px; cursor:pointer;"><input type="radio" name="market_${idx}" value="kr" checked> 🇰🇷 한국 종목</label>
+             <label style="cursor:pointer;"><input type="radio" name="market_${idx}" value="us"> 🇺🇸 미국 종목</label>
           </div>
 
           <div id="mappingInputArea_${idx}" style="display:flex; gap:5px; position:relative;">
@@ -2359,7 +2448,7 @@ function openCsvMappingModal() {
              <div style="position:relative; flex:1;">
                  <input type="text" id="mapInput_${idx}" class="form-input" placeholder="현재 종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
                  <ul id="mapDropdown_${idx}" class="search-dropdown" 
-                     style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:180px; overflow-y:auto; z-index:1; display:none; box-shadow: 0 4px 16px rgba(0,0,0,0.8); border: 1px solid var(--border2); border-radius: 6px;">
+                     style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:180px; overflow-y:auto; z-index:1; display:none; background-color:#141720; border:1px solid var(--border2); border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.8); padding:0;">
                  </ul>
              </div>
           </div>
@@ -2433,18 +2522,37 @@ function cancelCsvImport() {
     closeModal('csvMappingOverlay');
 }
 
-// 사용자가 짝지어준 데이터로 최종 장부 반영
+// 🌟 사용자가 매핑한 구 종목명 / 상장폐지 데이터 및 국가 정보 저장
 function processPendingCsv() {
+    if (!state.oldNames) state.oldNames = {};
     const mappingDict = {};
+
     for(let i=0; i<unmatchedSymbols.length; i++) {
         const raw = unmatchedSymbols[i];
-        const input = document.getElementById(`mapInput_${i}`);
-        if(input) {
-            // 사용자가 검색해서 선택한 티커가 있으면 1순위, 없으면 직접 입력한 텍스트 2순위, 둘 다 없으면 원본
-            const mapped = input.dataset.mappedSymbol || input.value.trim().toUpperCase() || raw;
-            mappingDict[raw] = mapped;
+        const status = document.querySelector(`input[name="status_${i}"]:checked`).value;
+        
+        if (status === 'delisted') {
+            // 🌟 국가별 맞춤 꼬리표 부여 (.KS.DLST 또는 .DLST)
+            const market = document.querySelector(`input[name="market_${i}"]:checked`).value;
+            let finalSym = raw;
+            if (market === 'kr' && !finalSym.endsWith('.KS') && !finalSym.endsWith('.KQ')) {
+                finalSym += '.KS'; 
+            }
+            finalSym += '.DLST';
+            
+            mappingDict[raw] = finalSym;
+            state.oldNames[finalSym] = '상장폐지';
         } else {
-            mappingDict[raw] = raw;
+            const input = document.getElementById(`mapInput_${i}`);
+            if(input) {
+                const mapped = input.dataset.mappedSymbol || input.value.trim().toUpperCase() || raw;
+                mappingDict[raw] = mapped;
+                if (mapped !== raw) {
+                    state.oldNames[mapped] = raw; 
+                }
+            } else {
+                mappingDict[raw] = raw;
+            }
         }
     }
 
