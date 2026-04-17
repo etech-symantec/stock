@@ -7330,17 +7330,17 @@
       "txType": "dividend"
     }
   ],
-  "range": "1m",
+  "range": "1y",
   "owners": {
     "user1": {
-      "name": "보유자1",
-      "color": "#7c6af7",
-      "icon": "👤"
+      "name": "ㅋㅋ",
+      "icon": "🐯",
+      "color": "#f769c3"
     },
     "user2": {
       "name": "보유자2",
-      "color": "#00c87a",
-      "icon": "👤"
+      "icon": "👤",
+      "color": "#00c87a"
     }
   },
   "oldNames": {}
