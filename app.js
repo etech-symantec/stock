@@ -2359,7 +2359,7 @@ function openCsvMappingModal() {
              <div style="position:relative; flex:1;">
                  <input type="text" id="mapInput_${idx}" class="form-input" placeholder="현재 종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
                  <ul id="mapDropdown_${idx}" class="search-dropdown" 
-                     style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:180px; overflow-y:auto; z-index:9999; display:none; box-shadow: 0 4px 16px rgba(0,0,0,0.8); border: 1px solid var(--border2); border-radius: 6px;">
+                     style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:180px; overflow-y:auto; z-index:1; display:none; box-shadow: 0 4px 16px rgba(0,0,0,0.8); border: 1px solid var(--border2); border-radius: 6px;">
                  </ul>
              </div>
           </div>
