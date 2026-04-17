@@ -15,6 +15,18 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .header-search .btn-add-icon:hover { background: #6855e0; transform: translateY(-50%) scale(1.05); }
 .header-search .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; list-style: none; z-index: 99999; max-height: 280px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; }
 
+/* 🌟 검색 목록(드롭다운) 배경색 강제 지정 (투명도 제거) */
+.search-dropdown, .tx-dropdown {
+    background-color: #0d0f14 !important; /* 완전히 불투명한 아주 어두운 배경색 */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95) !important; /* 글씨가 묻히지 않게 아주 진한 그림자 추가 */
+    border: 1px solid rgba(255, 255, 255, 0.2) !important; /* 테두리를 살짝 밝게 해서 구분감 부여 */
+}
+
+/* 🌟 검색된 종목(각 줄)에 마우스를 올렸을 때의 색상 */
+.search-item:hover {
+    background-color: #1c2030 !important; 
+}
+
 .view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); justify-content: center; flex-shrink: 0; }
 .vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; white-space: nowrap; }
 .vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
