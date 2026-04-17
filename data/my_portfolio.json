@@ -7330,7 +7330,7 @@
       "txType": "dividend"
     }
   ],
-  "range": "3m",
+  "range": "1d",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
@@ -7343,7 +7343,7 @@
     },
     "user2": {
       "name": "미니",
-      "icon": "👤",
+      "icon": "🐵",
       "color": "#bac700"
     }
   },
