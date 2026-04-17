@@ -11,8 +11,8 @@ function loadState() {
       let parsed = JSON.parse(s);
       if(!parsed.owners) {
          parsed.owners = {
-           user1: { name: parsed.ownerNames?.user1 || '보유자1', color: '#7c6af7', icon: '👤' },
-           user2: { name: parsed.ownerNames?.user2 || '보유자2', color: '#00c87a', icon: '👤' }
+           user1: { name: parsed.ownerNames?.user1 || '소유자1', color: '#7c6af7', icon: '👤' },
+           user2: { name: parsed.ownerNames?.user2 || '소유자2', color: '#00c87a', icon: '👤' }
          };
       }
       if(!parsed.oldNames) parsed.oldNames = {}; // 🌟 구 종목명 저장용 객체 추가
