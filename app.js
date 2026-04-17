@@ -380,64 +380,61 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// 🌟 CSV 모달 창 열기
+// 🌟 CSV 모달 창 열기 (스타일 보정)
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
     if(!container) return;
-    
+
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
-        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:6px; margin-bottom:0px; position:relative;">
-          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:0; position:relative;">
+          <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:8px; display:block;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
           <div style="position:relative;">
-             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 (예: *삼성*)" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
-             <ul id="mapDropdown_${idx}" class="search-dropdown" style="max-height: 180px; overflow-y: auto; z-index: 999999; display: none;"></ul>
+             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
+             <ul id="mapDropdown_${idx}" class="search-dropdown" 
+                 style="position:absolute; bottom:100%; left:0; width:100%; max-height:160px; overflow-y:auto; z-index:9999; display:none; margin-bottom:5px; box-shadow: 0 -4px 12px rgba(0,0,0,0.3);">
+             </ul>
           </div>
         </div>
     `).join('');
     document.getElementById('csvMappingOverlay').classList.add('open');
 }
 
-// 🌟 CSV 모달 내부 검색기능 (시작어 / 와일드카드 지원)
+// 🌟 CSV 모달 내부 검색기능 (결과 리스트 가독성 개선)
 function handleMapSearch(inputElem, idx) {
    let query = inputElem.value.trim().toLowerCase();
    const dropdown = document.getElementById(`mapDropdown_${idx}`);
    if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
    
-   // 사용자가 양쪽에 *를 입력했는지 확인 (예: *nc*)
    const isIncludesSearch = query.startsWith('*') || query.endsWith('*');
-   // 검색어에서 * 제거 (순수 검색어만 추출)
-   const cleanQuery = query.replace(/\*/g, '').trim();
+   let cleanQuery = query.replace(/\*/g, '').trim();
    
    if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
 
-   let results = [];
-   
-   if (isIncludesSearch) {
-       // *가 붙어있으면: 이름이나 심볼의 "어디에든 포함"된 종목 검색
-       results = localStockDB.filter(s => 
-           s.symbol.toLowerCase().includes(cleanQuery) || 
-           s.name.toLowerCase().includes(cleanQuery)
-       );
-   } else {
-       // 기본: 이름이나 심볼이 입력한 검색어로 "시작"하는 종목만 검색
-       results = localStockDB.filter(s => 
-           s.symbol.toLowerCase().startsWith(cleanQuery) || 
-           s.name.toLowerCase().startsWith(cleanQuery)
-       );
+   // ETF 브랜드 한글 변환 로직 (유지)
+   const etfBrandMap = { "timefolio": "타임폴리오", "koact": "코액트", "mighty": "마이티", "woori": "우리", "focus": "포커스", "treyn": "트레인", "vnam": "브이남", "hk": "흥국" };
+   for (const [eng, kor] of Object.entries(etfBrandMap)) {
+       if (cleanQuery.startsWith(eng)) { cleanQuery = cleanQuery.replace(eng, kor); break; }
    }
 
-   // 결과를 최대 10개까지만 가져옴 (3개가 넘어가면 자동으로 스크롤 생성됨)
-   results = results.slice(0, 10);
+   let results = [];
+   if (isIncludesSearch) {
+       results = localStockDB.filter(s => s.symbol.toLowerCase().includes(cleanQuery) || s.name.toLowerCase().includes(cleanQuery));
+   } else {
+       results = localStockDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
+   }
+
+   results = results.slice(0, 15); // 더 많은 결과를 보여주되 스크롤바가 처리함
    
    if (results.length === 0) { dropdown.style.display = 'none'; return; }
    
    dropdown.innerHTML = results.map(q => `
-     <li class="search-item" style="padding:10px; border-bottom:1px solid var(--border2);" onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
-       <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
+     <li class="search-item" style="padding:10px; border-bottom:1px solid var(--border2); display:flex; justify-content:space-between; align-items:center;" 
+         onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
+       <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
          <span style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
          <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
        </div>
-       <span style="color:var(--accent); font-family:var(--font-mono); font-size:12px; font-weight:700;">${q.symbol}</span>
+       <span style="color:var(--accent); font-family:var(--font-mono); font-size:11px; font-weight:700; margin-left:10px; flex-shrink:0;">${q.symbol}</span>
      </li>
    `).join('');
    
