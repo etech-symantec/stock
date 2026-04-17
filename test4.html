@@ -77,9 +77,9 @@
             </div>
             <div class="toggle-group" style="margin-top:2px;">
               <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
-              <label for="owner1" class="toggle-btn" id="lblUser1">보유자1</label>
+              <label for="owner1" class="toggle-btn" id="lblUser1">소유자1</label>
               <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
-              <label for="owner2" class="toggle-btn" id="lblUser2">보유자2</label>
+              <label for="owner2" class="toggle-btn" id="lblUser2">소유자2</label>
             </div>
           </div>
           <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
@@ -261,8 +261,8 @@
         <h2 class="section-title" style="margin:0;">💰 배당금 현황</h2>
         <div class="view-tabs" style="background:var(--bg3);">
           <button class="vtab active div-filter" onclick="setDivFilter('all', this)">전체 합산</button>
-          <button class="vtab div-filter" id="divTabUser1" onclick="setDivFilter('user1', this)">보유자1</button>
-          <button class="vtab div-filter" id="divTabUser2" onclick="setDivFilter('user2', this)">보유자2</button>
+          <button class="vtab div-filter" id="divTabUser1" onclick="setDivFilter('user1', this)">소유자1</button>
+          <button class="vtab div-filter" id="divTabUser2" onclick="setDivFilter('user2', this)">소유자2</button>
         </div>
       </div>
 
@@ -350,7 +350,7 @@
     
     <div class="form-group" style="margin-bottom:12px; display:flex; gap:10px;">
       <div style="flex:1">
-         <label>보유자1 이름</label>
+         <label>소유자1 이름</label>
          <input type="text" id="inputOwner1Name" class="form-input" placeholder="예: 아빠">
       </div>
       <div style="width: 60px;">
@@ -365,7 +365,7 @@
 
     <div class="form-group" style="margin-bottom:20px; display:flex; gap:10px;">
       <div style="flex:1">
-         <label>보유자2 이름</label>
+         <label>소유자2 이름</label>
          <input type="text" id="inputOwner2Name" class="form-input" placeholder="예: 엄마">
       </div>
       <div style="width: 60px;">
