@@ -394,13 +394,13 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// 🌟 CSV 모달 창 열기 (스크롤바 항상 표시되도록 강제 설정)
+// 🌟 CSV 모달 창 열기 (배경색 불투명 처리 및 그림자 추가로 가독성 개선)
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
     if(!container) return;
 
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
-        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px;">
+        <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px; position:relative; z-index:${9999 - idx};">
           <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:8px; display:block;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
           
           <div style="display: flex; gap: 15px; margin-bottom: 10px; font-size: 12px; color: var(--text2);">
@@ -408,10 +408,10 @@ function openCsvMappingModal() {
              <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'"> ☠️ 상장폐지</label>
           </div>
 
-          <div id="mappingInputArea_${idx}">
+          <div id="mappingInputArea_${idx}" style="position:relative;">
              <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 (예: *삼성*)" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
              <ul id="mapDropdown_${idx}" class="search-dropdown" 
-                 style="position:relative; width:100%; max-height:160px; overflow-y:scroll; overflow-x:hidden; display:none; margin-top:5px; box-shadow:none; border: 1px solid var(--border2); border-radius: 6px; background: var(--bg2); padding:0;">
+                 style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:160px; overflow-y:scroll; overflow-x:hidden; display:none; box-shadow:0 8px 24px rgba(0,0,0,0.9); border: 1px solid var(--border2); border-radius: 6px; background-color: #141720; z-index:9999; padding:0;">
              </ul>
           </div>
         </div>
