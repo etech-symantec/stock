@@ -25,13 +25,19 @@
       </svg>
       주식 매니저
     </div>
-    
-    <div class="header-search">
-      <input type="text" id="tickerInput" class="search-input" placeholder="종목명 또는 Ticker 검색 (와일드카드 *(별표) 지원)" autocomplete="off" />
-      <button class="btn-add-icon" onclick="addManualTicker()" title="종목 추가">＋</button>
-      <ul id="searchDropdown" class="search-dropdown"></ul>
+
+    <div class="header-search" style="display:flex; gap:6px; max-width:400px; background:none; border:none; padding:0;">
+        <select id="mainSearchFilter" class="search-input" style="width:85px; border-radius:20px; height:40px; padding:0 8px; cursor:pointer; font-size:12px;">
+            <option value="all">🌐 전체</option>
+            <option value="kr">🇰🇷 한국</option>
+            <option value="us">🇺🇸 미국</option>
+        </select>
+        <div style="position:relative; flex:1;">
+            <input type="text" id="tickerInput" class="search-input" placeholder="종목명/Ticker 검색 (와일드카드 *(별표) 지원)" autocomplete="off" style="width:100%;" />
+            <button class="btn-add-icon" onclick="addManualTicker()">＋</button>
+            <ul id="searchDropdown" class="search-dropdown" style="width:100%;"></ul>
+        </div>
     </div>
-  </div>
 
   <div class="view-tabs">
     <button class="vtab active" onclick="setView('all', this)">전체보기</button>
@@ -102,9 +108,18 @@
           <input type="date" id="txDate" class="form-input">
         </div>
         <div class="form-group tx-search-container">
-          <label>종목 (티커 또는 회사명)</label>
-          <input type="text" id="txSymbol" class="form-input" placeholder="예: AAPL, 삼성전자..." autocomplete="off">
-          <ul id="txDropdown" class="tx-dropdown"></ul>
+            <label>종목</label>
+            <div style="display:flex; gap:5px;">
+                <select id="sideSearchFilter" class="form-input" style="width:85px; padding:0 5px; cursor:pointer;">
+                    <option value="all">🌐 전체</option>
+                    <option value="kr">🇰🇷 한국</option>
+                    <option value="us">🇺🇸 미국</option>
+                </select>
+                <div style="position:relative; flex:1;">
+                    <input type="text" id="txSymbol" class="form-input" autocomplete="off" style="width:100%;">
+                    <ul id="txDropdown" class="tx-dropdown" style="width:100%;"></ul>
+                </div>
+            </div>
         </div>
         <div style="display:flex; gap:10px;">
           <div class="form-group" style="flex:1;" id="txQtyWrap">
