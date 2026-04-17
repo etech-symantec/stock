@@ -22,7 +22,7 @@ function loadState() {
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '보유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '보유자2', color: '#00c87a', icon: '👤' } } };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '보유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '보유자2', color: '#00c87a', icon: '👤' } } };
 }
 
 let state = loadState();
