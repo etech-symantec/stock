@@ -1023,8 +1023,95 @@ async function fetchExchangeRate() {
   if (data && data.last) { currentUsdKrw = data.last; isExchangeRateFetched = true; }
 }
 
-async function fetchYahooData(symbol) {
-  // 🌟 [안전 차단] 야후가 인식 못하는 한글, 특수문자가 있으면 워닝 로그 없이 조용히 실패 처리
+
+// 🌟 1. 공공데이터포털 API 호출 함수 (국내 주식 전용)
+async function fetchPublicData(symbol) {
+  // 🚨 [필수] 공공데이터포털에서 발급받은 'Decoding' 인증키를 입력하세요.
+  const API_KEY = 'd9f831a4f894f1149672e45b4b910dab8f9c2438061c5201f207c20f0d761e55';
+  
+  if (API_KEY === 'd9f831a4f894f1149672e45b4b910dab8f9c2438061c5201f207c20f0d761e55' || !API_KEY) {
+      console.warn("공공데이터포털 API 키가 설정되지 않았습니다.");
+      return { _failed: true };
+  }
+
+  // 공공데이터포털은 국내 주식(6자리 숫자)만 지원합니다. 미국 주식 등은 실패 처리.
+  if (!/^\d{6}\.K[SQ]$/.test(symbol)) {
+      return { _failed: true }; 
+  }
+
+  // 티커에서 숫자 6자리(단축코드)만 추출
+  const isinCode = symbol.substring(0, 6);
+  
+  // 과거 1년치 데이터를 가져오기 위해 시작일 계산 (YYYYMMDD 형식)
+  const today = new Date();
+  const pastYear = new Date(today.setFullYear(today.getFullYear() - 1));
+  const beginDate = pastYear.toISOString().substring(0, 10).replace(/-/g, '');
+
+  // 공공데이터 API 엔드포인트 구성 (한 페이지에 252개(약 1년치 영업일) 요청)
+  const targetUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${API_KEY}&numOfRows=252&pageNo=1&resultType=json&beginBasDt=${beginDate}&srtnCd=${isinCode}`;
+  
+  // 브라우저 CORS 에러 우회를 위해 프록시 사용
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
+  try {
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+
+    // 응답 데이터 구조 확인 및 에러 처리
+    if (!data.response || !data.response.body || !data.response.body.items || !data.response.body.items.item) {
+        console.warn("공공데이터 API 응답 형식이 올바르지 않거나 데이터가 없습니다.");
+        return { _failed: true };
+    }
+
+    // 데이터가 최신 날짜부터 내림차순으로 오므로, 차트를 위해 오름차순(과거->최신)으로 뒤집기
+    const items = data.response.body.items.item.reverse();
+
+    if (items.length === 0) return { _failed: true };
+
+    let validPrices = [];
+    let validDates = [];
+    let rawDates = [];
+    let stockName = symbol;
+
+    items.forEach(item => {
+        // clpr: 종가 (종가는 문자열로 오므로 숫자로 변환)
+        const price = parseInt(item.clpr, 10);
+        validPrices.push(price);
+
+        // basDt: 기준일자 (YYYYMMDD 형태) -> YYYY-MM-DD 및 M/D 형태로 변환
+        const dt = item.basDt; 
+        const year = dt.substring(0, 4);
+        const month = dt.substring(4, 6);
+        const day = dt.substring(6, 8);
+        
+        rawDates.push(`${year}-${month}-${day}`);
+        validDates.push(`${parseInt(month, 10)}/${parseInt(day, 10)}`);
+        
+        // itmsNm: 종목명 (매 행마다 같지만 덮어쓰기)
+        if (item.itmsNm) {
+            stockName = item.itmsNm;
+        }
+    });
+
+    return {
+      symbol: symbol, 
+      name: stockName, 
+      currency: 'KRW',
+      prices: validPrices, 
+      dates: validDates, 
+      rawDates: rawDates,
+      last: validPrices[validPrices.length - 1],
+      prev: validPrices[validPrices.length - 2] || validPrices[validPrices.length - 1]
+    };
+
+  } catch (e) {
+    return { _failed: true };
+  }
+}
+
+// 🌟 2. 야후 파이낸스 API 호출 함수 (미국 주식 및 대체용)
+async function fetchYahooAPI(symbol) {
+  // 비정상적인 포맷 차단
   if (!/^[A-Za-z0-9.=^-]+$/.test(symbol)) {
     return { _failed: true };
   }
@@ -1073,6 +1160,26 @@ async function fetchYahooData(symbol) {
   } catch (e) {
     return { _failed: true };
   }
+}
+
+// 🌟 3. 최종 데이터 라우터 (이 함수가 순서를 제어합니다)
+// 기존 앱 로직에서 이 함수를 호출하므로 이름은 그대로 유지합니다.
+async function fetchYahooData(symbol) {
+    // 국내 주식 티커 형태 (예: 005930.KS) 인지 확인
+    if (/^\d{6}\.K[SQ]$/.test(symbol)) {
+        // 1순위: 공공데이터포털 호출
+        let publicData = await fetchPublicData(symbol);
+        
+        if (publicData && !publicData._failed) {
+            return publicData; // 성공 시 바로 리턴
+        }
+        
+        // 2순위: 공공데이터 실패 시 야후 파이낸스로 대비(Fallback)
+        return await fetchYahooAPI(symbol);
+    } else {
+        // 미국 주식, 환율 등은 1순위로 바로 야후 파이낸스 호출
+        return await fetchYahooAPI(symbol);
+    }
 }
 
 async function addTickerToPortfolio(symbol) {
