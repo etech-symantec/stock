@@ -394,7 +394,7 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// 🌟 CSV 모달 창 열기 (검색 목록 최대 3개 높이 & 스크롤바)
+// 🌟 CSV 모달 창 열기 (스크롤바 항상 표시되도록 강제 설정)
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
     if(!container) return;
@@ -411,7 +411,7 @@ function openCsvMappingModal() {
           <div id="mappingInputArea_${idx}">
              <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 (예: *삼성*)" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
              <ul id="mapDropdown_${idx}" class="search-dropdown" 
-                 style="position:relative; width:100%; max-height:145px; overflow-y:auto; display:none; margin-top:5px; box-shadow:none; border: 1px solid var(--border2); border-radius: 6px; background: var(--bg2);">
+                 style="position:relative; width:100%; max-height:160px; overflow-y:scroll; overflow-x:hidden; display:none; margin-top:5px; box-shadow:none; border: 1px solid var(--border2); border-radius: 6px; background: var(--bg2); padding:0;">
              </ul>
           </div>
         </div>
