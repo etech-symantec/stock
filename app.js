@@ -395,10 +395,10 @@ function openCsvMappingModal() {
              <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'"> ☠️ 상장폐지</label>
           </div>
 
-          <div id="mappingInputArea_${idx}">
+          <div id="mappingInputArea_${idx}" style="position:relative;">
              <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 (예: *삼성*)" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
              <ul id="mapDropdown_${idx}" class="search-dropdown" 
-                 style="position:relative; width:100%; max-height:200px; overflow-y:auto; display:none; margin-top:5px; box-shadow:none; border: 1px solid var(--border2); border-radius: 6px; background: var(--bg2);">
+                 style="position:absolute; left:0; right:0; top:calc(100% + 4px); z-index:999; max-height:200px; overflow-y:auto; display:none; margin-top:0; box-shadow:0 4px 12px rgba(0,0,0,0.4); border: 1px solid var(--border2); border-radius: 6px; background: var(--bg2);">
              </ul>
           </div>
         </div>
@@ -410,7 +410,12 @@ function openCsvMappingModal() {
 function handleMapSearch(inputElem, idx) {
    let query = inputElem.value.trim().toLowerCase();
    const dropdown = document.getElementById(`mapDropdown_${idx}`);
-   if (query.length < 1 || localStockDB.length === 0) { dropdown.style.display = 'none'; return; }
+   if (query.length < 1 || localStockDB.length === 0) { 
+       dropdown.style.display = 'none';
+       const card = inputElem.closest('.form-group');
+       if (card) card.style.paddingBottom = '';
+       return; 
+   }
    
    // 🌟 사용자가 앞이나 뒤에 * 기호를 붙였는지 확인 (포함 검색 여부 결정)
    const isIncludesSearch = query.startsWith('*') || query.endsWith('*');
@@ -418,7 +423,12 @@ function handleMapSearch(inputElem, idx) {
    // 검색할 때는 * 기호를 제거하고 순수 검색어만 추출
    let cleanQuery = query.replace(/\*/g, '').trim();
    
-   if (cleanQuery.length < 1) { dropdown.style.display = 'none'; return; }
+   if (cleanQuery.length < 1) { 
+       dropdown.style.display = 'none';
+       const card = inputElem.closest('.form-group');
+       if (card) card.style.paddingBottom = '';
+       return; 
+   }
 
    // ETF 브랜드 영문 -> 한글 변환 로직
    const etfBrandMap = { "timefolio": "타임폴리오", "koact": "코액트", "mighty": "마이티", "woori": "우리", "focus": "포커스", "treyn": "트레인", "vnam": "브이남", "hk": "흥국" };
@@ -438,11 +448,17 @@ function handleMapSearch(inputElem, idx) {
    // 15개까지만 가져오고, 넘으면 스크롤바가 처리합니다.
    results = results.slice(0, 15);
    
-   if (results.length === 0) { dropdown.style.display = 'none'; return; }
+   if (results.length === 0) { 
+       dropdown.style.display = 'none'; 
+       // 드롭다운 닫힐 때 카드 여백 원복
+       const card = inputElem.closest('.form-group');
+       if (card) card.style.paddingBottom = '';
+       return; 
+   }
    
    dropdown.innerHTML = results.map(q => `
      <li class="search-item" style="padding:10px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" 
-         onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}')"
+         onclick="selectMapResult(${idx}, '${q.symbol}', '${q.name.replace(/'/g, "\\'")}'); this.closest('.form-group').style.paddingBottom='';"
          onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
        <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
          <span style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
@@ -453,6 +469,13 @@ function handleMapSearch(inputElem, idx) {
    `).join('');
    
    dropdown.style.display = 'block';
+   
+   // 드롭다운이 열리면 부모 카드에 드롭다운 높이만큼 padding-bottom 추가 → 아래 항목이 밀려 내려감
+   requestAnimationFrame(() => {
+       const dropHeight = dropdown.offsetHeight;
+       const card = inputElem.closest('.form-group');
+       if (card) card.style.paddingBottom = (dropHeight + 8) + 'px';
+   });
 }
 
 function selectMapResult(idx, symbol, name) {
