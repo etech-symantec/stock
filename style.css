@@ -290,3 +290,10 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     .list-item-chart { display: none; }
     .list-item-extra { border-left: none; margin-left: 0; padding-left: 0; text-align: right; }
 }
+
+.mapping-label {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
