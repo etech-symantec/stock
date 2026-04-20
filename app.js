@@ -465,7 +465,7 @@ function openCsvMappingModal() {
 
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
         <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px; position:relative; z-index:${9999 - idx};">
-          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <label class="mapping-label" style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px;">
              <span style="color:var(--accent); font-size:14px;">${sym}</span>
              <a href="https://www.google.com/search?q=${encodeURIComponent(sym + ' 주식 ticker')}" target="_blank" 
                 style="text-decoration:none; font-size:11px; background:var(--bg3); border:1px solid var(--border); padding:3px 8px; border-radius:4px; margin-left:6px; color:var(--text2); transition:0.2s;" 
