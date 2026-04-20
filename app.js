@@ -43,6 +43,21 @@ const chartInstances = {};
 let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
 let localStockDB = []; 
+
+// 🌟 [추가됨] 로컬 스토리지에서 이전 차트 데이터(캐시)를 불러옵니다. (접속 속도 10배 향상)
+try {
+    let cacheTime = localStorage.getItem('sw_market_cache_time');
+    let now = Date.now();
+    // 마지막 접속 후 4시간(14400000ms) 이내라면 기존 데이터를 즉시 재사용합니다.
+    if (cacheTime && now - parseInt(cacheTime) < 14400000) {
+        let c = localStorage.getItem('sw_market_cache');
+        if (c) cachedMarketData = JSON.parse(c);
+    } else {
+        localStorage.removeItem('sw_market_cache');
+        localStorage.removeItem('sw_market_cache_time');
+    }
+} catch(e) {}
+
 let currentUsdKrw = 1350; 
 let isExchangeRateFetched = false;
 
@@ -2302,6 +2317,50 @@ function openChartModal(ticker) {
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
 }
 
+// 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
+let isFetchingMarketData = false;
+async function fetchMissingMarketData(symbolsToFetch) {
+    if(isFetchingMarketData) return;
+    isFetchingMarketData = true;
+    const batchSize = 3;
+    
+    // 우측 하단에 조그맣게 '로딩 중' 알림 띄우기
+    let loadingEl = document.getElementById('bgLoadingIndicator');
+    if(!loadingEl) {
+        loadingEl = document.createElement('div');
+        loadingEl.id = 'bgLoadingIndicator';
+        loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--accent); color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition: 0.3s; opacity: 1;";
+        document.body.appendChild(loadingEl);
+    }
+    loadingEl.style.opacity = '1';
+
+    for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
+        if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 불러오는 중... (${i}/${symbolsToFetch.length})`;
+        const batch = symbolsToFetch.slice(i, i + batchSize);
+        await Promise.all(batch.map(async t => {
+            let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
+            let fetchedData = await fetchYahooData(fetchSym);
+            if (fetchedData) cachedMarketData[t] = fetchedData;
+            else cachedMarketData[t] = { _failed: true };
+        }));
+        
+        render(); // 데이터를 3개 가져올 때마다 화면의 빈칸에 쏙쏙 채워 넣음
+        
+        if (i + batchSize < symbolsToFetch.length) {
+            await new Promise(res => setTimeout(res, 1000)); 
+        }
+    }
+    
+    isFetchingMarketData = false;
+    if(loadingEl) loadingEl.style.opacity = '0';
+    
+    // 🌟 데이터를 다 가져오면 다음 번 광속 접속을 위해 기기에 임시 저장
+    try { 
+        localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
+        localStorage.setItem('sw_market_cache_time', Date.now().toString());
+    } catch(e){}
+}
+
 // ── 8. 메인 렌더 함수 (전체 흐름 제어) ──
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
@@ -2382,29 +2441,11 @@ async function render() {
   allSymbols = Array.from(allSymbols);
 
   let symbolsToFetch = allSymbols.filter(t => !cachedMarketData[t]);
+  // 🌟 [핵심] 화면을 멈추게 했던 옛날 로딩 방식을 지우고 백그라운드 호출로 바꿈
   if (symbolsToFetch.length > 0) {
-    const batchSize = 3; 
-    for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
-      if(container) {
-        container.innerHTML = `<div class="empty" style="border:none; line-height:1.6;">
-          <div style="font-size:24px; margin-bottom:10px;">⏳</div>
-          데이터 로딩 중... (${Math.min(i + batchSize, symbolsToFetch.length)} / ${symbolsToFetch.length})<br>
-          <span style="font-size:11px; color:var(--text3);">대량 데이터 조회 시 안전을 위해 순차적으로 불러옵니다.</span>
-        </div>`;
-      }
-      const batch = symbolsToFetch.slice(i, i + batchSize);
-      await Promise.all(batch.map(async t => {
-        let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
-        let fetchedData = await fetchYahooData(fetchSym);
-        if (fetchedData) cachedMarketData[t] = fetchedData;
-        else cachedMarketData[t] = { _failed: true };
-      }));
-      if (i + batchSize < symbolsToFetch.length) {
-        await new Promise(res => setTimeout(res, 1500)); 
-      }
-    }
+    fetchMissingMarketData(symbolsToFetch); // 뒤에서 몰래 가져오라고 시키고 바로 다음 줄로 넘어감
   }
-
+  
   let displayItems = [];
   for(let sym in symbolHoldings) {
     let sh = symbolHoldings[sym];
