@@ -754,6 +754,7 @@ function toggleTxOwner(id) {
   triggerAutoSync();
 }
 
+// 🌟 보유 주식 평단가 및 수량 계산 (계좌명에서 소유자 이름 제거)
 function calculateHoldings(ownerFilter = 'all') {
   let holdings = {};
   const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -763,7 +764,10 @@ function calculateHoldings(ownerFilter = 'all') {
     if (ownerFilter !== 'all' && tx.owner !== ownerFilter) return;
 
     let broker = tx.broker ? tx.broker.trim() : '미지정';
-    let displayBroker = ownerFilter === 'all' ? `${broker} (${tx.owner})` : broker;
+    
+    // 🌟 [핵심 변경] 전체보기 탭에서도 뒤에 '(보유자)'를 붙이지 않고 계좌명만 깔끔하게 사용합니다.
+    let displayBroker = broker;
+    
     let key = `${tx.symbol}::${displayBroker}`;
 
     if(!holdings[key]) holdings[key] = { qty: 0, avg: 0, broker: displayBroker, symbol: tx.symbol };
@@ -1466,9 +1470,9 @@ function generateCardHtml(item) {
       oInfo = getOwnerInfo(mainOwner);
   }
 
-  // 🌟 [수정] 소유자 이름(${oInfo.name})을 완전히 제거하고 아이콘과 계좌명만 표시합니다.
+  // 🌟 [수정] 아이콘, 소유자 이름 | 계좌명 형식으로 깔끔하게 표시
   const tagContent = isHeld 
-    ? `<span class="icon" style="font-size:14px;">${oInfo.icon}</span> <span class="divider" style="margin:0 4px; color:var(--border2);">|</span> <span class="broker-text" style="color:var(--text2); font-size:11px;">${brokerDisp}</span>` 
+    ? `<span class="icon">${oInfo.icon}</span> <span style="font-weight:600;">${oInfo.name}</span> <span class="divider" style="margin:0 4px; color:var(--text3);">|</span> <span class="broker-text" style="color:var(--text2);">${brokerDisp}</span>` 
     : `<span class="icon" style="font-style:normal;">⭐</span> 관심종목 <span style="margin-left:4px; font-weight:bold; opacity:0.7;">✕</span>`;
 
   const countryBadge = isKorean(item.symbol) 
