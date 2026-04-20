@@ -446,7 +446,16 @@ function openCsvMappingModal() {
 
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
         <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px; position:relative; z-index:${9999 - idx};">
-          <label style="font-size:12px; color:var(--text); font-weight:bold; margin-bottom:8px; display:block;">📌 원본 이름: <span style="color:var(--accent);">${sym}</span></label>
+          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+             <span style="color:var(--accent); font-size:14px;">${sym}</span>
+             <a href="https://www.google.com/search?q=${encodeURIComponent(sym + ' 주식 ticker')}" target="_blank" 
+                style="text-decoration:none; font-size:11px; background:var(--bg3); border:1px solid var(--border); padding:3px 8px; border-radius:4px; margin-left:6px; color:var(--text2); transition:0.2s;" 
+                onmouseover="this.style.color='var(--text)'; this.style.borderColor='var(--border2)';" 
+                onmouseout="this.style.color='var(--text2)'; this.style.borderColor='var(--border)';" 
+                title="새 탭에서 구글 검색하기">
+                🔍 구글 검색
+             </a>
+          </label>
           
           <div style="display: flex; gap: 15px; margin-bottom: 10px; font-size: 12px; color: var(--text2);">
              <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="rename" checked onchange="document.getElementById('mappingInputArea_${idx}').style.display='block'"> 🔄 종목명/티커 변경</label>
