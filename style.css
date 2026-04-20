@@ -274,3 +274,19 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     border-color: var(--red) !important;
     color: var(--red) !important;
 }
+
+/* 🌟 목록형 뷰 전용 스타일 */
+.list-layout { display: flex; flex-direction: column; gap: 10px; }
+.list-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); padding: 12px 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+.list-item:hover { border-color: var(--border2); background: rgba(255,255,255,0.03); }
+.list-item-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.list-item-chart { width: 100px; height: 40px; margin: 0 15px; flex-shrink: 0; position:relative; }
+.list-item-right { text-align: right; min-width: 80px; flex-shrink: 0; }
+.list-item-extra { text-align: right; min-width: 90px; margin-left: 15px; border-left: 1px solid var(--border); padding-left: 15px; flex-shrink: 0; }
+
+/* 🌟 목록형 반응형 (모바일 등 좁은 화면에서 그래프 숨김) */
+@media (max-width: 768px) {
+    .list-item { flex-wrap: wrap; }
+    .list-item-chart { display: none; }
+    .list-item-extra { border-left: none; margin-left: 0; padding-left: 0; text-align: right; }
+}
