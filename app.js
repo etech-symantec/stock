@@ -1158,7 +1158,22 @@ function setupSearch(inputId, dropdownId, onSelect, filterId) {
         results = filteredDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
     }
     
-    if (results.length === 0) { dropdown.style.display = 'none'; return; }
+    if (results.length === 0) {
+  dropdown.innerHTML = `
+    <li style="padding:12px 16px; display:flex; align-items:center; gap:8px; color:var(--text2); font-size:12px;">
+      <span>검색 결과 없음</span>
+      <a href="https://www.google.com/search?q=${encodeURIComponent(input.value.trim() + ' 주식 ticker')}"
+         target="_blank"
+         style="margin-left:auto; text-decoration:none; font-size:11px; background:var(--bg3); border:1px solid var(--border); padding:3px 8px; border-radius:4px; color:var(--text2);"
+         onmouseover="this.style.color='var(--text)'; this.style.borderColor='var(--border2)';"
+         onmouseout="this.style.color='var(--text2)'; this.style.borderColor='var(--border)';">
+        🔍 구글 검색
+      </a>
+    </li>
+  `;
+  dropdown.style.display = 'block';
+  return;
+}
     
     dropdown.innerHTML = results.map(q => `
       <li class="search-item" onclick="${onSelect}('${q.symbol}')">
