@@ -148,7 +148,7 @@ input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--gr
 .acc-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
 .acc-bar-val { font-family: var(--font-mono); font-size: 11px; color: var(--text); width: 75px; text-align: right; flex-shrink: 0; }
 
-.list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; flex-shrink: 0; position: sticky; top: 0; z-index: 30; background: var(--bg); margin-left: -2rem; margin-right: -2rem; padding-left: 2rem; padding-right: 2rem; padding-top: 10px; }
+.list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; flex-shrink: 0; position: sticky; top: 0; z-index: 30; background: var(--bg); margin-left: -2rem; margin-right: -2rem; padding-left: 2rem; padding-right: 2rem; padding-top: 0px; }
 .list-title-wrap { display: flex; align-items: center; gap: 12px; }
 .section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
 
