@@ -22,7 +22,7 @@ function loadState() {
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '보유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '보유자2', color: '#00c87a', icon: '👤' } } };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } } };
 }
 
 let state = loadState();
@@ -229,8 +229,8 @@ function importData(event) {
         state = data;
         if(!state.owners) {
            state.owners = {
-             user1: { name: state.ownerNames?.user1 || '보유자1', color: '#7c6af7', icon: '👤' },
-             user2: { name: state.ownerNames?.user2 || '보유자2', color: '#00c87a', icon: '👤' }
+             user1: { name: state.ownerNames?.user1 || '소유자1', color: '#7c6af7', icon: '👤' },
+             user2: { name: state.ownerNames?.user2 || '소유자2', color: '#00c87a', icon: '👤' }
            };
         }
         if(state.transactions) state.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
@@ -255,7 +255,7 @@ function importData(event) {
 }
 
 function downloadCsvSample() {
-  const csvContent = "일자,소유자,계좌,유형,종목,수량,단가,세금(세전/세후)\n2026-04-10,보유자1,키움증권,매수,005930,10,80000,\n2026-04-12,보유자2,토스증권,배당,AAPL,0,15.5,세전\n2026-04-14,보유자1,미래에셋,매도,TSLA,-5,170.2,세후";
+  const csvContent = "일자,소유자,계좌,유형,종목,수량,단가,세금(세전/세후)\n2026-04-10,소유자1,키움증권,매수,005930,10,80000,\n2026-04-12,소유자2,토스증권,배당,AAPL,0,15.5,세전\n2026-04-14,소유자1,미래에셋,매도,TSLA,-5,170.2,세후";
   const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -403,8 +403,8 @@ function importCsvData(event) {
         else if (typeStr.includes('매수') || typeStr.toLowerCase() === 'buy') { txType = 'buy'; qty = Math.abs(qty); }
 
         let ownerMapped = owner;
-        if (owner === '보유자1') ownerMapped = state.owners.user1.name;
-        else if (owner === '보유자2') ownerMapped = state.owners.user2.name;
+        if (owner === '소유자1') ownerMapped = state.owners.user1.name;
+        else if (owner === '소유자2') ownerMapped = state.owners.user2.name;
 
         pendingCsvData.push({
             id: Date.now() + i,
@@ -760,8 +760,8 @@ function toggleTxType() {
 function saveOwnerNames() {
   const old1 = state.owners.user1.name;
   const old2 = state.owners.user2.name;
-  const new1 = document.getElementById('inputOwner1Name').value.trim() || '보유자1';
-  const new2 = document.getElementById('inputOwner2Name').value.trim() || '보유자2';
+  const new1 = document.getElementById('inputOwner1Name').value.trim() || '소유자1';
+  const new2 = document.getElementById('inputOwner2Name').value.trim() || '소유자2';
   
   state.owners.user1 = { name: new1, icon: document.getElementById('inputOwner1Icon').value.trim() || '👤', color: document.getElementById('inputOwner1Color').value || '#7c6af7' };
   state.owners.user2 = { name: new2, icon: document.getElementById('inputOwner2Icon').value.trim() || '👤', color: document.getElementById('inputOwner2Color').value || '#00c87a' };
@@ -799,7 +799,7 @@ function calculateHoldings(ownerFilter = 'all') {
 
     let broker = tx.broker ? tx.broker.trim() : '미지정';
     
-    // 🌟 [핵심 변경] 전체보기 탭에서도 뒤에 '(보유자)'를 붙이지 않고 계좌명만 깔끔하게 사용합니다.
+    // 🌟 [핵심 변경] 전체보기 탭에서도 뒤에 '(소유자)'를 붙이지 않고 계좌명만 깔끔하게 사용합니다.
     let displayBroker = broker;
     
     let key = `${tx.symbol}::${displayBroker}`;
