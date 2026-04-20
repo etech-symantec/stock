@@ -33,6 +33,25 @@ let currentSortMode = 'changeDesc';
 let sortDirection = -1; 
 let activeAccountFilter = null; 
 let currentListStyle = 'card';
+let currentRegionLayout = 'vertical'; // 🌟 [추가] 기본 배치는 상하(vertical)로 설정
+
+// 🌟 [추가] 상하/좌우 버튼 클릭 시 동작하는 함수
+function setRegionLayout(layout) {
+    currentRegionLayout = layout;
+    const btnVert = document.getElementById('btnLayoutVertical');
+    const btnHoriz = document.getElementById('btnLayoutHorizontal');
+    
+    if(btnVert && btnHoriz) {
+        if (layout === 'vertical') {
+            btnVert.style.background = 'var(--bg3)'; btnVert.style.color = 'var(--text)';
+            btnHoriz.style.background = 'transparent'; btnHoriz.style.color = 'var(--text2)';
+        } else {
+            btnHoriz.style.background = 'var(--bg3)'; btnHoriz.style.color = 'var(--text)';
+            btnVert.style.background = 'transparent'; btnVert.style.color = 'var(--text2)';
+        }
+    }
+    render(); // 즉시 화면 새로고침
+}
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
 let allocationChartInst = null; 
@@ -2540,17 +2559,48 @@ async function render() {
   let layoutClass = currentListStyle === 'card' ? 'grid' : 'list-layout';
 
   let html = '';
-  if(krItems.length > 0) {
-    html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇰🇷 국내 주식</h3>`;
-    html += `<div class="${layoutClass}">${krItems.map(t => renderItemHtml(t)).join('')}</div>`;
-  }
-  if(usItems.length > 0) {
-    html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇺🇸 미국 주식</h3>`;
-    html += `<div class="${layoutClass}">${usItems.map(t => renderItemHtml(t)).join('')}</div>`;
-  }
-  if(cryptoItems.length > 0) {
-    html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🪙 암호화폐</h3>`;
-    html += `<div class="${layoutClass}">${cryptoItems.map(t => renderItemHtml(t)).join('')}</div>`;
+  
+  // 🌟 [변경] 좌우 배치 모드일 경우 (화면이 좁으면 알아서 상하로 떨어집니다)
+  if (currentRegionLayout === 'horizontal') {
+      html += `<div style="display:flex; gap:24px; flex-wrap:wrap;">`;
+      
+      // 한국 주식 구역
+      if(krItems.length > 0) {
+          html += `<div style="flex:1; min-width:320px;">`;
+          html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇰🇷 국내 주식</h3>`;
+          html += `<div class="${layoutClass}">${krItems.map(t => renderItemHtml(t)).join('')}</div>`;
+          html += `</div>`;
+      }
+      
+      // 미국 주식 구역
+      if(usItems.length > 0) {
+          html += `<div style="flex:1; min-width:320px;">`;
+          html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇺🇸 미국 주식</h3>`;
+          html += `<div class="${layoutClass}">${usItems.map(t => renderItemHtml(t)).join('')}</div>`;
+          html += `</div>`;
+      }
+      html += `</div>`; // 좌우 배치 구역 끝
+      
+      // 암호화폐는 보통 하단에 넓게 배치
+      if(cryptoItems.length > 0) {
+          html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🪙 암호화폐</h3>`;
+          html += `<div class="${layoutClass}">${cryptoItems.map(t => renderItemHtml(t)).join('')}</div>`;
+      }
+      
+  } else {
+      // 기존 상하(위아래) 배치 모드
+      if(krItems.length > 0) {
+        html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇰🇷 국내 주식</h3>`;
+        html += `<div class="${layoutClass}">${krItems.map(t => renderItemHtml(t)).join('')}</div>`;
+      }
+      if(usItems.length > 0) {
+        html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇺🇸 미국 주식</h3>`;
+        html += `<div class="${layoutClass}">${usItems.map(t => renderItemHtml(t)).join('')}</div>`;
+      }
+      if(cryptoItems.length > 0) {
+        html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🪙 암호화폐</h3>`;
+        html += `<div class="${layoutClass}">${cryptoItems.map(t => renderItemHtml(t)).join('')}</div>`;
+      }
   }
 
   container.innerHTML = html;
