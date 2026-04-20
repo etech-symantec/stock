@@ -1466,9 +1466,9 @@ function generateCardHtml(item) {
       oInfo = getOwnerInfo(mainOwner);
   }
 
-  // 🌟 [수정] 아이콘, 소유자 이름 | 계좌명 형식으로 깔끔하게 표시
+  // 🌟 [수정] 소유자 이름(${oInfo.name})을 완전히 제거하고 아이콘과 계좌명만 표시합니다.
   const tagContent = isHeld 
-    ? `<span class="icon">${oInfo.icon}</span> <span style="font-weight:600;">${oInfo.name}</span> <span class="divider" style="margin:0 4px; color:var(--text3);">|</span> <span class="broker-text" style="color:var(--text2);">${brokerDisp}</span>` 
+    ? `<span class="icon" style="font-size:14px;">${oInfo.icon}</span> <span class="divider" style="margin:0 4px; color:var(--border2);">|</span> <span class="broker-text" style="color:var(--text2); font-size:11px;">${brokerDisp}</span>` 
     : `<span class="icon" style="font-style:normal;">⭐</span> 관심종목 <span style="margin-left:4px; font-weight:bold; opacity:0.7;">✕</span>`;
 
   const countryBadge = isKorean(item.symbol) 
@@ -2631,3 +2631,32 @@ function saveStockTag(forcedValue) {
     render(); // 화면 즉시 새로고침
     triggerAutoSync(); // 클라우드 동기화
 }
+
+// ==========================================
+// 🌟 페이지 초기화 (첫 로딩 시 빈 화면 방지)
+// ==========================================
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. 기본 날짜 오늘로 설정
+  if (document.getElementById('txDate')) {
+      document.getElementById('txDate').valueAsDate = new Date();
+  }
+
+  // 2. 종목 DB 로드 완료를 기다린 후 화면 그리기
+  await loadStockDB();
+
+  // 3. UI 업데이트 및 첫 화면 렌더링
+  updateOwnerLabels();
+  renderTxList();
+  render(); 
+  
+  // 4. 자동 동기화 설정 적용
+  const ghAutoSyncCheckbox = document.getElementById('ghAutoSync');
+  if (ghAutoSyncCheckbox) {
+      ghAutoSyncCheckbox.addEventListener('change', function(e) {
+        let s = getGhSettings();
+        s.autoSync = e.target.checked;
+        saveGhSettings(s);
+        if(s.autoSync) triggerAutoSync();
+      });
+  }
+});
