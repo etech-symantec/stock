@@ -28,9 +28,11 @@ function loadState() {
 let state = loadState();
 let currentView = 'all'; 
 let currentDivFilter = 'all'; 
-let currentSortMode = 'default';
+// 🌟 기본 정렬을 등락률로 변경하고, 리스트 스타일 관련 변수 및 함수 추가
+let currentSortMode = 'changeDesc'; 
 let sortDirection = -1; 
 let activeAccountFilter = null; 
+let currentListStyle = 'card';
 if(['1mo','3mo','6mo'].includes(state.range)) { state.range = state.range.replace('mo','m'); }
 
 let allocationChartInst = null; 
@@ -47,6 +49,23 @@ let isExchangeRateFetched = false;
 // 🌟 CSV 수동 매핑을 위한 임시 저장 변수
 let pendingCsvData = [];
 let unmatchedSymbols = [];
+
+function setListStyle(style) {
+    currentListStyle = style;
+    const btnCard = document.getElementById('btnViewCard');
+    const btnList = document.getElementById('btnViewList');
+    
+    if(btnCard && btnList) {
+        if (style === 'card') {
+            btnCard.style.background = 'var(--bg3)'; btnCard.style.color = 'var(--text)';
+            btnList.style.background = 'transparent'; btnList.style.color = 'var(--text2)';
+        } else {
+            btnList.style.background = 'var(--bg3)'; btnList.style.color = 'var(--text)';
+            btnCard.style.background = 'transparent'; btnCard.style.color = 'var(--text2)';
+        }
+    }
+    render(); // 스타일 변경 즉시 화면 다시 그리기
+}
 
 function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
@@ -1545,6 +1564,77 @@ function generateCardHtml(item) {
   `;
 }
 
+// 🌟 목록형 뷰를 위한 한 줄짜리 아이템 HTML 생성
+function generateListItemHtml(item) {
+  const data = item.data;
+  const isHeld = item.type === 'held';
+  const chgPct = item.activeChange.toFixed(2);
+  const cls = item.activeChange > 0 ? 'up' : (item.activeChange < 0 ? 'down' : 'flat');
+  const sign = item.activeChange > 0 ? '+' : '';
+  const pnl = isHeld ? (data.last - item.avg) * item.qty : null;
+  const brokerDisp = isHeld && item.broker !== '미지정' ? item.broker : '계좌 미지정';
+
+  let oInfo = { icon: '💼', name: '보유' };
+  if (isHeld) {
+      let mainOwner = '보유';
+      if (currentView === 'user1') mainOwner = state.owners.user1.name;
+      else if (currentView === 'user2') mainOwner = state.owners.user2.name;
+      else {
+          const holdingTxs = state.transactions.filter(t => t.symbol === item.symbol && t.txType !== 'dividend');
+          if(holdingTxs.length > 0) mainOwner = holdingTxs[holdingTxs.length-1].owner; 
+      }
+      oInfo = getOwnerInfo(mainOwner);
+  }
+
+  const tagContent = isHeld 
+    ? `<span class="icon" style="font-size:12px;">${oInfo.icon}</span> <span class="divider" style="margin:0 4px; color:var(--border2);">|</span> <span class="broker-text" style="color:var(--text2); font-size:10px;">${brokerDisp}</span>` 
+    : `<span class="icon" style="font-size:10px; font-style:normal;">⭐ 관심종목</span>`;
+
+  const countryBadge = isKorean(item.symbol) ? '🇰🇷' : '🇺🇸';
+
+  let displayName = data.name;
+  let displaySymbol = item.symbol;
+  if (state.oldNames && state.oldNames[item.symbol]) {
+      if (state.oldNames[item.symbol] === '상장폐지') {
+          displaySymbol = item.symbol.replace('.KS.DLST', '').replace('.DLST', '');
+          displayName = `${displaySymbol} (상장폐지)`;
+      } else {
+          displayName = `${data.name} (구: ${state.oldNames[item.symbol]})`;
+      }
+  }
+
+  return `
+    <div class="list-item" onclick="openChartModal('${item.symbol}')">
+      <div class="list-item-left">
+         <div style="font-size:20px; line-height:1; margin-right:4px;">${countryBadge}</div>
+         <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:0;">
+            <div style="font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${displayName}">${displayName}</div>
+            <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${displaySymbol}</span>
+                <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" style="margin:0; padding:2px 6px; background:var(--bg); border:1px solid var(--border);">${tagContent}</div>
+            </div>
+         </div>
+      </div>
+      
+      <div class="list-item-chart"><canvas id="${item.uniqueId}"></canvas></div>
+      
+      <div class="list-item-right">
+         <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:2px;">${formatPrice(data.last, item.symbol)}</div>
+         <div style="font-size:12px; font-weight:700; color:var(--${cls==='up'?'green':(cls==='down'?'red':'text3')});">${sign}${chgPct}%</div>
+      </div>
+      
+      ${isHeld ? `
+      <div class="list-item-extra">
+         <div style="font-size:11px; color:var(--text2); margin-bottom:2px;">${item.qty}주</div>
+         <div style="font-size:12px; font-weight:700; color:var(--${pnl>=0?'green':'red'})">${pnl>=0?'+':''}${formatPrice(Math.abs(pnl), item.symbol)}</div>
+      </div>` : `
+      <div class="list-item-extra" style="display:flex; align-items:center; justify-content:flex-end;">
+         <button class="btn-sm" style="background:var(--bg); border-color:var(--border2); padding:4px 8px;" onclick="event.stopPropagation(); removeTickerConfirm('${item.symbol}', '${displayName.replace(/'/g, "\\'")}')">삭제</button>
+      </div>`}
+    </div>
+  `;
+}
+
 // 🌟 [추가됨] 자산 성장 추이 영역 차트 렌더링 함수
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
@@ -2394,18 +2484,22 @@ async function render() {
   const usItems = displayItems.filter(item => !isKorean(item.symbol) && !isCrypto(item.symbol));
   const cryptoItems = displayItems.filter(item => isCrypto(item.symbol));
 
+  // 🌟 현재 스타일에 따라 카드형 또는 목록형 렌더링 방식 선택
+  let renderItemHtml = currentListStyle === 'card' ? generateCardHtml : generateListItemHtml;
+  let layoutClass = currentListStyle === 'card' ? 'grid' : 'list-layout';
+
   let html = '';
   if(krItems.length > 0) {
     html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇰🇷 국내 주식</h3>`;
-    html += `<div class="grid">${krItems.map(t => generateCardHtml(t)).join('')}</div>`;
+    html += `<div class="${layoutClass}">${krItems.map(t => renderItemHtml(t)).join('')}</div>`;
   }
   if(usItems.length > 0) {
     html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇺🇸 미국 주식</h3>`;
-    html += `<div class="grid">${usItems.map(t => generateCardHtml(t)).join('')}</div>`;
+    html += `<div class="${layoutClass}">${usItems.map(t => renderItemHtml(t)).join('')}</div>`;
   }
   if(cryptoItems.length > 0) {
     html += `<h3 style="margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🪙 암호화폐</h3>`;
-    html += `<div class="grid">${cryptoItems.map(t => generateCardHtml(t)).join('')}</div>`;
+    html += `<div class="${layoutClass}">${cryptoItems.map(t => renderItemHtml(t)).join('')}</div>`;
   }
 
   container.innerHTML = html;
