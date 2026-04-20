@@ -2290,7 +2290,7 @@ function openChartModal(ticker) {
   const getSliceLen = (range) => {
     if (range === '1d') return 2; if (range === '1w') return 6; if (range === '1m') return 22;
     if (range === '3m') return 63; if (range === '6m') return 126; if (range === '1y') return 252;
-    if (range === '3y') return 756; return 252;
+    if (range === '3y') return 756; if (range === '5y') return 1260; if (range === '10y') return 2520; return 252;
   };
   let sliceLen = getSliceLen(state.range);
   const displayPrices = data.prices.slice(-sliceLen);
@@ -2365,6 +2365,7 @@ async function fetchMissingMarketData(symbolsToFetch) {
 async function render() {
   if (!isExchangeRateFetched) await fetchExchangeRate();
   
+  document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.rtab').forEach(b => {
     if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
   });
@@ -2411,7 +2412,7 @@ async function render() {
   const getSliceLen = (range) => {
     if (range === '1d') return 2; if (range === '1w') return 6; if (range === '1m') return 22;
     if (range === '3m') return 63; if (range === '6m') return 126; if (range === '1y') return 252;
-    if (range === '3y') return 756; return 252;
+    if (range === '3y') return 756; if (range === '5y') return 1260; if (range === '10y') return 2520; return 252;
   };
   const currentSliceLen = getSliceLen(state.range);
 
