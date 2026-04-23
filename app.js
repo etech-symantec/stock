@@ -469,7 +469,7 @@ function openCsvMappingModal() {
           <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
              📌 원본 이름: <span style="color:var(--accent); font-size:14px;">${sym}</span>
              <a href="https://www.google.com/search?q=${encodeURIComponent(sym + ' 주식 ticker')}" target="_blank" 
-                style="text-decoration:none; font-size:11px; background:var(--bg3); border:1px solid var(--border); padding:3px 10px; border-radius:4px; color:var(--text2); transition:0.2s;" 
+                style="text-decoration:none; font-size:11px; background:var(--bg3); border:1px solid var(--border); padding:4px 10px; border-radius:4px; color:var(--text2); transition:0.2s; display:inline-block;" 
                 onmouseover="this.style.color='var(--text)'; this.style.borderColor='var(--border2)';" 
                 onmouseout="this.style.color='var(--text2)'; this.style.borderColor='var(--border)';" 
                 title="새 탭에서 티커 검색하기">
