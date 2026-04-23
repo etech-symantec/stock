@@ -722,6 +722,10 @@ function updateOwnerLabels() {
   document.getElementById('lblUser2').innerHTML = `${o2.icon} ${o2.name}`;
   document.getElementById('divTabUser1').textContent = `${o1.icon} ${o1.name}`;
   document.getElementById('divTabUser2').textContent = `${o2.icon} ${o2.name}`;
+  const realTab1 = document.getElementById('realTabUser1');
+  const realTab2 = document.getElementById('realTabUser2');
+  if (realTab1) realTab1.textContent = `${o1.icon} ${o1.name}`;
+  if (realTab2) realTab2.textContent = `${o2.icon} ${o2.name}`;
 }
 
 function toggleAccountFilter(broker) {
@@ -1421,6 +1425,7 @@ function setView(view, el) {
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
   if(el) el.classList.add('active'); 
   if(view === 'history') renderHistoryDashboard();
+  if(view === 'realized') renderRealizedDashboard();
   
   const pChartWrap = document.getElementById('portfolioChartWrapper');
   if (view === 'dividend' || view === 'history') pChartWrap.style.display = 'none';
@@ -2385,6 +2390,7 @@ async function render() {
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
   const histDash = document.getElementById('historyDashboard');
+  const realDash = document.getElementById('realizedDashboard');
 
   if (currentView === 'dividend') {
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; divDash.style.display = 'flex';
@@ -2393,6 +2399,10 @@ async function render() {
   } else if (currentView === 'history') {
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'flex';
     renderHistoryDashboard();
+    return;
+  } else if (currentView === 'realized') { // 🌟 실현수익 탭 일 때의 동작 추가
+    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; if(realDash) realDash.style.display = 'flex';
+    renderRealizedDashboard();
     return;
   } else {
     dash.style.display = 'flex'; pChartWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none';
@@ -2850,3 +2860,141 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
   }
 });
+
+// ==========================================
+// 🌟 실현수익(매도) 통계 대시보드 로직
+// ==========================================
+let currentRealizedOwnerFilter = 'all';
+
+function setRealizedOwnerFilter(filter, el) {
+  currentRealizedOwnerFilter = filter;
+  document.querySelectorAll('.real-filter').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderRealizedDashboard();
+}
+
+function renderRealizedDashboard() {
+    const realDash = document.getElementById('realizedDashboard');
+    if(!realDash) return;
+
+    let ownerName = 'all';
+    if (currentRealizedOwnerFilter === 'user1') ownerName = state.owners.user1.name;
+    if (currentRealizedOwnerFilter === 'user2') ownerName = state.owners.user2.name;
+
+    const yearSelect = document.getElementById('realizedYearFilter');
+    let selectedYear = yearSelect ? yearSelect.value : 'all';
+
+    // 🌟 연도 목록(dropdown) 동적 생성 (매도 기록이 있는 연도만)
+    let years = new Set();
+    state.transactions.forEach(t => {
+        if (t.txType === 'sell' || t.qty < 0) years.add(t.date.substring(0, 4));
+    });
+    let yearArr = Array.from(years).sort().reverse();
+
+    if (yearSelect && yearSelect.options.length <= 1 && yearArr.length > 0) {
+        let html = `<option value="all">전체 연도</option>`;
+        yearArr.forEach(y => html += `<option value="${y}">${y}년</option>`);
+        yearSelect.innerHTML = html;
+        yearSelect.value = selectedYear; // 선택 유지
+    }
+
+    let holdings = {};
+    let realizedTxs = [];
+    let krwTotal = 0;
+    let usdTotal = 0;
+
+    // 과거부터 순차적으로 매수/매도를 시뮬레이션하여 정확한 평단가 파악
+    const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+    sortedTx.forEach(tx => {
+        if (tx.txType === 'dividend') return;
+        let broker = tx.broker ? tx.broker.trim() : '미지정';
+        let key = `${tx.symbol}::${broker}`;
+
+        if(!holdings[key]) holdings[key] = { qty: 0, avg: 0 };
+        let h = holdings[key];
+
+        if (tx.qty > 0) { // 매수 시 평단가 재계산
+            let totalValue = (h.qty * h.avg) + (tx.qty * tx.price);
+            h.qty += tx.qty;
+            h.avg = totalValue / h.qty;
+        } else if (tx.qty < 0) { // 매도 시 수익 계산
+            let sellQty = Math.abs(tx.qty);
+            let pnl = (tx.price - h.avg) * sellQty;
+            let currentAvg = h.avg;
+
+            h.qty -= sellQty;
+            if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+
+            let txYear = tx.date.substring(0, 4);
+
+            // 필터에 맞는 경우만 표와 합산에 추가
+            if ((ownerName === 'all' || tx.owner === ownerName) &&
+                (selectedYear === 'all' || txYear === selectedYear)) {
+
+                let isKr = isKorean(tx.symbol);
+                if (isKr) krwTotal += pnl;
+                else usdTotal += pnl;
+
+                realizedTxs.push({
+                    date: tx.date,
+                    symbol: tx.symbol,
+                    owner: tx.owner,
+                    broker: broker,
+                    sellQty: sellQty,
+                    sellPrice: tx.price,
+                    avgCost: currentAvg,
+                    pnl: pnl,
+                    roi: currentAvg > 0 ? (pnl / (currentAvg * sellQty)) * 100 : 0
+                });
+            }
+        }
+    });
+
+    // 화면 요약창 업데이트
+    document.getElementById('realTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
+    document.getElementById('realTotalUsd').textContent = `$ ${usdTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
+    const signG = grandTotal >= 0 ? '+' : '';
+    const totalEl = document.getElementById('realTotalConverted');
+    totalEl.textContent = `${signG}₩ ${Math.round(Math.abs(grandTotal)).toLocaleString()}`;
+    totalEl.style.color = grandTotal >= 0 ? 'var(--blue)' : 'var(--red)';
+
+    // 표 렌더링
+    const tbody = document.getElementById('realizedTableBody');
+    if (realizedTxs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--text3);">조건에 맞는 실현수익 내역이 없습니다.</td></tr>`;
+        return;
+    }
+
+    realizedTxs.reverse(); // 최신 매도일이 맨 위로 오게 뒤집기
+
+    tbody.innerHTML = realizedTxs.map(tx => {
+        let stockName = tx.symbol;
+        const dbMatch = localStockDB.find(x => x.symbol === tx.symbol);
+        const cachedMatch = cachedMarketData[tx.symbol];
+        if (dbMatch) stockName = dbMatch.name;
+        else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+
+        if (state.oldNames && state.oldNames[tx.symbol]) {
+           stockName = state.oldNames[tx.symbol] === '상장폐지' ? `${tx.symbol.replace('.KS.DLST', '').replace('.DLST', '')} (상장폐지)` : `${stockName} (구: ${state.oldNames[tx.symbol]})`;
+        }
+
+        let sign = tx.pnl >= 0 ? '+' : '';
+        let pnlColor = tx.pnl >= 0 ? 'var(--blue)' : 'var(--red)';
+        let oInfo = getOwnerInfo(tx.owner);
+
+        return `
+        <tr style="border-bottom: 1px solid var(--border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+            <td style="padding:12px 16px; color:var(--text2);">${tx.date}</td>
+            <td style="padding:12px 16px;"><div style="font-weight:700; color:var(--text);">${stockName}</div><div style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${tx.symbol.replace('.KS.DLST','').replace('.DLST','')}</div></td>
+            <td style="padding:12px 16px;"><div style="color:var(--text2); font-size:12px;">${tx.broker}</div><div style="font-size:11px; margin-top:2px;">${oInfo.icon} ${tx.owner}</div></td>
+            <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${tx.sellQty}</td>
+            <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${formatPrice(tx.sellPrice, tx.symbol)}</td>
+            <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); color:var(--text3);">${formatPrice(tx.avgCost, tx.symbol)}</td>
+            <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${pnlColor};">${sign}${formatPrice(Math.abs(tx.pnl), tx.symbol)}</td>
+            <td style="padding:12px 16px; text-align:right; font-weight:700; color:${pnlColor};">${sign}${tx.roi.toFixed(2)}%</td>
+        </tr>
+        `;
+    }).join('');
+}
