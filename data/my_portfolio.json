@@ -7536,6 +7536,16 @@
       "qty": -45,
       "price": 8.1,
       "txType": "trade"
+    },
+    {
+      "id": 1776945984939,
+      "date": "2023-12-11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "DIS",
+      "qty": -20,
+      "price": 90.9,
+      "txType": "trade"
     }
   ],
   "range": "1d",
