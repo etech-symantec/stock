@@ -2,7 +2,6 @@
   "tickers": [
     "AAPL",
     "TSLA",
-    "005930.KS",
     "096240.KQ",
     "190510.KQ",
     "017180.KS",
@@ -7530,7 +7529,7 @@
       "txType": "dividend"
     }
   ],
-  "range": "3y",
+  "range": "1d",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
