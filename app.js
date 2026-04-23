@@ -458,34 +458,48 @@ function importCsvData(event) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// 🌟 CSV 모달 창 열기 (배경색 불투명 처리 및 그림자 추가로 가독성 개선)
+// 🌟 CSV 모달 창 열기 (종목명 옆 구글 검색 버튼 추가)
 function openCsvMappingModal() {
     const container = document.getElementById('unmatchedContainer');
     if(!container) return;
 
     container.innerHTML = unmatchedSymbols.map((sym, idx) => `
         <div class="form-group" style="background:rgba(255,255,255,0.02); padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px; position:relative; z-index:${9999 - idx};">
-          <label class="mapping-label" style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px;">
-             <span style="color:var(--accent); font-size:14px;">${sym}</span>
+          
+          <label style="font-size:13px; color:var(--text); font-weight:bold; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+             📌 원본 이름: <span style="color:var(--accent); font-size:14px;">${sym}</span>
              <a href="https://www.google.com/search?q=${encodeURIComponent(sym + ' 주식 ticker')}" target="_blank" 
-                style="text-decoration:none; font-size:11px; background:var(--bg3); border:1px solid var(--border); padding:3px 8px; border-radius:4px; margin-left:6px; color:var(--text2); transition:0.2s;" 
+                style="text-decoration:none; font-size:11px; background:var(--bg3); border:1px solid var(--border); padding:3px 10px; border-radius:4px; color:var(--text2); transition:0.2s;" 
                 onmouseover="this.style.color='var(--text)'; this.style.borderColor='var(--border2)';" 
                 onmouseout="this.style.color='var(--text2)'; this.style.borderColor='var(--border)';" 
-                title="새 탭에서 구글 검색하기">
+                title="새 탭에서 티커 검색하기">
                 🔍 구글 검색
              </a>
           </label>
           
           <div style="display: flex; gap: 15px; margin-bottom: 10px; font-size: 12px; color: var(--text2);">
-             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="rename" checked onchange="document.getElementById('mappingInputArea_${idx}').style.display='block'"> 🔄 종목명/티커 변경</label>
-             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'"> ☠️ 상장폐지</label>
+             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="rename" checked onchange="document.getElementById('mappingInputArea_${idx}').style.display='flex'; document.getElementById('delistedMarketArea_${idx}').style.display='none';"> 🔄 변경</label>
+             <label style="cursor:pointer;"><input type="radio" name="status_${idx}" value="delisted" onchange="document.getElementById('mappingInputArea_${idx}').style.display='none'; document.getElementById('delistedMarketArea_${idx}').style.display='block';"> ☠️ 상장폐지</label>
           </div>
 
-          <div id="mappingInputArea_${idx}" style="position:relative;">
-             <input type="text" id="mapInput_${idx}" class="form-input" placeholder="종목명 또는 티커 (예: *삼성*)" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
-             <ul id="mapDropdown_${idx}" class="search-dropdown" 
-                 style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:160px; overflow-y:scroll; overflow-x:hidden; display:none; box-shadow:0 8px 24px rgba(0,0,0,0.9); border: 1px solid var(--border2); border-radius: 6px; background-color: #141720; z-index:9999; padding:0;">
-             </ul>
+          <div id="delistedMarketArea_${idx}" style="display:none; margin-bottom:10px; font-size:12px; color:var(--text); background:var(--bg3); padding:10px; border-radius:6px; border:1px solid var(--border2);">
+             <div style="margin-bottom:8px; font-weight:bold; color:var(--text2);">어느 국가 종목인가요?</div>
+             <label style="margin-right:15px; cursor:pointer;"><input type="radio" name="market_${idx}" value="kr" checked> 🇰🇷 한국</label>
+             <label style="cursor:pointer;"><input type="radio" name="market_${idx}" value="us"> 🇺🇸 미국</label>
+          </div>
+
+          <div id="mappingInputArea_${idx}" style="display:flex; gap:5px; position:relative;">
+             <select id="mapFilter_${idx}" class="form-input" style="width:85px; padding:0 5px; font-size:12px; cursor:pointer;" onchange="handleMapSearch(document.getElementById('mapInput_${idx}'), ${idx})">
+                 <option value="all">🌐 전체</option>
+                 <option value="kr">🇰🇷 한국</option>
+                 <option value="us">🇺🇸 미국</option>
+             </select>
+             <div style="position:relative; flex:1;">
+                 <input type="text" id="mapInput_${idx}" class="form-input" placeholder="티커 검색" autocomplete="off" oninput="handleMapSearch(this, ${idx})">
+                 <ul id="mapDropdown_${idx}" class="search-dropdown" 
+                     style="position:absolute; top:calc(100% + 4px); left:0; width:100%; max-height:180px; overflow-y:auto; z-index:99999; display:none; background-color:#141720; border:1px solid var(--border2); border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.8); padding:0;">
+                 </ul>
+             </div>
           </div>
         </div>
     `).join('');
