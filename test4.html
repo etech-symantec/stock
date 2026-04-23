@@ -414,7 +414,7 @@
 <div class="overlay" id="masterSettingsOverlay" onclick="closeModal('masterSettingsOverlay')">
   <div class="modal" style="max-width: 500px;" onclick="event.stopPropagation()">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h3 style="font-size:18px;">⚙️ POLARIS 설정</h3>
+      <h3 style="font-size:18px;">⚙️ POLARIS 거래내역 설정</h3>
       <button class="btn-sm" onclick="closeModal('masterSettingsOverlay')">닫기</button>
     </div>
 
@@ -444,20 +444,20 @@
       </div>
 
       <div style="display:flex; gap:10px;">
-        <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="pullFromGithub(false)">⬆️ 클라우드에서 불러오기</button>
-        <button class="btn-submit" style="background:var(--accent);" onclick="pushToGithub(false)">⬇️ 클라우드에 지금 저장</button>
+        <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="pullFromGithub(false)">⬇️ 클라우드에서 불러오기</button>
+        <button class="btn-submit" style="background:var(--accent);" onclick="pushToGithub(false)">⬆️ 클라우드에 백업</button>
       </div>
     </div>
 
     <div class="settings-section">
       <div class="settings-section-title">💻 기기 로컬 데이터 및 CSV 관리</div>
       <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="exportData()">⬇️ JSON 로컬 백업</button>
-        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="document.getElementById('importFile').click()">⬆️ JSON 로컬 복원</button>
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="exportData()">⬇️ JSON 파일로 로컬 백업</button>
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="document.getElementById('importFile').click()">⬆️ JSON 파일로 불러오기</button>
       </div>
       <div style="display:flex; gap:10px;">
-        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="downloadCsvSample()">⬇️ CSV 양식 받기</button>
-        <button class="btn-submit" style="flex:1; background:rgba(0, 200, 122, 0.15); border:1px solid rgba(0, 200, 122, 0.4); color:var(--green);" onclick="document.getElementById('importCsvFile').click()">📄 CSV 일괄 업로드</button>
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="downloadCsvSample()">⬇️ CSV 양식 파일 받기</button>
+        <button class="btn-submit" style="flex:1; background:rgba(0, 200, 122, 0.15); border:1px solid rgba(0, 200, 122, 0.4); color:var(--green);" onclick="document.getElementById('importCsvFile').click()">📄 CSV 파일로 일괄 업로드</button>
       </div>
     </div>
 
