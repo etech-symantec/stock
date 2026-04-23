@@ -7527,6 +7527,16 @@
       "qty": 0,
       "price": 5076,
       "txType": "dividend"
+    },
+    {
+      "id": 1776945904677,
+      "date": "2023-12-11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "SOFI",
+      "qty": -45,
+      "price": 8.1,
+      "txType": "trade"
     }
   ],
   "range": "1d",
