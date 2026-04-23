@@ -45,6 +45,7 @@
     <button class="vtab" id="tabUser2" onclick="setView('user2', this)">소유자2</button>
     <button class="vtab" onclick="setView('watch', this)">관심종목</button>
     <button class="vtab" onclick="setView('history', this)">거래 내역</button>
+    <button class="vtab" onclick="setView('realized', this)" style="color:var(--blue)">📈 실현수익</button>
     <button class="vtab" id="tabDividend" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
   </div>
   
@@ -341,6 +342,55 @@
             </tr>
           </thead>
           <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="realizedDashboard" style="display:none; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+        <h2 class="section-title" style="margin:0;">📈 연도별 실현수익 통계</h2>
+        <div style="display:flex; gap:10px;">
+          <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
+            <option value="all">전체 연도</option>
+          </select>
+          <div class="view-tabs" style="background:var(--bg3); margin:0;">
+            <button class="vtab active real-filter" onclick="setRealizedOwnerFilter('all', this)">전체 합산</button>
+            <button class="vtab real-filter" id="realTabUser1" onclick="setRealizedOwnerFilter('user1', this)">소유자1</button>
+            <button class="vtab real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary" style="display:flex; gap:10px; margin-bottom:15px;">
+        <div class="sum-card" style="flex:1; background:rgba(77, 159, 255, 0.1); border-color:var(--blue);">
+          <div class="sum-label" style="color:var(--blue)">총 실현수익 (환산 ₩)</div>
+          <div id="realTotalConverted" class="cp-sum-val" style="color:var(--blue); font-size:24px;">—</div>
+        </div>
+        <div class="sum-card" style="flex:1;">
+          <div class="sum-label">국내주식 실현수익</div>
+          <div id="realTotalKrw" class="cp-sum-val">—</div>
+        </div>
+        <div class="sum-card" style="flex:1;">
+          <div class="sum-label">해외주식 실현수익</div>
+          <div id="realTotalUsd" class="cp-sum-val" style="color:var(--text)">—</div>
+        </div>
+      </div>
+
+      <div class="history-table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>매도 일자</th>
+              <th>종목</th>
+              <th>계좌/소유자</th>
+              <th style="text-align:right;">매도 수량</th>
+              <th style="text-align:right;">매도 단가</th>
+              <th style="text-align:right;">매수 평단가</th>
+              <th style="text-align:right;">실현 수익금</th>
+              <th style="text-align:right;">수익률</th>
+            </tr>
+          </thead>
+          <tbody id="realizedTableBody"></tbody>
         </table>
       </div>
     </div>
