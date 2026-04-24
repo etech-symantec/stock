@@ -7545,6 +7545,16 @@
       "qty": -20,
       "price": 90.9,
       "txType": "trade"
+    },
+    {
+      "id": 1777010531739,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": -580,
+      "price": 14140,
+      "txType": "trade"
     }
   ],
   "range": "1d",
