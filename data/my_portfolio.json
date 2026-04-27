@@ -7555,9 +7555,19 @@
       "qty": -580,
       "price": 14140,
       "txType": "trade"
+    },
+    {
+      "id": 1777333616926,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "ORCL",
+      "qty": 0,
+      "price": 5.52,
+      "txType": "dividend"
     }
   ],
-  "range": "1d",
+  "range": "3m",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
