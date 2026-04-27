@@ -7565,6 +7565,16 @@
       "qty": 0,
       "price": 5.52,
       "txType": "dividend"
+    },
+    {
+      "id": 1777333734808,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "005380.KS",
+      "qty": -4,
+      "price": 517000,
+      "txType": "trade"
     }
   ],
   "range": "3m",
