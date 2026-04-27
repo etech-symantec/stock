@@ -1664,10 +1664,10 @@ function generateListItemHtml(item) {
   `;
 }
 
-// 🌟 [추가됨] 자산 성장 추이 영역 차트 렌더링 함수
+// 🌟 자산 성장 추이 그래프 렌더링 (평가액, 투자 원금, 실현 수익 표시)
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
-    if (currentView === 'dividend' || currentView === 'history' || state.transactions.length === 0) {
+    if (currentView === 'dividend' || currentView === 'history' || currentView === 'realized' || state.transactions.length === 0) {
         chartWrap.style.display = 'none';
         return;
     }
@@ -1693,37 +1693,49 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     
     const evalData = [];
     const costData = [];
+    const realizedData = []; // 🌟 실현수익 데이터를 담을 배열 추가
     
     slicedRawDates.forEach((dateStr) => {
         let dailyCost = 0;
         let dailyEval = 0;
+        let dailyRealized = 0; // 🌟 당일 누적 실현수익
         
+        let fxRate = currentUsdKrw;
+        if(cachedMarketData['KRW=X'] && !cachedMarketData['KRW=X']._failed) {
+            const fxIdx = cachedMarketData['KRW=X'].rawDates.indexOf(dateStr);
+            if(fxIdx !== -1) fxRate = cachedMarketData['KRW=X'].prices[fxIdx];
+        }
+
         const pastTxs = state.transactions.filter(t => t.date <= dateStr);
         let filteredTxs = pastTxs;
         if(ownerFilter !== 'all') {
            filteredTxs = pastTxs.filter(t => t.owner === ownerFilter || t.owner === state.owners[ownerFilter]?.name);
         }
         
+        // 시간순 정렬 (정확한 평단가 계산을 위함)
+        let sortedTxs = [...filteredTxs].sort((a,b) => new Date(a.date) - new Date(b.date));
+        
         let holdings = {};
-        filteredTxs.forEach(tx => {
+        sortedTxs.forEach(tx => {
             if (tx.txType === 'dividend') return;
             if (!holdings[tx.symbol]) holdings[tx.symbol] = { qty: 0, avg: 0 };
             let h = holdings[tx.symbol];
+            
             if (tx.qty > 0) {
                 let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
                 h.qty += tx.qty;
                 h.avg = totalVal / h.qty;
             } else {
-                h.qty += tx.qty;
+                let sellQty = Math.abs(tx.qty);
+                let pnl = (tx.price - h.avg) * sellQty;
+                
+                // 🌟 매도 시 당일 환율을 적용하여 누적 실현수익금 더하기
+                dailyRealized += pnl * (isKorean(tx.symbol) ? 1 : fxRate);
+                
+                h.qty -= sellQty;
                 if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
             }
         });
-
-        let fxRate = currentUsdKrw;
-        if(cachedMarketData['KRW=X'] && !cachedMarketData['KRW=X']._failed) {
-            const fxIdx = cachedMarketData['KRW=X'].rawDates.indexOf(dateStr);
-            if(fxIdx !== -1) fxRate = cachedMarketData['KRW=X'].prices[fxIdx];
-        }
 
         for (let sym in holdings) {
             if (holdings[sym].qty > 0) {
@@ -1752,17 +1764,20 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         
         costData.push(dailyCost);
         evalData.push(dailyEval);
+        realizedData.push(dailyRealized); // 🌟 실현수익 기록
     });
 
     let firstNonZeroIdx = evalData.findIndex(v => v > 0);
     let finalDisplayDates = slicedDisplayDates;
     let finalEvalData = evalData;
     let finalCostData = costData;
+    let finalRealizedData = realizedData; // 🌟
 
     if (firstNonZeroIdx > 0 && sliceLen >= 756) { 
         finalDisplayDates = slicedDisplayDates.slice(firstNonZeroIdx);
         finalEvalData = evalData.slice(firstNonZeroIdx);
         finalCostData = costData.slice(firstNonZeroIdx);
+        finalRealizedData = realizedData.slice(firstNonZeroIdx); // 🌟
     }
 
     const canvas = document.getElementById('portfolioChartCanvas');
@@ -1802,6 +1817,17 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     fill: false,
                     tension: 0.1,
                     order: 2
+                },
+                // 🌟 실현 수익 그래프 라인 추가 
+                {
+                    label: '실현 수익',
+                    data: finalRealizedData,
+                    borderColor: '#4d9fff', // 구분을 위한 맑은 파란색
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.1,
+                    order: 3
                 }
             ]
         },
