@@ -1449,12 +1449,14 @@ function setView(view, el) {
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
   if(el) el.classList.add('active'); 
   if(view === 'history') renderHistoryDashboard();
-  if(view === 'realized') renderRealizedDashboard(); // 🌟 실현수익 렌더링
+  if(view === 'realized') renderRealizedDashboard();
   
   const pChartWrap = document.getElementById('portfolioChartWrapper');
-  // 🌟 실현수익 탭에서도 메인 포트폴리오 차트 숨김 처리 추가
-  if (view === 'dividend' || view === 'history' || view === 'realized') pChartWrap.style.display = 'none';
-  else pChartWrap.style.display = 'flex';
+  if (view === 'dividend' || view === 'history' || view === 'realized') {
+      pChartWrap.style.display = 'none';
+  } else {
+      pChartWrap.style.display = 'flex';
+  }
   
   render();
 }
@@ -2441,9 +2443,9 @@ async function render() {
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
   const histDash = document.getElementById('historyDashboard');
-  const realDash = document.getElementById('realizedDashboard'); // 🌟 실현수익 창 요소 가져오기
+  const realDash = document.getElementById('realizedDashboard');
 
-  // 🌟 여기서부터 탭별 화면 표시/숨김을 엄격하게 통제합니다!
+  // 🌟 여기서부터 탭마다 보여주고 숨길 창들을 확실하게 통제합니다!
   if (currentView === 'dividend') {
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 숨김
@@ -2462,9 +2464,9 @@ async function render() {
     renderRealizedDashboard();
     return;
   } else {
-    // 🌟 전체보기, 소유자별, 관심종목 탭일 때
+    // 전체보기, 소유자별 등 메인 대시보드 탭일 때
     dash.style.display = 'flex'; pChartWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 확실히 숨김
+    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 숨김
   }
 
   let ownerFilter = 'all';
