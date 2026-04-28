@@ -35,6 +35,18 @@ let activeAccountFilter = null;
 let currentListStyle = 'card';
 let currentRegionLayout = 'vertical'; // 🌟 [추가] 기본 배치는 상하(vertical)로 설정
 let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
+// 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
+let realizedFilters = { market: 'all', symbol: null };
+
+function updateRealizedFilter(key, value) {
+    realizedFilters[key] = value;
+    renderRealizedDashboard();
+}
+
+function resetRealizedSymbolFilter() {
+    realizedFilters.symbol = null;
+    renderRealizedDashboard();
+}
 
 // 🌟 [추가] 상하/좌우 버튼 클릭 시 동작하는 함수
 function setRegionLayout(layout) {
