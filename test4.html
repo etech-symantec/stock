@@ -347,16 +347,9 @@
     </div>
 
     <div id="realizedDashboard" style="display:none; flex-direction:column;">
+      
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
         <h2 class="section-title" style="margin:0;">📈 연도별 실현수익 통계</h2>
-        </div>
-    
-      <div id="realizedChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:15px; flex-direction:column; flex-shrink:0;">
-        <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-            💰 누적 실현수익 흐름 <span style="font-size:11px; font-weight:normal; color:var(--text3);">(확정 수익의 합계 추이)</span>
-        </div>
-        <div style="height:180px; position:relative;"><canvas id="realizedChartCanvas"></canvas></div>
-      </div>
         <div style="display:flex; gap:10px;">
           <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
             <option value="all">전체 연도</option>
@@ -367,6 +360,13 @@
             <button class="vtab real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
           </div>
         </div>
+      </div>
+    
+      <div id="realizedChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:15px; flex-direction:column; flex-shrink:0;">
+        <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            💰 누적 실현수익 흐름 <span style="font-size:11px; font-weight:normal; color:var(--text3);">(확정 수익의 합계 추이)</span>
+        </div>
+        <div style="height:180px; position:relative;"><canvas id="realizedChartCanvas"></canvas></div>
       </div>
 
       <div class="summary" style="display:flex; gap:10px; margin-bottom:15px;">
@@ -401,10 +401,8 @@
           <tbody id="realizedTableBody"></tbody>
         </table>
       </div>
-    </div>
-
-  </main>
-</div>
+      
+    </div> </main> </div>
 
 <div class="overlay" id="chartOverlay" onclick="closeModal('chartOverlay')">
   <div class="modal" onclick="event.stopPropagation()">
