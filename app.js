@@ -1696,7 +1696,9 @@ function generateListItemHtml(item) {
 // 🌟 자산 성장 추이 그래프 렌더링 (평가액, 투자 원금, 실현 수익 표시)
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
-    if (currentView === 'dividend' || currentView === 'history' || currentView === 'realized' || state.transactions.length === 0) {
+    
+    // 🌟 관심종목(watch) 탭을 포함하여 차트가 필요 없는 화면에서는 강제 숨김 처리 및 실행 중지!
+    if (currentView === 'dividend' || currentView === 'history' || currentView === 'realized' || currentView === 'watch' || state.transactions.length === 0) {
         chartWrap.style.display = 'none';
         return;
     }
@@ -2468,7 +2470,7 @@ async function render() {
   } else if (currentView === 'watch') {
     // 🌟 관심종목 탭: 상단 통계 요약과 그래프를 모두 숨기고 종목 리스트만 띄웁니다!
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; 
-    container.style.display = 'none'; listOptions.style.display = 'flex'; 
+    container.style.display = 'block'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
   } else {
