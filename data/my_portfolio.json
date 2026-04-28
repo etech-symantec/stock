@@ -662,10 +662,10 @@
       "date": "2020-06-16",
       "owner": "끄니",
       "broker": "키움",
-      "symbol": "KG모빌리언스",
+      "symbol": "003620.KS",
       "qty": -14,
       "price": 12450,
-      "txType": "sell"
+      "txType": "trade"
     },
     {
       "id": 1776937388055,
