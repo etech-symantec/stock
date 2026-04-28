@@ -123,7 +123,8 @@
     "263750.KQ",
     "005380.KS",
     "0172V0.KS",
-    "347700.KQ"
+    "347700.KQ",
+    "003620.KS"
   ],
   "transactions": [
     {
@@ -461,10 +462,10 @@
       "date": "2020-05-08",
       "owner": "끄니",
       "broker": "키움",
-      "symbol": "KG모빌리언스",
+      "symbol": "003620.KS",
       "qty": 14,
       "price": 8800,
-      "txType": "buy"
+      "txType": "trade"
     },
     {
       "id": 1776937387678,
@@ -7597,7 +7598,7 @@
       "txType": "trade"
     }
   ],
-  "range": "3m",
+  "range": "3y",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
