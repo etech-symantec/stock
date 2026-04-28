@@ -3049,3 +3049,42 @@ function renderRealizedDashboard() {
         `;
     }).join('');
 }
+// 🌟 실현수익 누적 차트 생성 함수
+function renderRealizedChart(labels, data) {
+    const canvas = document.getElementById('realizedChartCanvas');
+    if (!canvas) return;
+    if (realizedChartInst) realizedChartInst.destroy();
+
+    const pnl = data[data.length - 1] || 0;
+    const color = pnl >= 0 ? '#4d9fff' : '#ff4d6a'; // 수익 파랑, 손실 빨강
+    const bg = pnl >= 0 ? 'rgba(77, 159, 255, 0.1)' : 'rgba(255, 77, 106, 0.1)';
+
+    realizedChartInst = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '누적 실현수익',
+                data: data,
+                borderColor: color,
+                backgroundColor: bg,
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.3,
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => '누적 수익: ₩' + Math.round(ctx.raw).toLocaleString() } }
+            },
+            scales: {
+                x: { ticks: { color: '#555e72', maxTicksLimit: 8 }, grid: { display: false } },
+                y: { ticks: { color: '#555e72', callback: (v) => '₩' + (v/10000).toLocaleString() + '만' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+            }
+        }
+    });
+}
