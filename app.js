@@ -1448,11 +1448,12 @@ function setView(view, el) {
   activeAccountFilter = null; 
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
   if(el) el.classList.add('active'); 
+  
   if(view === 'history') renderHistoryDashboard();
   if(view === 'realized') renderRealizedDashboard();
   
   const pChartWrap = document.getElementById('portfolioChartWrapper');
-  // 🌟 관심종목('watch') 탭에서도 상단 차트를 숨기도록 조건 추가
+  // 🌟 관심종목('watch') 탭과 다른 특수 탭에서 상단 자산 성장 그래프를 숨깁니다!
   if (view === 'dividend' || view === 'history' || view === 'realized' || view === 'watch') {
       pChartWrap.style.display = 'none';
   } else {
@@ -2446,33 +2447,34 @@ async function render() {
   const histDash = document.getElementById('historyDashboard');
   const realDash = document.getElementById('realizedDashboard');
 
+  // 🌟 여기서부터 각 탭마다 보여줄 화면과 숨길 화면을 아주 엄격하게 통제합니다! 🌟
   if (currentView === 'dividend') {
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none';
+    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
     divDash.style.display = 'flex';
     renderDividendDashboard();
     return;
   } else if (currentView === 'history') {
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none';
+    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
     histDash.style.display = 'flex';
     renderHistoryDashboard();
     return;
   } else if (currentView === 'realized') { 
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'flex';
+    if(realDash) realDash.style.display = 'flex'; // 💡 실현수익 페이지만 정보 켜기
     renderRealizedDashboard();
     return;
   } else if (currentView === 'watch') {
-    // 🌟 관심종목 탭일 때 상단 통계 대시보드(dash)와 차트(pChartWrap)를 숨깁니다.
+    // 🌟 관심종목 탭: 상단 통계 요약과 그래프를 모두 숨기고 종목 리스트만 띄웁니다!
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; 
     container.style.display = 'block'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none';
+    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
   } else {
-    // 전체보기, 소유자별 탭일 때
+    // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
     dash.style.display = 'flex'; pChartWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none';
+    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
   }
 
   let ownerFilter = 'all';
