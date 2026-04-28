@@ -3091,17 +3091,17 @@ function renderRealizedDashboard() {
     }).join('');
 }
 
-// 🌟 실현수익 콤보 차트 (막대: 개별 손익 / 선: 누적 수익)
+// 🌟 실현수익 콤보 차트 (최종 수정본 - 에러 완벽 해결)
 function renderRealizedChart(labels, lineData, barData) {
     const canvas = document.getElementById('realizedChartCanvas');
     if (!canvas) return;
     if (realizedChartInst) realizedChartInst.destroy();
 
-    // 개별 막대 색상 결정 (수익은 파랑, 손실은 빨강)
     const barColors = barData.map(val => val >= 0 ? 'rgba(77, 159, 255, 0.5)' : 'rgba(255, 77, 106, 0.5)');
     const barBorderColors = barData.map(val => val >= 0 ? '#4d9fff' : '#ff4d6a');
 
     realizedChartInst = new Chart(canvas.getContext('2d'), {
+        type: 'bar', // 🌟 이 부분이 추가되었습니다! (콤보 차트의 기본 바탕 타입)
         data: {
             labels: labels,
             datasets: [
@@ -3109,13 +3109,13 @@ function renderRealizedChart(labels, lineData, barData) {
                     type: 'line',
                     label: '누적 실현수익',
                     data: lineData,
-                    borderColor: '#7c6af7', // 누적 수익은 보라색 선
+                    borderColor: '#7c6af7',
                     borderWidth: 3,
                     pointRadius: 2,
                     fill: false,
                     tension: 0.3,
                     yAxisID: 'y-cumulative',
-                    order: 1 // 선을 막대 위에 표시
+                    order: 1
                 },
                 {
                     type: 'bar',
@@ -3134,6 +3134,19 @@ function renderRealizedChart(labels, lineData, barData) {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
+            // 🌟 차트 클릭 시 표 필터링
+            onClick: function(event, elements) {
+                if (elements && elements.length > 0) {
+                    const clickedIndex = elements[0].index;
+                    updateRealizedFilter('tradeIdx', clickedIndex);
+                }
+            },
+            // 🌟 마우스 오버 시 포인터(손가락) 모양 변경 (안전한 코드 적용)
+            onHover: function(event, elements) {
+                if (event.native && event.native.target) {
+                    event.native.target.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
+                }
+            },
             plugins: {
                 legend: { 
                     display: true, 
@@ -3142,7 +3155,7 @@ function renderRealizedChart(labels, lineData, barData) {
                 },
                 tooltip: {
                     callbacks: {
-                        label: (ctx) => {
+                        label: function(ctx) {
                             const val = Math.round(ctx.raw).toLocaleString();
                             return `${ctx.dataset.label}: ₩${val}`;
                         }
@@ -3159,7 +3172,7 @@ function renderRealizedChart(labels, lineData, barData) {
                     position: 'left',
                     ticks: { 
                         color: '#7c6af7', 
-                        callback: (v) => (v/10000).toLocaleString() + '만' 
+                        callback: function(v) { return (v/10000).toLocaleString() + '만'; } 
                     },
                     title: { display: true, text: '누적 수익', color: '#7c6af7', font: { size: 10 } },
                     grid: { color: 'rgba(255,255,255,0.05)' }
@@ -3169,23 +3182,11 @@ function renderRealizedChart(labels, lineData, barData) {
                     position: 'right',
                     ticks: { 
                         color: '#8890a4',
-                        callback: (v) => (v/10000).toLocaleString() + '만'
+                        callback: function(v) { return (v/10000).toLocaleString() + '만'; }
                     },
                     title: { display: true, text: '개별 손익', color: '#8890a4', font: { size: 10 } },
-                    grid: { display: false } // 우측 축 그리드는 숨김
+                    grid: { display: false }
                 }
-            },
-          onClick: (event, elements) => {
-                // 🌟 막대 또는 포인트를 클릭했을 때 실행
-                if (elements.length > 0) {
-                    const clickedIndex = elements[0].index;
-                    // 클릭한 인덱스로 필터 업데이트
-                    updateRealizedFilter('tradeIdx', clickedIndex);
-                }
-            },
-            // 마우스 커서를 포인터로 변경하여 클릭 가능함을 알림
-            onHover: (event, chartElement) => {
-                event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
             }
         }
     });
