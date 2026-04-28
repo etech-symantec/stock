@@ -2468,7 +2468,7 @@ async function render() {
   } else if (currentView === 'watch') {
     // 🌟 관심종목 탭: 상단 통계 요약과 그래프를 모두 숨기고 종목 리스트만 띄웁니다!
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; 
-    container.style.display = 'block'; listOptions.style.display = 'flex'; 
+    container.style.display = 'none'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
   } else {
