@@ -2956,9 +2956,10 @@ function renderRealizedDashboard() {
     let usdTotal = 0;
     
     // 📊 차트용 데이터 변수
-    let cumulativePnl = 0;
     let chartLabels = [];
-    let chartData = [];
+    let chartLineData = []; // 누적 수익용 (선)
+    let chartBarData = [];  // 개별 손익용 (막대)
+    let cumulativePnl = 0;
 
     const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
 
@@ -2999,9 +3000,12 @@ function renderRealizedDashboard() {
                 });
 
                 // 📈 차트 데이터 누적 (환산 ₩ 기준)
-                cumulativePnl += pnl * (isKr ? 1 : currentUsdKrw);
+                let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
+                cumulativePnl += pnlKrw;
+        
                 chartLabels.push(tx.date);
-                chartData.push(cumulativePnl);
+                chartLineData.push(cumulativePnl);
+                chartBarData.push(pnlKrw); // 🌟 각 매매의 개별 손익 저장
             }
         }
     });
@@ -3021,8 +3025,8 @@ function renderRealizedDashboard() {
     totalEl.textContent = `${signG}₩ ${Math.round(Math.abs(grandTotal)).toLocaleString()}`;
     totalEl.style.color = grandTotal >= 0 ? 'var(--blue)' : 'var(--red)';
 
-    // 📊 실현수익 차트 그리기 호출
-    renderRealizedChart(chartLabels, chartData);
+    // 📊 차트 그리기 함수 호출 시 데이터를 세 개 전달합니다.
+    renderRealizedChart(chartLabels, chartLineData, chartBarData);
 
     // 표 렌더링
     const tbody = document.getElementById('realizedTableBody');
@@ -3061,41 +3065,89 @@ function renderRealizedDashboard() {
         `;
     }).join('');
 }
-// 🌟 실현수익 누적 차트 생성 함수
-function renderRealizedChart(labels, data) {
+// 🌟 실현수익 콤보 차트 (막대: 개별 손익 / 선: 누적 수익)
+function renderRealizedChart(labels, lineData, barData) {
     const canvas = document.getElementById('realizedChartCanvas');
     if (!canvas) return;
     if (realizedChartInst) realizedChartInst.destroy();
 
-    const pnl = data[data.length - 1] || 0;
-    const color = pnl >= 0 ? '#4d9fff' : '#ff4d6a'; // 수익 파랑, 손실 빨강
-    const bg = pnl >= 0 ? 'rgba(77, 159, 255, 0.1)' : 'rgba(255, 77, 106, 0.1)';
+    // 개별 막대 색상 결정 (수익은 파랑, 손실은 빨강)
+    const barColors = barData.map(val => val >= 0 ? 'rgba(77, 159, 255, 0.5)' : 'rgba(255, 77, 106, 0.5)');
+    const barBorderColors = barData.map(val => val >= 0 ? '#4d9fff' : '#ff4d6a');
 
     realizedChartInst = new Chart(canvas.getContext('2d'), {
-        type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: '누적 실현수익',
-                data: data,
-                borderColor: color,
-                backgroundColor: bg,
-                borderWidth: 2,
-                pointRadius: 0,
-                fill: true,
-                tension: 0.3,
-            }]
+            datasets: [
+                {
+                    type: 'line',
+                    label: '누적 실현수익',
+                    data: lineData,
+                    borderColor: '#7c6af7', // 누적 수익은 보라색 선
+                    borderWidth: 3,
+                    pointRadius: 2,
+                    fill: false,
+                    tension: 0.3,
+                    yAxisID: 'y-cumulative',
+                    order: 1 // 선을 막대 위에 표시
+                },
+                {
+                    type: 'bar',
+                    label: '개별 매매 손익',
+                    data: barData,
+                    backgroundColor: barColors,
+                    borderColor: barBorderColors,
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    yAxisID: 'y-individual',
+                    order: 2
+                }
+            ]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true,
+            maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: { display: false },
-                tooltip: { callbacks: { label: (ctx) => '누적 수익: ₩' + Math.round(ctx.raw).toLocaleString() } }
+                legend: { 
+                    display: true, 
+                    position: 'top',
+                    labels: { color: '#8890a4', font: { size: 11 }, usePointStyle: true } 
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            const val = Math.round(ctx.raw).toLocaleString();
+                            return `${ctx.dataset.label}: ₩${val}`;
+                        }
+                    }
+                }
             },
             scales: {
-                x: { ticks: { color: '#555e72', maxTicksLimit: 8 }, grid: { display: false } },
-                y: { ticks: { color: '#555e72', callback: (v) => '₩' + (v/10000).toLocaleString() + '만' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                x: { 
+                    ticks: { color: '#555e72', maxTicksLimit: 10 }, 
+                    grid: { display: false } 
+                },
+                'y-cumulative': {
+                    type: 'linear',
+                    position: 'left',
+                    ticks: { 
+                        color: '#7c6af7', 
+                        callback: (v) => (v/10000).toLocaleString() + '만' 
+                    },
+                    title: { display: true, text: '누적 수익', color: '#7c6af7', font: { size: 10 } },
+                    grid: { color: 'rgba(255,255,255,0.05)' }
+                },
+                'y-individual': {
+                    type: 'linear',
+                    position: 'right',
+                    ticks: { 
+                        color: '#8890a4',
+                        callback: (v) => (v/10000).toLocaleString() + '만'
+                    },
+                    title: { display: true, text: '개별 손익', color: '#8890a4', font: { size: 10 } },
+                    grid: { display: false } // 우측 축 그리드는 숨김
+                }
             }
         }
     });
