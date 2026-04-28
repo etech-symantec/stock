@@ -36,15 +36,17 @@ let currentListStyle = 'card';
 let currentRegionLayout = 'vertical'; // 🌟 [추가] 기본 배치는 상하(vertical)로 설정
 let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 // 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
-let realizedFilters = { market: 'all', symbol: null };
+let realizedFilters = { market: 'all', symbol: null, tradeIdx: null };
 
 function updateRealizedFilter(key, value) {
     realizedFilters[key] = value;
+    if (key !== 'tradeIdx') realizedFilters.tradeIdx = null; 
     renderRealizedDashboard();
 }
 
 function resetRealizedSymbolFilter() {
     realizedFilters.symbol = null;
+    realizedFilters.tradeIdx = null;
     renderRealizedDashboard();
 }
 
@@ -2956,11 +2958,11 @@ function renderRealizedDashboard() {
     let usdTotal = 0;
     
     // 📊 차트용 데이터 변수
+    let realizedTxs = []; // 필터링된 거래들이 담길 배열
     let chartLabels = [];
-    let chartLineData = []; // 누적 수익용 (선)
-    let chartBarData = [];  // 개별 손익용 (막대)
+    let chartLineData = [];
+    let chartBarData = [];
     let cumulativePnl = 0;
-
     const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
 
     sortedTx.forEach(tx => {
@@ -3005,16 +3007,32 @@ function renderRealizedDashboard() {
         
                 chartLabels.push(tx.date);
                 chartLineData.push(cumulativePnl);
-                chartBarData.push(pnlKrw); // 🌟 각 매매의 개별 손익 저장
+                chartBarData.push(pnlKrw);
+        
+                // 현재 루프의 인덱스가 차트에서 클릭한 인덱스와 일치하거나, 클릭한 적이 없을 때만 표에 추가
+                const currentDataIndex = chartBarData.length - 1;
+                if (realizedFilters.tradeIdx === null || realizedFilters.tradeIdx === currentDataIndex) {
+                    realizedTxs.push({
+                        date: tx.date, symbol: tx.symbol, owner: tx.owner, broker: broker,
+                        sellQty: sellQty, sellPrice: tx.price, avgCost: currentAvg,
+                        pnl: pnl, roi: currentAvg > 0 ? (pnl / (currentAvg * sellQty)) * 100 : 0
+                    });
+                }
+                
+                if (isKr) krwTotal += pnl; // 요약 수치는 전체를 보여주기 위해 유지
+                else usdTotal += pnl;
             }
         }
     });
 
     // 요약 제목 업데이트
     const summaryTitle = document.querySelector('#realizedDashboard .section-title');
-    summaryTitle.innerHTML = realizedFilters.symbol 
-        ? `📈 실현수익: <span style="color:var(--accent)">${realizedFilters.symbol}</span> <button class="btn-sm" onclick="resetRealizedSymbolFilter()" style="margin-left:8px; padding:2px 8px;">전체보기 ✕</button>`
-        : `📈 연도별 실현수익 통계`;
+    if (realizedFilters.symbol || realizedFilters.tradeIdx !== null) {
+        const filterText = realizedFilters.symbol ? realizedFilters.symbol : "선택된 거래";
+        summaryTitle.innerHTML = `📈 실현수익: <span style="color:var(--accent)">${filterText}</span> <button class="btn-sm" onclick="resetRealizedFilters()" style="margin-left:8px; padding:2px 8px;">전체보기 ✕</button>`;
+    } else {
+        summaryTitle.textContent = `📈 연도별 실현수익 통계`;
+    }
 
     // 총계 업데이트
     document.getElementById('realTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
@@ -3148,6 +3166,18 @@ function renderRealizedChart(labels, lineData, barData) {
                     title: { display: true, text: '개별 손익', color: '#8890a4', font: { size: 10 } },
                     grid: { display: false } // 우측 축 그리드는 숨김
                 }
+            },
+          onClick: (event, elements) => {
+                // 🌟 막대 또는 포인트를 클릭했을 때 실행
+                if (elements.length > 0) {
+                    const clickedIndex = elements[0].index;
+                    // 클릭한 인덱스로 필터 업데이트
+                    updateRealizedFilter('tradeIdx', clickedIndex);
+                }
+            },
+            // 마우스 커서를 포인터로 변경하여 클릭 가능함을 알림
+            onHover: (event, chartElement) => {
+                event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
             }
         }
     });
