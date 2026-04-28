@@ -1449,10 +1449,11 @@ function setView(view, el) {
   document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
   if(el) el.classList.add('active'); 
   if(view === 'history') renderHistoryDashboard();
-  if(view === 'realized') renderRealizedDashboard();
+  if(view === 'realized') renderRealizedDashboard(); // 🌟 실현수익 렌더링
   
   const pChartWrap = document.getElementById('portfolioChartWrapper');
-  if (view === 'dividend' || view === 'history') pChartWrap.style.display = 'none';
+  // 🌟 실현수익 탭에서도 메인 포트폴리오 차트 숨김 처리 추가
+  if (view === 'dividend' || view === 'history' || view === 'realized') pChartWrap.style.display = 'none';
   else pChartWrap.style.display = 'flex';
   
   render();
@@ -2440,22 +2441,30 @@ async function render() {
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
   const histDash = document.getElementById('historyDashboard');
-  const realDash = document.getElementById('realizedDashboard');
+  const realDash = document.getElementById('realizedDashboard'); // 🌟 실현수익 창 요소 가져오기
 
+  // 🌟 여기서부터 탭별 화면 표시/숨김을 엄격하게 통제합니다!
   if (currentView === 'dividend') {
-    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; divDash.style.display = 'flex';
+    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 숨김
+    divDash.style.display = 'flex';
     renderDividendDashboard();
     return;
   } else if (currentView === 'history') {
-    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'flex';
+    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 숨김
+    histDash.style.display = 'flex';
     renderHistoryDashboard();
     return;
-  } else if (currentView === 'realized') { // 🌟 실현수익 탭 일 때의 동작 추가
-    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; if(realDash) realDash.style.display = 'flex';
+  } else if (currentView === 'realized') { 
+    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'flex'; // 💡 실현수익 창 보임
     renderRealizedDashboard();
     return;
   } else {
-    dash.style.display = 'flex'; pChartWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none';
+    // 🌟 전체보기, 소유자별, 관심종목 탭일 때
+    dash.style.display = 'flex'; pChartWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 확실히 숨김
   }
 
   let ownerFilter = 'all';
