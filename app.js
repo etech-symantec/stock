@@ -38,9 +38,18 @@ let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 // 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
 let realizedFilters = { market: 'all', symbol: null, tradeIdx: null };
 
+// 🌟 필터 업데이트 함수
 function updateRealizedFilter(key, value) {
     realizedFilters[key] = value;
+    // 차트에서 직접 클릭한 경우가 아니라면 특정 거래 필터는 초기화
     if (key !== 'tradeIdx') realizedFilters.tradeIdx = null; 
+    renderRealizedDashboard();
+}
+
+// 🌟 모든 실현수익 필터 초기화 함수 (에러 발생 원인!)
+function resetRealizedFilters() {
+    realizedFilters.symbol = null;
+    realizedFilters.tradeIdx = null;
     renderRealizedDashboard();
 }
 
