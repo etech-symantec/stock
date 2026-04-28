@@ -2914,11 +2914,14 @@ function setRealizedOwnerFilter(filter, el) {
   renderRealizedDashboard();
 }
 
+// ==========================================
+// 🌟 실현수익 대시보드 렌더링 (최종 완성본 - 에러 수정)
+// ==========================================
 function renderRealizedDashboard() {
     const realDash = document.getElementById('realizedDashboard');
     if(!realDash) return;
 
-    // UI 필터 드롭다운 생성 (기존 로직 유지)
+    // 1. UI 필터: 시장(국가) 드롭다운 자동 삽입
     const filterArea = realDash.querySelector('div:first-child > div');
     if (filterArea && !document.getElementById('realizedMarketFilter')) {
         const mFilter = document.createElement('select');
@@ -2941,10 +2944,12 @@ function renderRealizedDashboard() {
     const yearSelect = document.getElementById('realizedYearFilter');
     let selectedYear = yearSelect ? yearSelect.value : 'all';
 
-    // 연도 목록 생성 (기존 로직)
     let years = new Set();
-    state.transactions.forEach(t => { if (t.txType === 'sell' || t.qty < 0) years.add(t.date.substring(0, 4)); });
+    state.transactions.forEach(t => {
+        if (t.txType === 'sell' || t.qty < 0) years.add(t.date.substring(0, 4));
+    });
     let yearArr = Array.from(years).sort().reverse();
+
     if (yearSelect && yearSelect.options.length <= 1 && yearArr.length > 0) {
         let html = `<option value="all">전체 연도</option>`;
         yearArr.forEach(y => html += `<option value="${y}">${y}년</option>`);
@@ -2952,64 +2957,62 @@ function renderRealizedDashboard() {
         yearSelect.value = selectedYear;
     }
 
+    // 🌟 변수 선언 (중복 선언 에러 해결)
     let holdings = {};
-    let realizedTxs = [];
+    let realizedTxs = []; // 하단 표에 들어갈 데이터
     let krwTotal = 0;
     let usdTotal = 0;
-    
-    // 📊 차트용 데이터 변수
-    let realizedTxs = []; // 필터링된 거래들이 담길 배열
+
+    // 차트용 변수
     let chartLabels = [];
     let chartLineData = [];
     let chartBarData = [];
     let cumulativePnl = 0;
+
     const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
 
+    // 2. 과거 내역부터 순차적으로 평단가 및 수익 계산
     sortedTx.forEach(tx => {
         if (tx.txType === 'dividend') return;
         let broker = tx.broker ? tx.broker.trim() : '미지정';
         let key = `${tx.symbol}::${broker}`;
+
         if(!holdings[key]) holdings[key] = { qty: 0, avg: 0 };
         let h = holdings[key];
 
         if (tx.qty > 0) {
+            // 매수 시 평단가 갱신
             let totalValue = (h.qty * h.avg) + (tx.qty * tx.price);
             h.qty += tx.qty;
             h.avg = totalValue / h.qty;
         } else if (tx.qty < 0) {
+            // 매도 시 수익 계산
             let sellQty = Math.abs(tx.qty);
             let pnl = (tx.price - h.avg) * sellQty;
             let currentAvg = h.avg;
+            
             h.qty -= sellQty;
             if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
 
             let txYear = tx.date.substring(0, 4);
             const isKr = isKorean(tx.symbol);
 
+            // 상단 필터(연도, 소유자, 국가, 종목명) 확인
             const passYear = (selectedYear === 'all' || txYear === selectedYear);
             const passOwner = (ownerName === 'all' || tx.owner === ownerName);
             const passMarket = (realizedFilters.market === 'all' || (realizedFilters.market === 'kr' ? isKr : !isKr));
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
 
             if (passYear && passOwner && passMarket && passSymbol) {
-                if (isKr) krwTotal += pnl;
-                else usdTotal += pnl;
-
-                realizedTxs.push({
-                    date: tx.date, symbol: tx.symbol, owner: tx.owner, broker: broker,
-                    sellQty: sellQty, sellPrice: tx.price, avgCost: currentAvg,
-                    pnl: pnl, roi: currentAvg > 0 ? (pnl / (currentAvg * sellQty)) * 100 : 0
-                });
-
-                // 📈 차트 데이터 누적 (환산 ₩ 기준)
                 let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
                 cumulativePnl += pnlKrw;
-        
+
+                // 차트 데이터 누적 (필터 통과한 모든 내역)
                 chartLabels.push(tx.date);
                 chartLineData.push(cumulativePnl);
                 chartBarData.push(pnlKrw);
-        
-                // 현재 루프의 인덱스가 차트에서 클릭한 인덱스와 일치하거나, 클릭한 적이 없을 때만 표에 추가
+
+                // 표 데이터 누적 (차트에서 클릭한 특정 막대 인덱스만 걸러내기)
                 const currentDataIndex = chartBarData.length - 1;
                 if (realizedFilters.tradeIdx === null || realizedFilters.tradeIdx === currentDataIndex) {
                     realizedTxs.push({
@@ -3019,22 +3022,22 @@ function renderRealizedDashboard() {
                     });
                 }
                 
-                if (isKr) krwTotal += pnl; // 요약 수치는 전체를 보여주기 위해 유지
+                // 총계
+                if (isKr) krwTotal += pnl;
                 else usdTotal += pnl;
             }
         }
     });
 
-    // 요약 제목 업데이트
+    // 3. UI 요약 정보 텍스트 업데이트
     const summaryTitle = document.querySelector('#realizedDashboard .section-title');
     if (realizedFilters.symbol || realizedFilters.tradeIdx !== null) {
-        const filterText = realizedFilters.symbol ? realizedFilters.symbol : "선택된 거래";
+        const filterText = realizedFilters.symbol ? realizedFilters.symbol : "선택된 거래 내역";
         summaryTitle.innerHTML = `📈 실현수익: <span style="color:var(--accent)">${filterText}</span> <button class="btn-sm" onclick="resetRealizedFilters()" style="margin-left:8px; padding:2px 8px;">전체보기 ✕</button>`;
     } else {
         summaryTitle.textContent = `📈 연도별 실현수익 통계`;
     }
 
-    // 총계 업데이트
     document.getElementById('realTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
     document.getElementById('realTotalUsd').textContent = `$ ${usdTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
     const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
@@ -3043,25 +3046,29 @@ function renderRealizedDashboard() {
     totalEl.textContent = `${signG}₩ ${Math.round(Math.abs(grandTotal)).toLocaleString()}`;
     totalEl.style.color = grandTotal >= 0 ? 'var(--blue)' : 'var(--red)';
 
-    // 📊 차트 그리기 함수 호출 시 데이터를 세 개 전달합니다.
+    // 4. 차트 그리기 함수 호출
     renderRealizedChart(chartLabels, chartLineData, chartBarData);
 
-    // 표 렌더링
+    // 5. 거래 내역 표 렌더링
     const tbody = document.getElementById('realizedTableBody');
     if (realizedTxs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--text3);">조건에 맞는 실현수익 내역이 없습니다.</td></tr>`;
         return;
     }
-    realizedTxs.reverse();
+
+    realizedTxs.reverse(); // 최신 날짜가 위로 오게 뒤집기
+
     tbody.innerHTML = realizedTxs.map(tx => {
         let stockName = tx.symbol;
         const dbMatch = localStockDB.find(x => x.symbol === tx.symbol);
         const cachedMatch = cachedMarketData[tx.symbol];
         if (dbMatch) stockName = dbMatch.name;
         else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+
         if (state.oldNames && state.oldNames[tx.symbol]) {
            stockName = state.oldNames[tx.symbol] === '상장폐지' ? `${tx.symbol.replace('.KS.DLST', '').replace('.DLST', '')} (상장폐지)` : `${stockName} (구: ${state.oldNames[tx.symbol]})`;
         }
+
         let sign = tx.pnl >= 0 ? '+' : '';
         let pnlColor = tx.pnl >= 0 ? 'var(--blue)' : 'var(--red)';
         let oInfo = getOwnerInfo(tx.owner);
@@ -3083,6 +3090,7 @@ function renderRealizedDashboard() {
         `;
     }).join('');
 }
+
 // 🌟 실현수익 콤보 차트 (막대: 개별 손익 / 선: 누적 수익)
 function renderRealizedChart(labels, lineData, barData) {
     const canvas = document.getElementById('realizedChartCanvas');
