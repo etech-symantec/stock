@@ -1452,7 +1452,8 @@ function setView(view, el) {
   if(view === 'realized') renderRealizedDashboard();
   
   const pChartWrap = document.getElementById('portfolioChartWrapper');
-  if (view === 'dividend' || view === 'history' || view === 'realized') {
+  // 🌟 관심종목('watch') 탭에서도 상단 차트를 숨기도록 조건 추가
+  if (view === 'dividend' || view === 'history' || view === 'realized' || view === 'watch') {
       pChartWrap.style.display = 'none';
   } else {
       pChartWrap.style.display = 'flex';
@@ -2445,28 +2446,33 @@ async function render() {
   const histDash = document.getElementById('historyDashboard');
   const realDash = document.getElementById('realizedDashboard');
 
-  // 🌟 여기서부터 탭마다 보여주고 숨길 창들을 확실하게 통제합니다!
   if (currentView === 'dividend') {
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 숨김
+    if(realDash) realDash.style.display = 'none';
     divDash.style.display = 'flex';
     renderDividendDashboard();
     return;
   } else if (currentView === 'history') {
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 숨김
+    if(realDash) realDash.style.display = 'none';
     histDash.style.display = 'flex';
     renderHistoryDashboard();
     return;
   } else if (currentView === 'realized') { 
     dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'flex'; // 💡 실현수익 창 보임
+    if(realDash) realDash.style.display = 'flex';
     renderRealizedDashboard();
     return;
+  } else if (currentView === 'watch') {
+    // 🌟 관심종목 탭일 때 상단 통계 대시보드(dash)와 차트(pChartWrap)를 숨깁니다.
+    dash.style.display = 'none'; pChartWrap.style.display = 'none'; 
+    container.style.display = 'block'; listOptions.style.display = 'flex'; 
+    divDash.style.display = 'none'; histDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'none';
   } else {
-    // 전체보기, 소유자별 등 메인 대시보드 탭일 때
+    // 전체보기, 소유자별 탭일 때
     dash.style.display = 'flex'; pChartWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 창 숨김
+    if(realDash) realDash.style.display = 'none';
   }
 
   let ownerFilter = 'all';
