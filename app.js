@@ -2682,17 +2682,13 @@ async function render() {
 
   let allSymbols = new Set();
   
+  // 🌟 [수정됨] 수량이 0이더라도 (전량 매도) 차트 데이터를 가져오도록 allSymbols에 추가합니다.
   for(let sym in symbolHoldings) {
-    if(symbolHoldings[sym].qty > 0) {
-      allSymbols.add(sym);
-    }
+      allSymbols.add(sym); 
   }
   
   state.tickers.forEach(sym => {
-    let hasTransaction = state.transactions.some(t => t.symbol === sym);
-    if (!hasTransaction) {
       allSymbols.add(sym);
-    }
   });
 
   allSymbols = Array.from(allSymbols);
@@ -2709,8 +2705,11 @@ async function render() {
     let avg = sh.qty > 0 ? sh.totalCost / sh.qty : 0;
     let brokerStr = Array.from(sh.brokers).join(', ');
     
+    // 🌟 [수정됨] 보유 수량이 0(전량 매도)이면 'watch'(관심종목) 타입으로 강제 전환하여 표시
+    let displayType = sh.qty > 0 ? 'held' : 'watch';
+    
     if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
-      displayItems.push({ type: 'held', symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, data: cachedMarketData[sym] });
+      displayItems.push({ type: displayType, symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, data: cachedMarketData[sym] });
     } else {
       let fallbackName = sym;
       if (localStockDB && localStockDB.length > 0) {
@@ -2718,13 +2717,15 @@ async function render() {
           if (match) fallbackName = match.name;
       }
       displayItems.push({ 
-        type: 'held', symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, 
+        type: displayType, symbol: sym, broker: brokerStr, qty: sh.qty, avg: avg, 
         data: { name: fallbackName, last: avg, prices: [avg, avg], dates: ['-','-'] }, 
         _isFallback: true 
       });
     }
   }
 
+  // 🌟 수량이 0이 되어 watch로 들어간 종목도 이미 리스트에 있으므로,
+  // 관심종목 탭에서 중복해서 또 추가하지 않도록 heldSymbols에 모든 리스트의 심볼을 담습니다.
   let heldSymbols = new Set(displayItems.map(item => item.symbol));
   state.tickers.forEach(sym => {
     if(!heldSymbols.has(sym) && cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
