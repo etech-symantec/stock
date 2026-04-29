@@ -1345,24 +1345,17 @@ function selectSidebarSearchResult(symbol) {
   }
 }
 
-// 🌟 Vercel Serverless Function(나만의 전용 프록시)을 활용하는 로직으로 변경!
+// 🌟 모든 외부 API 요청은 이 Vercel 전용 프록시 함수를 통과하여 초고속으로 처리됩니다.
 async function fetchWithProxy(targetUrl, useCache = true) {
   const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
-  
-  // Vercel에 만들어둔 내 API 폴더의 proxy.js로 요청을 보냅니다.
   const vercelProxyUrl = `/api/proxy?url=${encodeURIComponent(finalUrl)}`;
 
   try {
     const res = await fetch(vercelProxyUrl);
-    if (res.ok) {
-        return await res.json();
-    } else {
-        console.error("Vercel API 오류:", res.status);
-    }
+    if(res.ok) return await res.json();
   } catch(e) {
-    console.error("Vercel Proxy 연결 실패:", e);
+      console.error("Vercel Proxy 연결 실패:", e);
   }
-  
   return null;
 }
 
@@ -1399,12 +1392,12 @@ async function fetchPublicData(symbol) {
   // 공공데이터 API 엔드포인트 구성 (한 페이지에 252개(약 1년치 영업일) 요청)
   const targetUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${API_KEY}&numOfRows=252&pageNo=1&resultType=json&beginBasDt=${beginDate}&srtnCd=${isinCode}`;
   
-  // 브라우저 CORS 에러 우회를 위해 프록시 사용
-  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
-
+  // 🌟 [수정됨] 국내 주식 공공데이터도 Vercel 전용 프록시(fetchWithProxy)를 태워서 빛의 속도로 가져옴
   try {
-    const res = await fetch(proxyUrl);
-    const data = await res.json();
+    const data = await fetchWithProxy(targetUrl, true);
+    
+    // 응답 데이터가 null 이면 실패
+    if (!data) return { _failed: true };
 
     // 응답 데이터 구조 확인 및 에러 처리
     if (!data.response || !data.response.body || !data.response.body.items || !data.response.body.items.item) {
