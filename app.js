@@ -1345,16 +1345,31 @@ function selectSidebarSearchResult(symbol) {
   }
 }
 
+// 🌟 Vercel 배포 시 corsproxy.io 차단 문제를 피하기 위한 다중 프록시 폴백(Fallback) 기능 적용
 async function fetchWithProxy(targetUrl, useCache = true) {
   const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
-  const proxy = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
-  try {
-    const res = await fetch(proxy);
-    if(res.ok) return await res.json();
-  } catch(e) {}
+  
+  // 사용할 무료 프록시 서버 후보들 (앞에서부터 순서대로 시도합니다)
+  const proxies = [
+    `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(finalUrl)}`, // 1순위 (Vercel에서 잘 작동함)
+    `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`,                   // 2순위 (기존)
+    `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(finalUrl)}`    // 3순위
+  ];
+
+  for (let proxy of proxies) {
+    try {
+      const res = await fetch(proxy);
+      if (res.ok) {
+          return await res.json();
+      }
+    } catch(e) {
+      console.warn(`프록시 실패: ${proxy} -> 다음 프록시 시도`);
+    }
+  }
+  
+  console.error("모든 프록시 서버 요청이 실패했습니다.");
   return null;
 }
-
 async function fetchExchangeRate() {
   if (isExchangeRateFetched) return;
   const data = await fetchYahooData('KRW=X');
