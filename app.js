@@ -1804,7 +1804,7 @@ function generateListItemHtml(item) {
   `;
 }
 
-// 🌟 자산 성장 추이 그래프 렌더링 (평가액, 원금, 실현수익 세분화)
+// 🌟 자산 성장 추이 그래프 렌더링 (국장/미장 누적 및 실현수익 건별 막대 적용)
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
     if (currentView === 'dividend' || currentView === 'history' || currentView === 'realized' || currentView === 'watch' || state.transactions.length === 0) {
@@ -1831,19 +1831,17 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     const slicedRawDates = rawDates.slice(startIndex);
     const slicedDisplayDates = displayDates.slice(startIndex);
     
-    // 🌟 분리된 데이터를 담을 배열들
-    const costDataTotal = [];
+    // 🌟 데이터를 담을 배열들
+    const costDataKr = []; const costDataUs = [];
+    const evalDataKr = []; const evalDataUs = [];
     const evalDataTotal = [];
-    const evalDataKr = [];
-    const evalDataUs = [];
-    const realizedDataKr = []; 
-    const realizedDataUs = []; 
+    const realDataKr = []; const realDataUs = []; // 건별 실현수익
     let firstNonZeroIdx = -1;
     
     slicedRawDates.forEach((dateStr, idx) => {
-        let dailyCostTotal = 0;
-        let dailyEvalKr = 0; let dailyEvalUs = 0;
-        let dailyRealizedKr = 0; let dailyRealizedUs = 0;
+        let dCostKr = 0, dCostUs = 0;
+        let dEvalKr = 0, dEvalUs = 0;
+        let dRealKr = 0, dRealUs = 0; // 매일 0으로 초기화 (건별 표시를 위함)
         
         let fxRate = currentUsdKrw;
         if(cachedMarketData['KRW=X'] && !cachedMarketData['KRW=X']._failed) {
@@ -1874,9 +1872,11 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                 let pnl = (tx.price - h.avg) * sellQty;
                 let isKr = isKorean(tx.symbol);
                 
-                // 🌟 국장/미장 실현수익 분리 누적
-                if (isKr) dailyRealizedKr += pnl;
-                else dailyRealizedUs += pnl * fxRate;
+                // 🌟 당일 발생한 매도(실현수익)만 막대그래프용으로 합산
+                if (tx.date === dateStr) {
+                    if (isKr) dRealKr += pnl;
+                    else dRealUs += pnl * fxRate;
+                }
                 
                 h.qty -= sellQty;
                 if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
@@ -1888,7 +1888,9 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                 let h = holdings[sym];
                 let isKr = isKorean(sym);
                 let costVal = (h.qty * h.avg) * (isKr ? 1 : fxRate);
-                dailyCostTotal += costVal; // 원금은 합산으로 처리
+                
+                if (isKr) dCostKr += costVal;
+                else dCostUs += costVal;
                 
                 let priceOnDate = h.avg; 
                 if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
@@ -1908,40 +1910,39 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                 }
                 
                 let evalVal = (h.qty * priceOnDate) * (isKr ? 1 : fxRate);
-                // 🌟 국장/미장 평가액 분리 누적
-                if (isKr) dailyEvalKr += evalVal;
-                else dailyEvalUs += evalVal;
+                if (isKr) dEvalKr += evalVal;
+                else dEvalUs += evalVal;
             }
         }
         
-        costDataTotal.push(dailyCostTotal);
-        evalDataKr.push(dailyEvalKr);
-        evalDataUs.push(dailyEvalUs);
-        evalDataTotal.push(dailyEvalKr + dailyEvalUs);
-        realizedDataKr.push(dailyRealizedKr);
-        realizedDataUs.push(dailyRealizedUs);
+        costDataKr.push(dCostKr);
+        costDataUs.push(dCostUs);
+        evalDataKr.push(dEvalKr);
+        evalDataUs.push(dEvalUs);
+        evalDataTotal.push(dEvalKr + dEvalUs);
+        realDataKr.push(dRealKr);
+        realDataUs.push(dRealUs);
         
-        if (firstNonZeroIdx === -1 && (dailyCostTotal > 0 || dailyEvalKr > 0 || dailyEvalUs > 0)) {
+        if (firstNonZeroIdx === -1 && (dCostKr > 0 || dCostUs > 0 || dEvalKr > 0 || dEvalUs > 0 || dRealKr > 0 || dRealUs > 0)) {
             firstNonZeroIdx = idx;
         }
     });
 
     let finalDisplayDates = slicedDisplayDates;
-    let finalCostTotal = costDataTotal;
+    let finalCostKr = costDataKr; let finalCostUs = costDataUs;
+    let finalEvalKr = evalDataKr; let finalEvalUs = evalDataUs;
     let finalEvalTotal = evalDataTotal;
-    let finalEvalKr = evalDataKr;
-    let finalEvalUs = evalDataUs;
-    let finalRealKr = realizedDataKr;
-    let finalRealUs = realizedDataUs;
+    let finalRealKr = realDataKr; let finalRealUs = realDataUs;
 
     if (firstNonZeroIdx > 0 && sliceLen >= 756) { 
         finalDisplayDates = slicedDisplayDates.slice(firstNonZeroIdx);
-        finalCostTotal = costDataTotal.slice(firstNonZeroIdx);
-        finalEvalTotal = evalDataTotal.slice(firstNonZeroIdx);
+        finalCostKr = costDataKr.slice(firstNonZeroIdx);
+        finalCostUs = costDataUs.slice(firstNonZeroIdx);
         finalEvalKr = evalDataKr.slice(firstNonZeroIdx);
         finalEvalUs = evalDataUs.slice(firstNonZeroIdx);
-        finalRealKr = realizedDataKr.slice(firstNonZeroIdx);
-        finalRealUs = realizedDataUs.slice(firstNonZeroIdx);
+        finalEvalTotal = evalDataTotal.slice(firstNonZeroIdx);
+        finalRealKr = realDataKr.slice(firstNonZeroIdx);
+        finalRealUs = realDataUs.slice(firstNonZeroIdx);
     }
 
     const canvas = document.getElementById('portfolioChartCanvas');
@@ -1949,73 +1950,93 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     if (portfolioChartInst) portfolioChartInst.destroy();
 
     portfolioChartInst = new Chart(canvas.getContext('2d'), {
-        type: 'line',
         data: {
             labels: finalDisplayDates,
             datasets: [
+                // 1. 합산 평가액 (노란색 단독 선 - 가장 위에 그려짐)
                 {
                     label: '합산 평가액',
+                    type: 'line',
                     data: finalEvalTotal,
-                    borderColor: '#f1c40f', // 🌟 노란색
-                    backgroundColor: 'rgba(241, 196, 15, 0.1)',
+                    borderColor: '#f1c40f',
                     borderWidth: 2,
                     pointRadius: 0,
-                    fill: true,
+                    fill: false,
                     tension: 0.1,
                     order: 1
                 },
+                // 2. 건별 실현수익 (국장/미장 막대 그래프)
                 {
-                    label: '평가액 (국장)',
-                    data: finalEvalKr,
-                    borderColor: '#00c87a', // 🌟 초록색
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: false,
-                    tension: 0.1,
+                    label: '실현수익 (국장)',
+                    type: 'bar',
+                    data: finalRealKr,
+                    backgroundColor: '#27ae60',
+                    borderWidth: 0,
+                    stack: 'Realized',
                     order: 2
                 },
                 {
-                    label: '평가액 (미장)',
-                    data: finalEvalUs,
-                    borderColor: '#ff4d6a', // 🌟 빨간색
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: false,
-                    tension: 0.1,
+                    label: '실현수익 (미장)',
+                    type: 'bar',
+                    data: finalRealUs,
+                    backgroundColor: '#2980b9',
+                    borderWidth: 0,
+                    stack: 'Realized',
                     order: 3
                 },
+                // 3. 투자액 누적 영역 (가장 진하게 표시, 평가액보다 앞에 그려짐)
                 {
-                    label: '총 투자 원금',
-                    data: finalCostTotal,
-                    borderColor: '#8890a4',
-                    backgroundColor: 'rgba(136, 144, 164, 0.25)', // 🌟 진한 회/파랑색 배경
-                    borderWidth: 3, // 두꺼운 선
+                    label: '투자액 (국장)',
+                    type: 'line',
+                    data: finalCostKr,
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.7)',
+                    borderWidth: 1.5,
                     pointRadius: 0,
-                    fill: true,     // 영역 채우기
-                    tension: 0.1,
-                    order: 6
-                },
-                {
-                    label: '실현수익 (국장)',
-                    data: finalRealKr,
-                    borderColor: '#0abde3', // 파란색 (국장)
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    fill: false,
+                    fill: true,
+                    stack: 'Cost', // 누적
                     tension: 0.1,
                     order: 4
                 },
                 {
-                    label: '실현수익 (미장)',
-                    data: finalRealUs,
-                    borderColor: '#fd79a8', // 분홍색 (미장)
-                    borderWidth: 2,
-                    borderDash: [5, 5],
+                    label: '투자액 (미장)',
+                    type: 'line',
+                    data: finalCostUs,
+                    borderColor: '#2980b9',
+                    backgroundColor: 'rgba(41, 128, 185, 0.7)',
+                    borderWidth: 1.5,
                     pointRadius: 0,
-                    fill: false,
+                    fill: true,
+                    stack: 'Cost', // 누적
                     tension: 0.1,
                     order: 5
+                },
+                // 4. 평가액 누적 영역 (배경에 은은하게 깔림)
+                {
+                    label: '평가액 (국장)',
+                    type: 'line',
+                    data: finalEvalKr,
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.35)',
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    fill: true,
+                    stack: 'Eval', // 누적
+                    tension: 0.1,
+                    order: 6
+                },
+                {
+                    label: '평가액 (미장)',
+                    type: 'line',
+                    data: finalEvalUs,
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.35)',
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    fill: true,
+                    stack: 'Eval', // 누적
+                    tension: 0.1,
+                    order: 7
                 }
             ]
         },
@@ -2024,12 +2045,11 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: { 
-                    display: true, 
-                    position: 'top', 
+                    display: true, position: 'top', 
                     labels: { color: '#8890a4', font: {size: 11}, usePointStyle: true, boxWidth:8 } 
                 },
                 tooltip: { 
-                    callbacks: { label: function(context) { return context.dataset.label + ': ₩' + Math.round(context.raw).toLocaleString(); } } 
+                    callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₩' + Math.round(ctx.raw).toLocaleString(); } } 
                 }
             },
             scales: {
