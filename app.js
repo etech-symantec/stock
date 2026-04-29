@@ -2932,7 +2932,8 @@ async function render() {
     if (item.data && item.data.prices && !item._isFallback) {
       const displayPrices = item.data.prices.slice(-item.sliceLen);
       const displayDates = item.data.dates.slice(-item.sliceLen);
-      chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true);
+      // 👇 이 줄의 맨 끝에 item.symbol 을 전달하도록 수정합니다!
+      chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true, item.symbol);
     }
   });
 }
