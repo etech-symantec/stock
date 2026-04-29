@@ -329,18 +329,25 @@
       </div>
       
       <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:10px;">
-        <div class="div-chart-area">
+        <div class="div-chart-area" style="min-height: 450px;">
           <div class="sum-label" style="margin-bottom:15px;">월별 배당금 추이 (합산 ₩)</div>
           <div style="flex:1; position:relative;"><canvas id="divMonthlyCanvas"></canvas></div>
         </div>
-        <div class="div-list-area">
+        
+        <div class="div-list-area" style="min-height: 450px;">
           <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px; flex-wrap:wrap; gap:8px;">
-            <div class="sum-label" style="margin-bottom:0;">효자 종목 (종목별 배당금)</div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="sum-label" style="margin-bottom:0;">효자 종목 (종목별 배당금)</div>
+                <select id="divSortSelect" class="form-input" style="padding:2px 6px; font-size:11px; width:auto; margin:0;" onchange="setDivSort(this.value)">
+                    <option value="yieldDesc">실질 배당률 순</option>
+                    <option value="amtDesc">총 배당금 순</option>
+                </select>
+            </div>
             <div style="font-size:11px; color:var(--text2); background:var(--bg); border:1px solid var(--border); padding:5px 8px; border-radius:4px;">
               💡 <b>실질 배당률</b> = 총 배당금 ÷ (지급일 기준 보유수량 × 지급일 주가) × 100
             </div>
           </div>
-          <div id="divStockList" style="flex:1; overflow-y:auto; max-height:350px; padding-right:5px;"></div>
+          <div id="divStockList" style="flex:1; overflow-y:auto; max-height:525px; padding-right:5px;"></div>
         </div>
       </div>
     </div>
