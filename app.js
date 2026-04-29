@@ -2408,6 +2408,7 @@ function renderDividendDashboard() {
   });
 }
 
+// 🌟 종목 카드 모달 차트 (매수/매도 마커 표시 기능 추가)
 function openChartModal(ticker) {
   const data = cachedMarketData[ticker]; if(!data || data._failed) return;
   const getSliceLen = (range) => {
@@ -2418,6 +2419,7 @@ function openChartModal(ticker) {
   let sliceLen = getSliceLen(state.range);
   const displayPrices = data.prices.slice(-sliceLen);
   const displayDates = data.dates.slice(-sliceLen);
+  const displayRawDates = data.rawDates ? data.rawDates.slice(-sliceLen) : [];
   if(displayPrices.length === 0) return;
   
   const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
@@ -2435,9 +2437,117 @@ function openChartModal(ticker) {
   chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
   document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
   
+  // 🌟 거래 내역에서 매수/매도 포인트 추출 로직 추가
+  const buyData = [];
+  const sellData = [];
+  
+  const txs = state.transactions.filter(t => t.symbol === ticker && t.txType !== 'dividend');
+  txs.forEach(tx => {
+      let dateIdx = -1;
+      if (displayRawDates.length > 0) {
+          dateIdx = displayRawDates.indexOf(tx.date);
+          if (dateIdx === -1) {
+              // 주말이나 휴일 매매의 경우 가장 가까운 장 열린 날짜에 맞춤
+              for(let k = 0; k < displayRawDates.length; k++) {
+                  if (displayRawDates[k] >= tx.date) { dateIdx = k; break; }
+              }
+              if (dateIdx === -1 && tx.date <= displayRawDates[displayRawDates.length-1]) {
+                  dateIdx = displayRawDates.length - 1;
+              }
+          }
+      }
+      
+      // 차트 기간 안에 있는 매매 내역만 점으로 표시
+      if (dateIdx !== -1) {
+          if (tx.qty > 0) {
+              buyData.push({ x: displayDates[dateIdx], y: tx.price, qty: tx.qty });
+          } else if (tx.qty < 0) {
+              sellData.push({ x: displayDates[dateIdx], y: tx.price, qty: Math.abs(tx.qty) });
+          }
+      }
+  });
+
   document.getElementById('chartOverlay').classList.add('open');
   if (modalChartInst) modalChartInst.destroy();
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false); }, 50);
+  
+  // 🌟 기존 buildChart 대신 커스텀 차트 생성 (마커 오버레이 적용)
+  setTimeout(() => { 
+      const canvas = document.getElementById('modalCanvas');
+      if (!canvas) return;
+      
+      const {line, fill} = getColors(displayPrices);
+      
+      modalChartInst = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: { 
+              labels: displayDates, 
+              datasets: [
+                  { 
+                      label: '주가',
+                      data: displayPrices, 
+                      borderColor: line, 
+                      backgroundColor: fill, 
+                      borderWidth: 2, 
+                      pointRadius: 0, 
+                      tension: 0.1, 
+                      fill: true,
+                      order: 3 // 주가 라인을 가장 밑에 깔기
+                  },
+                  {
+                      label: '매수',
+                      data: buyData,
+                      type: 'line', 
+                      showLine: false, // 선 없이 점만 찍기
+                      pointStyle: 'triangle', // 위로 향하는 화살표(삼각형)
+                      backgroundColor: '#ff4d6a', // 매수는 빨간색
+                      borderColor: '#fff',
+                      borderWidth: 1.5,
+                      pointRadius: 8,
+                      pointHoverRadius: 10,
+                      order: 1 // 마커를 선 위로 올리기
+                  },
+                  {
+                      label: '매도',
+                      data: sellData,
+                      type: 'line',
+                      showLine: false,
+                      pointStyle: 'triangle',
+                      rotation: 180, // 삼각형 뒤집기 (아래로 향하는 화살표)
+                      backgroundColor: '#4d9fff', // 매도는 파란색
+                      borderColor: '#fff',
+                      borderWidth: 1.5,
+                      pointRadius: 8,
+                      pointHoverRadius: 10,
+                      order: 2
+                  }
+              ] 
+          },
+          options: { 
+              responsive: true, maintainAspectRatio: false, 
+              interaction: { mode: 'index', intersect: false },
+              plugins: { 
+                  legend: { display: false }, 
+                  tooltip: { 
+                      callbacks: {
+                          // 마우스 올렸을 때 뜨는 정보(툴팁) 꾸미기
+                          label: function(ctx) {
+                              if (ctx.dataset.label === '매수') {
+                                  return `🔴 매수: ${formatPrice(ctx.raw.y, ticker)} (${ctx.raw.qty}주)`;
+                              } else if (ctx.dataset.label === '매도') {
+                                  return `🔵 매도: ${formatPrice(ctx.raw.y, ticker)} (${ctx.raw.qty}주)`;
+                              }
+                              return `${ctx.dataset.label}: ${formatPrice(ctx.raw, ticker)}`;
+                          }
+                      }
+                  } 
+              }, 
+              scales: { 
+                  x: { ticks: { font:{size:10}, color:'#555e72', maxTicksLimit: 10 }, grid: { display: false }, border: { display: false } }, 
+                  y: { ticks: { font:{size:10}, color:'#555e72' }, grid: { color:'rgba(255,255,255,0.04)' }, border: { display: false } } 
+              } 
+          }
+      });
+  }, 50);
 }
 
 // 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
