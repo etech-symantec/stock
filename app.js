@@ -2846,17 +2846,18 @@ async function render() {
     return true; 
   });
 
-  // 🌟 1. 현재 화면에 있는 종목들의 태그만 모아서 예쁜 버튼으로 만들기
+  // 🌟 1. 현재 화면에 있는 종목들의 태그만 모아서 예쁜 버튼으로 만들기 (쉼표 분리 기능 추가!)
   const tagContainer = document.getElementById('localTagFilterContainer');
   if (tagContainer) {
       let uniqueTags = new Set();
       displayItems.forEach(item => {
           if (state.tags && state.tags[item.symbol]) {
-              uniqueTags.add(state.tags[item.symbol]);
+              // 💡 쉼표로 쪼갠 뒤 빈칸 없애고, 빈 태그가 아니면 Set에 담기
+              const tagsArray = state.tags[item.symbol].split(',').map(t => t.trim()).filter(t => t !== '');
+              tagsArray.forEach(tag => uniqueTags.add(tag));
           }
       });
       
-      // 태그가 하나도 없으면 컨테이너 숨기기, 있으면 '전체' 버튼과 함께 나열
       if (uniqueTags.size === 0) {
           tagContainer.style.display = 'none';
       } else {
@@ -2869,13 +2870,17 @@ async function render() {
       }
   }
 
-  // 🌟 2. 클릭한 태그와 입력한 검색어로 리스트를 깔끔하게 걸러내기
+  // 🌟 2. 클릭한 태그와 입력한 검색어로 리스트를 깔끔하게 걸러내기 (쉼표 분리 검색 반영!)
   displayItems = displayItems.filter(item => {
-      // 태그 필터 (선택한 태그가 아니면 숨김)
-      const itemTag = (state.tags && state.tags[item.symbol]) ? state.tags[item.symbol] : '';
-      if (currentLocalTag !== 'all' && itemTag !== currentLocalTag) return false;
+      // 태그 필터
+      if (currentLocalTag !== 'all') {
+          const itemTagString = (state.tags && state.tags[item.symbol]) ? state.tags[item.symbol] : '';
+          // 💡 해당 종목의 태그를 쪼개서 배열로 만든 뒤, 클릭한 태그가 그 배열 안에 있는지 확인
+          const itemTagsArray = itemTagString.split(',').map(t => t.trim());
+          if (!itemTagsArray.includes(currentLocalTag)) return false;
+      }
       
-      // 검색어 필터 (종목명이나 Ticker에 검색어가 없으면 숨김)
+      // 검색어 필터
       if (currentLocalSearch) {
           const sText = currentLocalSearch.toLowerCase().trim();
           const stockName = (item.data && item.data.name) ? item.data.name.toLowerCase() : '';
@@ -2884,7 +2889,7 @@ async function render() {
       }
       return true;
   });
-
+  
   displayItems.forEach(item => {
     item.uniqueId = 'chart_' + Math.random().toString(36).substring(2, 10);
     if(item.data && item.data.prices && item.data.prices.length > 0) {
