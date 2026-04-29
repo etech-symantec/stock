@@ -37,6 +37,19 @@ let currentRegionLayout = 'vertical'; // 🌟 [추가] 기본 배치는 상하(v
 let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 // 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
 let realizedFilters = { market: 'all', symbol: null, tradeIdx: null };
+// 🌟 종목 리스트 검색 및 태그 필터 상태 변수
+let currentLocalSearch = '';
+let currentLocalTag = 'all';
+
+function updateLocalSearch(val) {
+    currentLocalSearch = val;
+    render();
+}
+
+function setLocalTag(tag) {
+    currentLocalTag = tag;
+    render();
+}
 
 // 🌟 필터 업데이트 함수
 function updateRealizedFilter(key, value) {
@@ -2831,6 +2844,45 @@ async function render() {
     if(currentView === 'user1' || currentView === 'user2') return item.type === 'held';
     if(currentView === 'watch') return item.type === 'watch';
     return true; 
+  });
+
+  // 🌟 1. 현재 화면에 있는 종목들의 태그만 모아서 예쁜 버튼으로 만들기
+  const tagContainer = document.getElementById('localTagFilterContainer');
+  if (tagContainer) {
+      let uniqueTags = new Set();
+      displayItems.forEach(item => {
+          if (state.tags && state.tags[item.symbol]) {
+              uniqueTags.add(state.tags[item.symbol]);
+          }
+      });
+      
+      // 태그가 하나도 없으면 컨테이너 숨기기, 있으면 '전체' 버튼과 함께 나열
+      if (uniqueTags.size === 0) {
+          tagContainer.style.display = 'none';
+      } else {
+          tagContainer.style.display = 'flex';
+          let tagsHtml = `<button class="vtab ${currentLocalTag === 'all' ? 'active' : ''}" onclick="setLocalTag('all')" style="padding:4px 10px; font-size:11px;">🏷️ 전체보기</button>`;
+          Array.from(uniqueTags).sort().forEach(tag => {
+              tagsHtml += `<button class="vtab ${currentLocalTag === tag ? 'active' : ''}" onclick="setLocalTag('${tag}')" style="padding:4px 10px; font-size:11px;">${tag}</button>`;
+          });
+          tagContainer.innerHTML = tagsHtml;
+      }
+  }
+
+  // 🌟 2. 클릭한 태그와 입력한 검색어로 리스트를 깔끔하게 걸러내기
+  displayItems = displayItems.filter(item => {
+      // 태그 필터 (선택한 태그가 아니면 숨김)
+      const itemTag = (state.tags && state.tags[item.symbol]) ? state.tags[item.symbol] : '';
+      if (currentLocalTag !== 'all' && itemTag !== currentLocalTag) return false;
+      
+      // 검색어 필터 (종목명이나 Ticker에 검색어가 없으면 숨김)
+      if (currentLocalSearch) {
+          const sText = currentLocalSearch.toLowerCase().trim();
+          const stockName = (item.data && item.data.name) ? item.data.name.toLowerCase() : '';
+          const symbolStr = item.symbol.toLowerCase();
+          if (!stockName.includes(sText) && !symbolStr.includes(sText)) return false;
+      }
+      return true;
   });
 
   displayItems.forEach(item => {
