@@ -3432,3 +3432,55 @@ function renderRealizedChart(labels, lineData, barData) {
         }
     });
 }
+
+// ==========================================
+// 🌟 주가 캐시 수동 최신화 및 마지막 업데이트 시간 표시 기능
+// ==========================================
+
+// 1. 수동으로 최신화하는 함수
+function forceMarketDataUpdate() {
+    if(confirm("현재 캐시된 주가 데이터를 지우고 증권 서버에서 최신 주가를 다시 받아오시겠습니까?\n(종목 수에 따라 몇 초 정도 소요될 수 있습니다.)")) {
+        // 임시 저장된 데이터 강제 삭제
+        localStorage.removeItem('sw_market_cache');
+        localStorage.removeItem('sw_market_cache_time');
+        
+        // 메모리에 있는 기존 캐시 비우기
+        cachedMarketData = {};
+        
+        alert("최신 주가를 받아옵니다. 화면이 새로고침됩니다.");
+        // 페이지를 아예 새로고침하여 처음부터 다시 로딩하게 만듦
+        location.reload();
+    }
+}
+
+// 2. 화면에 마지막 업데이트 시간을 예쁘게 표시해 주는 함수
+function updateLastSyncTimeDisplay() {
+    const timeDisplay = document.getElementById('marketDataLastUpdated');
+    if (!timeDisplay) return;
+
+    const cacheTimeStr = localStorage.getItem('sw_market_cache_time');
+    if (!cacheTimeStr) {
+        timeDisplay.innerHTML = `<span style="color:var(--text2)">방금 막 최신화됨</span>`;
+        return;
+    }
+
+    const cacheTime = parseInt(cacheTimeStr);
+    const now = Date.now();
+    const diffMin = Math.floor((now - cacheTime) / 60000);
+
+    if (diffMin < 1) {
+        timeDisplay.innerHTML = `<span style="color:var(--text2)">방금 막 최신화됨</span>`;
+    } else if (diffMin < 60) {
+        timeDisplay.innerHTML = `마지막 업데이트: <span style="color:var(--text2); font-weight:bold;">${diffMin}분 전</span>`;
+    } else {
+        const diffHour = Math.floor(diffMin / 60);
+        timeDisplay.innerHTML = `마지막 업데이트: <span style="color:var(--text2); font-weight:bold;">${diffHour}시간 전</span>`;
+    }
+}
+
+// 화면을 다시 그릴 때(렌더링 시) 시간 표시도 함께 업데이트하도록 인터셉트!
+const originalRender = render;
+render = async function() {
+    await originalRender();
+    updateLastSyncTimeDisplay();
+};
