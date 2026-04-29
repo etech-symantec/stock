@@ -247,18 +247,15 @@
 
     <div class="list-options-bar" id="listOptionsBar" style="display:none;">
       
-      <div class="list-title-wrap" style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+      <div class="list-title-wrap" style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px;">
         <h2 class="section-title" style="margin:0;">종목 리스트</h2>
-        <div style="position:relative;">
-            <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text3);">🔍</span>
-            <input type="text" id="localSearchInput" class="search-input" placeholder="등록된 종목 검색..." style="width:180px; padding:6px 12px 6px 28px; border-radius:20px; font-size:12px; margin:0;" oninput="updateLocalSearch(this.value)">
-        </div>
       </div>
       
       <div id="localTagFilterContainer" style="display:flex; flex-wrap:wrap; gap:6px; width:100%; margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border);">
-        </div>
+      </div>
 
       <div class="list-controls" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; width:100%;">
+        
         <div style="display:flex; gap:10px; align-items:center;">
             <select class="sort-select" id="sortSelect" onchange="setSortMode(this.value)">
               <option value="changeDesc" selected>등락률 순</option>
@@ -269,6 +266,12 @@
         </div>
         
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            
+            <div style="position:relative;">
+                <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text3);">🔍</span>
+                <input type="text" id="localSearchInput" class="search-input" placeholder="등록된 종목 검색..." style="width:160px; padding:6px 12px 6px 28px; border-radius:20px; font-size:12px; margin:0; border:1px solid var(--border);" oninput="updateLocalSearch(this.value)">
+            </div>
+
             <div class="view-toggle-group" style="display:flex; background:var(--bg); border-radius:6px; border:1px solid var(--border); padding:3px;">
                 <button id="btnViewCard" style="background:var(--bg3); border:none; color:var(--text); padding:4px 12px; font-size:12px; border-radius:4px; cursor:pointer;" onclick="setListStyle('card')">📇 카드</button>
                 <button id="btnViewList" style="background:transparent; border:none; color:var(--text2); padding:4px 12px; font-size:12px; border-radius:4px; cursor:pointer;" onclick="setListStyle('list')">📄 목록</button>
