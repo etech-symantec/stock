@@ -4842,7 +4842,7 @@
       "date": "2023-08-16",
       "owner": "끄니",
       "broker": "키움",
-      "symbol": "005930.KS",
+      "symbol": "005935.KS",
       "qty": 0,
       "price": 87968,
       "txType": "dividend"
@@ -4872,7 +4872,7 @@
       "date": "2023-11-20",
       "owner": "끄니",
       "broker": "키움",
-      "symbol": "005930.KS",
+      "symbol": "005935.KS",
       "qty": 0,
       "price": 87968,
       "txType": "dividend"
@@ -4942,7 +4942,7 @@
       "date": "2024-04-19",
       "owner": "끄니",
       "broker": "키움",
-      "symbol": "005930.KS",
+      "symbol": "005935.KS",
       "qty": 0,
       "price": 44118,
       "txType": "dividend"
@@ -5022,7 +5022,7 @@
       "date": "2024-08-20",
       "owner": "끄니",
       "broker": "키움",
-      "symbol": "005930.KS",
+      "symbol": "005935.KS",
       "qty": 0,
       "price": 43994,
       "txType": "dividend"
@@ -5082,7 +5082,7 @@
       "date": "2024-11-20",
       "owner": "끄니",
       "broker": "키움",
-      "symbol": "005930.KS",
+      "symbol": "005935.KS",
       "qty": 0,
       "price": 43994,
       "txType": "dividend"
@@ -5162,7 +5162,7 @@
       "date": "2025-04-18",
       "owner": "끄니",
       "broker": "키움",
-      "symbol": "005930.KS",
+      "symbol": "005935.KS",
       "qty": 0,
       "price": 44356,
       "txType": "dividend"
@@ -7608,7 +7608,7 @@
       "txType": "trade"
     }
   ],
-  "range": "3y",
+  "range": "1m",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
