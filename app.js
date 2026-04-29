@@ -159,17 +159,115 @@ function getColors(prices) {
   return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
 }
 
-function buildChart(canvasId, prices, dates, mini) {
+// 🌟 미니 차트 생성 함수 (매수/매도 타점 마커 표시 기능 완벽 추가!)
+function buildChart(canvasId, prices, dates, mini, symbol) {
   const {line, fill} = getColors(prices);
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
+  
+  const datasets = [
+      { 
+          label: '주가',
+          data: prices, 
+          borderColor: line, 
+          backgroundColor: fill, 
+          borderWidth: mini ? 1.5 : 2, 
+          pointRadius: 0, 
+          tension: 0.1, 
+          fill: true,
+          order: 3
+      }
+  ];
+  
+  // 🌟 종목(symbol) 정보가 전달되었고, 거래 내역이 존재하면 매수/매도 타점 추가
+  if (symbol && state.transactions) {
+      const data = cachedMarketData[symbol];
+      // 해당 종목의 rawDates(원본 날짜)가 있어야 정확한 위치 추적 가능
+      if (data && data.rawDates) {
+          const displayRawDates = data.rawDates.slice(-prices.length);
+          const buyData = [];
+          const sellData = [];
+          
+          const txs = state.transactions.filter(t => t.symbol === symbol && t.txType !== 'dividend');
+          txs.forEach(tx => {
+              let dateIdx = displayRawDates.indexOf(tx.date);
+              
+              // 휴일/주말 매매 등 정확한 날짜가 없을 경우 가장 가까운 미래 날짜로 위치 보정
+              if (dateIdx === -1) {
+                  for(let k = 0; k < displayRawDates.length; k++) {
+                      if (displayRawDates[k] >= tx.date) { dateIdx = k; break; }
+                  }
+                  if (dateIdx === -1 && tx.date <= displayRawDates[displayRawDates.length-1]) {
+                      dateIdx = displayRawDates.length - 1;
+                  }
+              }
+              
+              // 차트에 표시되는 기간(예: 3개월, 1년) 안에 있는 내역만 점으로 추가
+              if (dateIdx !== -1) {
+                  if (tx.qty > 0) {
+                      buyData.push({ x: dates[dateIdx], y: tx.price, qty: tx.qty });
+                  } else if (tx.qty < 0) {
+                      sellData.push({ x: dates[dateIdx], y: tx.price, qty: Math.abs(tx.qty) });
+                  }
+              }
+          });
+          
+          // 매수 마커 (빨간색 위 화살표)
+          if (buyData.length > 0) {
+              datasets.push({
+                  label: '매수', data: buyData, type: 'line', showLine: false,
+                  pointStyle: 'triangle', backgroundColor: '#ff4d6a', borderColor: '#fff',
+                  borderWidth: mini ? 1 : 1.5,
+                  pointRadius: mini ? 4 : 8,
+                  pointHoverRadius: mini ? 6 : 10,
+                  order: 1
+              });
+          }
+          // 매도 마커 (파란색 아래 화살표)
+          if (sellData.length > 0) {
+              datasets.push({
+                  label: '매도', data: sellData, type: 'line', showLine: false,
+                  pointStyle: 'triangle', rotation: 180, backgroundColor: '#4d9fff', borderColor: '#fff',
+                  borderWidth: mini ? 1 : 1.5,
+                  pointRadius: mini ? 4 : 8,
+                  pointHoverRadius: mini ? 6 : 10,
+                  order: 2
+              });
+          }
+      }
+  }
+
   return new Chart(canvas, {
     type: 'line',
-    data: { labels: dates, datasets: [{ data: prices, borderColor: line, backgroundColor: fill, borderWidth: mini ? 1.5 : 2, pointRadius: 0, tension: 0.1, fill: true }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, displayColors: false } }, scales: { x: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { display: false }, border: { display: false } }, y: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { color:'rgba(255,255,255,0.04)' }, border: { display: false } } }, interaction: { mode: 'index', intersect: false }, animation: { duration: 0 } }
+    data: { labels: dates, datasets: datasets },
+    options: { 
+        responsive: true, maintainAspectRatio: false, 
+        plugins: { 
+            legend: { display: false }, 
+            tooltip: { 
+                mode: 'index', intersect: false, displayColors: false,
+                callbacks: {
+                    // 미니 차트에서도 마우스를 올리면 가격 정보를 예쁘게 표시
+                    label: function(ctx) {
+                        const sym = symbol || '';
+                        if (ctx.dataset.label === '매수') return `🔴 매수: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주)`;
+                        if (ctx.dataset.label === '매도') return `🔵 매도: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주)`;
+                        
+                        let val = typeof ctx.raw === 'object' ? ctx.raw.y : ctx.raw;
+                        return `주가: ${formatPrice(val, sym)}`;
+                    }
+                }
+            } 
+        }, 
+        scales: { 
+            x: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { display: false }, border: { display: false } }, 
+            y: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { color:'rgba(255,255,255,0.04)' }, border: { display: false } } 
+        }, 
+        interaction: { mode: 'index', intersect: false }, 
+        animation: { duration: 0 } 
+    }
   });
 }
-
 function getHeatmapColor(change) {
   if (change >= 3) return 'rgba(0, 200, 122, 0.9)';
   if (change > 0) return 'rgba(0, 200, 122, 0.5)';
