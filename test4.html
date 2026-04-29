@@ -248,7 +248,13 @@
     <div class="list-options-bar" id="listOptionsBar" style="display:none;">
       
       <div class="list-title-wrap" style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px;">
-        <h2 class="section-title" style="margin:0;">종목 리스트</h2>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <h2 class="section-title" style="margin:0;">종목 리스트</h2>
+            <div style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text3);">
+                <span id="marketDataLastUpdated">업데이트 시간 확인 중...</span>
+                <button onclick="forceMarketDataUpdate()" title="최신 주가 강제 새로고침" style="background:none; border:none; color:var(--accent); cursor:pointer; padding:2px 4px; border-radius:4px; font-size:12px; transition:0.2s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">↻ 최신화</button>
+            </div>
+        </div>
       </div>
       
       <div id="localTagFilterContainer" style="display:flex; flex-wrap:wrap; gap:6px; width:100%; margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border);">
