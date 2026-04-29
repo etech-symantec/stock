@@ -172,12 +172,25 @@ function getColors(prices) {
   return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
 }
 
-// 🌟 미니 차트 생성 함수 (매수/매도 타점 마커 표시 기능 완벽 추가!)
-function buildChart(canvasId, prices, dates, mini, symbol) {
+// 🌟 미니 차트 & 종목 모달 통합 차트 생성기 (연도 표시 + 완벽한 매매타점 마커)
+function buildChart(canvasId, prices, passedDates, mini, symbol) {
   const {line, fill} = getColors(prices);
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
   
+  let displayRawDates = passedDates;
+
+  // 🌟 심볼이 주어지면 원본 캐시 데이터에서 정확한 연도가 포함된 rawDates를 가져옴
+  if (symbol && cachedMarketData[symbol] && cachedMarketData[symbol].rawDates) {
+      displayRawDates = cachedMarketData[symbol].rawDates.slice(-prices.length);
+  }
+  
+  // 🌟 x축 라벨 연도 표시 (YYYY-MM-DD 형식을 예쁜 YY.MM.DD 형식으로 변경)
+  const displayDates = displayRawDates.map(d => {
+      if (typeof d === 'string' && d.includes('-')) return d.substring(2).replace(/-/g, '.');
+      return d;
+  });
+
   const datasets = [
       { 
           label: '주가',
@@ -192,67 +205,49 @@ function buildChart(canvasId, prices, dates, mini, symbol) {
       }
   ];
   
-  // 🌟 종목(symbol) 정보가 전달되었고, 거래 내역이 존재하면 매수/매도 타점 추가
   if (symbol && state.transactions) {
-      const data = cachedMarketData[symbol];
-      // 해당 종목의 rawDates(원본 날짜)가 있어야 정확한 위치 추적 가능
-      if (data && data.rawDates) {
-          const displayRawDates = data.rawDates.slice(-prices.length);
-          const buyData = [];
-          const sellData = [];
+      // 🌟 배열 위치 기반(index 매핑)으로 수정하여 중복 날짜가 있어도 절대 엉뚱한 곳에 찍히지 않음!
+      const buyData = new Array(prices.length).fill(null);
+      const sellData = new Array(prices.length).fill(null);
+      let hasTx = false;
+      
+      const txs = state.transactions.filter(t => t.symbol === symbol && t.txType !== 'dividend');
+      txs.forEach(tx => {
+          let dateIdx = displayRawDates.indexOf(tx.date);
           
-          const txs = state.transactions.filter(t => t.symbol === symbol && t.txType !== 'dividend');
-          txs.forEach(tx => {
-              let dateIdx = displayRawDates.indexOf(tx.date);
-              
-              // 휴일/주말 매매 등 정확한 날짜가 없을 경우 가장 가까운 미래 날짜로 위치 보정
-              if (dateIdx === -1) {
-                  for(let k = 0; k < displayRawDates.length; k++) {
-                      if (displayRawDates[k] >= tx.date) { dateIdx = k; break; }
-                  }
-                  if (dateIdx === -1 && tx.date <= displayRawDates[displayRawDates.length-1]) {
-                      dateIdx = displayRawDates.length - 1;
-                  }
+          if (dateIdx === -1) {
+              for(let k = 0; k < displayRawDates.length; k++) {
+                  if (displayRawDates[k] >= tx.date) { dateIdx = k; break; }
               }
-              
-              // 차트에 표시되는 기간(예: 3개월, 1년) 안에 있는 내역만 점으로 추가
-              if (dateIdx !== -1) {
-                  if (tx.qty > 0) {
-                      buyData.push({ x: dates[dateIdx], y: tx.price, qty: tx.qty });
-                  } else if (tx.qty < 0) {
-                      sellData.push({ x: dates[dateIdx], y: tx.price, qty: Math.abs(tx.qty) });
-                  }
+              if (dateIdx === -1 && tx.date <= displayRawDates[displayRawDates.length-1]) {
+                  dateIdx = displayRawDates.length - 1;
               }
+          }
+          
+          if (dateIdx !== -1) {
+              hasTx = true;
+              if (tx.qty > 0) buyData[dateIdx] = { y: tx.price, qty: tx.qty };
+              else if (tx.qty < 0) sellData[dateIdx] = { y: tx.price, qty: Math.abs(tx.qty) };
+          }
+      });
+      
+      if (hasTx) {
+          datasets.push({
+              label: '매수', data: buyData, type: 'line', showLine: false,
+              pointStyle: 'triangle', backgroundColor: '#ff4d6a', borderColor: '#fff',
+              borderWidth: mini ? 1 : 1.5, pointRadius: mini ? 4 : 8, pointHoverRadius: mini ? 6 : 10, order: 1
           });
-          
-          // 매수 마커 (빨간색 위 화살표)
-          if (buyData.length > 0) {
-              datasets.push({
-                  label: '매수', data: buyData, type: 'line', showLine: false,
-                  pointStyle: 'triangle', backgroundColor: '#ff4d6a', borderColor: '#fff',
-                  borderWidth: mini ? 1 : 1.5,
-                  pointRadius: mini ? 4 : 8,
-                  pointHoverRadius: mini ? 6 : 10,
-                  order: 1
-              });
-          }
-          // 매도 마커 (파란색 아래 화살표)
-          if (sellData.length > 0) {
-              datasets.push({
-                  label: '매도', data: sellData, type: 'line', showLine: false,
-                  pointStyle: 'triangle', rotation: 180, backgroundColor: '#4d9fff', borderColor: '#fff',
-                  borderWidth: mini ? 1 : 1.5,
-                  pointRadius: mini ? 4 : 8,
-                  pointHoverRadius: mini ? 6 : 10,
-                  order: 2
-              });
-          }
+          datasets.push({
+              label: '매도', data: sellData, type: 'line', showLine: false,
+              pointStyle: 'triangle', rotation: 180, backgroundColor: '#4d9fff', borderColor: '#fff',
+              borderWidth: mini ? 1 : 1.5, pointRadius: mini ? 4 : 8, pointHoverRadius: mini ? 6 : 10, order: 2
+          });
       }
   }
 
   return new Chart(canvas, {
     type: 'line',
-    data: { labels: dates, datasets: datasets },
+    data: { labels: displayDates, datasets: datasets },
     options: { 
         responsive: true, maintainAspectRatio: false, 
         plugins: { 
@@ -260,12 +255,10 @@ function buildChart(canvasId, prices, dates, mini, symbol) {
             tooltip: { 
                 mode: 'index', intersect: false, displayColors: false,
                 callbacks: {
-                    // 미니 차트에서도 마우스를 올리면 가격 정보를 예쁘게 표시
                     label: function(ctx) {
                         const sym = symbol || '';
-                        if (ctx.dataset.label === '매수') return `🔴 매수: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주)`;
-                        if (ctx.dataset.label === '매도') return `🔵 매도: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주)`;
-                        
+                        if (ctx.dataset.label === '매수' && ctx.raw) return `🔴 매수: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주)`;
+                        if (ctx.dataset.label === '매도' && ctx.raw) return `🔵 매도: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주)`;
                         let val = typeof ctx.raw === 'object' ? ctx.raw.y : ctx.raw;
                         return `주가: ${formatPrice(val, sym)}`;
                     }
@@ -273,7 +266,7 @@ function buildChart(canvasId, prices, dates, mini, symbol) {
             } 
         }, 
         scales: { 
-            x: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { display: false }, border: { display: false } }, 
+            x: { display: !mini, ticks: { font:{size:10}, color:'#555e72', maxTicksLimit: mini ? 5 : 10 }, grid: { display: false }, border: { display: false } }, 
             y: { display: !mini, ticks: { font:{size:10}, color:'#555e72' }, grid: { color:'rgba(255,255,255,0.04)' }, border: { display: false } } 
         }, 
         interaction: { mode: 'index', intersect: false }, 
@@ -281,6 +274,8 @@ function buildChart(canvasId, prices, dates, mini, symbol) {
     }
   });
 }
+
+
 function getHeatmapColor(change) {
   if (change >= 3) return 'rgba(0, 200, 122, 0.9)';
   if (change > 0) return 'rgba(0, 200, 122, 0.5)';
@@ -2519,7 +2514,7 @@ function renderDividendDashboard() {
   });
 }
 
-// 🌟 종목 카드 모달 차트 (매수/매도 마커 표시 기능 추가)
+// 🌟 종목 카드 모달 차트 (오류 해결 및 연도 표시 완벽 지원)
 function openChartModal(ticker) {
   const data = cachedMarketData[ticker]; if(!data || data._failed) return;
   const getSliceLen = (range) => {
@@ -2529,8 +2524,7 @@ function openChartModal(ticker) {
   };
   let sliceLen = getSliceLen(state.range);
   const displayPrices = data.prices.slice(-sliceLen);
-  const displayDates = data.dates.slice(-sliceLen);
-  const displayRawDates = data.rawDates ? data.rawDates.slice(-sliceLen) : [];
+  const displayDates = data.dates.slice(-sliceLen); 
   if(displayPrices.length === 0) return;
   
   const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
@@ -2548,117 +2542,11 @@ function openChartModal(ticker) {
   chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
   document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
   
-  // 🌟 거래 내역에서 매수/매도 포인트 추출 로직 추가
-  const buyData = [];
-  const sellData = [];
-  
-  const txs = state.transactions.filter(t => t.symbol === ticker && t.txType !== 'dividend');
-  txs.forEach(tx => {
-      let dateIdx = -1;
-      if (displayRawDates.length > 0) {
-          dateIdx = displayRawDates.indexOf(tx.date);
-          if (dateIdx === -1) {
-              // 주말이나 휴일 매매의 경우 가장 가까운 장 열린 날짜에 맞춤
-              for(let k = 0; k < displayRawDates.length; k++) {
-                  if (displayRawDates[k] >= tx.date) { dateIdx = k; break; }
-              }
-              if (dateIdx === -1 && tx.date <= displayRawDates[displayRawDates.length-1]) {
-                  dateIdx = displayRawDates.length - 1;
-              }
-          }
-      }
-      
-      // 차트 기간 안에 있는 매매 내역만 점으로 표시
-      if (dateIdx !== -1) {
-          if (tx.qty > 0) {
-              buyData.push({ x: displayDates[dateIdx], y: tx.price, qty: tx.qty });
-          } else if (tx.qty < 0) {
-              sellData.push({ x: displayDates[dateIdx], y: tx.price, qty: Math.abs(tx.qty) });
-          }
-      }
-  });
-
   document.getElementById('chartOverlay').classList.add('open');
   if (modalChartInst) modalChartInst.destroy();
   
-  // 🌟 기존 buildChart 대신 커스텀 차트 생성 (마커 오버레이 적용)
-  setTimeout(() => { 
-      const canvas = document.getElementById('modalCanvas');
-      if (!canvas) return;
-      
-      const {line, fill} = getColors(displayPrices);
-      
-      modalChartInst = new Chart(canvas.getContext('2d'), {
-          type: 'line',
-          data: { 
-              labels: displayDates, 
-              datasets: [
-                  { 
-                      label: '주가',
-                      data: displayPrices, 
-                      borderColor: line, 
-                      backgroundColor: fill, 
-                      borderWidth: 2, 
-                      pointRadius: 0, 
-                      tension: 0.1, 
-                      fill: true,
-                      order: 3 // 주가 라인을 가장 밑에 깔기
-                  },
-                  {
-                      label: '매수',
-                      data: buyData,
-                      type: 'line', 
-                      showLine: false, // 선 없이 점만 찍기
-                      pointStyle: 'triangle', // 위로 향하는 화살표(삼각형)
-                      backgroundColor: '#ff4d6a', // 매수는 빨간색
-                      borderColor: '#fff',
-                      borderWidth: 1.5,
-                      pointRadius: 8,
-                      pointHoverRadius: 10,
-                      order: 1 // 마커를 선 위로 올리기
-                  },
-                  {
-                      label: '매도',
-                      data: sellData,
-                      type: 'line',
-                      showLine: false,
-                      pointStyle: 'triangle',
-                      rotation: 180, // 삼각형 뒤집기 (아래로 향하는 화살표)
-                      backgroundColor: '#4d9fff', // 매도는 파란색
-                      borderColor: '#fff',
-                      borderWidth: 1.5,
-                      pointRadius: 8,
-                      pointHoverRadius: 10,
-                      order: 2
-                  }
-              ] 
-          },
-          options: { 
-              responsive: true, maintainAspectRatio: false, 
-              interaction: { mode: 'index', intersect: false },
-              plugins: { 
-                  legend: { display: false }, 
-                  tooltip: { 
-                      callbacks: {
-                          // 마우스 올렸을 때 뜨는 정보(툴팁) 꾸미기
-                          label: function(ctx) {
-                              if (ctx.dataset.label === '매수') {
-                                  return `🔴 매수: ${formatPrice(ctx.raw.y, ticker)} (${ctx.raw.qty}주)`;
-                              } else if (ctx.dataset.label === '매도') {
-                                  return `🔵 매도: ${formatPrice(ctx.raw.y, ticker)} (${ctx.raw.qty}주)`;
-                              }
-                              return `${ctx.dataset.label}: ${formatPrice(ctx.raw, ticker)}`;
-                          }
-                      }
-                  } 
-              }, 
-              scales: { 
-                  x: { ticks: { font:{size:10}, color:'#555e72', maxTicksLimit: 10 }, grid: { display: false }, border: { display: false } }, 
-                  y: { ticks: { font:{size:10}, color:'#555e72' }, grid: { color:'rgba(255,255,255,0.04)' }, border: { display: false } } 
-              } 
-          }
-      });
-  }, 50);
+  // 🌟 buildChart 함수에 symbol(ticker)을 넘겨주면 알아서 마커와 연도 표시를 완벽하게 처리함
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, ticker); }, 50);
 }
 
 // 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
