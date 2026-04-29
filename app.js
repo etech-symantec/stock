@@ -172,7 +172,7 @@ function getColors(prices) {
   return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
 }
 
-// 🌟 미니 차트 & 종목 모달 통합 차트 생성기 (연도 표시 + 완벽한 매매타점 마커)
+// 🌟 미니 차트 & 종목 모달 통합 차트 생성기 (연도 표시 + 매매 마커 완벽 복구!)
 function buildChart(canvasId, prices, passedDates, mini, symbol) {
   const {line, fill} = getColors(prices);
   const canvas = document.getElementById(canvasId);
@@ -205,16 +205,16 @@ function buildChart(canvasId, prices, passedDates, mini, symbol) {
       }
   ];
   
+  // 🌟 거래 내역 마커 찍기
   if (symbol && state.transactions) {
-      // 🌟 배열 위치 기반(index 매핑)으로 수정하여 중복 날짜가 있어도 절대 엉뚱한 곳에 찍히지 않음!
-      const buyData = new Array(prices.length).fill(null);
-      const sellData = new Array(prices.length).fill(null);
-      let hasTx = false;
+      const buyData = [];
+      const sellData = [];
       
       const txs = state.transactions.filter(t => t.symbol === symbol && t.txType !== 'dividend');
       txs.forEach(tx => {
           let dateIdx = displayRawDates.indexOf(tx.date);
           
+          // 차트에 정확한 날짜가 없으면 가장 가까운 다음 날짜로 위치 보정
           if (dateIdx === -1) {
               for(let k = 0; k < displayRawDates.length; k++) {
                   if (displayRawDates[k] >= tx.date) { dateIdx = k; break; }
@@ -224,19 +224,24 @@ function buildChart(canvasId, prices, passedDates, mini, symbol) {
               }
           }
           
+          // 💡 확실하게 Chart.js가 인식하는 {x, y, qty} 좌표 구조로 데이터 추가!
           if (dateIdx !== -1) {
-              hasTx = true;
-              if (tx.qty > 0) buyData[dateIdx] = { y: tx.price, qty: tx.qty };
-              else if (tx.qty < 0) sellData[dateIdx] = { y: tx.price, qty: Math.abs(tx.qty) };
+              if (tx.qty > 0) {
+                  buyData.push({ x: displayDates[dateIdx], y: tx.price, qty: tx.qty });
+              } else if (tx.qty < 0) {
+                  sellData.push({ x: displayDates[dateIdx], y: tx.price, qty: Math.abs(tx.qty) });
+              }
           }
       });
       
-      if (hasTx) {
+      if (buyData.length > 0) {
           datasets.push({
               label: '매수', data: buyData, type: 'line', showLine: false,
               pointStyle: 'triangle', backgroundColor: '#ff4d6a', borderColor: '#fff',
               borderWidth: mini ? 1 : 1.5, pointRadius: mini ? 4 : 8, pointHoverRadius: mini ? 6 : 10, order: 1
           });
+      }
+      if (sellData.length > 0) {
           datasets.push({
               label: '매도', data: sellData, type: 'line', showLine: false,
               pointStyle: 'triangle', rotation: 180, backgroundColor: '#4d9fff', borderColor: '#fff',
