@@ -40,6 +40,12 @@ let realizedFilters = { market: 'all', symbol: null, tradeIdx: null };
 // 🌟 종목 리스트 검색 및 태그 필터 상태 변수
 let currentLocalSearch = '';
 let currentLocalTag = 'all';
+// 🌟 배당 리스트 정렬 상태 변수
+let currentDivSort = 'yieldDesc';
+function setDivSort(val) {
+    currentDivSort = val;
+    renderDividendDashboard();
+}
 
 function updateLocalSearch(val) {
     currentLocalSearch = val;
@@ -2474,10 +2480,22 @@ function renderDividendDashboard() {
   const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
   document.getElementById('divTotalConverted').textContent = `₩ ${Math.round(grandTotal).toLocaleString()}`;
 
+  // 🌟 배당 리스트 정렬 기준 적용 (배당률 순 vs 배당금 순)
   let symArr = Object.keys(symTotals).map(sym => {
-    return { symbol: sym, total: symTotals[sym].krw + (symTotals[sym].usd * currentUsdKrw) };
+    let yData = divYields[sym];
+    let yPct = (yData && yData.totalEvalAtDiv > 0) ? (yData.totalDiv / yData.totalEvalAtDiv) * 100 : 0;
+    return { 
+        symbol: sym, 
+        total: symTotals[sym].krw + (symTotals[sym].usd * currentUsdKrw), 
+        yieldPct: yPct 
+    };
   });
-  symArr.sort((a,b) => b.total - a.total); 
+  
+  if (currentDivSort === 'yieldDesc') {
+      symArr.sort((a,b) => b.yieldPct - a.yieldPct); // 실질 배당률 높은 순
+  } else {
+      symArr.sort((a,b) => b.total - a.total);       // 총 배당금 높은 순
+  }
 
   let listHtml = symArr.map(item => {
     const isKRW = isKorean(item.symbol);
