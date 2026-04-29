@@ -269,7 +269,7 @@
             
             <div style="position:relative;">
                 <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text3);">🔍</span>
-                <input type="text" id="localSearchInput" class="search-input" placeholder="등록된 종목 검색..." style="width:160px; padding:6px 12px 6px 28px; border-radius:20px; font-size:12px; margin:0; border:1px solid var(--border);" oninput="updateLocalSearch(this.value)">
+                <input type="text" id="localSearchInput" class="search-input" placeholder="종목 검색 (엔터 ↵)" style="width:160px; padding:6px 12px 6px 28px; border-radius:20px; font-size:12px; margin:0; border:1px solid var(--border);" onkeydown="if(event.key === 'Enter') updateLocalSearch(this.value)">
             </div>
 
             <div class="view-toggle-group" style="display:flex; background:var(--bg); border-radius:6px; border:1px solid var(--border); padding:3px;">
