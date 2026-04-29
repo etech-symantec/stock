@@ -1345,31 +1345,27 @@ function selectSidebarSearchResult(symbol) {
   }
 }
 
-// 🌟 Vercel 배포 시 corsproxy.io 차단 문제를 피하기 위한 다중 프록시 폴백(Fallback) 기능 적용
+// 🌟 Vercel Serverless Function(나만의 전용 프록시)을 활용하는 로직으로 변경!
 async function fetchWithProxy(targetUrl, useCache = true) {
   const finalUrl = useCache ? targetUrl : `${targetUrl}&_t=${Date.now()}`;
   
-  // 사용할 무료 프록시 서버 후보들 (앞에서부터 순서대로 시도합니다)
-  const proxies = [
-    `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(finalUrl)}`, // 1순위 (Vercel에서 잘 작동함)
-    `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`,                   // 2순위 (기존)
-    `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(finalUrl)}`    // 3순위
-  ];
+  // Vercel에 만들어둔 내 API 폴더의 proxy.js로 요청을 보냅니다.
+  const vercelProxyUrl = `/api/proxy?url=${encodeURIComponent(finalUrl)}`;
 
-  for (let proxy of proxies) {
-    try {
-      const res = await fetch(proxy);
-      if (res.ok) {
-          return await res.json();
-      }
-    } catch(e) {
-      console.warn(`프록시 실패: ${proxy} -> 다음 프록시 시도`);
+  try {
+    const res = await fetch(vercelProxyUrl);
+    if (res.ok) {
+        return await res.json();
+    } else {
+        console.error("Vercel API 오류:", res.status);
     }
+  } catch(e) {
+    console.error("Vercel Proxy 연결 실패:", e);
   }
   
-  console.error("모든 프록시 서버 요청이 실패했습니다.");
   return null;
 }
+
 async function fetchExchangeRate() {
   if (isExchangeRateFetched) return;
   const data = await fetchYahooData('KRW=X');
