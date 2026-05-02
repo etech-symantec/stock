@@ -302,31 +302,9 @@ function isKorean(symbol) {
 }
 
 // 🌟 전체 거래내역 필터 상태 저장 변수 추가 (isKorean 함수 바로 아래에 추가하세요)
-let historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all' };
+let historyFilters = { market: 'all', type: 'all', search: '' };
 function updateHistoryFilter(key, value) {
     historyFilters[key] = value;
-    renderHistoryDashboard();
-}
-
-function applyHistoryQuickDate(range) {
-    const today = new Date();
-    const pad = n => String(n).padStart(2,'0');
-    const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    if (range === 'thisMonth') {
-        historyFilters.dateFrom = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
-        historyFilters.dateTo   = fmt(today);
-    } else if (range === 'thisYear') {
-        historyFilters.dateFrom = `${today.getFullYear()}-01-01`;
-        historyFilters.dateTo   = fmt(today);
-    } else {
-        historyFilters.dateFrom = '';
-        historyFilters.dateTo   = '';
-    }
-    renderHistoryDashboard();
-}
-
-function resetHistoryFilters() {
-    historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all' };
     renderHistoryDashboard();
 }
 function isCrypto(symbol) { return symbol.endsWith('-USD'); }
@@ -959,15 +937,26 @@ function calculateHoldings(ownerFilter = 'all') {
     if (ownerFilter !== 'all' && tx.owner !== ownerFilter) return;
 
     let broker = tx.broker ? tx.broker.trim() : '미지정';
-    
-    // 🌟 [핵심 변경] 전체보기 탭에서도 뒤에 '(소유자)'를 붙이지 않고 계좌명만 깔끔하게 사용합니다.
     let displayBroker = broker;
-    
     let key = `${tx.symbol}::${displayBroker}`;
 
     if(!holdings[key]) holdings[key] = { qty: 0, avg: 0, broker: displayBroker, symbol: tx.symbol };
     let h = holdings[key];
     
+    if (tx.txType === 'transfer') {
+      // 이전 입고: 평단가 이어받기 / 이전 출고: 수량만 감소
+      if (tx.qty > 0) {
+        // 입고 — 보내는 쪽에서 avg를 그대로 넘겨줌
+        let totalValue = (h.qty * h.avg) + (tx.qty * tx.price);
+        h.qty += tx.qty;
+        h.avg = h.qty > 0 ? totalValue / h.qty : 0;
+      } else {
+        h.qty += tx.qty; // 수량 차감만, 평단가 유지
+        if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+      }
+      return;
+    }
+
     if (tx.qty > 0) {
       let totalValue = (h.qty * h.avg) + (tx.qty * tx.price);
       h.qty += tx.qty;
@@ -1104,8 +1093,9 @@ function renderTxList() {
     const stockName = dbMatch ? dbMatch.name : (cachedMatch && !cachedMatch._failed && cachedMatch.name ? cachedMatch.name : tx.symbol);
     
     const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
-    const typeLabel = isDiv ? '💰 배당금' : (isBuy ? '매수' : '매도') + ` ${Math.abs(tx.qty)}주`;
-    const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
+    const isTransfer = tx.txType === 'transfer';
+    const typeLabel = isDiv ? '💰 배당금' : (isTransfer ? (tx.qty > 0 ? '↙ 이전입고' : '↗ 이전출고') + ` ${Math.abs(tx.qty)}주` : (isBuy ? '매수' : '매도') + ` ${Math.abs(tx.qty)}주`);
+    const typeColor = isDiv ? 'var(--green)' : (isTransfer ? 'var(--text2)' : (isBuy ? 'var(--red)' : 'var(--blue)'));
     const oInfo = getOwnerInfo(tx.owner);
 
     return `
@@ -1143,89 +1133,43 @@ function renderHistoryDashboard() {
   if(!tbody || !dash) return;
   
   // 💡 HTML 수정 없이 JS가 알아서 필터 바를 만들어줍니다!
-  // 계좌 목록을 먼저 추출 (동적 드롭다운)
-  const allBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b && b.trim()))].sort();
-
   let filterBar = document.getElementById('historyFilterBar');
   if (!filterBar) {
       filterBar = document.createElement('div');
       filterBar.id = 'historyFilterBar';
-      filterBar.style.cssText = "display:flex; gap:10px; margin-bottom:15px; padding:15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border); flex-wrap:wrap; align-items:center;";
-      const tableWrap = tbody.closest('div');
-      dash.insertBefore(filterBar, tableWrap);
-  }
-
-  // 계좌 드롭다운은 매번 재생성 (거래 추가 시 새 계좌가 생길 수 있으므로)
-  const brokerOptions = allBrokers.map(b => `<option value="${b}">${b}</option>`).join('');
-  filterBar.innerHTML = `
-      <div style="display:flex; flex-wrap:wrap; gap:10px; width:100%; align-items:center;">
-
-        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-          <span style="font-size:11px; color:var(--text3); white-space:nowrap;">거래일자</span>
-          <input type="date" id="hfDateFrom" class="form-input" style="width:140px; padding:7px 10px; margin:0; font-size:12px;" 
-                 value="${historyFilters.dateFrom}" onchange="updateHistoryFilter('dateFrom', this.value)">
-          <span style="font-size:11px; color:var(--text3);">~</span>
-          <input type="date" id="hfDateTo" class="form-input" style="width:140px; padding:7px 10px; margin:0; font-size:12px;"
-                 value="${historyFilters.dateTo}" onchange="updateHistoryFilter('dateTo', this.value)">
-          <button class="btn-sm" style="padding:5px 10px; font-size:11px; background:var(--bg); border-color:var(--border2); color:var(--text2);" onclick="applyHistoryQuickDate('thisMonth')">이번달</button>
-          <button class="btn-sm" style="padding:5px 10px; font-size:11px; background:var(--bg); border-color:var(--border2); color:var(--text2);" onclick="applyHistoryQuickDate('thisYear')">올해</button>
-          <button class="btn-sm" style="padding:5px 10px; font-size:11px; background:var(--bg); border-color:var(--border2); color:var(--text2);" onclick="applyHistoryQuickDate('all')">전체</button>
-        </div>
-
-        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; flex:1; min-width:0;">
-          <select id="hfMarket" class="form-input" style="width:130px; padding:7px 10px; margin:0; cursor:pointer; font-size:12px;" onchange="updateHistoryFilter('market', this.value)">
+      filterBar.style.cssText = "display:flex; gap:10px; margin-bottom:15px; padding:15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border); flex-wrap:wrap;";
+      filterBar.innerHTML = `
+          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('market', this.value)">
               <option value="all">🌐 전체 국가</option>
               <option value="kr">🇰🇷 한국 종목</option>
               <option value="us">🇺🇸 미국 종목</option>
           </select>
-          <select id="hfType" class="form-input" style="width:130px; padding:7px 10px; margin:0; cursor:pointer; font-size:12px;" onchange="updateHistoryFilter('type', this.value)">
-              <option value="all">모든 거래유형</option>
-              <option value="buy">🔴 매수</option>
-              <option value="sell">🔵 매도</option>
-              <option value="dividend">🟢 배당</option>
+          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('type', this.value)">
+              <option value="all">모든 거래</option>
+              <option value="buy">🔴 매수 내역</option>
+              <option value="sell">🔵 매도 내역</option>
+              <option value="dividend">🟢 배당 내역</option>
           </select>
-          <select id="hfBroker" class="form-input" style="width:140px; padding:7px 10px; margin:0; cursor:pointer; font-size:12px;" onchange="updateHistoryFilter('broker', this.value)">
-              <option value="all">모든 계좌</option>
-              ${brokerOptions}
-          </select>
-          <input type="text" id="hfSearch" class="form-input" placeholder="🔍 종목명·티커 검색..." style="flex:1; min-width:160px; padding:7px 12px; margin:0; font-size:12px;"
-                 value="${historyFilters.search}" oninput="updateHistoryFilter('search', this.value)">
-          <button class="btn-sm" style="padding:5px 12px; font-size:11px; white-space:nowrap; background:rgba(255,77,106,0.15); border-color:rgba(255,77,106,0.4); color:var(--red);" onclick="resetHistoryFilters()">✕ 필터 초기화</button>
-        </div>
-
-      </div>
-      <div id="historyFilterSummary" style="width:100%; font-size:11px; color:var(--text3); margin-top:4px; padding-top:8px; border-top:1px solid var(--border);"></div>
-  `;
-
-  // 선택값 복원 (재렌더링 시 드롭다운 선택 유지)
-  const hfMarket = document.getElementById('hfMarket');
-  const hfType   = document.getElementById('hfType');
-  const hfBroker = document.getElementById('hfBroker');
-  if (hfMarket) hfMarket.value = historyFilters.market;
-  if (hfType)   hfType.value   = historyFilters.type;
-  if (hfBroker) hfBroker.value = historyFilters.broker;
-
+          <input type="text" class="form-input" placeholder="종목명 또는 티커 검색..." style="flex:1; min-width:200px; padding:8px 12px; margin:0;" oninput="updateHistoryFilter('search', this.value)">
+      `;
+      const tableWrap = tbody.closest('div');
+      dash.insertBefore(filterBar, tableWrap);
+  }
+  
   // 🌟 선택된 필터 조건에 맞게 데이터 걸러내기
   let filtered = state.transactions.filter(tx => {
       let pass = true;
       const isKr = isKorean(tx.symbol);
-
+      
       // 국가 필터
       if (historyFilters.market === 'kr' && !isKr) pass = false;
       if (historyFilters.market === 'us' && isKr) pass = false;
-
+      
       // 거래 유형 필터
-      if (historyFilters.type === 'buy' && !(tx.txType !== 'dividend' && tx.qty > 0)) pass = false;
-      if (historyFilters.type === 'sell' && !(tx.txType !== 'dividend' && tx.qty < 0)) pass = false;
+      if (historyFilters.type === 'buy' && (tx.txType !== 'trade' || tx.qty <= 0)) pass = false;
+      if (historyFilters.type === 'sell' && (tx.txType !== 'trade' || tx.qty >= 0)) pass = false;
       if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
-
-      // 계좌 필터
-      if (historyFilters.broker !== 'all' && (tx.broker || '').trim() !== historyFilters.broker) pass = false;
-
-      // 거래일자 범위 필터
-      if (historyFilters.dateFrom && tx.date < historyFilters.dateFrom) pass = false;
-      if (historyFilters.dateTo   && tx.date > historyFilters.dateTo)   pass = false;
-
+      
       // 검색어 필터
       if (historyFilters.search) {
           let s = historyFilters.search.toLowerCase();
@@ -1234,6 +1178,7 @@ function renderHistoryDashboard() {
           const cachedMatch = cachedMarketData[tx.symbol];
           if (dbMatch) stockName = dbMatch.name;
           else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+          
           if (state.oldNames && state.oldNames[tx.symbol] && state.oldNames[tx.symbol] !== '상장폐지') {
               stockName = state.oldNames[tx.symbol];
           }
@@ -1241,24 +1186,6 @@ function renderHistoryDashboard() {
       }
       return pass;
   });
-
-  // 활성 필터 요약 텍스트
-  const summaryEl = document.getElementById('historyFilterSummary');
-  if (summaryEl) {
-      const activeFilters = [];
-      if (historyFilters.dateFrom || historyFilters.dateTo) {
-          const from = historyFilters.dateFrom || '처음';
-          const to   = historyFilters.dateTo   || '오늘';
-          activeFilters.push(`📅 ${from} ~ ${to}`);
-      }
-      if (historyFilters.broker !== 'all') activeFilters.push(`🏦 ${historyFilters.broker}`);
-      if (historyFilters.market !== 'all') activeFilters.push(historyFilters.market === 'kr' ? '🇰🇷 한국' : '🇺🇸 미국');
-      if (historyFilters.type   !== 'all') activeFilters.push({ buy:'🔴 매수', sell:'🔵 매도', dividend:'🟢 배당' }[historyFilters.type]);
-      if (historyFilters.search) activeFilters.push(`🔍 "${historyFilters.search}"`);
-      summaryEl.innerHTML = activeFilters.length
-          ? `필터 적용 중: ${activeFilters.join(' &nbsp;·&nbsp; ')} &nbsp;<span style="color:var(--text2);">— 총 <b>${filtered.length}</b>건</span>`
-          : `전체 <b>${filtered.length}</b>건`;
-  }
 
   const sorted = filtered.sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
   
@@ -1270,9 +1197,10 @@ function renderHistoryDashboard() {
   tbody.innerHTML = sorted.map(tx => {
       const isBuy = tx.qty > 0;
       const isDiv = tx.txType === 'dividend';
+      const isTransfer = tx.txType === 'transfer';
       const totalAmt = isDiv ? tx.price : Math.abs(tx.qty) * tx.price;
-      const typeLabel = isDiv ? '배당' : (isBuy ? '매수' : '매도');
-      const typeColor = isDiv ? 'var(--green)' : (isBuy ? 'var(--red)' : 'var(--blue)');
+      const typeLabel = isDiv ? '배당' : (isTransfer ? (isBuy ? '↙ 이전입고' : '↗ 이전출고') : (isBuy ? '매수' : '매도'));
+      const typeColor = isDiv ? 'var(--green)' : (isTransfer ? 'var(--text2)' : (isBuy ? 'var(--red)' : 'var(--blue)'));
       
       let stockName = tx.symbol;
       const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
@@ -1958,6 +1886,19 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
             if (!holdings[tx.symbol]) holdings[tx.symbol] = { qty: 0, avg: 0 };
             let h = holdings[tx.symbol];
             
+            if (tx.txType === 'transfer') {
+                // 평단가 승계 처리 (실현수익 없음)
+                if (tx.qty > 0) {
+                    let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
+                    h.qty += tx.qty;
+                    h.avg = h.qty > 0 ? totalVal / h.qty : 0;
+                } else {
+                    h.qty += tx.qty;
+                    if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+                }
+                return;
+            }
+
             if (tx.qty > 0) {
                 let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
                 h.qty += tx.qty;
@@ -3342,7 +3283,7 @@ function renderRealizedDashboard() {
 
     // 2. 과거 내역부터 순차적으로 평단가 및 수익 계산
     sortedTx.forEach(tx => {
-        if (tx.txType === 'dividend') return;
+        if (tx.txType === 'dividend' || tx.txType === 'transfer') return;
         let broker = tx.broker ? tx.broker.trim() : '미지정';
         let key = `${tx.symbol}::${broker}`;
 
@@ -3612,3 +3553,257 @@ render = async function() {
     await originalRender();
     updateLastSyncTimeDisplay();
 };
+
+// ==========================================
+// 🔀 계좌 간 종목 이동 (이전) 기능
+// ==========================================
+
+function openTransferModal() {
+    // 현재 보유 종목 목록 계산
+    const holdings = calculateHoldings('all');
+    const heldBySymbol = {};
+    for (let key in holdings) {
+        const h = holdings[key];
+        if (h.qty > 0) {
+            if (!heldBySymbol[h.symbol]) heldBySymbol[h.symbol] = [];
+            heldBySymbol[h.symbol].push({ broker: h.broker, qty: h.qty, avg: h.avg });
+        }
+    }
+    window._transferHoldings = heldBySymbol;
+
+    const symSelect = document.getElementById('transferSymbol');
+    symSelect.innerHTML = '<option value="">종목 선택...</option>' +
+        Object.keys(heldBySymbol).sort().map(sym => {
+            const name = (cachedMarketData[sym] && !cachedMarketData[sym]._failed && cachedMarketData[sym].name)
+                ? cachedMarketData[sym].name : sym;
+            return `<option value="${sym}">${name} (${sym})</option>`;
+        }).join('');
+
+    // 소유자 라벨 동기화
+    const o1 = state.owners.user1, o2 = state.owners.user2;
+    const l1 = document.getElementById('lblTransferOwner1');
+    const l2 = document.getElementById('lblTransferOwner2');
+    const r1 = document.getElementById('transferOwner1');
+    const r2 = document.getElementById('transferOwner2');
+    if (l1) l1.textContent = `${o1.icon} ${o1.name}`;
+    if (l2) l2.textContent = `${o2.icon} ${o2.name}`;
+    if (r1) { r1.value = o1.name; r1.checked = true; }
+    if (r2) r2.value = o2.name;
+
+    // 계좌 빠른선택 태그
+    const allBrokers = [...new Set(state.transactions.map(t => t.broker).filter(Boolean))].sort();
+    const tagsEl = document.getElementById('transferToBrokerTags');
+    if (tagsEl) tagsEl.innerHTML = allBrokers.map(b =>
+        `<button type="button" class="broker-tag" onclick="document.getElementById('transferToBroker').value='${b}'">${b}</button>`
+    ).join('');
+
+    document.getElementById('transferDate').valueAsDate = new Date();
+    document.getElementById('transferFromBroker').innerHTML = '<option value="">먼저 종목을 선택하세요</option>';
+    document.getElementById('transferFromInfo').textContent = '';
+    document.getElementById('transferMaxQtyHint').textContent = '';
+    document.getElementById('transferQty').value = '';
+    document.getElementById('transferToBroker').value = '';
+
+    document.getElementById('transferOverlay').classList.add('open');
+}
+
+function onTransferSymbolChange() {
+    const sym = document.getElementById('transferSymbol').value;
+    const heldBySymbol = window._transferHoldings || {};
+    const fromSelect = document.getElementById('transferFromBroker');
+
+    if (!sym || !heldBySymbol[sym]) {
+        fromSelect.innerHTML = '<option value="">먼저 종목을 선택하세요</option>';
+        document.getElementById('transferFromInfo').textContent = '';
+        return;
+    }
+
+    fromSelect.innerHTML = '<option value="">계좌 선택...</option>' +
+        heldBySymbol[sym].map(h =>
+            `<option value="${h.broker}" data-qty="${h.qty}" data-avg="${h.avg}">` +
+            `${h.broker} · ${h.qty}주 보유 / 평단 ${formatPrice(h.avg, sym)}</option>`
+        ).join('');
+
+    onTransferFromChange();
+}
+
+function onTransferFromChange() {
+    const sym = document.getElementById('transferSymbol').value;
+    const fromSelect = document.getElementById('transferFromBroker');
+    const opt = fromSelect.options[fromSelect.selectedIndex];
+    const infoEl = document.getElementById('transferFromInfo');
+    const hintEl = document.getElementById('transferMaxQtyHint');
+    const qtyInput = document.getElementById('transferQty');
+
+    if (!opt || !opt.dataset.qty) {
+        if (infoEl) infoEl.textContent = '';
+        if (hintEl) hintEl.textContent = '';
+        return;
+    }
+    const qty = parseFloat(opt.dataset.qty);
+    const avg = parseFloat(opt.dataset.avg);
+    if (infoEl) infoEl.textContent = `보유 ${qty}주 · 평단 ${formatPrice(avg, sym)}`;
+    if (hintEl) hintEl.textContent = `(최대 ${qty}주)`;
+    if (qtyInput) { qtyInput.max = qty; qtyInput.value = qty; }
+}
+
+function applyTransfer() {
+    const sym = document.getElementById('transferSymbol').value;
+    const date = document.getElementById('transferDate').value;
+    const fromSelect = document.getElementById('transferFromBroker');
+    const fromBroker = fromSelect.value;
+    const toBroker = document.getElementById('transferToBroker').value.trim();
+    const qty = parseFloat(document.getElementById('transferQty').value);
+    const ownerEl = document.querySelector('input[name="transferOwner"]:checked');
+    const owner = ownerEl ? ownerEl.value : state.owners.user1.name;
+
+    if (!sym || !date || !fromBroker || !toBroker || !qty || qty <= 0) {
+        alert('모든 항목을 빠짐없이 입력해주세요.'); return;
+    }
+    if (fromBroker === toBroker) {
+        alert('출발 계좌와 도착 계좌가 동일합니다.'); return;
+    }
+
+    const opt = fromSelect.options[fromSelect.selectedIndex];
+    const avgCost = parseFloat(opt.dataset.avg) || 0;
+    const maxQty  = parseFloat(opt.dataset.qty)  || 0;
+    if (qty > maxQty) {
+        alert(`이전 가능 수량은 최대 ${maxQty}주입니다.`); return;
+    }
+
+    const now = Date.now();
+    // 출고 (수량 차감, 실현손익 없음)
+    state.transactions.push({
+        id: now, date: formatDate(date), owner,
+        broker: fromBroker, symbol: sym,
+        qty: -qty, price: avgCost, txType: 'transfer'
+    });
+    // 입고 (평단가 그대로 이어받기)
+    state.transactions.push({
+        id: now + 1, date: formatDate(date), owner,
+        broker: toBroker, symbol: sym,
+        qty: qty, price: avgCost, txType: 'transfer'
+    });
+
+    saveState(); renderTxList();
+    if (currentView === 'history') renderHistoryDashboard(); else render();
+    triggerAutoSync();
+    closeModal('transferOverlay');
+    alert(`✅ 계좌 이동 완료\n${sym} ${qty}주\n[${fromBroker}] → [${toBroker}]\n평단가 ${formatPrice(avgCost, sym)} 유지`);
+}
+
+
+// ==========================================
+// ✂️ 액면분할 적용 기능
+// ==========================================
+
+function openSplitModal() {
+    const allSymbols = [...new Set(
+        state.transactions
+            .filter(t => t.txType !== 'dividend')
+            .map(t => t.symbol)
+    )].sort();
+
+    const symSelect = document.getElementById('splitSymbol');
+    symSelect.innerHTML = '<option value="">종목 선택...</option>' +
+        allSymbols.map(sym => {
+            const name = (cachedMarketData[sym] && !cachedMarketData[sym]._failed && cachedMarketData[sym].name)
+                ? cachedMarketData[sym].name : sym;
+            return `<option value="${sym}">${name} (${sym})</option>`;
+        }).join('');
+
+    document.getElementById('splitDate').valueAsDate = new Date();
+    document.getElementById('splitRatioOld').value = 1;
+    document.getElementById('splitRatioNew').value = '';
+    document.getElementById('splitPreview').innerHTML = '';
+
+    document.getElementById('splitOverlay').classList.add('open');
+}
+
+function updateSplitPreview() {
+    const sym = document.getElementById('splitSymbol').value;
+    const ratioNew = parseFloat(document.getElementById('splitRatioNew').value);
+    const ratioOld = parseFloat(document.getElementById('splitRatioOld').value) || 1;
+    const previewEl = document.getElementById('splitPreview');
+
+    if (!sym || !ratioNew || ratioNew <= 0 || ratioNew === ratioOld) {
+        previewEl.innerHTML = '';
+        return;
+    }
+
+    const factor = ratioNew / ratioOld;
+    const txForSym = state.transactions.filter(t =>
+        t.symbol === sym && t.txType !== 'dividend' && t.txType !== 'transfer'
+    );
+    const totalQty = txForSym.reduce((s, t) => s + t.qty, 0);
+    const newQty = Math.round(totalQty * factor * 10000) / 10000;
+
+    const sampleTx = txForSym.find(t => t.qty > 0);
+    const samplePriceOld = sampleTx ? sampleTx.price : 0;
+    const samplePriceNew = samplePriceOld / factor;
+
+    previewEl.innerHTML = `
+        <div style="background:rgba(124,106,247,0.1); border:1px solid rgba(124,106,247,0.3); border-radius:8px; padding:12px; margin-top:10px; font-size:12px; line-height:1.8;">
+            <div style="color:var(--accent); font-weight:700; margin-bottom:8px; font-size:13px;">📋 적용 미리보기</div>
+            <div style="display:flex; flex-direction:column; gap:4px; color:var(--text2);">
+                <div>총 수량 &nbsp;<b style="color:var(--text)">${totalQty}주</b> → <b style="color:var(--green)">${newQty}주</b></div>
+                ${sampleTx ? `<div>단가 예시 &nbsp;<b style="color:var(--text)">${formatPrice(samplePriceOld, sym)}</b> → <b style="color:var(--blue)">${formatPrice(Math.round(samplePriceNew * 100) / 100, sym)}</b></div>` : ''}
+                <div style="color:var(--text3); margin-top:4px;">비율: 구 ${ratioOld}주 → 신 ${ratioNew}주 (×${factor.toFixed(4)})</div>
+            </div>
+            <div style="color:var(--red); font-size:11px; margin-top:8px; padding-top:8px; border-top:1px solid rgba(124,106,247,0.2);">
+                ⚠️ 분할 기준일 <b>이전</b> 거래 내역 ${txForSym.length}건이 수정됩니다. 이 작업은 되돌릴 수 없습니다.
+            </div>
+        </div>`;
+}
+
+function applySplit() {
+    const sym = document.getElementById('splitSymbol').value;
+    const date = document.getElementById('splitDate').value;
+    const ratioNew = parseFloat(document.getElementById('splitRatioNew').value);
+    const ratioOld = parseFloat(document.getElementById('splitRatioOld').value) || 1;
+
+    if (!sym || !date || !ratioNew || ratioNew <= 0) {
+        alert('모든 항목을 입력해주세요.'); return;
+    }
+    if (ratioNew === ratioOld) {
+        alert('분할 비율이 1:1 입니다. 변경사항이 없습니다.'); return;
+    }
+
+    const formattedDate = formatDate(date);
+    const factor = ratioNew / ratioOld;
+
+    if (!confirm(
+        `${sym} 액면분할을 적용하시겠습니까?\n\n` +
+        `비율: ${ratioOld} → ${ratioNew}주 (×${factor.toFixed(4)})\n` +
+        `기준일: ${formattedDate} 이전 내역 전체 수정\n\n` +
+        `⚠️ 이 작업은 되돌릴 수 없습니다.`
+    )) return;
+
+    let count = 0;
+    state.transactions.forEach(tx => {
+        if (tx.symbol !== sym) return;
+        if (tx.txType === 'dividend' || tx.txType === 'transfer') return;
+        if (tx.date > formattedDate) return;
+
+        tx.qty   = Math.round(tx.qty   * factor * 100000) / 100000;
+        tx.price = Math.round(tx.price / factor * 100000) / 100000;
+        count++;
+    });
+
+    // 분할 이력 기록
+    if (!state.splitEvents) state.splitEvents = [];
+    state.splitEvents.push({
+        symbol: sym, date: formattedDate,
+        ratioOld, ratioNew,
+        appliedAt: new Date().toISOString()
+    });
+
+    // 해당 종목 캐시 초기화 (가격 재조회)
+    delete cachedMarketData[sym];
+
+    saveState(); renderTxList();
+    if (currentView === 'history') renderHistoryDashboard(); else render();
+    triggerAutoSync();
+    closeModal('splitOverlay');
+    alert(`✅ 액면분할 적용 완료\n${sym} · ${ratioOld}:${ratioNew} 분할\n총 ${count}건의 거래 내역이 수정되었습니다.`);
+}
