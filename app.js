@@ -2137,15 +2137,57 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       }
     });
     
+    // ── 🌟 누적 실현수익 계산 (소유자 필터 적용) ──
+    let realHoldings = {};
+    let realizedKrw = 0, realizedUsd = 0;
+    const sortedForRealized = [...state.transactions]
+        .filter(tx => filterName === 'all' || tx.owner === filterName)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    sortedForRealized.forEach(tx => {
+        if (tx.txType === 'dividend') return;
+        const key = tx.symbol;
+        if (!realHoldings[key]) realHoldings[key] = { qty: 0, avg: 0 };
+        const rh = realHoldings[key];
+        if (tx.qty > 0) {
+            const totalVal = (rh.qty * rh.avg) + (tx.qty * tx.price);
+            rh.qty += tx.qty;
+            rh.avg = totalVal / rh.qty;
+        } else if (tx.qty < 0) {
+            const sellQty = Math.abs(tx.qty);
+            const pnl = (tx.price - rh.avg) * sellQty;
+            if (isKorean(tx.symbol)) realizedKrw += pnl;
+            else realizedUsd += pnl;
+            rh.qty -= sellQty;
+            if (rh.qty <= 0) { rh.qty = 0; rh.avg = 0; }
+        }
+    });
+    const globalRealized = realizedKrw + (realizedUsd * currentUsdKrw);
+
     const globalDiv = krwDiv + (usdDiv * currentUsdKrw);
     const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
     const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
     const globalRoi = globalCost > 0 ? ((globalEval - globalCost) / globalCost * 100) : 0;
     const globalPnl = globalEval - globalCost;
+    // 누적 자산 = 현재 포트폴리오 평가액 + 실현수익 + 배당금
+    const globalCumulative = globalEval + globalRealized + globalDiv;
 
     document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
     document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
     document.getElementById('globalTotalDiv').textContent = `₩ ${Math.round(globalDiv).toLocaleString()}`;
+
+    // 누적 실현수익 표시
+    const realEl = document.getElementById('globalRealizedTotal');
+    if (realEl) {
+        const signR = globalRealized >= 0 ? '+' : '';
+        realEl.textContent = `${signR}₩ ${Math.round(Math.abs(globalRealized)).toLocaleString()}`;
+        realEl.style.color = globalRealized >= 0 ? 'var(--blue)' : 'var(--red)';
+    }
+
+    // 누적 총 자산 표시
+    const cumEl = document.getElementById('globalCumulativeAsset');
+    if (cumEl) cumEl.textContent = `₩ ${Math.round(globalCumulative).toLocaleString()}`;
+
     const gRoiEl = document.getElementById('globalTotalRoi');
     const signG = globalPnl >= 0 ? '+' : '';
     gRoiEl.innerHTML = `${signG}₩${Math.round(Math.abs(globalPnl)).toLocaleString()}<br><span style="font-size:12px; font-weight:500">(${signG}${globalRoi.toFixed(2)}%)</span>`;
