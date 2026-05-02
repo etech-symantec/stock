@@ -302,9 +302,31 @@ function isKorean(symbol) {
 }
 
 // 🌟 전체 거래내역 필터 상태 저장 변수 추가 (isKorean 함수 바로 아래에 추가하세요)
-let historyFilters = { market: 'all', type: 'all', search: '' };
+let historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all' };
 function updateHistoryFilter(key, value) {
     historyFilters[key] = value;
+    renderHistoryDashboard();
+}
+
+function applyHistoryQuickDate(range) {
+    const today = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    if (range === 'thisMonth') {
+        historyFilters.dateFrom = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
+        historyFilters.dateTo   = fmt(today);
+    } else if (range === 'thisYear') {
+        historyFilters.dateFrom = `${today.getFullYear()}-01-01`;
+        historyFilters.dateTo   = fmt(today);
+    } else {
+        historyFilters.dateFrom = '';
+        historyFilters.dateTo   = '';
+    }
+    renderHistoryDashboard();
+}
+
+function resetHistoryFilters() {
+    historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all' };
     renderHistoryDashboard();
 }
 function isCrypto(symbol) { return symbol.endsWith('-USD'); }
@@ -1121,43 +1143,89 @@ function renderHistoryDashboard() {
   if(!tbody || !dash) return;
   
   // 💡 HTML 수정 없이 JS가 알아서 필터 바를 만들어줍니다!
+  // 계좌 목록을 먼저 추출 (동적 드롭다운)
+  const allBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b && b.trim()))].sort();
+
   let filterBar = document.getElementById('historyFilterBar');
   if (!filterBar) {
       filterBar = document.createElement('div');
       filterBar.id = 'historyFilterBar';
-      filterBar.style.cssText = "display:flex; gap:10px; margin-bottom:15px; padding:15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border); flex-wrap:wrap;";
-      filterBar.innerHTML = `
-          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('market', this.value)">
+      filterBar.style.cssText = "display:flex; gap:10px; margin-bottom:15px; padding:15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border); flex-wrap:wrap; align-items:center;";
+      const tableWrap = tbody.closest('div');
+      dash.insertBefore(filterBar, tableWrap);
+  }
+
+  // 계좌 드롭다운은 매번 재생성 (거래 추가 시 새 계좌가 생길 수 있으므로)
+  const brokerOptions = allBrokers.map(b => `<option value="${b}">${b}</option>`).join('');
+  filterBar.innerHTML = `
+      <div style="display:flex; flex-wrap:wrap; gap:10px; width:100%; align-items:center;">
+
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:11px; color:var(--text3); white-space:nowrap;">거래일자</span>
+          <input type="date" id="hfDateFrom" class="form-input" style="width:140px; padding:7px 10px; margin:0; font-size:12px;" 
+                 value="${historyFilters.dateFrom}" onchange="updateHistoryFilter('dateFrom', this.value)">
+          <span style="font-size:11px; color:var(--text3);">~</span>
+          <input type="date" id="hfDateTo" class="form-input" style="width:140px; padding:7px 10px; margin:0; font-size:12px;"
+                 value="${historyFilters.dateTo}" onchange="updateHistoryFilter('dateTo', this.value)">
+          <button class="btn-sm" style="padding:5px 10px; font-size:11px; background:var(--bg); border-color:var(--border2); color:var(--text2);" onclick="applyHistoryQuickDate('thisMonth')">이번달</button>
+          <button class="btn-sm" style="padding:5px 10px; font-size:11px; background:var(--bg); border-color:var(--border2); color:var(--text2);" onclick="applyHistoryQuickDate('thisYear')">올해</button>
+          <button class="btn-sm" style="padding:5px 10px; font-size:11px; background:var(--bg); border-color:var(--border2); color:var(--text2);" onclick="applyHistoryQuickDate('all')">전체</button>
+        </div>
+
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; flex:1; min-width:0;">
+          <select id="hfMarket" class="form-input" style="width:130px; padding:7px 10px; margin:0; cursor:pointer; font-size:12px;" onchange="updateHistoryFilter('market', this.value)">
               <option value="all">🌐 전체 국가</option>
               <option value="kr">🇰🇷 한국 종목</option>
               <option value="us">🇺🇸 미국 종목</option>
           </select>
-          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('type', this.value)">
-              <option value="all">모든 거래</option>
-              <option value="buy">🔴 매수 내역</option>
-              <option value="sell">🔵 매도 내역</option>
-              <option value="dividend">🟢 배당 내역</option>
+          <select id="hfType" class="form-input" style="width:130px; padding:7px 10px; margin:0; cursor:pointer; font-size:12px;" onchange="updateHistoryFilter('type', this.value)">
+              <option value="all">모든 거래유형</option>
+              <option value="buy">🔴 매수</option>
+              <option value="sell">🔵 매도</option>
+              <option value="dividend">🟢 배당</option>
           </select>
-          <input type="text" class="form-input" placeholder="종목명 또는 티커 검색..." style="flex:1; min-width:200px; padding:8px 12px; margin:0;" oninput="updateHistoryFilter('search', this.value)">
-      `;
-      const tableWrap = tbody.closest('div');
-      dash.insertBefore(filterBar, tableWrap);
-  }
-  
+          <select id="hfBroker" class="form-input" style="width:140px; padding:7px 10px; margin:0; cursor:pointer; font-size:12px;" onchange="updateHistoryFilter('broker', this.value)">
+              <option value="all">모든 계좌</option>
+              ${brokerOptions}
+          </select>
+          <input type="text" id="hfSearch" class="form-input" placeholder="🔍 종목명·티커 검색..." style="flex:1; min-width:160px; padding:7px 12px; margin:0; font-size:12px;"
+                 value="${historyFilters.search}" oninput="updateHistoryFilter('search', this.value)">
+          <button class="btn-sm" style="padding:5px 12px; font-size:11px; white-space:nowrap; background:rgba(255,77,106,0.15); border-color:rgba(255,77,106,0.4); color:var(--red);" onclick="resetHistoryFilters()">✕ 필터 초기화</button>
+        </div>
+
+      </div>
+      <div id="historyFilterSummary" style="width:100%; font-size:11px; color:var(--text3); margin-top:4px; padding-top:8px; border-top:1px solid var(--border);"></div>
+  `;
+
+  // 선택값 복원 (재렌더링 시 드롭다운 선택 유지)
+  const hfMarket = document.getElementById('hfMarket');
+  const hfType   = document.getElementById('hfType');
+  const hfBroker = document.getElementById('hfBroker');
+  if (hfMarket) hfMarket.value = historyFilters.market;
+  if (hfType)   hfType.value   = historyFilters.type;
+  if (hfBroker) hfBroker.value = historyFilters.broker;
+
   // 🌟 선택된 필터 조건에 맞게 데이터 걸러내기
   let filtered = state.transactions.filter(tx => {
       let pass = true;
       const isKr = isKorean(tx.symbol);
-      
+
       // 국가 필터
       if (historyFilters.market === 'kr' && !isKr) pass = false;
       if (historyFilters.market === 'us' && isKr) pass = false;
-      
+
       // 거래 유형 필터
-      if (historyFilters.type === 'buy' && (tx.txType !== 'trade' || tx.qty <= 0)) pass = false;
-      if (historyFilters.type === 'sell' && (tx.txType !== 'trade' || tx.qty >= 0)) pass = false;
+      if (historyFilters.type === 'buy' && !(tx.txType !== 'dividend' && tx.qty > 0)) pass = false;
+      if (historyFilters.type === 'sell' && !(tx.txType !== 'dividend' && tx.qty < 0)) pass = false;
       if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
-      
+
+      // 계좌 필터
+      if (historyFilters.broker !== 'all' && (tx.broker || '').trim() !== historyFilters.broker) pass = false;
+
+      // 거래일자 범위 필터
+      if (historyFilters.dateFrom && tx.date < historyFilters.dateFrom) pass = false;
+      if (historyFilters.dateTo   && tx.date > historyFilters.dateTo)   pass = false;
+
       // 검색어 필터
       if (historyFilters.search) {
           let s = historyFilters.search.toLowerCase();
@@ -1166,7 +1234,6 @@ function renderHistoryDashboard() {
           const cachedMatch = cachedMarketData[tx.symbol];
           if (dbMatch) stockName = dbMatch.name;
           else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
-          
           if (state.oldNames && state.oldNames[tx.symbol] && state.oldNames[tx.symbol] !== '상장폐지') {
               stockName = state.oldNames[tx.symbol];
           }
@@ -1174,6 +1241,24 @@ function renderHistoryDashboard() {
       }
       return pass;
   });
+
+  // 활성 필터 요약 텍스트
+  const summaryEl = document.getElementById('historyFilterSummary');
+  if (summaryEl) {
+      const activeFilters = [];
+      if (historyFilters.dateFrom || historyFilters.dateTo) {
+          const from = historyFilters.dateFrom || '처음';
+          const to   = historyFilters.dateTo   || '오늘';
+          activeFilters.push(`📅 ${from} ~ ${to}`);
+      }
+      if (historyFilters.broker !== 'all') activeFilters.push(`🏦 ${historyFilters.broker}`);
+      if (historyFilters.market !== 'all') activeFilters.push(historyFilters.market === 'kr' ? '🇰🇷 한국' : '🇺🇸 미국');
+      if (historyFilters.type   !== 'all') activeFilters.push({ buy:'🔴 매수', sell:'🔵 매도', dividend:'🟢 배당' }[historyFilters.type]);
+      if (historyFilters.search) activeFilters.push(`🔍 "${historyFilters.search}"`);
+      summaryEl.innerHTML = activeFilters.length
+          ? `필터 적용 중: ${activeFilters.join(' &nbsp;·&nbsp; ')} &nbsp;<span style="color:var(--text2);">— 총 <b>${filtered.length}</b>건</span>`
+          : `전체 <b>${filtered.length}</b>건`;
+  }
 
   const sorted = filtered.sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
   
@@ -2137,57 +2222,15 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       }
     });
     
-    // ── 🌟 누적 실현수익 계산 (소유자 필터 적용) ──
-    let realHoldings = {};
-    let realizedKrw = 0, realizedUsd = 0;
-    const sortedForRealized = [...state.transactions]
-        .filter(tx => filterName === 'all' || tx.owner === filterName)
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    sortedForRealized.forEach(tx => {
-        if (tx.txType === 'dividend') return;
-        const key = tx.symbol;
-        if (!realHoldings[key]) realHoldings[key] = { qty: 0, avg: 0 };
-        const rh = realHoldings[key];
-        if (tx.qty > 0) {
-            const totalVal = (rh.qty * rh.avg) + (tx.qty * tx.price);
-            rh.qty += tx.qty;
-            rh.avg = totalVal / rh.qty;
-        } else if (tx.qty < 0) {
-            const sellQty = Math.abs(tx.qty);
-            const pnl = (tx.price - rh.avg) * sellQty;
-            if (isKorean(tx.symbol)) realizedKrw += pnl;
-            else realizedUsd += pnl;
-            rh.qty -= sellQty;
-            if (rh.qty <= 0) { rh.qty = 0; rh.avg = 0; }
-        }
-    });
-    const globalRealized = realizedKrw + (realizedUsd * currentUsdKrw);
-
     const globalDiv = krwDiv + (usdDiv * currentUsdKrw);
     const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
     const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
     const globalRoi = globalCost > 0 ? ((globalEval - globalCost) / globalCost * 100) : 0;
     const globalPnl = globalEval - globalCost;
-    // 누적 자산 = 현재 포트폴리오 평가액 + 실현수익 + 배당금
-    const globalCumulative = globalEval + globalRealized + globalDiv;
 
     document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
     document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
     document.getElementById('globalTotalDiv').textContent = `₩ ${Math.round(globalDiv).toLocaleString()}`;
-
-    // 누적 실현수익 표시
-    const realEl = document.getElementById('globalRealizedTotal');
-    if (realEl) {
-        const signR = globalRealized >= 0 ? '+' : '';
-        realEl.textContent = `${signR}₩ ${Math.round(Math.abs(globalRealized)).toLocaleString()}`;
-        realEl.style.color = globalRealized >= 0 ? 'var(--blue)' : 'var(--red)';
-    }
-
-    // 누적 총 자산 표시
-    const cumEl = document.getElementById('globalCumulativeAsset');
-    if (cumEl) cumEl.textContent = `₩ ${Math.round(globalCumulative).toLocaleString()}`;
-
     const gRoiEl = document.getElementById('globalTotalRoi');
     const signG = globalPnl >= 0 ? '+' : '';
     gRoiEl.innerHTML = `${signG}₩${Math.round(Math.abs(globalPnl)).toLocaleString()}<br><span style="font-size:12px; font-weight:500">(${signG}${globalRoi.toFixed(2)}%)</span>`;
