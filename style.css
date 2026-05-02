@@ -297,3 +297,15 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     gap: 6px;
     flex-wrap: nowrap;
 }
+
+/* 계좌 이전 내역 전용 스타일 */
+.transfer-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(136,144,164,0.15);
+  color: var(--text2);
+  border: 1px solid var(--border2);
+}
