@@ -101,6 +101,7 @@ let allocationChartInst = null;
 let modalChartInst = null;
 let divMonthlyChartInst = null; 
 let portfolioChartInst = null; 
+let portfolioChartInstUs = null;
 const chartInstances = {};
 let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
@@ -1178,46 +1179,44 @@ function renderHistoryDashboard() {
   if (!filterBar) {
       filterBar = document.createElement('div');
       filterBar.id = 'historyFilterBar';
-      filterBar.style.cssText = "display:flex; flex-direction:column; gap:10px; margin-bottom:15px; padding:15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border);";
+      filterBar.style.cssText = "margin-bottom:15px; padding:12px 15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border);";
       const tableWrap = tbody.closest('div');
       dash.insertBefore(filterBar, tableWrap);
   }
 
+  const hasActiveExtra = historyFilters.dateFrom || historyFilters.dateTo || historyFilters.broker !== 'all';
   // 필터 바 HTML 재렌더링 (계좌 목록이 바뀔 수 있으므로 항상 갱신)
   filterBar.innerHTML = `
-      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('market', this.value)">
-              <option value="all" ${historyFilters.market==='all'?'selected':''}>🌐 전체 국가</option>
-              <option value="kr" ${historyFilters.market==='kr'?'selected':''}>🇰🇷 한국 종목</option>
-              <option value="us" ${historyFilters.market==='us'?'selected':''}>🇺🇸 미국 종목</option>
+      <div style="display:flex; gap:7px; align-items:center; flex-wrap:wrap;">
+          <select class="form-input" style="width:100px; padding:6px 7px; margin:0; cursor:pointer; font-size:12px; flex-shrink:0;" onchange="updateHistoryFilter('market', this.value)">
+              <option value="all" ${historyFilters.market==='all'?'selected':''}>🌐 전체</option>
+              <option value="kr" ${historyFilters.market==='kr'?'selected':''}>🇰🇷 국내</option>
+              <option value="us" ${historyFilters.market==='us'?'selected':''}>🇺🇸 해외</option>
           </select>
-          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('type', this.value)">
-              <option value="all" ${historyFilters.type==='all'?'selected':''}>모든 거래</option>
-              <option value="buy" ${historyFilters.type==='buy'?'selected':''}>🔴 매수 내역</option>
-              <option value="sell" ${historyFilters.type==='sell'?'selected':''}>🔵 매도 내역</option>
-              <option value="dividend" ${historyFilters.type==='dividend'?'selected':''}>🟢 배당 내역</option>
+          <select class="form-input" style="width:105px; padding:6px 7px; margin:0; cursor:pointer; font-size:12px; flex-shrink:0;" onchange="updateHistoryFilter('type', this.value)">
+              <option value="all" ${historyFilters.type==='all'?'selected':''}>전체 유형</option>
+              <option value="buy" ${historyFilters.type==='buy'?'selected':''}>🔴 매수</option>
+              <option value="sell" ${historyFilters.type==='sell'?'selected':''}>🔵 매도</option>
+              <option value="dividend" ${historyFilters.type==='dividend'?'selected':''}>🟢 배당</option>
           </select>
-          <select class="form-input" id="historyBrokerFilter" style="width:auto; min-width:130px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('broker', this.value)">
+          <select class="form-input" id="historyBrokerFilter" style="width:115px; padding:6px 7px; margin:0; cursor:pointer; font-size:12px; flex-shrink:0;" onchange="updateHistoryFilter('broker', this.value)">
               <option value="all" ${historyFilters.broker==='all'?'selected':''}>🏦 전체 계좌</option>
               ${allBrokers.map(b => `<option value="${b}" ${historyFilters.broker===b?'selected':''}>${b}</option>`).join('')}
           </select>
-          <input type="text" class="form-input" placeholder="종목명 또는 티커 검색..." value="${historyFilters.search}" style="flex:1; min-width:180px; padding:8px 12px; margin:0;" oninput="updateHistoryFilter('search', this.value)">
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <span style="font-size:12px; color:var(--text2); font-weight:600; white-space:nowrap;">📅 기간 필터</span>
-          <div style="display:flex; align-items:center; gap:6px; flex:1; flex-wrap:wrap;">
-              <input type="date" class="form-input" id="historyDateFrom" value="${historyFilters.dateFrom}" style="width:150px; padding:8px 10px; margin:0;" onchange="updateHistoryFilter('dateFrom', this.value)">
-              <span style="color:var(--text3); font-size:13px;">~</span>
-              <input type="date" class="form-input" id="historyDateTo" value="${historyFilters.dateTo}" style="width:150px; padding:8px 10px; margin:0;" onchange="updateHistoryFilter('dateTo', this.value)">
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                  <button class="btn-sm" onclick="setHistoryDatePreset('1m')" style="padding:6px 10px; font-size:11px;">1개월</button>
-                  <button class="btn-sm" onclick="setHistoryDatePreset('3m')" style="padding:6px 10px; font-size:11px;">3개월</button>
-                  <button class="btn-sm" onclick="setHistoryDatePreset('6m')" style="padding:6px 10px; font-size:11px;">6개월</button>
-                  <button class="btn-sm" onclick="setHistoryDatePreset('1y')" style="padding:6px 10px; font-size:11px;">1년</button>
-                  <button class="btn-sm" onclick="setHistoryDatePreset('ytd')" style="padding:6px 10px; font-size:11px;">올해</button>
-                  ${(historyFilters.dateFrom||historyFilters.dateTo||historyFilters.broker!=='all') ? `<button class="btn-sm" onclick="resetHistoryFilters()" style="padding:6px 10px; font-size:11px; color:var(--red); border-color:var(--red);">✕ 초기화</button>` : ''}
-              </div>
+          <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+              <input type="date" class="form-input" id="historyDateFrom" value="${historyFilters.dateFrom}" style="width:134px; padding:6px 7px; margin:0; font-size:12px;" onchange="updateHistoryFilter('dateFrom', this.value)">
+              <span style="color:var(--text3); font-size:11px; flex-shrink:0;">~</span>
+              <input type="date" class="form-input" id="historyDateTo" value="${historyFilters.dateTo}" style="width:134px; padding:6px 7px; margin:0; font-size:12px;" onchange="updateHistoryFilter('dateTo', this.value)">
           </div>
+          <div style="display:flex; gap:3px; flex-shrink:0;">
+              <button class="btn-sm" onclick="setHistoryDatePreset('1m')" style="padding:5px 7px; font-size:11px;">1M</button>
+              <button class="btn-sm" onclick="setHistoryDatePreset('3m')" style="padding:5px 7px; font-size:11px;">3M</button>
+              <button class="btn-sm" onclick="setHistoryDatePreset('6m')" style="padding:5px 7px; font-size:11px;">6M</button>
+              <button class="btn-sm" onclick="setHistoryDatePreset('1y')" style="padding:5px 7px; font-size:11px;">1Y</button>
+              <button class="btn-sm" onclick="setHistoryDatePreset('ytd')" style="padding:5px 7px; font-size:11px;">YTD</button>
+          </div>
+          <input type="text" class="form-input" placeholder="🔍 종목명 / 티커" value="${historyFilters.search}" style="flex:1; min-width:120px; padding:6px 10px; margin:0; font-size:12px;" oninput="updateHistoryFilter('search', this.value)">
+          ${hasActiveExtra ? `<button class="btn-sm" onclick="resetHistoryFilters()" style="padding:5px 9px; font-size:11px; color:var(--red); border-color:var(--red); flex-shrink:0;">✕ 초기화</button>` : ''}
       </div>
   `;
   
@@ -2089,119 +2088,135 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         finalRealUs = realDataUs.slice(firstNonZeroIdx);
     }
 
-    const canvas = document.getElementById('portfolioChartCanvas');
-    if (!canvas) return; 
-    if (portfolioChartInst) portfolioChartInst.destroy();
+    // ── 국장/미장 두 패널 분리 렌더링 ──────────────────────────────────
+    // 캔버스 컨테이너를 두 패널로 교체 (최초 1회)
+    const chartWrap2 = document.getElementById('portfolioChartWrapper');
+    if (!document.getElementById('portfolioCanvasKr')) {
+        chartWrap2.querySelector('[data-chart-panels]')?.remove();
+        // 기존 단일 canvas 숨기기
+        const oldCanvas = document.getElementById('portfolioChartCanvas');
+        if (oldCanvas) oldCanvas.parentElement.style.display = 'none';
 
-    portfolioChartInst = new Chart(canvas.getContext('2d'), {
-        data: {
-            labels: finalDisplayDates,
-            datasets: [
-                // 1. 합산 평가액 (노란색 단독 선 - 가장 위에 그려짐)
-                {
-                    label: '합산 평가액',
-                    type: 'line',
-                    data: finalEvalTotal,
-                    borderColor: '#f1c40f',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: false,
-                    tension: 0.1,
-                    order: 1
-                },
-                // 2. 건별 실현수익 (국장/미장 막대 그래프)
-                {
-                    label: '실현수익 (국장)',
-                    type: 'bar',
-                    data: finalRealKr,
-                    backgroundColor: '#27ae60',
-                    borderWidth: 0,
-                    stack: 'Realized',
-                    order: 2
-                },
-                {
-                    label: '실현수익 (미장)',
-                    type: 'bar',
-                    data: finalRealUs,
-                    backgroundColor: '#2980b9',
-                    borderWidth: 0,
-                    stack: 'Realized',
-                    order: 3
-                },
-                // 3. 투자액 누적 영역 (가장 진하게 표시, 평가액보다 앞에 그려짐)
-                {
-                    label: '투자액 (국장)',
-                    type: 'line',
-                    data: finalCostKr,
-                    borderColor: '#27ae60',
-                    backgroundColor: 'rgba(39, 174, 96, 0.7)',
-                    borderWidth: 1.5,
-                    pointRadius: 0,
-                    fill: true,
-                    stack: 'Cost', // 누적
-                    tension: 0.1,
-                    order: 4
-                },
-                {
-                    label: '투자액 (미장)',
-                    type: 'line',
-                    data: finalCostUs,
-                    borderColor: '#2980b9',
-                    backgroundColor: 'rgba(41, 128, 185, 0.7)',
-                    borderWidth: 1.5,
-                    pointRadius: 0,
-                    fill: true,
-                    stack: 'Cost', // 누적
-                    tension: 0.1,
-                    order: 5
-                },
-                // 4. 평가액 누적 영역 (배경에 은은하게 깔림)
-                {
-                    label: '평가액 (국장)',
-                    type: 'line',
-                    data: finalEvalKr,
-                    borderColor: '#2ecc71',
-                    backgroundColor: 'rgba(46, 204, 113, 0.35)',
-                    borderWidth: 1.5,
-                    pointRadius: 0,
-                    fill: true,
-                    stack: 'Eval', // 누적
-                    tension: 0.1,
-                    order: 6
-                },
-                {
-                    label: '평가액 (미장)',
-                    type: 'line',
-                    data: finalEvalUs,
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.35)',
-                    borderWidth: 1.5,
-                    pointRadius: 0,
-                    fill: true,
-                    stack: 'Eval', // 누적
-                    tension: 0.1,
-                    order: 7
-                }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: { 
-                    display: true, position: 'top', 
-                    labels: { color: '#8890a4', font: {size: 11}, usePointStyle: true, boxWidth:8 } 
-                },
-                tooltip: { 
-                    callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₩' + Math.round(ctx.raw).toLocaleString(); } } 
-                }
+        const panels = document.createElement('div');
+        panels.setAttribute('data-chart-panels', '1');
+        panels.style.cssText = 'display:flex; gap:16px; margin-top:4px;';
+        panels.innerHTML = `
+            <div style="flex:1; min-width:0;">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                    <span style="font-size:13px; font-weight:700; color:#2ecc71;">🇰🇷 국내 주식</span>
+                    <span style="font-size:10px; color:var(--text3);">원화 기준 (₩)</span>
+                </div>
+                <div style="height:200px; position:relative;"><canvas id="portfolioCanvasKr"></canvas></div>
+            </div>
+            <div style="width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin:0 4px;"></div>
+            <div style="flex:1; min-width:0;">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                    <span style="font-size:13px; font-weight:700; color:#3498db;">🇺🇸 해외 주식</span>
+                    <span style="font-size:10px; color:var(--text3);">원화 환산 기준 (₩)</span>
+                </div>
+                <div style="height:200px; position:relative;"><canvas id="portfolioCanvasUs"></canvas></div>
+            </div>
+        `;
+        chartWrap2.appendChild(panels);
+    }
+
+    function makeChartConfig(labels, costData, evalData, realData, costColor, evalColor, realColor) {
+        const warnFmt = v => '₩' + (Math.abs(v) >= 100000000
+            ? (v/100000000).toFixed(1) + '억'
+            : Math.abs(v) >= 10000
+            ? Math.round(v/10000).toLocaleString() + '만'
+            : Math.round(v).toLocaleString());
+        return {
+            data: {
+                labels,
+                datasets: [
+                    // 평가액 영역 (연한 색, 뒤)
+                    {
+                        label: '평가액',
+                        type: 'line',
+                        data: evalData,
+                        borderColor: evalColor,
+                        backgroundColor: evalColor.replace(')', ', 0.18)').replace('rgb', 'rgba'),
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: 'origin',
+                        tension: 0.1,
+                        order: 3
+                    },
+                    // 투자액 영역 (진한 색, 앞)
+                    {
+                        label: '투자액',
+                        type: 'line',
+                        data: costData,
+                        borderColor: costColor,
+                        backgroundColor: costColor.replace(')', ', 0.50)').replace('rgb', 'rgba'),
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: 'origin',
+                        tension: 0.1,
+                        order: 2
+                    },
+                    // 실현수익 막대 (날짜별)
+                    {
+                        label: '실현수익',
+                        type: 'bar',
+                        data: realData,
+                        backgroundColor: function(ctx) {
+                            const v = ctx.raw;
+                            return v >= 0 ? realColor + '99' : 'rgba(255,77,106,0.55)';
+                        },
+                        borderWidth: 0,
+                        order: 1
+                    }
+                ]
             },
-            scales: {
-                x: { ticks: { color: '#555e72', maxTicksLimit: 10 }, grid: { display: false } },
-                y: { ticks: { color: '#555e72', callback: function(val) { return '₩' + (val/10000).toLocaleString() + '만'; } }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } }
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        display: true, position: 'top',
+                        labels: { color: '#8890a4', font: { size: 10 }, usePointStyle: true, boxWidth: 7, padding: 10 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                if (ctx.raw === 0 && ctx.dataset.label === '실현수익') return null;
+                                const sign = ctx.raw < 0 ? '-' : '';
+                                return ctx.dataset.label + ': ' + sign + warnFmt(ctx.raw);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#555e72', maxTicksLimit: 8, font: { size: 10 } }, grid: { display: false } },
+                    y: { ticks: { color: '#555e72', font: { size: 10 }, callback: function(val) {
+                        if (Math.abs(val) >= 100000000) return '₩' + (val/100000000).toFixed(1) + '억';
+                        if (Math.abs(val) >= 10000) return '₩' + Math.round(val/10000).toLocaleString() + '만';
+                        return '₩' + val.toLocaleString();
+                    }}, grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false } }
+                }
             }
-        }
-    });
+        };
+    }
+
+    // 국장 차트
+    const canvasKr = document.getElementById('portfolioCanvasKr');
+    if (canvasKr) {
+        if (portfolioChartInst) portfolioChartInst.destroy();
+        portfolioChartInst = new Chart(canvasKr.getContext('2d'),
+            makeChartConfig(finalDisplayDates, finalCostKr, finalEvalKr, finalRealKr,
+                'rgb(39,174,96)', 'rgb(46,204,113)', 'rgba(39,174,96,'));
+    }
+
+    // 미장 차트
+    const canvasUs = document.getElementById('portfolioCanvasUs');
+    if (canvasUs) {
+        if (portfolioChartInstUs) portfolioChartInstUs.destroy();
+        portfolioChartInstUs = new Chart(canvasUs.getContext('2d'),
+            makeChartConfig(finalDisplayDates, finalCostUs, finalEvalUs, finalRealUs,
+                'rgb(41,128,185)', 'rgb(52,152,219)', 'rgba(41,128,185,'));
+    }
 }
 
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
