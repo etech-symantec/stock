@@ -302,7 +302,7 @@ function isKorean(symbol) {
 }
 
 // 🌟 전체 거래내역 필터 상태 저장 변수 추가 (isKorean 함수 바로 아래에 추가하세요)
-let historyFilters = { market: 'all', type: 'all', search: '' };
+let historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all' };
 function updateHistoryFilter(key, value) {
     historyFilters[key] = value;
     renderHistoryDashboard();
@@ -1171,27 +1171,55 @@ function renderHistoryDashboard() {
   
   // 💡 HTML 수정 없이 JS가 알아서 필터 바를 만들어줍니다!
   let filterBar = document.getElementById('historyFilterBar');
+
+  // 계좌 목록 동적 수집
+  const allBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b && b.trim()))].sort();
+
   if (!filterBar) {
       filterBar = document.createElement('div');
       filterBar.id = 'historyFilterBar';
-      filterBar.style.cssText = "display:flex; gap:10px; margin-bottom:15px; padding:15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border); flex-wrap:wrap;";
-      filterBar.innerHTML = `
-          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('market', this.value)">
-              <option value="all">🌐 전체 국가</option>
-              <option value="kr">🇰🇷 한국 종목</option>
-              <option value="us">🇺🇸 미국 종목</option>
-          </select>
-          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('type', this.value)">
-              <option value="all">모든 거래</option>
-              <option value="buy">🔴 매수 내역</option>
-              <option value="sell">🔵 매도 내역</option>
-              <option value="dividend">🟢 배당 내역</option>
-          </select>
-          <input type="text" class="form-input" placeholder="종목명 또는 티커 검색..." style="flex:1; min-width:200px; padding:8px 12px; margin:0;" oninput="updateHistoryFilter('search', this.value)">
-      `;
+      filterBar.style.cssText = "display:flex; flex-direction:column; gap:10px; margin-bottom:15px; padding:15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border);";
       const tableWrap = tbody.closest('div');
       dash.insertBefore(filterBar, tableWrap);
   }
+
+  // 필터 바 HTML 재렌더링 (계좌 목록이 바뀔 수 있으므로 항상 갱신)
+  filterBar.innerHTML = `
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('market', this.value)">
+              <option value="all" ${historyFilters.market==='all'?'selected':''}>🌐 전체 국가</option>
+              <option value="kr" ${historyFilters.market==='kr'?'selected':''}>🇰🇷 한국 종목</option>
+              <option value="us" ${historyFilters.market==='us'?'selected':''}>🇺🇸 미국 종목</option>
+          </select>
+          <select class="form-input" style="width:auto; min-width:120px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('type', this.value)">
+              <option value="all" ${historyFilters.type==='all'?'selected':''}>모든 거래</option>
+              <option value="buy" ${historyFilters.type==='buy'?'selected':''}>🔴 매수 내역</option>
+              <option value="sell" ${historyFilters.type==='sell'?'selected':''}>🔵 매도 내역</option>
+              <option value="dividend" ${historyFilters.type==='dividend'?'selected':''}>🟢 배당 내역</option>
+          </select>
+          <select class="form-input" id="historyBrokerFilter" style="width:auto; min-width:130px; padding:8px 12px; margin:0; cursor:pointer;" onchange="updateHistoryFilter('broker', this.value)">
+              <option value="all" ${historyFilters.broker==='all'?'selected':''}>🏦 전체 계좌</option>
+              ${allBrokers.map(b => `<option value="${b}" ${historyFilters.broker===b?'selected':''}>${b}</option>`).join('')}
+          </select>
+          <input type="text" class="form-input" placeholder="종목명 또는 티커 검색..." value="${historyFilters.search}" style="flex:1; min-width:180px; padding:8px 12px; margin:0;" oninput="updateHistoryFilter('search', this.value)">
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <span style="font-size:12px; color:var(--text2); font-weight:600; white-space:nowrap;">📅 기간 필터</span>
+          <div style="display:flex; align-items:center; gap:6px; flex:1; flex-wrap:wrap;">
+              <input type="date" class="form-input" id="historyDateFrom" value="${historyFilters.dateFrom}" style="width:150px; padding:8px 10px; margin:0;" onchange="updateHistoryFilter('dateFrom', this.value)">
+              <span style="color:var(--text3); font-size:13px;">~</span>
+              <input type="date" class="form-input" id="historyDateTo" value="${historyFilters.dateTo}" style="width:150px; padding:8px 10px; margin:0;" onchange="updateHistoryFilter('dateTo', this.value)">
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button class="btn-sm" onclick="setHistoryDatePreset('1m')" style="padding:6px 10px; font-size:11px;">1개월</button>
+                  <button class="btn-sm" onclick="setHistoryDatePreset('3m')" style="padding:6px 10px; font-size:11px;">3개월</button>
+                  <button class="btn-sm" onclick="setHistoryDatePreset('6m')" style="padding:6px 10px; font-size:11px;">6개월</button>
+                  <button class="btn-sm" onclick="setHistoryDatePreset('1y')" style="padding:6px 10px; font-size:11px;">1년</button>
+                  <button class="btn-sm" onclick="setHistoryDatePreset('ytd')" style="padding:6px 10px; font-size:11px;">올해</button>
+                  ${(historyFilters.dateFrom||historyFilters.dateTo||historyFilters.broker!=='all') ? `<button class="btn-sm" onclick="resetHistoryFilters()" style="padding:6px 10px; font-size:11px; color:var(--red); border-color:var(--red);">✕ 초기화</button>` : ''}
+              </div>
+          </div>
+      </div>
+  `;
   
   // 🌟 선택된 필터 조건에 맞게 데이터 걸러내기
   let filtered = state.transactions.filter(tx => {
@@ -1206,6 +1234,13 @@ function renderHistoryDashboard() {
       if (historyFilters.type === 'buy' && (tx.txType !== 'trade' || tx.qty <= 0)) pass = false;
       if (historyFilters.type === 'sell' && (tx.txType !== 'trade' || tx.qty >= 0)) pass = false;
       if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
+
+      // 기간 필터
+      if (historyFilters.dateFrom && tx.date < historyFilters.dateFrom) pass = false;
+      if (historyFilters.dateTo   && tx.date > historyFilters.dateTo)   pass = false;
+
+      // 계좌 필터
+      if (historyFilters.broker !== 'all' && (tx.broker || '') !== historyFilters.broker) pass = false;
       
       // 검색어 필터
       if (historyFilters.search) {
@@ -1272,6 +1307,34 @@ function renderHistoryDashboard() {
           <td style="padding:12px 16px; text-align:center;"><div class="tx-actions" style="justify-content:center;"><button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button><button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button></div></td>
       </tr>`;
   }).join('');
+}
+
+function setHistoryDatePreset(preset) {
+    const today = new Date();
+    const fmt = d => d.toISOString().slice(0, 10);
+    let from = '';
+    const to = fmt(today);
+    if (preset === '1m') {
+        const d = new Date(today); d.setMonth(d.getMonth() - 1); from = fmt(d);
+    } else if (preset === '3m') {
+        const d = new Date(today); d.setMonth(d.getMonth() - 3); from = fmt(d);
+    } else if (preset === '6m') {
+        const d = new Date(today); d.setMonth(d.getMonth() - 6); from = fmt(d);
+    } else if (preset === '1y') {
+        const d = new Date(today); d.setFullYear(d.getFullYear() - 1); from = fmt(d);
+    } else if (preset === 'ytd') {
+        from = `${today.getFullYear()}-01-01`;
+    }
+    historyFilters.dateFrom = from;
+    historyFilters.dateTo = to;
+    renderHistoryDashboard();
+}
+
+function resetHistoryFilters() {
+    historyFilters.dateFrom = '';
+    historyFilters.dateTo = '';
+    historyFilters.broker = 'all';
+    renderHistoryDashboard();
 }
 
 function prepareTransaction(symbol, broker) {
