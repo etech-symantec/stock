@@ -7626,6 +7626,26 @@
       "qty": 36,
       "price": 110.9590909090909,
       "txType": "transfer"
+    },
+    {
+      "id": 1777794013578,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "TSLA",
+      "qty": -18,
+      "price": 182.46527777777777,
+      "txType": "transfer"
+    },
+    {
+      "id": 1777794013579,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "KB (RIA)",
+      "symbol": "TSLA",
+      "qty": 18,
+      "price": 182.46527777777777,
+      "txType": "transfer"
     }
   ],
   "range": "3y",
