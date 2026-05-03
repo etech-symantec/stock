@@ -78,6 +78,8 @@ input[name="txOwner"]:checked + .toggle-btn { background: var(--bg3); color: var
 input#typeBuy:checked + .type-buy { background: var(--red-bg); color: var(--red); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,77,106,0.3); }
 input#typeSell:checked + .type-sell { background: rgba(77, 159, 255, 0.15); color: var(--blue); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(77,159,255,0.3); }
 input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
+input#typeTransfer:checked + .type-transfer { background: rgba(255,183,3,0.15); color: #ffb703; box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,183,3,0.3); }
+input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); color: var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(124,106,247,0.3); }
 
 .broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
 .broker-tag:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.05); }
@@ -296,16 +298,4 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     align-items: center;
     gap: 6px;
     flex-wrap: nowrap;
-}
-
-/* 계좌 이전 내역 전용 스타일 */
-.transfer-badge {
-  display: inline-block;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  background: rgba(136,144,164,0.15);
-  color: var(--text2);
-  border: 1px solid var(--border2);
 }
