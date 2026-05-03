@@ -7606,9 +7606,29 @@
       "qty": -200,
       "price": 3935,
       "txType": "trade"
+    },
+    {
+      "id": 1777793999574,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "AAPL",
+      "qty": -36,
+      "price": 110.9590909090909,
+      "txType": "transfer"
+    },
+    {
+      "id": 1777793999575,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "KB (RIA)",
+      "symbol": "AAPL",
+      "qty": 36,
+      "price": 110.9590909090909,
+      "txType": "transfer"
     }
   ],
-  "range": "1m",
+  "range": "3y",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
