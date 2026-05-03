@@ -89,13 +89,17 @@
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-size:11px; color:var(--text2); font-weight:700;">유형</span>
             </div>
-            <div class="toggle-group" style="margin-top:2px;">
+            <div class="toggle-group" style="margin-top:2px; flex-wrap:wrap; gap:2px;">
               <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
-              <label for="typeBuy" class="toggle-btn type-buy" style="padding:8px 2px;">매수</label>
+              <label for="typeBuy" class="toggle-btn type-buy" style="padding:6px 2px; font-size:11px;">매수</label>
               <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
-              <label for="typeSell" class="toggle-btn type-sell" style="padding:8px 2px;">매도</label>
+              <label for="typeSell" class="toggle-btn type-sell" style="padding:6px 2px; font-size:11px;">매도</label>
               <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
-              <label for="typeDiv" class="toggle-btn type-div" style="padding:8px 2px;">배당</label>
+              <label for="typeDiv" class="toggle-btn type-div" style="padding:6px 2px; font-size:11px;">배당</label>
+              <input type="radio" id="typeTransfer" name="txType" value="transfer" onchange="toggleTxType()" class="hidden-radio">
+              <label for="typeTransfer" class="toggle-btn type-transfer" style="padding:6px 2px; font-size:11px;">이동</label>
+              <input type="radio" id="typeSplitTx" name="txType" value="split" onchange="toggleTxType()" class="hidden-radio">
+              <label for="typeSplitTx" class="toggle-btn type-split" style="padding:6px 2px; font-size:11px;">분할</label>
             </div>
           </div>
         </div>
@@ -123,7 +127,7 @@
             <label>수량</label>
             <input type="number" id="txQty" class="form-input" placeholder="0">
           </div>
-          <div class="form-group" style="flex:1; position:relative;">
+          <div class="form-group" style="flex:1; position:relative;" id="txPriceWrap">
             <label id="txPriceLabel">단가 (1주당 가격)</label>
             <input type="number" id="txPrice" class="form-input" placeholder="0" step="0.01">
             <div id="divTaxWrap" style="display:none; margin-top:6px;">
@@ -134,8 +138,28 @@
             </div>
           </div>
         </div>
-        <div class="form-group">
-          <label>계좌명 (선택)</label>
+
+        <!-- 이동 전용: 출발 계좌 -->
+        <div class="form-group" id="txTransferFromWrap" style="display:none;">
+          <label>출발 계좌 <span id="txTransferFromInfo" style="font-size:10px; color:var(--green); margin-left:6px; font-weight:700;"></span></label>
+          <select id="txTransferFrom" class="form-input" onchange="onLedgerTransferFromChange()">
+            <option value="">먼저 종목을 선택하세요</option>
+          </select>
+        </div>
+
+        <!-- 분할 전용: 비율 입력 -->
+        <div class="form-group" id="txSplitRatioWrap" style="display:none;">
+          <label>분할 비율 &nbsp;<span style="font-size:10px; color:var(--text3);">구 주식 수 : 신 주식 수</span></label>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="number" id="txSplitOld" class="form-input" value="1" min="1" style="text-align:center; width:70px;" oninput="updateLedgerSplitPreview()">
+            <span style="font-size:18px; color:var(--text2); font-weight:700; flex-shrink:0;">:</span>
+            <input type="number" id="txSplitNew" class="form-input" placeholder="예: 5" min="1" style="text-align:center; width:70px;" oninput="updateLedgerSplitPreview()">
+          </div>
+          <div id="txSplitPreview" style="margin-top:8px; font-size:11px;"></div>
+        </div>
+
+        <div class="form-group" id="txBrokerGroup">
+          <label id="txBrokerLabel">계좌명 (선택)</label>
           <input type="text" id="txBroker" class="form-input" placeholder="예: 키움증권, 토스 등">
           <div id="brokerTags" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
         </div>
@@ -163,52 +187,26 @@
             <div class="cp-title">🌐 통합 자산</div>
             <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
           </div>
-
-          <!-- ① 누적 자산 섹션 -->
-          <div style="background:rgba(124,106,247,0.08); border:1px solid rgba(124,106,247,0.25); border-radius:10px; padding:14px; margin-bottom:10px;">
-            <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
-              📊 누적 자산
-              <span style="font-size:10px; font-weight:400; color:var(--text3);">(현재 평가액 + 실현수익 + 배당금)</span>
+          <div class="gs-group" style="display:flex; gap:15px; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:-5px;">
+            <div style="flex:1;">
+              <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">통합 투자 원금</div>
+              <div id="globalTotalCost" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--text);">—</div>
             </div>
-            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
-              <div style="flex:1; min-width:80px;">
-                <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">투자 원금</div>
-                <div id="globalTotalCost" style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--text);">—</div>
-              </div>
-              <div style="flex:1; min-width:80px;">
-                <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">누적 실현수익</div>
-                <div id="globalRealizedTotal" style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--blue);">—</div>
-              </div>
-              <div style="flex:1; min-width:80px;">
-                <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">누적 배당금</div>
-                <div id="globalTotalDiv" style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--green);">—</div>
-              </div>
-            </div>
-            <div style="border-top:1px solid rgba(124,106,247,0.25); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-              <div style="font-size:11px; color:var(--text3); font-weight:600;">누적 총 자산</div>
-              <div id="globalCumulativeAsset" style="font-family:var(--font-mono); font-size:20px; font-weight:900; color:var(--accent);">—</div>
+            <div style="flex:1;">
+              <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">누적 배당금</div>
+              <div id="globalTotalDiv" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--green);">—</div>
             </div>
           </div>
-
-          <!-- ② 현재 포트폴리오 자산 섹션 -->
-          <div style="background:rgba(0,200,122,0.06); border:1px solid rgba(0,200,122,0.25); border-radius:10px; padding:14px; margin-bottom:10px;">
-            <div style="font-size:11px; font-weight:700; color:var(--green); margin-bottom:10px;">
-              💼 현재 포트폴리오 자산
-              <span style="font-size:10px; font-weight:400; color:var(--text3);">(보유 종목 평가액만)</span>
+          <div class="cp-summary">
+            <div class="cp-sum-box" style="flex:1.2;">
+              <div class="cp-sum-label">통합 평가 자산</div>
+              <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue); font-size:22px;">—</div>
             </div>
-            <div class="cp-summary" style="margin-bottom:0;">
-              <div class="cp-sum-box" style="flex:1.2;">
-                <div class="cp-sum-label">통합 평가 자산</div>
-                <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue); font-size:20px;">—</div>
-              </div>
-              <div class="cp-sum-box">
-                <div class="cp-sum-label">미실현 수익금 (수익률)</div>
-                <div class="cp-sum-val" id="globalTotalRoi">—</div>
-              </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">통합 수익금 (수익률)</div>
+              <div class="cp-sum-val" id="globalTotalRoi">—</div>
             </div>
           </div>
-
-          <!-- 포트폴리오 맵 -->
           <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
              <div class="section-title" style="margin: 0 0 10px 0; font-size:12px; color:var(--text3)">포트폴리오 맵</div>
              <div id="allocationTreemap" style="flex:1; position:relative; min-height: 180px; width: 100%; border-radius: 8px; overflow: hidden; background:var(--bg3);"></div>
@@ -567,114 +565,12 @@
       </div>
     </div>
 
-    <div class="settings-section">
-      <div class="settings-section-title">📦 포트폴리오 이벤트</div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn-submit" style="flex:1; background:rgba(77,159,255,0.15); border:1px solid rgba(77,159,255,0.4); color:var(--blue);" onclick="closeModal('masterSettingsOverlay'); openTransferModal()">🔀 계좌 간 종목 이동</button>
-        <button class="btn-submit" style="flex:1; background:rgba(124,106,247,0.15); border:1px solid rgba(124,106,247,0.4); color:var(--accent);" onclick="closeModal('masterSettingsOverlay'); openSplitModal()">✂️ 액면분할 적용</button>
-      </div>
-    </div>
-
     <div class="settings-section" style="border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); margin-bottom:0;">
       <div class="settings-section-title" style="color:var(--red);">🚨 모든 데이터 영구 삭제 (초기화)</div>
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <span style="font-size:11px; color:var(--text2);">저장된 모든 장부 내역을 완전히 비웁니다.</span>
         <button class="btn-danger" style="background:var(--red); color:#fff; padding:6px 12px; font-weight:bold; border:none;" onclick="resetAllTransactions()">전체 초기화 실행</button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== 계좌 간 종목 이동 모달 ===== -->
-<div class="overlay" id="transferOverlay" onclick="closeModal('transferOverlay')">
-  <div class="modal modal-sm" onclick="event.stopPropagation()" style="max-width:460px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-      <h3 style="font-size:16px;">🔀 계좌 간 종목 이동</h3>
-      <button class="btn-sm" onclick="closeModal('transferOverlay')">닫기</button>
-    </div>
-    <div style="font-size:11px; color:var(--text2); background:rgba(77,159,255,0.08); border:1px solid rgba(77,159,255,0.25); border-radius:6px; padding:10px; margin-bottom:16px; line-height:1.6;">
-      보유 중인 종목을 다른 계좌로 이전합니다.<br>
-      <b>평단가가 그대로 유지</b>되며, 실현손익으로 잡히지 않습니다.
-    </div>
-
-    <div class="form-group">
-      <label>이전 일자</label>
-      <input type="date" id="transferDate" class="form-input">
-    </div>
-    <div class="form-group">
-      <label>소유자</label>
-      <div class="toggle-group">
-        <input type="radio" id="transferOwner1" name="transferOwner" class="hidden-radio">
-        <label for="transferOwner1" class="toggle-btn" id="lblTransferOwner1">소유자1</label>
-        <input type="radio" id="transferOwner2" name="transferOwner" class="hidden-radio">
-        <label for="transferOwner2" class="toggle-btn" id="lblTransferOwner2">소유자2</label>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>종목</label>
-      <select id="transferSymbol" class="form-input" onchange="onTransferSymbolChange()">
-        <option value="">종목 선택...</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>출발 계좌 <span id="transferFromInfo" style="font-size:10px; color:var(--text3); margin-left:6px;"></span></label>
-      <select id="transferFromBroker" class="form-input" onchange="onTransferFromChange()">
-        <option value="">먼저 종목을 선택하세요</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>도착 계좌</label>
-      <input type="text" id="transferToBroker" class="form-input" placeholder="예: 키움증권, 토스증권...">
-      <div id="transferToBrokerTags" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
-    </div>
-    <div class="form-group">
-      <label>이전 수량 <span id="transferMaxQtyHint" style="font-size:10px; color:var(--text3); margin-left:4px;"></span></label>
-      <input type="number" id="transferQty" class="form-input" placeholder="0" min="1">
-    </div>
-    <div style="display:flex; gap:10px; margin-top:16px;">
-      <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="closeModal('transferOverlay')">취소</button>
-      <button class="btn-submit" style="flex:1; background:rgba(77,159,255,0.8);" onclick="applyTransfer()">🔀 이동 적용</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== 액면분할 모달 ===== -->
-<div class="overlay" id="splitOverlay" onclick="closeModal('splitOverlay')">
-  <div class="modal modal-sm" onclick="event.stopPropagation()" style="max-width:460px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-      <h3 style="font-size:16px;">✂️ 액면분할 적용</h3>
-      <button class="btn-sm" onclick="closeModal('splitOverlay')">닫기</button>
-    </div>
-    <div style="font-size:11px; color:var(--text2); background:rgba(124,106,247,0.08); border:1px solid rgba(124,106,247,0.25); border-radius:6px; padding:10px; margin-bottom:16px; line-height:1.6;">
-      선택 날짜 <b>이전</b>의 거래 내역에 분할 비율을 일괄 적용합니다.<br>
-      수량은 늘어나고 단가는 낮아지며, <b>총 투자금액은 변하지 않습니다.</b>
-    </div>
-
-    <div class="form-group">
-      <label>종목</label>
-      <select id="splitSymbol" class="form-input" onchange="updateSplitPreview()">
-        <option value="">종목 선택...</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>분할 기준일 (이 날짜 이전 내역에 적용)</label>
-      <input type="date" id="splitDate" class="form-input" onchange="updateSplitPreview()">
-    </div>
-    <div class="form-group">
-      <label>분할 비율</label>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <div style="flex:1; text-align:right; font-size:11px; color:var(--text3);">구 주식</div>
-        <input type="number" id="splitRatioOld" class="form-input" value="1" min="1" style="width:70px; text-align:center;" oninput="updateSplitPreview()">
-        <span style="font-weight:700; color:var(--text2); font-size:16px;">:</span>
-        <input type="number" id="splitRatioNew" class="form-input" placeholder="예: 5" min="1" style="width:70px; text-align:center;" oninput="updateSplitPreview()">
-        <div style="flex:1; font-size:11px; color:var(--text3);">신 주식</div>
-      </div>
-      <div style="font-size:10px; color:var(--text3); margin-top:5px;">예) 1:5 분할이면 왼쪽 1, 오른쪽 5 입력</div>
-    </div>
-    <div id="splitPreview"></div>
-    <div style="display:flex; gap:10px; margin-top:16px;">
-      <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="closeModal('splitOverlay')">취소</button>
-      <button class="btn-submit" style="flex:1; background:rgba(124,106,247,0.8);" onclick="applySplit()">✂️ 분할 적용</button>
     </div>
   </div>
 </div>
