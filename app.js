@@ -2096,9 +2096,9 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     const singleCanvasWrap = document.getElementById('portfolioChartCanvas')?.parentElement;
     if (singleCanvasWrap) singleCanvasWrap.style.display = '';
 
-    // 투자액 / 평가액 합산
+    // 투자액 / 평가액 합산 (국장+미장)
     const finalCostTotal = finalCostKr.map((v, i) => v + finalCostUs[i]);
-    const finalEvalTotal = finalEvalKr.map((v, i) => v + finalEvalUs[i]);
+    finalEvalTotal = finalEvalKr.map((v, i) => v + finalEvalUs[i]);
 
     // 누적 실현수익 라인 (건별 합산을 누적으로 변환)
     const finalRealDailyTotal = finalRealKr.map((v, i) => v + finalRealUs[i]);
