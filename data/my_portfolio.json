@@ -7646,6 +7646,26 @@
       "qty": 18,
       "price": 182.46527777777777,
       "txType": "transfer"
+    },
+    {
+      "id": 1777794024762,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "NVDA",
+      "qty": -87,
+      "price": 12.2754,
+      "txType": "transfer"
+    },
+    {
+      "id": 1777794024763,
+      "date": "2026-04-24",
+      "owner": "끄니",
+      "broker": "KB (RIA)",
+      "symbol": "NVDA",
+      "qty": 87,
+      "price": 12.2754,
+      "txType": "transfer"
     }
   ],
   "range": "3y",
