@@ -124,6 +124,26 @@ try {
 let currentUsdKrw = 1350; 
 let isExchangeRateFetched = false;
 
+// 🌟 통합 자산 패널 보기 모드: 'current' (현재 보유) | 'cumulative' (누적 자산)
+let globalAssetViewMode = 'current';
+
+function setGlobalAssetView(mode) {
+    globalAssetViewMode = mode;
+    const btnCurrent = document.getElementById('btnGlobalCurrent');
+    const btnCumul = document.getElementById('btnGlobalCumulative');
+    if (btnCurrent && btnCumul) {
+        if (mode === 'current') {
+            btnCurrent.style.background = 'var(--bg3)'; btnCurrent.style.color = 'var(--text)';
+            btnCumul.style.background = 'transparent'; btnCumul.style.color = 'var(--text2)';
+        } else {
+            btnCumul.style.background = 'var(--bg3)'; btnCumul.style.color = 'var(--text)';
+            btnCurrent.style.background = 'transparent'; btnCurrent.style.color = 'var(--text2)';
+        }
+    }
+    // 최신 데이터로 화면 갱신 (updateSummaryAndAllocation 재호출)
+    render();
+}
+
 // 🌟 CSV 수동 매핑을 위한 임시 저장 변수
 let pendingCsvData = [];
 let unmatchedSymbols = [];
@@ -1956,11 +1976,17 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     chartWrap.style.display = 'flex';
     
     const rawDates = masterData.rawDates;
-    const displayDates = masterData.dates;
     
     const startIndex = Math.max(0, rawDates.length - sliceLen);
     const slicedRawDates = rawDates.slice(startIndex);
-    const slicedDisplayDates = displayDates.slice(startIndex);
+    // 연도까지 포함한 YYYY.MM.DD 형태로 변환
+    const slicedDisplayDates = slicedRawDates.map(d => {
+        if (typeof d === 'string' && d.includes('-')) {
+            const parts = d.split('-');
+            return `${parts[0]}.${parts[1]}.${parts[2]}`;
+        }
+        return d;
+    });
     
     // 🌟 데이터를 담을 배열들
     const costDataKr = []; const costDataUs = [];
@@ -2121,33 +2147,47 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         data: {
             labels: finalDisplayDates,
             datasets: [
-                // ❶ 평가액 영역 — 금색, 배경에 깔림
+                // ❶ 국장 평가액 — 파란색 (KR)
                 {
-                    label: '평가액',
+                    label: '🇰🇷 국장 평가액',
                     type: 'line',
-                    data: finalEvalTotal,
-                    borderColor: '#f1c40f',
-                    backgroundColor: 'rgba(241,196,15,0.13)',
-                    borderWidth: 2.5,
+                    data: finalEvalKr,
+                    borderColor: '#4d9fff',
+                    backgroundColor: 'rgba(77,159,255,0.12)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: 'origin',
+                    tension: 0.1,
+                    order: 5
+                },
+                // ❷ 미장 평가액 — 주황/황금색 (US)
+                {
+                    label: '🇺🇸 미장 평가액 (환산)',
+                    type: 'line',
+                    data: finalEvalUs,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245,158,11,0.10)',
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: 'origin',
                     tension: 0.1,
                     order: 4
                 },
-                // ❷ 투자액 영역 — 보라, 평가액 위에 반투명하게 올라탐
+                // ❸ 총 투자액 — 보라, 참조선
                 {
-                    label: '투자액',
+                    label: '통합 투자액',
                     type: 'line',
                     data: finalCostTotal,
                     borderColor: '#a78bfa',
-                    backgroundColor: 'rgba(124,106,247,0.30)',
-                    borderWidth: 2,
+                    backgroundColor: 'rgba(124,106,247,0.08)',
+                    borderWidth: 1.5,
+                    borderDash: [5, 3],
                     pointRadius: 0,
                     fill: 'origin',
                     tension: 0.1,
                     order: 3
                 },
-                // ❸ 누적 실현수익 라인 — 민트/에메랄드, 얼마나 확정됐는지 보여줌
+                // ❹ 누적 실현수익 라인 — 민트
                 {
                     label: '누적 실현수익',
                     type: 'line',
@@ -2161,7 +2201,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     tension: 0.1,
                     order: 2
                 },
-                // ❹ 건별 실현수익 막대 — 매도 당일만 표시 (수익 초록, 손실 빨강)
+                // ❺ 건별 실현수익 막대
                 {
                     label: '실현수익 (건별)',
                     type: 'bar',
@@ -2190,18 +2230,21 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                                 return `💰 ${lbl}: ${sign}${fmtWon(ctx.raw)}`;
                             }
                             if (lbl === '누적 실현수익') return `📈 ${lbl}: ${fmtWon(ctx.raw)}`;
-                            if (lbl === '평가액') return `🟡 ${lbl}: ${fmtWon(ctx.raw)}`;
-                            if (lbl === '투자액') return `🟣 ${lbl}: ${fmtWon(ctx.raw)}`;
+                            if (lbl === '🇰🇷 국장 평가액') return `🇰🇷 국장 평가액: ${fmtWon(ctx.raw)}`;
+                            if (lbl === '🇺🇸 미장 평가액 (환산)') return `🇺🇸 미장 평가액: ${fmtWon(ctx.raw)}`;
+                            if (lbl === '통합 투자액') return `🟣 통합 투자액: ${fmtWon(ctx.raw)}`;
                             return `${lbl}: ${fmtWon(ctx.raw)}`;
                         },
                         afterBody: function(items) {
-                            const evalVal  = items.find(i => i.dataset.label === '평가액')?.raw;
-                            const costVal  = items.find(i => i.dataset.label === '투자액')?.raw;
-                            if (evalVal != null && costVal != null && costVal > 0) {
-                                const pnl  = evalVal - costVal;
+                            const krEval  = items.find(i => i.dataset.label === '🇰🇷 국장 평가액')?.raw;
+                            const usEval  = items.find(i => i.dataset.label === '🇺🇸 미장 평가액 (환산)')?.raw;
+                            const costVal = items.find(i => i.dataset.label === '통합 투자액')?.raw;
+                            const totalEval = (krEval || 0) + (usEval || 0);
+                            if (totalEval > 0 && costVal != null && costVal > 0) {
+                                const pnl  = totalEval - costVal;
                                 const pct  = (pnl / costVal * 100).toFixed(2);
                                 const sign = pnl >= 0 ? '+' : '';
-                                return [`─────────────────`, `미실현 손익: ${sign}${fmtWon(pnl)}  (${sign}${pct}%)`];
+                                return [`─────────────────`, `통합 평가액: ${fmtWon(totalEval)}`, `미실현 손익: ${sign}${fmtWon(pnl)}  (${sign}${pct}%)`];
                             }
                             return [];
                         }
@@ -2285,23 +2328,55 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     if (currentView === 'user1') filterName = state.owners.user1.name;
     if (currentView === 'user2') filterName = state.owners.user2.name;
 
-    state.transactions.forEach(tx => {
-      if (tx.txType === 'dividend') {
-         if (filterName === 'all' || tx.owner === filterName) {
-           if (isKorean(tx.symbol)) krwDiv += tx.price; else usdDiv += tx.price;
-         }
-      }
+    // 누적 실현수익 계산
+    let cumulRealKr = 0, cumulRealUs = 0;
+    const holdingsForReal = {};
+    const sortedForReal = [...state.transactions]
+        .filter(t => filterName === 'all' || t.owner === filterName)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    sortedForReal.forEach(tx => {
+        if (tx.txType === 'dividend' || tx.txType === 'transfer') {
+            if (tx.txType === 'dividend') {
+                if (isKorean(tx.symbol)) krwDiv += tx.price; else usdDiv += tx.price;
+            }
+            return;
+        }
+        if (!holdingsForReal[tx.symbol]) holdingsForReal[tx.symbol] = { qty: 0, avg: 0 };
+        const h = holdingsForReal[tx.symbol];
+        if (tx.qty > 0) {
+            const totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
+            h.qty += tx.qty;
+            h.avg = h.qty > 0 ? totalVal / h.qty : 0;
+        } else {
+            const sellQty = Math.abs(tx.qty);
+            const pnl = (tx.price - h.avg) * sellQty;
+            if (isKorean(tx.symbol)) cumulRealKr += pnl;
+            else cumulRealUs += pnl;
+            h.qty -= sellQty;
+            if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+        }
     });
+    // dividend 는 위에서 처리했으니 중복 계산 방지를 위해 아래 루프는 제거
     
     const globalDiv = krwDiv + (usdDiv * currentUsdKrw);
     const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
     const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
-    const globalRoi = globalCost > 0 ? ((globalEval - globalCost) / globalCost * 100) : 0;
-    const globalPnl = globalEval - globalCost;
+    const cumulRealTotal = cumulRealKr + (cumulRealUs * currentUsdKrw);
+    // 누적 자산 = 현재 평가액 + 누적 실현수익
+    const globalCumulative = globalEval + cumulRealTotal;
+
+    // 보기 모드에 따라 표시값 결정
+    const displayVal = globalAssetViewMode === 'cumulative' ? globalCumulative : globalEval;
+    const displayValLabel = globalAssetViewMode === 'cumulative' ? '누적 자산 (평가+실현)' : '통합 평가 자산';
+    const globalRoi = globalCost > 0 ? ((displayVal - globalCost) / globalCost * 100) : 0;
+    const globalPnl = displayVal - globalCost;
 
     document.getElementById('globalTotalCost').textContent = `₩ ${Math.round(globalCost).toLocaleString()}`;
-    document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(globalEval).toLocaleString()}`;
+    document.getElementById('globalTotalVal').textContent = `₩ ${Math.round(displayVal).toLocaleString()}`;
     document.getElementById('globalTotalDiv').textContent = `₩ ${Math.round(globalDiv).toLocaleString()}`;
+    // 레이블도 모드에 따라 변경
+    const valLabelEl = document.getElementById('globalTotalValLabel');
+    if (valLabelEl) valLabelEl.textContent = displayValLabel;
     const gRoiEl = document.getElementById('globalTotalRoi');
     const signG = globalPnl >= 0 ? '+' : '';
     gRoiEl.innerHTML = `${signG}₩${Math.round(Math.abs(globalPnl)).toLocaleString()}<br><span style="font-size:12px; font-weight:500">(${signG}${globalRoi.toFixed(2)}%)</span>`;
