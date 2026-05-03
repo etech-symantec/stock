@@ -2088,135 +2088,142 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         finalRealUs = realDataUs.slice(firstNonZeroIdx);
     }
 
-    // ── 국장/미장 두 패널 분리 렌더링 ──────────────────────────────────
-    // 캔버스 컨테이너를 두 패널로 교체 (최초 1회)
+    // ── 합산 단일 차트 렌더링 ─────────────────────────────────────────
+    // 두 패널이 남아있으면 제거하고 원래 canvas 복원
     const chartWrap2 = document.getElementById('portfolioChartWrapper');
-    if (!document.getElementById('portfolioCanvasKr')) {
-        chartWrap2.querySelector('[data-chart-panels]')?.remove();
-        // 기존 단일 canvas 숨기기
-        const oldCanvas = document.getElementById('portfolioChartCanvas');
-        if (oldCanvas) oldCanvas.parentElement.style.display = 'none';
+    const oldPanels = chartWrap2.querySelector('[data-chart-panels]');
+    if (oldPanels) oldPanels.remove();
+    const singleCanvasWrap = document.getElementById('portfolioChartCanvas')?.parentElement;
+    if (singleCanvasWrap) singleCanvasWrap.style.display = '';
 
-        const panels = document.createElement('div');
-        panels.setAttribute('data-chart-panels', '1');
-        panels.style.cssText = 'display:flex; gap:16px; margin-top:4px;';
-        panels.innerHTML = `
-            <div style="flex:1; min-width:0;">
-                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-                    <span style="font-size:13px; font-weight:700; color:#2ecc71;">🇰🇷 국내 주식</span>
-                    <span style="font-size:10px; color:var(--text3);">원화 기준 (₩)</span>
-                </div>
-                <div style="height:200px; position:relative;"><canvas id="portfolioCanvasKr"></canvas></div>
-            </div>
-            <div style="width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin:0 4px;"></div>
-            <div style="flex:1; min-width:0;">
-                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-                    <span style="font-size:13px; font-weight:700; color:#3498db;">🇺🇸 해외 주식</span>
-                    <span style="font-size:10px; color:var(--text3);">원화 환산 기준 (₩)</span>
-                </div>
-                <div style="height:200px; position:relative;"><canvas id="portfolioCanvasUs"></canvas></div>
-            </div>
-        `;
-        chartWrap2.appendChild(panels);
-    }
+    // 투자액 / 평가액 합산
+    const finalCostTotal = finalCostKr.map((v, i) => v + finalCostUs[i]);
+    const finalEvalTotal = finalEvalKr.map((v, i) => v + finalEvalUs[i]);
 
-    function makeChartConfig(labels, costData, evalData, realData, costColor, evalColor, realColor) {
-        const warnFmt = v => '₩' + (Math.abs(v) >= 100000000
-            ? (v/100000000).toFixed(1) + '억'
-            : Math.abs(v) >= 10000
-            ? Math.round(v/10000).toLocaleString() + '만'
-            : Math.round(v).toLocaleString());
-        return {
-            data: {
-                labels,
-                datasets: [
-                    // 평가액 영역 (연한 색, 뒤)
-                    {
-                        label: '평가액',
-                        type: 'line',
-                        data: evalData,
-                        borderColor: evalColor,
-                        backgroundColor: evalColor.replace(')', ', 0.18)').replace('rgb', 'rgba'),
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        fill: 'origin',
-                        tension: 0.1,
-                        order: 3
-                    },
-                    // 투자액 영역 (진한 색, 앞)
-                    {
-                        label: '투자액',
-                        type: 'line',
-                        data: costData,
-                        borderColor: costColor,
-                        backgroundColor: costColor.replace(')', ', 0.50)').replace('rgb', 'rgba'),
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        fill: 'origin',
-                        tension: 0.1,
-                        order: 2
-                    },
-                    // 실현수익 막대 (날짜별)
-                    {
-                        label: '실현수익',
-                        type: 'bar',
-                        data: realData,
-                        backgroundColor: function(ctx) {
-                            const v = ctx.raw;
-                            return v >= 0 ? realColor + '99' : 'rgba(255,77,106,0.55)';
-                        },
-                        borderWidth: 0,
-                        order: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    legend: {
-                        display: true, position: 'top',
-                        labels: { color: '#8890a4', font: { size: 10 }, usePointStyle: true, boxWidth: 7, padding: 10 }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(ctx) {
-                                if (ctx.raw === 0 && ctx.dataset.label === '실현수익') return null;
-                                const sign = ctx.raw < 0 ? '-' : '';
-                                return ctx.dataset.label + ': ' + sign + warnFmt(ctx.raw);
+    // 누적 실현수익 라인 (건별 합산을 누적으로 변환)
+    const finalRealDailyTotal = finalRealKr.map((v, i) => v + finalRealUs[i]);
+    let cumReal = 0;
+    const finalRealCumulative = finalRealDailyTotal.map(v => { cumReal += v; return cumReal; });
+
+    const fmtWon = v => {
+        const abs = Math.abs(v);
+        if (abs >= 100000000) return (v < 0 ? '-' : '') + '₩' + (abs / 100000000).toFixed(1) + '억';
+        if (abs >= 10000)     return (v < 0 ? '-' : '') + '₩' + Math.round(abs / 10000).toLocaleString() + '만';
+        return (v < 0 ? '-' : '') + '₩' + Math.round(abs).toLocaleString();
+    };
+
+    const canvas = document.getElementById('portfolioChartCanvas');
+    if (!canvas) return;
+    if (portfolioChartInst) portfolioChartInst.destroy();
+    if (portfolioChartInstUs) { portfolioChartInstUs.destroy(); portfolioChartInstUs = null; }
+
+    portfolioChartInst = new Chart(canvas.getContext('2d'), {
+        data: {
+            labels: finalDisplayDates,
+            datasets: [
+                // ❶ 평가액 영역 — 금색, 배경에 깔림
+                {
+                    label: '평가액',
+                    type: 'line',
+                    data: finalEvalTotal,
+                    borderColor: '#f1c40f',
+                    backgroundColor: 'rgba(241,196,15,0.13)',
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    fill: 'origin',
+                    tension: 0.1,
+                    order: 4
+                },
+                // ❷ 투자액 영역 — 보라, 평가액 위에 반투명하게 올라탐
+                {
+                    label: '투자액',
+                    type: 'line',
+                    data: finalCostTotal,
+                    borderColor: '#a78bfa',
+                    backgroundColor: 'rgba(124,106,247,0.30)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: 'origin',
+                    tension: 0.1,
+                    order: 3
+                },
+                // ❸ 누적 실현수익 라인 — 민트/에메랄드, 얼마나 확정됐는지 보여줌
+                {
+                    label: '누적 실현수익',
+                    type: 'line',
+                    data: finalRealCumulative,
+                    borderColor: '#00c87a',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [5, 3],
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.1,
+                    order: 2
+                },
+                // ❹ 건별 실현수익 막대 — 매도 당일만 표시 (수익 초록, 손실 빨강)
+                {
+                    label: '실현수익 (건별)',
+                    type: 'bar',
+                    data: finalRealDailyTotal.map(v => v === 0 ? null : v),
+                    backgroundColor: finalRealDailyTotal.map(v => v >= 0 ? 'rgba(0,200,122,0.70)' : 'rgba(255,77,106,0.70)'),
+                    borderWidth: 0,
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    display: true, position: 'top',
+                    labels: { color: '#8890a4', font: { size: 11 }, usePointStyle: true, boxWidth: 8, padding: 12 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            if (ctx.raw === null) return null;
+                            const lbl = ctx.dataset.label;
+                            if (lbl === '실현수익 (건별)') {
+                                const sign = ctx.raw >= 0 ? '+' : '';
+                                return `💰 ${lbl}: ${sign}${fmtWon(ctx.raw)}`;
                             }
+                            if (lbl === '누적 실현수익') return `📈 ${lbl}: ${fmtWon(ctx.raw)}`;
+                            if (lbl === '평가액') return `🟡 ${lbl}: ${fmtWon(ctx.raw)}`;
+                            if (lbl === '투자액') return `🟣 ${lbl}: ${fmtWon(ctx.raw)}`;
+                            return `${lbl}: ${fmtWon(ctx.raw)}`;
+                        },
+                        afterBody: function(items) {
+                            const evalVal  = items.find(i => i.dataset.label === '평가액')?.raw;
+                            const costVal  = items.find(i => i.dataset.label === '투자액')?.raw;
+                            if (evalVal != null && costVal != null && costVal > 0) {
+                                const pnl  = evalVal - costVal;
+                                const pct  = (pnl / costVal * 100).toFixed(2);
+                                const sign = pnl >= 0 ? '+' : '';
+                                return [`─────────────────`, `미실현 손익: ${sign}${fmtWon(pnl)}  (${sign}${pct}%)`];
+                            }
+                            return [];
                         }
                     }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#555e72', maxTicksLimit: 10, font: { size: 10 } },
+                    grid: { display: false }
                 },
-                scales: {
-                    x: { ticks: { color: '#555e72', maxTicksLimit: 8, font: { size: 10 } }, grid: { display: false } },
-                    y: { ticks: { color: '#555e72', font: { size: 10 }, callback: function(val) {
-                        if (Math.abs(val) >= 100000000) return '₩' + (val/100000000).toFixed(1) + '억';
-                        if (Math.abs(val) >= 10000) return '₩' + Math.round(val/10000).toLocaleString() + '만';
-                        return '₩' + val.toLocaleString();
-                    }}, grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false } }
+                y: {
+                    ticks: {
+                        color: '#555e72', font: { size: 10 },
+                        callback: function(val) { return fmtWon(val); }
+                    },
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    border: { display: false }
                 }
             }
-        };
-    }
-
-    // 국장 차트
-    const canvasKr = document.getElementById('portfolioCanvasKr');
-    if (canvasKr) {
-        if (portfolioChartInst) portfolioChartInst.destroy();
-        portfolioChartInst = new Chart(canvasKr.getContext('2d'),
-            makeChartConfig(finalDisplayDates, finalCostKr, finalEvalKr, finalRealKr,
-                'rgb(39,174,96)', 'rgb(46,204,113)', 'rgba(39,174,96,'));
-    }
-
-    // 미장 차트
-    const canvasUs = document.getElementById('portfolioCanvasUs');
-    if (canvasUs) {
-        if (portfolioChartInstUs) portfolioChartInstUs.destroy();
-        portfolioChartInstUs = new Chart(canvasUs.getContext('2d'),
-            makeChartConfig(finalDisplayDates, finalCostUs, finalEvalUs, finalRealUs,
-                'rgb(41,128,185)', 'rgb(52,152,219)', 'rgba(41,128,185,'));
-    }
+        }
+    });
 }
 
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
@@ -2925,7 +2932,7 @@ async function render() {
   });
 
   displayItems = displayItems.filter(item => {
-    if(currentView === 'all') return true;
+    if(currentView === 'all') return item.type === 'held';
     if(currentView === 'user1' || currentView === 'user2') return item.type === 'held';
     if(currentView === 'watch') return item.type === 'watch';
     return true; 
