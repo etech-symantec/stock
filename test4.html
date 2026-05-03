@@ -185,7 +185,19 @@
         <div class="country-panel">
           <div class="cp-header">
             <div class="cp-title">🌐 통합 자산</div>
-            <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
+              <div style="display:flex; gap:2px; background:var(--bg3); padding:2px; border-radius:6px; border:1px solid var(--border);">
+                <button id="btnGlobalCurrent" onclick="setGlobalAssetView('current')"
+                  style="padding:3px 8px; font-size:10px; font-weight:700; border:none; border-radius:4px; cursor:pointer; transition:0.2s; background:var(--bg3); color:var(--text); font-family:var(--font-sans);">
+                  현재 보유
+                </button>
+                <button id="btnGlobalCumulative" onclick="setGlobalAssetView('cumulative')"
+                  style="padding:3px 8px; font-size:10px; font-weight:700; border:none; border-radius:4px; cursor:pointer; transition:0.2s; background:transparent; color:var(--text2); font-family:var(--font-sans);">
+                  누적 자산
+                </button>
+              </div>
+            </div>
           </div>
           <div class="gs-group" style="display:flex; gap:15px; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:-5px;">
             <div style="flex:1;">
@@ -199,7 +211,7 @@
           </div>
           <div class="cp-summary">
             <div class="cp-sum-box" style="flex:1.2;">
-              <div class="cp-sum-label">통합 평가 자산</div>
+              <div class="cp-sum-label" id="globalTotalValLabel">통합 평가 자산</div>
               <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue); font-size:22px;">—</div>
             </div>
             <div class="cp-sum-box">
@@ -260,7 +272,7 @@
     <div id="portfolioChartWrapper" style="display:none; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px; flex-direction:column; flex-shrink:0;">
       <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
           📈 자산 성장 추이
-          <span style="font-size:11px; font-weight:normal; color:var(--text3);">국장+미장 합산 · 투자액 / 평가액 / 누적 실현수익</span>
+          <span style="font-size:11px; font-weight:normal; color:var(--text3);">🇰🇷 국장 (파랑) · 🇺🇸 미장 환산 (주황) · 점선: 투자액 / 누적 실현수익</span>
       </div>
       <div style="height:240px; position:relative;"><canvas id="portfolioChartCanvas"></canvas></div>
     </div>
