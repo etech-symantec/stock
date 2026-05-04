@@ -1,6 +1,6 @@
 :root { --bg: #0d0f14; --bg2: #141720; --bg3: #1c2030; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14); --text: #e8eaf0; --text2: #8890a4; --text3: #555e72; --green: #00c87a; --green-bg: rgba(0,200,122,0.1); --red: #ff4d6a; --red-bg: rgba(255,77,106,0.1); --blue: #4d9fff; --accent: #7c6af7; --accent-bg: rgba(124,106,247,0.12); --radius: 8px; --radius-lg: 12px; --font-mono: 'Space Mono', monospace; --font-sans: 'Noto Sans KR', sans-serif;
   /* 🌟 익절(수익)=빨강, 손절(손실)=파랑 (한국 주식 컨벤션) */
-  --profit: #DB1A1A; --profit-bg: rgba(219,26,26,0.12);
+  --profit: #08CB00; --profit-bg: rgba(26,219,30,0.12);
   --loss: #3A9AFF;   --loss-bg:   rgba(58,154,255,0.12);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
