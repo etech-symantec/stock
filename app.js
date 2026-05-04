@@ -118,6 +118,7 @@ let modalChartInst = null;
 let divMonthlyChartInst = null; 
 let portfolioChartInst = null; 
 let portfolioChartInstUs = null;
+let portfolioZoomData = null; // 드래그 줌을 위한 차트 데이터 저장
 const chartInstances = {};
 let accountPieChartInsts = []; 
 let cachedMarketData = {}; 
@@ -2005,12 +2006,14 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     const costDataKr = []; const costDataUs = [];
     const evalDataKr = []; const evalDataUs = [];
     const realDataKr = []; const realDataUs = [];
+    const realDataSymbols = []; // 날짜별 매도 종목 정보
     let firstNonZeroIdx = -1;
     
     slicedRawDates.forEach((dateStr, idx) => {
         let dCostKr = 0, dCostUs = 0;
         let dEvalKr = 0, dEvalUs = 0;
         let dRealKr = 0, dRealUs = 0;
+        let dRealSymbols = []; // 해당 날짜에 매도된 종목들
         
         let fxRate = currentUsdKrw;
         if(cachedMarketData['KRW=X'] && !cachedMarketData['KRW=X']._failed) {
@@ -2055,6 +2058,10 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                 if (tx.date === dateStr) {
                     if (isKr) dRealKr += pnl;
                     else dRealUs += pnl * fxRate;
+                    // 매도 종목 기록
+                    const symName = (cachedMarketData[tx.symbol] && !cachedMarketData[tx.symbol]._failed)
+                        ? (cachedMarketData[tx.symbol].name || tx.symbol) : tx.symbol;
+                    dRealSymbols.push({ symbol: tx.symbol, name: symName, qty: sellQty, pnl: isKr ? pnl : pnl * fxRate });
                 }
                 h.qty -= sellQty;
                 if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
@@ -2098,6 +2105,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         evalDataUs.push(dEvalUs);
         realDataKr.push(dRealKr);
         realDataUs.push(dRealUs);
+        realDataSymbols.push(dRealSymbols);
         
         if (firstNonZeroIdx === -1 && (dCostKr > 0 || dCostUs > 0 || dEvalKr > 0 || dEvalUs > 0)) {
             firstNonZeroIdx = idx;
@@ -2108,6 +2116,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     let finalCostKr = costDataKr; let finalCostUs = costDataUs;
     let finalEvalKr = evalDataKr; let finalEvalUs = evalDataUs;
     let finalRealKr = realDataKr; let finalRealUs = realDataUs;
+    let finalRealSymbols = realDataSymbols;
 
     if (firstNonZeroIdx > 0 && sliceLen >= 756) { 
         finalDisplayDates = slicedDisplayDates.slice(firstNonZeroIdx);
@@ -2117,6 +2126,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         finalEvalUs = evalDataUs.slice(firstNonZeroIdx);
         finalRealKr = realDataKr.slice(firstNonZeroIdx);
         finalRealUs = realDataUs.slice(firstNonZeroIdx);
+        finalRealSymbols = realDataSymbols.slice(firstNonZeroIdx);
     }
 
     // ── 캔버스 & 차트 초기화 ─────────────────────────────────────────
@@ -2160,15 +2170,57 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     // └ Layer 1: 국장 투자액 (바닥)
     // * 통합 평가액은 국장+미장 평가액의 합이므로, "선(border)"만 가진 투명 레이어로 올려 전체 합계선을 표시
 
+    // ── 드래그 줌용 데이터 저장 ──
+    portfolioZoomData = {
+        labels: finalDisplayDates,
+        costTotal: finalCostTotal,
+        evalTotal: finalEvalTotal,
+        realPerTrade: finalRealPerTrade,
+        realBarColors: finalRealBarColors,
+        realBarBorderColors: finalRealBarBorderColors,
+        realDaily: finalRealDaily,
+        realSymbols: finalRealSymbols,
+        fmtWon
+    };
+
+    _buildPortfolioChart(portfolioZoomData, null);
+}
+
+// ── 포트폴리오 차트 실제 생성 (줌 슬라이스 지원) ──
+function _buildPortfolioChart(data, zoomRange) {
+    const canvas = document.getElementById('portfolioChartCanvas');
+    if (!canvas) return;
+
+    // 줌 범위에 따라 데이터 슬라이스
+    const si = (zoomRange && zoomRange.start >= 0) ? zoomRange.start : 0;
+    const ei = (zoomRange && zoomRange.end >= 0)   ? zoomRange.end + 1 : data.labels.length;
+    const sl  = (x) => x.slice(si, ei);
+
+    const labels          = sl(data.labels);
+    const costTotal       = sl(data.costTotal);
+    const evalTotal       = sl(data.evalTotal);
+    const realPerTrade    = sl(data.realPerTrade);
+    const realBarColors   = sl(data.realBarColors);
+    const realBarBordClrs = sl(data.realBarBorderColors);
+    const realDaily       = sl(data.realDaily);
+    const realSymbols     = sl(data.realSymbols);
+    const fmtWon          = data.fmtWon;
+
+    if (portfolioChartInst) portfolioChartInst.destroy();
+
+    // 줌 초기화 버튼 상태 갱신
+    const btnReset = document.getElementById('btnPortfolioZoomReset');
+    if (btnReset) btnReset.classList.toggle('active', !!zoomRange);
+
     portfolioChartInst = new Chart(canvas.getContext('2d'), {
         data: {
-            labels: finalDisplayDates,
+            labels: labels,
             datasets: [
                 // ❶ 총 투자액 (당시 보유 기준 합산 — 틸 영역)
                 {
                     label: '📊 총 투자액',
                     type: 'line',
-                    data: finalCostTotal,
+                    data: costTotal,
                     borderColor: '#56B6C6',
                     backgroundColor: 'rgba(86,182,198,0.35)',
                     borderWidth: 2,
@@ -2182,7 +2234,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                 {
                     label: '📈 총 평가액',
                     type: 'line',
-                    data: finalEvalTotal,
+                    data: evalTotal,
                     borderColor: 'rgba(0,200,122,1)',
                     backgroundColor: 'rgba(0,200,122,0.18)',
                     borderWidth: 2.5,
@@ -2196,9 +2248,9 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                 {
                     label: '💰 건별 실현수익',
                     type: 'bar',
-                    data: finalRealPerTrade,
-                    backgroundColor: finalRealBarColors,
-                    borderColor: finalRealBarBorderColors,
+                    data: realPerTrade,
+                    backgroundColor: realBarColors,
+                    borderColor: realBarBordClrs,
                     borderWidth: 1.5,
                     borderRadius: 3,
                     yAxisID: 'y2',
@@ -2222,9 +2274,17 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                             if (ctx.raw === null || ctx.raw === undefined) return null;
                             const lbl = ctx.dataset.label || '';
                             if (lbl.includes('건별 실현수익')) {
-                                const origVal = finalRealDaily[ctx.dataIndex] || 0;
-                                const sign = origVal >= 0 ? '+' : '-';
-                                return `${lbl}: ${sign}${fmtWon(Math.abs(origVal))}`;
+                                const origVal = realDaily[ctx.dataIndex] || 0;
+                                if (origVal === 0) return null;
+                                const sign = origVal >= 0 ? '▲ +' : '▼ ';
+                                const lines = [`💰 건별 실현수익: ${sign}${fmtWon(Math.abs(origVal))}`];
+                                const syms = realSymbols[ctx.dataIndex] || [];
+                                syms.forEach(s => {
+                                    const pnlSign = s.pnl >= 0 ? '+' : '';
+                                    const nameStr = s.name !== s.symbol ? `${s.name}` : s.symbol;
+                                    lines.push(`  📌 ${nameStr} (${s.qty}주)  →  ${pnlSign}${fmtWon(s.pnl)}`);
+                                });
+                                return lines;
                             }
                             return `${lbl}: ${fmtWon(ctx.raw)}`;
                         },
@@ -2269,6 +2329,106 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
             }
         }
     });
+
+    // ── 드래그 줌 이벤트 설정 ──
+    _setupPortfolioDragZoom(canvas, zoomRange);
+}
+
+// ── 드래그 줌 이벤트 핸들러 ──
+let _pDragStartX = 0, _pDragCurrentX = 0, _pIsDragging = false;
+let _pZoomOverlay = null;
+
+function _setupPortfolioDragZoom(canvas, currentZoom) {
+    // 기존 리스너 제거를 위해 새 함수 참조 방식 사용
+    canvas._onMouseDown = function(e) {
+        if (e.button !== 0) return;
+        const rect = canvas.getBoundingClientRect();
+        _pDragStartX = e.clientX - rect.left;
+        _pDragCurrentX = _pDragStartX;
+        _pIsDragging = true;
+        // 오버레이 캔버스 준비
+        if (!_pZoomOverlay) {
+            _pZoomOverlay = document.createElement('canvas');
+            _pZoomOverlay.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:10;';
+            canvas.parentElement.appendChild(_pZoomOverlay);
+        }
+        _pZoomOverlay.width  = canvas.offsetWidth;
+        _pZoomOverlay.height = canvas.offsetHeight;
+    };
+    canvas._onMouseMove = function(e) {
+        if (!_pIsDragging || !_pZoomOverlay) return;
+        const rect = canvas.getBoundingClientRect();
+        _pDragCurrentX = e.clientX - rect.left;
+        const ctx2 = _pZoomOverlay.getContext('2d');
+        ctx2.clearRect(0, 0, _pZoomOverlay.width, _pZoomOverlay.height);
+        const x1 = Math.min(_pDragStartX, _pDragCurrentX);
+        const x2 = Math.max(_pDragStartX, _pDragCurrentX);
+        if (x2 - x1 < 5) return;
+        ctx2.fillStyle = 'rgba(124,106,247,0.15)';
+        ctx2.fillRect(x1, 0, x2 - x1, _pZoomOverlay.height);
+        ctx2.strokeStyle = 'rgba(124,106,247,0.7)';
+        ctx2.lineWidth = 1.5;
+        ctx2.setLineDash([4, 3]);
+        ctx2.strokeRect(x1, 0, x2 - x1, _pZoomOverlay.height);
+        ctx2.setLineDash([]);
+    };
+    canvas._onMouseUp = function(e) {
+        if (!_pIsDragging) return;
+        _pIsDragging = false;
+        if (_pZoomOverlay) {
+            _pZoomOverlay.getContext('2d').clearRect(0, 0, _pZoomOverlay.width, _pZoomOverlay.height);
+        }
+        const rect = canvas.getBoundingClientRect();
+        const endX = e.clientX - rect.left;
+        const x1 = Math.min(_pDragStartX, endX);
+        const x2 = Math.max(_pDragStartX, endX);
+        if (x2 - x1 < 8 || !portfolioChartInst || !portfolioZoomData) return;
+
+        // Chart.js 차트 영역 기준으로 인덱스 계산
+        const chartArea = portfolioChartInst.chartArea;
+        if (!chartArea) return;
+        const totalPts = portfolioZoomData.labels.length;
+        const areaW = chartArea.right - chartArea.left;
+        function pxToIdx(px) {
+            const ratio = Math.max(0, Math.min(1, (px - chartArea.left) / areaW));
+            // 현재 zoomed offset 반영
+            const base = currentZoom ? currentZoom.start : 0;
+            const span = currentZoom ? (currentZoom.end - currentZoom.start + 1) : totalPts;
+            return Math.round(base + ratio * (span - 1));
+        }
+        const startIdx = Math.max(0, pxToIdx(x1));
+        const endIdx   = Math.min(totalPts - 1, pxToIdx(x2));
+        if (endIdx - startIdx < 1) return;
+
+        _buildPortfolioChart(portfolioZoomData, { start: startIdx, end: endIdx });
+    };
+
+    canvas.removeEventListener('mousedown', canvas._prevMouseDown);
+    canvas.removeEventListener('mousemove', canvas._prevMouseMove);
+    canvas.removeEventListener('mouseup',   canvas._prevMouseUp);
+    canvas.addEventListener('mousedown', canvas._onMouseDown);
+    canvas.addEventListener('mousemove', canvas._onMouseMove);
+    canvas.addEventListener('mouseup',   canvas._onMouseUp);
+    canvas._prevMouseDown = canvas._onMouseDown;
+    canvas._prevMouseMove = canvas._onMouseMove;
+    canvas._prevMouseUp   = canvas._onMouseUp;
+
+    // 캔버스 밖에서 마우스 놓을 때 드래그 취소
+    if (!window._pDocMouseUpBound) {
+        window._pDocMouseUpBound = true;
+        document.addEventListener('mouseup', () => {
+            if (_pIsDragging) {
+                _pIsDragging = false;
+                if (_pZoomOverlay) _pZoomOverlay.getContext('2d').clearRect(0, 0, _pZoomOverlay.width, _pZoomOverlay.height);
+            }
+        });
+    }
+}
+
+// ── 줌 초기화 ──
+function resetPortfolioChartZoom() {
+    if (!portfolioZoomData) return;
+    _buildPortfolioChart(portfolioZoomData, null);
 }
 
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
