@@ -4267,3 +4267,115 @@ function applyLedgerSplit() {
     triggerAutoSync();
     alert(`✅ 액면분할 완료\n${sym}  ${ratioOld}:${ratioNew} 분할 적용\n총 ${count}건 수정됨`);
 }
+// ==========================================
+// 🌓 테마 (다크/라이트 모드) 토글
+// ==========================================
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('btnThemeToggle');
+  if (btn) btn.textContent = theme === 'light' ? '🌙' : '☀️';
+  // 로고 이미지 전환
+  const logo = document.getElementById('logoImg');
+  if (logo) logo.src = theme === 'light' ? '/img/logo_light.png' : '/img/logo_dark.png';
+  localStorage.setItem('app_theme', theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// ==========================================
+// 📱 모바일 메뉴 (드로어)
+// ==========================================
+
+function openMobileMenu() {
+  const drawer = document.getElementById('mobileNavDrawer');
+  if (drawer) drawer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileMenu() {
+  const drawer = document.getElementById('mobileNavDrawer');
+  if (drawer) drawer.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// 모바일 하단 탭바 active 상태 동기화
+function syncMobileTabBar(view) {
+  const map = { all: 'mbTabAll', watch: 'mbTabWatch', history: 'mbTabHistory' };
+  document.querySelectorAll('.mobile-tab-btn').forEach(b => b.classList.remove('active'));
+  if (map[view]) {
+    const el = document.getElementById(map[view]);
+    if (el) el.classList.add('active');
+  }
+  // 드로어 탭도 동기화
+  const drawerMap = {
+    all: 'mDrawerTabAll', user1: 'mDrawerTabUser1', user2: 'mDrawerTabUser2',
+    watch: 'mDrawerTabWatch', history: 'mDrawerTabHistory',
+    realized: 'mDrawerTabRealized', dividend: 'mDrawerTabDividend'
+  };
+  document.querySelectorAll('.mobile-nav-panel .vtab').forEach(b => b.classList.remove('active'));
+  if (drawerMap[view]) {
+    const el = document.getElementById(drawerMap[view]);
+    if (el) el.classList.add('active');
+  }
+}
+
+// 사이드바 모바일 열기/닫기 패치
+const _origToggleSidebar = typeof toggleSidebar === 'function' ? toggleSidebar : null;
+if (_origToggleSidebar) {
+  toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar');
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile && sidebar) {
+      sidebar.classList.toggle('mobile-open');
+    } else {
+      _origToggleSidebar();
+    }
+  };
+}
+
+// ==========================================
+// 🚀 초기화 (DOMContentLoaded)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  // 저장된 테마 복원 (없으면 시스템 설정 따름)
+  const saved = localStorage.getItem('app_theme');
+  if (saved) {
+    applyTheme(saved);
+  } else {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(prefersDark ? 'dark' : 'light');
+  }
+
+  // 시스템 테마 변경 감지 (사용자가 직접 설정한 경우 무시)
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('app_theme')) {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+
+  // 모바일 사이드바 닫기: 사이드바 바깥 터치 시
+  document.addEventListener('click', e => {
+    if (window.innerWidth > 768) return;
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    if (sidebar.classList.contains('mobile-open') &&
+        !sidebar.contains(e.target) &&
+        !e.target.closest('#btnOpenSidebar') &&
+        !e.target.closest('.mobile-tab-btn')) {
+      sidebar.classList.remove('mobile-open');
+    }
+  });
+});
+
+// setView 함수 래핑: 모바일 탭바 동기화
+const _origSetView = typeof setView === 'function' ? setView : null;
+if (_origSetView) {
+  setView = function(view, el) {
+    _origSetView(view, el);
+    syncMobileTabBar(view);
+  };
+}
