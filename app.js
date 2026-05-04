@@ -2134,9 +2134,14 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     // 통합 평가액 = 국장 평가액 + 미장 평가액
     const finalEvalTotal = finalEvalKr.map((v, i) => v + finalEvalUs[i]);
 
-    // 건별 실현수익 (우측 Y축 막대용 — 누적 아닌 거래별)
+    // 건별 실현수익 (우측 Y축 막대용 — 절댓값으로 막대 높이, 색상으로 손익 구분)
     const finalRealDaily = finalRealKr.map((v, i) => v + finalRealUs[i]);
-    const finalRealPerTrade = finalRealDaily.map(v => v !== 0 ? v : null);
+    const finalRealPerTrade = finalRealDaily.map(v => v !== 0 ? Math.abs(v) : null);
+    const finalRealBarColors = finalRealDaily.map(v => v > 0 ? 'rgba(0,200,122,0.75)' : (v < 0 ? 'rgba(255,77,106,0.75)' : 'rgba(136,144,164,0.3)'));
+    const finalRealBarBorderColors = finalRealDaily.map(v => v > 0 ? '#00C578' : (v < 0 ? '#ff4d6a' : '#8890a4'));
+
+    // 총 투자액 / 평가액 (국장+미장 합산, 당시 보유 기준)
+    const finalCostTotal = finalCostKr.map((v, i) => v + finalCostUs[i]);
 
     const fmtWon = v => {
         const abs = Math.abs(v);
@@ -2159,91 +2164,45 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         data: {
             labels: finalDisplayDates,
             datasets: [
-                // ❶ 국장 투자액 (바닥 레이어) — 틸 블루
+                // ❶ 총 투자액 (당시 보유 기준 합산 — 틸 영역)
                 {
-                    label: '🇰🇷 국장 투자액',
+                    label: '📊 총 투자액',
                     type: 'line',
-                    data: finalCostKr,
+                    data: finalCostTotal,
                     borderColor: '#56B6C6',
-                    backgroundColor: 'rgba(86,182,198,0.55)',
-                    borderWidth: 1.5,
+                    backgroundColor: 'rgba(86,182,198,0.35)',
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: 'origin',
                     tension: 0.1,
-                    stack: 'area',
                     yAxisID: 'y',
-                    order: 10
+                    order: 3
                 },
-                // ❷ 미장 투자액 — 로즈 핑크
+                // ❷ 총 평가액 (당시 보유 기준 합산 — 민트 영역)
                 {
-                    label: '🇺🇸 미장 투자액',
-                    type: 'line',
-                    data: finalCostUs,
-                    borderColor: '#F891BB',
-                    backgroundColor: 'rgba(248,145,187,0.55)',
-                    borderWidth: 1.5,
-                    pointRadius: 0,
-                    fill: '-1',
-                    tension: 0.1,
-                    stack: 'area',
-                    yAxisID: 'y',
-                    order: 9
-                },
-                // ❸ 국장 평가액-투자액 — 밝은 틸
-                {
-                    label: '🇰🇷 국장 평가액-투자액',
-                    type: 'line',
-                    data: finalEvalKr,
-                    borderColor: '#8ACBD0',
-                    backgroundColor: 'rgba(138,203,208,0.45)',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: '-1',
-                    tension: 0.1,
-                    stack: 'area',
-                    yAxisID: 'y',
-                    order: 8
-                },
-                // ❹ 미장 평가액-투자액 — 밝은 핑크 베이지
-                {
-                    label: '🇺🇸 미장 평가액-투자액',
-                    type: 'line',
-                    data: finalEvalUs,
-                    borderColor: '#F9D0CD',
-                    backgroundColor: 'rgba(249,208,205,0.40)',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: '-1',
-                    tension: 0.1,
-                    stack: 'area',
-                    yAxisID: 'y',
-                    order: 7
-                },
-                // ❺ 통합 평가액 — 민트 선만 (fill:false, 상단 경계선 역할)
-                {
-                    label: '📊 통합 평가액',
+                    label: '📈 총 평가액',
                     type: 'line',
                     data: finalEvalTotal,
                     borderColor: 'rgba(0,200,122,1)',
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(0,200,122,0.18)',
                     borderWidth: 2.5,
                     pointRadius: 0,
-                    fill: false,
+                    fill: '-1',
                     tension: 0.1,
                     yAxisID: 'y',
-                    order: 1
+                    order: 2
                 },
-                // ❻ 건별 실현수익 막대 — 우측 Y축 (노란색, 두껍게)
+                // ❸ 건별 실현수익 막대 — 우측 Y축 (익절=초록, 손절=빨강)
                 {
                     label: '💰 건별 실현수익',
                     type: 'bar',
                     data: finalRealPerTrade,
-                    backgroundColor: 'rgba(248,222,34,0.75)',
-                    borderColor: '#F8DE22',
-                    borderWidth: 2,
+                    backgroundColor: finalRealBarColors,
+                    borderColor: finalRealBarBorderColors,
+                    borderWidth: 1.5,
                     borderRadius: 3,
                     yAxisID: 'y2',
-                    order: 5,
+                    order: 1,
                     barThickness: 6,
                     minBarLength: 4
                 }
@@ -2262,24 +2221,21 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                         label: function(ctx) {
                             if (ctx.raw === null || ctx.raw === undefined) return null;
                             const lbl = ctx.dataset.label || '';
-                            if (lbl.includes('건별 실현수익')) return `${lbl}: ${fmtWon(ctx.raw)}`;
-                            if (lbl.includes('통합 평가액'))   return `${lbl}: ${fmtWon(ctx.raw)}`;
-                            if (lbl.includes('국장 투자액'))   return `${lbl}: ${fmtWon(ctx.raw)}`;
-                            if (lbl.includes('미장 투자액'))   return `${lbl}: ${fmtWon(ctx.raw)}`;
-                            if (lbl.includes('국장 평가액'))   return `${lbl}: ${fmtWon(ctx.raw)}`;
-                            if (lbl.includes('미장 평가액'))   return `${lbl}: ${fmtWon(ctx.raw)}`;
+                            if (lbl.includes('건별 실현수익')) {
+                                const origVal = finalRealDaily[ctx.dataIndex] || 0;
+                                const sign = origVal >= 0 ? '+' : '-';
+                                return `${lbl}: ${sign}${fmtWon(Math.abs(origVal))}`;
+                            }
                             return `${lbl}: ${fmtWon(ctx.raw)}`;
                         },
                         afterBody: function(items) {
-                            const krCost  = items.find(i => (i.dataset.label || '').includes('국장 투자액'))?.raw || 0;
-                            const usCost  = items.find(i => (i.dataset.label || '').includes('미장 투자액'))?.raw || 0;
-                            const total   = items.find(i => (i.dataset.label || '').includes('통합 평가액'))?.raw || 0;
-                            const totalCost = krCost + usCost;
-                            if (total > 0 && totalCost > 0) {
-                                const pnl  = total - totalCost;
-                                const pct  = (pnl / totalCost * 100).toFixed(2);
+                            const cost  = items.find(i => (i.dataset.label || '').includes('총 투자액'))?.raw || 0;
+                            const total = items.find(i => (i.dataset.label || '').includes('총 평가액'))?.raw || 0;
+                            if (total > 0 && cost > 0) {
+                                const pnl  = total - cost;
+                                const pct  = (pnl / cost * 100).toFixed(2);
                                 const sign = pnl >= 0 ? '+' : '';
-                                return [`─────────────────`, `통합 투자액: ${fmtWon(totalCost)}`, `미실현 손익: ${sign}${fmtWon(pnl)}  (${sign}${pct}%)`];
+                                return [`─────────────────`, `미실현 손익: ${sign}${fmtWon(pnl)}  (${sign}${pct}%)`];
                             }
                             return [];
                         }
@@ -2292,7 +2248,6 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     grid: { display: false }
                 },
                 y: {
-                    stacked: true,
                     position: 'left',
                     ticks: {
                         color: '#555e72', font: { size: 10 },
@@ -2305,7 +2260,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     position: 'right',
                     beginAtZero: true,
                     ticks: {
-                        color: 'rgba(248,222,34,0.7)', font: { size: 10 },
+                        color: '#8890a4', font: { size: 10 },
                         callback: function(val) { return fmtWon(val); }
                     },
                     grid: { drawOnChartArea: false },
@@ -3803,8 +3758,9 @@ function renderRealizedChart(labels, lineData, barData) {
     if (!canvas) return;
     if (realizedChartInst) realizedChartInst.destroy();
 
-    const barColors = barData.map(val => val >= 0 ? 'rgba(219,26,26,0.55)' : 'rgba(58,154,255,0.55)');
-    const barBorderColors = barData.map(val => val >= 0 ? '#00C578' : '#3A9AFF');
+    const barColors = barData.map(val => val >= 0 ? 'rgba(0,200,122,0.75)' : 'rgba(255,77,106,0.75)');
+    const barBorderColors = barData.map(val => val >= 0 ? '#00C578' : '#ff4d6a');
+    const absBarData = barData.map(v => Math.abs(v));
 
     realizedChartInst = new Chart(canvas.getContext('2d'), {
         type: 'bar', // 🌟 이 부분이 추가되었습니다! (콤보 차트의 기본 바탕 타입)
@@ -3826,7 +3782,7 @@ function renderRealizedChart(labels, lineData, barData) {
                 {
                     type: 'bar',
                     label: '개별 매매 손익',
-                    data: barData,
+                    data: absBarData,
                     backgroundColor: barColors,
                     borderColor: barBorderColors,
                     borderWidth: 1,
@@ -3862,6 +3818,12 @@ function renderRealizedChart(labels, lineData, barData) {
                 tooltip: {
                     callbacks: {
                         label: function(ctx) {
+                            if (ctx.dataset.label === '개별 매매 손익') {
+                                const origVal = barData[ctx.dataIndex] || 0;
+                                const sign = origVal >= 0 ? '+' : '-';
+                                const val = Math.round(Math.abs(origVal)).toLocaleString();
+                                return `${ctx.dataset.label}: ${sign}₩${val}`;
+                            }
                             const val = Math.round(ctx.raw).toLocaleString();
                             return `${ctx.dataset.label}: ₩${val}`;
                         }
