@@ -37,6 +37,10 @@ let currentRegionLayout = 'vertical'; // 🌟 [추가] 기본 배치는 상하(v
 let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 // 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
 let realizedFilters = { market: 'all', symbol: null, tradeIdx: null };
+// 🌟 실현수익 랭킹 탭 상태 (pnl: 수익금 | roi: 수익률)
+let realizedRankingTab = 'pnl';
+// 🌟 실현수익 랭킹 기간 필터 (all | 1y | 6m | 3m | 1m)
+let realizedRankingPeriod = 'all';
 // 🌟 종목 리스트 검색 및 태그 필터 상태 변수
 let currentLocalSearch = '';
 let currentLocalTag = 'all';
@@ -75,6 +79,18 @@ function resetRealizedFilters() {
 function resetRealizedSymbolFilter() {
     realizedFilters.symbol = null;
     realizedFilters.tradeIdx = null;
+    renderRealizedDashboard();
+}
+
+// 🌟 실현수익 랭킹 탭 전환
+function setRealizedRankingTab(tab) {
+    realizedRankingTab = tab;
+    renderRealizedDashboard();
+}
+
+// 🌟 실현수익 랭킹 기간 필터 전환
+function setRealizedRankingPeriod(period) {
+    realizedRankingPeriod = period;
     renderRealizedDashboard();
 }
 
@@ -2118,10 +2134,9 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     // 통합 평가액 = 국장 평가액 + 미장 평가액
     const finalEvalTotal = finalEvalKr.map((v, i) => v + finalEvalUs[i]);
 
-    // 누적 실현수익 (우측 Y축 막대용)
+    // 건별 실현수익 (우측 Y축 막대용 — 누적 아닌 거래별)
     const finalRealDaily = finalRealKr.map((v, i) => v + finalRealUs[i]);
-    let cumReal = 0;
-    const finalRealCumulative = finalRealDaily.map(v => { cumReal += v; return cumReal > 0 ? cumReal : null; });
+    const finalRealPerTrade = finalRealDaily.map(v => v !== 0 ? v : null);
 
     const fmtWon = v => {
         const abs = Math.abs(v);
@@ -2144,13 +2159,13 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         data: {
             labels: finalDisplayDates,
             datasets: [
-                // ❶ 국장 투자액 (바닥 레이어) — 딥 블루
+                // ❶ 국장 투자액 (바닥 레이어) — 틸 블루
                 {
                     label: '🇰🇷 국장 투자액',
                     type: 'line',
                     data: finalCostKr,
-                    borderColor: 'rgba(93,107,217,0.9)',
-                    backgroundColor: 'rgba(93,107,217,0.55)',
+                    borderColor: '#56B6C6',
+                    backgroundColor: 'rgba(86,182,198,0.55)',
                     borderWidth: 1.5,
                     pointRadius: 0,
                     fill: 'origin',
@@ -2159,13 +2174,13 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     yAxisID: 'y',
                     order: 10
                 },
-                // ❷ 미장 투자액 — 딥 오렌지
+                // ❷ 미장 투자액 — 로즈 핑크
                 {
                     label: '🇺🇸 미장 투자액',
                     type: 'line',
                     data: finalCostUs,
-                    borderColor: 'rgba(217,134,63,0.9)',
-                    backgroundColor: 'rgba(217,134,63,0.55)',
+                    borderColor: '#F891BB',
+                    backgroundColor: 'rgba(248,145,187,0.55)',
                     borderWidth: 1.5,
                     pointRadius: 0,
                     fill: '-1',
@@ -2174,13 +2189,13 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     yAxisID: 'y',
                     order: 9
                 },
-                // ❸ 국장 평가액 — 밝은 파랑
+                // ❸ 국장 평가액-투자액 — 밝은 틸
                 {
-                    label: '🇰🇷 국장 평가액',
+                    label: '🇰🇷 국장 평가액-투자액',
                     type: 'line',
                     data: finalEvalKr,
-                    borderColor: 'rgba(77,159,255,1)',
-                    backgroundColor: 'rgba(77,159,255,0.45)',
+                    borderColor: '#8ACBD0',
+                    backgroundColor: 'rgba(138,203,208,0.45)',
                     borderWidth: 2,
                     pointRadius: 0,
                     fill: '-1',
@@ -2189,13 +2204,13 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     yAxisID: 'y',
                     order: 8
                 },
-                // ❹ 미장 평가액 — 밝은 앰버
+                // ❹ 미장 평가액-투자액 — 밝은 핑크 베이지
                 {
-                    label: '🇺🇸 미장 평가액',
+                    label: '🇺🇸 미장 평가액-투자액',
                     type: 'line',
                     data: finalEvalUs,
-                    borderColor: 'rgba(245,158,11,1)',
-                    backgroundColor: 'rgba(245,158,11,0.40)',
+                    borderColor: '#F9D0CD',
+                    backgroundColor: 'rgba(249,208,205,0.40)',
                     borderWidth: 2,
                     pointRadius: 0,
                     fill: '-1',
@@ -2218,17 +2233,19 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     yAxisID: 'y',
                     order: 1
                 },
-                // ❻ 누적 실현수익 막대 — 우측 Y축
+                // ❻ 건별 실현수익 막대 — 우측 Y축 (노란색, 두껍게)
                 {
-                    label: '💰 누적 실현수익',
+                    label: '💰 건별 실현수익',
                     type: 'bar',
-                    data: finalRealCumulative,
-                    backgroundColor: 'rgba(0,200,122,0.35)',
-                    borderColor: 'rgba(0,200,122,0.8)',
-                    borderWidth: 1,
-                    borderRadius: 2,
+                    data: finalRealPerTrade,
+                    backgroundColor: 'rgba(248,222,34,0.75)',
+                    borderColor: '#F8DE22',
+                    borderWidth: 2,
+                    borderRadius: 3,
                     yAxisID: 'y2',
-                    order: 5
+                    order: 5,
+                    barThickness: 6,
+                    minBarLength: 4
                 }
             ]
         },
@@ -2245,7 +2262,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                         label: function(ctx) {
                             if (ctx.raw === null || ctx.raw === undefined) return null;
                             const lbl = ctx.dataset.label || '';
-                            if (lbl.includes('누적 실현수익')) return `${lbl}: ${fmtWon(ctx.raw)}`;
+                            if (lbl.includes('건별 실현수익')) return `${lbl}: ${fmtWon(ctx.raw)}`;
                             if (lbl.includes('통합 평가액'))   return `${lbl}: ${fmtWon(ctx.raw)}`;
                             if (lbl.includes('국장 투자액'))   return `${lbl}: ${fmtWon(ctx.raw)}`;
                             if (lbl.includes('미장 투자액'))   return `${lbl}: ${fmtWon(ctx.raw)}`;
@@ -2288,7 +2305,7 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                     position: 'right',
                     beginAtZero: true,
                     ticks: {
-                        color: 'rgba(0,200,122,0.7)', font: { size: 10 },
+                        color: 'rgba(248,222,34,0.7)', font: { size: 10 },
                         callback: function(val) { return fmtWon(val); }
                     },
                     grid: { drawOnChartArea: false },
@@ -3596,7 +3613,24 @@ function renderRealizedDashboard() {
 
     // 5. 종목별 통계 집계 → 랭킹 패널 렌더링
     const symStats = {};
-    realizedTxs.forEach(tx => {
+
+    // 🌟 기간 필터: 랭킹용 기간 컷오프 계산
+    const rankingPeriodCutoff = (() => {
+        const now = new Date();
+        const map = { '1m': 30, '3m': 90, '6m': 180, '1y': 365 };
+        if (realizedRankingPeriod in map) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - map[realizedRankingPeriod]);
+            return d.toISOString().substring(0, 10);
+        }
+        return null;
+    })();
+
+    const rankingTxs = rankingPeriodCutoff
+        ? realizedTxs.filter(tx => tx.date >= rankingPeriodCutoff)
+        : realizedTxs;
+
+    rankingTxs.forEach(tx => {
         const isKr = isKorean(tx.symbol);
         const pnlKrw = tx.pnl * (isKr ? 1 : currentUsdKrw);
         const costKrw = (tx.avgCost * tx.sellQty) * (isKr ? 1 : currentUsdKrw);
@@ -3661,23 +3695,61 @@ function renderRealizedDashboard() {
         if (symList.length === 0) {
             rankingPanelEl.innerHTML = `<div style="font-size:12px; color:var(--text3); text-align:center; padding:20px;">실현수익 데이터 없음</div>`;
         } else {
+            // 기간 레이블 맵
+            const periodLabel = { all: '전체', '1y': '1년', '6m': '6개월', '3m': '3개월', '1m': '1개월' };
+            const periods = ['all', '1y', '6m', '3m', '1m'];
+
+            // 현재 탭에 따라 표시할 랭킹 결정
+            const isRoi = realizedRankingTab === 'roi';
+            const activeRank = isRoi ? rankByRoi : rankByPnl;
+            const maxAbsActive = isRoi ? maxAbsRoi : maxAbsPnl;
+
+            const periodBtns = periods.map(p => {
+                const isActive = p === realizedRankingPeriod;
+                return `<button onclick="setRealizedRankingPeriod('${p}')"
+                    style="padding:3px 9px; font-size:10px; font-weight:${isActive?'700':'400'}; border-radius:12px;
+                           border:1px solid ${isActive?'var(--accent)':'var(--border)'}; 
+                           background:${isActive?'var(--accent-bg)':'transparent'}; 
+                           color:${isActive?'var(--accent)':'var(--text3)'}; cursor:pointer; 
+                           font-family:var(--font-sans); transition:0.15s; white-space:nowrap;">
+                    ${periodLabel[p]}
+                </button>`;
+            }).join('');
+
+            const tabBtn = (tab, label) => {
+                const isActive = realizedRankingTab === tab;
+                return `<button onclick="setRealizedRankingTab('${tab}')"
+                    style="flex:1; padding:9px 6px; font-size:11px; font-weight:700; border:none;
+                           background:transparent; color:${isActive?'var(--blue)':'var(--text3)'};
+                           cursor:pointer; border-bottom:2px solid ${isActive?'var(--blue)':'transparent'};
+                           transition:0.2s; font-family:var(--font-sans);">
+                    ${label}
+                </button>`;
+            };
+
             rankingPanelEl.innerHTML = `
-            <!-- 수익금 랭킹 -->
-            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px;">
-              <div style="font-size:12px; font-weight:700; color:var(--text2); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-                💵 수익금 랭킹 <span style="font-size:10px; font-weight:400; color:var(--text3);">환산 ₩</span>
+            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+              <!-- 기간 필터 -->
+              <div style="display:flex; align-items:center; gap:5px; padding:10px 12px 8px; border-bottom:1px solid var(--border); flex-wrap:wrap;">
+                <span style="font-size:10px; color:var(--text3); flex-shrink:0; margin-right:2px;">기간</span>
+                ${periodBtns}
               </div>
-              <div style="display:flex; flex-direction:column; gap:4px;">
-                ${rankByPnl.map((s, i) => rankRowHtml(s, i+1, fmtW(s.pnlKrw), (s.pnlKrw / maxAbsPnl) * 100, s.pnlKrw >= 0)).join('')}
+              <!-- 탭 (수익금 / 수익률) -->
+              <div style="display:flex; border-bottom:1px solid var(--border);">
+                ${tabBtn('pnl', '💵 수익금')}
+                ${tabBtn('roi', '📊 수익률')}
               </div>
-            </div>
-            <!-- 수익률 랭킹 -->
-            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px;">
-              <div style="font-size:12px; font-weight:700; color:var(--text2); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-                📊 수익률 랭킹 <span style="font-size:10px; font-weight:400; color:var(--text3);">비용 대비</span>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:4px;">
-                ${rankByRoi.map((s, i) => rankRowHtml(s, i+1, (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%', (s.roi / maxAbsRoi) * 100, s.roi >= 0)).join('')}
+              <!-- 랭킹 리스트 -->
+              <div style="padding:6px 8px; display:flex; flex-direction:column; gap:2px; max-height:420px; overflow-y:auto;">
+                ${rankingTxs.length === 0
+                    ? `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">해당 기간 데이터 없음</div>`
+                    : activeRank.map((s, i) => rankRowHtml(
+                        s, i+1,
+                        isRoi ? (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%' : fmtW(s.pnlKrw),
+                        isRoi ? (s.roi / maxAbsActive) * 100 : (s.pnlKrw / maxAbsActive) * 100,
+                        isRoi ? s.roi >= 0 : s.pnlKrw >= 0
+                      )).join('')
+                }
               </div>
             </div>`;
         }
