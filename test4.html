@@ -18,7 +18,7 @@
 <nav>
   <div class="nav-left">
     <div class="logo">
-      <img src="/img/logo_dark.png" alt="Two the Moon" width="320">
+      <img id="logoImg" src="/img/logo_dark.png" alt="Two the Moon" width="320">
     </div>
 
     <div class="header-search" style="display:flex; gap:6px; flex:1; max-width:800px; min-width:300px; margin-right:20px; background:none; border:none; padding:0;">
@@ -49,9 +49,67 @@
       <div class="sync-spinner" id="syncSpinner"></div>
       <span id="syncText"></span>
     </div>
+    <button class="btn-theme-toggle" onclick="toggleTheme()" id="btnThemeToggle" title="라이트/다크 모드 전환">🌙</button>
     <button class="btn-sm" onclick="openMasterSettingsModal()" title="전체 설정 및 데이터 관리">⚙️ 설정</button>
+    <button class="btn-mobile-menu" onclick="openMobileMenu()" title="메뉴">☰</button>
   </div>
 </nav>
+
+<!-- 📱 모바일 검색바 (768px 이하에서만 표시) -->
+<div class="mobile-search-bar" id="mobileSearchBar">
+  <select id="mobileSearchFilter" class="search-input" style="width:85px; border-radius:20px; height:40px; padding:0 8px; cursor:pointer; font-size:12px; border:1px solid var(--border2); background:var(--bg3); color:var(--text);" onchange="document.getElementById('mainSearchFilter').value=this.value">
+    <option value="all">🌐 전체</option>
+    <option value="kr">🇰🇷 한국</option>
+    <option value="us">🇺🇸 미국</option>
+  </select>
+  <div style="position:relative; flex:1;">
+    <input type="text" id="mobileTickerInput" class="search-input" placeholder="종목명/Ticker 검색" autocomplete="off"
+      style="width:100%; padding:8px 36px 8px 16px; border-radius:20px; background:var(--bg3); border:1px solid var(--border2); color:var(--text); font-size:12px; font-family:var(--font-sans); outline:none;"
+      oninput="document.getElementById('tickerInput').value=this.value; document.getElementById('tickerInput').dispatchEvent(new Event('input'))"/>
+    <button class="btn-add-icon" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:var(--accent); border:none; color:#fff; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:16px; line-height:1;" onclick="addManualTicker()">＋</button>
+  </div>
+</div>
+
+<!-- 📱 모바일 내비 드로어 -->
+<div class="mobile-nav-drawer" id="mobileNavDrawer">
+  <div class="mobile-nav-backdrop" onclick="closeMobileMenu()"></div>
+  <div class="mobile-nav-panel">
+    <div class="mobile-nav-header">
+      <span class="mobile-nav-title">메뉴</span>
+      <button class="mobile-nav-close" onclick="closeMobileMenu()">✕</button>
+    </div>
+    <button class="vtab active" id="mDrawerTabAll" onclick="setView('all',this);closeMobileMenu()">📊 전체보기</button>
+    <button class="vtab" id="mDrawerTabUser1" onclick="setView('user1',this);closeMobileMenu()">👤 소유자1</button>
+    <button class="vtab" id="mDrawerTabUser2" onclick="setView('user2',this);closeMobileMenu()">👤 소유자2</button>
+    <button class="vtab" id="mDrawerTabWatch" onclick="setView('watch',this);closeMobileMenu()">⭐ 관심종목</button>
+    <button class="vtab" id="mDrawerTabHistory" onclick="setView('history',this);closeMobileMenu()">📋 거래 내역</button>
+    <button class="vtab" id="mDrawerTabRealized" onclick="setView('realized',this);closeMobileMenu()" style="color:var(--blue)">📈 실현수익</button>
+    <button class="vtab" id="mDrawerTabDividend" onclick="setView('dividend',this);closeMobileMenu()" style="color:var(--green)">🌿 배당통계</button>
+    <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:8px;">
+      <button class="btn-sm" style="justify-content:center;" onclick="toggleSidebar();closeMobileMenu()">✏️ 거래 장부 열기</button>
+      <button class="btn-sm" style="justify-content:center;" onclick="openMasterSettingsModal();closeMobileMenu()">⚙️ 설정</button>
+    </div>
+  </div>
+</div>
+
+<!-- 📱 모바일 하단 탭바 -->
+<div class="mobile-bottom-bar" id="mobileBottomBar">
+  <button class="mobile-tab-btn active" id="mbTabAll" onclick="setView('all',this)">
+    <span class="tab-icon">📊</span><span>전체</span>
+  </button>
+  <button class="mobile-tab-btn" id="mbTabWatch" onclick="setView('watch',this)">
+    <span class="tab-icon">⭐</span><span>관심</span>
+  </button>
+  <button class="mobile-tab-btn" id="mbTabLedger" onclick="toggleSidebar()">
+    <span class="tab-icon">✏️</span><span>장부</span>
+  </button>
+  <button class="mobile-tab-btn" id="mbTabHistory" onclick="setView('history',this)">
+    <span class="tab-icon">📋</span><span>내역</span>
+  </button>
+  <button class="mobile-tab-btn" id="mbTabMore" onclick="openMobileMenu()">
+    <span class="tab-icon">☰</span><span>더보기</span>
+  </button>
+</div>
 
 <div class="layout-wrapper">
   <button id="btnOpenSidebar" onclick="toggleSidebar()" title="장부 열기">▶</button>
