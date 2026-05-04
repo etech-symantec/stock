@@ -210,8 +210,8 @@ loadStockDB();
 function getColors(prices) {
   if(!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
   const last = prices[prices.length-1], first = prices[0];
-  if (last > first) return { line:'#00c87a', fill:'rgba(0,200,122,0.12)' };
-  if (last < first) return { line:'#ff4d6a', fill:'rgba(255,77,106,0.12)' };
+  if (last > first) return { line:'#DB1A1A', fill:'rgba(219,26,26,0.12)' };
+  if (last < first) return { line:'#3A9AFF', fill:'rgba(58,154,255,0.12)' };
   return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
 }
 
@@ -1780,7 +1780,7 @@ function renderSidebarYieldList(currentHoldings) {
   }
 
   container.innerHTML = yieldItems.map((item, idx) => {
-      let sign = item.roi > 0 ? '+' : ''; let color = item.roi > 0 ? 'var(--green)' : (item.roi < 0 ? 'var(--red)' : 'var(--text)');
+      let sign = item.roi > 0 ? '+' : ''; let color = item.roi > 0 ? '#DB1A1A' : (item.roi < 0 ? '#3A9AFF' : 'var(--text)');
       let rankColor = idx === 0 ? '#ffb703' : (idx === 1 ? '#a259ff' : (idx === 2 ? '#4d9fff' : 'var(--text3)'));
       let cleanBroker = item.broker.split(' (')[0]; let brokerText = cleanBroker !== '미지정' ? `<span style="font-size:10px; color:var(--text3); margin-left:6px;">[${cleanBroker}]</span>` : '';
       
@@ -1891,7 +1891,7 @@ function generateCardHtml(item) {
       <div class="card-footer">
         <div>평단가 ${formatPrice(item.avg, item.symbol)}<br>수량 <strong>${item.qty}</strong>주</div>
         <div style="text-align:right">
-          <span class="holding-val" style="color:var(--${pnl>=0?'green':'red'})">
+          <span class="holding-val" style="color:${pnl>=0?'#DB1A1A':'#3A9AFF'}">
             ${pnl>=0?'+':''}${formatPrice(Math.abs(pnl), item.symbol)}<br>(${pnl>=0?'+':''}${pnlPct}%)
           </span>
         </div>
@@ -1956,13 +1956,13 @@ function generateListItemHtml(item) {
       
       <div class="list-item-right">
          <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:2px;">${formatPrice(data.last, item.symbol)}</div>
-         <div style="font-size:12px; font-weight:700; color:var(--${cls==='up'?'green':(cls==='down'?'red':'text3')});">${sign}${chgPct}%</div>
+         <div style="font-size:12px; font-weight:700; color:${cls==='up'?'#DB1A1A':(cls==='down'?'#3A9AFF':'var(--text3)')};">${sign}${chgPct}%</div>
       </div>
       
       ${isHeld ? `
       <div class="list-item-extra">
          <div style="font-size:11px; color:var(--text2); margin-bottom:2px;">${item.qty}주</div>
-         <div style="font-size:12px; font-weight:700; color:var(--${pnl>=0?'green':'red'})">${pnl>=0?'+':''}${formatPrice(Math.abs(pnl), item.symbol)}</div>
+         <div style="font-size:12px; font-weight:700; color:${pnl>=0?'#DB1A1A':'#3A9AFF'}">${pnl>=0?'+':''}${formatPrice(Math.abs(pnl), item.symbol)}</div>
       </div>` : `
       <div class="list-item-extra" style="display:flex; align-items:center; justify-content:flex-end;">
          <button class="btn-sm" style="background:var(--bg); border-color:var(--border2); padding:4px 8px;" onclick="event.stopPropagation(); removeTickerConfirm('${item.symbol}', '${displayName.replace(/'/g, "\\'")}')">삭제</button>
@@ -2427,7 +2427,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     const gRoiEl = document.getElementById('globalTotalRoi');
     const signG = globalPnl >= 0 ? '+' : '';
     gRoiEl.innerHTML = `${signG}₩${Math.round(Math.abs(globalPnl)).toLocaleString()}<br><span style="font-size:12px; font-weight:500">(${signG}${globalRoi.toFixed(2)}%)</span>`;
-    gRoiEl.style.color = globalPnl >= 0 ? 'var(--green)' : (globalCost > 0 ? 'var(--red)' : 'var(--text)');
+    gRoiEl.style.color = globalPnl >= 0 ? '#DB1A1A' : (globalCost > 0 ? '#3A9AFF' : 'var(--text)');
     document.getElementById('globalExchangeRate').textContent = `$1 = ₩${Math.round(currentUsdKrw).toLocaleString()}`;
 
     const tmContainer = document.getElementById('allocationTreemap');
@@ -2541,7 +2541,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
       let costPct = maxKrwAccVal > 0 ? (d.cost / maxKrwAccVal * 100) : 0;
       let evalPct = maxKrwAccVal > 0 ? (d.eval / maxKrwAccVal * 100) : 0;
-      let evalColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      let evalColor = pnl >= 0 ? '#DB1A1A' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
@@ -2598,7 +2598,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
       let costPct = maxUsdAccVal > 0 ? (d.cost / maxUsdAccVal * 100) : 0;
       let evalPct = maxUsdAccVal > 0 ? (d.eval / maxUsdAccVal * 100) : 0;
-      let evalColor = pnl >= 0 ? 'rgba(0,200,122,0.8)' : 'rgba(255,77,106,0.8)';
+      let evalColor = pnl >= 0 ? 'rgba(219,26,26,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
@@ -2863,8 +2863,8 @@ function openChartModal(ticker) {
   
   const chgEl = document.getElementById('mChange');
   chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
-  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
-  chgEl.style.color = chgPct > 0 ? 'var(--green)' : 'var(--red)';
+  chgEl.style.backgroundColor = chgPct > 0 ? 'var(--profit-bg)' : 'var(--loss-bg)';
+  chgEl.style.color = chgPct > 0 ? '#DB1A1A' : '#3A9AFF';
   document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
   
   document.getElementById('chartOverlay').classList.add('open');
@@ -3606,7 +3606,7 @@ function renderRealizedDashboard() {
     const signG = grandTotal >= 0 ? '+' : '';
     const totalEl = document.getElementById('realTotalConverted');
     totalEl.textContent = `${signG}₩ ${Math.round(Math.abs(grandTotal)).toLocaleString()}`;
-    totalEl.style.color = grandTotal >= 0 ? 'var(--blue)' : 'var(--red)';
+    totalEl.style.color = grandTotal >= 0 ? '#DB1A1A' : '#3A9AFF';
 
     // 4. 차트 그리기 함수 호출
     renderRealizedChart(chartLabels, chartLineData, chartBarData);
@@ -3669,8 +3669,8 @@ function renderRealizedDashboard() {
     const rankRowHtml = (item, rank, valueStr, barPct, isPos) => {
         const medalMap = { 1: '🥇', 2: '🥈', 3: '🥉' };
         const medal = medalMap[rank] || `<span style="font-size:11px; color:var(--text3); font-weight:700; min-width:18px; display:inline-block; text-align:center;">${rank}</span>`;
-        const barColor = isPos ? 'var(--blue)' : 'var(--red)';
-        const valColor = isPos ? 'var(--blue)' : 'var(--red)';
+        const barColor = isPos ? '#DB1A1A' : '#3A9AFF';
+        const valColor = isPos ? '#DB1A1A' : '#3A9AFF';
         return `
         <div onclick="updateRealizedFilter('symbol','${item.symbol}')"
              style="padding:8px 10px; border-radius:6px; cursor:pointer; transition:0.15s; border:1px solid transparent;"
@@ -3720,27 +3720,27 @@ function renderRealizedDashboard() {
                 const isActive = realizedRankingTab === tab;
                 return `<button onclick="setRealizedRankingTab('${tab}')"
                     style="flex:1; padding:9px 6px; font-size:11px; font-weight:700; border:none;
-                           background:transparent; color:${isActive?'var(--blue)':'var(--text3)'};
-                           cursor:pointer; border-bottom:2px solid ${isActive?'var(--blue)':'transparent'};
+                           background:transparent; color:${isActive?'#DB1A1A':'var(--text3)'};
+                           cursor:pointer; border-bottom:2px solid ${isActive?'#DB1A1A':'transparent'};
                            transition:0.2s; font-family:var(--font-sans);">
                     ${label}
                 </button>`;
             };
 
             rankingPanelEl.innerHTML = `
-            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
               <!-- 기간 필터 -->
-              <div style="display:flex; align-items:center; gap:5px; padding:10px 12px 8px; border-bottom:1px solid var(--border); flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:5px; padding:10px 12px 8px; border-bottom:1px solid var(--border); flex-wrap:wrap; flex-shrink:0;">
                 <span style="font-size:10px; color:var(--text3); flex-shrink:0; margin-right:2px;">기간</span>
                 ${periodBtns}
               </div>
               <!-- 탭 (수익금 / 수익률) -->
-              <div style="display:flex; border-bottom:1px solid var(--border);">
+              <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0;">
                 ${tabBtn('pnl', '💵 수익금')}
                 ${tabBtn('roi', '📊 수익률')}
               </div>
               <!-- 랭킹 리스트 -->
-              <div style="padding:6px 8px; display:flex; flex-direction:column; gap:2px; max-height:420px; overflow-y:auto;">
+              <div style="padding:6px 8px; display:flex; flex-direction:column; gap:2px; flex:1; overflow-y:auto;">
                 ${rankingTxs.length === 0
                     ? `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">해당 기간 데이터 없음</div>`
                     : activeRank.map((s, i) => rankRowHtml(
@@ -3776,7 +3776,7 @@ function renderRealizedDashboard() {
         }
 
         let sign = tx.pnl >= 0 ? '+' : '';
-        let pnlColor = tx.pnl >= 0 ? 'var(--blue)' : 'var(--red)';
+        let pnlColor = tx.pnl >= 0 ? '#DB1A1A' : '#3A9AFF';
         let oInfo = getOwnerInfo(tx.owner);
 
         return `
@@ -3803,8 +3803,8 @@ function renderRealizedChart(labels, lineData, barData) {
     if (!canvas) return;
     if (realizedChartInst) realizedChartInst.destroy();
 
-    const barColors = barData.map(val => val >= 0 ? 'rgba(77, 159, 255, 0.5)' : 'rgba(255, 77, 106, 0.5)');
-    const barBorderColors = barData.map(val => val >= 0 ? '#4d9fff' : '#ff4d6a');
+    const barColors = barData.map(val => val >= 0 ? 'rgba(219,26,26,0.55)' : 'rgba(58,154,255,0.55)');
+    const barBorderColors = barData.map(val => val >= 0 ? '#DB1A1A' : '#3A9AFF');
 
     realizedChartInst = new Chart(canvas.getContext('2d'), {
         type: 'bar', // 🌟 이 부분이 추가되었습니다! (콤보 차트의 기본 바탕 타입)
