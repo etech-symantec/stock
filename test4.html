@@ -424,45 +424,59 @@
         </div>
       </div>
     
-      <div id="realizedChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:15px; flex-direction:column; flex-shrink:0;">
-        <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-            💰 누적 실현수익 흐름 <span style="font-size:11px; font-weight:normal; color:var(--text3);">(확정 수익의 합계 추이)</span>
-        </div>
-        <div style="height:180px; position:relative;"><canvas id="realizedChartCanvas"></canvas></div>
-      </div>
+      <!-- 메인 바디: 왼쪽 랭킹 + 오른쪽 차트/요약/표 -->
+      <div style="display:flex; gap:15px; align-items:flex-start;">
 
-      <div class="summary" style="display:flex; gap:10px; margin-bottom:15px;">
-        <div class="sum-card" style="flex:1; background:rgba(77, 159, 255, 0.1); border-color:var(--blue);">
-          <div class="sum-label" style="color:var(--blue)">총 실현수익 (환산 ₩)</div>
-          <div id="realTotalConverted" class="cp-sum-val" style="color:var(--blue); font-size:24px;">—</div>
+        <!-- ◀ 왼쪽 랭킹 패널 -->
+        <div id="realizedRankingPanel" style="width:260px; flex-shrink:0; display:flex; flex-direction:column; gap:12px;">
+          <!-- JS로 동적 렌더링 -->
         </div>
-        <div class="sum-card" style="flex:1;">
-          <div class="sum-label">국내주식 실현수익</div>
-          <div id="realTotalKrw" class="cp-sum-val">—</div>
-        </div>
-        <div class="sum-card" style="flex:1;">
-          <div class="sum-label">해외주식 실현수익</div>
-          <div id="realTotalUsd" class="cp-sum-val" style="color:var(--text)">—</div>
-        </div>
-      </div>
 
-      <div class="history-table-container">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>매도 일자</th>
-              <th>종목</th>
-              <th>계좌/소유자</th>
-              <th style="text-align:right;">매도 수량</th>
-              <th style="text-align:right;">매도 단가</th>
-              <th style="text-align:right;">매수 평단가</th>
-              <th style="text-align:right;">실현 수익금</th>
-              <th style="text-align:right;">수익률</th>
-            </tr>
-          </thead>
-          <tbody id="realizedTableBody"></tbody>
-        </table>
-      </div>
+        <!-- ▶ 오른쪽 콘텐츠 -->
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:15px;">
+
+          <div id="realizedChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex-shrink:0;">
+            <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                💰 누적 실현수익 흐름 <span style="font-size:11px; font-weight:normal; color:var(--text3);">(확정 수익의 합계 추이)</span>
+            </div>
+            <div style="height:180px; position:relative;"><canvas id="realizedChartCanvas"></canvas></div>
+          </div>
+
+          <div class="summary" style="display:flex; gap:10px;">
+            <div class="sum-card" style="flex:1; background:rgba(77, 159, 255, 0.1); border-color:var(--blue);">
+              <div class="sum-label" style="color:var(--blue)">총 실현수익 (환산 ₩)</div>
+              <div id="realTotalConverted" class="cp-sum-val" style="color:var(--blue); font-size:24px;">—</div>
+            </div>
+            <div class="sum-card" style="flex:1;">
+              <div class="sum-label">국내주식 실현수익</div>
+              <div id="realTotalKrw" class="cp-sum-val">—</div>
+            </div>
+            <div class="sum-card" style="flex:1;">
+              <div class="sum-label">해외주식 실현수익</div>
+              <div id="realTotalUsd" class="cp-sum-val" style="color:var(--text)">—</div>
+            </div>
+          </div>
+
+          <div class="history-table-container">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>매도 일자</th>
+                  <th>종목</th>
+                  <th>계좌/소유자</th>
+                  <th style="text-align:right;">매도 수량</th>
+                  <th style="text-align:right;">매도 단가</th>
+                  <th style="text-align:right;">매수 평단가</th>
+                  <th style="text-align:right;">실현 수익금</th>
+                  <th style="text-align:right;">수익률</th>
+                </tr>
+              </thead>
+              <tbody id="realizedTableBody"></tbody>
+            </table>
+          </div>
+
+        </div><!-- /right -->
+      </div><!-- /flex wrapper -->
       
     </div> </main> </div>
 
