@@ -427,8 +427,8 @@
       <!-- 메인 바디: 왼쪽 랭킹 + 오른쪽 차트/요약/표 -->
       <div style="display:flex; gap:15px; align-items:flex-start;">
 
-        <!-- ◀ 왼쪽 랭킹 패널 -->
-        <div id="realizedRankingPanel" style="width:260px; flex-shrink:0; display:flex; flex-direction:column; gap:12px;">
+        <!-- ◀ 왼쪽 랭킹 패널 (sticky + 화면 높이 자동 맞춤) -->
+        <div id="realizedRankingPanel" style="width:260px; flex-shrink:0; position:sticky; top:20px; height:calc(100vh - 130px); display:flex; flex-direction:column;">
           <!-- JS로 동적 렌더링 -->
         </div>
 
