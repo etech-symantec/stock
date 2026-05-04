@@ -3594,7 +3594,96 @@ function renderRealizedDashboard() {
     // 4. 차트 그리기 함수 호출
     renderRealizedChart(chartLabels, chartLineData, chartBarData);
 
-    // 5. 거래 내역 표 렌더링
+    // 5. 종목별 통계 집계 → 랭킹 패널 렌더링
+    const symStats = {};
+    realizedTxs.forEach(tx => {
+        const isKr = isKorean(tx.symbol);
+        const pnlKrw = tx.pnl * (isKr ? 1 : currentUsdKrw);
+        const costKrw = (tx.avgCost * tx.sellQty) * (isKr ? 1 : currentUsdKrw);
+
+        if (!symStats[tx.symbol]) {
+            let stockName = tx.symbol;
+            const dbMatch = localStockDB.find(x => x.symbol === tx.symbol);
+            const cachedMatch = cachedMarketData[tx.symbol];
+            if (dbMatch) stockName = dbMatch.name;
+            else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+            symStats[tx.symbol] = { symbol: tx.symbol, name: stockName, pnlKrw: 0, costKrw: 0, trades: 0 };
+        }
+        symStats[tx.symbol].pnlKrw  += pnlKrw;
+        symStats[tx.symbol].costKrw += costKrw;
+        symStats[tx.symbol].trades  += 1;
+    });
+
+    const symList = Object.values(symStats).map(s => ({
+        ...s,
+        roi: s.costKrw > 0 ? (s.pnlKrw / s.costKrw) * 100 : 0
+    }));
+
+    const rankByPnl = [...symList].sort((a, b) => b.pnlKrw - a.pnlKrw);
+    const rankByRoi = [...symList].sort((a, b) => b.roi - a.roi);
+
+    const maxAbsPnl = Math.max(...rankByPnl.map(s => Math.abs(s.pnlKrw)), 1);
+    const maxAbsRoi = Math.max(...rankByRoi.map(s => Math.abs(s.roi)), 1);
+
+    const fmtW = v => {
+        const abs = Math.abs(v);
+        if (abs >= 100000000) return (v < 0 ? '-' : '+') + '₩' + (abs / 100000000).toFixed(1) + '억';
+        if (abs >= 10000)     return (v < 0 ? '-' : '+') + '₩' + Math.round(abs / 10000).toLocaleString() + '만';
+        return (v < 0 ? '-' : '+') + '₩' + Math.round(abs).toLocaleString();
+    };
+
+    const rankRowHtml = (item, rank, valueStr, barPct, isPos) => {
+        const medalMap = { 1: '🥇', 2: '🥈', 3: '🥉' };
+        const medal = medalMap[rank] || `<span style="font-size:11px; color:var(--text3); font-weight:700; min-width:18px; display:inline-block; text-align:center;">${rank}</span>`;
+        const barColor = isPos ? 'var(--blue)' : 'var(--red)';
+        const valColor = isPos ? 'var(--blue)' : 'var(--red)';
+        return `
+        <div onclick="updateRealizedFilter('symbol','${item.symbol}')"
+             style="padding:8px 10px; border-radius:6px; cursor:pointer; transition:0.15s; border:1px solid transparent;"
+             onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='var(--border2)'"
+             onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:5px;">
+            <span style="font-size:15px; flex-shrink:0;">${medal}</span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</div>
+              <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${item.symbol.replace('.KS','').replace('.KQ','')} · ${item.trades}건</div>
+            </div>
+            <div style="font-size:12px; font-weight:700; color:${valColor}; font-family:var(--font-mono); flex-shrink:0;">${valueStr}</div>
+          </div>
+          <div style="height:3px; border-radius:2px; background:var(--bg3); overflow:hidden;">
+            <div style="height:100%; width:${Math.min(100, Math.abs(barPct))}%; background:${barColor}; border-radius:2px; transition:width 0.4s;"></div>
+          </div>
+        </div>`;
+    };
+
+    const rankingPanelEl = document.getElementById('realizedRankingPanel');
+    if (rankingPanelEl) {
+        if (symList.length === 0) {
+            rankingPanelEl.innerHTML = `<div style="font-size:12px; color:var(--text3); text-align:center; padding:20px;">실현수익 데이터 없음</div>`;
+        } else {
+            rankingPanelEl.innerHTML = `
+            <!-- 수익금 랭킹 -->
+            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px;">
+              <div style="font-size:12px; font-weight:700; color:var(--text2); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                💵 수익금 랭킹 <span style="font-size:10px; font-weight:400; color:var(--text3);">환산 ₩</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                ${rankByPnl.map((s, i) => rankRowHtml(s, i+1, fmtW(s.pnlKrw), (s.pnlKrw / maxAbsPnl) * 100, s.pnlKrw >= 0)).join('')}
+              </div>
+            </div>
+            <!-- 수익률 랭킹 -->
+            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px;">
+              <div style="font-size:12px; font-weight:700; color:var(--text2); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                📊 수익률 랭킹 <span style="font-size:10px; font-weight:400; color:var(--text3);">비용 대비</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                ${rankByRoi.map((s, i) => rankRowHtml(s, i+1, (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%', (s.roi / maxAbsRoi) * 100, s.roi >= 0)).join('')}
+              </div>
+            </div>`;
+        }
+    }
+
+    // 6. 거래 내역 표 렌더링
     const tbody = document.getElementById('realizedTableBody');
     if (realizedTxs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--text3);">조건에 맞는 실현수익 내역이 없습니다.</td></tr>`;
