@@ -72,34 +72,48 @@
           <button class="btn-cancel-edit" onclick="cancelEdit()">취소 ✕</button>
         </div>
 
-        <div style="display:flex; gap:10px; margin-bottom:5px;">
-          <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11px; color:var(--text2); font-weight:700;">소유자</span>
-              <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름/테마 설정">설정 ⚙️</button>
-            </div>
-            <div class="toggle-group" style="margin-top:2px;">
-              <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
-              <label for="owner1" class="toggle-btn" id="lblUser1">소유자1</label>
-              <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
-              <label for="owner2" class="toggle-btn" id="lblUser2">소유자2</label>
+        <!-- 소유자 선택 -->
+        <div class="form-group tx-owner-type-wrap">
+          <div class="tx-meta-row">
+            <div class="tx-meta-block">
+              <div class="tx-meta-label">
+                <span>소유자</span>
+                <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름/테마 설정">설정 ⚙️</button>
+              </div>
+              <div class="toggle-group tx-owner-group">
+                <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
+                <label for="owner1" class="toggle-btn" id="lblUser1">소유자1</label>
+                <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
+                <label for="owner2" class="toggle-btn" id="lblUser2">소유자2</label>
+              </div>
             </div>
           </div>
-          <div class="form-group" style="flex:1; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:6px; border: 1px solid var(--border);">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11px; color:var(--text2); font-weight:700;">유형</span>
-            </div>
-            <div class="toggle-group" style="margin-top:2px; flex-wrap:wrap; gap:2px;">
-              <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
-              <label for="typeBuy" class="toggle-btn type-buy" style="padding:6px 2px; font-size:11px;">매수</label>
-              <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
-              <label for="typeSell" class="toggle-btn type-sell" style="padding:6px 2px; font-size:11px;">매도</label>
-              <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
-              <label for="typeDiv" class="toggle-btn type-div" style="padding:6px 2px; font-size:11px;">배당</label>
-              <input type="radio" id="typeTransfer" name="txType" value="transfer" onchange="toggleTxType()" class="hidden-radio">
-              <label for="typeTransfer" class="toggle-btn type-transfer" style="padding:6px 2px; font-size:11px;">이동</label>
-              <input type="radio" id="typeSplitTx" name="txType" value="split" onchange="toggleTxType()" class="hidden-radio">
-              <label for="typeSplitTx" class="toggle-btn type-split" style="padding:6px 2px; font-size:11px;">분할</label>
+          <!-- 거래 유형 -->
+          <div class="tx-meta-row" style="margin-top:6px;">
+            <div class="tx-meta-block">
+              <div class="tx-meta-label"><span>거래 유형</span></div>
+              <div class="toggle-group tx-type-group">
+                <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeBuy" class="toggle-btn type-buy">
+                  <span class="type-icon">🔴</span><span class="type-text">매수</span>
+                </label>
+                <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeSell" class="toggle-btn type-sell">
+                  <span class="type-icon">🔵</span><span class="type-text">매도</span>
+                </label>
+                <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeDiv" class="toggle-btn type-div">
+                  <span class="type-icon">💚</span><span class="type-text">배당</span>
+                </label>
+                <input type="radio" id="typeTransfer" name="txType" value="transfer" onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeTransfer" class="toggle-btn type-transfer">
+                  <span class="type-icon">🔀</span><span class="type-text">이동</span>
+                </label>
+                <input type="radio" id="typeSplitTx" name="txType" value="split" onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeSplitTx" class="toggle-btn type-split">
+                  <span class="type-icon">✂️</span><span class="type-text">분할</span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -270,11 +284,15 @@
     </div>
 
     <div id="portfolioChartWrapper" style="display:none; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px; flex-direction:column; flex-shrink:0;">
-      <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+      <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px;">
           📈 자산 성장 추이
           <span style="font-size:11px; font-weight:normal; color:var(--text3);">당시 보유 총 투자액 / 평가액 · 🟢 수익 🔴 손절: 건별 실현수익 (막대)</span>
       </div>
-      <div style="height:240px; position:relative;"><canvas id="portfolioChartCanvas"></canvas></div>
+      <div class="chart-zoom-bar">
+        <div class="chart-zoom-hint">🔍 <span>드래그</span>로 원하는 구간 확대</div>
+        <button class="btn-zoom-reset" id="btnPortfolioZoomReset" onclick="resetPortfolioChartZoom()">✕ 전체 보기</button>
+      </div>
+      <div style="height:240px; position:relative;"><canvas id="portfolioChartCanvas" style="cursor:crosshair;"></canvas></div>
     </div>
 
     <div class="list-options-bar" id="listOptionsBar" style="display:none;">
