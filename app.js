@@ -4277,7 +4277,7 @@ function applyTheme(theme) {
   if (btn) btn.textContent = theme === 'light' ? '🌙' : '☀️';
   // 로고 이미지 전환
   const logo = document.getElementById('logoImg');
-  if (logo) logo.src = theme === 'light' ? '/img/logo_white.png' : '/img/logo_dark.png';
+  if (logo) logo.src = theme === 'light' ? '/img/logo_light_tp.png' : '/img/logo_dark_tp.png';
   localStorage.setItem('app_theme', theme);
 }
 
