@@ -41,6 +41,7 @@ let realizedFilters = { market: 'all', symbol: null, tradeIdx: null };
 let realizedRankingTab = 'pnl';
 // 🌟 실현수익 랭킹 기간 필터 (all | 1y | 6m | 3m | 1m)
 let realizedRankingPeriod = 'all';
+let realizedRankingSortDir = 'desc'; // 'desc' 내림차순 | 'asc' 오름차순
 // 🌟 종목 리스트 검색 및 태그 필터 상태 변수
 let currentLocalSearch = '';
 let currentLocalTag = 'all';
@@ -91,6 +92,11 @@ function setRealizedRankingTab(tab) {
 // 🌟 실현수익 랭킹 기간 필터 전환
 function setRealizedRankingPeriod(period) {
     realizedRankingPeriod = period;
+    renderRealizedDashboard();
+}
+ 
+function setRealizedRankingSortDir(dir) {
+    realizedRankingSortDir = dir;
     renderRealizedDashboard();
 }
 
@@ -3829,6 +3835,13 @@ function renderRealizedDashboard() {
     const maxAbsPnl   = Math.max(...rankByPnl.map(s => Math.abs(s.pnlKrw)),      1);
     const maxAbsRoi   = Math.max(...rankByRoi.map(s => Math.abs(s.roi)),          1);
     const maxAbsSpeed = Math.max(...rankBySpeed.map(s => Math.abs(s.speedScore)), 1);
+ 
+    // 오름차순이면 전체 뒤집기
+    if (realizedRankingSortDir === 'asc') {
+        rankByPnl.reverse();
+        rankByRoi.reverse();
+        rankBySpeed.reverse();
+    }
 
     const fmtW = v => {
         const abs = Math.abs(v);
@@ -3837,6 +3850,15 @@ function renderRealizedDashboard() {
         return (v < 0 ? '-' : '+') + '₩' + Math.round(abs).toLocaleString();
     };
 
+    // 🌟 일평균 금액 포맷 (정확하게)
+    const fmtSpeed = (v) => {
+        const abs  = Math.abs(v);
+        const sign = v >= 0 ? '+' : '-';
+        if (abs >= 100000000) return sign + '₩' + (abs / 100000000).toFixed(2) + '억/일';
+        if (abs >= 10000)     return sign + '₩' + (abs / 10000).toFixed(2) + '만/일';
+        return sign + '₩' + Math.round(abs).toLocaleString() + '/일';
+    };
+ 
     const rankRowHtml = (item, rank, valueStr, barPct, isPos) => {
         const medalMap = { 1: '🥇', 2: '🥈', 3: '🥉' };
         const medal = medalMap[rank] || `<span style="font-size:11px; color:var(--text3); font-weight:700; min-width:18px; display:inline-block; text-align:center;">${rank}</span>`;
@@ -3851,9 +3873,9 @@ function renderRealizedDashboard() {
             <span style="font-size:15px; flex-shrink:0;">${medal}</span>
             <div style="flex:1; min-width:0;">
               <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</div>
-              <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${item.symbol.replace('.KS','').replace('.KQ','')} · ${item.trades}건</div>
+              <div style="font-size:10px; color:var(--text3);">${item.trades}건 매도</div>
             </div>
-            <div style="font-size:12px; font-weight:700; color:${valColor}; font-family:var(--font-mono); flex-shrink:0;">${valueStr}</div>
+            <div style="font-size:12px; font-weight:700; color:${valColor}; font-family:var(--font-mono); flex-shrink:0; text-align:right; line-height:1.4;">${valueStr}</div>
           </div>
           <div style="height:3px; border-radius:2px; background:var(--bg3); overflow:hidden;">
             <div style="height:100%; width:${Math.min(100, Math.abs(barPct))}%; background:${barColor}; border-radius:2px; transition:width 0.4s;"></div>
@@ -3906,11 +3928,17 @@ function renderRealizedDashboard() {
                 <span style="font-size:10px; color:var(--text3); flex-shrink:0; margin-right:2px;">기간</span>
                 ${periodBtns}
               </div>
-              <!-- 탭 (수익금 / 수익률) -->
-              <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0;">
+              <!-- 탭 + 정렬 방향 버튼 -->
+              <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
                 ${tabBtn('pnl', '💵 수익금')}
                 ${tabBtn('roi', '📊 수익률')}
                 ${tabBtn('speed', '⚡ 단타왕')}
+                <div style="margin-left:auto; display:flex; align-items:center; padding:0 8px; gap:4px; border-left:1px solid var(--border);">
+                  <button onclick="setRealizedRankingSortDir('desc')"
+                    style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='desc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='desc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='desc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; white-space:nowrap; line-height:1;">↓</button>
+                  <button onclick="setRealizedRankingSortDir('asc')"
+                    style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='asc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='asc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='asc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; white-space:nowrap; line-height:1;">↑</button>
+                </div>
               </div>
               <!-- 랭킹 리스트 -->
               <div style="padding:6px 8px; display:flex; flex-direction:column; gap:2px; flex:1; overflow-y:auto;">
@@ -3920,14 +3948,10 @@ function renderRealizedDashboard() {
                         s, i+1,
                         (() => {
                             if (isSpeed) {
-                                const abs  = Math.abs(s.speedScore);
-                                const sign = s.speedScore >= 0 ? '+' : '-';
-                                const fmt  = abs >= 10000
-                                    ? sign + '₩' + (abs / 10000).toFixed(0) + '만/일'
-                                    : sign + '₩' + Math.round(abs).toLocaleString() + '/일';
-                                // 보유 기간을 작은 글씨로 덧붙임
-                                return fmt +
-                                    `<span style="font-size:9px;color:var(--text3);margin-left:4px;">(${s.holdDays}일 보유)</span>`;
+                                // 일평균: 총 실현수익 ÷ 보유 일수 (정확한 값 표시)
+                                const dailyLine = fmtSpeed(s.speedScore);
+                                const holdLine  = `<br><span style="font-size:9px;color:var(--text3);font-weight:400;">${s.holdDays}일 보유 · 총 ${fmtW(s.pnlKrw)}</span>`;
+                                return dailyLine + holdLine;
                             }
                             return isRoi
                                 ? (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%'
