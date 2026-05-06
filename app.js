@@ -45,7 +45,7 @@ let realizedRankingSortDir = 'desc'; // 'desc' 내림차순 | 'asc' 오름차순
 // 🌟 종목 리스트 검색 및 태그 필터 상태 변수
 let currentLocalSearch = '';
 let currentLocalTag = 'all';
-// 🌟 배당 리스트 정렬 상태 변수
+// 'yieldDesc' | 'yieldAsc' | 'totalDesc' | 'totalAsc'
 let currentDivSort = 'yieldDesc';
 function setDivSort(val) {
     currentDivSort = val;
@@ -2894,10 +2894,101 @@ function renderDividendDashboard() {
     };
   });
   
-  if (currentDivSort === 'yieldDesc') {
-      symArr.sort((a,b) => b.yieldPct - a.yieldPct); // 실질 배당률 높은 순
-  } else {
-      symArr.sort((a,b) => b.total - a.total);       // 총 배당금 높은 순
+  const divSortFns = {
+      yieldDesc: (a, b) => b.yieldPct - a.yieldPct,
+      yieldAsc:  (a, b) => a.yieldPct - b.yieldPct,
+      totalDesc: (a, b) => b.total    - a.total,
+      totalAsc:  (a, b) => a.total    - b.total,
+  };
+  symArr.sort(divSortFns[currentDivSort] || divSortFns.yieldDesc);
+ 
+  // 🌟 정렬 탭 UI — divStockList 바로 위에 동적 삽입
+  const _divListEl = document.getElementById('divStockList');
+  let _sortTabBar  = document.getElementById('divSortTabBar');
+  if (!_sortTabBar && _divListEl) {
+      _sortTabBar = document.createElement('div');
+      _sortTabBar.id = 'divSortTabBar';
+      _divListEl.parentNode.insertBefore(_sortTabBar, _divListEl);
+  }
+  if (_sortTabBar) {
+      const _tb = (val, label, icon) => {
+          const isActive = currentDivSort === val;
+          return `<button
+              onclick="setDivSort('${val}')"
+              style="
+                  padding: 7px 13px;
+                  font-size: 12px;
+                  font-weight: ${isActive ? '700' : '500'};
+                  border-radius: 6px;
+                  border: 1px solid ${isActive ? 'var(--accent)' : 'var(--border)'};
+                  background: ${isActive ? 'var(--accent-bg)' : 'transparent'};
+                  color: ${isActive ? 'var(--accent)' : 'var(--text3)'};
+                  cursor: pointer;
+                  font-family: var(--font-sans);
+                  transition: 0.15s;
+                  white-space: nowrap;
+                  display: flex; align-items: center; gap: 5px;
+              "
+              onmouseover="if('${val}'!=='${currentDivSort}') { this.style.background='rgba(255,255,255,0.04)'; this.style.color='var(--text)'; }"
+              onmouseout="if('${val}'!=='${currentDivSort}') { this.style.background='transparent'; this.style.color='var(--text3)'; }"
+          >${icon} ${label}</button>`;
+      };
+ 
+      _sortTabBar.innerHTML = `
+          <div style="
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              margin-bottom: 14px;
+              padding-bottom: 14px;
+              border-bottom: 1px solid var(--border);
+              flex-wrap: wrap;
+          ">
+              <!-- ── 배당률 그룹 ── -->
+              <div style="
+                  display: flex;
+                  align-items: center;
+                  gap: 3px;
+                  background: var(--bg3);
+                  padding: 4px;
+                  border-radius: 8px;
+                  border: 1px solid var(--border);
+              ">
+                  <span style="
+                      padding: 5px 8px;
+                      font-size: 11px;
+                      font-weight: 700;
+                      color: var(--text2);
+                      white-space: nowrap;
+                      letter-spacing: 0.02em;
+                  ">📊 배당률</span>
+                  ${_tb('yieldDesc', '↓ 높은순', '')}
+                  ${_tb('yieldAsc',  '↑ 낮은순', '')}
+              </div>
+ 
+              <!-- ── 배당금 그룹 ── -->
+              <div style="
+                  display: flex;
+                  align-items: center;
+                  gap: 3px;
+                  background: var(--bg3);
+                  padding: 4px;
+                  border-radius: 8px;
+                  border: 1px solid var(--border);
+              ">
+                  <span style="
+                      padding: 5px 8px;
+                      font-size: 11px;
+                      font-weight: 700;
+                      color: var(--text2);
+                      white-space: nowrap;
+                      letter-spacing: 0.02em;
+                  ">💰 배당금</span>
+                  ${_tb('totalDesc', '↓ 많은순', '')}
+                  ${_tb('totalAsc',  '↑ 적은순', '')}
+              </div>
+          </div>
+      `;
   }
 
   let listHtml = symArr.map(item => {
