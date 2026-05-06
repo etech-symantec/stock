@@ -2954,15 +2954,45 @@ function renderDividendDashboard() {
   });
 }
 
-// 🌟 종목 카드 모달 차트 (오류 해결 및 연도 표시 완벽 지원)
+// 🌟 종목 카드 모달 관련 로직 (개별 기간 조정 기능 추가)
+let currentModalTicker = '';
+let currentModalRange = state.range; // 처음 켤 때는 메인 대시보드 설정을 따라감
+
 function openChartModal(ticker) {
-  const data = cachedMarketData[ticker]; if(!data || data._failed) return;
+  currentModalTicker = ticker;
+  currentModalRange = state.range; // 모달을 새로 열 때마다 메인 설정으로 초기화
+  
+  // 버튼 UI 초기화
+  document.querySelectorAll('.m-rtab').forEach(b => {
+      b.classList.remove('active');
+      if (b.textContent.toLowerCase() === currentModalRange.toLowerCase()) {
+          b.classList.add('active');
+      }
+  });
+  
+  renderModalChart();
+  document.getElementById('chartOverlay').classList.add('open');
+}
+
+function setModalRange(range, el) {
+  currentModalRange = range;
+  document.querySelectorAll('.m-rtab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderModalChart();
+}
+
+function renderModalChart() {
+  if (!currentModalTicker) return;
+  const data = cachedMarketData[currentModalTicker]; 
+  if(!data || data._failed) return;
+  
   const getSliceLen = (range) => {
     if (range === '1d') return 2; if (range === '1w') return 6; if (range === '1m') return 22;
     if (range === '3m') return 63; if (range === '6m') return 126; if (range === '1y') return 252;
     if (range === '3y') return 756; if (range === '5y') return 1260; if (range === '10y') return 2520; return 252;
   };
-  let sliceLen = getSliceLen(state.range);
+  let sliceLen = getSliceLen(currentModalRange);
+  
   const displayPrices = data.prices.slice(-sliceLen);
   const displayDates = data.dates.slice(-sliceLen); 
   if(displayPrices.length === 0) return;
@@ -2974,19 +3004,16 @@ function openChartModal(ticker) {
   
   document.getElementById('mTicker').textContent = data.name;
   document.getElementById('mBroker').textContent = data.symbol;
-  document.getElementById('mPrice').textContent = formatPrice(last, ticker);
+  document.getElementById('mPrice').textContent = formatPrice(last, currentModalTicker);
   
   const chgEl = document.getElementById('mChange');
-  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, ticker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
+  chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, currentModalTicker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
   chgEl.style.backgroundColor = chgPct > 0 ? 'var(--profit-bg)' : 'var(--loss-bg)';
   chgEl.style.color = chgPct > 0 ? '#00C578' : '#3A9AFF';
-  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, ticker)} · 최저 ${formatPrice(lo, ticker)}`;
+  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
   
-  document.getElementById('chartOverlay').classList.add('open');
   if (modalChartInst) modalChartInst.destroy();
-  
-  // 🌟 buildChart 함수에 symbol(ticker)을 넘겨주면 알아서 마커와 연도 표시를 완벽하게 처리함
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, ticker); }, 50);
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker); }, 50);
 }
 
 // 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
