@@ -3783,23 +3783,52 @@ function renderRealizedDashboard() {
             const cachedMatch = cachedMarketData[tx.symbol];
             if (dbMatch) stockName = dbMatch.name;
             else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
-            symStats[tx.symbol] = { symbol: tx.symbol, name: stockName, pnlKrw: 0, costKrw: 0, trades: 0 };
+            symStats[tx.symbol] = {
+                symbol: tx.symbol, name: stockName,
+                pnlKrw: 0, costKrw: 0, trades: 0,
+                lastSellDate: tx.date
+            };
         }
         symStats[tx.symbol].pnlKrw  += pnlKrw;
         symStats[tx.symbol].costKrw += costKrw;
         symStats[tx.symbol].trades  += 1;
+        // 마지막 매도일 갱신
+        if (tx.date > symStats[tx.symbol].lastSellDate) {
+            symStats[tx.symbol].lastSellDate = tx.date;
+        }
     });
-
+ 
+    // 🌟 단타왕 속도 점수 = 총 실현수익(₩) ÷ 보유 일수
+    //    보유 일수: state.transactions 전체에서 해당 종목 첫 매수일 ~ 마지막 매도일
+    Object.values(symStats).forEach(s => {
+        const buyTxs = state.transactions.filter(
+            t => t.symbol === s.symbol && t.qty > 0 &&
+                 t.txType !== 'dividend' && t.txType !== 'transfer'
+        );
+        const firstBuyDate = buyTxs.length > 0
+            ? buyTxs.map(t => t.date).sort()[0]
+            : s.lastSellDate;
+        const holdDays = Math.max(
+            1,
+            Math.round((new Date(s.lastSellDate) - new Date(firstBuyDate)) / 86400000)
+        );
+        s.firstBuyDate = firstBuyDate;
+        s.holdDays     = holdDays;
+        s.speedScore   = s.pnlKrw / holdDays;   // 하루 평균 실현 수익(₩)
+    });
+ 
     const symList = Object.values(symStats).map(s => ({
         ...s,
         roi: s.costKrw > 0 ? (s.pnlKrw / s.costKrw) * 100 : 0
     }));
-
-    const rankByPnl = [...symList].sort((a, b) => b.pnlKrw - a.pnlKrw);
-    const rankByRoi = [...symList].sort((a, b) => b.roi - a.roi);
-
-    const maxAbsPnl = Math.max(...rankByPnl.map(s => Math.abs(s.pnlKrw)), 1);
-    const maxAbsRoi = Math.max(...rankByRoi.map(s => Math.abs(s.roi)), 1);
+ 
+    const rankByPnl   = [...symList].sort((a, b) => b.pnlKrw    - a.pnlKrw);
+    const rankByRoi   = [...symList].sort((a, b) => b.roi        - a.roi);
+    const rankBySpeed = [...symList].sort((a, b) => b.speedScore - a.speedScore);   // 단타왕
+ 
+    const maxAbsPnl   = Math.max(...rankByPnl.map(s => Math.abs(s.pnlKrw)),      1);
+    const maxAbsRoi   = Math.max(...rankByRoi.map(s => Math.abs(s.roi)),          1);
+    const maxAbsSpeed = Math.max(...rankBySpeed.map(s => Math.abs(s.speedScore)), 1);
 
     const fmtW = v => {
         const abs = Math.abs(v);
@@ -3842,9 +3871,10 @@ function renderRealizedDashboard() {
             const periods = ['all', '1y', '6m', '3m', '1m'];
 
             // 현재 탭에 따라 표시할 랭킹 결정
-            const isRoi = realizedRankingTab === 'roi';
-            const activeRank = isRoi ? rankByRoi : rankByPnl;
-            const maxAbsActive = isRoi ? maxAbsRoi : maxAbsPnl;
+            const isRoi   = realizedRankingTab === 'roi';
+            const isSpeed = realizedRankingTab === 'speed';
+            const activeRank   = isSpeed ? rankBySpeed : (isRoi ? rankByRoi : rankByPnl);
+            const maxAbsActive = isSpeed ? maxAbsSpeed  : (isRoi ? maxAbsRoi : maxAbsPnl);
 
             const periodBtns = periods.map(p => {
                 const isActive = p === realizedRankingPeriod;
@@ -3880,6 +3910,7 @@ function renderRealizedDashboard() {
               <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0;">
                 ${tabBtn('pnl', '💵 수익금')}
                 ${tabBtn('roi', '📊 수익률')}
+                ${tabBtn('speed', '⚡ 단타왕')}
               </div>
               <!-- 랭킹 리스트 -->
               <div style="padding:6px 8px; display:flex; flex-direction:column; gap:2px; flex:1; overflow-y:auto;">
@@ -3887,9 +3918,23 @@ function renderRealizedDashboard() {
                     ? `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">해당 기간 데이터 없음</div>`
                     : activeRank.map((s, i) => rankRowHtml(
                         s, i+1,
-                        isRoi ? (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%' : fmtW(s.pnlKrw),
-                        isRoi ? (s.roi / maxAbsActive) * 100 : (s.pnlKrw / maxAbsActive) * 100,
-                        isRoi ? s.roi >= 0 : s.pnlKrw >= 0
+                        (() => {
+                            if (isSpeed) {
+                                const abs  = Math.abs(s.speedScore);
+                                const sign = s.speedScore >= 0 ? '+' : '-';
+                                const fmt  = abs >= 10000
+                                    ? sign + '₩' + (abs / 10000).toFixed(0) + '만/일'
+                                    : sign + '₩' + Math.round(abs).toLocaleString() + '/일';
+                                // 보유 기간을 작은 글씨로 덧붙임
+                                return fmt +
+                                    `<span style="font-size:9px;color:var(--text3);margin-left:4px;">(${s.holdDays}일 보유)</span>`;
+                            }
+                            return isRoi
+                                ? (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%'
+                                : fmtW(s.pnlKrw);
+                        })(),
+                        (Math.abs(isSpeed ? s.speedScore : isRoi ? s.roi : s.pnlKrw) / maxAbsActive) * 100,
+                        isSpeed ? s.speedScore >= 0 : isRoi ? s.roi >= 0 : s.pnlKrw >= 0
                       )).join('')
                 }
               </div>
