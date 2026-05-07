@@ -4566,3 +4566,429 @@ if (_origSetView) {
     syncMobileTabBar(view);
   };
 }
+
+
+
+// ============================================================
+// 🎓 POLARIS 튜토리얼 시스템 (app.js 맨 아래에 통째로 붙여넣기)
+// ============================================================
+
+(function() {
+'use strict';
+
+// ── 상수 & 상태 ────────────────────────────────────────────
+const TUTORIAL_DONE_KEY = 'polaris_tutorial_done_v1';
+let tutorialActive = false;
+let currentStep    = 0;
+
+// ── 스텝 정의 ──────────────────────────────────────────────
+// target: CSS 선택자 | 'center': 화면 중앙에 표시 (요소 없음)
+// arrow: 'top' | 'bottom' | 'left' | 'right' (툴팁 꼬리 방향)
+// position: 툴팁의 기준 위치 (auto 계산)
+const STEPS = [
+    {
+        target: 'nav',
+        arrow: 'top',
+        icon: '🗺️',
+        label: '01 — 네비게이션',
+        title: '상단 메뉴로 화면을 전환하세요',
+        body: '상단 탭(전체보기·소유자별·관심종목·거래내역·실현수익·배당통계)을 클릭해 각 대시보드로 이동할 수 있어요.',
+        tip: '💡 검색창에서 티커를 입력하고 ＋를 눌러 관심 종목을 추가하세요',
+    },
+    {
+        target: '#sidebar',
+        arrow: 'left',
+        icon: '✏️',
+        label: '02 — 거래 장부',
+        title: '좌측 장부에서 매수·매도를 기록하세요',
+        body: '소유자, 거래 유형(매수/매도/배당/이동/분할), 종목, 수량, 단가를 입력하면 전체 포트폴리오에 즉시 반영됩니다.',
+        tip: '💡 계좌명을 입력하면 계좌별 수익률도 분리해서 확인할 수 있어요',
+    },
+    {
+        target: '#dashboardTopWrapper',
+        arrow: 'top',
+        icon: '📊',
+        label: '03 — 통합 자산 패널',
+        title: '내 전체 자산 현황을 한눈에 확인하세요',
+        body: '국내·해외 주식의 투자 원금, 현재 평가액, 수익률을 실시간으로 집계합니다. "현재 보유 / 누적 자산" 버튼으로 실현수익까지 포함한 누적 자산을 볼 수 있어요.',
+        tip: '💡 우측 포트폴리오 맵에서 종목별 비중을 시각적으로 확인하세요',
+    },
+    {
+        target: '#portfolioChartWrapper',
+        arrow: 'top',
+        icon: '📈',
+        label: '04 — 자산 성장 추이',
+        title: '투자 원금 대비 평가액 흐름을 추적하세요',
+        body: '시간 흐름에 따른 총 투자액과 총 평가액을 영역 차트로 보여줍니다. 차트 위를 드래그하면 원하는 구간을 확대할 수 있어요.',
+        tip: '💡 초록 막대 = 익절, 파랑 막대 = 손절로 건별 실현수익도 표시됩니다',
+    },
+    {
+        target: '.vtab[onclick*="history"]',
+        arrow: 'bottom',
+        icon: '📜',
+        label: '05 — 거래 내역',
+        title: '전체 거래 이력을 필터링해서 조회하세요',
+        body: '국가·유형·계좌·기간·종목명으로 거래를 검색하고, CSV 파일로 일괄 업로드할 수도 있어요. 각 행을 클릭하면 소유자를 바로 변경할 수 있습니다.',
+        tip: '💡 ⚙️ 설정 > "CSV 파일로 일괄 업로드"로 기존 거래 내역을 한 번에 가져오세요',
+    },
+    {
+        target: '.vtab[onclick*="realized"]',
+        arrow: 'bottom',
+        icon: '💵',
+        label: '06 — 실현수익',
+        title: '매도를 통해 확정된 수익을 분석하세요',
+        body: '누적 실현수익 차트, 종목별 수익금·수익률·단타왕 랭킹을 제공합니다. 기간 필터와 ↓↑ 정렬 버튼으로 원하는 분석을 바로 찾을 수 있어요.',
+        tip: '💡 랭킹 항목을 클릭하면 해당 종목의 거래 내역만 필터링됩니다',
+    },
+    {
+        target: '.vtab[onclick*="dividend"]',
+        arrow: 'bottom',
+        icon: '🌿',
+        label: '07 — 배당통계',
+        title: '배당금 현황과 실질 배당률을 추적하세요',
+        body: '월별 배당 추이 차트와 종목별 배당금 목록을 제공합니다. 📊 배당률 / 💰 배당금 탭과 ↓↑ 정렬로 원하는 기준으로 정렬할 수 있어요.',
+        tip: '💡 배당 입력 시 "세전 금액" 체크하면 세금(15%)이 자동 차감됩니다',
+    },
+    {
+        target: '.btn-sm[onclick*="openMasterSettings"]',
+        arrow: 'bottom',
+        icon: '☁️',
+        label: '08 — 클라우드 백업',
+        title: 'GitHub에 데이터를 안전하게 백업하세요',
+        body: '개인 GitHub 저장소를 연결하면 모든 기기에서 장부를 동기화할 수 있습니다. "자동 동기화"를 켜면 거래 추가·수정 시 자동으로 저장돼요.',
+        tip: '💡 JSON 파일로 로컬 백업도 지원합니다',
+    },
+];
+
+// ── DOM 헬퍼 ───────────────────────────────────────────────
+function $(sel)  { return document.querySelector(sel); }
+function injectWelcomeModal() {
+    if ($('#tutorialWelcomeOverlay')) return;
+    const el = document.createElement('div');
+    el.id = 'tutorialWelcomeOverlay';
+    el.className = 'tutorial-welcome-overlay';
+    el.innerHTML = `
+      <div class="tutorial-welcome-modal" onclick="event.stopPropagation()">
+        <span class="tutorial-welcome-logo">🚀</span>
+        <h2>POLARIS에 오신 걸 환영합니다!</h2>
+        <p>
+          국내·해외 주식 포트폴리오를 한 곳에서 관리하는
+          <span class="highlight-text">나만의 스마트 주식 장부</span>입니다.<br>
+          빠른 가이드로 핵심 기능을 바로 익혀보세요!
+        </p>
+
+        <div class="tutorial-feature-grid">
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">✏️</span>
+            <span>거래 장부로<br><b>매수·매도·배당 기록</b></span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">📊</span>
+            <span>실시간 시세·<br><b>수익률 자동 계산</b></span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">💵</span>
+            <span>실현수익 & <br><b>배당금 통계</b></span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">☁️</span>
+            <span>GitHub 클라우드<br><b>자동 백업·동기화</b></span>
+          </div>
+        </div>
+
+        <div class="tutorial-welcome-actions">
+          <button class="btn-tutorial-start" onclick="startTutorial()">
+            🎓 빠른 가이드 시작하기 (${STEPS.length}단계)
+          </button>
+          <button class="btn-tutorial-skip" onclick="skipTutorial()">
+            건너뛰기 — 나중에 ⚙️ 설정에서 다시 볼 수 있어요
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(el);
+}
+
+function injectTutorialDOM() {
+    if ($('#tutorialBackdrop')) return;
+
+    // 4방향 커튼
+    ['top','bottom','left','right'].forEach(dir => {
+        const c = document.createElement('div');
+        c.id = `tutorialCurtain_${dir}`;
+        c.className = 'tutorial-curtain';
+        c.style.display = 'none';
+        c.onclick = () => closeTutorial();
+        document.body.appendChild(c);
+    });
+
+    // 하이라이트 링
+    const ring = document.createElement('div');
+    ring.id = 'tutorialHighlightRing';
+    ring.className = 'tutorial-highlight-ring';
+    ring.style.display = 'none';
+    document.body.appendChild(ring);
+
+    // 툴팁
+    const tt = document.createElement('div');
+    tt.id = 'tutorialTooltip';
+    tt.className = 'tutorial-tooltip';
+    tt.style.display = 'none';
+    document.body.appendChild(tt);
+
+    // 완료 토스트
+    const toast = document.createElement('div');
+    toast.id = 'tutorialDoneToast';
+    toast.className = 'tutorial-done-toast';
+    toast.innerHTML = '🎉 튜토리얼 완료! 이제 POLARIS를 마음껏 사용하세요';
+    document.body.appendChild(toast);
+}
+
+// ── 스포트라이트 포지셔닝 ─────────────────────────────────
+const PAD = 8; // 하이라이트 여백
+
+function positionSpotlight(rect) {
+    const { top: t, left: l, right: r, bottom: b, width: w, height: h } = rect;
+    const vw = window.innerWidth, vh = window.innerHeight;
+
+    // 커튼 4개
+    function curtain(id, styles) {
+        const el = $(`#tutorialCurtain_${id}`);
+        Object.assign(el.style, { display: 'block', ...styles });
+    }
+    curtain('top',    { top:'0',                left:'0',               width:`${vw}px`,          height:`${t-PAD}px` });
+    curtain('bottom', { top:`${b+PAD}px`,        left:'0',               width:`${vw}px`,          height:`${vh-(b+PAD)}px` });
+    curtain('left',   { top:`${t-PAD}px`,        left:'0',               width:`${l-PAD}px`,       height:`${h+PAD*2}px` });
+    curtain('right',  { top:`${t-PAD}px`,        left:`${r+PAD}px`,      width:`${vw-(r+PAD)}px`,  height:`${h+PAD*2}px` });
+
+    // 링
+    const ring = $('#tutorialHighlightRing');
+    Object.assign(ring.style, {
+        display: 'block',
+        top:    `${t - PAD}px`,
+        left:   `${l - PAD}px`,
+        width:  `${w + PAD*2}px`,
+        height: `${h + PAD*2}px`,
+    });
+}
+
+function hideCurtains() {
+    ['top','bottom','left','right'].forEach(id => {
+        const el = $(`#tutorialCurtain_${id}`);
+        if (el) el.style.display = 'none';
+    });
+    const ring = $('#tutorialHighlightRing');
+    if (ring) ring.style.display = 'none';
+}
+
+function positionTooltip(targetRect, arrow) {
+    const tt = $('#tutorialTooltip');
+    if (!tt) return;
+
+    tt.className = `tutorial-tooltip arrow-${arrow}`;
+    tt.style.display = 'block';
+
+    const TW = tt.offsetWidth  || 300;
+    const TH = tt.offsetHeight || 260;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const MARGIN = 14;
+
+    let top, left;
+
+    if (arrow === 'top') {
+        top  = (targetRect ? targetRect.bottom + PAD + MARGIN : vh / 2 - TH / 2);
+        left = targetRect ? Math.min(targetRect.left, vw - TW - MARGIN) : vw / 2 - TW / 2;
+    } else if (arrow === 'bottom') {
+        top  = (targetRect ? targetRect.top - TH - PAD - MARGIN : vh / 2 - TH / 2);
+        left = targetRect ? Math.min(targetRect.left, vw - TW - MARGIN) : vw / 2 - TW / 2;
+    } else if (arrow === 'left') {
+        left = (targetRect ? targetRect.right + PAD + MARGIN : vw / 2 - TW / 2);
+        top  = targetRect ? targetRect.top : vh / 2 - TH / 2;
+    } else { // right
+        left = (targetRect ? targetRect.left - TW - PAD - MARGIN : vw / 2 - TW / 2);
+        top  = targetRect ? targetRect.top : vh / 2 - TH / 2;
+    }
+
+    // 뷰포트 밖으로 나가지 않게 보정
+    left = Math.max(MARGIN, Math.min(left, vw - TW - MARGIN));
+    top  = Math.max(MARGIN, Math.min(top,  vh - TH - MARGIN));
+
+    tt.style.top  = `${top}px`;
+    tt.style.left = `${left}px`;
+}
+
+// ── 스텝 렌더 ─────────────────────────────────────────────
+function renderStep(idx) {
+    const step = STEPS[idx];
+    const total = STEPS.length;
+
+    // 타깃 요소 찾기
+    let targetEl = step.target ? $(step.target) : null;
+
+    // 숨겨진 요소 처리 (nav는 항상 보임)
+    if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        const visible = rect.width > 0 && rect.height > 0;
+        if (!visible) targetEl = null;
+    }
+
+    if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        positionSpotlight(rect);
+        positionTooltip(rect, step.arrow);
+        // 요소가 화면 밖이면 스크롤
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        hideCurtains();
+        positionTooltip(null, 'top');
+    }
+
+    // 툴팁 내용 렌더링
+    const dots = STEPS.map((_, i) => {
+        const cls = i === idx ? 'active' : (i < idx ? 'done' : '');
+        return `<div class="tutorial-dot ${cls}" onclick="goToStep(${i})" title="${i+1}단계"></div>`;
+    }).join('');
+
+    const tt = $('#tutorialTooltip');
+    const isLast = idx === total - 1;
+    tt.innerHTML = `
+      <button class="btn-tutorial-close-x" onclick="closeTutorial()" title="튜토리얼 닫기">✕</button>
+      <div class="tutorial-tooltip-step">${step.label}</div>
+      <span class="tutorial-tooltip-icon">${step.icon}</span>
+      <h3>${step.title}</h3>
+      <p>${step.body}</p>
+      ${step.tip ? `<div class="tip-tag">${step.tip}</div>` : ''}
+      <div class="tutorial-nav">
+        <button class="btn-tutorial-prev" onclick="prevStep()" ${idx === 0 ? 'disabled' : ''}>← 이전</button>
+        <div class="tutorial-progress-dots">${dots}</div>
+        <button class="btn-tutorial-next" onclick="nextStep()">
+          ${isLast ? '🎉 완료!' : '다음 →'}
+        </button>
+      </div>
+    `;
+}
+
+// ── 공개 API ───────────────────────────────────────────────
+window.startTutorial = function() {
+    closeWelcome();
+    injectTutorialDOM();
+    tutorialActive = true;
+    currentStep = 0;
+    renderStep(0);
+};
+
+window.skipTutorial = function() {
+    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
+    closeWelcome();
+};
+
+window.closeTutorial = function() {
+    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
+    tutorialActive = false;
+    hideCurtains();
+    const tt = $('#tutorialTooltip');
+    if (tt) tt.style.display = 'none';
+};
+
+window.nextStep = function() {
+    if (!tutorialActive) return;
+    if (currentStep >= STEPS.length - 1) {
+        finishTutorial();
+    } else {
+        currentStep++;
+        renderStep(currentStep);
+    }
+};
+
+window.prevStep = function() {
+    if (!tutorialActive || currentStep <= 0) return;
+    currentStep--;
+    renderStep(currentStep);
+};
+
+window.goToStep = function(idx) {
+    if (!tutorialActive) return;
+    currentStep = idx;
+    renderStep(idx);
+};
+
+window.restartTutorial = function() {
+    closeModal('masterSettingsOverlay');
+    localStorage.removeItem(TUTORIAL_DONE_KEY);
+    injectWelcomeModal();
+    $('#tutorialWelcomeOverlay').classList.add('open');
+};
+
+function closeWelcome() {
+    const el = $('#tutorialWelcomeOverlay');
+    if (el) el.classList.remove('open');
+}
+
+function finishTutorial() {
+    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
+    tutorialActive = false;
+    hideCurtains();
+    const tt = $('#tutorialTooltip');
+    if (tt) tt.style.display = 'none';
+
+    const toast = $('#tutorialDoneToast');
+    if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3800);
+    }
+}
+
+// ── 설정 모달에 재시작 버튼 주입 ──────────────────────────
+function injectRestartButton() {
+    const settingsModal = $('#masterSettingsOverlay .modal');
+    if (!settingsModal || settingsModal.querySelector('.tutorial-restart-section')) return;
+
+    const sec = document.createElement('div');
+    sec.className = 'settings-section tutorial-restart-section';
+    sec.style.cssText = 'margin-top:16px; margin-bottom:0;';
+    sec.innerHTML = `
+      <div class="settings-section-title">🎓 튜토리얼</div>
+      <button class="btn-restart-tutorial" onclick="restartTutorial()">
+        <span>🔁</span> 빠른 가이드 다시 보기
+      </button>
+    `;
+    settingsModal.appendChild(sec);
+}
+
+// ── 초기화 ────────────────────────────────────────────────
+function initTutorial() {
+    // 최초 방문 여부 확인
+    const done = localStorage.getItem(TUTORIAL_DONE_KEY);
+    if (!done) {
+        // 첫 방문: 약간 딜레이 후 환영 모달 표시
+        setTimeout(() => {
+            injectWelcomeModal();
+            const overlay = $('#tutorialWelcomeOverlay');
+            if (overlay) overlay.classList.add('open');
+        }, 800);
+    }
+
+    // 설정 모달이 열릴 때마다 재시작 버튼 주입 (MutationObserver 활용)
+    const settingsOverlay = document.getElementById('masterSettingsOverlay');
+    if (settingsOverlay) {
+        const obs = new MutationObserver(() => {
+            if (settingsOverlay.classList.contains('open')) injectRestartButton();
+        });
+        obs.observe(settingsOverlay, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // 리사이즈 시 스텝 위치 재계산
+    window.addEventListener('resize', () => {
+        if (tutorialActive) renderStep(currentStep);
+    });
+}
+
+// DOMContentLoaded 이후 또는 즉시 실행
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTutorial);
+} else {
+    // 이미 로드됐으면 다음 틱에 실행 (다른 초기화 코드가 끝난 후)
+    setTimeout(initTutorial, 0);
+}
+
+})(); // IIFE 끝
