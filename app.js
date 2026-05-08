@@ -1737,12 +1737,11 @@ function setView(view, el) {
   if(view === 'history') renderHistoryDashboard();
   if(view === 'realized') renderRealizedDashboard();
   
-  const pChartWrap = document.getElementById('portfolioChartWrapper');
-  // 🌟 관심종목('watch') 탭과 다른 특수 탭에서 상단 자산 성장 그래프를 숨깁니다!
+  const pChartRowWrap2 = document.getElementById('chartRowWrapper');
   if (view === 'dividend' || view === 'history' || view === 'realized' || view === 'watch') {
-      pChartWrap.style.display = 'none';
+      if(pChartRowWrap2) pChartRowWrap2.style.display = 'none';
   } else {
-      pChartWrap.style.display = 'flex';
+      if(pChartRowWrap2) pChartRowWrap2.style.display = 'flex';
   }
   
   render();
@@ -1978,11 +1977,75 @@ function generateListItemHtml(item) {
   `;
 }
 
+// 📊 오늘 종목 현황 패널 렌더링
+function renderTodayStocksPanel(displayItems) {
+    const panel = document.getElementById('todayStocksPanel');
+    const listEl = document.getElementById('todayStocksList');
+    const totalChangeEl = document.getElementById('todayStocksTotalChange');
+    if (!panel || !listEl || !totalChangeEl) return;
+
+    // 보유 종목만 필터 (qty > 0)
+    const heldItems = displayItems.filter(item => item.qty > 0 && item.data && !item.data._failed);
+
+    if (heldItems.length === 0) {
+        panel.style.display = 'none';
+        return;
+    }
+    panel.style.display = 'flex';
+
+    // 각 종목별 1일 등락률 계산 (data.prev → data.last)
+    const rows = heldItems.map(item => {
+        const d = item.data;
+        const last = d.last || 0;
+        const prev = d.prev || last;
+        const chg1d = prev > 0 ? ((last - prev) / prev) * 100 : 0;
+        const evalAmt = item.qty * last;
+        const name = (d.name || item.symbol).replace(/\(.*?\)/g, '').trim();
+        return { symbol: item.symbol, name, chg1d, evalAmt };
+    });
+
+    // 가중평균 총 등락률 = Σ(evalAmt * chg1d) / Σ(evalAmt)
+    const totalEval = rows.reduce((s, r) => s + r.evalAmt, 0);
+    const weightedChange = totalEval > 0
+        ? rows.reduce((s, r) => s + r.chg1d * r.evalAmt, 0) / totalEval
+        : 0;
+
+    // 등락률 기준 정렬 (높은 순)
+    rows.sort((a, b) => b.chg1d - a.chg1d);
+
+    // 리스트 렌더링
+    listEl.innerHTML = rows.map(r => {
+        const sign = r.chg1d > 0 ? '+' : '';
+        const colorStyle = r.chg1d > 0
+            ? 'color:var(--red, #ff4d6a)'
+            : r.chg1d < 0 ? 'color:var(--blue, #3A9AFF)' : 'color:var(--text2)';
+        const barColor = r.chg1d > 0 ? 'var(--red, #ff4d6a)' : r.chg1d < 0 ? 'var(--blue, #3A9AFF)' : 'var(--border)';
+        const barWidth = Math.min(Math.abs(r.chg1d) * 5, 100);
+        return `
+        <div style="display:flex; align-items:center; gap:10px; padding:7px 10px; background:var(--bg3); border-radius:8px; border:1px solid var(--border);">
+            <div style="flex:1; min-width:0;">
+                <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</div>
+                <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${r.symbol}</div>
+                <div style="margin-top:4px; height:3px; background:var(--border); border-radius:2px; overflow:hidden;">
+                    <div style="height:100%; width:${barWidth}%; background:${barColor}; border-radius:2px; transition:width 0.4s;"></div>
+                </div>
+            </div>
+            <div style="font-size:15px; font-weight:700; font-family:var(--font-mono); ${colorStyle}; white-space:nowrap; min-width:64px; text-align:right;">${sign}${r.chg1d.toFixed(2)}%</div>
+        </div>`;
+    }).join('');
+
+    // 총 등락률 표시
+    const totalSign = weightedChange > 0 ? '+' : '';
+    const totalColor = weightedChange > 0 ? 'var(--red, #ff4d6a)' : weightedChange < 0 ? 'var(--blue, #3A9AFF)' : 'var(--text2)';
+    totalChangeEl.style.color = totalColor;
+    totalChangeEl.textContent = `${totalSign}${weightedChange.toFixed(2)}%`;
+}
+
 // 🌟 자산 성장 추이 그래프 렌더링 (누적 영역 + 우측 기준 누적 실현수익 막대)
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
     if (currentView === 'dividend' || currentView === 'history' || currentView === 'realized' || currentView === 'watch' || state.transactions.length === 0) {
-        chartWrap.style.display = 'none';
+        if(chartWrap) chartWrap.style.display = 'none';
         return;
     }
     
@@ -1992,11 +2055,11 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
         if(keys.length > 0) masterData = cachedMarketData[keys[0]];
     }
     if (!masterData || masterData._failed || !masterData.rawDates) {
-        chartWrap.style.display = 'none';
+        if(chartWrap) chartWrap.style.display = 'none';
         return;
     }
 
-    chartWrap.style.display = 'flex';
+    if(chartWrap) chartWrap.style.display = 'flex';
     
     const rawDates = masterData.rawDates;
     const startIndex = Math.max(0, rawDates.length - sliceLen);
@@ -3168,7 +3231,7 @@ async function render() {
 
   const container = document.getElementById('gridContainer');
   const dash = document.getElementById('dashboardTopWrapper');
-  const pChartWrap = document.getElementById('portfolioChartWrapper'); 
+  const pChartRowWrap = document.getElementById('chartRowWrapper'); 
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
   const histDash = document.getElementById('historyDashboard');
@@ -3176,32 +3239,31 @@ async function render() {
 
   // 🌟 여기서부터 각 탭마다 보여줄 화면과 숨길 화면을 아주 엄격하게 통제합니다! 🌟
   if (currentView === 'dividend') {
-    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
+    dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'none';
     divDash.style.display = 'flex';
     renderDividendDashboard();
     return;
   } else if (currentView === 'history') {
-    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
+    dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'none';
     histDash.style.display = 'flex';
     renderHistoryDashboard();
     return;
   } else if (currentView === 'realized') { 
-    dash.style.display = 'none'; pChartWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'flex'; // 💡 실현수익 페이지만 정보 켜기
+    dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'flex';
     renderRealizedDashboard();
     return;
   } else if (currentView === 'watch') {
-    // 🌟 관심종목 탭: 상단 통계 요약과 그래프를 모두 숨기고 종목 리스트만 띄웁니다!
-    dash.style.display = 'none'; pChartWrap.style.display = 'none'; 
+    dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; 
     container.style.display = 'block'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
+    if(realDash) realDash.style.display = 'none';
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
-    dash.style.display = 'flex'; pChartWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
-    if(realDash) realDash.style.display = 'none'; // 💡 실현수익 정보 숨김
+    dash.style.display = 'flex'; pChartRowWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
+    if(realDash) realDash.style.display = 'none';
   }
 
   let ownerFilter = 'all';
@@ -3363,6 +3425,7 @@ async function render() {
 
   updateSummaryAndAllocation(currentHoldings, displayItems);
   renderPortfolioChart(ownerFilter, currentSliceLen);
+  renderTodayStocksPanel(displayItems);
   renderSidebarYieldList(currentHoldings);
 
   if (activeAccountFilter) {
