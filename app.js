@@ -4615,7 +4615,7 @@ const STEPS = [
     },
     {
         target: '#portfolioChartWrapper',
-        arrow: 'top',
+        arrow: 'bottom',
         icon: '📈',
         label: '04 — 자산 성장 추이',
         title: '투자 원금 대비 평가액 흐름을 추적하세요',
@@ -4624,7 +4624,7 @@ const STEPS = [
     },
     {
         target: '.vtab[onclick*="history"]',
-        arrow: 'bottom',
+        arrow: 'top',
         icon: '📜',
         label: '05 — 거래 내역',
         title: '전체 거래 이력을 필터링해서 조회하세요',
@@ -4633,7 +4633,7 @@ const STEPS = [
     },
     {
         target: '.vtab[onclick*="realized"]',
-        arrow: 'bottom',
+        arrow: 'top',
         icon: '💵',
         label: '06 — 실현수익',
         title: '매도를 통해 확정된 수익을 분석하세요',
@@ -4642,7 +4642,7 @@ const STEPS = [
     },
     {
         target: '.vtab[onclick*="dividend"]',
-        arrow: 'bottom',
+        arrow: 'top',
         icon: '🌿',
         label: '07 — 배당통계',
         title: '배당금 현황과 실질 배당률을 추적하세요',
@@ -4651,7 +4651,7 @@ const STEPS = [
     },
     {
         target: '.btn-sm[onclick*="openMasterSettings"]',
-        arrow: 'bottom',
+        arrow: 'top',
         icon: '☁️',
         label: '08 — 클라우드 백업',
         title: 'GitHub에 데이터를 안전하게 백업하세요',
