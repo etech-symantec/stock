@@ -1094,22 +1094,23 @@ function addOrUpdateTransaction() {
   const ownerKey = document.querySelector('input[name="txOwner"]:checked').value;
   const owner = state.owners[ownerKey].name;
   const broker = document.getElementById('txBroker').value.trim();
-  let symbol = document.getElementById('txSymbol').value.trim().toUpperCase();
-  
-  let qty = parseFloat(document.getElementById('txQty').value) || 0;
-  let price = parseFloat(document.getElementById('txPrice').value);
-
-  if(!date || !symbol || isNaN(price)) { alert("종목코드, 단가(배당금액)를 정확히 입력해주세요."); return; }
-  if(typeVal !== 'dividend' && qty === 0) { alert("매매 내역은 수량을 0으로 입력할 수 없습니다."); return; }
-  
-  let rawSymbol = symbol;
-  let cleanRaw = rawSymbol.replace(/\s+/g, '').toUpperCase();
-  if (localStockDB && localStockDB.length > 0) {
+  const txSymbolInput = document.getElementById('txSymbol');
+  let symbol;
+  if (txSymbolInput.dataset.symbol) {
+    symbol = txSymbolInput.dataset.symbol.toUpperCase();
+    txSymbolInput.dataset.symbol = '';  // 사용 후 초기화
+  } else {
+    let rawSymbol = txSymbolInput.value.trim().toUpperCase();
+    let cleanRaw = rawSymbol.replace(/\s+/g, '').toUpperCase();
+    if (localStockDB && localStockDB.length > 0) {
       let matched = localStockDB.find(s => s.name.replace(/\s+/g,'').toUpperCase() === cleanRaw || s.symbol.toUpperCase() === rawSymbol);
       if(matched) symbol = matched.symbol;
-      else if (/^\d{6}$/.test(symbol)) symbol += '.KS';
-  } else {
-      if (/^\d{6}$/.test(symbol)) symbol += '.KS';
+      else if (/^\d{6}$/.test(rawSymbol)) symbol = rawSymbol + '.KS';
+      else symbol = rawSymbol;
+    } else {
+      if (/^\d{6}$/.test(rawSymbol)) symbol = rawSymbol + '.KS';
+      else symbol = rawSymbol;
+    }
   }
 
   if (typeVal === 'dividend' && document.getElementById('applyDivTax').checked) {
@@ -1160,7 +1161,7 @@ function renderTxList() {
   const reversed = [...state.transactions].sort((a,b) => {
     const dateDiff = new Date(b.date) - new Date(a.date);
     return dateDiff !== 0 ? dateDiff : b.id - a.id; 
-  });
+  }).slice(0, 10);
   
   listEl.innerHTML = reversed.map(tx => {
     const isBuy = tx.qty > 0;
@@ -1194,7 +1195,7 @@ function renderTxList() {
         </div>
         <div class="tx-card-body">
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <span class="tx-sym" title="${stockName}">${stockName}</span>
+            <span style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; display:inline-block;" title="${stockName}">${stockName}</span>
             <span style="color:${typeColor}; font-weight:700; font-size:11px;">${typeLabel}</span>
           </div>
           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
@@ -1446,7 +1447,7 @@ function setupSearch(inputId, dropdownId, onSelect, filterId) {
 }
     
     dropdown.innerHTML = results.map(q => `
-      <li class="search-item" onclick="${onSelect}('${q.symbol}')">
+      <li class="search-item" onclick="${onSelect}('${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
         <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
           <span style="font-weight:500; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
           <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
@@ -1494,8 +1495,10 @@ if(tickerInp) {
     tickerInp.addEventListener('keydown', e => { if (e.key === 'Enter') addManualTicker(); });
 }
 
-function selectSidebarSearchResult(symbol) {
-  document.getElementById('txSymbol').value = symbol;
+function selectSidebarSearchResult(symbol, name) {
+  const input = document.getElementById('txSymbol');
+  input.value = name || symbol;
+  input.dataset.symbol = symbol;  // 실제 ticker는 숨겨서 보관
   document.getElementById('txDropdown').style.display = 'none';
   const type = document.querySelector('input[name="txType"]:checked').value;
   if (type === 'transfer') {
