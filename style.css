@@ -1098,6 +1098,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   display: none;
   flex-direction: row;
   margin-bottom: 20px;
+  align-items: stretch;
 }
 #chartRowWrapper #portfolioChartWrapper {
   display: flex;
@@ -1108,17 +1109,19 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 #todayStocksPanel {
   flex: 1;
   min-width: 0;
-  max-height: 320px;
 }
 #todayStocksList {
+  flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
+  min-height: 0;
 }
 @media (max-width: 900px) {
   #chartRowWrapper {
     flex-direction: column;
+    align-items: initial;
   }
   #todayStocksPanel {
-    max-height: 260px;
+    max-height: 280px;
   }
 }
