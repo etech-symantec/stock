@@ -5522,11 +5522,11 @@
       "id": 1776937394681,
       "date": "2025-05-13",
       "owner": "끄니",
-      "broker": "미래에셋",
+      "broker": "미래에셋 (ISA)",
       "symbol": "458730.KS",
       "qty": 1171,
       "price": 11850,
-      "txType": "buy"
+      "txType": "trade"
     },
     {
       "id": 1776937394682,
