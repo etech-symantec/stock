@@ -7707,6 +7707,16 @@
       "qty": 0,
       "price": 111169.476,
       "txType": "dividend"
+    },
+    {
+      "id": 1778250911437,
+      "date": "2026-05-06",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "469070.KS",
+      "qty": 0,
+      "price": 2461.86,
+      "txType": "dividend"
     }
   ],
   "range": "1m",
