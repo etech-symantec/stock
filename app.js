@@ -1982,6 +1982,7 @@ function renderTodayStocksPanel(displayItems) {
     const panel = document.getElementById('todayStocksPanel');
     const listEl = document.getElementById('todayStocksList');
     const totalChangeEl = document.getElementById('todayStocksTotalChange');
+    const totalPnlEl = document.getElementById('todayStocksTotalPnl');
     if (!panel || !listEl || !totalChangeEl) return;
 
     // 보유 종목만 필터 (qty > 0)
@@ -1993,101 +1994,138 @@ function renderTodayStocksPanel(displayItems) {
     }
     panel.style.display = 'flex';
 
-    // 각 종목별 1일 등락률 계산 (data.prev → data.last)
+    // 각 종목별 1일 데이터 계산
     const rows = heldItems.map(item => {
         const d = item.data;
         const last = d.last || 0;
         const prev = d.prev || last;
         const chg1d = prev > 0 ? ((last - prev) / prev) * 100 : 0;
-        const evalAmt = item.qty * last;
+        // 실제 당일 손익 = 보유 수량 × (현재가 - 전일가)
+        const pnl1d = item.qty * (last - prev);
+        // 전일 평가금액 = 보유 수량 × 전일가
+        const prevEval = item.qty * prev;
         const name = (d.name || item.symbol).replace(/\(.*?\)/g, '').trim();
-        return { symbol: item.symbol, name, chg1d, evalAmt };
+        const isKr = isKorean(item.symbol);
+        return { symbol: item.symbol, name, chg1d, pnl1d, prevEval, isKr };
     });
 
-    // 가중평균 총 등락률 = Σ(evalAmt * chg1d) / Σ(evalAmt)
-    const totalEval = rows.reduce((s, r) => s + r.evalAmt, 0);
-    const weightedChange = totalEval > 0
-        ? rows.reduce((s, r) => s + r.chg1d * r.evalAmt, 0) / totalEval
-        : 0;
+    // 실제 총 등락률 = 당일 전체 손익 / 전일 전체 평가금액 × 100
+    // (환율 변환 없이 종목 통화 그대로 합산 — 대략적 지표)
+    const totalPnl = rows.reduce((s, r) => s + r.pnl1d, 0);
+    const totalPrevEval = rows.reduce((s, r) => s + r.prevEval, 0);
+    const totalChangePct = totalPrevEval > 0 ? (totalPnl / totalPrevEval) * 100 : 0;
 
-    // 등락률 기준 정렬 (높은 순)
-    rows.sort((a, b) => b.chg1d - a.chg1d);
+    // 상승 / 하락 / 보합 분리 후 각각 등락률 절대값 내림차순 정렬
+    const upRows   = rows.filter(r => r.chg1d > 0).sort((a, b) => b.chg1d - a.chg1d);
+    const downRows = rows.filter(r => r.chg1d < 0).sort((a, b) => a.chg1d - b.chg1d);
+    const flatRows = rows.filter(r => r.chg1d === 0);
 
-    // 리스트 렌더링
-    listEl.innerHTML = rows.map(r => {
+    // 종목 카드 HTML 생성
+    function stockCard(r) {
         const sign = r.chg1d > 0 ? '+' : '';
-        const colorStyle = r.chg1d > 0
-            ? 'color:var(--red, #ff4d6a)'
-            : r.chg1d < 0 ? 'color:var(--blue, #3A9AFF)' : 'color:var(--text2)';
-        const barColor = r.chg1d > 0 ? 'var(--red, #ff4d6a)' : r.chg1d < 0 ? 'var(--blue, #3A9AFF)' : 'var(--border)';
-        const barWidth = Math.min(Math.abs(r.chg1d) * 5, 100);
+        const isUp   = r.chg1d > 0;
+        const isDown = r.chg1d < 0;
+        const accentColor = isUp ? 'var(--profit)' : isDown ? 'var(--loss)' : 'var(--text3)';
+        const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
+        const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
+        const barWidth    = Math.min(Math.abs(r.chg1d) * 6, 100);
         return `
-        <div style="display:flex; align-items:center; gap:10px; padding:7px 10px; background:var(--bg3); border-radius:8px; border:1px solid var(--border);">
-            <div style="flex:1; min-width:0;">
-                <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</div>
-                <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${r.symbol}</div>
-                <div style="margin-top:4px; height:3px; background:var(--border); border-radius:2px; overflow:hidden;">
-                    <div style="height:100%; width:${barWidth}%; background:${barColor}; border-radius:2px; transition:width 0.4s;"></div>
+        <div style="padding:7px 9px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha};">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
+                <div style="min-width:0; flex:1;">
+                    <div style="font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</div>
+                    <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px;">${r.symbol}</div>
                 </div>
+                <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:${accentColor}; white-space:nowrap;">${sign}${r.chg1d.toFixed(2)}%</div>
             </div>
-            <div style="font-size:15px; font-weight:700; font-family:var(--font-mono); ${colorStyle}; white-space:nowrap; min-width:64px; text-align:right;">${sign}${r.chg1d.toFixed(2)}%</div>
+            <div style="margin-top:5px; height:2px; background:var(--border); border-radius:1px; overflow:hidden;">
+                <div style="height:100%; width:${barWidth}%; background:${accentColor}; border-radius:1px;"></div>
+            </div>
         </div>`;
-    }).join('');
+    }
 
-    // 총 등락률 표시
-    const totalSign = weightedChange > 0 ? '+' : '';
-    const totalColor = weightedChange > 0 ? 'var(--red, #ff4d6a)' : weightedChange < 0 ? 'var(--blue, #3A9AFF)' : 'var(--text2)';
+    // 구분 헤더 HTML
+    function colHeader(label, count, color) {
+        return `<div style="font-size:10px; font-weight:700; color:${color}; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+            ${label} <span style="background:${color}; color:#fff; border-radius:10px; padding:1px 6px; font-size:9px;">${count}</span>
+        </div>`;
+    }
+
+    const upHtml   = (upRows.length   > 0 ? colHeader('▲ 상승', upRows.length,   'var(--profit)') : '')
+                   + upRows.map(stockCard).join('')
+                   + (flatRows.length > 0 && upRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
+    const downHtml = (downRows.length > 0 ? colHeader('▼ 하락', downRows.length, 'var(--loss)') : '')
+                   + downRows.map(stockCard).join('')
+                   + (flatRows.length > 0 && downRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
+
+    listEl.innerHTML = `
+    <div style="display:flex; gap:10px; flex:1; min-height:0;">
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; overflow-y:auto;">
+            ${upRows.length + (flatRows.length > 0 && upRows.length === 0 ? flatRows.length : 0) > 0 ? upHtml : '<div style="font-size:11px; color:var(--text3); text-align:center; margin-top:12px;">상승 종목 없음</div>'}
+        </div>
+        <div style="width:1px; background:var(--border); flex-shrink:0;"></div>
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; overflow-y:auto;">
+            ${downRows.length + (flatRows.length > 0 && downRows.length === 0 ? flatRows.length : 0) > 0 ? downHtml : '<div style="font-size:11px; color:var(--text3); text-align:center; margin-top:12px;">하락 종목 없음</div>'}
+        </div>
+    </div>`;
+
+    // 총 등락률 & 손익 표시
+    const totalSign  = totalChangePct > 0 ? '+' : '';
+    const totalColor = totalChangePct > 0 ? 'var(--profit)' : totalChangePct < 0 ? 'var(--loss)' : 'var(--text2)';
     totalChangeEl.style.color = totalColor;
-    totalChangeEl.textContent = `${totalSign}${weightedChange.toFixed(2)}%`;
+    totalChangeEl.textContent = `${totalSign}${totalChangePct.toFixed(2)}%`;
+    if (totalPnlEl) {
+        const pnlSign = totalPnl > 0 ? '+' : '';
+        totalPnlEl.style.color = totalColor;
+        totalPnlEl.textContent = `(${pnlSign}${Math.round(totalPnl).toLocaleString()})`;
+    }
 }
 
-// 🌟 자산 성장 추이 그래프 렌더링 (국장/미장 누적 및 실현수익 건별 막대 적용, 사라짐 방지 강화)
+// 🌟 자산 성장 추이 그래프 렌더링 (누적 영역 + 우측 기준 누적 실현수익 막대)
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
-    if (!chartWrap) return; // HTML이 없으면 에러 방지
-    
-    // 특정 화면(배당, 내역 등)이거나 거래 내역이 아예 없으면 차트를 숨김
-    if (currentView === 'dividend' || currentView === 'history' || currentView === 'realized' || currentView === 'watch' || !state.transactions || state.transactions.length === 0) {
-        chartWrap.style.display = 'none';
+    if (currentView === 'dividend' || currentView === 'history' || currentView === 'realized' || currentView === 'watch' || state.transactions.length === 0) {
+        if(chartWrap) chartWrap.style.display = 'none';
         return;
     }
     
-    // X축 날짜의 기준이 될 데이터를 찾음 (환율 우선, 없으면 데이터가 있는 다른 종목 아무거나)
     let masterData = cachedMarketData['KRW=X'];
-    if (!masterData || masterData._failed || !masterData.rawDates) {
-        const validKeys = Object.keys(cachedMarketData).filter(k => cachedMarketData[k] && !cachedMarketData[k]._failed && cachedMarketData[k].rawDates);
-        if(validKeys.length > 0) masterData = cachedMarketData[validKeys[0]];
+    if (!masterData || masterData._failed) {
+        const keys = Object.keys(cachedMarketData);
+        if(keys.length > 0) masterData = cachedMarketData[keys[0]];
     }
-    
-    // 그래도 그릴 기준 데이터가 아예 없다면 숨김
     if (!masterData || masterData._failed || !masterData.rawDates) {
-        chartWrap.style.display = 'none';
+        if(chartWrap) chartWrap.style.display = 'none';
         return;
     }
 
-    // 조건이 맞으면 차트 영역 보이기 강제 활성화!
-    chartWrap.style.display = 'flex'; 
+    if(chartWrap) chartWrap.style.display = 'flex';
     
     const rawDates = masterData.rawDates;
-    const displayDates = masterData.dates;
-    
     const startIndex = Math.max(0, rawDates.length - sliceLen);
     const slicedRawDates = rawDates.slice(startIndex);
-    const slicedDisplayDates = displayDates.slice(startIndex);
+    const slicedDisplayDates = slicedRawDates.map(d => {
+        if (typeof d === 'string' && d.includes('-')) {
+            const parts = d.split('-');
+            return `${parts[0]}.${parts[1]}.${parts[2]}`;
+        }
+        return d;
+    });
     
     const costDataKr = []; const costDataUs = [];
     const evalDataKr = []; const evalDataUs = [];
-    const evalDataTotal = [];
     const realDataKr = []; const realDataUs = [];
+    const realDataSymbols = []; // 날짜별 매도 종목 정보
     let firstNonZeroIdx = -1;
     
     slicedRawDates.forEach((dateStr, idx) => {
         let dCostKr = 0, dCostUs = 0;
         let dEvalKr = 0, dEvalUs = 0;
-        let dRealKr = 0, dRealUs = 0; 
+        let dRealKr = 0, dRealUs = 0;
+        let dRealSymbols = []; // 해당 날짜에 매도된 종목들
         
         let fxRate = currentUsdKrw;
-        if(cachedMarketData['KRW=X'] && !cachedMarketData['KRW=X']._failed && cachedMarketData['KRW=X'].rawDates) {
+        if(cachedMarketData['KRW=X'] && !cachedMarketData['KRW=X']._failed) {
             const fxIdx = cachedMarketData['KRW=X'].rawDates.indexOf(dateStr);
             if(fxIdx !== -1) fxRate = cachedMarketData['KRW=X'].prices[fxIdx];
         }
@@ -2105,6 +2143,18 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
             if (tx.txType === 'dividend') return;
             if (!holdings[tx.symbol]) holdings[tx.symbol] = { qty: 0, avg: 0 };
             let h = holdings[tx.symbol];
+
+            if (tx.txType === 'transfer') {
+                if (tx.qty > 0) {
+                    let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
+                    h.qty += tx.qty;
+                    h.avg = h.qty > 0 ? totalVal / h.qty : 0;
+                } else {
+                    h.qty += tx.qty;
+                    if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+                }
+                return;
+            }
             
             if (tx.qty > 0) {
                 let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
@@ -2114,12 +2164,14 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                 let sellQty = Math.abs(tx.qty);
                 let pnl = (tx.price - h.avg) * sellQty;
                 let isKr = isKorean(tx.symbol);
-                
                 if (tx.date === dateStr) {
                     if (isKr) dRealKr += pnl;
                     else dRealUs += pnl * fxRate;
+                    // 매도 종목 기록
+                    const symName = (cachedMarketData[tx.symbol] && !cachedMarketData[tx.symbol]._failed)
+                        ? (cachedMarketData[tx.symbol].name || tx.symbol) : tx.symbol;
+                    dRealSymbols.push({ symbol: tx.symbol, name: symName, qty: sellQty, pnl: isKr ? pnl : pnl * fxRate });
                 }
-                
                 h.qty -= sellQty;
                 if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
             }
@@ -2130,12 +2182,11 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
                 let h = holdings[sym];
                 let isKr = isKorean(sym);
                 let costVal = (h.qty * h.avg) * (isKr ? 1 : fxRate);
-                
                 if (isKr) dCostKr += costVal;
                 else dCostUs += costVal;
                 
                 let priceOnDate = h.avg; 
-                if (cachedMarketData[sym] && !cachedMarketData[sym]._failed && cachedMarketData[sym].rawDates) {
+                if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
                     const pIdx = cachedMarketData[sym].rawDates.indexOf(dateStr);
                     if (pIdx !== -1 && cachedMarketData[sym].prices[pIdx] !== null) {
                         priceOnDate = cachedMarketData[sym].prices[pIdx];
@@ -2157,12 +2208,15 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
             }
         }
         
-        costDataKr.push(dCostKr); costDataUs.push(dCostUs);
-        evalDataKr.push(dEvalKr); evalDataUs.push(dEvalUs);
-        evalDataTotal.push(dEvalKr + dEvalUs);
-        realDataKr.push(dRealKr); realDataUs.push(dRealUs);
+        costDataKr.push(dCostKr);
+        costDataUs.push(dCostUs);
+        evalDataKr.push(dEvalKr);
+        evalDataUs.push(dEvalUs);
+        realDataKr.push(dRealKr);
+        realDataUs.push(dRealUs);
+        realDataSymbols.push(dRealSymbols);
         
-        if (firstNonZeroIdx === -1 && (dCostKr > 0 || dCostUs > 0 || dEvalKr > 0 || dEvalUs > 0 || dRealKr > 0 || dRealUs > 0)) {
+        if (firstNonZeroIdx === -1 && (dCostKr > 0 || dCostUs > 0 || dEvalKr > 0 || dEvalUs > 0)) {
             firstNonZeroIdx = idx;
         }
     });
@@ -2170,53 +2224,75 @@ function renderPortfolioChart(ownerFilter, sliceLen) {
     let finalDisplayDates = slicedDisplayDates;
     let finalCostKr = costDataKr; let finalCostUs = costDataUs;
     let finalEvalKr = evalDataKr; let finalEvalUs = evalDataUs;
-    let finalEvalTotal = evalDataTotal;
     let finalRealKr = realDataKr; let finalRealUs = realDataUs;
+    let finalRealSymbols = realDataSymbols;
 
-    // 공백(0)인 과거 구간 잘라내기
     if (firstNonZeroIdx > 0 && sliceLen >= 756) { 
         finalDisplayDates = slicedDisplayDates.slice(firstNonZeroIdx);
         finalCostKr = costDataKr.slice(firstNonZeroIdx);
         finalCostUs = costDataUs.slice(firstNonZeroIdx);
         finalEvalKr = evalDataKr.slice(firstNonZeroIdx);
         finalEvalUs = evalDataUs.slice(firstNonZeroIdx);
-        finalEvalTotal = evalDataTotal.slice(firstNonZeroIdx);
         finalRealKr = realDataKr.slice(firstNonZeroIdx);
         finalRealUs = realDataUs.slice(firstNonZeroIdx);
+        finalRealSymbols = realDataSymbols.slice(firstNonZeroIdx);
     }
 
-    const canvas = document.getElementById('portfolioChartCanvas');
-    if (!canvas) return; 
-    
-    // 기존 차트가 있으면 삭제 후 다시 그리기
-    if (window.portfolioChartInst) window.portfolioChartInst.destroy();
+    // ── 캔버스 & 차트 초기화 ─────────────────────────────────────────
+    const chartWrap2 = document.getElementById('portfolioChartWrapper');
+    const oldPanels = chartWrap2.querySelector('[data-chart-panels]');
+    if (oldPanels) oldPanels.remove();
+    const singleCanvasWrap = document.getElementById('portfolioChartCanvas')?.parentElement;
+    if (singleCanvasWrap) singleCanvasWrap.style.display = '';
 
-    window.portfolioChartInst = new Chart(canvas.getContext('2d'), {
-        data: {
-            labels: finalDisplayDates,
-            datasets: [
-                { label: '합산 평가액', type: 'line', data: finalEvalTotal, borderColor: '#f1c40f', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1, order: 1 },
-                { label: '실현수익 (국장)', type: 'bar', data: finalRealKr, backgroundColor: '#27ae60', borderWidth: 0, stack: 'Realized', order: 2 },
-                { label: '실현수익 (미장)', type: 'bar', data: finalRealUs, backgroundColor: '#2980b9', borderWidth: 0, stack: 'Realized', order: 3 },
-                { label: '투자액 (국장)', type: 'line', data: finalCostKr, borderColor: '#27ae60', backgroundColor: 'rgba(39, 174, 96, 0.7)', borderWidth: 1.5, pointRadius: 0, fill: true, stack: 'Cost', tension: 0.1, order: 4 },
-                { label: '투자액 (미장)', type: 'line', data: finalCostUs, borderColor: '#2980b9', backgroundColor: 'rgba(41, 128, 185, 0.7)', borderWidth: 1.5, pointRadius: 0, fill: true, stack: 'Cost', tension: 0.1, order: 5 },
-                { label: '평가액 (국장)', type: 'line', data: finalEvalKr, borderColor: '#2ecc71', backgroundColor: 'rgba(46, 204, 113, 0.35)', borderWidth: 1.5, pointRadius: 0, fill: true, stack: 'Eval', tension: 0.1, order: 6 },
-                { label: '평가액 (미장)', type: 'line', data: finalEvalUs, borderColor: '#3498db', backgroundColor: 'rgba(52, 152, 219, 0.35)', borderWidth: 1.5, pointRadius: 0, fill: true, stack: 'Eval', tension: 0.1, order: 7 }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: { display: true, position: 'top', labels: { color: '#8890a4', font: {size: 11}, usePointStyle: true, boxWidth:8 } },
-                tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₩' + Math.round(ctx.raw).toLocaleString(); } } }
-            },
-            scales: {
-                x: { ticks: { color: '#555e72', maxTicksLimit: 10 }, grid: { display: false } },
-                y: { ticks: { color: '#555e72', callback: function(val) { return '₩' + (val/10000).toLocaleString() + '만'; } }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } }
-            }
-        }
-    });
+    const canvas = document.getElementById('portfolioChartCanvas');
+    if (!canvas) return;
+    if (portfolioChartInst) portfolioChartInst.destroy();
+    if (portfolioChartInstUs) { portfolioChartInstUs.destroy(); portfolioChartInstUs = null; }
+
+    // 통합 평가액 = 국장 평가액 + 미장 평가액
+    const finalEvalTotal = finalEvalKr.map((v, i) => v + finalEvalUs[i]);
+
+    // 건별 실현수익 (우측 Y축 막대용 — 절댓값으로 막대 높이, 색상으로 손익 구분)
+    const finalRealDaily = finalRealKr.map((v, i) => v + finalRealUs[i]);
+    const finalRealPerTrade = finalRealDaily.map(v => v !== 0 ? Math.abs(v) : null);
+    const finalRealBarColors = finalRealDaily.map(v => v > 0 ? 'rgba(0,200,122,0.75)' : (v < 0 ? 'rgba(255,77,106,0.75)' : 'rgba(136,144,164,0.3)'));
+    const finalRealBarBorderColors = finalRealDaily.map(v => v > 0 ? '#00C578' : (v < 0 ? '#ff4d6a' : '#8890a4'));
+
+    // 총 투자액 / 평가액 (국장+미장 합산, 당시 보유 기준)
+    const finalCostTotal = finalCostKr.map((v, i) => v + finalCostUs[i]);
+
+    const fmtWon = v => {
+        const abs = Math.abs(v);
+        if (abs >= 100000000) return (v < 0 ? '-' : '') + '₩' + (abs / 100000000).toFixed(1) + '억';
+        if (abs >= 10000)     return (v < 0 ? '-' : '') + '₩' + Math.round(abs / 10000).toLocaleString() + '만';
+        return (v < 0 ? '-' : '') + '₩' + Math.round(abs).toLocaleString();
+    };
+
+    // ── 누적 영역 그래프: 아래→위 순서 (국장투자액, 미장투자액, 국장평가액, 미장평가액, 통합평가액) ──
+    // Chart.js stacked: true 로 각 레이어가 이전 레이어 위에 쌓임
+    // 각 dataset의 data는 해당 레이어의 "순수 기여분(increment)"
+    // ┌ Layer 5: 통합 평가액 → 순수 기여분 = 통합 평가액 - (국장평가액 + 미장평가액) = 0 (단, 최상단 라인으로 시각화)
+    // ┌ Layer 4: 미장 평가액
+    // ┌ Layer 3: 국장 평가액
+    // ┌ Layer 2: 미장 투자액
+    // └ Layer 1: 국장 투자액 (바닥)
+    // * 통합 평가액은 국장+미장 평가액의 합이므로, "선(border)"만 가진 투명 레이어로 올려 전체 합계선을 표시
+
+    // ── 드래그 줌용 데이터 저장 ──
+    portfolioZoomData = {
+        labels: finalDisplayDates,
+        costTotal: finalCostTotal,
+        evalTotal: finalEvalTotal,
+        realPerTrade: finalRealPerTrade,
+        realBarColors: finalRealBarColors,
+        realBarBorderColors: finalRealBarBorderColors,
+        realDaily: finalRealDaily,
+        realSymbols: finalRealSymbols,
+        fmtWon
+    };
+
+    _buildPortfolioChart(portfolioZoomData, null);
 }
 
 // ── 포트폴리오 차트 실제 생성 (줌 슬라이스 지원) ──
@@ -2746,7 +2822,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
       let costPct = maxUsdAccVal > 0 ? (d.cost / maxUsdAccVal * 100) : 0;
       let evalPct = maxUsdAccVal > 0 ? (d.eval / maxUsdAccVal * 100) : 0;
-      let evalColor = pnl >= 0 ? 'rgba(219,26,26,0.8)' : 'rgba(58,154,255,0.8)';
+      let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
