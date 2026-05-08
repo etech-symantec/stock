@@ -471,6 +471,33 @@
           <div id="divStockList" style="flex:1; overflow-y:auto; max-height:525px; padding-right:5px;"></div>
         </div>
       </div>
+
+      <div class="div-list-area" style="min-height: 450px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px; flex-wrap:wrap; gap:8px;">
+            </div>
+          <div id="divStockList" style="flex:1; overflow-y:auto; max-height:525px; padding-right:5px;"></div>
+        </div>
+      </div> <div class="div-list-area" style="margin-top:15px; height:auto; max-height:none; padding: 20px;">
+        <div class="sum-label" style="margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+            <span>📅 보유 종목 다음 배당 예상</span>
+            <span style="font-size:11px; color:var(--text3); font-weight:normal;">(가장 최근 배당 기록을 기준으로 계산됩니다)</span>
+        </div>
+        <div class="history-table-container" style="max-height:400px;">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>종목</th>
+                <th style="text-align:center;">배당 주기(월)</th>
+                <th style="text-align:center;">다음 예상월</th>
+                <th style="text-align:right;">1주당 배당금</th>
+                <th style="text-align:right;">보유 수량</th>
+                <th style="text-align:right;">예상 총액</th>
+              </tr>
+            </thead>
+            <tbody id="upcomingDivTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <div id="historyDashboard">
