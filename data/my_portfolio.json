@@ -5532,11 +5532,11 @@
       "id": 1776937394682,
       "date": "2025-05-13",
       "owner": "끄니",
-      "broker": "미래에셋",
+      "broker": "미래에셋 (ISA)",
       "symbol": "360750.KS",
       "qty": 300,
       "price": 20400,
-      "txType": "buy"
+      "txType": "trade"
     },
     {
       "id": 1776937394703,
