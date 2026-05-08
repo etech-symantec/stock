@@ -1982,7 +1982,6 @@ function renderTodayStocksPanel(displayItems) {
     const panel = document.getElementById('todayStocksPanel');
     const listEl = document.getElementById('todayStocksList');
     const totalChangeEl = document.getElementById('todayStocksTotalChange');
-    const totalPnlEl = document.getElementById('todayStocksTotalPnl');
     if (!panel || !listEl || !totalChangeEl) return;
 
     // 보유 종목만 필터 (qty > 0)
@@ -1994,91 +1993,52 @@ function renderTodayStocksPanel(displayItems) {
     }
     panel.style.display = 'flex';
 
-    // 각 종목별 1일 데이터 계산
+    // 각 종목별 1일 등락률 계산 (data.prev → data.last)
     const rows = heldItems.map(item => {
         const d = item.data;
         const last = d.last || 0;
         const prev = d.prev || last;
         const chg1d = prev > 0 ? ((last - prev) / prev) * 100 : 0;
-        // 실제 당일 손익 = 보유 수량 × (현재가 - 전일가)
-        const pnl1d = item.qty * (last - prev);
-        // 전일 평가금액 = 보유 수량 × 전일가
-        const prevEval = item.qty * prev;
+        const evalAmt = item.qty * last;
         const name = (d.name || item.symbol).replace(/\(.*?\)/g, '').trim();
-        const isKr = isKorean(item.symbol);
-        return { symbol: item.symbol, name, chg1d, pnl1d, prevEval, isKr };
+        return { symbol: item.symbol, name, chg1d, evalAmt };
     });
 
-    // 실제 총 등락률 = 당일 전체 손익 / 전일 전체 평가금액 × 100
-    // (환율 변환 없이 종목 통화 그대로 합산 — 대략적 지표)
-    const totalPnl = rows.reduce((s, r) => s + r.pnl1d, 0);
-    const totalPrevEval = rows.reduce((s, r) => s + r.prevEval, 0);
-    const totalChangePct = totalPrevEval > 0 ? (totalPnl / totalPrevEval) * 100 : 0;
+    // 가중평균 총 등락률 = Σ(evalAmt * chg1d) / Σ(evalAmt)
+    const totalEval = rows.reduce((s, r) => s + r.evalAmt, 0);
+    const weightedChange = totalEval > 0
+        ? rows.reduce((s, r) => s + r.chg1d * r.evalAmt, 0) / totalEval
+        : 0;
 
-    // 상승 / 하락 / 보합 분리 후 각각 등락률 절대값 내림차순 정렬
-    const upRows   = rows.filter(r => r.chg1d > 0).sort((a, b) => b.chg1d - a.chg1d);
-    const downRows = rows.filter(r => r.chg1d < 0).sort((a, b) => a.chg1d - b.chg1d);
-    const flatRows = rows.filter(r => r.chg1d === 0);
+    // 등락률 기준 정렬 (높은 순)
+    rows.sort((a, b) => b.chg1d - a.chg1d);
 
-    // 종목 카드 HTML 생성
-    function stockCard(r) {
+    // 리스트 렌더링
+    listEl.innerHTML = rows.map(r => {
         const sign = r.chg1d > 0 ? '+' : '';
-        const isUp   = r.chg1d > 0;
-        const isDown = r.chg1d < 0;
-        const accentColor = isUp ? 'var(--profit)' : isDown ? 'var(--loss)' : 'var(--text3)';
-        const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
-        const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
-        const barWidth    = Math.min(Math.abs(r.chg1d) * 6, 100);
+        const colorStyle = r.chg1d > 0
+            ? 'color:var(--red, #ff4d6a)'
+            : r.chg1d < 0 ? 'color:var(--blue, #3A9AFF)' : 'color:var(--text2)';
+        const barColor = r.chg1d > 0 ? 'var(--red, #ff4d6a)' : r.chg1d < 0 ? 'var(--blue, #3A9AFF)' : 'var(--border)';
+        const barWidth = Math.min(Math.abs(r.chg1d) * 5, 100);
         return `
-        <div style="padding:7px 9px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha};">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
-                <div style="min-width:0; flex:1;">
-                    <div style="font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</div>
-                    <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px;">${r.symbol}</div>
+        <div style="display:flex; align-items:center; gap:10px; padding:7px 10px; background:var(--bg3); border-radius:8px; border:1px solid var(--border);">
+            <div style="flex:1; min-width:0;">
+                <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</div>
+                <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${r.symbol}</div>
+                <div style="margin-top:4px; height:3px; background:var(--border); border-radius:2px; overflow:hidden;">
+                    <div style="height:100%; width:${barWidth}%; background:${barColor}; border-radius:2px; transition:width 0.4s;"></div>
                 </div>
-                <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:${accentColor}; white-space:nowrap;">${sign}${r.chg1d.toFixed(2)}%</div>
             </div>
-            <div style="margin-top:5px; height:2px; background:var(--border); border-radius:1px; overflow:hidden;">
-                <div style="height:100%; width:${barWidth}%; background:${accentColor}; border-radius:1px;"></div>
-            </div>
+            <div style="font-size:15px; font-weight:700; font-family:var(--font-mono); ${colorStyle}; white-space:nowrap; min-width:64px; text-align:right;">${sign}${r.chg1d.toFixed(2)}%</div>
         </div>`;
-    }
+    }).join('');
 
-    // 구분 헤더 HTML
-    function colHeader(label, count, color) {
-        return `<div style="font-size:10px; font-weight:700; color:${color}; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-            ${label} <span style="background:${color}; color:#fff; border-radius:10px; padding:1px 6px; font-size:9px;">${count}</span>
-        </div>`;
-    }
-
-    const upHtml   = (upRows.length   > 0 ? colHeader('▲ 상승', upRows.length,   'var(--profit)') : '')
-                   + upRows.map(stockCard).join('')
-                   + (flatRows.length > 0 && upRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
-    const downHtml = (downRows.length > 0 ? colHeader('▼ 하락', downRows.length, 'var(--loss)') : '')
-                   + downRows.map(stockCard).join('')
-                   + (flatRows.length > 0 && downRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
-
-    listEl.innerHTML = `
-    <div style="display:flex; gap:10px; flex:1; min-height:0;">
-        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; overflow-y:auto;">
-            ${upRows.length + (flatRows.length > 0 && upRows.length === 0 ? flatRows.length : 0) > 0 ? upHtml : '<div style="font-size:11px; color:var(--text3); text-align:center; margin-top:12px;">상승 종목 없음</div>'}
-        </div>
-        <div style="width:1px; background:var(--border); flex-shrink:0;"></div>
-        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; overflow-y:auto;">
-            ${downRows.length + (flatRows.length > 0 && downRows.length === 0 ? flatRows.length : 0) > 0 ? downHtml : '<div style="font-size:11px; color:var(--text3); text-align:center; margin-top:12px;">하락 종목 없음</div>'}
-        </div>
-    </div>`;
-
-    // 총 등락률 & 손익 표시
-    const totalSign  = totalChangePct > 0 ? '+' : '';
-    const totalColor = totalChangePct > 0 ? 'var(--profit)' : totalChangePct < 0 ? 'var(--loss)' : 'var(--text2)';
+    // 총 등락률 표시
+    const totalSign = weightedChange > 0 ? '+' : '';
+    const totalColor = weightedChange > 0 ? 'var(--red, #ff4d6a)' : weightedChange < 0 ? 'var(--blue, #3A9AFF)' : 'var(--text2)';
     totalChangeEl.style.color = totalColor;
-    totalChangeEl.textContent = `${totalSign}${totalChangePct.toFixed(2)}%`;
-    if (totalPnlEl) {
-        const pnlSign = totalPnl > 0 ? '+' : '';
-        totalPnlEl.style.color = totalColor;
-        totalPnlEl.textContent = `(${pnlSign}${Math.round(totalPnl).toLocaleString()})`;
-    }
+    totalChangeEl.textContent = `${totalSign}${weightedChange.toFixed(2)}%`;
 }
 
 // 🌟 자산 성장 추이 그래프 렌더링 (누적 영역 + 우측 기준 누적 실현수익 막대)
@@ -2822,7 +2782,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
       let costPct = maxUsdAccVal > 0 ? (d.cost / maxUsdAccVal * 100) : 0;
       let evalPct = maxUsdAccVal > 0 ? (d.eval / maxUsdAccVal * 100) : 0;
-      let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
+      let evalColor = pnl >= 0 ? 'rgba(219,26,26,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
