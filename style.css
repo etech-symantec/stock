@@ -1122,3 +1122,28 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     max-height: 260px;
   }
 }
+/* 🔍 검색 결과 목록 컨테이너 수정 */
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  /* right: 0; 를 지우거나 아래처럼 width 설정을 변경하세요 */
+  width: max-content; 
+  min-width: 100%; 
+  max-width: 400px; /* 너무 길어지는 것 방지 */
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  margin-top: 5px;
+}
+
+/* 목록 내부 아이템의 텍스트 짤림(점점점) 제거 */
+.suggestion-item span {
+  white-space: normal !important; /* 줄바꿈 허용 또는 한 줄 유지 시 nowrap 해제 */
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
