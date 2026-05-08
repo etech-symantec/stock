@@ -2084,15 +2084,16 @@ function renderTodayStocksPanel(displayItems) {
 // 🌟 자산 성장 추이 그래프 렌더링 (누적 영역 + 우측 기준 누적 실현수익 막대)
 function renderPortfolioChart(ownerFilter, sliceLen) {
     const chartWrap = document.getElementById('portfolioChartWrapper');
+    if (!chartWrap) return; // HTML이 없으면 에러 방지
     if (currentView === 'dividend' || currentView === 'history' || currentView === 'realized' || currentView === 'watch' || state.transactions.length === 0) {
         if(chartWrap) chartWrap.style.display = 'none';
         return;
     }
     
     let masterData = cachedMarketData['KRW=X'];
-    if (!masterData || masterData._failed) {
-        const keys = Object.keys(cachedMarketData);
-        if(keys.length > 0) masterData = cachedMarketData[keys[0]];
+    if (!masterData || masterData._failed || !masterData.rawDates) {
+        const validKeys = Object.keys(cachedMarketData).filter(k => cachedMarketData[k] && !cachedMarketData[k]._failed && cachedMarketData[k].rawDates);
+        if(validKeys.length > 0) masterData = cachedMarketData[validKeys[0]];
     }
     if (!masterData || masterData._failed || !masterData.rawDates) {
         if(chartWrap) chartWrap.style.display = 'none';
