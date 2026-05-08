@@ -1113,6 +1113,9 @@ function addOrUpdateTransaction() {
     }
   }
 
+  let qty   = parseFloat(document.getElementById('txQty').value)   || 0;
+  let price = parseFloat(document.getElementById('txPrice').value) || 0;
+
   if (typeVal === 'dividend' && document.getElementById('applyDivTax').checked) {
       const taxRate = isKorean(symbol) ? 0.154 : 0.15;
       price = price * (1 - taxRate);
