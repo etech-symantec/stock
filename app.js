@@ -3219,50 +3219,77 @@ function renderModalChart() {
 // 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
 let isFetchingMarketData = false;
 async function fetchMissingMarketData(symbolsToFetch) {
-    if(isFetchingMarketData) return;
+    if (isFetchingMarketData) return;
     isFetchingMarketData = true;
-    const batchSize = 3;
-    
-    // 우측 하단에 조그맣게 '로딩 중' 알림 띄우기
+
+    // ── 로딩 인디케이터 ──────────────────────────────────────────
     let loadingEl = document.getElementById('bgLoadingIndicator');
-    if(!loadingEl) {
+    if (!loadingEl) {
         loadingEl = document.createElement('div');
         loadingEl.id = 'bgLoadingIndicator';
-        loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--accent); color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition: 0.3s; opacity: 1;";
+        loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--accent); color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:opacity 0.3s; opacity:1;";
         document.body.appendChild(loadingEl);
     }
     loadingEl.style.opacity = '1';
 
-    for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
-        if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 불러오는 중... (${i}/${symbolsToFetch.length})`;
-        const batch = symbolsToFetch.slice(i, i + batchSize);
-        await Promise.all(batch.map(async t => {
-            let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
-            let fetchedData = await fetchYahooData(fetchSym);
-            if (fetchedData) cachedMarketData[t] = fetchedData;
-            else cachedMarketData[t] = { _failed: true };
-        }));
-        
-        render(); // 데이터를 3개 가져올 때마다 화면의 빈칸에 쏙쏙 채워 넣음
-        
-        if (i + batchSize < symbolsToFetch.length) {
-            await new Promise(res => setTimeout(res, 1000)); 
-        }
+    const total = symbolsToFetch.length;
+    let done = 0;
+
+    const updateIndicator = () => {
+        if (loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 불러오는 중... (${done}/${total})`;
+    };
+    updateIndicator();
+
+    // ── KRW=X 환율을 최우선으로 먼저 처리 (렌더 블로킹 해소) ──────
+    const fxIdx = symbolsToFetch.indexOf('KRW=X');
+    if (fxIdx !== -1) {
+        symbolsToFetch.splice(fxIdx, 1);
+        const fxData = await fetchYahooData('KRW=X');
+        cachedMarketData['KRW=X'] = fxData || { _failed: true };
+        if (fxData && fxData.last) { currentUsdKrw = fxData.last; isExchangeRateFetched = true; }
+        done++;
+        updateIndicator();
+        render();
     }
-    
+
+    // ── 나머지 종목 전체 병렬 요청 ───────────────────────────────
+    // 각 종목이 응답되는 즉시 캐시에 저장하고 화면을 바로 갱신 (progressive render)
+    let renderScheduled = false;
+    const scheduleRender = () => {
+        if (renderScheduled) return;
+        renderScheduled = true;
+        requestAnimationFrame(() => { renderScheduled = false; render(); });
+    };
+
+    await Promise.allSettled(symbolsToFetch.map(async t => {
+        const fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
+        try {
+            const data = await fetchYahooData(fetchSym);
+            cachedMarketData[t] = data || { _failed: true };
+        } catch {
+            cachedMarketData[t] = { _failed: true };
+        }
+        done++;
+        updateIndicator();
+        scheduleRender(); // 개별 응답 즉시 화면 갱신
+    }));
+
     isFetchingMarketData = false;
-    if(loadingEl) loadingEl.style.opacity = '0';
-    
-    // 🌟 데이터를 다 가져오면 다음 번 광속 접속을 위해 기기에 임시 저장
-    try { 
-        localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
+    if (loadingEl) loadingEl.style.opacity = '0';
+
+    render(); // 최종 완료 후 한 번 더 확정 렌더
+
+    // ── 완료 후 로컬스토리지 캐싱 ────────────────────────────────
+    try {
+        localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData));
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
-    } catch(e){}
+    } catch (e) {}
 }
 
 // ── 8. 메인 렌더 함수 (전체 흐름 제어) ──
 async function render() {
-  if (!isExchangeRateFetched) await fetchExchangeRate();
+  // 환율은 fetchMissingMarketData에서 최우선 처리 — 여기서 블로킹하지 않음
+  if (!isExchangeRateFetched) fetchExchangeRate(); // fire-and-forget; 캐시 있으면 즉시 반환
   
   document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.rtab').forEach(b => {
