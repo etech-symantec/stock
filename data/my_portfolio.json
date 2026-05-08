@@ -7677,16 +7677,6 @@
       "qty": 0,
       "price": 2157.2999999999997,
       "txType": "dividend"
-    },
-    {
-      "id": 1778250838391,
-      "date": "2026-05-08",
-      "owner": "끄니",
-      "broker": "",
-      "symbol": "DHR",
-      "qty": 0,
-      "price": 0,
-      "txType": "trade"
     }
   ],
   "range": "1m",
