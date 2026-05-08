@@ -7737,6 +7737,16 @@
       "qty": 0,
       "price": 13823.64,
       "txType": "dividend"
+    },
+    {
+      "id": 1778250948959,
+      "date": "2026-05-06",
+      "owner": "끄니",
+      "broker": "미래에셋 (ISA)",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 32691.978,
+      "txType": "dividend"
     }
   ],
   "range": "1m",
