@@ -341,16 +341,30 @@
       </div>
     </div>
 
-    <div id="portfolioChartWrapper" style="display:none; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px; flex-direction:column; flex-shrink:0;">
-      <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px;">
-          📈 자산 성장 추이
-          <span style="font-size:11px; font-weight:normal; color:var(--text3);">당시 보유 총 투자액 / 평가액 · 🟢 수익 🔴 손절: 건별 실현수익 (막대)</span>
+    <div id="chartRowWrapper" style="display:none; gap:16px; margin-bottom:20px; flex-shrink:0; align-items:stretch;">
+      <div id="portfolioChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex:1; min-width:0;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+            📈 자산 성장 추이
+            <span style="font-size:11px; font-weight:normal; color:var(--text3);">당시 보유 총 투자액 / 평가액 · 🟢 수익 🔴 손절: 건별 실현수익 (막대)</span>
+        </div>
+        <div class="chart-zoom-bar">
+          <div class="chart-zoom-hint">🔍 <span>드래그</span>로 원하는 구간 확대</div>
+          <button class="btn-zoom-reset" id="btnPortfolioZoomReset" onclick="resetPortfolioChartZoom()">✕ 전체 보기</button>
+        </div>
+        <div style="height:240px; position:relative;"><canvas id="portfolioChartCanvas" style="cursor:crosshair;"></canvas></div>
       </div>
-      <div class="chart-zoom-bar">
-        <div class="chart-zoom-hint">🔍 <span>드래그</span>로 원하는 구간 확대</div>
-        <button class="btn-zoom-reset" id="btnPortfolioZoomReset" onclick="resetPortfolioChartZoom()">✕ 전체 보기</button>
+
+      <div id="todayStocksPanel" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex:1; min-width:0; display:none;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          📊 오늘 종목 현황
+          <span style="font-size:11px; font-weight:normal; color:var(--text3);">보유 종목 당일 등락률</span>
+        </div>
+        <div id="todayStocksList" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; min-height:0;"></div>
+        <div id="todayStocksTotalBar" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+          <span style="font-size:12px; font-weight:700; color:var(--text2);">총 등락률 (가중평균)</span>
+          <span id="todayStocksTotalChange" style="font-size:18px; font-weight:700; font-family:var(--font-mono);">—</span>
+        </div>
       </div>
-      <div style="height:240px; position:relative;"><canvas id="portfolioChartCanvas" style="cursor:crosshair;"></canvas></div>
     </div>
 
     <div class="list-options-bar" id="listOptionsBar" style="display:none;">
