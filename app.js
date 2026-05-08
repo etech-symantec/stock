@@ -2025,9 +2025,9 @@ function renderTodayStocksPanel(displayItems) {
         const sign = r.chg1d > 0 ? '+' : '';
         const isUp   = r.chg1d > 0;
         const isDown = r.chg1d < 0;
-        const accentColor = isUp ? 'var(--red, #ff4d6a)' : isDown ? 'var(--blue, #3A9AFF)' : 'var(--text3)';
-        const bgAlpha     = isUp ? 'rgba(255,77,106,0.07)' : isDown ? 'rgba(58,154,255,0.07)' : 'var(--bg3)';
-        const borderAlpha = isUp ? 'rgba(255,77,106,0.25)' : isDown ? 'rgba(58,154,255,0.25)' : 'var(--border)';
+        const accentColor = isUp ? 'var(--profit)' : isDown ? 'var(--loss)' : 'var(--text3)';
+        const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
+        const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
         const barWidth    = Math.min(Math.abs(r.chg1d) * 6, 100);
         return `
         <div style="padding:7px 9px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha};">
@@ -2051,11 +2051,10 @@ function renderTodayStocksPanel(displayItems) {
         </div>`;
     }
 
-    // 두 컬럼 렌더링
-    const upHtml   = (upRows.length   > 0 ? colHeader('▲ 상승', upRows.length,   'var(--red, #ff4d6a)') : '')
+    const upHtml   = (upRows.length   > 0 ? colHeader('▲ 상승', upRows.length,   'var(--profit)') : '')
                    + upRows.map(stockCard).join('')
                    + (flatRows.length > 0 && upRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
-    const downHtml = (downRows.length > 0 ? colHeader('▼ 하락', downRows.length, 'var(--blue, #3A9AFF)') : '')
+    const downHtml = (downRows.length > 0 ? colHeader('▼ 하락', downRows.length, 'var(--loss)') : '')
                    + downRows.map(stockCard).join('')
                    + (flatRows.length > 0 && downRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
 
@@ -2072,7 +2071,7 @@ function renderTodayStocksPanel(displayItems) {
 
     // 총 등락률 & 손익 표시
     const totalSign  = totalChangePct > 0 ? '+' : '';
-    const totalColor = totalChangePct > 0 ? 'var(--red, #ff4d6a)' : totalChangePct < 0 ? 'var(--blue, #3A9AFF)' : 'var(--text2)';
+    const totalColor = totalChangePct > 0 ? 'var(--profit)' : totalChangePct < 0 ? 'var(--loss)' : 'var(--text2)';
     totalChangeEl.style.color = totalColor;
     totalChangeEl.textContent = `${totalSign}${totalChangePct.toFixed(2)}%`;
     if (totalPnlEl) {
@@ -2823,7 +2822,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
       let costPct = maxUsdAccVal > 0 ? (d.cost / maxUsdAccVal * 100) : 0;
       let evalPct = maxUsdAccVal > 0 ? (d.eval / maxUsdAccVal * 100) : 0;
-      let evalColor = pnl >= 0 ? 'rgba(219,26,26,0.8)' : 'rgba(58,154,255,0.8)';
+      let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
       return `
