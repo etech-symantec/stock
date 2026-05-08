@@ -3159,6 +3159,7 @@ function renderDividendDashboard() {
       scales: { x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } }, y: { stacked: true, ticks: { color: '#8890a4' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } } }
     }
   });
+  renderUpcomingDividends();
 }
 
 // 🌟 종목 카드 모달 관련 로직 (개별 기간 조정 기능 추가)
@@ -5102,3 +5103,114 @@ if (document.readyState === 'loading') {
 }
 
 })(); // IIFE 끝
+
+// 🌟 보유 종목들의 최근 배당 기록을 바탕으로 다음 예상 배당금 계산
+function renderUpcomingDividends() {
+    const tbody = document.getElementById('upcomingDivTableBody');
+    if (!tbody) return;
+
+    let filterName = 'all';
+    if(typeof currentDivFilter !== 'undefined') {
+        if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
+        if(currentDivFilter === 'user2') filterName = state.owners.user2.name;
+    }
+
+    const holdings = calculateHoldings(filterName);
+    let heldSymbols = {};
+    for (let key in holdings) {
+        let h = holdings[key];
+        if (h.qty > 0) {
+            if (!heldSymbols[h.symbol]) heldSymbols[h.symbol] = 0;
+            heldSymbols[h.symbol] += h.qty;
+        }
+    }
+
+    let divTxs = state.transactions.filter(t => t.txType === 'dividend');
+    if (filterName !== 'all') {
+        divTxs = divTxs.filter(t => t.owner === filterName);
+    }
+
+    let divHistory = {};
+    divTxs.forEach(tx => {
+        if (!divHistory[tx.symbol]) divHistory[tx.symbol] = [];
+        divHistory[tx.symbol].push(tx);
+    });
+
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1; 
+
+    let upcomingItems = [];
+
+    for (let sym in heldSymbols) {
+        if (!divHistory[sym] || divHistory[sym].length === 0) continue; 
+
+        let history = divHistory[sym].sort((a, b) => new Date(a.date) - new Date(b.date));
+        let pastMonths = [...new Set(history.map(t => parseInt(t.date.split('-')[1], 10)))].sort((a, b) => a - b);
+        let recentTx = history[history.length - 1]; 
+
+        let qtyAtDiv = 0;
+        state.transactions.forEach(t => {
+            if (t.symbol === sym && t.txType !== 'dividend' && t.date <= recentTx.date) {
+                if (filterName === 'all' || t.owner === filterName) {
+                    qtyAtDiv += t.qty;
+                }
+            }
+        });
+
+        if (qtyAtDiv <= 0) continue; 
+
+        let dps = recentTx.price / qtyAtDiv; 
+        let currentQty = heldSymbols[sym];
+        let expectedTotal = dps * currentQty;
+
+        let nextMonth = pastMonths.find(m => m > currentMonth);
+        if (!nextMonth) nextMonth = pastMonths[0]; 
+
+        let fallbackName = sym;
+        if (typeof localStockDB !== 'undefined' && localStockDB.length > 0) {
+            let match = localStockDB.find(s => s.symbol === sym);
+            if (match) fallbackName = match.name;
+        }
+        if (cachedMarketData[sym] && !cachedMarketData[sym]._failed && cachedMarketData[sym].name) {
+            fallbackName = cachedMarketData[sym].name;
+        }
+
+        upcomingItems.push({
+            symbol: sym, name: fallbackName, pastMonths: pastMonths,
+            nextMonth: nextMonth, dps: dps, qty: currentQty, expectedTotal: expectedTotal
+        });
+    }
+
+    upcomingItems.sort((a, b) => {
+        let aDist = a.nextMonth >= currentMonth ? a.nextMonth - currentMonth : (a.nextMonth + 12) - currentMonth;
+        let bDist = b.nextMonth >= currentMonth ? b.nextMonth - currentMonth : (b.nextMonth + 12) - currentMonth;
+        if (aDist !== bDist) return aDist - bDist;
+        return b.expectedTotal - a.expectedTotal;
+    });
+
+    if (upcomingItems.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text3); padding:40px;">과거 배당 기록을 바탕으로 예측할 수 있는 데이터가 없습니다.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = upcomingItems.map(item => {
+        let formattedDps = formatPrice(item.dps, item.symbol);
+        let formattedTotal = formatPrice(item.expectedTotal, item.symbol);
+        
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--text); font-size:13px; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${item.name}">${item.name}</div>
+              <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${item.symbol}</div>
+            </td>
+            <td style="text-align:center; color:var(--text2); font-family:var(--font-mono); font-size:11px;">${item.pastMonths.join(', ')}월</td>
+            <td style="text-align:center;">
+                <span style="background:var(--accent-bg); color:var(--accent); padding:3px 8px; border-radius:12px; font-weight:700; font-size:11px;">${item.nextMonth}월 예정</span>
+            </td>
+            <td style="text-align:right; color:var(--text2); font-family:var(--font-mono); font-size:12px;">${formattedDps}</td>
+            <td style="text-align:right; color:var(--text); font-weight:500;">${item.qty}주</td>
+            <td style="text-align:right; color:var(--green); font-weight:700; font-family:var(--font-mono); font-size:13px;">${formattedTotal}</td>
+          </tr>
+        `;
+    }).join('');
+}
