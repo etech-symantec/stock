@@ -4760,14 +4760,14 @@ if (_origSetView) {
 
 
 // ============================================================
-// 🎓 POLARIS 튜토리얼 시스템 (app.js 맨 아래에 통째로 붙여넣기)
+// 🎓 Two the Moon 튜토리얼 시스템 (app.js 맨 아래에 통째로 붙여넣기)
 // ============================================================
 
 (function() {
 'use strict';
 
 // ── 상수 & 상태 ────────────────────────────────────────────
-const TUTORIAL_DONE_KEY = 'polaris_tutorial_done_v1';
+const TUTORIAL_DONE_KEY = 'ttm_tutorial_done_v1';
 let tutorialActive = false;
 let currentStep    = 0;
 
@@ -4860,7 +4860,7 @@ function injectWelcomeModal() {
     el.innerHTML = `
       <div class="tutorial-welcome-modal" onclick="event.stopPropagation()">
         <span class="tutorial-welcome-logo">🚀</span>
-        <h2>POLARIS에 오신 걸 환영합니다!</h2>
+        <h2>Two the Moon에 오신 걸 환영합니다!</h2>
         <p>
           국내·해외 주식 포트폴리오를 한 곳에서 관리하는
           <span class="highlight-text">나만의 스마트 주식 장부</span>입니다.<br>
@@ -4930,7 +4930,7 @@ function injectTutorialDOM() {
     const toast = document.createElement('div');
     toast.id = 'tutorialDoneToast';
     toast.className = 'tutorial-done-toast';
-    toast.innerHTML = '🎉 튜토리얼 완료! 이제 POLARIS를 마음껏 사용하세요';
+    toast.innerHTML = '🎉 튜토리얼 완료! 이제 Two the Moon을 마음껏 사용하세요';
     document.body.appendChild(toast);
 }
 
