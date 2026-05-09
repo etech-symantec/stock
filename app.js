@@ -4862,8 +4862,8 @@ function injectWelcomeModal() {
         <span class="tutorial-welcome-logo">🚀</span>
         <h2>Two the Moon에 오신 걸 환영합니다!</h2>
         <p>
-          국내·해외 주식 포트폴리오를 한 곳에서 관리하는
-          <span class="highlight-text">나만의 스마트 주식 장부</span>입니다.<br>
+          국내·미국 주식 포트폴리오를 한 곳에서 관리하는
+          <span class="highlight-text">스마트 주식 장부</span>입니다.<br>
           빠른 가이드로 핵심 기능을 바로 익혀보세요!
         </p>
 
