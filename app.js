@@ -5258,6 +5258,7 @@ function renderUpcomingDividends() {
         `;
     }).join('');
 }
+
 document.addEventListener('DOMContentLoaded', async () => {
   // 🌟 기간 설정 UI를 최상단 글로벌 내비게이션 바 우측으로 이동
   const rangeGroup = document.querySelector('.range-group');
@@ -5266,4 +5267,4 @@ document.addEventListener('DOMContentLoaded', async () => {
       navRight.insertBefore(rangeGroup, navRight.firstChild);
       rangeGroup.style.marginRight = '10px';
   }
-}
+});
