@@ -40,7 +40,7 @@ function getCutoffDateFromRange(range) {
     else if (range === '3y') d.setFullYear(d.getFullYear() - 3);
     else if (range === '5y') d.setFullYear(d.getFullYear() - 5);
     else if (range === '10y') d.setFullYear(d.getFullYear() - 10);
-    else return '1970-01-01'; // 'all' 또는 전체
+    else return '2020-01-01'; // 'all' 또는 전체
     return d.toISOString().split('T')[0];
 }
 let currentDivFilter = 'all'; 
