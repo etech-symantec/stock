@@ -1055,15 +1055,17 @@ function editTransaction(id) {
   const tx = state.transactions.find(t => t.id === id);
   if (!tx) return;
 
-  // 이전 내역은 쌍으로 관리되므로 직접 수정 불가
   if (tx.txType === 'transfer') {
-    alert('계좌 이동 내역은 직접 수정할 수 없습니다.\n해당 이동 내역을 삭제한 후 다시 입력해주세요.\n(출고·입고 2건이 동시에 생성됩니다.)');
+    alert('계좌 이동 내역은 직접 수정할 수 없습니다.\n해당 이동 내역을 삭제한 후 다시 입력해주세요.');
     return;
   }
 
   setSidebarView('ledger');
   const sb = document.getElementById('sidebar');
   if(sb.classList.contains('collapsed')) toggleSidebar();
+
+  // 🌟 사이드바 하이라이트 효과 활성화
+  sb.classList.add('highlight-edit');
 
   document.getElementById('txDate').value = tx.date;
   document.getElementById('txSymbol').value = tx.symbol.replace('.KS', '');
@@ -1092,6 +1094,11 @@ function cancelEdit() {
   document.getElementById('btnSubmitTx').textContent = '내역 추가하기';
   document.getElementById('btnSubmitTx').style.background = 'var(--accent)';
   document.getElementById('editModeBanner').style.display = 'none';
+  
+  // 🌟 하이라이트 효과 제거
+  const sb = document.getElementById('sidebar');
+  sb.classList.remove('highlight-edit');
+
   document.getElementById('txSymbol').value = '';
   document.getElementById('txQty').value = '';
   document.getElementById('txPrice').value = '';
@@ -1144,7 +1151,9 @@ function addOrUpdateTransaction() {
   if (editId) {
     const idx = state.transactions.findIndex(t => t.id == editId);
     if (idx !== -1) state.transactions[idx] = { id: parseInt(editId), date: formatDate(date), owner, broker, symbol, qty, price, txType: finalTxType };
-    cancelEdit(); 
+    const sb = document.getElementById('sidebar');
+    sb.classList.remove('highlight-edit');
+    cancelEdit();
   } else {
     state.transactions.push({ id: Date.now(), date: formatDate(date), owner, broker, symbol, qty, price, txType: finalTxType });
     document.getElementById('txSymbol').value = '';
