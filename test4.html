@@ -365,19 +365,33 @@
         <div style="flex:1; position:relative; min-height:0;"><canvas id="portfolioChartCanvas" style="cursor:crosshair;"></canvas></div>
       </div>
 
-      <div id="todayStocksPanel" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex:1; min-width:0; display:none; min-height:0; height:100%; margin-bottom:0;">
-        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:12px; display:flex; align-items:center; gap:8px; flex-shrink:0;">
+      <div id="todayStocksPanel" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex:1; min-width:0; display:none; height:100%; margin-bottom:0;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:15px; display:flex; align-items:center; gap:8px; flex-shrink:0;">
           📊 오늘 종목 현황
           <span style="font-size:11px; font-weight:normal; color:var(--text3);">당일 등락률</span>
         </div>
-        <div id="todayStocksList" style="flex:1; overflow:hidden; display:flex; flex-direction:column; min-height:0;"></div>
-        <div id="todayStocksTotalBar" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
-          <span style="font-size:12px; font-weight:700; color:var(--text2);">오늘 전체 손익</span>
-          <div style="display:flex; align-items:baseline; gap:8px;">
-            <span id="todayStocksTotalPnl" style="font-size:12px; font-family:var(--font-mono); color:var(--text3);"></span>
-            <span id="todayStocksTotalChange" style="font-size:18px; font-weight:700; font-family:var(--font-mono);">—</span>
+      
+        <div id="todayStocksTotalBar" style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; font-weight:700; color:var(--text2);">오늘 전체 손익</span>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span id="todayStocksTotalPnl" style="font-size:12px; font-family:var(--font-mono); font-weight:700;"></span>
+              <span id="todayStocksTotalChange" style="font-size:20px; font-weight:700; font-family:var(--font-mono);">—</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <div style="flex:1; background:var(--bg3); padding:8px; border-radius:8px; display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:10px; color:var(--text3);">🇰🇷 국내 오늘</span>
+              <div id="todayKrSum" style="font-size:12px; font-weight:700; font-family:var(--font-mono);">—</div>
+            </div>
+            <div style="flex:1; background:var(--bg3); padding:8px; border-radius:8px; display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:10px; color:var(--text3);">🇺🇸 미국 오늘</span>
+              <div id="todayUsSum" style="font-size:12px; font-weight:700; font-family:var(--font-mono);">—</div>
+            </div>
           </div>
         </div>
+      
+        <div id="todayStocksList" style="flex:1; overflow:hidden; display:flex; flex-direction:column; min-height:0;"></div>
       </div>
     </div>
 
