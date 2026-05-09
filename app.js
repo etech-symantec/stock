@@ -3346,6 +3346,8 @@ async function render() {
   const pChartRowWrap = document.getElementById('chartRowWrapper'); 
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
+  const watchlistSearch = document.getElementById('watchlistSearchGroup'); // 🌟 추가된 검색창 요소 찾기
+  const mobileSearch = document.getElementById('mobileSearchBar'); // 모바일용 검색창
   const histDash = document.getElementById('historyDashboard');
   const realDash = document.getElementById('realizedDashboard');
 
@@ -3372,10 +3374,16 @@ async function render() {
     container.style.display = 'block'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
+    if(watchlistSearch) watchlistSearch.style.display = 'flex'; 
+    if(mobileSearch) mobileSearch.style.display = 'flex';
+    renderMainDashboard(displayItems);
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
     dash.style.display = 'flex'; pChartRowWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
+    if(watchlistSearch) watchlistSearch.style.display = 'none'; 
+    if(mobileSearch) mobileSearch.style.display = 'none';
+    renderMainDashboard(displayItems);
   }
 
   let ownerFilter = 'all';
