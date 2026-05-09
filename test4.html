@@ -18,7 +18,7 @@
 <nav>
   <div class="nav-left">
     <div class="logo">
-      <img id="logoImg" src="/img/logo_dark_tp.png" alt="Two the Moon" width="320">
+      <img id="logoImg" src="/img/logo_dark_tp.png" alt="Two the Moon" width="300">
     </div>
 
     <div class="header-search" style="display:flex; gap:6px; flex:1; max-width:800px; min-width:300px; margin-right:20px; background:none; border:none; padding:0;">
@@ -368,24 +368,18 @@
         </div>
       </div>
     
-      <div id="todayStocksPanel" style="display:none; flex-direction:column; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex:1; height:100%; box-sizing:border-box; margin:0;">
-        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:15px; display:flex; align-items:center; gap:8px; flex-shrink:0;">
-          📊 오늘 종목 현황
+      <div id="todayStocksPanel" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex:1; min-width:0; display:none; height:100%; margin-bottom:0;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border); flex-shrink:0;">
+          <span style="font-size:14px; font-weight:700; color:var(--text); white-space:nowrap;">📊 오늘 종목 현황</span>
+          
+          <div style="display:flex; align-items:baseline; gap:8px;">
+            <span id="todayStocksTotalPnl" style="font-size:12px; font-family:var(--font-mono); font-weight:700;"></span>
+            <span id="todayStocksTotalChange" style="font-size:18px; font-weight:700; font-family:var(--font-mono);">—</span>
+          </div>
         </div>
-    
-        <div id="todayStocksTotalBar" style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:12px; font-weight:700; color:var(--text2);">오늘 전체 손익</span>
-            <div style="display:flex; align-items:baseline; gap:8px;">
-              <span id="todayStocksTotalPnl" style="font-size:12px; font-family:var(--font-mono); font-weight:700;"></span>
-              <span id="todayStocksTotalChange" style="font-size:20px; font-weight:700; font-family:var(--font-mono);">—</span>
-            </div>
-          </div>
-          </div>
-    
-        <div id="todayStocksList" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; min-height:0;"></div>
-      </div>
       
+        <div id="todayStocksList" style="flex:1; overflow:hidden; display:flex; flex-direction:column; min-height:0;"></div>
+      </div>
     </div>
 
     <div class="list-options-bar" id="listOptionsBar" style="display:none;">
