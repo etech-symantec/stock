@@ -27,6 +27,22 @@ function loadState() {
 
 let state = loadState();
 let currentView = 'all'; 
+
+// 🌟 선택된 기간의 시작 날짜(Cut-off Date)를 계산하는 함수
+function getCutoffDateFromRange(range) {
+    const d = new Date();
+    if (range === '1d') d.setDate(d.getDate() - 1);
+    else if (range === '1w') d.setDate(d.getDate() - 7);
+    else if (range === '1m') d.setMonth(d.getMonth() - 1);
+    else if (range === '3m') d.setMonth(d.getMonth() - 3);
+    else if (range === '6m') d.setMonth(d.getMonth() - 6);
+    else if (range === '1y') d.setFullYear(d.getFullYear() - 1);
+    else if (range === '3y') d.setFullYear(d.getFullYear() - 3);
+    else if (range === '5y') d.setFullYear(d.getFullYear() - 5);
+    else if (range === '10y') d.setFullYear(d.getFullYear() - 10);
+    else return '1970-01-01'; // 'all' 또는 전체
+    return d.toISOString().split('T')[0];
+}
 let currentDivFilter = 'all'; 
 // 🌟 기본 정렬을 등락률로 변경하고, 리스트 스타일 관련 변수 및 함수 추가
 let currentSortMode = 'changeDesc'; 
@@ -1300,10 +1316,11 @@ function renderHistoryDashboard() {
           if (state.oldNames && state.oldNames[tx.symbol] && state.oldNames[tx.symbol] !== '상장폐지') {
               stockName = state.oldNames[tx.symbol];
           }
-          if (!tx.symbol.toLowerCase().includes(s) && !stockName.toLowerCase().includes(s)) pass = false;
-      }
-      return pass;
-  });
+          const cutoff = getCutoffDateFromRange(state.range);
+          if (tx.date < cutoff) pass = false;
+        
+          return pass;
+        });
 
   const sorted = filtered.sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
   
@@ -1722,8 +1739,20 @@ function removeTicker(t) {
 function setRange(rangeStr, el) {
   state.range = rangeStr; saveState();
   document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
-  el.classList.add('active'); 
-  render();
+  
+  if(el) {
+      el.classList.add('active'); 
+  } else {
+      document.querySelectorAll('.rtab').forEach(b => {
+          if(b.textContent.toLowerCase() === rangeStr.toLowerCase()) b.classList.add('active');
+      });
+  }
+
+  // 🌟 기간 변경 시 현재 보고 있는 뷰에 맞춰 전체 재계산 및 렌더링
+  if (currentView === 'dividend') renderDividendDashboard();
+  else if (currentView === 'history') renderHistoryDashboard();
+  else if (currentView === 'realized') renderRealizedDashboard();
+  else render();
 }
 
 function setSortMode(mode) { currentSortMode = mode; render(); }
@@ -2939,8 +2968,11 @@ function renderDividendDashboard() {
   let symTotals = {};
   let divYields = {}; 
 
+  const cutoff = getCutoffDateFromRange(state.range);
   const divTxs = state.transactions.filter(t => {
     if(t.txType !== 'dividend') return false;
+    if(t.date < cutoff) return false; // 🌟 선택된 기간 이전의 배당 내역 제외
+  
     let filterName = 'all';
     if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
     if(currentDivFilter === 'user2') filterName = state.owners.user2.name;
@@ -3464,8 +3496,8 @@ async function render() {
       if(isNaN(item.activeChange)) item.activeChange = 0;
       
       item.evalAmt = item.qty * last;
-      item.costAmt = item.qty * item.avg;
-      item.roi = item.costAmt > 0 ? ((item.evalAmt - item.costAmt)/item.costAmt*100) : -9999;
+      item.costAmt = item.qty * pStart; 
+      item.roi = item.activeChange;
     } else {
       item.activeChange = 0; item.evalAmt = 0; item.costAmt = 0; item.roi = -9999; item.sliceLen = 0;
     }
@@ -3910,12 +3942,16 @@ function renderRealizedDashboard() {
             const isKr = isKorean(tx.symbol);
 
             // 상단 필터(연도, 소유자, 국가, 종목명) 확인
+            const cutoff = getCutoffDateFromRange(state.range);
+            const passPeriod = tx.date >= cutoff;
+            
             const passYear = (selectedYear === 'all' || txYear === selectedYear);
             const passOwner = (ownerName === 'all' || tx.owner === ownerName);
             const passMarket = (realizedFilters.market === 'all' || (realizedFilters.market === 'kr' ? isKr : !isKr));
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
-
-            if (passYear && passOwner && passMarket && passSymbol) {
+            
+            // 🌟 if문에 passPeriod 조건을 추가합니다.
+            if (passYear && passOwner && passMarket && passSymbol && passPeriod) {
                 let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
                 cumulativePnl += pnlKrw;
 
@@ -5214,3 +5250,13 @@ function renderUpcomingDividends() {
         `;
     }).join('');
 }
+document.addEventListener('DOMContentLoaded', async () => {
+  // 🌟 기간 설정 UI를 최상단 글로벌 내비게이션 바 우측으로 이동
+  const rangeGroup = document.querySelector('.range-group');
+  const navRight = document.querySelector('.nav-right');
+  if (rangeGroup && navRight) {
+      navRight.insertBefore(rangeGroup, navRight.firstChild);
+      rangeGroup.style.marginRight = '10px';
+  }
+  
+  // (이하 기존 DOMContentLoaded 코드 유지)
