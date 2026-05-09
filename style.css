@@ -1196,40 +1196,69 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     100% { box-shadow: 0 0 0px rgba(124, 106, 247, 0.4); }
 }
 
-/* 🌟 네비게이션 중앙 배치 및 프리미엄 효과 적용 */
+/* 1. 상단 내비게이션 바 레이아웃 조정 */
 nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* 좌(1):중(자동):우(1) 비율로 메뉴를 정중앙에 배치 */
   align-items: center;
-  justify-content: space-between;
-  
-  /* 1. 화면 중앙 배치: margin auto와 적절한 너비 설정 */
-  margin: 15px auto;
-  width: 95%;
-  max-width: 1400px;
-  padding: 12px 28px;
-  
-  /* 2. 디자인: 하단 테두리 대신 전체 테두리와 둥근 모서리 */
-  border: 1px solid rgba(128, 128, 128, 0.15); /* 은은한 테두리 */
-  border-radius: 20px;
-  background: var(--bg); /* 배경색 유지 (반투명 설정을 원하시면 rgba 활용 추천) */
-  
-  /* 3. 은은하고 이쁜 효과: 부드러운 그림자와 배경 블러 */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  
-  /* 4. 사용자 경험: 상단에 고정되도록 설정 */
+  padding: 10px 2rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
   position: sticky;
-  top: 15px;
+  top: 0;
   z-index: 1000;
-  
-  /* 부드러운 전환 효과 */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 20px;
 }
 
-/* 🌟 마우스 오버 시 테두리가 빛나는 포인트 효과 추가 */
-nav:hover {
-  border-color: var(--accent); /* 기존 코드의 포인트 컬러 활용 */
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
+/* 2. 중앙 탭 메뉴(전체보기~배당통계) 스타일 및 효과 */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  
+  /* 🌟 글래스모피즘 & 실버 테두리 효과 */
+  background: rgba(255, 255, 255, 0.03); /* 아주 연한 배경 */
+  border: 1px solid rgba(255, 255, 255, 0.12); /* 은은한 은색 테두리 */
+  border-radius: 100px; /* 둥근 캡슐 모양 */
+  backdrop-filter: blur(12px); /* 배경 블러 효과 */
+  -webkit-backdrop-filter: blur(12px);
+  
+  /* 부드러운 그림자와 미세한 광택 */
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  
+  transition: all 0.3s ease;
 }
+
+/* 3. 개별 탭 버튼 디자인 */
+.nav-tabs .vtab {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 100px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+/* 활성화된 탭 효과 */
+.nav-tabs .vtab.active {
+  background: var(--accent); /* 포인트 컬러 배경 */
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(124, 106, 247, 0.3); /* 포인트 컬러 그림자 */
+}
+
+/* 마우스 오버 시 효과 */
+.nav-tabs .vtab:not(.active):hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+/* 좌우 영역 정렬 */
+.nav-left { justify-self: start; }
+.nav-right { justify-self: end; }
