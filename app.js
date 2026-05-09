@@ -1562,7 +1562,8 @@ async function fetchPublicData(symbol) {
   // 🚨 [필수] 공공데이터포털에서 발급받은 'Decoding' 인증키를 입력하세요.
   const API_KEY = 'd9f831a4f894f1149672e45b4b910dab8f9c2438061c5201f207c20f0d761e55';
   
-  if (API_KEY === 'd9f831a4f894f1149672e45b4b910dab8f9c2438061c5201f207c20f0d761e55' || !API_KEY) {
+  // 🌟 기존 임시 키 검사 로직 삭제, 키가 비어있을 때만 에러 처리
+  if (!API_KEY) {
       console.warn("공공데이터포털 API 키가 설정되지 않았습니다.");
       return { _failed: true };
   }
