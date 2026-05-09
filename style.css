@@ -1196,69 +1196,73 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     100% { box-shadow: 0 0 0px rgba(124, 106, 247, 0.4); }
 }
 
-/* 1. 상단 내비게이션 바 레이아웃 조정 */
+/* 1. 상단 내비게이션 바 전체 레이아웃 */
 nav {
   display: grid;
-  grid-template-columns: 1fr auto 1fr; /* 좌(1):중(자동):우(1) 비율로 메뉴를 정중앙에 배치 */
+  grid-template-columns: 1fr auto 1fr; /* 좌(로고), 중(메뉴), 우(설정) 3분할 */
   align-items: center;
-  padding: 10px 2rem;
+  padding: 12px 1rem; /* 좌우 여백을 줄여 로고와 버튼을 끝으로 밀착 */
   background: var(--bg);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 1000;
-  gap: 20px;
+  width: 100%;
 }
 
-/* 2. 중앙 탭 메뉴(전체보기~배당통계) 스타일 및 효과 */
-.nav-tabs {
+/* 2. 좌측 영역: 로고 */
+.nav-left {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px;
-  
-  /* 🌟 글래스모피즘 & 실버 테두리 효과 */
-  background: rgba(255, 255, 255, 0.03); /* 아주 연한 배경 */
-  border: 1px solid rgba(255, 255, 255, 0.12); /* 은은한 은색 테두리 */
-  border-radius: 100px; /* 둥근 캡슐 모양 */
-  backdrop-filter: blur(12px); /* 배경 블러 효과 */
-  -webkit-backdrop-filter: blur(12px);
-  
-  /* 부드러운 그림자와 미세한 광택 */
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.15),
-    inset 0 1px 1px rgba(255, 255, 255, 0.05);
-  
-  transition: all 0.3s ease;
+  justify-content: flex-start; /* 왼쪽 정렬 */
 }
 
-/* 3. 개별 탭 버튼 디자인 */
-.nav-tabs .vtab {
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  border-radius: 100px;
-  border: none;
-  background: transparent;
-  color: var(--text3);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
+.logo img {
+  width: 240px !important; /* 로고 크기 적정 조절 */
+  margin-left: -10px; /* 좌측으로 더 붙임 */
 }
 
-/* 활성화된 탭 효과 */
-.nav-tabs .vtab.active {
-  background: var(--accent); /* 포인트 컬러 배경 */
+/* 3. 중앙 영역: 내비게이션 탭 (더 크고 웅장하게) */
+.view-tabs {
+  justify-self: center; /* 그리드 중앙 배치 */
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border2);
+  border-radius: 14px; /* 더 둥근 캡슐 모양 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.vtab {
+  padding: 10px 20px; /* 버튼 크기 확대 */
+  font-size: 14px; /* 폰트 크기 확대 */
+  font-weight: 700; /* 더 두껍게 부각 */
+  color: var(--text2);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.vtab.active {
+  background: var(--accent);
   color: #fff;
-  font-weight: 700;
-  box-shadow: 0 2px 10px rgba(124, 106, 247, 0.3); /* 포인트 컬러 그림자 */
+  transform: scale(1.05); /* 활성화된 탭 살짝 확대 효과 */
 }
 
-/* 마우스 오버 시 효과 */
-.nav-tabs .vtab:not(.active):hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
+/* 4. 우측 영역: 기간, 테마, 설정 버튼 */
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  gap: 12px;
 }
 
-/* 좌우 영역 정렬 */
-.nav-left { justify-self: start; }
-.nav-right { justify-self: end; }
+/* 기간 선택 버튼 스타일 소폭 조정 */
+.range-group {
+  margin-right: 10px;
+}
+
+.rtab {
+  padding: 6px 12px;
+  font-weight: 600;
+}
