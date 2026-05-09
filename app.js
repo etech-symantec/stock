@@ -3294,8 +3294,16 @@ function renderModalChart() {
 // 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
 let isFetchingMarketData = false;
 async function fetchMissingMarketData(symbolsToFetch) {
-    if(isFetchingMarketData) return;
+    if(isFetchingMarketData || !symbolsToFetch || symbolsToFetch.length === 0) return;
     isFetchingMarketData = true;
+    
+    // 🌟 [핵심 추가] 장부에 한 번이라도 기록된 종목(보유/매도)을 1순위로 끌어올리기
+    const transactedSymbols = new Set(state.transactions.map(tx => tx.symbol));
+    symbolsToFetch.sort((a, b) => {
+        const aOwned = transactedSymbols.has(a) ? 1 : 0;
+        const bOwned = transactedSymbols.has(b) ? 1 : 0;
+        return bOwned - aOwned; // 1(내 종목)이 0(단순 관심종목)보다 무조건 먼저 오게 정렬
+    });
     const batchSize = 3;
     
     // 우측 하단에 조그맣게 '로딩 중' 알림 띄우기
@@ -3309,19 +3317,19 @@ async function fetchMissingMarketData(symbolsToFetch) {
     loadingEl.style.opacity = '1';
 
     for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
-        if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 불러오는 중... (${i}/${symbolsToFetch.length})`;
+        if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 쾌속 로딩 중... (${Math.min(i + batchSize, symbolsToFetch.length)}/${symbolsToFetch.length})`;
         const batch = symbolsToFetch.slice(i, i + batchSize);
         await Promise.all(batch.map(async t => {
             let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
             let fetchedData = await fetchYahooData(fetchSym);
-            if (fetchedData) cachedMarketData[t] = fetchedData;
+            if (fetchedData && !fetchedData._failed) cachedMarketData[t] = fetchedData;
             else cachedMarketData[t] = { _failed: true };
         }));
         
-        render(); // 데이터를 3개 가져올 때마다 화면의 빈칸에 쏙쏙 채워 넣음
+        render();
         
         if (i + batchSize < symbolsToFetch.length) {
-            await new Promise(res => setTimeout(res, 1000)); 
+            await new Promise(res => setTimeout(res, 100)); 
         }
     }
     
