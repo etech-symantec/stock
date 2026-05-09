@@ -47,7 +47,7 @@ let currentSortMode = 'changeDesc';
 let sortDirection = 1; // 🌟 1(내림차순)을 기본값으로 변경하여 높은 수익률이 상단에 오게 설정
 let activeAccountFilter = null; 
 let currentListStyle = 'card';
-let currentRegionLayout = 'vertical'; // 🌟 [추가] 기본 배치는 상하(vertical)로 설정
+let currentRegionLayout = 'horizontal'; // 🌟 기본 배치를 좌우(horizontal)로 변경
 let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 // 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
 let realizedFilters = { market: 'all', symbol: null, tradeIdx: null };
