@@ -3714,9 +3714,9 @@
       "owner": "끄니",
       "broker": "키움",
       "symbol": "BKKT",
-      "qty": 50,
+      "qty": -50,
       "price": 26.3,
-      "txType": "buy"
+      "txType": "trade"
     },
     {
       "id": 1776937392749,
@@ -7759,7 +7759,7 @@
       "txType": "dividend"
     }
   ],
-  "range": "1m",
+  "range": "all",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
