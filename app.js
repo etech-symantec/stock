@@ -3386,13 +3386,11 @@ async function render() {
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
     if(watchlistSearch) watchlistSearch.style.display = 'flex'; 
-    if(mobileSearch) mobileSearch.style.display = 'flex';
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
     dash.style.display = 'flex'; pChartRowWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
     if(watchlistSearch) watchlistSearch.style.display = 'none'; 
-    if(mobileSearch) mobileSearch.style.display = 'none';
   }
 
   let ownerFilter = 'all';
