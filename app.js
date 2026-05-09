@@ -2024,14 +2024,12 @@ function generateListItemHtml(item) {
   `;
 }
 
-// 📊 오늘 종목 현황 패널 렌더링 (국장/미장 분리 및 상승/하락 정렬)
+// 📊 오늘 종목 현황 패널 렌더링
 function renderTodayStocksPanel(displayItems) {
     const panel = document.getElementById('todayStocksPanel');
     const listEl = document.getElementById('todayStocksList');
     const totalChangeEl = document.getElementById('todayStocksTotalChange');
     const totalPnlEl = document.getElementById('todayStocksTotalPnl');
-    const krSumEl = document.getElementById('todayKrSum');
-    const usSumEl = document.getElementById('todayUsSum');
     
     if (!panel || !listEl || !totalChangeEl) return;
 
@@ -2070,18 +2068,7 @@ function renderTodayStocksPanel(displayItems) {
     const totalPrevEval = krStats.rawPrevEval + usStats.rawPrevEval;
     const totalChangePct = totalPrevEval > 0 ? (totalPnl / totalPrevEval) * 100 : 0;
 
-    // 3. 요약 표시 업데이트
-    const updateSumDisplay = (el, stats, prefix = '') => {
-        if (!el) return;
-        const color = stats.pct > 0 ? 'var(--profit)' : stats.pct < 0 ? 'var(--loss)' : 'var(--text2)';
-        const sign = stats.pct > 0 ? '+' : '';
-        el.style.color = color;
-        el.innerHTML = `${sign}${stats.pct.toFixed(2)}% <span style="font-size:10px; font-weight:normal; margin-left:4px;">(${sign}${prefix}${Math.round(stats.pnl).toLocaleString()})</span>`;
-    };
-
-    updateSumDisplay(krSumEl, krStats, '₩');
-    updateSumDisplay(usSumEl, usStats, '₩');
-
+    // 3. 오늘 전체 손익 요약 업데이트
     const totalColor = totalChangePct > 0 ? 'var(--profit)' : totalChangePct < 0 ? 'var(--loss)' : 'var(--text2)';
     totalChangeEl.style.color = totalColor;
     totalChangeEl.textContent = `${totalChangePct > 0 ? '+' : ''}${totalChangePct.toFixed(2)}%`;
@@ -2090,7 +2077,14 @@ function renderTodayStocksPanel(displayItems) {
         totalPnlEl.textContent = `(${totalChangePct > 0 ? '+' : ''}₩${Math.round(totalPnl).toLocaleString()})`;
     }
 
-    // 4. 종목 리스트 렌더링
+    // 🌟 4. 시장별 타이틀 옆에 붙일 예쁜 손익 텍스트 생성기
+    const getStatHtml = (stats, prefix = '') => {
+        const color = stats.pct > 0 ? 'var(--profit)' : stats.pct < 0 ? 'var(--loss)' : 'var(--text2)';
+        const sign = stats.pct > 0 ? '+' : '';
+        return `<span style="color:${color}; font-size:11px; font-weight:normal; font-family:var(--font-mono); margin-left:auto;">${sign}${stats.pct.toFixed(2)}% (${sign}${prefix}${Math.round(stats.pnl).toLocaleString()})</span>`;
+    };
+
+    // 5. 종목 리스트 렌더링 헬퍼
     function getMarketHtml(marketRows) {
         const upRows   = marketRows.filter(r => r.chg1d > 0).sort((a, b) => b.chg1d - a.chg1d);
         const downRows = marketRows.filter(r => r.chg1d < 0).sort((a, b) => a.chg1d - b.chg1d);
@@ -2137,12 +2131,16 @@ function renderTodayStocksPanel(displayItems) {
     listEl.innerHTML = `
     <div style="display:flex; gap:12px; flex:1; min-height:0; height:100%;">
         <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
-            <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px;">🇰🇷 국내 주식</div>
+            <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:5px;">
+                🇰🇷 국내 주식 ${getStatHtml(krStats, '₩')}
+            </div>
             ${getMarketHtml(rows.filter(r => r.isKr))}
         </div>
         <div style="width:1px; background:var(--border); flex-shrink:0;"></div>
         <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
-            <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px;">🇺🇸 미국 주식</div>
+            <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:5px;">
+                🇺🇸 미국 주식 ${getStatHtml(usStats, '₩')}
+            </div>
             ${getMarketHtml(rows.filter(r => !r.isKr))}
         </div>
     </div>`;
