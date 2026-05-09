@@ -21,19 +21,6 @@
       <img id="logoImg" src="/img/logo_dark_tp.png" alt="Two the Moon" width="300">
     </div>
 
-    <div class="header-search" style="display:flex; gap:6px; flex:1; max-width:800px; min-width:300px; margin-right:20px; background:none; border:none; padding:0;">
-        <select id="mainSearchFilter" class="search-input" style="width:85px; border-radius:20px; height:40px; padding:0 8px; cursor:pointer; font-size:12px;">
-            <option value="all">🌐 전체</option>
-            <option value="kr">🇰🇷 한국</option>
-            <option value="us">🇺🇸 미국</option>
-        </select>
-        <div style="position:relative; flex:1;">
-            <input type="text" id="tickerInput" class="search-input" placeholder="종목명/Ticker 검색 (와일드카드 *(별표) 지원)" autocomplete="off" style="width:100%;" />
-            <button class="btn-add-icon" onclick="addManualTicker()">＋</button>
-            <ul id="searchDropdown" class="search-dropdown" style="width:100%;"></ul>
-        </div>
-    </div>
-
   <div class="view-tabs">
     <button class="vtab active" onclick="setView('all', this)">전체보기</button>
     <button class="vtab" id="tabUser1" onclick="setView('user1', this)">소유자1</button>
@@ -384,6 +371,19 @@
 
     <div class="list-options-bar" id="listOptionsBar" style="display:none;">
       
+      <div id="watchlistSearchGroup" style="display:none; gap:8px; width:100%; margin-bottom:20px; background:var(--bg2); padding:15px; border-radius:12px; border:1px solid var(--border); box-sizing:border-box;">
+          <select id="mainSearchFilter" class="form-input" style="width:100px; margin:0; height:42px; cursor:pointer; font-size:13px;">
+              <option value="all">🌐 전체</option>
+              <option value="kr">🇰🇷 한국</option>
+              <option value="us">🇺🇸 미국</option>
+          </select>
+          <div style="position:relative; flex:1; display:flex; gap:10px;">
+              <input type="text" id="tickerInput" class="form-input" placeholder="관심종목에 추가할 종목명 / Ticker 검색..." autocomplete="off" style="flex:1; margin:0; height:42px; font-size:14px;" />
+              <button class="btn-submit" onclick="addManualTicker()" style="height:42px; margin:0; padding:0 24px; white-space:nowrap; background:var(--accent); font-size:14px;">＋ 종목 추가</button>
+              <ul id="searchDropdown" class="search-dropdown" style="width:100%; top:48px;"></ul>
+          </div>
+      </div>
+
       <div class="list-title-wrap" style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px;">
         <div style="display:flex; align-items:center; gap:12px;">
             <h2 class="section-title" style="margin:0;">종목 리스트</h2>
