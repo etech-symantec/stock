@@ -3288,12 +3288,14 @@ function renderModalChart() {
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker); }, 50);
 }
 
-// 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
+// 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수 (속도 대폭 개선)
 let isFetchingMarketData = false;
 async function fetchMissingMarketData(symbolsToFetch) {
     if(isFetchingMarketData) return;
     isFetchingMarketData = true;
-    const batchSize = 3;
+    
+    // 🌟 1. 병렬 처리량 대폭 증가: 한 번에 3개 -> 10개씩 동시 요청
+    const batchSize = 10; 
     
     // 우측 하단에 조그맣게 '로딩 중' 알림 띄우기
     let loadingEl = document.getElementById('bgLoadingIndicator');
@@ -3306,26 +3308,28 @@ async function fetchMissingMarketData(symbolsToFetch) {
     loadingEl.style.opacity = '1';
 
     for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
-        if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 불러오는 중... (${i}/${symbolsToFetch.length})`;
+        if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 쾌속 로딩 중... (${Math.min(i + batchSize, symbolsToFetch.length)}/${symbolsToFetch.length})`;
+        
         const batch = symbolsToFetch.slice(i, i + batchSize);
         await Promise.all(batch.map(async t => {
             let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
             let fetchedData = await fetchYahooData(fetchSym);
-            if (fetchedData) cachedMarketData[t] = fetchedData;
+            if (fetchedData && !fetchedData._failed) cachedMarketData[t] = fetchedData;
             else cachedMarketData[t] = { _failed: true };
         }));
         
-        render(); // 데이터를 3개 가져올 때마다 화면의 빈칸에 쏙쏙 채워 넣음
+        render(); // 데이터를 가져올 때마다 화면의 빈칸에 쏙쏙 채워 넣음
         
+        // 🌟 2. 강제 대기 시간 최소화: 1000ms(1초) -> 100ms(0.1초)로 줄여서 체감 속도 10배 향상
         if (i + batchSize < symbolsToFetch.length) {
-            await new Promise(res => setTimeout(res, 1000)); 
+            await new Promise(res => setTimeout(res, 100)); 
         }
     }
     
     isFetchingMarketData = false;
     if(loadingEl) loadingEl.style.opacity = '0';
     
-    // 🌟 데이터를 다 가져오면 다음 번 광속 접속을 위해 기기에 임시 저장
+    // 데이터를 다 가져오면 다음 번 광속 접속을 위해 기기에 임시 저장
     try { 
         localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
