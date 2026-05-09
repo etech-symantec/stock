@@ -416,7 +416,6 @@
 
     <div id="dividendDashboard">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
-        <h2 class="section-title" style="margin:0;">💰 배당금 현황</h2>
         <div class="view-tabs" style="background:var(--bg3);">
           <button class="vtab active div-filter" onclick="setDivFilter('all', this)">전체 합산</button>
           <button class="vtab div-filter" id="divTabUser1" onclick="setDivFilter('user1', this)">소유자1</button>
@@ -505,7 +504,6 @@
     <div id="realizedDashboard" style="display:none; flex-direction:column;">
       
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
-        <h2 class="section-title" style="margin:0;">📈 연도별 실현수익 통계</h2>
         <div style="display:flex; gap:10px;">
           <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
             <option value="all">전체 연도</option>
