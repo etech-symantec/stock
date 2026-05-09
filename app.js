@@ -5258,5 +5258,4 @@ document.addEventListener('DOMContentLoaded', async () => {
       navRight.insertBefore(rangeGroup, navRight.firstChild);
       rangeGroup.style.marginRight = '10px';
   }
-  
-  // (이하 기존 DOMContentLoaded 코드 유지)
+}
