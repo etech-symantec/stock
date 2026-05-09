@@ -2044,7 +2044,7 @@ function renderTodayStocksPanel(displayItems) {
     }
     panel.style.display = 'flex';
 
-    // 1. 데이터 가공 및 시장별 분류
+    // 1. 데이터 가공
     const rows = heldItems.map(item => {
         const d = item.data;
         const last = d.last || 0;
@@ -2053,31 +2053,28 @@ function renderTodayStocksPanel(displayItems) {
         const pnl1d = item.qty * (last - prev);
         const prevEval = item.qty * prev;
         const isKr = isKorean(item.symbol);
-        // symbol 정보도 함께 전달하도록 수정
-        return { isKr, pnl1d, prevEval, chg1d, name: d.name || item.symbol, symbol: item.symbol }; 
+        return { isKr, pnl1d, prevEval, chg1d, name: d.name || item.symbol, symbol: item.symbol };
     });
 
-    // 2. 전체/국내/미국 성과 계산
-    const krRows = rows.filter(r => r.isKr);
-    const usRows = rows.filter(r => !r.isKr);
-
+    // 2. 성과 계산 함수
     const calcStats = (marketRows, useFx = false) => {
         const pnl = marketRows.reduce((s, r) => s + r.pnl1d, 0);
         const prevEval = marketRows.reduce((s, r) => s + r.prevEval, 0);
         const pct = prevEval > 0 ? (pnl / prevEval) * 100 : 0;
-        const finalPnl = useFx ? pnl * currentUsdKrw : pnl;
-        return { pnl: finalPnl, pct };
+        const finalPnl = useFx ? pnl * (currentUsdKrw || 1) : pnl;
+        return { pnl: finalPnl, pct, rawPrevEval: useFx ? prevEval * (currentUsdKrw || 1) : prevEval };
     };
 
-    const krStats = calcStats(krRows, false);
-    const usStats = calcStats(usRows, true); // 미장은 환율 적용
+    const krStats = calcStats(rows.filter(r => r.isKr), false);
+    const usStats = calcStats(rows.filter(r => !r.isKr), true);
     
     const totalPnl = krStats.pnl + usStats.pnl;
-    const totalChangePct = (krStats.pnl + usStats.pnl) / (calcStats(krRows).prevEval + (calcStats(usRows).prevEval * currentUsdKrw)) * 100 || 0;
+    const totalPrevEval = krStats.rawPrevEval + usStats.rawPrevEval;
+    const totalChangePct = totalPrevEval > 0 ? (totalPnl / totalPrevEval) * 100 : 0;
 
-    // 3. UI 업데이트 (상단 바)
+    // 3. 요약 표시 업데이트
     const updateSumDisplay = (el, stats, prefix = '') => {
-        if(!el) return;
+        if (!el) return;
         const color = stats.pct > 0 ? 'var(--profit)' : stats.pct < 0 ? 'var(--loss)' : 'var(--text2)';
         const sign = stats.pct > 0 ? '+' : '';
         el.style.color = color;
@@ -2095,57 +2092,46 @@ function renderTodayStocksPanel(displayItems) {
         totalPnlEl.textContent = `(${totalChangePct > 0 ? '+' : ''}₩${Math.round(totalPnl).toLocaleString()})`;
     }
 
-    // 4. 종목 리스트 렌더링 헬퍼 함수
+    // 4. 종목 리스트 렌더링
     function getMarketHtml(marketRows) {
         const upRows   = marketRows.filter(r => r.chg1d > 0).sort((a, b) => b.chg1d - a.chg1d);
         const downRows = marketRows.filter(r => r.chg1d < 0).sort((a, b) => a.chg1d - b.chg1d);
         const flatRows = marketRows.filter(r => r.chg1d === 0);
 
-        // 🌟 중복 제거된 종목 카드 HTML 생성 (티커 표시 디자인)
         function stockCard(r) {
             const sign = r.chg1d > 0 ? '+' : '';
-            const isUp   = r.chg1d > 0;
-            const isDown = r.chg1d < 0;
+            const isUp = r.chg1d > 0, isDown = r.chg1d < 0;
             const accentColor = isUp ? 'var(--profit)' : isDown ? 'var(--loss)' : 'var(--text3)';
             const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
             const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
-            const barWidth    = Math.min(Math.abs(r.chg1d) * 6, 100);
             return `
             <div style="padding:7px 9px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha}; margin-bottom:5px;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
                     <div style="min-width:0; flex:1;">
-                        <div style="font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.name}">${r.name}</div>
+                        <div style="font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</div>
                         <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px;">${r.symbol}</div>
                     </div>
-                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:${accentColor}; white-space:nowrap;">${sign}${r.chg1d.toFixed(2)}%</div>
-                </div>
-                <div style="margin-top:5px; height:2px; background:var(--border); border-radius:1px; overflow:hidden;">
-                    <div style="height:100%; width:${barWidth}%; background:${accentColor}; border-radius:1px;"></div>
+                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:${accentColor};">${sign}${r.chg1d.toFixed(2)}%</div>
                 </div>
             </div>`;
         }
 
-        // 구분 헤더 HTML
         function colHeader(label, count, color) {
-            return `<div style="font-size:10px; font-weight:700; color:${color}; margin-bottom:4px; display:flex; align-items:center; gap:4px; position:sticky; top:0; background:var(--bg2); padding:2px 0; z-index:1;">
+            return `<div style="font-size:10px; font-weight:700; color:${color}; margin-bottom:6px; display:flex; align-items:center; gap:4px; position:sticky; top:0; background:var(--bg2); padding:2px 0;">
                 ${label} <span style="background:${color}; color:#fff; border-radius:10px; padding:1px 5px; font-size:9px;">${count}</span>
             </div>`;
         }
 
-        const upHtml   = (upRows.length   > 0 ? colHeader('▲ 상승', upRows.length,   'var(--profit)') : '')
-                       + upRows.map(stockCard).join('')
-                       + (flatRows.length > 0 && upRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
-        const downHtml = (downRows.length > 0 ? colHeader('▼ 하락', downRows.length, 'var(--loss)') : '')
-                       + downRows.map(stockCard).join('')
-                       + (flatRows.length > 0 && downRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
+        const upHtml   = (upRows.length > 0 ? colHeader('▲ 상승', upRows.length, 'var(--profit)') : '') + upRows.map(stockCard).join('') + (flatRows.length > 0 && upRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
+        const downHtml = (downRows.length > 0 ? colHeader('▼ 하락', downRows.length, 'var(--loss)') : '') + downRows.map(stockCard).join('') + (flatRows.length > 0 && downRows.length === 0 ? colHeader('━ 보합', flatRows.length, 'var(--text3)') + flatRows.map(stockCard).join('') : '');
 
         return `
         <div style="display:flex; gap:8px; flex:1; min-height:0;">
             <div style="flex:1; min-width:0; overflow-y:auto; padding-right:2px;" class="custom-scrollbar">
-                ${upRows.length + (flatRows.length > 0 && upRows.length === 0 ? flatRows.length : 0) > 0 ? upHtml : '<div style="font-size:10px; color:var(--text3); text-align:center; margin-top:12px;">상승 없음</div>'}
+                ${upRows.length + flatRows.length > 0 && upRows.length === 0 ? upHtml : upHtml || '<div style="font-size:10px; color:var(--text3); text-align:center; margin-top:12px;">상승 없음</div>'}
             </div>
             <div style="flex:1; min-width:0; overflow-y:auto; padding-right:2px;" class="custom-scrollbar">
-                ${downRows.length + (flatRows.length > 0 && downRows.length === 0 ? flatRows.length : 0) > 0 ? downHtml : '<div style="font-size:10px; color:var(--text3); text-align:center; margin-top:12px;">하락 없음</div>'}
+                ${downHtml || '<div style="font-size:10px; color:var(--text3); text-align:center; margin-top:12px;">하락 없음</div>'}
             </div>
         </div>`;
     }
@@ -2153,13 +2139,13 @@ function renderTodayStocksPanel(displayItems) {
     listEl.innerHTML = `
     <div style="display:flex; gap:12px; flex:1; min-height:0; height:100%;">
         <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
-            <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:5px;">🇰🇷 국내 주식</div>
-            ${getMarketHtml(krRows)}
+            <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px;">🇰🇷 국내 주식</div>
+            ${getMarketHtml(rows.filter(r => r.isKr))}
         </div>
         <div style="width:1px; background:var(--border); flex-shrink:0;"></div>
         <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
-            <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:5px;">🇺🇸 미국 주식</div>
-            ${getMarketHtml(usRows)}
+            <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px;">🇺🇸 미국 주식</div>
+            ${getMarketHtml(rows.filter(r => !r.isKr))}
         </div>
     </div>`;
 }
