@@ -2099,16 +2099,14 @@ function renderTodayStocksPanel(displayItems) {
             const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
             const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
             
-            // 🌟 티커를 제거하고 종목명과 등락률을 중앙 정렬하여 글씨 크기를 키웠습니다.
+            // 🌟 2줄 레이아웃: 종목명 풀네임(줄바꿈 허용) 윗줄, 등락률 아랫줄 우측 배치
             return `
-            <div style="padding:10px 12px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha}; margin-bottom:5px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                    <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
-                        ${r.name}
-                    </div>
-                    <div style="font-size:15px; font-weight:800; font-family:var(--font-mono); color:${accentColor}; flex-shrink:0;">
-                        ${sign}${r.chg1d.toFixed(2)}%
-                    </div>
+            <div style="padding:10px 12px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha}; margin-bottom:5px; display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:12px; font-weight:700; color:var(--text); line-height:1.4; word-break:keep-all;">
+                    ${r.name}
+                </div>
+                <div style="font-size:15px; font-weight:800; font-family:var(--font-mono); color:${accentColor}; text-align:right;">
+                    ${sign}${r.chg1d.toFixed(2)}%
                 </div>
             </div>`;
         }
