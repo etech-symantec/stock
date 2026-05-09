@@ -2053,7 +2053,8 @@ function renderTodayStocksPanel(displayItems) {
         const pnl1d = item.qty * (last - prev);
         const prevEval = item.qty * prev;
         const isKr = isKorean(item.symbol);
-        return { isKr, pnl1d, prevEval, chg1d, name: d.name || item.symbol };
+        // symbol 정보도 함께 전달하도록 수정
+        return { isKr, pnl1d, prevEval, chg1d, name: d.name || item.symbol, symbol: item.symbol }; 
     });
 
     // 2. 전체/국내/미국 성과 계산
@@ -2072,11 +2073,11 @@ function renderTodayStocksPanel(displayItems) {
     const usStats = calcStats(usRows, true); // 미장은 환율 적용
     
     const totalPnl = krStats.pnl + usStats.pnl;
-    const totalPrevEval = krStats.pnl / (krStats.pct/100 || 1) + usStats.pnl / (usStats.pct/100 || 1); // 역산하여 가중치 계산
-    const totalChangePct = (krStats.pnl + usStats.pnl) / (calcStats(krRows).prevEval + (calcStats(usRows).prevEval * currentUsdKrw)) * 100;
+    const totalChangePct = (krStats.pnl + usStats.pnl) / (calcStats(krRows).prevEval + (calcStats(usRows).prevEval * currentUsdKrw)) * 100 || 0;
 
     // 3. UI 업데이트 (상단 바)
     const updateSumDisplay = (el, stats, prefix = '') => {
+        if(!el) return;
         const color = stats.pct > 0 ? 'var(--profit)' : stats.pct < 0 ? 'var(--loss)' : 'var(--text2)';
         const sign = stats.pct > 0 ? '+' : '';
         el.style.color = color;
@@ -2089,63 +2090,43 @@ function renderTodayStocksPanel(displayItems) {
     const totalColor = totalChangePct > 0 ? 'var(--profit)' : totalChangePct < 0 ? 'var(--loss)' : 'var(--text2)';
     totalChangeEl.style.color = totalColor;
     totalChangeEl.textContent = `${totalChangePct > 0 ? '+' : ''}${totalChangePct.toFixed(2)}%`;
-    totalPnlEl.style.color = totalColor;
-    totalPnlEl.textContent = `(${totalChangePct > 0 ? '+' : ''}₩${Math.round(totalPnl).toLocaleString()})`;
-
-  // 내부 리스트 생성 헬퍼 함수
-  function getMarketHtml(marketRows) {
-      const upRows   = marketRows.filter(r => r.chg1d > 0).sort((a, b) => b.chg1d - a.chg1d);
-      const downRows = marketRows.filter(r => r.chg1d < 0).sort((a, b) => a.chg1d - b.chg1d);
-      const flatRows = marketRows.filter(r => r.chg1d === 0);
-
-      function stockCard(r) {
-          const sign = r.chg1d > 0 ? '+' : '';
-          const isUp   = r.chg1d > 0;
-          const isDown = r.chg1d < 0;
-          const accentColor = isUp ? 'var(--profit)' : isDown ? 'var(--loss)' : 'var(--text3)';
-          const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
-          const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
-          const barWidth    = Math.min(Math.abs(r.chg1d) * 6, 100);
-          return `
-          <div style="padding:5px 7px; background:${bgAlpha}; border-radius:6px; border:1px solid ${borderAlpha}; margin-bottom:5px;">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
-                  <div style="min-width:0; flex:1;">
-                      <div style="font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.name}">${r.name}</div>
-                  </div>
-                  <div style="font-size:11px; font-weight:700; font-family:var(--font-mono); color:${accentColor}; white-space:nowrap;">${sign}${r.chg1d.toFixed(2)}%</div>
-              </div>
-              <div style="margin-top:4px; height:2px; background:var(--border); border-radius:1px; overflow:hidden;">
-                  <div style="height:100%; width:${barWidth}%; background:${accentColor}; border-radius:1px;"></div>
-              </div>
-          </div>`;
-      }
-
-    // 종목 카드 HTML 생성
-    function stockCard(r) {
-        const sign = r.chg1d > 0 ? '+' : '';
-        const isUp   = r.chg1d > 0;
-        const isDown = r.chg1d < 0;
-        const accentColor = isUp ? 'var(--profit)' : isDown ? 'var(--loss)' : 'var(--text3)';
-        const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
-        const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
-        const barWidth    = Math.min(Math.abs(r.chg1d) * 6, 100);
-        return `
-        <div style="padding:7px 9px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha};">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
-                <div style="min-width:0; flex:1;">
-                    <div style="font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</div>
-                    <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px;">${r.symbol}</div>
-                </div>
-                <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:${accentColor}; white-space:nowrap;">${sign}${r.chg1d.toFixed(2)}%</div>
-            </div>
-            <div style="margin-top:5px; height:2px; background:var(--border); border-radius:1px; overflow:hidden;">
-                <div style="height:100%; width:${barWidth}%; background:${accentColor}; border-radius:1px;"></div>
-            </div>
-        </div>`;
+    if (totalPnlEl) {
+        totalPnlEl.style.color = totalColor;
+        totalPnlEl.textContent = `(${totalChangePct > 0 ? '+' : ''}₩${Math.round(totalPnl).toLocaleString()})`;
     }
 
-    // 구분 헤더 HTML
-    function colHeader(label, count, color) {
+    // 4. 종목 리스트 렌더링 헬퍼 함수
+    function getMarketHtml(marketRows) {
+        const upRows   = marketRows.filter(r => r.chg1d > 0).sort((a, b) => b.chg1d - a.chg1d);
+        const downRows = marketRows.filter(r => r.chg1d < 0).sort((a, b) => a.chg1d - b.chg1d);
+        const flatRows = marketRows.filter(r => r.chg1d === 0);
+
+        // 🌟 중복 제거된 종목 카드 HTML 생성 (티커 표시 디자인)
+        function stockCard(r) {
+            const sign = r.chg1d > 0 ? '+' : '';
+            const isUp   = r.chg1d > 0;
+            const isDown = r.chg1d < 0;
+            const accentColor = isUp ? 'var(--profit)' : isDown ? 'var(--loss)' : 'var(--text3)';
+            const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
+            const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
+            const barWidth    = Math.min(Math.abs(r.chg1d) * 6, 100);
+            return `
+            <div style="padding:7px 9px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha}; margin-bottom:5px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
+                    <div style="min-width:0; flex:1;">
+                        <div style="font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.name}">${r.name}</div>
+                        <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px;">${r.symbol}</div>
+                    </div>
+                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:${accentColor}; white-space:nowrap;">${sign}${r.chg1d.toFixed(2)}%</div>
+                </div>
+                <div style="margin-top:5px; height:2px; background:var(--border); border-radius:1px; overflow:hidden;">
+                    <div style="height:100%; width:${barWidth}%; background:${accentColor}; border-radius:1px;"></div>
+                </div>
+            </div>`;
+        }
+
+        // 구분 헤더 HTML
+        function colHeader(label, count, color) {
             return `<div style="font-size:10px; font-weight:700; color:${color}; margin-bottom:4px; display:flex; align-items:center; gap:4px; position:sticky; top:0; background:var(--bg2); padding:2px 0; z-index:1;">
                 ${label} <span style="background:${color}; color:#fff; border-radius:10px; padding:1px 5px; font-size:9px;">${count}</span>
             </div>`;
@@ -2181,17 +2162,6 @@ function renderTodayStocksPanel(displayItems) {
             ${getMarketHtml(usRows)}
         </div>
     </div>`;
-
-    // 총 등락률 & 손익 업데이트
-    const totalSign  = totalChangePct > 0 ? '+' : '';
-    const totalColor = totalChangePct > 0 ? 'var(--profit)' : totalChangePct < 0 ? 'var(--loss)' : 'var(--text2)';
-    totalChangeEl.style.color = totalColor;
-    totalChangeEl.textContent = `${totalSign}${totalChangePct.toFixed(2)}%`;
-    if (totalPnlEl) {
-        const pnlSign = totalPnl > 0 ? '+' : '';
-        totalPnlEl.style.color = totalColor;
-        totalPnlEl.textContent = `(${pnlSign}₩${Math.round(totalPnl).toLocaleString()})`;
-    }
 }
 
 // 🌟 자산 성장 추이 그래프 렌더링 (누적 영역 + 우측 기준 누적 실현수익 막대)
