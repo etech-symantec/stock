@@ -1575,6 +1575,9 @@ async function fetchPublicData(symbol) {
       return { _failed: true };
   }
 
+  // 🌟 핵심 수정 포인트: 야후 파이낸스용 꼬리표(.KS, .KQ)를 제거한 순수 6자리 숫자만 추출
+  const cleanSymbol = symbol.replace('.KS', '').replace('.KQ', '');
+
   // 공공데이터포털은 국내 주식(6자리 숫자)만 지원합니다. 미국 주식 등은 실패 처리.
   if (!/^\d{6}\.K[SQ]$/.test(symbol)) {
       return { _failed: true }; 
@@ -1589,7 +1592,7 @@ async function fetchPublicData(symbol) {
   const beginDate = pastYear.toISOString().substring(0, 10).replace(/-/g, '');
 
   // 공공데이터 API 엔드포인트 구성 (한 페이지에 252개(약 1년치 영업일) 요청)
-  const targetUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${API_KEY}&numOfRows=252&pageNo=1&resultType=json&beginBasDt=${beginDate}&srtnCd=${isinCode}`;
+  const targetUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${API_KEY}&numOfRows=252&pageNo=1&resultType=json&beginBasDt=${beginDate}&srtnCd=${cleanSymbol}`;
   
   // 🌟 [수정됨] 국내 주식 공공데이터도 Vercel 전용 프록시(fetchWithProxy)를 태워서 빛의 속도로 가져옴
   try {
