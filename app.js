@@ -2071,7 +2071,7 @@ function renderTodayStocksPanel(displayItems) {
     const totalPrevEval = krStats.rawPrevEval + usStats.rawPrevEval;
     const totalChangePct = totalPrevEval > 0 ? (totalPnl / totalPrevEval) * 100 : 0;
 
-    // 3. 오늘 전체 손익 (제목 옆) 업데이트
+    // 3. 오늘 전체 손익 업데이트
     const totalColor = totalChangePct > 0 ? 'var(--profit)' : totalChangePct < 0 ? 'var(--loss)' : 'var(--text2)';
     totalChangeEl.style.color = totalColor;
     totalChangeEl.textContent = `${totalChangePct > 0 ? '+' : ''}${totalChangePct.toFixed(2)}%`;
@@ -2080,7 +2080,6 @@ function renderTodayStocksPanel(displayItems) {
         totalPnlEl.textContent = `(${totalChangePct > 0 ? '+' : ''}₩${Math.round(totalPnl).toLocaleString()})`;
     }
 
-    // 시장별 타이틀 옆 손익 텍스트 생성기
     const getStatHtml = (stats, prefix = '') => {
         const color = stats.pct > 0 ? 'var(--profit)' : stats.pct < 0 ? 'var(--loss)' : 'var(--text2)';
         const sign = stats.pct > 0 ? '+' : '';
@@ -2099,14 +2098,17 @@ function renderTodayStocksPanel(displayItems) {
             const accentColor = isUp ? 'var(--profit)' : isDown ? 'var(--loss)' : 'var(--text3)';
             const bgAlpha     = isUp ? 'var(--profit-bg)' : isDown ? 'var(--loss-bg)' : 'var(--bg3)';
             const borderAlpha = isUp ? 'rgba(0,200,122,0.2)' : isDown ? 'rgba(58,154,255,0.2)' : 'var(--border)';
+            
+            // 🌟 티커를 제거하고 종목명과 등락률을 중앙 정렬하여 글씨 크기를 키웠습니다.
             return `
-            <div style="padding:7px 9px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha}; margin-bottom:5px;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
-                    <div style="min-width:0; flex:1;">
-                        <div style="font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</div>
-                        <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px;">${r.symbol}</div>
+            <div style="padding:10px 12px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha}; margin-bottom:5px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
+                        ${r.name}
                     </div>
-                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:${accentColor};">${sign}${r.chg1d.toFixed(2)}%</div>
+                    <div style="font-size:15px; font-weight:800; font-family:var(--font-mono); color:${accentColor}; flex-shrink:0;">
+                        ${sign}${r.chg1d.toFixed(2)}%
+                    </div>
                 </div>
             </div>`;
         }
