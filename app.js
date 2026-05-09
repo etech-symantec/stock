@@ -1592,7 +1592,7 @@ async function fetchPublicData(symbol) {
   const beginDate = pastYear.toISOString().substring(0, 10).replace(/-/g, '');
 
   // 공공데이터 API 엔드포인트 구성 (한 페이지에 252개(약 1년치 영업일) 요청)
-  const targetUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${API_KEY}&numOfRows=252&pageNo=1&resultType=json&beginBasDt=${beginDate}&srtnCd=${cleanSymbol}`;
+  const targetUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${API_KEY}&numOfRows=252&pageNo=1&resultType=json&beginBasDt=${beginDate}&likeSrtnCd=${isinCode}`;
   
   // 🌟 [수정됨] 국내 주식 공공데이터도 Vercel 전용 프록시(fetchWithProxy)를 태워서 빛의 속도로 가져옴
   try {
