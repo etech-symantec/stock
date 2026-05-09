@@ -1287,7 +1287,7 @@ function renderHistoryDashboard() {
               <button class="btn-sm" onclick="setHistoryDatePreset('1y')" style="padding:5px 7px; font-size:11px;">1Y</button>
               <button class="btn-sm" onclick="setHistoryDatePreset('ytd')" style="padding:5px 7px; font-size:11px;">YTD</button>
           </div>
-          <input type="text" class="form-input" placeholder="🔍 종목명 / 티커" value="${historyFilters.search}" style="flex:1; min-width:120px; padding:6px 10px; margin:0; font-size:12px;" oninput="updateHistoryFilter('search', this.value)">
+          <input type="text" class="form-input" placeholder="🔍 종목명 / 티커" value="${historyFilters.search}" style="flex:1; min-width:120px; padding:6px 10px; margin:0; font-size:12px;" onkeydown="if(event.key === 'Enter') updateHistoryFilter('search', this.value)">
           ${hasActiveExtra ? `<button class="btn-sm" onclick="resetHistoryFilters()" style="padding:5px 9px; font-size:11px; color:var(--red); border-color:var(--red); flex-shrink:0;">✕ 초기화</button>` : ''}
       </div>
   `;
