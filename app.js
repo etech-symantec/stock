@@ -30,6 +30,7 @@ let currentView = 'all';
 
 // 🌟 선택된 기간의 시작 날짜(Cut-off Date)를 계산하는 함수
 function getCutoffDateFromRange(range) {
+    if (!range || range === 'all') return '1970-01-01'; // 🌟 전체 기간일 경우 모든 데이터를 포함하도록 아주 과거 날짜 반환
     const d = new Date();
     if (range === '1d') d.setDate(d.getDate() - 1);
     else if (range === '1w') d.setDate(d.getDate() - 7);
@@ -38,9 +39,6 @@ function getCutoffDateFromRange(range) {
     else if (range === '6m') d.setMonth(d.getMonth() - 6);
     else if (range === '1y') d.setFullYear(d.getFullYear() - 1);
     else if (range === '3y') d.setFullYear(d.getFullYear() - 3);
-    else if (range === '5y') d.setFullYear(d.getFullYear() - 5);
-    else if (range === '10y') d.setFullYear(d.getFullYear() - 10);
-    else return '2020-01-01'; // 'all' 또는 전체
     return d.toISOString().split('T')[0];
 }
 let currentDivFilter = 'all'; 
