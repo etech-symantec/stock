@@ -3261,7 +3261,9 @@ function renderModalChart() {
   const getSliceLen = (range) => {
     if (range === '1d') return 2; if (range === '1w') return 6; if (range === '1m') return 22;
     if (range === '3m') return 63; if (range === '6m') return 126; if (range === '1y') return 252;
-    if (range === '3y') return 756; if (range === '5y') return 1260; if (range === '10y') return 2520; return 252;
+    if (range === '3y') return 756; if (range === '5y') return 1260; if (range === '10y') return 2520; 
+    if (range === 'all') return 99999; // 🌟 전체 기간일 때 데이터가 잘리지 않도록 매우 큰 값 반환
+    return 252;
   };
   let sliceLen = getSliceLen(currentModalRange);
   
@@ -3401,7 +3403,9 @@ async function render() {
   const getSliceLen = (range) => {
     if (range === '1d') return 2; if (range === '1w') return 6; if (range === '1m') return 22;
     if (range === '3m') return 63; if (range === '6m') return 126; if (range === '1y') return 252;
-    if (range === '3y') return 756; if (range === '5y') return 1260; if (range === '10y') return 2520; return 252;
+    if (range === '3y') return 756; if (range === '5y') return 1260; if (range === '10y') return 2520; 
+    if (range === 'all') return 99999; // 🌟 전체 기간일 때 데이터가 잘리지 않도록 매우 큰 값 반환
+    return 252;
   };
   const currentSliceLen = getSliceLen(state.range);
 
@@ -3524,8 +3528,9 @@ async function render() {
       const last = item.data.last;
       item.sliceLen = currentSliceLen; 
       
-      // 🌟 선택된 기간 시작 시점의 주가 (없으면 최초가)
-      let pStart = prices[Math.max(0, prices.length - currentSliceLen)] || item.data.prev || last;
+      // 🌟 '전체' 기간이면 전체 데이터를 사용하고, 아니면 기간만큼 자름
+      const actualSlice = state.range === 'all' ? prices.length : Math.min(prices.length, currentSliceLen);
+      let pStart = prices[prices.length - actualSlice] || item.data.prev || last;
       
       item.activeChange = pStart > 0 ? ((last - pStart) / pStart) * 100 : 0;
       if(isNaN(item.activeChange)) item.activeChange = 0;
