@@ -1105,21 +1105,49 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   flex: 1;
   min-width: 0;
 }
-#todayStocksPanel {
-  flex: 1;
-  min-width: 0;
-  max-height: 320px;
+/* ── 차트 행 래퍼 (자산성장추이 + 오늘 종목 현황) ── */
+#chartRowWrapper {
+  display: none;
+  flex-direction: row;
+  gap: 16px;
+  align-items: stretch;
+  height: 450px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
 }
+
+#chartRowWrapper #portfolioChartWrapper,
+#chartRowWrapper #todayStocksPanel {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  max-height: none;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+#todayStocksPanel {
+  display: flex;
+  flex-direction: column;
+}
+
 #todayStocksList {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
 }
+
 @media (max-width: 900px) {
   #chartRowWrapper {
     flex-direction: column;
+    height: auto;
   }
-  #todayStocksPanel {
-    max-height: 260px;
+
+  #chartRowWrapper #portfolioChartWrapper,
+  #chartRowWrapper #todayStocksPanel {
+    min-height: 450px;
+    height: auto;
   }
 }
 
