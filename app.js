@@ -1297,7 +1297,7 @@ function renderHistoryDashboard() {
       if (historyFilters.type === 'sell' && (tx.txType !== 'trade' || tx.qty >= 0)) pass = false;
       if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
 
-      // 기간 필터
+      // 거래내역 자체 기간 필터
       if (historyFilters.dateFrom && tx.date < historyFilters.dateFrom) pass = false;
       if (historyFilters.dateTo   && tx.date > historyFilters.dateTo)   pass = false;
 
@@ -1316,11 +1316,15 @@ function renderHistoryDashboard() {
           if (state.oldNames && state.oldNames[tx.symbol] && state.oldNames[tx.symbol] !== '상장폐지') {
               stockName = state.oldNames[tx.symbol];
           }
-          const cutoff = getCutoffDateFromRange(state.range);
-          if (tx.date < cutoff) pass = false;
-        
-          return pass;
-        });
+          if (!tx.symbol.toLowerCase().includes(s) && !stockName.toLowerCase().includes(s)) pass = false;
+      }
+
+      // 🌟 글로벌 기간 설정 연동 필터 (1D~3Y)
+      const cutoff = getCutoffDateFromRange(state.range);
+      if (tx.date < cutoff) pass = false;
+
+      return pass;
+  });
 
   const sorted = filtered.sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
   
@@ -3491,13 +3495,17 @@ async function render() {
       const prices = item.data.prices;
       const last = item.data.last;
       item.sliceLen = currentSliceLen; 
-      const pStart = prices[Math.max(0, prices.length - currentSliceLen)] || item.data.prev || last;
+      
+      // 🌟 선택된 기간 시작 시점의 주가 (없으면 최초가)
+      let pStart = prices[Math.max(0, prices.length - currentSliceLen)] || item.data.prev || last;
+      
       item.activeChange = pStart > 0 ? ((last - pStart) / pStart) * 100 : 0;
       if(isNaN(item.activeChange)) item.activeChange = 0;
       
       item.evalAmt = item.qty * last;
-      item.costAmt = item.qty * pStart; 
-      item.roi = item.activeChange;
+      // 🌟 평단가가 아닌 "기간 시작 시점의 가격"을 투자 원금으로 간주하여 기간 수익률 산출
+      item.costAmt = state.range === 'all' ? (item.qty * item.avg) : (item.qty * pStart); 
+      item.roi = item.costAmt > 0 ? ((item.evalAmt - item.costAmt)/item.costAmt*100) : -9999;
     } else {
       item.activeChange = 0; item.evalAmt = 0; item.costAmt = 0; item.roi = -9999; item.sliceLen = 0;
     }
