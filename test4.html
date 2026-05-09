@@ -380,17 +380,18 @@
           <div style="display:flex; align-items:center; gap:8px; margin-left:auto; flex-wrap:wrap;">
               
               <div id="watchlistSearchGroup" style="display:none; align-items:center; gap:6px; background:var(--bg2); padding:4px 6px; border-radius:8px; border:1px solid var(--border);">
-                  <select id="mainSearchFilter" class="form-input" style="width:75px; margin:0; height:30px; font-size:12px; padding:0 5px; border:none; background:var(--bg3); cursor:pointer;">
-                      <option value="all">🌐 전체</option>
-                      <option value="kr">🇰🇷 한국</option>
-                      <option value="us">🇺🇸 미국</option>
-                  </select>
-                  <div style="position:relative; display:flex; gap:4px;">
-                      <input type="text" id="tickerInput" class="form-input" placeholder="관심종목 추가 (종목/티커)..." autocomplete="off" style="width:170px; margin:0; height:30px; font-size:12px; border:none; background:transparent;" />
-                      <button class="btn-submit" onclick="addManualTicker()" style="height:30px; margin:0; padding:0 12px; background:var(--accent); font-size:12px; border:none; border-radius:6px; font-weight:bold; white-space:nowrap; cursor:pointer;">＋ 추가</button>
-                      <ul id="searchDropdown" class="search-dropdown" style="width:100%; top:36px; min-width:220px;"></ul>
-                  </div>
-              </div>
+                <select id="mainSearchFilter" class="form-input" style="width:75px; margin:0; height:30px; font-size:12px; padding:0 5px; border:none; background:var(--bg3); cursor:pointer;">
+                    <option value="all">🌐 전체</option>
+                    <option value="kr">🇰🇷 한국</option>
+                    <option value="us">🇺🇸 미국</option>
+                </select>
+                <div style="position:relative; display:flex; gap:4px;">
+                    <input type="text" id="tickerInput" class="form-input" placeholder="관심종목 추가 (종목/티커)..." autocomplete="off" style="width:170px; margin:0; height:30px; font-size:12px; border:none; background:transparent;" />
+                    <button class="btn-submit" onclick="addManualTicker()" style="height:30px; margin:0; padding:0 12px; background:var(--accent); font-size:12px; border:none; border-radius:6px; font-weight:bold; white-space:nowrap; cursor:pointer;">＋ 추가</button>
+                    
+                    <ul id="searchDropdown" class="search-dropdown" style="position:absolute; top:calc(100% + 5px); left:0; width:100%; min-width:260px; max-height:250px; overflow-y:auto; z-index:99999; background:var(--bg2); border:1px solid var(--border2); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.6); margin:0; padding:0; display:none;"></ul>
+                </div>
+            </div>
     
               <select class="form-input" onchange="setSortMode(this.value)" style="width:100px; height:38px; margin:0; font-size:12px; cursor:pointer;">
                   <option value="changeDesc">등락률 순</option>
