@@ -2032,18 +2032,19 @@ function renderTodayStocksPanel(displayItems) {
     const listEl = document.getElementById('todayStocksList');
     const totalChangeEl = document.getElementById('todayStocksTotalChange');
     const totalPnlEl = document.getElementById('todayStocksTotalPnl');
+    const krSumEl = document.getElementById('todayKrSum');
+    const usSumEl = document.getElementById('todayUsSum');
+    
     if (!panel || !listEl || !totalChangeEl) return;
 
-    // 보유 종목만 필터 (qty > 0)
     const heldItems = displayItems.filter(item => item.qty > 0 && item.data && !item.data._failed);
-
     if (heldItems.length === 0) {
         panel.style.display = 'none';
         return;
     }
     panel.style.display = 'flex';
 
-    // 각 종목별 1일 데이터 계산
+    // 1. 데이터 가공 및 시장별 분류
     const rows = heldItems.map(item => {
         const d = item.data;
         const last = d.last || 0;
@@ -2051,18 +2052,45 @@ function renderTodayStocksPanel(displayItems) {
         const chg1d = prev > 0 ? ((last - prev) / prev) * 100 : 0;
         const pnl1d = item.qty * (last - prev);
         const prevEval = item.qty * prev;
-        const name = (d.name || item.symbol).replace(/\(.*?\)/g, '').trim();
         const isKr = isKorean(item.symbol);
-        return { symbol: item.symbol, name, chg1d, pnl1d, prevEval, isKr };
+        return { isKr, pnl1d, prevEval, chg1d, name: d.name || item.symbol };
     });
 
-    // 전체 총 손익 및 등락률 (미장 환율 적용)
-    const totalPnl = rows.reduce((s, r) => s + (r.isKr ? r.pnl1d : r.pnl1d * currentUsdKrw), 0);
-    const totalPrevEval = rows.reduce((s, r) => s + (r.isKr ? r.prevEval : r.prevEval * currentUsdKrw), 0);
-    const totalChangePct = totalPrevEval > 0 ? (totalPnl / totalPrevEval) * 100 : 0;
-
+    // 2. 전체/국내/미국 성과 계산
     const krRows = rows.filter(r => r.isKr);
     const usRows = rows.filter(r => !r.isKr);
+
+    const calcStats = (marketRows, useFx = false) => {
+        const pnl = marketRows.reduce((s, r) => s + r.pnl1d, 0);
+        const prevEval = marketRows.reduce((s, r) => s + r.prevEval, 0);
+        const pct = prevEval > 0 ? (pnl / prevEval) * 100 : 0;
+        const finalPnl = useFx ? pnl * currentUsdKrw : pnl;
+        return { pnl: finalPnl, pct };
+    };
+
+    const krStats = calcStats(krRows, false);
+    const usStats = calcStats(usRows, true); // 미장은 환율 적용
+    
+    const totalPnl = krStats.pnl + usStats.pnl;
+    const totalPrevEval = krStats.pnl / (krStats.pct/100 || 1) + usStats.pnl / (usStats.pct/100 || 1); // 역산하여 가중치 계산
+    const totalChangePct = (krStats.pnl + usStats.pnl) / (calcStats(krRows).prevEval + (calcStats(usRows).prevEval * currentUsdKrw)) * 100;
+
+    // 3. UI 업데이트 (상단 바)
+    const updateSumDisplay = (el, stats, prefix = '') => {
+        const color = stats.pct > 0 ? 'var(--profit)' : stats.pct < 0 ? 'var(--loss)' : 'var(--text2)';
+        const sign = stats.pct > 0 ? '+' : '';
+        el.style.color = color;
+        el.innerHTML = `${sign}${stats.pct.toFixed(2)}% <span style="font-size:10px; font-weight:normal; margin-left:4px;">(${sign}${prefix}${Math.round(stats.pnl).toLocaleString()})</span>`;
+    };
+
+    updateSumDisplay(krSumEl, krStats, '₩');
+    updateSumDisplay(usSumEl, usStats, '₩');
+
+    const totalColor = totalChangePct > 0 ? 'var(--profit)' : totalChangePct < 0 ? 'var(--loss)' : 'var(--text2)';
+    totalChangeEl.style.color = totalColor;
+    totalChangeEl.textContent = `${totalChangePct > 0 ? '+' : ''}${totalChangePct.toFixed(2)}%`;
+    totalPnlEl.style.color = totalColor;
+    totalPnlEl.textContent = `(${totalChangePct > 0 ? '+' : ''}₩${Math.round(totalPnl).toLocaleString()})`;
 
   // 내부 리스트 생성 헬퍼 함수
   function getMarketHtml(marketRows) {
