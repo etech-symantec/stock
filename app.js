@@ -4091,9 +4091,16 @@ function renderRealizedDashboard() {
         filterStatusBox.style.display = "none";
     }
 
-    // (기존 요약 타이틀 업데이트 로직은 간소화하거나 제거해도 무방합니다)
+    // 3. UI 요약 정보 텍스트 업데이트 (안전장치 적용)
     const summaryTitle = document.querySelector('#realizedDashboard .section-title');
-    if (summaryTitle) summaryTitle.textContent = `📈 연도별 실현수익 통계`;
+    if (summaryTitle) {
+        if (realizedFilters.symbol || realizedFilters.tradeIdx !== null) {
+            const filterText = realizedFilters.symbol ? realizedFilters.symbol : "선택된 거래 내역";
+            summaryTitle.innerHTML = `📈 실현수익: <span style="color:var(--accent)">${filterText}</span> <button class="btn-sm" onclick="resetRealizedFilters()" style="margin-left:8px; padding:2px 8px;">전체보기 ✕</button>`;
+        } else {
+            summaryTitle.textContent = `📈 연도별 실현수익 통계`;
+        }
+    }
 
     let years = new Set();
     state.transactions.forEach(t => {
