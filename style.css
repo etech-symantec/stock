@@ -1825,3 +1825,75 @@ nav {
     margin-top: 1rem !important;
   }
 }
+
+
+/* 🌟 인라인 버튼 필터 전용 스타일 */
+.inline-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 8px;
+}
+
+.filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text3);
+    margin-right: 6px;
+    margin-left: 4px;
+    user-select: none;
+}
+
+.f-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text2);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+    font-family: var(--font-sans);
+}
+
+.f-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+}
+
+.f-btn.active {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-color: rgba(124, 106, 247, 0.3);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(124, 106, 247, 0.15);
+}
+
+.f-input {
+    width: 85px;
+    height: 28px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 12px;
+    padding: 0 8px;
+    outline: none;
+    transition: 0.2s;
+    font-family: var(--font-mono);
+}
+
+.f-input:focus {
+    border-color: var(--accent);
+    background: var(--bg2);
+}
+
+.f-input::placeholder {
+    color: var(--text3);
+    font-family: var(--font-sans);
+    font-size: 11px;
+}
