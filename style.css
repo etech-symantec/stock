@@ -1704,3 +1704,42 @@ nav {
   .stat-banner-val { font-size: 22px; }
   .stat-markets { flex-direction: column; }
 }
+
+/* ── 범용 뷰 헤더 — 모든 탭 상단 여백 통일 ── */
+.view-header {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.view-header.active { display: flex; }
+.view-header-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+.view-header-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.view-header-badge {
+  font-size: 11px; color: var(--text3); font-weight: 400;
+  background: var(--bg3); border: 1px solid var(--border);
+  padding: 2px 9px; border-radius: 20px;
+  font-family: var(--font-mono);
+}
+
+/* ── 관심종목: listOptionsBar 비스티키 모드 ── */
+.list-options-bar.non-sticky {
+  position: static !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background: transparent !important;
+  border-bottom: none !important;
+  padding-top: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ── 거래내역 / 실현수익 상단 필터행 여백 ── */
+#historyDashboard > div:first-child { margin-top: 0; }
+#realizedDashboard > div:first-child { margin-top: 0; }
