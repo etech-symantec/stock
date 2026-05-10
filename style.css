@@ -1179,16 +1179,16 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 }
 
 /* =================================================
-   🚀 상단 네비게이션 — 3분할 그리드 (교체용)
+   🚀 네비게이션 완전 재정의 — flex + 절대중앙 방식
    ================================================= */
 
 nav {
-  display: grid !important;
-  grid-template-columns: 1fr auto 1fr !important;
+  position: relative !important;
+  display: flex !important;
   align-items: center !important;
+  justify-content: space-between !important;
   height: 60px !important;
   padding: 0 1.5rem !important;
-  gap: 12px;
   background: var(--bg2);
   border-bottom: 1px solid var(--border2);
   position: sticky;
@@ -1196,38 +1196,45 @@ nav {
   z-index: 1000;
   width: 100%;
   box-sizing: border-box;
+  gap: 0 !important;
 }
 
-/* ── 좌측: 로고 영역 ── */
+/* ── 좌측: 로고 ── */
 .nav-left {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  min-width: 0;
+  flex: 0 0 auto;
   gap: 10px;
+  z-index: 2;
 }
 
-/* ── 중앙: 네비탭 — 완전 정중앙 고정 ── */
+/* ── 중앙: 네비탭 — position:absolute로 완전 정중앙 ── */
 .view-tabs {
-  justify-self: center !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
   display: flex !important;
   gap: 2px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--border2);
   border-radius: 12px;
   padding: 4px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  /* grid 이전 방식 override */
-  position: static !important;
-  left: auto !important;
-  transform: none !important;
-  margin: 0 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
   white-space: nowrap;
+  z-index: 1;
+  margin: 0 !important;
+  /* 좌우 nav 영역과 겹치지 않도록 최대폭 제한 */
+  max-width: calc(100% - 600px);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.view-tabs::-webkit-scrollbar { display: none; }
 
 /* 각 탭 버튼 */
 .vtab {
-  padding: 6px 14px;
+  padding: 6px 13px;
   border-radius: 8px;
   border: 1px solid transparent;
   background: none;
@@ -1242,6 +1249,7 @@ nav {
   align-items: center;
   gap: 5px;
   line-height: 1;
+  flex-shrink: 0;
 }
 .vtab:hover {
   color: var(--text2);
@@ -1250,8 +1258,7 @@ nav {
 .vtab.active {
   background: var(--accent-bg);
   color: var(--accent);
-  border-color: rgba(124, 106, 247, 0.3);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-color: rgba(124, 106, 247, 0.28);
 }
 
 /* ── 우측: 기간 + 테마 + 설정 ── */
@@ -1259,8 +1266,9 @@ nav {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
+  flex: 0 0 auto;
   gap: 8px !important;
-  min-width: 0;
+  z-index: 2;
 }
 
 /* 기간 선택 그룹 */
@@ -1274,7 +1282,7 @@ nav {
   flex-shrink: 0;
 }
 .rtab {
-  padding: 4px 10px;
+  padding: 4px 9px;
   font-size: 11px;
   font-family: var(--font-mono);
   background: transparent;
@@ -1282,9 +1290,10 @@ nav {
   color: var(--text3);
   cursor: pointer;
   border-radius: 5px;
-  transition: all 0.15s;
   font-weight: 600;
+  transition: all 0.15s;
   line-height: 1.4;
+  white-space: nowrap;
 }
 .rtab:hover:not(.active) {
   background: rgba(255, 255, 255, 0.05);
@@ -1293,43 +1302,42 @@ nav {
 .rtab.active {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 2px 6px rgba(124, 106, 247, 0.4);
+  box-shadow: 0 2px 6px rgba(124, 106, 247, 0.35);
 }
 
-/* 테마 토글 & 설정 버튼 */
+/* 테마 토글 */
 .btn-theme-toggle {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border2);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text2);
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border2) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: var(--text2) !important;
   cursor: pointer;
   transition: 0.15s;
   line-height: 1;
   flex-shrink: 0;
 }
 .btn-theme-toggle:hover {
-  background: var(--bg3);
-  color: var(--text);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--bg3) !important;
+  color: var(--text) !important;
 }
 
-/* 설정 버튼 (btn-sm 형태) */
+/* 설정 버튼 */
 .nav-right .btn-sm {
   height: 34px;
-  padding: 0 12px;
+  padding: 0 14px;
   font-size: 12px;
   flex-shrink: 0;
 }
 
-/* sync 상태 표시 */
-.sync-status {
+/* sync 표시 */
+.nav-right .sync-status {
   font-size: 10px;
   font-family: var(--font-mono);
   color: var(--text3);
@@ -1337,13 +1345,13 @@ nav {
   align-items: center;
   gap: 4px;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
-/* ── 라이트모드 nav override ── */
+/* ── 라이트 모드 ── */
 [data-theme="light"] nav {
   background: #ffffff;
   border-bottom-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 [data-theme="light"] .view-tabs {
   background: rgba(0, 0, 0, 0.04);
@@ -1354,34 +1362,22 @@ nav {
   border-color: rgba(0, 0, 0, 0.12);
 }
 
-/* ── 모바일 반응형 ── */
-@media (max-width: 768px) {
-  nav {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 0 12px !important;
-    height: 52px !important;
-    gap: 8px;
-  }
-  .view-tabs {
-    display: none !important;
-  }
-  .range-group {
-    display: none !important;
-  }
-  .nav-right .sync-status {
-    display: none;
-  }
-}
-
-/* ── 태블릿: 기간탭 숨기고 탭만 스크롤 ── */
+/* ── 태블릿 (1100px 이하) ── */
 @media (max-width: 1100px) and (min-width: 769px) {
   .view-tabs {
-    overflow-x: auto;
-    max-width: 500px;
-    scrollbar-width: none;
+    max-width: calc(100% - 480px);
   }
-  .view-tabs::-webkit-scrollbar { display: none; }
   .range-group { display: none !important; }
+}
+
+/* ── 모바일 (768px 이하) ── */
+@media (max-width: 768px) {
+  nav {
+    padding: 0 12px !important;
+    height: 52px !important;
+  }
+  .view-tabs { display: none !important; }
+  .range-group { display: none !important; }
+  .nav-right .sync-status { display: none; }
+  .btn-mobile-menu { display: flex !important; }
 }
