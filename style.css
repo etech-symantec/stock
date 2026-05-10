@@ -1806,11 +1806,23 @@ nav {
   margin-bottom: 2px;
 }
 
-/* ── 거래내역 / 실현수익 / 배당통계 상단 여백 통일 ── */
-#historyDashboard,
-#realizedDashboard,
-#dividendDashboard {
-  padding-top: 0;
+/* ── 거래내역 / 실현수익: 컨트롤 박스 없거나 마진 적용 안 될 때 패딩으로 보완 ── */
+#historyDashboard {
+  padding-top: 1.5rem;
+}
+#realizedDashboard {
+  padding-top: 1.5rem;
+}
+/* realizedDashboard 안 page-controls-box는 패딩으로 이미 여백 확보됐으니 margin-top 제거 */
+#realizedDashboard > .page-controls-box {
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  #historyDashboard,
+  #realizedDashboard {
+    padding-top: 1rem;
+  }
 }
 
 /* 라이트 모드 대응 */
