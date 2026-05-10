@@ -66,9 +66,16 @@ function setDivSort(val) {
     renderDividendDashboard();
 }
 
+// 🌟 연속 입력 에러 방지를 위한 타이머 변수 추가
+let filterDebounceTimer = null; 
+
 function updateLocalSearch(val) {
     currentLocalSearch = val;
-    render();
+    // 🌟 타이핑할 때마다 즉시 그리지 않고 0.3초 대기
+    if (filterDebounceTimer) clearTimeout(filterDebounceTimer);
+    filterDebounceTimer = setTimeout(() => {
+        render();
+    }, 300);
 }
 
 function setLocalTag(tag) {
@@ -361,9 +368,19 @@ function isKorean(symbol) {
 
 // 🌟 전체 거래내역 필터 상태 저장 변수 추가 (isKorean 함수 바로 아래에 추가하세요)
 let historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all' };
+
 function updateHistoryFilter(key, value) {
     historyFilters[key] = value;
-    renderHistoryDashboard();
+    
+    // 검색어 입력일 때만 0.3초 지연 처리 (나머지 셀렉트박스는 즉시 반영)
+    if (key === 'search') {
+        if (filterDebounceTimer) clearTimeout(filterDebounceTimer);
+        filterDebounceTimer = setTimeout(() => {
+            renderHistoryDashboard();
+        }, 300);
+    } else {
+        renderHistoryDashboard();
+    }
 }
 function isCrypto(symbol) { return symbol.endsWith('-USD'); }
 function formatPrice(val, symbol) {
@@ -2440,7 +2457,7 @@ function _buildPortfolioChart(data, zoomRange) {
     const realSymbols     = sl(data.realSymbols);
     const fmtWon          = data.fmtWon;
 
-    if (portfolioChartInst) portfolioChartInst.destroy();
+    if (portfolioChartInst) { portfolioChartInst.destroy(); portfolioChartInst = null; }
 
     // 줌 초기화 버튼 상태 갱신
     const btnReset = document.getElementById('btnPortfolioZoomReset');
@@ -2668,7 +2685,7 @@ function resetPortfolioChartZoom() {
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
-    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') allocationChartInst.destroy();
+    if(allocationChartInst && typeof allocationChartInst.destroy === 'function') { allocationChartInst.destroy(); allocationChartInst = null; }
 
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
     let usdSummary = { totalEval: 0, totalCost: 0, accounts: {} };
@@ -3280,7 +3297,7 @@ function renderDividendDashboard() {
   const krwData = allMonths.map(m => monthlyKrw[m] || 0);
   const usdConvertedData = allMonths.map(m => (monthlyUsd[m] || 0) * currentUsdKrw);
 
-  if(divMonthlyChartInst) divMonthlyChartInst.destroy();
+  if(divMonthlyChartInst) { divMonthlyChartInst.destroy(); divMonthlyChartInst = null; }
   const ctx = document.getElementById('divMonthlyCanvas').getContext('2d');
   divMonthlyChartInst = new Chart(ctx, {
     type: 'bar',
@@ -3360,7 +3377,7 @@ function renderModalChart() {
   chgEl.style.color = chgPct > 0 ? '#00C578' : '#3A9AFF';
   document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
   
-  if (modalChartInst) modalChartInst.destroy();
+  if (modalChartInst) { modalChartInst.destroy(); modalChartInst = null; }
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker); }, 50);
 }
 
@@ -4407,7 +4424,7 @@ function renderRealizedDashboard() {
 function renderRealizedChart(labels, lineData, barData) {
     const canvas = document.getElementById('realizedChartCanvas');
     if (!canvas) return;
-    if (realizedChartInst) realizedChartInst.destroy();
+    if (realizedChartInst) { realizedChartInst.destroy(); realizedChartInst = null; }
 
     const barColors = barData.map(val => val >= 0 ? 'rgba(0,200,122,0.75)' : 'rgba(255,77,106,0.75)');
     const barBorderColors = barData.map(val => val >= 0 ? '#00C578' : '#ff4d6a');
