@@ -125,7 +125,15 @@
     "0172V0.KS",
     "347700.KQ",
     "003620.KS",
-    "DHR"
+    "DHR",
+    "005930.KS",
+    "017800.KS",
+    "292150.KS",
+    "364960.KS",
+    "475460.KQ",
+    "411060.KS",
+    "CRM",
+    "NVDY"
   ],
   "transactions": [
     {
@@ -7757,6 +7765,256 @@
       "qty": 0,
       "price": 15735.6,
       "txType": "dividend"
+    },
+    {
+      "id": 1778250958498,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 220,
+      "price": 12952,
+      "txType": "buy"
+    },
+    {
+      "id": 1778250958499,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "005930.KS",
+      "qty": 14,
+      "price": 64560,
+      "txType": "buy"
+    },
+    {
+      "id": 1778250958500,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "005935.KS",
+      "qty": 15,
+      "price": 104381,
+      "txType": "buy"
+    },
+    {
+      "id": 1778250958501,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "012450.KS",
+      "qty": 1,
+      "price": 1340000,
+      "txType": "buy"
+    },
+    {
+      "id": 1778250958502,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "017800.KS",
+      "qty": 20,
+      "price": 86000,
+      "txType": "buy"
+    },
+    {
+      "id": 1778250958503,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "161510.KS",
+      "qty": 218,
+      "price": 25126,
+      "txType": "buy"
+    },
+    {
+      "id": 1778250958504,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "292150.KS",
+      "qty": 60,
+      "price": 30890,
+      "txType": "buy"
+    },
+    {
+      "id": 1778250958505,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "352820.KS",
+      "qty": 15,
+      "price": 347267,
+      "txType": "buy"
+    },
+    {
+      "id": 1778250958506,
+      "date": "2026-05-10",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "360750.KS",
+      "qty": 125,
+      "price": 23820,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958507,
+      "date": "2026-05-10",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "364960.KS",
+      "qty": 45,
+      "price": 9050,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958508,
+      "date": "2026-05-10",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "475460.KQ",
+      "qty": 2,
+      "price": 19000,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958509,
+      "date": "2026-05-10",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "478150.KS",
+      "qty": 70,
+      "price": 22520,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958510,
+      "date": "2026-05-10",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "481180.KS",
+      "qty": 150,
+      "price": 11140,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958511,
+      "date": "2026-05-10",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "487230.KS",
+      "qty": 120,
+      "price": 20233,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958512,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "키움 (ISA)",
+      "symbol": "360750.KS",
+      "qty": 87,
+      "price": 24869,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958513,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "키움 (ISA)",
+      "symbol": "411060.KS",
+      "qty": 52,
+      "price": 32076,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958514,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "한투 (IRP)",
+      "symbol": "360750.KS",
+      "qty": 106,
+      "price": 24851,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958515,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋 (연금저축)",
+      "symbol": "441800.KS",
+      "qty": 320,
+      "price": 18822,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958516,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "BA",
+      "qty": 11,
+      "price": 218.9355,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958517,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "CRM",
+      "qty": 8,
+      "price": 238.9013,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958518,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "ORCL",
+      "qty": 12,
+      "price": 212.21,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958519,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "AAPL",
+      "qty": 11,
+      "price": 134.0208,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958520,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "GOOGL",
+      "qty": 3,
+      "price": 167,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958521,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "TSLA",
+      "qty": 17,
+      "price": 204.6171,
+      "txType": "trade"
+    },
+    {
+      "id": 1778250958522,
+      "date": "2026-05-01",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "NVDY",
+      "qty": 10,
+      "price": 25.37,
+      "txType": "trade"
     }
   ],
   "range": "all",
