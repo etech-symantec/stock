@@ -1398,11 +1398,6 @@ nav {
   transition: opacity 0.2s ease;
 }
 
-[data-theme="light"] .logo img {
-  width: 320px !important;
-  height: auto !important; 
-}
-
 /* =================================================
    ✨ 네비탭 hover 애니메이션 (선택보다 연하게)
    ================================================= */
