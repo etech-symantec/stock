@@ -57,7 +57,10 @@
 [data-theme="light"] .treemap-cell { border-color: #f0f2f7; }
 
 /* 라이트모드 로고 이미지 전환 */
-[data-theme="light"] #logoImg { content: url('/img/logo_light_tp.png'); }
+[data-theme="light"] #logoImg { 
+  content: url('/img/logo_light_tp.png'); 
+  transform: translateY(1px); /* 1px 내림 (다크모드와 맞게 수치 조절) */
+}
 
 /* =====================================================
    🌓 테마 토글 버튼
