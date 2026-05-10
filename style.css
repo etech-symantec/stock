@@ -1746,3 +1746,93 @@ nav {
 /* ── 거래내역 / 실현수익 상단 필터행 여백 ── */
 #historyDashboard > div:first-child { margin-top: 0; }
 #realizedDashboard > div:first-child { margin-top: 0; }
+
+/* =====================================================
+   📦 페이지 컨트롤 박스
+   관심목록 / 거래내역 / 실현수익 / 배당통계 공통
+   ===================================================== */
+
+/* 페이지 뷰 헤더 숨김 (4개 탭은 제목 불필요) */
+#viewHeader { display: none !important; }
+
+/* ── 컨트롤 박스 공통 ── */
+.page-controls-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+/* 컨트롤 박스 안에서 .view-tabs는 absolute 해제 */
+.page-controls-box .view-tabs,
+#dividendDashboard .view-tabs,
+#realizedDashboard .view-tabs {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  max-width: none !important;
+  overflow-x: visible !important;
+  scrollbar-width: none;
+  background: var(--bg3);
+  margin: 0 !important;
+}
+
+/* ── 관심목록(watch): listOptionsBar → 박스형 ── */
+.list-options-bar.non-sticky {
+  background: var(--bg2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 14px 18px !important;
+  margin-top: 1.5rem !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  position: static !important;
+  margin-bottom: 16px !important;
+}
+
+/* 관심종목 안 태그 필터 컨테이너 */
+.list-options-bar.non-sticky #localTagFilterContainer {
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+/* ── 거래내역 / 실현수익 / 배당통계 상단 여백 통일 ── */
+#historyDashboard,
+#realizedDashboard,
+#dividendDashboard {
+  padding-top: 0;
+}
+
+/* 라이트 모드 대응 */
+[data-theme="light"] .page-controls-box {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.1);
+}
+[data-theme="light"] .list-options-bar.non-sticky {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+/* ── 모바일 ── */
+@media (max-width: 768px) {
+  .page-controls-box {
+    padding: 12px 14px;
+    gap: 8px;
+    margin-top: 1rem;
+    margin-bottom: 12px;
+  }
+  .list-options-bar.non-sticky {
+    padding: 12px 14px !important;
+    margin-top: 1rem !important;
+  }
+}
