@@ -419,8 +419,8 @@
     <div class="grid-container" id="gridContainer"></div>
 
     <div id="dividendDashboard">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
-        <div class="view-tabs" style="background:var(--bg3);">
+      <div class="page-controls-box">
+        <div class="view-tabs">
           <button class="vtab active div-filter" onclick="setDivFilter('all', this)">전체 합산</button>
           <button class="vtab div-filter" id="divTabUser1" onclick="setDivFilter('user1', this)">소유자1</button>
           <button class="vtab div-filter" id="divTabUser2" onclick="setDivFilter('user2', this)">소유자2</button>
@@ -511,6 +511,7 @@
     </div>
 
     <div id="historyDashboard">
+      <div id="historyControlsBox" class="page-controls-box" style="display:none;"></div>
       <div class="history-table-container">
         <table class="history-table">
           <thead>
@@ -533,16 +534,14 @@
 
     <div id="realizedDashboard" style="display:none; flex-direction:column;">
       
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
-        <div style="display:flex; gap:10px;">
-          <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
-            <option value="all">전체 연도</option>
-          </select>
-          <div class="view-tabs" style="background:var(--bg3); margin:0;">
-            <button class="vtab active real-filter" onclick="setRealizedOwnerFilter('all', this)">전체 합산</button>
-            <button class="vtab real-filter" id="realTabUser1" onclick="setRealizedOwnerFilter('user1', this)">소유자1</button>
-            <button class="vtab real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
-          </div>
+      <div class="page-controls-box">
+        <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
+          <option value="all">전체 연도</option>
+        </select>
+        <div class="view-tabs">
+          <button class="vtab active real-filter" onclick="setRealizedOwnerFilter('all', this)">전체 합산</button>
+          <button class="vtab real-filter" id="realTabUser1" onclick="setRealizedOwnerFilter('user1', this)">소유자1</button>
+          <button class="vtab real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
         </div>
       </div>
     
