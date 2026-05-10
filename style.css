@@ -160,8 +160,6 @@
 
 body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
 
-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 1.5rem 10px 0.5rem; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; flex-wrap: wrap; gap: 10px; }
-.nav-left { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 0; }
 .logo { font-family: var(--font-sans); font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; white-space: nowrap; letter-spacing: -0.02em; }
 .logo svg { display: block; flex-shrink: 0; }
 
@@ -184,11 +182,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
     background-color: #1c2030 !important; 
 }
 
-.view-tabs { display: flex; gap: 2px; background: var(--bg2); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); justify-content: center; flex-shrink: 0; }
-.vtab { padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border-radius: 6px; transition: 0.2s; border:none; background:none; white-space: nowrap; }
-.vtab.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-
-.nav-right { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
 .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border2); background: rgba(255,255,255,0.05); color: var(--text); font-family: var(--font-sans); transition: 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; font-weight: 500; }
 .btn-sm:hover { background: var(--bg3); border-color: rgba(255,255,255,0.3); }
 
@@ -1093,18 +1086,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   .tutorial-feature-grid  { grid-template-columns: 1fr; }
   .tutorial-tooltip       { width: calc(100vw - 32px); max-width: 320px; }
 }
-/* ── 차트 행 래퍼 (자산성장추이 + 오늘 종목 현황) ── */
-#chartRowWrapper {
-  display: none;
-  flex-direction: row;
-  margin-bottom: 20px;
-}
-#chartRowWrapper #portfolioChartWrapper {
-  display: flex;
-  margin-bottom: 0;
-  flex: 1;
-  min-width: 0;
-}
+
 /* ── 차트 행 래퍼 (자산성장추이 + 오늘 종목 현황) ── */
 #chartRowWrapper {
   display: none;
