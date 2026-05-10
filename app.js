@@ -5408,16 +5408,6 @@ function renderUpcomingDividends() {
     }).join('');
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // 🌟 기간 설정 UI를 최상단 글로벌 내비게이션 바 우측으로 이동
-  const rangeGroup = document.querySelector('.range-group');
-  const navRight = document.querySelector('.nav-right');
-  if (rangeGroup && navRight) {
-      navRight.insertBefore(rangeGroup, navRight.firstChild);
-      rangeGroup.style.marginRight = '10px';
-  }
-});
-
 function updateViewHeader(icon, title, badge) {
   const el = document.getElementById('viewHeader');
   if (!el) return;
