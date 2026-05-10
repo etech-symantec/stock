@@ -1381,3 +1381,181 @@ nav {
   .nav-right .sync-status { display: none; }
   .btn-mobile-menu { display: flex !important; }
 }
+/* =================================================
+   🖼️ 로고 위치 통일 — 다크/라이트 동일하게 좌측 고정
+   ================================================= */
+
+.nav-left {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex: 0 0 auto;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 1;
+}
+
+.logo img {
+  display: block;
+  /* 다크/라이트 무관하게 동일 기준점 */
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  position: static !important;
+}
+
+/* 라이트모드에서도 로고가 밀리지 않도록 */
+[data-theme="light"] .nav-left,
+[data-theme="light"] .logo,
+[data-theme="light"] .logo img {
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  position: static !important;
+}
+
+
+/* =================================================
+   ✨ 네비탭 hover 애니메이션 (선택보다 연하게)
+   ================================================= */
+
+.vtab {
+  /* 기존 transition 강화 */
+  transition:
+    color 0.2s ease,
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.18s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 리플 레이어 (::before) */
+.vtab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(124, 106, 247, 0.08);
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+  pointer-events: none;
+}
+
+.vtab:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 호버: 선택 상태보다 훨씬 연한 색 + 살짝 위로 */
+.vtab:hover:not(.active) {
+  color: rgba(124, 106, 247, 0.75);
+  background: rgba(124, 106, 247, 0.06);
+  border-color: rgba(124, 106, 247, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(124, 106, 247, 0.1);
+}
+
+/* 선택(active) 상태는 진하게 유지 */
+.vtab.active {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: rgba(124, 106, 247, 0.3);
+  transform: none;
+  box-shadow: none;
+  transition:
+    color 0.2s ease,
+    background 0.22s ease,
+    border-color 0.22s ease !important;
+}
+
+/* 클릭 시 살짝 눌리는 효과 */
+.vtab:active:not(.active) {
+  transform: translateY(0px) scale(0.97);
+  transition-duration: 0.08s !important;
+}
+
+
+/* =================================================
+   ✨ 기간 선택 rtab hover 애니메이션
+   ================================================= */
+
+.rtab {
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.18s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 리플 레이어 */
+.rtab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(124, 106, 247, 0.12);
+  opacity: 0;
+  transform: scaleX(0.7);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+
+.rtab:hover:not(.active)::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* 호버: 연한 보라 틴트 + 글자 밝게 */
+.rtab:hover:not(.active) {
+  color: rgba(124, 106, 247, 0.8);
+  background: rgba(124, 106, 247, 0.07);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(124, 106, 247, 0.08);
+}
+
+/* 선택 상태 — 진하게 유지, 움직임 없음 */
+.rtab.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 106, 247, 0.4);
+  transform: none;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
+
+/* 클릭 시 눌리는 효과 */
+.rtab:active:not(.active) {
+  transform: scale(0.94);
+  transition-duration: 0.08s !important;
+}
+
+/* 라이트모드 호버 색상 보정 */
+[data-theme="light"] .vtab:hover:not(.active) {
+  color: var(--accent);
+  background: rgba(98, 80, 224, 0.07);
+  border-color: rgba(98, 80, 224, 0.18);
+  box-shadow: 0 2px 8px rgba(98, 80, 224, 0.08);
+}
+
+[data-theme="light"] .rtab:hover:not(.active) {
+  color: var(--accent);
+  background: rgba(98, 80, 224, 0.08);
+  box-shadow: 0 2px 6px rgba(98, 80, 224, 0.08);
+}
