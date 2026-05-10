@@ -3055,6 +3055,22 @@ function renderDividendDashboard() {
 
   document.getElementById('divTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
   document.getElementById('divTotalUsd').textContent = `$ ${usdTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
+  // 배당 비율바 + 환산액
+  const divKrwNum = krwTotal;
+  const divUsdKrwNum = usdTotal * currentUsdKrw;
+  const divGrand = divKrwNum + divUsdKrwNum;
+  const divKrPct = divGrand > 0 ? Math.round(divKrwNum / divGrand * 100) : 50;
+  const divUsPct = 100 - divKrPct;
+  const rKr = document.getElementById('divRatioKr');
+  const rPKr = document.getElementById('divRatioPctKr');
+  const rPUs = document.getElementById('divRatioPctUs');
+  const rConv = document.getElementById('divTotalUsdConverted');
+  if (rKr) rKr.style.width = divKrPct + '%';
+  if (rPKr) rPKr.textContent = `🇰🇷 ${divKrPct}%`;
+  if (rPUs) rPUs.textContent = `${divUsPct}% 🇺🇸`;
+  if (rConv) rConv.textContent = usdTotal > 0 ? `≈ ₩${Math.round(divUsdKrwNum).toLocaleString()}` : '';
+    
   const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
   document.getElementById('divTotalConverted').textContent = `₩ ${Math.round(grandTotal).toLocaleString()}`;
 
@@ -4055,6 +4071,21 @@ function renderRealizedDashboard() {
         totalEl.textContent = `${signG}₩ ${Math.round(Math.abs(grandTotal)).toLocaleString()}`;
         totalEl.style.color = grandTotal >= 0 ? '#00C578' : '#3A9AFF';
     }
+
+    // 실현수익 비율바 + 환산액
+    const realKrNum = krwTotal;
+    const realUsKrwNum = usdTotal * currentUsdKrw;
+    const realGrand = Math.abs(realKrNum) + Math.abs(realUsKrwNum);
+    const realKrPct = realGrand > 0 ? Math.round(Math.abs(realKrNum) / realGrand * 100) : 50;
+    const realUsPct = 100 - realKrPct;
+    const rrKr = document.getElementById('realRatioKr');
+    const rrPKr = document.getElementById('realRatioPctKr');
+    const rrPUs = document.getElementById('realRatioPctUs');
+    const rrConv = document.getElementById('realTotalUsdConverted');
+    if (rrKr) rrKr.style.width = realKrPct + '%';
+    if (rrPKr) rrPKr.textContent = `🇰🇷 ${realKrPct}%`;
+    if (rrPUs) rrPUs.textContent = `${realUsPct}% 🇺🇸`;
+    if (rrConv) rrConv.textContent = usdTotal !== 0 ? `≈ ₩${Math.round(Math.abs(realUsKrwNum)).toLocaleString()}` : '';
 
     // 4. 차트 그리기 함수 호출
     renderRealizedChart(chartLabels, chartLineData, chartBarData);
