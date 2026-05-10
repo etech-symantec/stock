@@ -373,31 +373,6 @@
     </div>
 
     <div class="list-options-bar" id="listOptionsBar" style="display:none; margin-bottom:20px; flex-direction:column; gap:12px; align-items:flex-start;">
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; width:100%;">
-          <div class="inline-filter-group">
-              <span class="filter-label">소유자</span>
-              <button class="f-btn active" id="fOwnerAll" onclick="setFilterOwner('all')">전체</button>
-              <button class="f-btn" id="fOwnerUser1" onclick="setFilterOwner('user1')">소유자 1</button>
-              <button class="f-btn" id="fOwnerUser2" onclick="setFilterOwner('user2')">소유자 2</button>
-          </div>
-  
-          <div class="inline-filter-group">
-              <span class="filter-label">평가손익</span>
-              <input type="number" id="fProfitMin" class="f-input" placeholder="최소(₩)" oninput="applyFilters()">
-              <span style="color:var(--text3); font-size:11px;">~</span>
-              <input type="number" id="fProfitMax" class="f-input" placeholder="최대(₩)" oninput="applyFilters()">
-          </div>
-  
-          <div class="inline-filter-group">
-              <span class="filter-label">수익률</span>
-              <input type="number" id="fRoiMin" class="f-input" placeholder="최소(%)" oninput="applyFilters()">
-              <span style="color:var(--text3); font-size:11px;">~</span>
-              <input type="number" id="fRoiMax" class="f-input" placeholder="최대(%)" oninput="applyFilters()">
-          </div>
-  
-          <button class="btn-sm" onclick="resetDetailedFilters()" style="height:34px; padding:0 14px; background:var(--bg3); border:1px solid var(--border2); color:var(--text); font-weight:600; border-radius:8px;">초기화</button>
-      </div>
-  
       <div id="localTagFilterContainer" class="inline-filter-group" style="display:flex; gap:6px; flex-wrap:wrap; background:transparent; border:none; padding:0;"></div>
   
       <div class="list-title-wrap" style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:10px; border-top:1px solid var(--border); padding-top:12px;">
