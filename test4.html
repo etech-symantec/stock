@@ -372,31 +372,56 @@
       </div>
     </div>
 
-    <div class="list-options-bar" id="listOptionsBar" style="display:none; margin-bottom:20px;">
-      <div id="localTagFilterContainer" class="tag-filter-container" style="margin-bottom:10px;"></div>
-      <div class="list-title-wrap" style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:10px;">
-      
-          <div style="display:flex; align-items:center;">
-              <input type="text" class="form-input" placeholder="🔍 리스트 내 검색" oninput="updateLocalSearch(this.value)" style="width:160px; height:38px; margin:0; font-size:13px;">
+    <div class="list-options-bar" id="listOptionsBar" style="display:none; margin-bottom:20px; flex-direction:column; gap:12px; align-items:flex-start;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; width:100%;">
+          <div class="inline-filter-group">
+              <span class="filter-label">소유자</span>
+              <button class="f-btn active" id="fOwnerAll" onclick="setFilterOwner('all')">전체</button>
+              <button class="f-btn" id="fOwnerUser1" onclick="setFilterOwner('user1')">소유자 1</button>
+              <button class="f-btn" id="fOwnerUser2" onclick="setFilterOwner('user2')">소유자 2</button>
+          </div>
+  
+          <div class="inline-filter-group">
+              <span class="filter-label">평가손익</span>
+              <input type="number" id="fProfitMin" class="f-input" placeholder="최소(₩)" oninput="applyFilters()">
+              <span style="color:var(--text3); font-size:11px;">~</span>
+              <input type="number" id="fProfitMax" class="f-input" placeholder="최대(₩)" oninput="applyFilters()">
+          </div>
+  
+          <div class="inline-filter-group">
+              <span class="filter-label">수익률</span>
+              <input type="number" id="fRoiMin" class="f-input" placeholder="최소(%)" oninput="applyFilters()">
+              <span style="color:var(--text3); font-size:11px;">~</span>
+              <input type="number" id="fRoiMax" class="f-input" placeholder="최대(%)" oninput="applyFilters()">
+          </div>
+  
+          <button class="btn-sm" onclick="resetDetailedFilters()" style="height:34px; padding:0 14px; background:var(--bg3); border:1px solid var(--border2); color:var(--text); font-weight:600; border-radius:8px;">초기화</button>
+      </div>
+  
+      <div id="localTagFilterContainer" class="inline-filter-group" style="display:flex; gap:6px; flex-wrap:wrap; background:transparent; border:none; padding:0;"></div>
+  
+      <div class="list-title-wrap" style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:10px; border-top:1px solid var(--border); padding-top:12px;">
+          
+          <div style="display:flex; align-items:center; gap:8px;">
+              <input type="text" class="form-input" placeholder="🔍 종목명 / 티커 검색" oninput="updateLocalSearch(this.value)" style="width:200px; height:38px; margin:0; font-size:13px;">
+              
+              <div id="watchlistSearchGroup" style="display:none; align-items:center; gap:6px; background:var(--bg2); padding:4px 6px; border-radius:8px; border:1px solid var(--border);">
+                  <select id="mainSearchFilter" class="form-input" style="width:75px; margin:0; height:30px; font-size:12px; padding:0 5px; border:none; background:var(--bg3); cursor:pointer;">
+                      <option value="all">전체</option>
+                      <option value="kr">한국</option>
+                      <option value="us">미국</option>
+                  </select>
+                  <div style="position:relative; display:flex; gap:4px;">
+                      <input type="text" id="tickerInput" class="form-input" placeholder="관심종목 추가..." autocomplete="off" style="width:160px; margin:0; height:30px; font-size:12px; border:none; background:transparent;" />
+                      <button class="btn-submit" onclick="addManualTicker()" style="height:30px; margin:0; padding:0 12px; background:var(--accent); font-size:12px; border:none; border-radius:6px; font-weight:bold; white-space:nowrap; cursor:pointer;">추가</button>
+                      <ul id="searchDropdown" class="search-dropdown" style="position:absolute; top:calc(100% + 5px); left:0; width:100%; min-width:260px; max-height:250px; overflow-y:auto; z-index:99999; background:var(--bg2); border:1px solid var(--border2); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.6); margin:0; padding:0; display:none;"></ul>
+                  </div>
+              </div>
           </div>
           
           <div style="display:flex; align-items:center; gap:8px; margin-left:auto; flex-wrap:wrap;">
               
-              <div id="watchlistSearchGroup" style="display:none; align-items:center; gap:6px; background:var(--bg2); padding:4px 6px; border-radius:8px; border:1px solid var(--border);">
-                <select id="mainSearchFilter" class="form-input" style="width:75px; margin:0; height:30px; font-size:12px; padding:0 5px; border:none; background:var(--bg3); cursor:pointer;">
-                    <option value="all">🌐 전체</option>
-                    <option value="kr">🇰🇷 한국</option>
-                    <option value="us">🇺🇸 미국</option>
-                </select>
-                <div style="position:relative; display:flex; gap:4px;">
-                    <input type="text" id="tickerInput" class="form-input" placeholder="관심종목 추가 (종목/티커)..." autocomplete="off" style="width:170px; margin:0; height:30px; font-size:12px; border:none; background:transparent;" />
-                    <button class="btn-submit" onclick="addManualTicker()" style="height:30px; margin:0; padding:0 12px; background:var(--accent); font-size:12px; border:none; border-radius:6px; font-weight:bold; white-space:nowrap; cursor:pointer;">＋ 추가</button>
-                    
-                    <ul id="searchDropdown" class="search-dropdown" style="position:absolute; top:calc(100% + 5px); left:0; width:100%; min-width:260px; max-height:250px; overflow-y:auto; z-index:99999; background:var(--bg2); border:1px solid var(--border2); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.6); margin:0; padding:0; display:none;"></ul>
-                </div>
-            </div>
-    
-              <select class="form-input" onchange="setSortMode(this.value)" style="width:100px; height:38px; margin:0; font-size:12px; cursor:pointer;">
+              <select class="form-input" onchange="setSortMode(this.value)" style="width:110px; height:38px; margin:0; font-size:12px; cursor:pointer;">
                   <option value="changeDesc">등락률 순</option>
                   <option value="evalDesc">평가금액 순</option>
                   <option value="roiDesc">수익률 순</option>
@@ -404,17 +429,17 @@
               <button class="btn-sm" id="btnSortDir" onclick="toggleSortDirection()" style="height:38px; padding:0 10px; font-size:14px;" title="오름차순/내림차순">⬇️</button>
               
               <div style="display:flex; background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; height:38px;">
-                  <button id="btnViewCard" class="btn-sm" style="background:var(--bg3); color:var(--text); border:none; border-radius:0; padding:0 10px;" onclick="setListStyle('card')" title="카드형 보기">🗂️</button>
-                  <button id="btnViewList" class="btn-sm" style="background:transparent; color:var(--text2); border:none; border-radius:0; padding:0 10px;" onclick="setListStyle('list')" title="리스트형 보기">📄</button>
+                  <button id="btnViewCard" class="btn-sm" style="background:var(--bg3); color:var(--text); border:none; border-radius:0; padding:0 10px;" onclick="setListStyle('card')" title="카드형 보기">🗂️ 카드</button>
+                  <button id="btnViewList" class="btn-sm" style="background:transparent; color:var(--text2); border:none; border-radius:0; padding:0 10px;" onclick="setListStyle('list')" title="리스트형 보기">📄 리스트</button>
               </div>
     
               <div style="display:flex; background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; height:38px;">
-                  <button id="btnLayoutVertical" class="btn-sm" style="background:var(--bg3); color:var(--text); border:none; border-radius:0; padding:0 10px;" onclick="setRegionLayout('vertical')" title="상하 분할">上下</button>
-                  <button id="btnLayoutHorizontal" class="btn-sm" style="background:transparent; color:var(--text2); border:none; border-radius:0; padding:0 10px;" onclick="setRegionLayout('horizontal')" title="좌우 분할">左右</button>
+                  <button id="btnLayoutVertical" class="btn-sm" style="background:var(--bg3); color:var(--text); border:none; border-radius:0; padding:0 10px;" onclick="setRegionLayout('vertical')">상하 배치</button>
+                  <button id="btnLayoutHorizontal" class="btn-sm" style="background:transparent; color:var(--text2); border:none; border-radius:0; padding:0 10px;" onclick="setRegionLayout('horizontal')">좌우 배치</button>
               </div>
           </div>
       </div>
-    </div>
+  </div>
     
     <div class="grid-container" id="gridContainer"></div>
 
