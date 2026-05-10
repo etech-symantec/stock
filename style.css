@@ -1398,8 +1398,9 @@ nav {
   transition: opacity 0.2s ease;
 }
 
-[data-theme="light"] #logoImg {
+[data-theme="light"] .logo img {
   width: 310px !important;
+  height: auto !important; 
 }
 
 /* =================================================
