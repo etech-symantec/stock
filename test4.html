@@ -427,18 +427,44 @@
         </div>
       </div>
 
-      <div class="summary" style="display:flex; gap:10px;">
-        <div class="sum-card" style="flex:1; background:var(--green-bg); border-color:var(--green);">
-          <div class="sum-label" style="color:var(--green)">누적 배당금 총액 (환산)</div>
-          <div id="divTotalConverted" class="cp-sum-val" style="color:var(--green); font-size:24px;">—</div>
+      <div class="stat-banner" id="divStatBanner">
+        <div class="stat-banner-accent" style="background:var(--green);"></div>
+        <div class="stat-banner-total">
+          <div class="stat-banner-label">
+            <span class="stat-dot" style="background:var(--green);"></span>
+            누적 배당금 (환산)
+          </div>
+          <div id="divTotalConverted" class="stat-banner-val" style="color:var(--green);">—</div>
+          <div class="stat-banner-sub">국내 + 해외 합산</div>
         </div>
-        <div class="sum-card" style="flex:1;">
-          <div class="sum-label">국내주식 배당금</div>
-          <div id="divTotalKrw" class="cp-sum-val">—</div>
-        </div>
-        <div class="sum-card" style="flex:1;">
-          <div class="sum-label">해외주식 배당금</div>
-          <div id="divTotalUsd" class="cp-sum-val" style="color:var(--text)">—</div>
+        <div class="stat-banner-right">
+          <div class="stat-markets">
+            <div class="stat-market">
+              <span class="stat-flag">🇰🇷</span>
+              <div class="stat-market-info">
+                <div class="stat-market-label">국내주식 배당금</div>
+                <div id="divTotalKrw" class="stat-market-val" style="color:var(--green);">—</div>
+              </div>
+            </div>
+            <div class="stat-market">
+              <span class="stat-flag">🇺🇸</span>
+              <div class="stat-market-info">
+                <div class="stat-market-label">해외주식 배당금</div>
+                <div id="divTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
+                <div id="divTotalUsdConverted" class="stat-market-converted">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="stat-ratio-row">
+            <div class="stat-ratio-bar">
+              <div id="divRatioKr" class="stat-ratio-kr" style="background:var(--green);"></div>
+              <div class="stat-ratio-us" style="background:var(--blue);"></div>
+            </div>
+            <div class="stat-ratio-pcts">
+              <span id="divRatioPctKr" style="color:var(--green);">🇰🇷 —</span>
+              <span id="divRatioPctUs" style="color:var(--blue);">— 🇺🇸</span>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -538,18 +564,44 @@
             <div style="height:180px; position:relative;"><canvas id="realizedChartCanvas"></canvas></div>
           </div>
 
-          <div class="summary" style="display:flex; gap:10px;">
-            <div class="sum-card" style="flex:1; background:rgba(77, 159, 255, 0.1); border-color:var(--blue);">
-              <div class="sum-label" style="color:var(--blue)">총 실현수익 (환산 ₩)</div>
-              <div id="realTotalConverted" class="cp-sum-val" style="color:var(--blue); font-size:24px;">—</div>
+          <div class="stat-banner" id="realStatBanner">
+            <div class="stat-banner-accent" style="background:var(--blue);"></div>
+            <div class="stat-banner-total">
+              <div class="stat-banner-label">
+                <span class="stat-dot" style="background:var(--blue);"></span>
+                총 실현수익 (환산)
+              </div>
+              <div id="realTotalConverted" class="stat-banner-val" style="color:var(--blue);">—</div>
+              <div class="stat-banner-sub">국내 + 해외 합산</div>
             </div>
-            <div class="sum-card" style="flex:1;">
-              <div class="sum-label">국내주식 실현수익</div>
-              <div id="realTotalKrw" class="cp-sum-val">—</div>
-            </div>
-            <div class="sum-card" style="flex:1;">
-              <div class="sum-label">해외주식 실현수익</div>
-              <div id="realTotalUsd" class="cp-sum-val" style="color:var(--text)">—</div>
+            <div class="stat-banner-right">
+              <div class="stat-markets">
+                <div class="stat-market">
+                  <span class="stat-flag">🇰🇷</span>
+                  <div class="stat-market-info">
+                    <div class="stat-market-label">국내주식 실현수익</div>
+                    <div id="realTotalKrw" class="stat-market-val" style="color:var(--profit);">—</div>
+                  </div>
+                </div>
+                <div class="stat-market">
+                  <span class="stat-flag">🇺🇸</span>
+                  <div class="stat-market-info">
+                    <div class="stat-market-label">해외주식 실현수익</div>
+                    <div id="realTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
+                    <div id="realTotalUsdConverted" class="stat-market-converted">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="stat-ratio-row">
+                <div class="stat-ratio-bar">
+                  <div id="realRatioKr" class="stat-ratio-kr" style="background:var(--profit);"></div>
+                  <div class="stat-ratio-us" style="background:var(--blue);"></div>
+                </div>
+                <div class="stat-ratio-pcts">
+                  <span id="realRatioPctKr" style="color:var(--profit);">🇰🇷 —</span>
+                  <span id="realRatioPctUs" style="color:var(--blue);">— 🇺🇸</span>
+                </div>
+              </div>
             </div>
           </div>
 
