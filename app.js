@@ -1236,6 +1236,7 @@ function renderTxList() {
 
 // 🌟 전체 거래 내역 렌더링 (필터 UI 자동 생성 및 필터링 로직 추가)
 function renderHistoryDashboard() {
+  updateViewHeader('📋', '거래 내역');
   const tbody = document.getElementById('historyTableBody');
   const dash = document.getElementById('historyDashboard');
   if(!tbody || !dash) return;
@@ -2996,6 +2997,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 }
 
 function renderDividendDashboard() {
+  updateViewHeader('🌿', '배당통계');
   let krwTotal = 0, usdTotal = 0;
   let monthlyKrw = {}, monthlyUsd = {};
   let symTotals = {};
@@ -3401,12 +3403,18 @@ async function render() {
     container.style.display = 'block'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
-    if(watchlistSearch) watchlistSearch.style.display = 'flex'; 
+    if(watchlistSearch) watchlistSearch.style.display = 'flex';
+    updateViewHeader('⭐', '관심종목');
+    const _lob = document.getElementById('listOptionsBar');
+    if (_lob) _lob.classList.add('non-sticky');
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
     dash.style.display = 'flex'; pChartRowWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
-    if(watchlistSearch) watchlistSearch.style.display = 'none'; 
+    if(watchlistSearch) watchlistSearch.style.display = 'none';
+    updateViewHeader();
+    const _lob = document.getElementById('listOptionsBar');
+    if (_lob) _lob.classList.remove('non-sticky');
   }
 
   let ownerFilter = 'all';
@@ -3932,6 +3940,7 @@ function setRealizedOwnerFilter(filter, el) {
 // 🌟 실현수익 대시보드 렌더링 (최종 완성본 - 에러 수정)
 // ==========================================
 function renderRealizedDashboard() {
+    updateViewHeader('💵', '실현수익');
     const realDash = document.getElementById('realizedDashboard');
     if(!realDash) return;
 
@@ -5353,3 +5362,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       rangeGroup.style.marginRight = '10px';
   }
 });
+
+function updateViewHeader(icon, title, badge) {
+  const el = document.getElementById('viewHeader');
+  if (!el) return;
+  if (!icon) { el.className = 'view-header'; return; }
+  el.className = 'view-header active';
+  el.innerHTML = `
+    <span class="view-header-icon" aria-hidden="true">${icon}</span>
+    <span class="view-header-title">${title}</span>
+    ${badge !== undefined
+      ? `<span class="view-header-badge">${badge}</span>`
+      : ''}
+  `;
+}
