@@ -1559,3 +1559,148 @@ nav {
   background: rgba(98, 80, 224, 0.08);
   box-shadow: 0 2px 6px rgba(98, 80, 224, 0.08);
 }
+/* ── stat-banner (실현수익 / 배당통계 요약 패널) ── */
+.stat-banner {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+.stat-banner-accent {
+  width: 4px;
+  flex-shrink: 0;
+}
+.stat-banner-total {
+  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 210px;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.stat-banner-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stat-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.stat-banner-val {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.stat-banner-sub {
+  margin-top: 5px;
+  font-size: 10px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+}
+.stat-banner-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 20px 12px;
+  gap: 10px;
+  min-width: 0;
+}
+.stat-markets {
+  display: flex;
+  gap: 10px;
+}
+.stat-market {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 0;
+  transition: border-color 0.2s;
+}
+.stat-market:hover { border-color: var(--border2); }
+.stat-flag {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.stat-market-info { flex: 1; min-width: 0; }
+.stat-market-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+}
+.stat-market-val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-market-converted {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.stat-ratio-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-ratio-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg3);
+  overflow: hidden;
+  display: flex;
+}
+.stat-ratio-kr {
+  height: 100%;
+  border-radius: 2px 0 0 2px;
+  opacity: 0.75;
+  transition: width 0.5s ease;
+}
+.stat-ratio-us {
+  flex: 1;
+  height: 100%;
+  border-radius: 0 2px 2px 0;
+  opacity: 0.35;
+}
+.stat-ratio-pcts {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+@media (max-width: 768px) {
+  .stat-banner { flex-direction: column; }
+  .stat-banner-accent { width: 100%; height: 4px; }
+  .stat-banner-total { border-right: none; border-bottom: 1px solid var(--border); padding: 14px 16px; min-width: 0; }
+  .stat-banner-val { font-size: 22px; }
+  .stat-markets { flex-direction: column; }
+}
