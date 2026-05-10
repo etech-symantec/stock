@@ -3569,12 +3569,13 @@ async function render() {
     return true; 
   });
 
-  // 🌟 1. 태그도 같은 디자인의 버튼으로 나열되도록 변경
+  // 🌟 1. 현재 화면에 있는 종목들의 태그만 모아서 예쁜 버튼으로 만들기 (쉼표 분리 기능 추가!)
   const tagContainer = document.getElementById('localTagFilterContainer');
   if (tagContainer) {
       let uniqueTags = new Set();
       displayItems.forEach(item => {
           if (state.tags && state.tags[item.symbol]) {
+              // 💡 쉼표로 쪼갠 뒤 빈칸 없애고, 빈 태그가 아니면 Set에 담기
               const tagsArray = state.tags[item.symbol].split(',').map(t => t.trim()).filter(t => t !== '');
               tagsArray.forEach(tag => uniqueTags.add(tag));
           }
@@ -3584,29 +3585,20 @@ async function render() {
           tagContainer.style.display = 'none';
       } else {
           tagContainer.style.display = 'flex';
-          let tagsHtml = `<span class="filter-label">태그</span>`;
-          tagsHtml += `<button class="f-btn ${currentLocalTag === 'all' ? 'active' : ''}" onclick="setLocalTag('all')">전체보기</button>`;
+          let tagsHtml = `<button class="vtab ${currentLocalTag === 'all' ? 'active' : ''}" onclick="setLocalTag('all')" style="padding:4px 10px; font-size:11px;">🏷️ 전체보기</button>`;
           Array.from(uniqueTags).sort().forEach(tag => {
-              tagsHtml += `<button class="f-btn ${currentLocalTag === tag ? 'active' : ''}" onclick="setLocalTag('${tag}')">${tag}</button>`;
+              tagsHtml += `<button class="vtab ${currentLocalTag === tag ? 'active' : ''}" onclick="setLocalTag('${tag}')" style="padding:4px 10px; font-size:11px;">${tag}</button>`;
           });
           tagContainer.innerHTML = tagsHtml;
       }
   }
 
-  // 🌟 2. 클릭한 태그, 소유자, 수익금, 수익률 등으로 리스트 걸러내기
+  // 🌟 2. 클릭한 태그와 입력한 검색어로 리스트를 깔끔하게 걸러내기 (쉼표 분리 검색 반영!)
   displayItems = displayItems.filter(item => {
-      // 소유자 필터
-      if (currentDetailedOwner !== 'all') {
-          const ownerName = state.owners[currentDetailedOwner].name;
-          let mainOwner = '보유';
-          const holdingTxs = state.transactions.filter(t => t.symbol === item.symbol && t.txType !== 'dividend');
-          if(holdingTxs.length > 0) mainOwner = holdingTxs[holdingTxs.length-1].owner;
-          if (mainOwner !== ownerName) return false;
-      }
-
       // 태그 필터
       if (currentLocalTag !== 'all') {
           const itemTagString = (state.tags && state.tags[item.symbol]) ? state.tags[item.symbol] : '';
+          // 💡 해당 종목의 태그를 쪼개서 배열로 만든 뒤, 클릭한 태그가 그 배열 안에 있는지 확인
           const itemTagsArray = itemTagString.split(',').map(t => t.trim());
           if (!itemTagsArray.includes(currentLocalTag)) return false;
       }
@@ -3618,19 +3610,6 @@ async function render() {
           const symbolStr = item.symbol.toLowerCase();
           if (!stockName.includes(sText) && !symbolStr.includes(sText)) return false;
       }
-
-      // 평가 손익 및 수익률 필터
-      if (item.type === 'held') {
-          const profit = (item.data.last - item.avg) * item.qty;
-          const profitVal = isKorean(item.symbol) ? profit : profit * currentUsdKrw;
-          if (currentDetailedFilters.profitMin !== null && profitVal < currentDetailedFilters.profitMin) return false;
-          if (currentDetailedFilters.profitMax !== null && profitVal > currentDetailedFilters.profitMax) return false;
-          
-          const roi = item.avg > 0 ? ((item.data.last - item.avg) / item.avg) * 100 : 0;
-          if (currentDetailedFilters.roiMin !== null && roi < currentDetailedFilters.roiMin) return false;
-          if (currentDetailedFilters.roiMax !== null && roi > currentDetailedFilters.roiMax) return false;
-      }
-
       return true;
   });
   
