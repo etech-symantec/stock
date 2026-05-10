@@ -436,39 +436,94 @@ function exportData() {
   document.body.removeChild(dlAnchorElem);
 }
 
+// 🌟 JSON 복원 시 덮어쓰기 / 추가하기(병합) 선택 기능 적용
 function importData(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
+  
   reader.onload = function(e) {
     try {
       const data = JSON.parse(e.target.result);
       if(data.tickers && data.transactions) {
-        state = data;
-        if(!state.owners) {
-           state.owners = {
-             user1: { name: state.ownerNames?.user1 || '소유자1', color: '#7c6af7', icon: '👤' },
-             user2: { name: state.ownerNames?.user2 || '소유자2', color: '#00c87a', icon: '👤' }
-           };
+        
+        let isAppend = false;
+        let proceed = true;
+
+        // 1. 기존 장부에 데이터가 있다면 병합 여부를 묻습니다.
+        if (state.transactions && state.transactions.length > 0) {
+            const appendConfirm = confirm("📁 기존 데이터가 존재합니다. 어떻게 복원하시겠습니까?\n\n• [확인] 기존 내역을 유지하고 새 내역을 추가(병합)합니다.\n• [취소] 덮어쓰기 모드로 진행합니다.");
+            
+            if (appendConfirm) {
+                isAppend = true;
+            } else {
+                // 덮어쓰기 전 최종 확인
+                const overwriteConfirm = confirm("🚨 경고: 기존 장부 데이터가 모두 삭제되고 완전히 덮어씌워집니다. 진행하시겠습니까?");
+                if (!overwriteConfirm) {
+                    proceed = false;
+                }
+            }
         }
-        if(state.transactions) state.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
-        saveState();
-        cachedMarketData = {};
-        updateOwnerLabels();
-        renderTxList();
-        if (currentView === 'history') renderHistoryDashboard();
-        else render();
-        triggerAutoSync();
-        alert('데이터를 성공적으로 복원했습니다.');
+
+        if (proceed) {
+            if (isAppend) {
+                // 📌 추가하기(병합) 모드
+                // 고유 ID 충돌을 막기 위해 현재 장부의 최고 ID값을 구합니다.
+                let maxId = state.transactions.length > 0 ? Math.max(...state.transactions.map(t => t.id)) : Date.now();
+                
+                // 거래내역 병합
+                data.transactions.forEach((tx, idx) => {
+                    let newTx = { ...tx };
+                    newTx.id = maxId + idx + 1; // 새 ID 부여
+                    newTx.date = formatDate(tx.date);
+                    state.transactions.push(newTx);
+                });
+
+                // 관심종목(티커) 병합
+                data.tickers.forEach(ticker => {
+                    if (!state.tickers.includes(ticker)) state.tickers.push(ticker);
+                });
+
+                // 구 종목명, 태그 데이터 병합
+                if (data.oldNames) state.oldNames = { ...state.oldNames, ...data.oldNames };
+                if (data.tags) state.tags = { ...state.tags, ...data.tags };
+
+                alert(`데이터 병합 완료!\n총 ${data.transactions.length}건의 거래가 기존 장부에 추가되었습니다.`);
+                
+            } else {
+                // 📌 덮어쓰기 모드 (기존 로직)
+                state = data;
+                if(!state.owners) {
+                   state.owners = {
+                     user1: { name: state.ownerNames?.user1 || '소유자1', color: '#7c6af7', icon: '👤' },
+                     user2: { name: state.ownerNames?.user2 || '소유자2', color: '#00c87a', icon: '👤' }
+                   };
+                }
+                if(state.transactions) state.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
+                alert('데이터를 성공적으로 덮어썼습니다.');
+            }
+
+            // 공통 후처리 로직
+            saveState();
+            cachedMarketData = {};
+            updateOwnerLabels();
+            renderTxList();
+            if (currentView === 'history') renderHistoryDashboard();
+            else render();
+            triggerAutoSync();
+        }
+
       } else {
         alert('올바른 백업 파일 형식이 아닙니다.');
       }
     } catch(err) {
       alert('파일을 읽는 중 오류가 발생했습니다.');
     }
-    event.target.value = '';
+    
+    event.target.value = ''; // 파일 인풋 초기화
     closeModal('masterSettingsOverlay');
   };
+  
   reader.readAsText(file);
 }
 
