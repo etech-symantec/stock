@@ -4035,8 +4035,7 @@ function renderRealizedDashboard() {
     if(!realDash) return;
 
     // 1. UI 필터: 시장(국가) 드롭다운 자동 삽입
-    const headerRow = realDash.querySelector('div:first-child');
-    const filterArea = headerRow?.querySelector('div:first-child');
+    const filterArea = realDash.querySelector('div:first-child > div');
     if (filterArea && !document.getElementById('realizedMarketFilter')) {
         const mFilter = document.createElement('select');
         mFilter.id = 'realizedMarketFilter';
@@ -4051,56 +4050,13 @@ function renderRealizedDashboard() {
         filterArea.insertBefore(mFilter, filterArea.firstChild);
     }
 
-    // 🌟 2. 필터링 상태 박스 (Status Bar) 생성 및 업데이트
-    let filterStatusBox = document.getElementById('realizedFilterStatusBar');
-    if (!filterStatusBox) {
-        filterStatusBox = document.createElement('div');
-        filterStatusBox.id = 'realizedFilterStatusBar';
-        filterStatusBox.style.cssText = "margin: 10px 0; padding: 12px 15px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; display: none; gap: 10px; align-items: center; flex-wrap: wrap;";
-        if (headerRow) headerRow.after(filterStatusBox);
-    }
+    // 🚨 [핵심 수정] 삭제되었던 소유자 필터 변수 복구!
+    let ownerName = 'all';
+    if (currentRealizedOwnerFilter === 'user1') ownerName = state.owners.user1.name;
+    if (currentRealizedOwnerFilter === 'user2') ownerName = state.owners.user2.name;
 
     const yearSelect = document.getElementById('realizedYearFilter');
     let selectedYear = yearSelect ? yearSelect.value : 'all';
-
-    // 활성화된 필터 뱃지 생성
-    let filterBadgesHtml = "";
-    if (realizedFilters.symbol) {
-        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목: ${realizedFilters.symbol} <span onclick="resetRealizedSymbolFilter()" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
-    }
-    if (realizedFilters.market !== 'all') {
-        const mLabel = realizedFilters.market === 'kr' ? '국내' : '해외';
-        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="updateRealizedFilter('market', 'all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
-    }
-    if (selectedYear !== 'all') {
-        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="document.getElementById('realizedYearFilter').value='all'; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
-    }
-    if (currentRealizedOwnerFilter !== 'all') {
-        const ownerLabel = currentRealizedOwnerFilter === 'user1' ? state.owners.user1.name : state.owners.user2.name;
-        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">소유자: ${ownerLabel} <span onclick="setRealizedOwnerFilter('all', null);" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
-    }
-
-    // 필터가 하나라도 있으면 박스 표시, 없으면 숨김
-    if (filterBadgesHtml) {
-        filterStatusBox.innerHTML = `
-            <span style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em;">적용 필터</span> 
-            ${filterBadgesHtml} 
-            <button class="btn-sm" onclick="resetRealizedFilters()" style="margin-left:auto; height:28px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">필터 초기화 🔄</button>`;
-        filterStatusBox.style.display = "flex";
-    } else {
-        filterStatusBox.style.display = "none";
-    }
-
-    // 3. UI 요약 정보 텍스트 업데이트 (안전장치 적용)
-    const summaryTitle = document.querySelector('#realizedDashboard .section-title');
-    if (summaryTitle) {
-        if (realizedFilters.symbol || realizedFilters.tradeIdx !== null) {
-            const filterText = realizedFilters.symbol ? realizedFilters.symbol : "선택된 거래 내역";
-            summaryTitle.innerHTML = `📈 실현수익: <span style="color:var(--accent)">${filterText}</span> <button class="btn-sm" onclick="resetRealizedFilters()" style="margin-left:8px; padding:2px 8px;">전체보기 ✕</button>`;
-        } else {
-            summaryTitle.textContent = `📈 연도별 실현수익 통계`;
-        }
-    }
 
     let years = new Set();
     state.transactions.forEach(t => {
@@ -4115,13 +4071,48 @@ function renderRealizedDashboard() {
         yearSelect.value = selectedYear;
     }
 
-    // 🌟 변수 선언 (중복 선언 에러 해결)
+    // 🌟 2. 필터링 상태 박스 (Status Bar) 생성 및 업데이트
+    const headerRow = realDash.querySelector('div:first-child');
+    let filterStatusBox = document.getElementById('realizedFilterStatusBar');
+    if (!filterStatusBox) {
+        filterStatusBox = document.createElement('div');
+        filterStatusBox.id = 'realizedFilterStatusBar';
+        filterStatusBox.style.cssText = "margin: 10px 0; padding: 12px 15px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; display: none; gap: 10px; align-items: center; flex-wrap: wrap;";
+        if (headerRow) headerRow.after(filterStatusBox);
+    }
+
+    // 활성화된 필터 뱃지 생성
+    let filterBadgesHtml = "";
+    if (realizedFilters.symbol) {
+        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목: ${realizedFilters.symbol} <span onclick="resetRealizedSymbolFilter()" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+    }
+    if (realizedFilters.market !== 'all') {
+        const mLabel = realizedFilters.market === 'kr' ? '국내' : '해외';
+        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="document.getElementById('realizedMarketFilter').value='all'; updateRealizedFilter('market', 'all');" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+    }
+    if (selectedYear !== 'all') {
+        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="document.getElementById('realizedYearFilter').value='all'; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+    }
+    if (currentRealizedOwnerFilter !== 'all') {
+        const ownerLabel = currentRealizedOwnerFilter === 'user1' ? state.owners.user1.name : state.owners.user2.name;
+        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">소유자: ${ownerLabel} <span onclick="setRealizedOwnerFilter('all', null);" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+    }
+
+    if (filterBadgesHtml) {
+        filterStatusBox.innerHTML = `
+            <span style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em;">적용 필터</span> 
+            ${filterBadgesHtml} 
+            <button class="btn-sm" onclick="resetRealizedFilters()" style="margin-left:auto; height:28px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">필터 초기화 🔄</button>`;
+        filterStatusBox.style.display = "flex";
+    } else {
+        filterStatusBox.style.display = "none";
+    }
+
+    // 🌟 변수 선언
     let holdings = {};
-    let realizedTxs = []; // 하단 표에 들어갈 데이터
+    let realizedTxs = []; 
     let krwTotal = 0;
     let usdTotal = 0;
-
-    // 차트용 변수
     let chartLabels = [];
     let chartLineData = [];
     let chartBarData = [];
@@ -4129,7 +4120,7 @@ function renderRealizedDashboard() {
 
     const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
 
-    // 2. 과거 내역부터 순차적으로 평단가 및 수익 계산
+    // 3. 과거 내역부터 순차적으로 평단가 및 수익 계산
     sortedTx.forEach(tx => {
         if (tx.txType === 'dividend' || tx.txType === 'transfer') return;
         let broker = tx.broker ? tx.broker.trim() : '미지정';
@@ -4139,12 +4130,10 @@ function renderRealizedDashboard() {
         let h = holdings[key];
 
         if (tx.qty > 0) {
-            // 매수 시 평단가 갱신
             let totalValue = (h.qty * h.avg) + (tx.qty * tx.price);
             h.qty += tx.qty;
             h.avg = totalValue / h.qty;
         } else if (tx.qty < 0) {
-            // 매도 시 수익 계산
             let sellQty = Math.abs(tx.qty);
             let pnl = (tx.price - h.avg) * sellQty;
             let currentAvg = h.avg;
@@ -4155,7 +4144,6 @@ function renderRealizedDashboard() {
             let txYear = tx.date.substring(0, 4);
             const isKr = isKorean(tx.symbol);
 
-            // 상단 필터(연도, 소유자, 국가, 종목명) 확인
             const cutoff = getCutoffDateFromRange(state.range);
             const passPeriod = tx.date >= cutoff;
             
@@ -4164,17 +4152,14 @@ function renderRealizedDashboard() {
             const passMarket = (realizedFilters.market === 'all' || (realizedFilters.market === 'kr' ? isKr : !isKr));
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
             
-            // 🌟 if문에 passPeriod 조건을 추가합니다.
             if (passYear && passOwner && passMarket && passSymbol && passPeriod) {
                 let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
                 cumulativePnl += pnlKrw;
 
-                // 차트 데이터 누적 (필터 통과한 모든 내역)
                 chartLabels.push(tx.date);
                 chartLineData.push(cumulativePnl);
                 chartBarData.push(pnlKrw);
 
-                // 표 데이터 누적 (차트에서 클릭한 특정 막대 인덱스만 걸러내기)
                 const currentDataIndex = chartBarData.length - 1;
                 if (realizedFilters.tradeIdx === null || realizedFilters.tradeIdx === currentDataIndex) {
                     realizedTxs.push({
@@ -4184,12 +4169,22 @@ function renderRealizedDashboard() {
                     });
                 }
                 
-                // 총계
                 if (isKr) krwTotal += pnl;
                 else usdTotal += pnl;
             }
         }
     });
+
+    // 4. UI 요약 정보 텍스트 업데이트
+    const summaryTitle = document.querySelector('#realizedDashboard .section-title');
+    if (summaryTitle) {
+        if (realizedFilters.symbol || realizedFilters.tradeIdx !== null) {
+            const filterText = realizedFilters.symbol ? realizedFilters.symbol : "선택된 거래 내역";
+            summaryTitle.innerHTML = `📈 실현수익: <span style="color:var(--accent)">${filterText}</span> <button class="btn-sm" onclick="resetRealizedFilters()" style="margin-left:8px; padding:2px 8px;">전체보기 ✕</button>`;
+        } else {
+            summaryTitle.textContent = `📈 연도별 실현수익 통계`;
+        }
+    }
 
     const krwEl = document.getElementById('realTotalKrw');
     if (krwEl) krwEl.textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
@@ -4205,7 +4200,6 @@ function renderRealizedDashboard() {
         totalEl.style.color = grandTotal >= 0 ? '#00C578' : '#3A9AFF';
     }
 
-    // 실현수익 비율바 + 환산액
     const realKrNum = krwTotal;
     const realUsKrwNum = usdTotal * currentUsdKrw;
     const realGrand = Math.abs(realKrNum) + Math.abs(realUsKrwNum);
@@ -4220,13 +4214,12 @@ function renderRealizedDashboard() {
     if (rrPUs) rrPUs.textContent = `${realUsPct}% 🇺🇸`;
     if (rrConv) rrConv.textContent = usdTotal !== 0 ? `≈ ₩${Math.round(Math.abs(realUsKrwNum)).toLocaleString()}` : '';
 
-    // 4. 차트 그리기 함수 호출
+    // 5. 차트 그리기 함수 호출
     renderRealizedChart(chartLabels, chartLineData, chartBarData);
 
-    // 5. 종목별 통계 집계 → 랭킹 패널 렌더링
+    // 6. 종목별 통계 집계 → 랭킹 패널 렌더링
     const symStats = {};
 
-    // 🌟 기간 필터: 랭킹용 기간 컷오프 계산
     const rankingPeriodCutoff = (() => {
         const now = new Date();
         const map = { '1m': 30, '3m': 90, '6m': 180, '1y': 365 };
@@ -4238,9 +4231,7 @@ function renderRealizedDashboard() {
         return null;
     })();
 
-    const rankingTxs = rankingPeriodCutoff
-        ? realizedTxs.filter(tx => tx.date >= rankingPeriodCutoff)
-        : realizedTxs;
+    const rankingTxs = rankingPeriodCutoff ? realizedTxs.filter(tx => tx.date >= rankingPeriodCutoff) : realizedTxs;
 
     rankingTxs.forEach(tx => {
         const isKr = isKorean(tx.symbol);
@@ -4262,29 +4253,21 @@ function renderRealizedDashboard() {
         symStats[tx.symbol].pnlKrw  += pnlKrw;
         symStats[tx.symbol].costKrw += costKrw;
         symStats[tx.symbol].trades  += 1;
-        // 마지막 매도일 갱신
         if (tx.date > symStats[tx.symbol].lastSellDate) {
             symStats[tx.symbol].lastSellDate = tx.date;
         }
     });
  
-    // 🌟 단타왕 속도 점수 = 총 실현수익(₩) ÷ 보유 일수
-    //    보유 일수: state.transactions 전체에서 해당 종목 첫 매수일 ~ 마지막 매도일
     Object.values(symStats).forEach(s => {
         const buyTxs = state.transactions.filter(
             t => t.symbol === s.symbol && t.qty > 0 &&
                  t.txType !== 'dividend' && t.txType !== 'transfer'
         );
-        const firstBuyDate = buyTxs.length > 0
-            ? buyTxs.map(t => t.date).sort()[0]
-            : s.lastSellDate;
-        const holdDays = Math.max(
-            1,
-            Math.round((new Date(s.lastSellDate) - new Date(firstBuyDate)) / 86400000)
-        );
+        const firstBuyDate = buyTxs.length > 0 ? buyTxs.map(t => t.date).sort()[0] : s.lastSellDate;
+        const holdDays = Math.max(1, Math.round((new Date(s.lastSellDate) - new Date(firstBuyDate)) / 86400000));
         s.firstBuyDate = firstBuyDate;
         s.holdDays     = holdDays;
-        s.speedScore   = s.pnlKrw / holdDays;   // 하루 평균 실현 수익(₩)
+        s.speedScore   = s.pnlKrw / holdDays;
     });
  
     const symList = Object.values(symStats).map(s => ({
@@ -4294,13 +4277,12 @@ function renderRealizedDashboard() {
  
     const rankByPnl   = [...symList].sort((a, b) => b.pnlKrw    - a.pnlKrw);
     const rankByRoi   = [...symList].sort((a, b) => b.roi        - a.roi);
-    const rankBySpeed = [...symList].sort((a, b) => b.speedScore - a.speedScore);   // 단타왕
+    const rankBySpeed = [...symList].sort((a, b) => b.speedScore - a.speedScore); 
  
     const maxAbsPnl   = Math.max(...rankByPnl.map(s => Math.abs(s.pnlKrw)),      1);
     const maxAbsRoi   = Math.max(...rankByRoi.map(s => Math.abs(s.roi)),          1);
     const maxAbsSpeed = Math.max(...rankBySpeed.map(s => Math.abs(s.speedScore)), 1);
  
-    // 오름차순이면 전체 뒤집기
     if (realizedRankingSortDir === 'asc') {
         rankByPnl.reverse();
         rankByRoi.reverse();
@@ -4314,7 +4296,6 @@ function renderRealizedDashboard() {
         return (v < 0 ? '-' : '+') + '₩' + Math.round(abs).toLocaleString();
     };
 
-    // 🌟 일평균 금액 포맷 (정확하게)
     const fmtSpeed = (v) => {
         const abs  = Math.abs(v);
         const sign = v >= 0 ? '+' : '-';
@@ -4352,11 +4333,9 @@ function renderRealizedDashboard() {
         if (symList.length === 0) {
             rankingPanelEl.innerHTML = `<div style="font-size:12px; color:var(--text3); text-align:center; padding:20px;">실현수익 데이터 없음</div>`;
         } else {
-            // 기간 레이블 맵
             const periodLabel = { all: '전체', '1y': '1년', '6m': '6개월', '3m': '3개월', '1m': '1개월' };
             const periods = ['all', '1y', '6m', '3m', '1m'];
 
-            // 현재 탭에 따라 표시할 랭킹 결정
             const isRoi   = realizedRankingTab === 'roi';
             const isSpeed = realizedRankingTab === 'speed';
             const activeRank   = isSpeed ? rankBySpeed : (isRoi ? rankByRoi : rankByPnl);
@@ -4387,12 +4366,10 @@ function renderRealizedDashboard() {
 
             rankingPanelEl.innerHTML = `
             <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
-              <!-- 기간 필터 -->
               <div style="display:flex; align-items:center; gap:5px; padding:10px 12px 8px; border-bottom:1px solid var(--border); flex-wrap:wrap; flex-shrink:0;">
                 <span style="font-size:10px; color:var(--text3); flex-shrink:0; margin-right:2px;">기간</span>
                 ${periodBtns}
               </div>
-              <!-- 탭 + 정렬 방향 버튼 -->
               <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
                 ${tabBtn('pnl', '💵 수익금')}
                 ${tabBtn('roi', '📊 수익률')}
@@ -4404,7 +4381,6 @@ function renderRealizedDashboard() {
                     style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='asc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='asc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='asc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; white-space:nowrap; line-height:1;">↑</button>
                 </div>
               </div>
-              <!-- 랭킹 리스트 -->
               <div style="padding:6px 8px; display:flex; flex-direction:column; gap:2px; flex:1; overflow-y:auto;">
                 ${rankingTxs.length === 0
                     ? `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">해당 기간 데이터 없음</div>`
@@ -4412,7 +4388,6 @@ function renderRealizedDashboard() {
                         s, i+1,
                         (() => {
                             if (isSpeed) {
-                                // 일평균: 총 실현수익 ÷ 보유 일수 (정확한 값 표시)
                                 const dailyLine = fmtSpeed(s.speedScore);
                                 const holdLine  = `<br><span style="font-size:9px;color:var(--text3);font-weight:400;">${s.holdDays}일 보유 · 총 ${fmtW(s.pnlKrw)}</span>`;
                                 return dailyLine + holdLine;
@@ -4430,14 +4405,14 @@ function renderRealizedDashboard() {
         }
     }
 
-    // 6. 거래 내역 표 렌더링
+    // 7. 거래 내역 표 렌더링
     const tbody = document.getElementById('realizedTableBody');
     if (realizedTxs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--text3);">조건에 맞는 실현수익 내역이 없습니다.</td></tr>`;
         return;
     }
 
-    realizedTxs.reverse(); // 최신 날짜가 위로 오게 뒤집기
+    realizedTxs.reverse(); 
 
     tbody.innerHTML = realizedTxs.map(tx => {
         let stockName = tx.symbol;
@@ -5489,4 +5464,149 @@ function updateViewHeader(icon, title, badge) {
       ? `<span class="view-header-badge">${badge}</span>`
       : ''}
   `;
+}
+
+// ==========================================
+// 🎨 수익/손실 색상 커스터마이징 모듈
+// ==========================================
+const COLOR_PREFS_KEY = 'ttm_color_prefs';
+
+// 현재 적용된 색상을 언제 어디서나 꺼낼 수 있는 전역 변수
+window._PC    = '#00C578';   // profit color (수익)
+window._LC    = '#3A9AFF';   // loss color   (손실)
+window._PCbg  = 'rgba(0,200,122,0.12)';
+window._LCbg  = 'rgba(58,154,255,0.12)';
+
+// HEX → rgba 변환
+function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// CSS 변수 + 전역 변수 동시 적용
+function applyColors(profit, loss) {
+    window._PC   = profit;
+    window._LC   = loss;
+    window._PCbg = hexToRgba(profit, 0.12);
+    window._LCbg = hexToRgba(loss,   0.12);
+
+    const root = document.documentElement;
+    // 기존 테마가 var(--profit)/var(--loss)/var(--green)/var(--blue) 를
+    // 쓰는 곳은 CSS 변수 덮어쓰기만으로 즉시 반영됩니다.
+    root.style.setProperty('--profit',    profit);
+    root.style.setProperty('--loss',      loss);
+    root.style.setProperty('--green',     profit);
+    root.style.setProperty('--blue',      loss);
+    root.style.setProperty('--profit-bg', hexToRgba(profit, 0.12));
+    root.style.setProperty('--loss-bg',   hexToRgba(loss,   0.12));
+
+    // Chart.js 의 기본 녹색/파랑 데이터셋 색상도 맞춰줍니다.
+    // (buildChart 내부 getColors 함수를 재정의)
+    window._colorsOverridden = true;
+}
+
+// 로컬스토리지에서 불러와 즉시 적용
+function loadAndApplyColorPrefs() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(COLOR_PREFS_KEY));
+        if (saved && saved.profit && saved.loss) {
+            applyColors(saved.profit, saved.loss);
+            return saved;
+        }
+    } catch(e) {}
+    return { profit: '#00C578', loss: '#3A9AFF' };
+}
+
+// 설정 모달 내 색상 피커 값을 UI와 동기화
+function syncColorPickerUI() {
+    const pi = document.getElementById('inputColorProfit');
+    const li = document.getElementById('inputColorLoss');
+    if (pi) pi.value = window._PC;
+    if (li) li.value = window._LC;
+    updateColorPreview();
+}
+
+// 미리보기 뱃지 실시간 갱신
+function updateColorPreview() {
+    const pp = document.getElementById('colorPreviewProfit');
+    const lp = document.getElementById('colorPreviewLoss');
+    const pi = document.getElementById('inputColorProfit');
+    const li = document.getElementById('inputColorLoss');
+    if (pp && pi) {
+        pp.style.background = hexToRgba(pi.value, 0.15);
+        pp.style.color       = pi.value;
+        pp.style.borderColor = hexToRgba(pi.value, 0.4);
+    }
+    if (lp && li) {
+        lp.style.background = hexToRgba(li.value, 0.15);
+        lp.style.color       = li.value;
+        lp.style.borderColor = hexToRgba(li.value, 0.4);
+    }
+}
+
+// 저장 버튼 클릭
+function saveColorPrefs() {
+    const profit = document.getElementById('inputColorProfit').value;
+    const loss   = document.getElementById('inputColorLoss').value;
+    localStorage.setItem(COLOR_PREFS_KEY, JSON.stringify({ profit, loss }));
+    applyColors(profit, loss);
+
+    // 차트 캐시 무효화 후 전체 재렌더
+    Object.values(chartInstances).forEach(c => c && c.destroy && c.destroy());
+    for (let k in chartInstances) delete chartInstances[k];
+    render();
+
+    // 저장 완료 피드백
+    const btn = document.getElementById('btnSaveColorPrefs');
+    if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = '✅ 저장됨';
+        btn.disabled = true;
+        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
+    }
+}
+
+// 기본값으로 초기화
+function resetColorPrefs() {
+    localStorage.removeItem(COLOR_PREFS_KEY);
+    applyColors('#00C578', '#3A9AFF');
+    syncColorPickerUI();
+
+    Object.values(chartInstances).forEach(c => c && c.destroy && c.destroy());
+    for (let k in chartInstances) delete chartInstances[k];
+    render();
+}
+
+// getColors 함수를 오버라이드하여 미니 차트도 커스텀 색상 사용
+const _origGetColors = getColors;
+getColors = function(prices) {
+    if (!window._colorsOverridden) return _origGetColors(prices);
+    if (!prices || prices.length === 0) return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
+    const last = prices[prices.length-1], first = prices[0];
+    if (last > first) return { line: window._PC, fill: hexToRgba(window._PC, 0.12) };
+    if (last < first) return { line: window._LC, fill: hexToRgba(window._LC, 0.12) };
+    return { line:'#8890a4', fill:'rgba(136,144,164,0.1)' };
+};
+
+// 페이지 로드 시 즉시 적용 (깜빡임 방지)
+loadAndApplyColorPrefs();
+
+// 설정 모달이 열릴 때마다 피커 UI 동기화
+(function watchSettingsModal() {
+    const overlay = document.getElementById('masterSettingsOverlay');
+    if (!overlay) { setTimeout(watchSettingsModal, 300); return; }
+    new MutationObserver(() => {
+        if (overlay.classList.contains('open')) syncColorPickerUI();
+    }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
+})();
+
+// applyColorPreset — 프리셋 버튼 클릭 시 피커 값 변경 후 즉시 미리보기 갱신
+function applyColorPreset(profit, loss) {
+    const pi = document.getElementById('inputColorProfit');
+    const li = document.getElementById('inputColorLoss');
+    if (pi) pi.value = profit;
+    if (li) li.value = loss;
+    updateColorPreview();
 }
