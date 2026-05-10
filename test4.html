@@ -557,13 +557,6 @@
         <!-- ▶ 오른쪽 콘텐츠 -->
         <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:15px;">
 
-          <div id="realizedChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex-shrink:0;">
-            <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-                💰 누적 실현수익 흐름 <span style="font-size:11px; font-weight:normal; color:var(--text3);">(확정 수익의 합계 추이)</span>
-            </div>
-            <div style="height:180px; position:relative;"><canvas id="realizedChartCanvas"></canvas></div>
-          </div>
-
           <div class="stat-banner" id="realStatBanner">
             <div class="stat-banner-accent" style="background:var(--blue);"></div>
             <div class="stat-banner-total">
@@ -603,6 +596,13 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <div id="realizedChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex-shrink:0;">
+            <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                💰 누적 실현수익 흐름 <span style="font-size:11px; font-weight:normal; color:var(--text3);">(확정 수익의 합계 추이)</span>
+            </div>
+            <div style="height:180px; position:relative;"><canvas id="realizedChartCanvas"></canvas></div>
           </div>
 
           <div class="history-table-container">
