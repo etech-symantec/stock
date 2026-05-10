@@ -16,11 +16,14 @@
 <input type="file" id="importCsvFile" accept=".csv" style="display: none;" onchange="importCsvData(event)">
 
 <nav>
+  <!-- 좌측: 로고 -->
   <div class="nav-left">
     <div class="logo">
       <img id="logoImg" src="/img/logo_dark_tp.png" alt="Two the Moon" width="300">
     </div>
+  </div>  <!-- ✅ nav-left 여기서 닫기 -->
 
+  <!-- 중앙: 네비탭 -->
   <div class="view-tabs">
     <button class="vtab active" onclick="setView('all', this)">전체보기</button>
     <button class="vtab" id="tabUser1" onclick="setView('user1', this)">소유자1</button>
@@ -30,7 +33,8 @@
     <button class="vtab" onclick="setView('realized', this)" style="color:var(--blue)">📈 실현수익</button>
     <button class="vtab" id="tabDividend" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
   </div>
-  
+
+  <!-- 우측: 기간 + 테마 + 설정 -->
   <div class="nav-right" style="display:flex; align-items:center; gap:10px;">
     <div class="range-group" style="margin:0;">
       <button class="rtab" onclick="setRange('1d',this)">1D</button>
@@ -42,7 +46,6 @@
       <button class="rtab" onclick="setRange('3y',this)">3Y</button>
       <button class="rtab" onclick="setRange('all',this)">전체</button>
     </div>
-
     <div class="sync-status" id="syncStatus">
       <div class="sync-spinner" id="syncSpinner"></div>
       <span id="syncText"></span>
