@@ -760,6 +760,103 @@
         <button class="btn-danger" style="background:var(--red); color:#fff; padding:6px 12px; font-weight:bold; border:none;" onclick="resetAllTransactions()">전체 초기화 실행</button>
       </div>
     </div>
+
+    <div class="settings-section" style="margin-top:16px;">
+      <div class="settings-section-title">🎨 수익 / 손실 색상</div>
+     
+      <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+     
+        <!-- 수익 색상 -->
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="font-size:12px; color:var(--text2); width:60px; flex-shrink:0;">수익 색상</label>
+          <input
+            type="color"
+            id="inputColorProfit"
+            value="#00C578"
+            oninput="updateColorPreview()"
+            style="width:40px; height:34px; border:none; background:none; cursor:pointer; padding:0; border-radius:6px;"
+          >
+          <span
+            id="colorPreviewProfit"
+            style="
+              flex:1; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:700;
+              text-align:center; border:1px solid; transition:0.2s;
+              background:rgba(0,200,122,0.15); color:#00C578; border-color:rgba(0,200,122,0.4);
+            "
+          >+12.34%&nbsp; ▲ 수익</span>
+        </div>
+     
+        <!-- 손실 색상 -->
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="font-size:12px; color:var(--text2); width:60px; flex-shrink:0;">손실 색상</label>
+          <input
+            type="color"
+            id="inputColorLoss"
+            value="#3A9AFF"
+            oninput="updateColorPreview()"
+            style="width:40px; height:34px; border:none; background:none; cursor:pointer; padding:0; border-radius:6px;"
+          >
+          <span
+            id="colorPreviewLoss"
+            style="
+              flex:1; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:700;
+              text-align:center; border:1px solid; transition:0.2s;
+              background:rgba(58,154,255,0.15); color:#3A9AFF; border-color:rgba(58,154,255,0.4);
+            "
+          >-8.76%&nbsp; ▼ 손실</span>
+        </div>
+     
+        <!-- 프리셋 버튼 -->
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
+          <span style="font-size:11px; color:var(--text3); align-self:center; margin-right:2px;">프리셋:</span>
+     
+          <!-- 기본 (초록/파랑) -->
+          <button type="button" onclick="applyColorPreset('#00C578','#3A9AFF')"
+            style="padding:4px 10px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#00C578; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#3A9AFF; display:inline-block;"></span>
+            기본
+          </button>
+     
+          <!-- 전통 (빨강/파랑) -->
+          <button type="button" onclick="applyColorPreset('#FF4D6A','#3A9AFF')"
+            style="padding:4px 10px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#FF4D6A; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#3A9AFF; display:inline-block;"></span>
+            전통 (빨강↑)
+          </button>
+     
+          <!-- 미국식 (초록/빨강) -->
+          <button type="button" onclick="applyColorPreset('#00C578','#FF4D6A')"
+            style="padding:4px 10px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#00C578; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#FF4D6A; display:inline-block;"></span>
+            미국식 (빨강↓)
+          </button>
+     
+          <!-- 파스텔 -->
+          <button type="button" onclick="applyColorPreset('#5BB88E','#7B9FD4')"
+            style="padding:4px 10px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#5BB88E; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#7B9FD4; display:inline-block;"></span>
+            파스텔
+          </button>
+        </div>
+     
+        <!-- 저장 / 초기화 버튼 -->
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <button id="btnSaveColorPrefs" type="button" onclick="saveColorPrefs()"
+            style="flex:1; padding:8px; font-size:12px; font-weight:700; border-radius:6px; border:none; background:var(--accent); color:#fff; cursor:pointer; transition:0.15s;">
+            💾 색상 저장하기
+          </button>
+          <button type="button" onclick="resetColorPrefs()"
+            style="padding:8px 14px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer;">
+            기본값
+          </button>
+        </div>
+     
+      </div>
+    </div>
   </div>
 </div>
 
