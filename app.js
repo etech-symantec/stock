@@ -91,13 +91,23 @@ function updateRealizedFilter(key, value) {
     renderRealizedDashboard();
 }
 
-// 🌟 모든 실현수익 필터 초기화 함수 (에러 발생 원인!)
+// 🌟 실현수익 모든 필터 및 연도 설정 초기화
+// 🌟 실현수익 모든 필터 및 연도/소유자 설정 일괄 초기화
 function resetRealizedFilters() {
     realizedFilters.symbol = null;
     realizedFilters.tradeIdx = null;
-    renderRealizedDashboard();
+    realizedFilters.market = 'all';
+    
+    // UI 드롭다운 초기화
+    const yearSelect = document.getElementById('realizedYearFilter');
+    if (yearSelect) yearSelect.value = 'all';
+    const marketSelect = document.getElementById('realizedMarketFilter');
+    if (marketSelect) marketSelect.value = 'all';
+    
+    // 소유자 필터 초기화
+    setRealizedOwnerFilter('all', null); 
+    // (이 함수 안에 renderRealizedDashboard()가 포함되어 있으므로 여기서 끝납니다)
 }
-
 function resetRealizedSymbolFilter() {
     realizedFilters.symbol = null;
     realizedFilters.tradeIdx = null;
@@ -4004,7 +4014,15 @@ let currentRealizedOwnerFilter = 'all';
 function setRealizedOwnerFilter(filter, el) {
   currentRealizedOwnerFilter = filter;
   document.querySelectorAll('.real-filter').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+  
+  if (el) {
+      el.classList.add('active');
+  } else {
+      // 강제 초기화 시 '전체' 버튼 활성화
+      document.querySelectorAll('.real-filter').forEach(b => {
+          if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'all'")) b.classList.add('active');
+      });
+  }
   renderRealizedDashboard();
 }
 
@@ -4017,7 +4035,8 @@ function renderRealizedDashboard() {
     if(!realDash) return;
 
     // 1. UI 필터: 시장(국가) 드롭다운 자동 삽입
-    const filterArea = realDash.querySelector('div:first-child > div');
+    const headerRow = realDash.querySelector('div:first-child');
+    const filterArea = headerRow?.querySelector('div:first-child');
     if (filterArea && !document.getElementById('realizedMarketFilter')) {
         const mFilter = document.createElement('select');
         mFilter.id = 'realizedMarketFilter';
@@ -4032,12 +4051,49 @@ function renderRealizedDashboard() {
         filterArea.insertBefore(mFilter, filterArea.firstChild);
     }
 
-    let ownerName = 'all';
-    if (currentRealizedOwnerFilter === 'user1') ownerName = state.owners.user1.name;
-    if (currentRealizedOwnerFilter === 'user2') ownerName = state.owners.user2.name;
+    // 🌟 2. 필터링 상태 박스 (Status Bar) 생성 및 업데이트
+    let filterStatusBox = document.getElementById('realizedFilterStatusBar');
+    if (!filterStatusBox) {
+        filterStatusBox = document.createElement('div');
+        filterStatusBox.id = 'realizedFilterStatusBar';
+        filterStatusBox.style.cssText = "margin: 10px 0; padding: 12px 15px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; display: none; gap: 10px; align-items: center; flex-wrap: wrap;";
+        if (headerRow) headerRow.after(filterStatusBox);
+    }
 
     const yearSelect = document.getElementById('realizedYearFilter');
     let selectedYear = yearSelect ? yearSelect.value : 'all';
+
+    // 활성화된 필터 뱃지 생성
+    let filterBadgesHtml = "";
+    if (realizedFilters.symbol) {
+        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목: ${realizedFilters.symbol} <span onclick="resetRealizedSymbolFilter()" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+    }
+    if (realizedFilters.market !== 'all') {
+        const mLabel = realizedFilters.market === 'kr' ? '국내' : '해외';
+        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="updateRealizedFilter('market', 'all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+    }
+    if (selectedYear !== 'all') {
+        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="document.getElementById('realizedYearFilter').value='all'; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+    }
+    if (currentRealizedOwnerFilter !== 'all') {
+        const ownerLabel = currentRealizedOwnerFilter === 'user1' ? state.owners.user1.name : state.owners.user2.name;
+        filterBadgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">소유자: ${ownerLabel} <span onclick="setRealizedOwnerFilter('all', null);" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+    }
+
+    // 필터가 하나라도 있으면 박스 표시, 없으면 숨김
+    if (filterBadgesHtml) {
+        filterStatusBox.innerHTML = `
+            <span style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em;">적용 필터</span> 
+            ${filterBadgesHtml} 
+            <button class="btn-sm" onclick="resetRealizedFilters()" style="margin-left:auto; height:28px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">필터 초기화 🔄</button>`;
+        filterStatusBox.style.display = "flex";
+    } else {
+        filterStatusBox.style.display = "none";
+    }
+
+    // (기존 요약 타이틀 업데이트 로직은 간소화하거나 제거해도 무방합니다)
+    const summaryTitle = document.querySelector('#realizedDashboard .section-title');
+    if (summaryTitle) summaryTitle.textContent = `📈 연도별 실현수익 통계`;
 
     let years = new Set();
     state.transactions.forEach(t => {
