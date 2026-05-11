@@ -4135,8 +4135,9 @@ function renderRealizedDashboard() {
             const cutoff = getCutoffDateFromRange(state.range);
             const passPeriod = tx.date >= cutoff;
             
-            const passYear = (selectedYear === 'all' || txYear === selectedYear);
-            const passMonth = (selectedMonth === 'all' || tx.date.substring(5, 7) === selectedMonth);
+            const passYear   = (selectedYear === 'all' || txYear === selectedYear);
+            const passMonth  = (selectedMonth === 'all' || tx.date.substring(5, 7) === selectedMonth);
+            const passOwner  = (ownerName === 'all' || tx.owner === ownerName);
             const passMarket = (realizedFilters.market === 'all' || (realizedFilters.market === 'kr' ? isKr : !isKr));
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
             
