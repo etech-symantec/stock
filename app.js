@@ -4081,20 +4081,26 @@ function renderRealizedDashboard() {
     // 활성화된 종목·시장 필터 배지를 상단 박스에 인라인으로 표시
     const badgesEl = document.getElementById('realizedActiveBadges');
     if (badgesEl) {
-        let badgesHtml = "";
-        if (realizedFilters.symbol) {
-            const displayName = _getDisplayName(realizedFilters.symbol);
-            badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목: ${displayName} <span onclick="resetRealizedSymbolFilter()" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
-        }
-        if (realizedFilters.market !== 'all') {
-            const mLabel = realizedFilters.market === 'kr' ? '국내' : '해외';
-            badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="document.getElementById('realizedMarketFilter').value='all'; updateRealizedFilter('market','all');" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
-        }
-        if (badgesHtml) {
-            badgesHtml += `<button class="btn-sm" onclick="resetRealizedFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
-        }
-        badgesEl.innerHTML = badgesHtml;
-    }
+      let badgesHtml = "";
+      if (realizedFilters.symbol) {
+          const displayName = _getDisplayName(realizedFilters.symbol);
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목: ${displayName} <span onclick="resetRealizedSymbolFilter()" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
+      if (realizedFilters.market !== 'all') {
+          const mLabel = realizedFilters.market === 'kr' ? '국내' : '해외';
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="document.getElementById('realizedMarketFilter').value='all'; updateRealizedFilter('market','all');" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
+      if (selectedYear !== 'all') {
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="document.getElementById('realizedYearFilter').value='all'; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
+      if (selectedMonth !== 'all') {
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">월: ${parseInt(selectedMonth, 10)}월 <span onclick="document.getElementById('realizedMonthFilter').value='all'; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
+      if (badgesHtml) {
+          badgesHtml += `<button class="btn-sm" onclick="resetRealizedFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
+      }
+      badgesEl.innerHTML = badgesHtml;
+  }
 
     // 🌟 변수 선언
     let holdings = {};
