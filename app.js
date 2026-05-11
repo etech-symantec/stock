@@ -50,11 +50,10 @@ let currentListStyle = 'card';
 let currentRegionLayout = 'horizontal'; // 🌟 기본 배치를 좌우(horizontal)로 변경
 let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 // 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
-let realizedFilters = { market: 'all', symbol: null, tradeIdx: null, month: 'all' };
+let realizedFilters = { market: 'all', symbol: null, tradeIdx: null, period: 'all', year: 'all', month: 'all' };
 // 🌟 실현수익 랭킹 탭 상태 (pnl: 수익금 | roi: 수익률)
 let realizedRankingTab = 'pnl';
-// 🌟 실현수익 랭킹 기간 필터 (all | 1y | 6m | 3m | 1m)
-let realizedRankingPeriod = 'all';
+// 기존 realizedRankingPeriod 변수 삭제됨
 let realizedRankingSortDir = 'desc'; // 'desc' 내림차순 | 'asc' 오름차순
 // 🌟 종목 리스트 검색 및 태그 필터 상태 변수
 let currentLocalSearch = '';
@@ -91,12 +90,46 @@ function updateRealizedFilter(key, value) {
     renderRealizedDashboard();
 }
 
+function setRealizedPeriodFilter(period, el) {
+    realizedFilters.period = period;
+    realizedFilters.year = 'all';
+    realizedFilters.month = 'all';
+    
+    document.querySelectorAll('.real-period-btn').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    
+    const yearSelect = document.getElementById('realizedYearFilter');
+    if (yearSelect) yearSelect.value = 'all';
+    const monthSelect = document.getElementById('realizedMonthFilter');
+    if (monthSelect) monthSelect.value = 'all';
+    
+    renderRealizedDashboard();
+}
+
+function updateRealizedDateFilter(type, value) {
+    realizedFilters[type] = value;
+    realizedFilters.period = 'all';
+    
+    document.querySelectorAll('.real-period-btn').forEach(b => b.classList.remove('active'));
+    const allBtn = document.querySelector('.real-period-btn[onclick*="\'all\'"]');
+    if(allBtn && value === 'all' && realizedFilters.year === 'all' && realizedFilters.month === 'all') allBtn.classList.add('active');
+
+    renderRealizedDashboard();
+}
+
 // 🌟 실현수익 모든 필터 및 연도/소유자 설정 일괄 초기화
 function resetRealizedFilters() {
     realizedFilters.symbol = null;
     realizedFilters.tradeIdx = null;
     realizedFilters.market = 'all';
+    realizedFilters.period = 'all';
+    realizedFilters.year = 'all';
     realizedFilters.month = 'all';
+    
+    document.querySelectorAll('.real-period-btn').forEach(b => b.classList.remove('active'));
+    const allBtn = document.querySelector('.real-period-btn[onclick*="\'all\'"]');
+    if(allBtn) allBtn.classList.add('active');
+
     const yearSelect = document.getElementById('realizedYearFilter');
     if (yearSelect) yearSelect.value = 'all';
     const monthSelect = document.getElementById('realizedMonthFilter');
@@ -115,12 +148,6 @@ function resetRealizedSymbolFilter() {
 // 🌟 실현수익 랭킹 탭 전환
 function setRealizedRankingTab(tab) {
     realizedRankingTab = tab;
-    renderRealizedDashboard();
-}
-
-// 🌟 실현수익 랭킹 기간 필터 전환
-function setRealizedRankingPeriod(period) {
-    realizedRankingPeriod = period;
     renderRealizedDashboard();
 }
  
@@ -4048,15 +4075,15 @@ function renderRealizedDashboard() {
         filterArea.insertBefore(mFilter, filterArea.firstChild);
     }
 
-    // 🚨 [핵심 수정] 삭제되었던 소유자 필터 변수 복구!
+    // 🚨 [핵심 수정] 소유자 및 기간 필터 변수 매핑
     let ownerName = 'all';
     if (currentRealizedOwnerFilter === 'user1') ownerName = state.owners.user1.name;
     if (currentRealizedOwnerFilter === 'user2') ownerName = state.owners.user2.name;
 
     const yearSelect = document.getElementById('realizedYearFilter');
-    let selectedYear = yearSelect ? yearSelect.value : 'all';
+    let selectedYear = realizedFilters.year;
     const monthSelect = document.getElementById('realizedMonthFilter');
-    let selectedMonth = monthSelect ? monthSelect.value : 'all';
+    let selectedMonth = realizedFilters.month;
 
     let years = new Set();
     state.transactions.forEach(t => {
@@ -4091,16 +4118,34 @@ function renderRealizedDashboard() {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="document.getElementById('realizedMarketFilter').value='all'; updateRealizedFilter('market','all');" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
       if (selectedYear !== 'all') {
-          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="document.getElementById('realizedYearFilter').value='all'; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="updateRealizedDateFilter('year','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
       if (selectedMonth !== 'all') {
-          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">월: ${parseInt(selectedMonth, 10)}월 <span onclick="document.getElementById('realizedMonthFilter').value='all'; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">월: ${parseInt(selectedMonth, 10)}월 <span onclick="updateRealizedDateFilter('month','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
-      if (badgesHtml) {
+      if (realizedFilters.period !== 'all') {
+          const pLabel = { '1y':'1년', '6m':'6개월', '3m':'3개월', '1m':'1개월' }[realizedFilters.period];
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">기간: ${pLabel} <span onclick="setRealizedPeriodFilter('all', document.querySelector('.real-period-btn[onclick*=\\'\\'all\\'\\']'))" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
+      
+      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || realizedFilters.period !== 'all' || currentRealizedOwnerFilter !== 'all';
+      if (isAnyFilterActive) {
           badgesHtml += `<button class="btn-sm" onclick="resetRealizedFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
       }
       badgesEl.innerHTML = badgesHtml;
-  }
+    }
+
+    // 🌟 글로벌 기간 컷오프(dashboardCutoff) 계산
+    const dashboardCutoff = (() => {
+        const now = new Date();
+        const map = { '1m': 30, '3m': 90, '6m': 180, '1y': 365 };
+        if (realizedFilters.period in map) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - map[realizedFilters.period]);
+            return d.toISOString().substring(0, 10);
+        }
+        return null;
+    })();
 
     // 🌟 변수 선언
     let holdings = {};
@@ -4138,16 +4183,14 @@ function renderRealizedDashboard() {
             let txYear = tx.date.substring(0, 4);
             const isKr = isKorean(tx.symbol);
 
-            const cutoff = getCutoffDateFromRange(state.range);
-            const passPeriod = tx.date >= cutoff;
-            
+            const passPeriodLocal = dashboardCutoff ? tx.date >= dashboardCutoff : true;
             const passYear   = (selectedYear === 'all' || txYear === selectedYear);
             const passMonth  = (selectedMonth === 'all' || tx.date.substring(5, 7) === selectedMonth);
             const passOwner  = (ownerName === 'all' || tx.owner === ownerName);
             const passMarket = (realizedFilters.market === 'all' || (realizedFilters.market === 'kr' ? isKr : !isKr));
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
             
-            if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriod) {
+            if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal) {
                 let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
                 cumulativePnl += pnlKrw;
 
@@ -4214,19 +4257,7 @@ function renderRealizedDashboard() {
 
     // 6. 종목별 통계 집계 → 랭킹 패널 렌더링
     const symStats = {};
-
-    const rankingPeriodCutoff = (() => {
-        const now = new Date();
-        const map = { '1m': 30, '3m': 90, '6m': 180, '1y': 365 };
-        if (realizedRankingPeriod in map) {
-            const d = new Date(now);
-            d.setDate(d.getDate() - map[realizedRankingPeriod]);
-            return d.toISOString().substring(0, 10);
-        }
-        return null;
-    })();
-
-    const rankingTxs = rankingPeriodCutoff ? realizedTxs.filter(tx => tx.date >= rankingPeriodCutoff) : realizedTxs;
+    const rankingTxs = realizedTxs;
 
     rankingTxs.forEach(tx => {
         const isKr = isKorean(tx.symbol);
@@ -4361,10 +4392,6 @@ function renderRealizedDashboard() {
 
             rankingPanelEl.innerHTML = `
             <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
-              <div style="display:flex; align-items:center; gap:5px; padding:10px 12px 8px; border-bottom:1px solid var(--border); flex-wrap:wrap; flex-shrink:0;">
-                <span style="font-size:10px; color:var(--text3); flex-shrink:0; margin-right:2px;">기간</span>
-                ${periodBtns}
-              </div>
               <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
                 ${tabBtn('pnl', '💵 수익금')}
                 ${tabBtn('roi', '📊 수익률')}
