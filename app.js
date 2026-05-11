@@ -4359,25 +4359,10 @@ function renderRealizedDashboard() {
         if (symList.length === 0) {
             rankingPanelEl.innerHTML = `<div style="font-size:12px; color:var(--text3); text-align:center; padding:20px;">실현수익 데이터 없음</div>`;
         } else {
-            const periodLabel = { all: '전체', '1y': '1년', '6m': '6개월', '3m': '3개월', '1m': '1개월' };
-            const periods = ['all', '1y', '6m', '3m', '1m'];
-
             const isRoi   = realizedRankingTab === 'roi';
             const isSpeed = realizedRankingTab === 'speed';
             const activeRank   = isSpeed ? rankBySpeed : (isRoi ? rankByRoi : rankByPnl);
             const maxAbsActive = isSpeed ? maxAbsSpeed  : (isRoi ? maxAbsRoi : maxAbsPnl);
-
-            const periodBtns = periods.map(p => {
-                const isActive = p === realizedRankingPeriod;
-                return `<button onclick="setRealizedRankingPeriod('${p}')"
-                    style="padding:3px 9px; font-size:10px; font-weight:${isActive?'700':'400'}; border-radius:12px;
-                           border:1px solid ${isActive?'var(--accent)':'var(--border)'}; 
-                           background:${isActive?'var(--accent-bg)':'transparent'}; 
-                           color:${isActive?'var(--accent)':'var(--text3)'}; cursor:pointer; 
-                           font-family:var(--font-sans); transition:0.15s; white-space:nowrap;">
-                    ${periodLabel[p]}
-                </button>`;
-            }).join('');
 
             const tabBtn = (tab, label) => {
                 const isActive = realizedRankingTab === tab;
