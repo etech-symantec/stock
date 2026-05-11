@@ -535,10 +535,17 @@
     <div id="realizedDashboard" style="display:none; flex-direction:column;">
       
       <div class="page-controls-box" style="flex-wrap:wrap; gap:8px;">
-        <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
+        <div style="display:flex; gap:3px; align-items:center; flex-shrink:0;">
+          <button class="btn-sm real-period-btn active" onclick="setRealizedPeriodFilter('all', this)" style="padding:5px 9px; font-size:11px;">전체</button>
+          <button class="btn-sm real-period-btn" onclick="setRealizedPeriodFilter('1y', this)" style="padding:5px 9px; font-size:11px;">1년</button>
+          <button class="btn-sm real-period-btn" onclick="setRealizedPeriodFilter('6m', this)" style="padding:5px 9px; font-size:11px;">6개월</button>
+          <button class="btn-sm real-period-btn" onclick="setRealizedPeriodFilter('3m', this)" style="padding:5px 9px; font-size:11px;">3개월</button>
+          <button class="btn-sm real-period-btn" onclick="setRealizedPeriodFilter('1m', this)" style="padding:5px 9px; font-size:11px;">1개월</button>
+        </div>
+        <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="updateRealizedDateFilter('year', this.value)">
           <option value="all">전체 연도</option>
         </select>
-        <select id="realizedMonthFilter" class="form-input" style="width:90px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
+        <select id="realizedMonthFilter" class="form-input" style="width:90px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="updateRealizedDateFilter('month', this.value)">
           <option value="all">전체 월</option>
           <option value="01">1월</option><option value="02">2월</option><option value="03">3월</option>
           <option value="04">4월</option><option value="05">5월</option><option value="06">6월</option>
@@ -550,7 +557,6 @@
           <button class="vtab real-filter" id="realTabUser1" onclick="setRealizedOwnerFilter('user1', this)">소유자1</button>
           <button class="vtab real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
         </div>
-        <!-- 종목·시장 필터 배지가 여기에 인라인으로 표시됨 -->
         <div id="realizedActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;"></div>
       </div>
     
