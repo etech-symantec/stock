@@ -534,15 +534,24 @@
 
     <div id="realizedDashboard" style="display:none; flex-direction:column;">
       
-      <div class="page-controls-box">
+      <div class="page-controls-box" style="flex-wrap:wrap; gap:8px;">
         <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
           <option value="all">전체 연도</option>
+        </select>
+        <select id="realizedMonthFilter" class="form-input" style="width:90px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="renderRealizedDashboard()">
+          <option value="all">전체 월</option>
+          <option value="01">1월</option><option value="02">2월</option><option value="03">3월</option>
+          <option value="04">4월</option><option value="05">5월</option><option value="06">6월</option>
+          <option value="07">7월</option><option value="08">8월</option><option value="09">9월</option>
+          <option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
         </select>
         <div class="view-tabs">
           <button class="vtab active real-filter" onclick="setRealizedOwnerFilter('all', this)">전체 합산</button>
           <button class="vtab real-filter" id="realTabUser1" onclick="setRealizedOwnerFilter('user1', this)">소유자1</button>
           <button class="vtab real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
         </div>
+        <!-- 종목·시장 필터 배지가 여기에 인라인으로 표시됨 -->
+        <div id="realizedActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;"></div>
       </div>
     
       <!-- 메인 바디: 왼쪽 랭킹 + 오른쪽 차트/요약/표 -->
