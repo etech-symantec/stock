@@ -50,7 +50,7 @@ let currentListStyle = 'card';
 let currentRegionLayout = 'horizontal'; // 🌟 기본 배치를 좌우(horizontal)로 변경
 let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 // 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
-let realizedFilters = { market: 'all', symbol: null, tradeIdx: null, period: 'all', year: 'all', month: 'all', dateFrom: '', dateTo: '' };
+let realizedFilters = { market: 'all', symbol: null, tradeIdx: null, period: 'all', year: 'all', month: 'all', dateFrom: '', dateTo: '', broker: '', name: '' };
 // 🌟 실현수익 랭킹 탭 상태 (pnl: 수익금 | roi: 수익률)
 let realizedRankingTab = 'pnl';
 // 기존 realizedRankingPeriod 변수 삭제됨
@@ -122,6 +122,12 @@ function resetRealizedFilters() {
     realizedFilters.month = 'all';
     realizedFilters.dateFrom = '';
     realizedFilters.dateTo   = '';
+    realizedFilters.broker = '';
+    realizedFilters.name = '';
+    const brokerInput = document.getElementById('realBrokerSearch');
+    if (brokerInput) brokerInput.value = '';
+    const nameInput = document.getElementById('realNameSearch');
+    if (nameInput) nameInput.value = '';
     
     document.querySelectorAll('.real-period-btn').forEach(b => b.classList.remove('active'));
     const allBtn = document.querySelector('.real-period-btn[onclick*="\'all\'"]');
@@ -4084,6 +4090,12 @@ function renderRealizedDashboard() {
           const mLabel = realizedFilters.market === 'kr' ? '국내' : '해외';
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="_setRealMktBtn(document.getElementById('realMktAll')); updateRealizedFilter('market','all');" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
+      if (realizedFilters.broker) {
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">계좌: ${realizedFilters.broker} <span onclick="realizedFilters.broker=''; document.getElementById('realBrokerSearch').value=''; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
+      if (realizedFilters.name) {
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목명: ${realizedFilters.name} <span onclick="realizedFilters.name=''; document.getElementById('realNameSearch').value=''; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
       if (selectedYear !== 'all') {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="updateRealizedDateFilter('year','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
@@ -4091,7 +4103,7 @@ function renderRealizedDashboard() {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">월: ${parseInt(selectedMonth, 10)}월 <span onclick="updateRealizedDateFilter('month','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
       
-      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || currentRealizedOwnerFilter !== 'all' || realizedFilters.dateFrom || realizedFilters.dateTo;
+      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || currentRealizedOwnerFilter !== 'all' || realizedFilters.dateFrom || realizedFilters.dateTo || realizedFilters.broker || realizedFilters.name;
       if (isAnyFilterActive) {
           badgesHtml += `<button class="btn-sm" onclick="resetRealizedFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
       }
@@ -4145,8 +4157,10 @@ function renderRealizedDashboard() {
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
             const passCustomDate = (!realizedFilters.dateFrom || tx.date >= realizedFilters.dateFrom) &&
                        (!realizedFilters.dateTo   || tx.date <= realizedFilters.dateTo);
+            const passBroker = (!realizedFilters.broker || broker.toLowerCase().includes(realizedFilters.broker.toLowerCase()));
+            const passName   = (!realizedFilters.name   || tx.symbol.toLowerCase().includes(realizedFilters.name.toLowerCase()) || (_getDisplayName(tx.symbol) || '').toLowerCase().includes(realizedFilters.name.toLowerCase()));
             
-            if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal && passCustomDate) {
+            if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal && passCustomDate && passBroker && passName) {
                 let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
                 cumulativePnl += pnlKrw;
 
