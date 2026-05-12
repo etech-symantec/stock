@@ -561,6 +561,22 @@
           <button class="f-btn" id="realMktKr" onclick="_setRealMktBtn(this); updateRealizedFilter('market','kr')">🇰🇷 국내</button>
           <button class="f-btn" id="realMktUs" onclick="_setRealMktBtn(this); updateRealizedFilter('market','us')">🇺🇸 해외</button>
         </div>
+
+        <!-- 계좌 검색 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">계좌</span>
+          <input type="text" id="realBrokerSearch" placeholder="계좌명 검색"
+            oninput="updateRealizedFilter('broker', this.value.trim())"
+            style="width:130px; cursor:text; font-size:12px; height:30px; padding:0 10px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none;">
+        </div>
+        
+        <!-- 종목명 검색 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">종목명</span>
+          <input type="text" id="realNameSearch" placeholder="종목명 / 티커"
+            oninput="updateRealizedFilter('name', this.value.trim())"
+            style="width:130px; cursor:text; font-size:12px; height:30px; padding:0 10px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none;">
+        </div>
       
         <!-- 활성 필터 배지 -->
         <div id="realizedActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:auto;"></div>
