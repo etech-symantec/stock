@@ -1386,13 +1386,6 @@ function renderHistoryDashboard() {
               <span style="color:var(--text3); font-size:11px; flex-shrink:0;">~</span>
               <input type="date" class="form-input" id="historyDateTo" value="${historyFilters.dateTo}" style="width:134px; padding:6px 7px; margin:0; font-size:12px;" onchange="updateHistoryFilter('dateTo', this.value)">
           </div>
-          <div style="display:flex; gap:3px; flex-shrink:0;">
-              <button class="btn-sm" onclick="setHistoryDatePreset('1m')" style="padding:5px 7px; font-size:11px;">1M</button>
-              <button class="btn-sm" onclick="setHistoryDatePreset('3m')" style="padding:5px 7px; font-size:11px;">3M</button>
-              <button class="btn-sm" onclick="setHistoryDatePreset('6m')" style="padding:5px 7px; font-size:11px;">6M</button>
-              <button class="btn-sm" onclick="setHistoryDatePreset('1y')" style="padding:5px 7px; font-size:11px;">1Y</button>
-              <button class="btn-sm" onclick="setHistoryDatePreset('ytd')" style="padding:5px 7px; font-size:11px;">YTD</button>
-          </div>
           <input type="text" class="form-input" placeholder="🔍 종목명 / 티커" value="${historyFilters.search}" style="flex:1; min-width:120px; padding:6px 10px; margin:0; font-size:12px;" onkeydown="if(event.key === 'Enter') updateHistoryFilter('search', this.value)">
           ${hasActiveExtra ? `<button class="btn-sm" onclick="resetHistoryFilters()" style="padding:5px 9px; font-size:11px; color:var(--red); border-color:var(--red); flex-shrink:0;">✕ 초기화</button>` : ''}
       </div>
@@ -4123,12 +4116,8 @@ function renderRealizedDashboard() {
       if (selectedMonth !== 'all') {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">월: ${parseInt(selectedMonth, 10)}월 <span onclick="updateRealizedDateFilter('month','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
-      if (realizedFilters.period !== 'all') {
-          const pLabel = { '1y':'1년', '6m':'6개월', '3m':'3개월', '1m':'1개월' }[realizedFilters.period];
-          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">기간: ${pLabel} <span onclick="setRealizedPeriodFilter('all', document.querySelector('.real-period-btn[onclick*=\\'\\'all\\'\\']'))" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
-      }
       
-      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || realizedFilters.period !== 'all' || currentRealizedOwnerFilter !== 'all';
+      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || currentRealizedOwnerFilter !== 'all';
       if (isAnyFilterActive) {
           badgesHtml += `<button class="btn-sm" onclick="resetRealizedFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
       }
@@ -4136,16 +4125,7 @@ function renderRealizedDashboard() {
     }
 
     // 🌟 글로벌 기간 컷오프(dashboardCutoff) 계산
-    const dashboardCutoff = (() => {
-        const now = new Date();
-        const map = { '1m': 30, '3m': 90, '6m': 180, '1y': 365 };
-        if (realizedFilters.period in map) {
-            const d = new Date(now);
-            d.setDate(d.getDate() - map[realizedFilters.period]);
-            return d.toISOString().substring(0, 10);
-        }
-        return null;
-    })();
+    const dashboardCutoff = getCutoffDateFromRange(state.range);
 
     // 🌟 변수 선언
     let holdings = {};
@@ -4183,7 +4163,7 @@ function renderRealizedDashboard() {
             let txYear = tx.date.substring(0, 4);
             const isKr = isKorean(tx.symbol);
 
-            const passPeriodLocal = dashboardCutoff ? tx.date >= dashboardCutoff : true;
+            const passPeriodLocal = tx.date >= dashboardCutoff;
             const passYear   = (selectedYear === 'all' || txYear === selectedYear);
             const passMonth  = (selectedMonth === 'all' || tx.date.substring(5, 7) === selectedMonth);
             const passOwner  = (ownerName === 'all' || tx.owner === ownerName);
