@@ -419,12 +419,53 @@
     <div class="grid-container" id="gridContainer"></div>
 
     <div id="dividendDashboard">
-      <div class="page-controls-box">
-        <div class="view-tabs">
-          <button class="vtab active div-filter" onclick="setDivFilter('all', this)">전체 합산</button>
-          <button class="vtab div-filter" id="divTabUser1" onclick="setDivFilter('user1', this)">소유자1</button>
-          <button class="vtab div-filter" id="divTabUser2" onclick="setDivFilter('user2', this)">소유자2</button>
+      <div class="page-controls-box" style="flex-wrap:wrap; gap:10px; align-items:center;">
+    
+        <!-- 기간 직접 선택 -->
+        <div style="position:relative;">
+          <button id="btnDividendDatePicker" class="f-btn" onclick="openDividendDatePicker()"
+            style="border-color:var(--border2); display:flex; align-items:center; gap:6px; height:34px; padding:0 14px;">
+            📅 기간 선택
+          </button>
+          <div id="dividendDatePickerPop" style="display:none; position:absolute; top:calc(100% + 6px); left:0; z-index:9999;"></div>
         </div>
+    
+        <!-- 소유자 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">소유자</span>
+          <button class="f-btn active div-filter" onclick="setDivFilter('all', this)">전체</button>
+          <button class="f-btn div-filter" id="divTabUser1" onclick="setDivFilter('user1', this)">소유자1</button>
+          <button class="f-btn div-filter" id="divTabUser2" onclick="setDivFilter('user2', this)">소유자2</button>
+        </div>
+    
+        <!-- 시장 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">시장</span>
+          <button class="f-btn active" id="divMktAll" onclick="_setDivMktBtn(this); updateDividendFilter('market','all')">🌐 전체</button>
+          <button class="f-btn" id="divMktKr" onclick="_setDivMktBtn(this); updateDividendFilter('market','kr')">🇰🇷 국내</button>
+          <button class="f-btn" id="divMktUs" onclick="_setDivMktBtn(this); updateDividendFilter('market','us')">🇺🇸 해외</button>
+        </div>
+    
+        <!-- 계좌 선택 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">계좌</span>
+          <select id="divBrokerFilter" onchange="updateDividendFilter('broker', this.value)"
+            style="height:30px; padding:0 8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); cursor:pointer; outline:none;">
+            <option value="all">전체</option>
+          </select>
+        </div>
+    
+        <!-- 종목명 검색 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">종목명</span>
+          <input type="text" id="divNameSearch" placeholder="종목명 / 티커"
+            oninput="updateDividendFilter('search', this.value.trim())"
+            style="height:30px; padding:0 10px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none; width:130px;">
+        </div>
+    
+        <!-- 활성 필터 배지 -->
+        <div id="dividendActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:auto;"></div>
+    
       </div>
 
       <div class="stat-banner" id="divStatBanner">
@@ -511,7 +552,63 @@
     </div>
 
     <div id="historyDashboard">
-      <div id="historyControlsBox" class="page-controls-box" style="display:none;"></div>
+      <div id="historyControlsBox" class="page-controls-box" style="flex-wrap:wrap; gap:10px; align-items:center;">
+    
+        <!-- 기간 직접 선택 -->
+        <div style="position:relative;">
+          <button id="btnHistoryDatePicker" class="f-btn" onclick="openHistoryDatePicker()"
+            style="border-color:var(--border2); display:flex; align-items:center; gap:6px; height:34px; padding:0 14px;">
+            📅 기간 선택
+          </button>
+          <div id="historyDatePickerPop" style="display:none; position:absolute; top:calc(100% + 6px); left:0; z-index:9999;"></div>
+        </div>
+    
+        <!-- 소유자 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">소유자</span>
+          <button class="f-btn active hist-owner-filter" onclick="setHistoryOwnerFilter('all', this)">전체</button>
+          <button class="f-btn hist-owner-filter" id="histTabUser1" onclick="setHistoryOwnerFilter('user1', this)">소유자1</button>
+          <button class="f-btn hist-owner-filter" id="histTabUser2" onclick="setHistoryOwnerFilter('user2', this)">소유자2</button>
+        </div>
+    
+        <!-- 시장 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">시장</span>
+          <button class="f-btn active" id="histMktAll" onclick="_setHistMktBtn(this); updateHistoryFilter('market','all')">🌐 전체</button>
+          <button class="f-btn" id="histMktKr" onclick="_setHistMktBtn(this); updateHistoryFilter('market','kr')">🇰🇷 국내</button>
+          <button class="f-btn" id="histMktUs" onclick="_setHistMktBtn(this); updateHistoryFilter('market','us')">🇺🇸 해외</button>
+        </div>
+    
+        <!-- 유형 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">유형</span>
+          <button class="f-btn active" id="histTypeAll" onclick="_setHistTypeBtn(this); updateHistoryFilter('type','all')">전체</button>
+          <button class="f-btn" id="histTypeBuy" onclick="_setHistTypeBtn(this); updateHistoryFilter('type','buy')">🔴 매수</button>
+          <button class="f-btn" id="histTypeSell" onclick="_setHistTypeBtn(this); updateHistoryFilter('type','sell')">🔵 매도</button>
+          <button class="f-btn" id="histTypeDiv" onclick="_setHistTypeBtn(this); updateHistoryFilter('type','dividend')">💚 배당</button>
+        </div>
+    
+        <!-- 계좌 선택 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">계좌</span>
+          <select id="histBrokerFilter" onchange="updateHistoryFilter('broker', this.value)"
+            style="height:30px; padding:0 8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); cursor:pointer; outline:none;">
+            <option value="all">전체</option>
+          </select>
+        </div>
+    
+        <!-- 종목명 검색 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">종목명</span>
+          <input type="text" id="histNameSearch" placeholder="종목명 / 티커"
+            oninput="updateHistoryFilter('search', this.value.trim())"
+            style="height:30px; padding:0 10px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none; width:130px;">
+        </div>
+    
+        <!-- 활성 필터 배지 -->
+        <div id="historyActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:auto;"></div>
+    
+      </div>
       <div class="history-table-container">
         <table class="history-table">
           <thead>
