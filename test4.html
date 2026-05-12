@@ -535,13 +535,6 @@
     <div id="realizedDashboard" style="display:none; flex-direction:column;">
       
       <div class="page-controls-box" style="flex-wrap:wrap; gap:8px;">
-        <div style="display:flex; gap:3px; align-items:center; flex-shrink:0;">
-          <button class="btn-sm real-period-btn active" onclick="setRealizedPeriodFilter('all', this)" style="padding:5px 9px; font-size:11px;">전체</button>
-          <button class="btn-sm real-period-btn" onclick="setRealizedPeriodFilter('1y', this)" style="padding:5px 9px; font-size:11px;">1년</button>
-          <button class="btn-sm real-period-btn" onclick="setRealizedPeriodFilter('6m', this)" style="padding:5px 9px; font-size:11px;">6개월</button>
-          <button class="btn-sm real-period-btn" onclick="setRealizedPeriodFilter('3m', this)" style="padding:5px 9px; font-size:11px;">3개월</button>
-          <button class="btn-sm real-period-btn" onclick="setRealizedPeriodFilter('1m', this)" style="padding:5px 9px; font-size:11px;">1개월</button>
-        </div>
         <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="updateRealizedDateFilter('year', this.value)">
           <option value="all">전체 연도</option>
         </select>
