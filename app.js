@@ -98,11 +98,6 @@ function setRealizedPeriodFilter(period, el) {
     document.querySelectorAll('.real-period-btn').forEach(b => b.classList.remove('active'));
     if (el) el.classList.add('active');
     
-    const yearSelect = document.getElementById('realizedYearFilter');
-    if (yearSelect) yearSelect.value = 'all';
-    const monthSelect = document.getElementById('realizedMonthFilter');
-    if (monthSelect) monthSelect.value = 'all';
-    
     renderRealizedDashboard();
 }
 
@@ -132,12 +127,7 @@ function resetRealizedFilters() {
     const allBtn = document.querySelector('.real-period-btn[onclick*="\'all\'"]');
     if(allBtn) allBtn.classList.add('active');
 
-    const yearSelect = document.getElementById('realizedYearFilter');
-    if (yearSelect) yearSelect.value = 'all';
-    const monthSelect = document.getElementById('realizedMonthFilter');
-    if (monthSelect) monthSelect.value = 'all';
-    const marketSelect = document.getElementById('realizedMarketFilter');
-    if (marketSelect) marketSelect.value = 'all';
+    _setRealMktBtn(document.getElementById('realMktAll'));
     setRealizedOwnerFilter('all', null);
 }
 
@@ -4046,6 +4036,14 @@ function setRealizedOwnerFilter(filter, el) {
   renderRealizedDashboard();
 }
 
+function _setRealMktBtn(el) {
+  ['realMktAll','realMktKr','realMktUs'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.classList.remove('active');
+  });
+  if (el) el.classList.add('active');
+}
+
 // ==========================================
 // 🌟 실현수익 대시보드 렌더링 (최종 완성본 - 에러 수정)
 // ==========================================
@@ -4054,44 +4052,13 @@ function renderRealizedDashboard() {
     const realDash = document.getElementById('realizedDashboard');
     if(!realDash) return;
 
-    // 1. UI 필터: 시장(국가) 드롭다운 자동 삽입
-    const filterArea = realDash.querySelector('div:first-child > div');
-    if (filterArea && !document.getElementById('realizedMarketFilter')) {
-        const mFilter = document.createElement('select');
-        mFilter.id = 'realizedMarketFilter';
-        mFilter.className = 'form-input';
-        mFilter.style.cssText = "width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;";
-        mFilter.innerHTML = `
-            <option value="all">🌐 전체 국가</option>
-            <option value="kr">🇰🇷 국내 주식</option>
-            <option value="us">🇺🇸 미국 주식</option>
-        `;
-        mFilter.onchange = (e) => updateRealizedFilter('market', e.target.value);
-        filterArea.insertBefore(mFilter, filterArea.firstChild);
-    }
-
     // 🚨 [핵심 수정] 소유자 및 기간 필터 변수 매핑
     let ownerName = 'all';
     if (currentRealizedOwnerFilter === 'user1') ownerName = state.owners.user1.name;
     if (currentRealizedOwnerFilter === 'user2') ownerName = state.owners.user2.name;
 
-    const yearSelect = document.getElementById('realizedYearFilter');
     let selectedYear = realizedFilters.year;
-    const monthSelect = document.getElementById('realizedMonthFilter');
     let selectedMonth = realizedFilters.month;
-
-    let years = new Set();
-    state.transactions.forEach(t => {
-        if (t.txType === 'sell' || t.qty < 0) years.add(t.date.substring(0, 4));
-    });
-    let yearArr = Array.from(years).sort().reverse();
-
-    if (yearSelect && yearSelect.options.length <= 1 && yearArr.length > 0) {
-        let html = `<option value="all">전체 연도</option>`;
-        yearArr.forEach(y => html += `<option value="${y}">${y}년</option>`);
-        yearSelect.innerHTML = html;
-        yearSelect.value = selectedYear;
-    }
 
     // 🌟 2. 종목명 헬퍼
     function _getDisplayName(symbol) {
@@ -4115,7 +4082,7 @@ function renderRealizedDashboard() {
       }
       if (realizedFilters.market !== 'all') {
           const mLabel = realizedFilters.market === 'kr' ? '국내' : '해외';
-          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="document.getElementById('realizedMarketFilter').value='all'; updateRealizedFilter('market','all');" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="_setRealMktBtn(document.getElementById('realMktAll')); updateRealizedFilter('market','all');" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
       if (selectedYear !== 'all') {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="updateRealizedDateFilter('year','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
