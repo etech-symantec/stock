@@ -4084,14 +4084,6 @@ function renderRealizedDashboard() {
             uniqueBrokers.map(b => `<option value="${b}" ${curBroker === b ? 'selected' : ''}>${b}</option>`).join('');
     }
     
-    const nameSel = document.getElementById('realNameSearch');
-    if (nameSel) {
-        const uniqueSymbols = [...new Set(sellTxs.map(t => t.symbol))].sort();
-        const curName = realizedFilters.name;
-        nameSel.innerHTML = '<option value="">전체</option>' +
-            uniqueSymbols.map(s => `<option value="${s}" ${curName === s ? 'selected' : ''}>${_getDisplayName(s)} (${s})</option>`).join('');
-    }
-    
     // 활성화된 종목·시장 필터 배지를 상단 박스에 인라인으로 표시
     const badgesEl = document.getElementById('realizedActiveBadges');
     if (badgesEl) {
@@ -4169,15 +4161,15 @@ function renderRealizedDashboard() {
             const isKr = isKorean(tx.symbol);
 
             const passPeriodLocal = tx.date >= dashboardCutoff;
-            const passYear   = (selectedYear === 'all' || txYear === selectedYear);
-            const passMonth  = (selectedMonth === 'all' || tx.date.substring(5, 7) === selectedMonth);
-            const passOwner  = (ownerName === 'all' || tx.owner === ownerName);
+            const passYear = (selectedYear === 'all' || txYear === selectedYear);
+            const passMonth = (selectedMonth === 'all' || tx.date.substring(5, 7) === selectedMonth);
+            const passOwner = (ownerName === 'all' || tx.owner === ownerName);
             const passMarket = (realizedFilters.market === 'all' || (realizedFilters.market === 'kr' ? isKr : !isKr));
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
             const passCustomDate = (!realizedFilters.dateFrom || tx.date >= realizedFilters.dateFrom) &&
                        (!realizedFilters.dateTo   || tx.date <= realizedFilters.dateTo);
             const passBroker = (!realizedFilters.broker || broker === realizedFilters.broker);
-            const passName   = (!realizedFilters.name   || tx.symbol === realizedFilters.name);
+            const passName = (!realizedFilters.name || tx.symbol.toLowerCase().includes(realizedFilters.name.toLowerCase()) || (_getDisplayName(tx.symbol) || '').toLowerCase().includes(realizedFilters.name.toLowerCase()));
             
             if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal && passCustomDate && passBroker && passName) {
                 let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
