@@ -5612,7 +5612,7 @@ function applyColorPreset(profit, loss) {
 // ==========================================
 let _drp = {
   year: new Date().getFullYear(), month: new Date().getMonth(),
-  dragStart: null, dragEnd: null, hover: null, dragging: false
+  dragStart: null, dragEnd: null
 };
 
 function openRealizedDatePicker() {
@@ -5649,7 +5649,7 @@ function _renderDrpCalendar() {
   const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 
   let rs = _drp.dragStart;
-  let re = _drp.dragging ? (_drp.hover || _drp.dragStart) : _drp.dragEnd;
+  let re = _drp.dragEnd;
   if (rs && re && rs > re) { [rs, re] = [re, rs]; }
 
   const todayStr = new Date().toISOString().split('T')[0];
@@ -5668,18 +5668,18 @@ function _renderDrpCalendar() {
     else if (inRange) { bg = 'var(--accent-bg)'; color = 'var(--accent)'; }
     cells += `<div data-date="${ds}"
       style="text-align:center;padding:7px 2px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:${fw};background:${bg};color:${color};user-select:none;transition:background 0.1s;"
-      onmousedown="_drpMouseDown('${ds}')" onmousemove="_drpMouseMove('${ds}')" onmouseup="_drpMouseUp('${ds}')"
+      onclick="_drpClick('${ds}')"
       onmouseover="if(!this.style.background||this.style.background==='transparent')this.style.background='rgba(255,255,255,0.05)'"
       onmouseout="this.style.background='${bg}'">${d}</div>`;
   }
 
-  const selText = (rs && re) ? `${rs} ~ ${re}` : (rs ? `${rs} ~ ...` : '날짜를 드래그하여 기간을 선택하세요');
+  const selText = (rs && re && rs !== re) ? `${rs} ~ ${re}` : (rs ? `${rs} (하루 필터 / 두 번째 날짜 선택 가능)` : '날짜 클릭: 하루 / 두 번 클릭: 기간');
 
   el.innerHTML = `
     <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);" onmousedown="event.stopPropagation()">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <button onclick="_drpNav(-1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">◀</button>
-        <span style="font-weight:700;font-size:14px;">${y}년 ${monthNames[m]}</span>
+        <span onclick="_drpApplyMonth()" style="font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;" title="클릭하면 이 달 전체로 필터">${y}년 ${monthNames[m]}</span>
         <button onclick="_drpNav(1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">▶</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">${dayHeaders}</div>
@@ -5692,18 +5692,17 @@ function _renderDrpCalendar() {
     </div>`;
 }
 
-function _drpMouseDown(ds) {
-  _drp.dragging = true; _drp.dragStart = ds; _drp.dragEnd = null; _drp.hover = ds;
-  _renderDrpCalendar();
-}
-function _drpMouseMove(ds) {
-  if (!_drp.dragging || _drp.hover === ds) return;
-  _drp.hover = ds; _renderDrpCalendar();
-}
-function _drpMouseUp(ds) {
-  if (!_drp.dragging) return;
-  _drp.dragging = false; _drp.dragEnd = ds; _drp.hover = null;
-  if (_drp.dragStart > _drp.dragEnd) [_drp.dragStart, _drp.dragEnd] = [_drp.dragEnd, _drp.dragStart];
+function _drpClick(ds) {
+  if (!_drp.dragStart || (_drp.dragStart && _drp.dragEnd)) {
+    // 선택 없음 또는 이미 완성된 범위 → 새로 시작
+    _drp.dragStart = ds;
+    _drp.dragEnd = null;
+  } else {
+    // 시작만 있음 → 두 번째 클릭으로 끝 설정
+    _drp.dragEnd = ds;
+    if (_drp.dragStart > _drp.dragEnd)
+      [_drp.dragStart, _drp.dragEnd] = [_drp.dragEnd, _drp.dragStart];
+  }
   _renderDrpCalendar();
 }
 function _drpClear() {
@@ -5711,8 +5710,25 @@ function _drpClear() {
   _renderDrpCalendar();
 }
 function _drpApply() {
-  realizedFilters.dateFrom = _drp.dragStart || '';
-  realizedFilters.dateTo   = _drp.dragEnd   || '';
+  if (_drp.dragStart && !_drp.dragEnd) {
+    // 날짜 하나만 찍은 경우 → 그날 하루만 필터
+    realizedFilters.dateFrom = _drp.dragStart;
+    realizedFilters.dateTo   = _drp.dragStart;
+  } else {
+    realizedFilters.dateFrom = _drp.dragStart || '';
+    realizedFilters.dateTo   = _drp.dragEnd   || '';
+  }
+  closeRealizedDatePicker();
+  renderRealizedDashboard();
+}
+
+function _drpApplyMonth() {
+  const y = _drp.year, m = _drp.month;
+  const firstDay = `${y}-${String(m+1).padStart(2,'0')}-01`;
+  const lastDate  = new Date(y, m+1, 0).getDate();
+  const lastDay   = `${y}-${String(m+1).padStart(2,'0')}-${String(lastDate).padStart(2,'0')}`;
+  realizedFilters.dateFrom = firstDay;
+  realizedFilters.dateTo   = lastDay;
   closeRealizedDatePicker();
   renderRealizedDashboard();
 }
@@ -5723,16 +5739,5 @@ document.addEventListener('mousedown', (e) => {
   const btn = document.getElementById('btnRealizedDatePicker');
   if (pop && pop.style.display !== 'none' && !pop.contains(e.target) && e.target !== btn) {
     closeRealizedDatePicker();
-  }
-});
-// 캘린더 바깥에서 마우스 업 시 드래그 종료
-document.addEventListener('mouseup', () => {
-  if (_drp.dragging) {
-    _drp.dragging = false;
-    if (_drp.dragStart && _drp.hover) {
-      _drp.dragEnd = _drp.hover;
-      if (_drp.dragStart > _drp.dragEnd) [_drp.dragStart, _drp.dragEnd] = [_drp.dragEnd, _drp.dragStart];
-    }
-    _renderDrpCalendar();
   }
 });
