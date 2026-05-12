@@ -121,13 +121,13 @@ function resetRealizedFilters() {
     realizedFilters.year = 'all';
     realizedFilters.month = 'all';
     realizedFilters.dateFrom = '';
-    realizedFilters.dateTo   = '';
+    realizedFilters.dateTo = '';
     realizedFilters.broker = '';
     realizedFilters.name = '';
-    const brokerInput = document.getElementById('realBrokerSearch');
-    if (brokerInput) brokerInput.value = '';
-    const nameInput = document.getElementById('realNameSearch');
-    if (nameInput) nameInput.value = '';
+    const brokerSel = document.getElementById('realBrokerSearch');
+    if (brokerSel) brokerSel.value = '';
+    const nameSel = document.getElementById('realNameSearch');
+    if (nameSel) nameSel.value = '';
     
     document.querySelectorAll('.real-period-btn').forEach(b => b.classList.remove('active'));
     const allBtn = document.querySelector('.real-period-btn[onclick*="\'all\'"]');
@@ -4072,6 +4072,25 @@ function renderRealizedDashboard() {
         const match = localStockDB && localStockDB.find(s => s.symbol === symbol);
         return match ? match.name : symbol;
     }
+
+    // 계좌 / 종목명 select 옵션 동적 주입 (매도 거래 기준)
+    const sellTxs = state.transactions.filter(t => t.qty < 0 && t.txType !== 'dividend' && t.txType !== 'transfer');
+    
+    const brokerSel = document.getElementById('realBrokerSearch');
+    if (brokerSel) {
+        const uniqueBrokers = [...new Set(sellTxs.map(t => t.broker ? t.broker.trim() : '미지정'))].sort();
+        const curBroker = realizedFilters.broker;
+        brokerSel.innerHTML = '<option value="">전체</option>' +
+            uniqueBrokers.map(b => `<option value="${b}" ${curBroker === b ? 'selected' : ''}>${b}</option>`).join('');
+    }
+    
+    const nameSel = document.getElementById('realNameSearch');
+    if (nameSel) {
+        const uniqueSymbols = [...new Set(sellTxs.map(t => t.symbol))].sort();
+        const curName = realizedFilters.name;
+        nameSel.innerHTML = '<option value="">전체</option>' +
+            uniqueSymbols.map(s => `<option value="${s}" ${curName === s ? 'selected' : ''}>${_getDisplayName(s)} (${s})</option>`).join('');
+    }
     
     // 활성화된 종목·시장 필터 배지를 상단 박스에 인라인으로 표시
     const badgesEl = document.getElementById('realizedActiveBadges');
@@ -4094,7 +4113,7 @@ function renderRealizedDashboard() {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">계좌: ${realizedFilters.broker} <span onclick="realizedFilters.broker=''; document.getElementById('realBrokerSearch').value=''; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
       if (realizedFilters.name) {
-          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목명: ${realizedFilters.name} <span onclick="realizedFilters.name=''; document.getElementById('realNameSearch').value=''; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목: ${_getDisplayName(realizedFilters.name)} <span onclick="realizedFilters.name=''; document.getElementById('realNameSearch').value=''; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
       if (selectedYear !== 'all') {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">연도: ${selectedYear}년 <span onclick="updateRealizedDateFilter('year','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
@@ -4157,8 +4176,8 @@ function renderRealizedDashboard() {
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
             const passCustomDate = (!realizedFilters.dateFrom || tx.date >= realizedFilters.dateFrom) &&
                        (!realizedFilters.dateTo   || tx.date <= realizedFilters.dateTo);
-            const passBroker = (!realizedFilters.broker || broker.toLowerCase().includes(realizedFilters.broker.toLowerCase()));
-            const passName   = (!realizedFilters.name   || tx.symbol.toLowerCase().includes(realizedFilters.name.toLowerCase()) || (_getDisplayName(tx.symbol) || '').toLowerCase().includes(realizedFilters.name.toLowerCase()));
+            const passBroker = (!realizedFilters.broker || broker === realizedFilters.broker);
+            const passName   = (!realizedFilters.name   || tx.symbol === realizedFilters.name);
             
             if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal && passCustomDate && passBroker && passName) {
                 let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
