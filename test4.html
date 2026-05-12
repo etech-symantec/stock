@@ -574,10 +574,9 @@
         <!-- 종목명 선택 -->
         <div class="inline-filter-group">
           <span class="filter-label">종목명</span>
-          <select id="realNameSearch" onchange="updateRealizedFilter('name', this.value)"
-            style="height:30px; padding:0 8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); cursor:pointer; outline:none;">
-            <option value="">전체</option>
-          </select>
+          <input type="text" id="realNameSearch" placeholder="종목명 / 티커"
+            oninput="updateRealizedFilter('name', this.value.trim())"
+            style="height:30px; padding:0 10px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none; width:130px;">
         </div>
       
         <!-- 활성 필터 배지 -->
