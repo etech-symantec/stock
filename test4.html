@@ -533,35 +533,38 @@
     </div>
 
     <div id="realizedDashboard" style="display:none; flex-direction:column;">
-      
-      <div class="page-controls-box" style="flex-wrap:wrap; gap:8px;">
-        <!-- 기간 직접 선택 버튼 + 드래그 캘린더 팝업 -->
+      <div class="page-controls-box" style="flex-wrap:wrap; gap:10px; align-items:center;">
+        <!-- 기간 직접 선택 -->
         <div style="position:relative;">
-          <button id="btnRealizedDatePicker" class="btn-sm"
+          <button id="btnRealizedDatePicker" class="f-btn"
             onclick="openRealizedDatePicker()"
-            style="height:32px; padding:0 12px; font-size:12px; white-space:nowrap;">
-            📅 기간 직접 선택
+            style="border-color:var(--border2); display:flex; align-items:center; gap:6px; height:34px; padding:0 14px;">
+            📅 기간 선택
           </button>
           <div id="realizedDatePickerPop"
             style="display:none; position:absolute; top:calc(100% + 6px); left:0; z-index:9999;">
           </div>
         </div>
-        <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="updateRealizedDateFilter('year', this.value)">
-          <option value="all">전체 연도</option>
-        </select>
-        <select id="realizedMonthFilter" class="form-input" style="width:90px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="updateRealizedDateFilter('month', this.value)">
-          <option value="all">전체 월</option>
-          <option value="01">1월</option><option value="02">2월</option><option value="03">3월</option>
-          <option value="04">4월</option><option value="05">5월</option><option value="06">6월</option>
-          <option value="07">7월</option><option value="08">8월</option><option value="09">9월</option>
-          <option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
-        </select>
-        <div class="view-tabs">
-          <button class="vtab active real-filter" onclick="setRealizedOwnerFilter('all', this)">전체 합산</button>
-          <button class="vtab real-filter" id="realTabUser1" onclick="setRealizedOwnerFilter('user1', this)">소유자1</button>
-          <button class="vtab real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
+      
+        <!-- 소유자 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">소유자</span>
+          <button class="f-btn active real-filter" onclick="setRealizedOwnerFilter('all', this)">전체</button>
+          <button class="f-btn real-filter" id="realTabUser1" onclick="setRealizedOwnerFilter('user1', this)">소유자1</button>
+          <button class="f-btn real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
         </div>
-        <div id="realizedActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;"></div>
+      
+        <!-- 시장 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">시장</span>
+          <button class="f-btn active" id="realMktAll" onclick="_setRealMktBtn(this); updateRealizedFilter('market','all')">🌐 전체</button>
+          <button class="f-btn" id="realMktKr" onclick="_setRealMktBtn(this); updateRealizedFilter('market','kr')">🇰🇷 국내</button>
+          <button class="f-btn" id="realMktUs" onclick="_setRealMktBtn(this); updateRealizedFilter('market','us')">🇺🇸 해외</button>
+        </div>
+      
+        <!-- 활성 필터 배지 -->
+        <div id="realizedActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:auto;"></div>
+      
       </div>
     
       <!-- 메인 바디: 왼쪽 랭킹 + 오른쪽 차트/요약/표 -->
