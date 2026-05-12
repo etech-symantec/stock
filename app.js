@@ -41,7 +41,8 @@ function getCutoffDateFromRange(range) {
     else if (range === '3y') d.setFullYear(d.getFullYear() - 3);
     return d.toISOString().split('T')[0];
 }
-let currentDivFilter = 'all'; 
+let currentDivFilter = 'all';
+let dividendFilters = { market: 'all', broker: 'all', search: '', dateFrom: '', dateTo: '' };
 // 🌟 기본 정렬을 등락률로 변경하고, 리스트 스타일 관련 변수 및 함수 추가
 let currentSortMode = 'changeDesc'; 
 let sortDirection = 1; // 🌟 1(내림차순)을 기본값으로 변경하여 높은 수익률이 상단에 오게 설정
@@ -400,7 +401,7 @@ function isKorean(symbol) {
 }
 
 // 🌟 전체 거래내역 필터 상태 저장 변수 추가 (isKorean 함수 바로 아래에 추가하세요)
-let historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all' };
+let historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all', owner: 'all' };
 
 function updateHistoryFilter(key, value) {
     historyFilters[key] = value;
@@ -1349,50 +1350,44 @@ function renderHistoryDashboard() {
   // 💡 HTML 수정 없이 JS가 알아서 필터 바를 만들어줍니다!
   let filterBar = document.getElementById('historyFilterBar');
 
-  // 계좌 목록 동적 수집
+  // 계좌 드롭다운 동적 업데이트
   const allBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b && b.trim()))].sort();
-
-  if (!filterBar) {
-      filterBar = document.createElement('div');
-      filterBar.id = 'historyFilterBar';
-      filterBar.style.cssText = "margin-bottom:15px; padding:12px 15px; background:var(--bg3); border-radius:8px; border:1px solid var(--border);";
-      const tableWrap = tbody.closest('div');
-      dash.insertBefore(filterBar, tableWrap);
+  const brokerSel = document.getElementById('histBrokerFilter');
+  if (brokerSel) {
+    const cur = historyFilters.broker;
+    brokerSel.innerHTML = `<option value="all">전체</option>` +
+      allBrokers.map(b => `<option value="${b}" ${cur===b?'selected':''}>${b}</option>`).join('');
   }
 
-  const hasActiveExtra = historyFilters.dateFrom || historyFilters.dateTo || historyFilters.broker !== 'all';
-  // 필터 바 HTML 재렌더링 (계좌 목록이 바뀔 수 있으므로 항상 갱신)
-  filterBar.innerHTML = `
-      <div style="display:flex; gap:7px; align-items:center; flex-wrap:wrap;">
-          <select class="form-input" style="width:100px; padding:6px 7px; margin:0; cursor:pointer; font-size:12px; flex-shrink:0;" onchange="updateHistoryFilter('market', this.value)">
-              <option value="all" ${historyFilters.market==='all'?'selected':''}>🌐 전체</option>
-              <option value="kr" ${historyFilters.market==='kr'?'selected':''}>🇰🇷 국내</option>
-              <option value="us" ${historyFilters.market==='us'?'selected':''}>🇺🇸 해외</option>
-          </select>
-          <select class="form-input" style="width:105px; padding:6px 7px; margin:0; cursor:pointer; font-size:12px; flex-shrink:0;" onchange="updateHistoryFilter('type', this.value)">
-              <option value="all" ${historyFilters.type==='all'?'selected':''}>전체 유형</option>
-              <option value="buy" ${historyFilters.type==='buy'?'selected':''}>🔴 매수</option>
-              <option value="sell" ${historyFilters.type==='sell'?'selected':''}>🔵 매도</option>
-              <option value="dividend" ${historyFilters.type==='dividend'?'selected':''}>🟢 배당</option>
-          </select>
-          <select class="form-input" id="historyBrokerFilter" style="width:115px; padding:6px 7px; margin:0; cursor:pointer; font-size:12px; flex-shrink:0;" onchange="updateHistoryFilter('broker', this.value)">
-              <option value="all" ${historyFilters.broker==='all'?'selected':''}>🏦 전체 계좌</option>
-              ${allBrokers.map(b => `<option value="${b}" ${historyFilters.broker===b?'selected':''}>${b}</option>`).join('')}
-          </select>
-          <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-              <input type="date" class="form-input" id="historyDateFrom" value="${historyFilters.dateFrom}" style="width:134px; padding:6px 7px; margin:0; font-size:12px;" onchange="updateHistoryFilter('dateFrom', this.value)">
-              <span style="color:var(--text3); font-size:11px; flex-shrink:0;">~</span>
-              <input type="date" class="form-input" id="historyDateTo" value="${historyFilters.dateTo}" style="width:134px; padding:6px 7px; margin:0; font-size:12px;" onchange="updateHistoryFilter('dateTo', this.value)">
-          </div>
-          <input type="text" class="form-input" placeholder="🔍 종목명 / 티커" value="${historyFilters.search}" style="flex:1; min-width:120px; padding:6px 10px; margin:0; font-size:12px;" onkeydown="if(event.key === 'Enter') updateHistoryFilter('search', this.value)">
-          ${hasActiveExtra ? `<button class="btn-sm" onclick="resetHistoryFilters()" style="padding:5px 9px; font-size:11px; color:var(--red); border-color:var(--red); flex-shrink:0;">✕ 초기화</button>` : ''}
-      </div>
-  `;
+  // 활성 필터 배지 업데이트
+  const badgesEl = document.getElementById('historyActiveBadges');
+  if (badgesEl) {
+    let html = '';
+    if (historyFilters.dateFrom || historyFilters.dateTo) {
+      const label = historyFilters.dateFrom === historyFilters.dateTo
+        ? historyFilters.dateFrom
+        : `${historyFilters.dateFrom||'~'} ~ ${historyFilters.dateTo||'~'}`;
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">📅 ${label}
+        <span onclick="historyFilters.dateFrom='';historyFilters.dateTo='';renderHistoryDashboard();"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (historyFilters.broker !== 'all') {
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">계좌: ${historyFilters.broker}
+        <span onclick="historyFilters.broker='all';renderHistoryDashboard();"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (html) html += `<button class="f-btn" onclick="resetHistoryFilters()" style="font-size:11px;color:var(--red);border-color:var(--red);">✕ 초기화</button>`;
+    badgesEl.innerHTML = html;
+  }
   
   // 🌟 선택된 필터 조건에 맞게 데이터 걸러내기
   let filtered = state.transactions.filter(tx => {
       let pass = true;
       const isKr = isKorean(tx.symbol);
+
+      // 소유자 필터
+      if (historyFilters.owner === 'user1' && tx.owner !== state.owners.user1.name) pass = false;
+      if (historyFilters.owner === 'user2' && tx.owner !== state.owners.user2.name) pass = false;
       
       // 국가 필터
       if (historyFilters.market === 'kr' && !isKr) pass = false;
@@ -1504,11 +1499,158 @@ function setHistoryDatePreset(preset) {
 }
 
 function resetHistoryFilters() {
-    historyFilters.dateFrom = '';
-    historyFilters.dateTo = '';
-    historyFilters.broker = 'all';
-    renderHistoryDashboard();
+  historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all', owner: 'all' };
+  const nameEl = document.getElementById('histNameSearch');
+  if (nameEl) nameEl.value = '';
+  // 버튼 active 초기화
+  ['histMktAll','histTypeAll'].forEach(id => { const b = document.getElementById(id); if(b) b.classList.add('active'); });
+  ['histMktKr','histMktUs','histTypeBuy','histTypeSell','histTypeDiv'].forEach(id => { const b = document.getElementById(id); if(b) b.classList.remove('active'); });
+  document.querySelectorAll('.hist-owner-filter').forEach((b,i) => b.classList.toggle('active', i===0));
+  renderHistoryDashboard();
 }
+
+// ── 거래내역 필터 헬퍼 ──────────────────────────────
+function setHistoryOwnerFilter(filter, el) {
+  historyFilters.owner = filter;
+  document.querySelectorAll('.hist-owner-filter').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderHistoryDashboard();
+}
+function _setHistMktBtn(el) {
+  ['histMktAll','histMktKr','histMktUs'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  el.classList.add('active');
+}
+function _setHistTypeBtn(el) {
+  ['histTypeAll','histTypeBuy','histTypeSell','histTypeDiv'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  el.classList.add('active');
+}
+// 거래내역 날짜 피커
+function openHistoryDatePicker() {
+  const today = new Date();
+  _drp.year = today.getFullYear(); _drp.month = today.getMonth();
+  _drp.dragStart = historyFilters.dateFrom || null;
+  _drp.dragEnd   = historyFilters.dateTo   || null;
+  _drp.hover = null; _drp.dragging = false;
+  _renderHistDrpCalendar();
+  document.getElementById('historyDatePickerPop').style.display = 'block';
+}
+function closeHistoryDatePicker() {
+  document.getElementById('historyDatePickerPop').style.display = 'none';
+}
+function _renderHistDrpCalendar() {
+  const el = document.getElementById('historyDatePickerPop');
+  if (!el) return;
+  const y = _drp.year, m = _drp.month;
+  const firstDay = new Date(y,m,1).getDay(), daysInMonth = new Date(y,m+1,0).getDate();
+  const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  let rs = _drp.dragStart, re = _drp.dragEnd;
+  if (rs && re && rs > re) [rs,re]=[re,rs];
+  const todayStr = new Date().toISOString().split('T')[0];
+  const dayH = ['일','월','화','수','목','금','토'].map(d=>`<div style="text-align:center;font-size:10px;color:var(--text3);padding:4px 0;">${d}</div>`).join('');
+  let cells = '';
+  for(let i=0;i<firstDay;i++) cells+='<div></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=_drpFmt(y,m,d), isEdge=ds===rs||ds===re, inRange=rs&&re&&ds>=rs&&ds<=re, isToday=ds===todayStr;
+    let bg='transparent',color=isToday?'var(--green)':'var(--text)',fw=isToday?'700':'400';
+    if(isEdge){bg='var(--accent)';color='#fff';fw='700';}
+    else if(inRange){bg='var(--accent-bg)';color='var(--accent)';}
+    cells+=`<div style="text-align:center;padding:7px 2px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:${fw};background:${bg};color:${color};user-select:none;transition:background 0.1s;"
+      onclick="_histDrpClick('${ds}')"
+      onmouseover="if(this.style.background==='transparent')this.style.background='rgba(255,255,255,0.05)'"
+      onmouseout="this.style.background='${bg}'">${d}</div>`;
+  }
+  const selText=(rs&&re&&rs!==re)?`${rs} ~ ${re}`:(rs?`${rs} (두 번째 날짜 선택 가능)`:'날짜 클릭: 하루 / 두 번 클릭: 기간');
+  el.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);" onmousedown="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <button onclick="_histDrpNav(-1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">◀</button>
+      <span onclick="_histDrpApplyMonth()" style="font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;">${y}년 ${monthNames[m]}</span>
+      <button onclick="_histDrpNav(1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">▶</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">${dayH}</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">${cells}</div>
+    <div style="margin-top:12px;padding:8px;background:var(--bg3);border-radius:6px;font-size:11px;color:var(--text2);text-align:center;min-height:28px;line-height:1.6;">${selText}</div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="_histDrpClear()" style="flex:1;padding:7px;font-size:11px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;">초기화</button>
+      <button onclick="_histDrpApply()" style="flex:1;padding:7px;font-size:11px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;">적용</button>
+    </div>
+  </div>`;
+}
+function _histDrpNav(d){_drp.month+=d;if(_drp.month>11){_drp.month=0;_drp.year++;}if(_drp.month<0){_drp.month=11;_drp.year--;}_renderHistDrpCalendar();}
+function _histDrpClick(ds){if(!_drp.dragStart||(_drp.dragStart&&_drp.dragEnd)){_drp.dragStart=ds;_drp.dragEnd=null;}else{_drp.dragEnd=ds;if(_drp.dragStart>_drp.dragEnd)[_drp.dragStart,_drp.dragEnd]=[_drp.dragEnd,_drp.dragStart];}_renderHistDrpCalendar();}
+function _histDrpClear(){_drp.dragStart=null;_drp.dragEnd=null;_renderHistDrpCalendar();}
+function _histDrpApply(){if(_drp.dragStart&&!_drp.dragEnd){historyFilters.dateFrom=_drp.dragStart;historyFilters.dateTo=_drp.dragStart;}else{historyFilters.dateFrom=_drp.dragStart||'';historyFilters.dateTo=_drp.dragEnd||'';}closeHistoryDatePicker();renderHistoryDashboard();}
+function _histDrpApplyMonth(){const y=_drp.year,m=_drp.month;historyFilters.dateFrom=`${y}-${String(m+1).padStart(2,'0')}-01`;historyFilters.dateTo=`${y}-${String(m+1).padStart(2,'0')}-${String(new Date(y,m+1,0).getDate()).padStart(2,'0')}`;closeHistoryDatePicker();renderHistoryDashboard();}
+
+// ── 배당통계 필터 헬퍼 ──────────────────────────────
+function updateDividendFilter(key, value) {
+  dividendFilters[key] = value;
+  renderDividendDashboard();
+}
+function _setDivMktBtn(el) {
+  ['divMktAll','divMktKr','divMktUs'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  el.classList.add('active');
+}
+function resetDividendFilters() {
+  dividendFilters = { market: 'all', broker: 'all', search: '', dateFrom: '', dateTo: '' };
+  const nameEl = document.getElementById('divNameSearch');
+  if (nameEl) nameEl.value = '';
+  ['divMktKr','divMktUs'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  document.getElementById('divMktAll')?.classList.add('active');
+  renderDividendDashboard();
+}
+function openDividendDatePicker() {
+  const today = new Date();
+  _drp.year = today.getFullYear(); _drp.month = today.getMonth();
+  _drp.dragStart = dividendFilters.dateFrom || null;
+  _drp.dragEnd   = dividendFilters.dateTo   || null;
+  _drp.hover = null; _drp.dragging = false;
+  _renderDivDrpCalendar();
+  document.getElementById('dividendDatePickerPop').style.display = 'block';
+}
+function closeDividendDatePicker() {
+  document.getElementById('dividendDatePickerPop').style.display = 'none';
+}
+function _renderDivDrpCalendar() {
+  const el = document.getElementById('dividendDatePickerPop');
+  if (!el) return;
+  const y=_drp.year, m=_drp.month, firstDay=new Date(y,m,1).getDay(), daysInMonth=new Date(y,m+1,0).getDate();
+  const monthNames=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  let rs=_drp.dragStart, re=_drp.dragEnd;
+  if(rs&&re&&rs>re)[rs,re]=[re,rs];
+  const todayStr=new Date().toISOString().split('T')[0];
+  const dayH=['일','월','화','수','목','금','토'].map(d=>`<div style="text-align:center;font-size:10px;color:var(--text3);padding:4px 0;">${d}</div>`).join('');
+  let cells='';
+  for(let i=0;i<firstDay;i++) cells+='<div></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=_drpFmt(y,m,d),isEdge=ds===rs||ds===re,inRange=rs&&re&&ds>=rs&&ds<=re,isToday=ds===todayStr;
+    let bg='transparent',color=isToday?'var(--green)':'var(--text)',fw=isToday?'700':'400';
+    if(isEdge){bg='var(--accent)';color='#fff';fw='700';}else if(inRange){bg='var(--accent-bg)';color='var(--accent)';}
+    cells+=`<div style="text-align:center;padding:7px 2px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:${fw};background:${bg};color:${color};user-select:none;transition:background 0.1s;"
+      onclick="_divDrpClick('${ds}')"
+      onmouseover="if(this.style.background==='transparent')this.style.background='rgba(255,255,255,0.05)'"
+      onmouseout="this.style.background='${bg}'">${d}</div>`;
+  }
+  const selText=(rs&&re&&rs!==re)?`${rs} ~ ${re}`:(rs?`${rs} (두 번째 날짜 선택 가능)`:'날짜 클릭: 하루 / 두 번 클릭: 기간');
+  el.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);" onmousedown="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <button onclick="_divDrpNav(-1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">◀</button>
+      <span onclick="_divDrpApplyMonth()" style="font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;">${y}년 ${monthNames[m]}</span>
+      <button onclick="_divDrpNav(1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">▶</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">${dayH}</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">${cells}</div>
+    <div style="margin-top:12px;padding:8px;background:var(--bg3);border-radius:6px;font-size:11px;color:var(--text2);text-align:center;min-height:28px;line-height:1.6;">${selText}</div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="_divDrpClear()" style="flex:1;padding:7px;font-size:11px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;">초기화</button>
+      <button onclick="_divDrpApply()" style="flex:1;padding:7px;font-size:11px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;">적용</button>
+    </div>
+  </div>`;
+}
+function _divDrpNav(d){_drp.month+=d;if(_drp.month>11){_drp.month=0;_drp.year++;}if(_drp.month<0){_drp.month=11;_drp.year--;}_renderDivDrpCalendar();}
+function _divDrpClick(ds){if(!_drp.dragStart||(_drp.dragStart&&_drp.dragEnd)){_drp.dragStart=ds;_drp.dragEnd=null;}else{_drp.dragEnd=ds;if(_drp.dragStart>_drp.dragEnd)[_drp.dragStart,_drp.dragEnd]=[_drp.dragEnd,_drp.dragStart];}_renderDivDrpCalendar();}
+function _divDrpClear(){_drp.dragStart=null;_drp.dragEnd=null;_renderDivDrpCalendar();}
+function _divDrpApply(){if(_drp.dragStart&&!_drp.dragEnd){dividendFilters.dateFrom=_drp.dragStart;dividendFilters.dateTo=_drp.dragStart;}else{dividendFilters.dateFrom=_drp.dragStart||'';dividendFilters.dateTo=_drp.dragEnd||'';}closeDividendDatePicker();renderDividendDashboard();}
+function _divDrpApplyMonth(){const y=_drp.year,m=_drp.month;dividendFilters.dateFrom=`${y}-${String(m+1).padStart(2,'0')}-01`;dividendFilters.dateTo=`${y}-${String(m+1).padStart(2,'0')}-${String(new Date(y,m+1,0).getDate()).padStart(2,'0')}`;closeDividendDatePicker();renderDividendDashboard();}
 
 function prepareTransaction(symbol, broker) {
   document.getElementById('txSymbol').value = symbol;
@@ -3102,14 +3244,62 @@ function renderDividendDashboard() {
   let divYields = {}; 
 
   const cutoff = getCutoffDateFromRange(state.range);
+// 배당 계좌 드롭다운 동적 업데이트
+  const allDivBrokers = [...new Set(
+    state.transactions.filter(t=>t.txType==='dividend').map(t=>t.broker).filter(b=>b&&b.trim())
+  )].sort();
+  const divBrokerSel = document.getElementById('divBrokerFilter');
+  if (divBrokerSel) {
+    const cur = dividendFilters.broker;
+    divBrokerSel.innerHTML = `<option value="all">전체</option>` +
+      allDivBrokers.map(b => `<option value="${b}" ${cur===b?'selected':''}>${b}</option>`).join('');
+  }
+
+  // 활성 필터 배지 업데이트
+  const divBadgesEl = document.getElementById('dividendActiveBadges');
+  if (divBadgesEl) {
+    let html = '';
+    if (dividendFilters.dateFrom || dividendFilters.dateTo) {
+      const label = dividendFilters.dateFrom === dividendFilters.dateTo
+        ? dividendFilters.dateFrom
+        : `${dividendFilters.dateFrom||'~'} ~ ${dividendFilters.dateTo||'~'}`;
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">📅 ${label}
+        <span onclick="dividendFilters.dateFrom='';dividendFilters.dateTo='';renderDividendDashboard();"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (dividendFilters.broker !== 'all') {
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">계좌: ${dividendFilters.broker}
+        <span onclick="dividendFilters.broker='all';renderDividendDashboard();"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (html) html += `<button class="f-btn" onclick="resetDividendFilters()" style="font-size:11px;color:var(--red);border-color:var(--red);">✕ 초기화</button>`;
+    divBadgesEl.innerHTML = html;
+  }
+
   const divTxs = state.transactions.filter(t => {
-    if(t.txType !== 'dividend') return false;
-    if(t.date < cutoff) return false; // 🌟 선택된 기간 이전의 배당 내역 제외
-  
+    if (t.txType !== 'dividend') return false;
+    if (t.date < cutoff) return false;
+
     let filterName = 'all';
-    if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
-    if(currentDivFilter === 'user2') filterName = state.owners.user2.name;
-    if(filterName !== 'all' && t.owner !== filterName) return false;
+    if (currentDivFilter === 'user1') filterName = state.owners.user1.name;
+    if (currentDivFilter === 'user2') filterName = state.owners.user2.name;
+    if (filterName !== 'all' && t.owner !== filterName) return false;
+
+    // 추가 필터
+    const isKr = isKorean(t.symbol);
+    if (dividendFilters.market === 'kr' && !isKr) return false;
+    if (dividendFilters.market === 'us' && isKr) return false;
+    if (dividendFilters.broker !== 'all' && (t.broker||'') !== dividendFilters.broker) return false;
+    if (dividendFilters.dateFrom && t.date < dividendFilters.dateFrom) return false;
+    if (dividendFilters.dateTo   && t.date > dividendFilters.dateTo)   return false;
+    if (dividendFilters.search) {
+      const s = dividendFilters.search.toLowerCase();
+      let name = t.symbol;
+      const dbM = localStockDB.find(x => x.symbol === t.symbol);
+      if (dbM) name = dbM.name;
+      else if (cachedMarketData[t.symbol]?.name) name = cachedMarketData[t.symbol].name;
+      if (!t.symbol.toLowerCase().includes(s) && !name.toLowerCase().includes(s)) return false;
+    }
     return true;
   });
 
@@ -5725,11 +5915,22 @@ function _drpApplyMonth() {
   renderRealizedDashboard();
 }
 
-// 캘린더 바깥 클릭 시 닫기
 document.addEventListener('mousedown', (e) => {
+  // 기존 realized 닫기
   const pop = document.getElementById('realizedDatePickerPop');
   const btn = document.getElementById('btnRealizedDatePicker');
-  if (pop && pop.style.display !== 'none' && !pop.contains(e.target) && e.target !== btn) {
+  if (pop && pop.style.display !== 'none' && !pop.contains(e.target) && e.target !== btn)
     closeRealizedDatePicker();
-  }
+
+  // 거래내역 닫기 (추가)
+  const hPop = document.getElementById('historyDatePickerPop');
+  const hBtn = document.getElementById('btnHistoryDatePicker');
+  if (hPop && hPop.style.display !== 'none' && !hPop.contains(e.target) && e.target !== hBtn)
+    closeHistoryDatePicker();
+
+  // 배당통계 닫기 (추가)
+  const dPop = document.getElementById('dividendDatePickerPop');
+  const dBtn = document.getElementById('btnDividendDatePicker');
+  if (dPop && dPop.style.display !== 'none' && !dPop.contains(e.target) && e.target !== dBtn)
+    closeDividendDatePicker();
 });
