@@ -535,6 +535,17 @@
     <div id="realizedDashboard" style="display:none; flex-direction:column;">
       
       <div class="page-controls-box" style="flex-wrap:wrap; gap:8px;">
+        <!-- 기간 직접 선택 버튼 + 드래그 캘린더 팝업 -->
+        <div style="position:relative;">
+          <button id="btnRealizedDatePicker" class="btn-sm"
+            onclick="openRealizedDatePicker()"
+            style="height:32px; padding:0 12px; font-size:12px; white-space:nowrap;">
+            📅 기간 직접 선택
+          </button>
+          <div id="realizedDatePickerPop"
+            style="display:none; position:absolute; top:calc(100% + 6px); left:0; z-index:9999;">
+          </div>
+        </div>
         <select id="realizedYearFilter" class="form-input" style="width:110px; padding:4px 8px; margin:0; font-size:12px; cursor:pointer;" onchange="updateRealizedDateFilter('year', this.value)">
           <option value="all">전체 연도</option>
         </select>
