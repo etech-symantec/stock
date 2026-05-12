@@ -562,20 +562,22 @@
           <button class="f-btn" id="realMktUs" onclick="_setRealMktBtn(this); updateRealizedFilter('market','us')">🇺🇸 해외</button>
         </div>
 
-        <!-- 계좌 검색 -->
+        <!-- 계좌 선택 -->
         <div class="inline-filter-group">
           <span class="filter-label">계좌</span>
-          <input type="text" id="realBrokerSearch" placeholder="계좌명 검색"
-            oninput="updateRealizedFilter('broker', this.value.trim())"
-            style="width:130px; cursor:text; font-size:12px; height:30px; padding:0 10px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none;">
+          <select id="realBrokerSearch" onchange="updateRealizedFilter('broker', this.value)"
+            style="height:30px; padding:0 8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); cursor:pointer; outline:none;">
+            <option value="">전체</option>
+          </select>
         </div>
         
-        <!-- 종목명 검색 -->
+        <!-- 종목명 선택 -->
         <div class="inline-filter-group">
           <span class="filter-label">종목명</span>
-          <input type="text" id="realNameSearch" placeholder="종목명 / 티커"
-            oninput="updateRealizedFilter('name', this.value.trim())"
-            style="width:130px; cursor:text; font-size:12px; height:30px; padding:0 10px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none;">
+          <select id="realNameSearch" onchange="updateRealizedFilter('name', this.value)"
+            style="height:30px; padding:0 8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); cursor:pointer; outline:none;">
+            <option value="">전체</option>
+          </select>
         </div>
       
         <!-- 활성 필터 배지 -->
