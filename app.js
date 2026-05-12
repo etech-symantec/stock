@@ -50,7 +50,7 @@ let currentListStyle = 'card';
 let currentRegionLayout = 'horizontal'; // 🌟 기본 배치를 좌우(horizontal)로 변경
 let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 // 🌟 실현수익 필터 상태 저장 변수 및 업데이트 함수
-let realizedFilters = { market: 'all', symbol: null, tradeIdx: null, period: 'all', year: 'all', month: 'all' };
+let realizedFilters = { market: 'all', symbol: null, tradeIdx: null, period: 'all', year: 'all', month: 'all', dateFrom: '', dateTo: '' };
 // 🌟 실현수익 랭킹 탭 상태 (pnl: 수익금 | roi: 수익률)
 let realizedRankingTab = 'pnl';
 // 기존 realizedRankingPeriod 변수 삭제됨
@@ -125,6 +125,8 @@ function resetRealizedFilters() {
     realizedFilters.period = 'all';
     realizedFilters.year = 'all';
     realizedFilters.month = 'all';
+    realizedFilters.dateFrom = '';
+    realizedFilters.dateTo   = '';
     
     document.querySelectorAll('.real-period-btn').forEach(b => b.classList.remove('active'));
     const allBtn = document.querySelector('.real-period-btn[onclick*="\'all\'"]');
@@ -4102,6 +4104,11 @@ function renderRealizedDashboard() {
     const badgesEl = document.getElementById('realizedActiveBadges');
     if (badgesEl) {
       let badgesHtml = "";
+      if (realizedFilters.dateFrom || realizedFilters.dateTo) {
+          const from = realizedFilters.dateFrom || '처음';
+          const to   = realizedFilters.dateTo   || '오늘';
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">📅 ${from} ~ ${to} <span onclick="realizedFilters.dateFrom=''; realizedFilters.dateTo=''; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
       if (realizedFilters.symbol) {
           const displayName = _getDisplayName(realizedFilters.symbol);
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목: ${displayName} <span onclick="resetRealizedSymbolFilter()" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
@@ -4117,7 +4124,7 @@ function renderRealizedDashboard() {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">월: ${parseInt(selectedMonth, 10)}월 <span onclick="updateRealizedDateFilter('month','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
       
-      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || currentRealizedOwnerFilter !== 'all';
+      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || currentRealizedOwnerFilter !== 'all' || realizedFilters.dateFrom || realizedFilters.dateTo;
       if (isAnyFilterActive) {
           badgesHtml += `<button class="btn-sm" onclick="resetRealizedFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
       }
@@ -4169,8 +4176,10 @@ function renderRealizedDashboard() {
             const passOwner  = (ownerName === 'all' || tx.owner === ownerName);
             const passMarket = (realizedFilters.market === 'all' || (realizedFilters.market === 'kr' ? isKr : !isKr));
             const passSymbol = (realizedFilters.symbol === null || tx.symbol === realizedFilters.symbol);
+            const passCustomDate = (!realizedFilters.dateFrom || tx.date >= realizedFilters.dateFrom) &&
+                       (!realizedFilters.dateTo   || tx.date <= realizedFilters.dateTo);
             
-            if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal) {
+            if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal && passCustomDate) {
                 let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
                 cumulativePnl += pnlKrw;
 
@@ -5597,3 +5606,133 @@ function applyColorPreset(profit, loss) {
     if (li) li.value = loss;
     updateColorPreview();
 }
+
+// ==========================================
+// 📅 실현수익 드래그형 날짜 범위 선택기
+// ==========================================
+let _drp = {
+  year: new Date().getFullYear(), month: new Date().getMonth(),
+  dragStart: null, dragEnd: null, hover: null, dragging: false
+};
+
+function openRealizedDatePicker() {
+  const today = new Date();
+  _drp.year = today.getFullYear(); _drp.month = today.getMonth();
+  _drp.dragStart = realizedFilters.dateFrom || null;
+  _drp.dragEnd   = realizedFilters.dateTo   || null;
+  _drp.hover = null; _drp.dragging = false;
+  _renderDrpCalendar();
+  document.getElementById('realizedDatePickerPop').style.display = 'block';
+}
+
+function closeRealizedDatePicker() {
+  document.getElementById('realizedDatePickerPop').style.display = 'none';
+}
+
+function _drpNav(delta) {
+  _drp.month += delta;
+  if (_drp.month > 11) { _drp.month = 0; _drp.year++; }
+  if (_drp.month < 0)  { _drp.month = 11; _drp.year--; }
+  _renderDrpCalendar();
+}
+
+function _drpFmt(y, m, d) {
+  return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+function _renderDrpCalendar() {
+  const el = document.getElementById('realizedDatePickerPop');
+  if (!el) return;
+  const y = _drp.year, m = _drp.month;
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+  let rs = _drp.dragStart;
+  let re = _drp.dragging ? (_drp.hover || _drp.dragStart) : _drp.dragEnd;
+  if (rs && re && rs > re) { [rs, re] = [re, rs]; }
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  let dayHeaders = ['일','월','화','수','목','금','토']
+    .map(d => `<div style="text-align:center;font-size:10px;color:var(--text3);padding:4px 0;">${d}</div>`).join('');
+
+  let cells = '';
+  for (let i = 0; i < firstDay; i++) cells += '<div></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = _drpFmt(y, m, d);
+    const isEdge  = ds === rs || ds === re;
+    const inRange = rs && re && ds >= rs && ds <= re;
+    const isToday = ds === todayStr;
+    let bg = 'transparent', color = isToday ? 'var(--green)' : 'var(--text)', fw = isToday ? '700' : '400';
+    if (isEdge)       { bg = 'var(--accent)'; color = '#fff'; fw = '700'; }
+    else if (inRange) { bg = 'var(--accent-bg)'; color = 'var(--accent)'; }
+    cells += `<div data-date="${ds}"
+      style="text-align:center;padding:7px 2px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:${fw};background:${bg};color:${color};user-select:none;transition:background 0.1s;"
+      onmousedown="_drpMouseDown('${ds}')" onmousemove="_drpMouseMove('${ds}')" onmouseup="_drpMouseUp('${ds}')"
+      onmouseover="if(!this.style.background||this.style.background==='transparent')this.style.background='rgba(255,255,255,0.05)'"
+      onmouseout="this.style.background='${bg}'">${d}</div>`;
+  }
+
+  const selText = (rs && re) ? `${rs} ~ ${re}` : (rs ? `${rs} ~ ...` : '날짜를 드래그하여 기간을 선택하세요');
+
+  el.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);" onmousedown="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <button onclick="_drpNav(-1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">◀</button>
+        <span style="font-weight:700;font-size:14px;">${y}년 ${monthNames[m]}</span>
+        <button onclick="_drpNav(1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">▶</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">${dayHeaders}</div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">${cells}</div>
+      <div style="margin-top:12px;padding:8px;background:var(--bg3);border-radius:6px;font-size:11px;color:var(--text2);text-align:center;min-height:28px;line-height:1.6;">${selText}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button onclick="_drpClear()" style="flex:1;padding:7px;font-size:11px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font-sans);">초기화</button>
+        <button onclick="_drpApply()" style="flex:1;padding:7px;font-size:11px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;font-family:var(--font-sans);">적용</button>
+      </div>
+    </div>`;
+}
+
+function _drpMouseDown(ds) {
+  _drp.dragging = true; _drp.dragStart = ds; _drp.dragEnd = null; _drp.hover = ds;
+  _renderDrpCalendar();
+}
+function _drpMouseMove(ds) {
+  if (!_drp.dragging || _drp.hover === ds) return;
+  _drp.hover = ds; _renderDrpCalendar();
+}
+function _drpMouseUp(ds) {
+  if (!_drp.dragging) return;
+  _drp.dragging = false; _drp.dragEnd = ds; _drp.hover = null;
+  if (_drp.dragStart > _drp.dragEnd) [_drp.dragStart, _drp.dragEnd] = [_drp.dragEnd, _drp.dragStart];
+  _renderDrpCalendar();
+}
+function _drpClear() {
+  _drp.dragStart = null; _drp.dragEnd = null; _drp.hover = null; _drp.dragging = false;
+  _renderDrpCalendar();
+}
+function _drpApply() {
+  realizedFilters.dateFrom = _drp.dragStart || '';
+  realizedFilters.dateTo   = _drp.dragEnd   || '';
+  closeRealizedDatePicker();
+  renderRealizedDashboard();
+}
+
+// 캘린더 바깥 클릭 시 닫기
+document.addEventListener('mousedown', (e) => {
+  const pop = document.getElementById('realizedDatePickerPop');
+  const btn = document.getElementById('btnRealizedDatePicker');
+  if (pop && pop.style.display !== 'none' && !pop.contains(e.target) && e.target !== btn) {
+    closeRealizedDatePicker();
+  }
+});
+// 캘린더 바깥에서 마우스 업 시 드래그 종료
+document.addEventListener('mouseup', () => {
+  if (_drp.dragging) {
+    _drp.dragging = false;
+    if (_drp.dragStart && _drp.hover) {
+      _drp.dragEnd = _drp.hover;
+      if (_drp.dragStart > _drp.dragEnd) [_drp.dragStart, _drp.dragEnd] = [_drp.dragEnd, _drp.dragStart];
+    }
+    _renderDrpCalendar();
+  }
+});
