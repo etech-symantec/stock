@@ -1328,6 +1328,10 @@ nav {
   .vtab { padding: 9px 11px; gap: 0; }
   .vtab-icon { font-size: 17px; }
   .view-tabs { max-width: calc(100% - 440px); }
+
+  /* 소유자 탭은 1480px에서 텍스트 유지 */
+  #tabUser1 .vtab-text, #tabUser2 .vtab-text { display: inline; }
+  #tabUser1, #tabUser2 { padding: 8px 16px; gap: 6px; }
 }
 
 /* ── 1360px 이하: 6M 숨김 ── */
