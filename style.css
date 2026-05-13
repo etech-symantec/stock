@@ -1343,8 +1343,8 @@ nav {
 /* ── 1100px 이하: 1M 숨김 ── */
 @media (max-width: 1100px) and (min-width: 769px) {
   #rtab-1m { display: none; }
-  #tabUser1 .vtab-icon, #tabUser2 .vtab-icon { display: none; }
-  #tabUser1, #tabUser2 { display: none !important; }
+  #tabUser1 .vtab-text, #tabUser2 .vtab-text { display: none; }
+  #tabUser1, #tabUser2 { padding: 9px 11px; gap: 0; }
 }
 
 /* 라이트 모드 */
