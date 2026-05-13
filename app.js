@@ -4263,6 +4263,9 @@ function renderRealizedDashboard() {
           const displayName = _getDisplayName(realizedFilters.symbol);
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">종목: ${displayName} <span onclick="resetRealizedSymbolFilter()" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
+      if (realizedFilters.tradeIdx !== null) {  // 🌟 추가
+          badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">📊 차트 선택: ${realizedFilters.tradeIdx + 1}번째 거래 <span onclick="realizedFilters.tradeIdx=null; renderRealizedDashboard();" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
+      }
       if (realizedFilters.market !== 'all') {
           const mLabel = realizedFilters.market === 'kr' ? '국내' : '해외';
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">시장: ${mLabel} <span onclick="_setRealMktBtn(document.getElementById('realMktAll')); updateRealizedFilter('market','all');" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
@@ -4280,7 +4283,7 @@ function renderRealizedDashboard() {
           badgesHtml += `<div class="f-btn active" style="cursor:default; font-size:11px;">월: ${parseInt(selectedMonth, 10)}월 <span onclick="updateRealizedDateFilter('month','all')" style="margin-left:6px; cursor:pointer; font-weight:bold; color:var(--text2);">✕</span></div>`;
       }
       
-      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || currentRealizedOwnerFilter !== 'all' || realizedFilters.dateFrom || realizedFilters.dateTo || realizedFilters.broker || realizedFilters.name;
+      const isAnyFilterActive = realizedFilters.symbol || realizedFilters.tradeIdx !== null || realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' || currentRealizedOwnerFilter !== 'all' || realizedFilters.dateFrom || realizedFilters.dateTo || realizedFilters.broker || realizedFilters.name;
       if (isAnyFilterActive) {
           badgesHtml += `<button class="btn-sm" onclick="resetRealizedFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
       }
