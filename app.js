@@ -3322,13 +3322,16 @@ function renderDividendDashboard() {
      if (!monthlyKrw[month]) monthlyKrw[month] = 0;
      if (!monthlyUsd[month]) monthlyUsd[month] = 0;
      if (!symTotals[sym]) symTotals[sym] = { krw: 0, usd: 0 };
-     if (!divYields[sym]) divYields[sym] = { totalDiv: 0, totalEvalAtDiv: 0 };
+     if (!divYields[sym]) divYields[sym] = { totalDiv: 0, totalEvalAtDiv: 0, payCount: 0, firstDate: tx.date, lastDate: tx.date };
 
      if (isKRW) { krwTotal += amt; monthlyKrw[month] += amt; symTotals[sym].krw += amt; }
      else { usdTotal += amt; monthlyUsd[month] += amt; symTotals[sym].usd += amt; }
      
      divYields[sym].totalDiv += amt;
-     
+     divYields[sym].payCount += 1;
+     if (tx.date < divYields[sym].firstDate) divYields[sym].firstDate = tx.date;
+     if (tx.date > divYields[sym].lastDate)  divYields[sym].lastDate  = tx.date;
+
      let qtyAtDiv = 0;
      let filterName = 'all';
      if(currentDivFilter === 'user1') filterName = state.owners.user1.name;
@@ -3377,7 +3380,13 @@ function renderDividendDashboard() {
   // 🌟 배당 리스트 정렬 기준 적용 (배당률 순 vs 배당금 순)
   let symArr = Object.keys(symTotals).map(sym => {
     let yData = divYields[sym];
-    let yPct = (yData && yData.totalEvalAtDiv > 0) ? (yData.totalDiv / yData.totalEvalAtDiv) * 100 : 0;
+    let yPct = 0;
+    if (yData && yData.totalEvalAtDiv > 0 && yData.payCount > 0) {
+        const avgEval = yData.totalEvalAtDiv / yData.payCount; // 지급 횟수로 나눠 평균 평가금액 산출
+        const periodDays = Math.max(1, (new Date(yData.lastDate) - new Date(yData.firstDate)) / 86400000);
+        const annualFactor = yData.payCount === 1 ? 1 : (365 / periodDays); // 지급이 1회면 그대로, 복수면 연환산
+        yPct = (yData.totalDiv / avgEval) * annualFactor * 100;
+    }
     return { 
         symbol: sym, 
         total: symTotals[sym].krw + (symTotals[sym].usd * currentUsdKrw), 
