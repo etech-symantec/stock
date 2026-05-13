@@ -61,6 +61,12 @@ let currentLocalSearch = '';
 let currentLocalTag = 'all';
 // 'yieldDesc' | 'yieldAsc' | 'totalDesc' | 'totalAsc'
 let currentDivSort = 'yieldDesc';
+let divRankingSortDir = 'desc'; // 'desc' | 'asc'
+
+function setDivRankingSortDir(dir) {
+    divRankingSortDir = dir;
+    renderDividendDashboard();
+}
 function setDivSort(val) {
     currentDivSort = val;
     renderDividendDashboard();
@@ -3385,7 +3391,6 @@ function renderDividendDashboard() {
       totalDesc: (a, b) => b.total    - a.total,
       totalAsc:  (a, b) => a.total    - b.total,
   };
-  symArr.sort(divSortFns[currentDivSort] || divSortFns.yieldDesc);
  
   // 🌟 정렬 탭 UI — divStockList 바로 위에 동적 삽입
   const _sortTabBar = document.getElementById('divSortTabBar');
@@ -3413,59 +3418,34 @@ function renderDividendDashboard() {
           >${icon} ${label}</button>`;
       };
  
+      const divRankingTab = currentDivSort.startsWith('yield') ? 'yield' : 'total';
+
+      const tabBtn = (tab, label) => {
+          const isActive = divRankingTab === tab;
+          return `<button onclick="currentDivSort='${tab}${divRankingSortDir==='desc'?'Desc':'Asc'}'; renderDividendDashboard();"
+              style="flex:1; padding:9px 6px; font-size:11px; font-weight:700; border:none;
+                     background:transparent; color:${isActive?'#00C578':'var(--text3)'};
+                     cursor:pointer; border-bottom:2px solid ${isActive?'#00C578':'transparent'};
+                     transition:0.2s; font-family:var(--font-sans);">
+              ${label}
+          </button>`;
+      };
+      
       _sortTabBar.innerHTML = `
-              <div style="
-                  display: flex;
-                  align-items: center;
-                  gap: 4px;
-                  flex-wrap: wrap;
-              ">
-              <!-- ── 배당률 그룹 ── -->
-              <div style="
-                  display: flex;
-                  align-items: center;
-                  gap: 3px;
-                  background: var(--bg3);
-                  padding: 4px;
-                  border-radius: 8px;
-                  border: 1px solid var(--border);
-              ">
-                  <span style="
-                      padding: 5px 8px;
-                      font-size: 11px;
-                      font-weight: 700;
-                      color: var(--text2);
-                      white-space: nowrap;
-                      letter-spacing: 0.02em;
-                  ">📊 배당률</span>
-                  ${_tb('yieldDesc', '↓ 높은순', '')}
-                  ${_tb('yieldAsc',  '↑ 낮은순', '')}
-              </div>
- 
-              <!-- ── 배당금 그룹 ── -->
-              <div style="
-                  display: flex;
-                  align-items: center;
-                  gap: 3px;
-                  background: var(--bg3);
-                  padding: 4px;
-                  border-radius: 8px;
-                  border: 1px solid var(--border);
-              ">
-                  <span style="
-                      padding: 5px 8px;
-                      font-size: 11px;
-                      font-weight: 700;
-                      color: var(--text2);
-                      white-space: nowrap;
-                      letter-spacing: 0.02em;
-                  ">💰 배당금</span>
-                  ${_tb('totalDesc', '↓ 많은순', '')}
-                  ${_tb('totalAsc',  '↑ 적은순', '')}
-              </div>
-          </div>
-      `;
-  }
+      <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
+        ${tabBtn('yield', '📊 배당률')}
+        ${tabBtn('total', '💰 배당금')}
+        <div style="margin-left:auto; display:flex; align-items:center; padding:0 8px; gap:4px; border-left:1px solid var(--border);">
+          <button onclick="setDivRankingSortDir('desc')"
+            style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${divRankingSortDir==='desc'?'var(--accent)':'var(--border)'}; background:${divRankingSortDir==='desc'?'var(--accent-bg)':'transparent'}; color:${divRankingSortDir==='desc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↓</button>
+          <button onclick="setDivRankingSortDir('asc')"
+            style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${divRankingSortDir==='asc'?'var(--accent)':'var(--border)'}; background:${divRankingSortDir==='asc'?'var(--accent-bg)':'transparent'}; color:${divRankingSortDir==='asc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↑</button>
+        </div>
+      </div>`;
+      
+      // 정렬 방향 반영
+      const sortKey = divRankingTab === 'yield' ? 'yieldPct' : 'total';
+      symArr.sort((a, b) => divRankingSortDir === 'desc' ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]);
 
   let listHtml = symArr.map(item => {
     const isKRW = isKorean(item.symbol);
