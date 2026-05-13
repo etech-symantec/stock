@@ -25,13 +25,13 @@
 
   <!-- 중앙: 네비탭 -->
   <div class="view-tabs">
-    <button class="vtab active" onclick="setView('all', this)">전체보기</button>
-    <button class="vtab" id="tabUser1" onclick="setView('user1', this)">소유자1</button>
-    <button class="vtab" id="tabUser2" onclick="setView('user2', this)">소유자2</button>
-    <button class="vtab" onclick="setView('watch', this)">관심종목</button>
-    <button class="vtab" onclick="setView('history', this)">거래 내역</button>
-    <button class="vtab" onclick="setView('realized', this)" style="color:var(--blue)">📈 실현수익</button>
-    <button class="vtab" id="tabDividend" onclick="setView('dividend', this)" style="color:var(--green)">배당통계</button>
+    <button class="vtab active" onclick="setView('all', this)"><span class="vtab-icon">📊</span><span class="vtab-text">전체보기</span></button>
+    <button class="vtab" id="tabUser1" onclick="setView('user1', this)"><span class="vtab-icon">👤</span><span class="vtab-text">소유자1</span></button>
+    <button class="vtab" id="tabUser2" onclick="setView('user2', this)"><span class="vtab-icon">👥</span><span class="vtab-text">소유자2</span></button>
+    <button class="vtab" onclick="setView('watch', this)"><span class="vtab-icon">⭐</span><span class="vtab-text">관심종목</span></button>
+    <button class="vtab" onclick="setView('history', this)"><span class="vtab-icon">📋</span><span class="vtab-text">거래 내역</span></button>
+    <button class="vtab" onclick="setView('realized', this)" style="color:var(--blue)"><span class="vtab-icon">📈</span><span class="vtab-text">실현수익</span></button>
+    <button class="vtab" id="tabDividend" onclick="setView('dividend', this)" style="color:var(--green)"><span class="vtab-icon">🌿</span><span class="vtab-text">배당통계</span></button>
   </div>
 
   <!-- 우측: 기간 + 테마 + 설정 -->
