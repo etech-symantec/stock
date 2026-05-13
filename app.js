@@ -1031,6 +1031,10 @@ function updateOwnerLabels() {
   const realTab2 = document.getElementById('realTabUser2');
   if (realTab1) realTab1.textContent = `${o1.icon} ${o1.name}`;
   if (realTab2) realTab2.textContent = `${o2.icon} ${o2.name}`;
+  const histTab1 = document.getElementById('histTabUser1');
+  const histTab2 = document.getElementById('histTabUser2');
+  if (histTab1) histTab1.textContent = `${o1.icon} ${o1.name}`;
+  if (histTab2) histTab2.textContent = `${o2.icon} ${o2.name}`;
 }
 
 function toggleAccountFilter(broker) {
