@@ -1312,18 +1312,18 @@ nav {
 }
 .view-tabs::-webkit-scrollbar { display: none; }
 
-/* ── 1600px 이하: 3Y 숨김 ── */
-@media (max-width: 1600px) and (min-width: 769px) {
+/* ── 1800px 이하: 3Y 숨김 ── */
+@media (max-width: 1800px) and (min-width: 769px) {
   #rtab-3y { display: none; }
 }
 
-/* ── 1480px 이하: 1Y 숨김 ── */
-@media (max-width: 1480px) and (min-width: 769px) {
+/* ── 1600px 이하: 1Y 숨김 ── */
+@media (max-width: 1600px) and (min-width: 769px) {
   #rtab-1y { display: none; }
 }
 
-/* ── 1480px 이하: 네비탭 아이콘 전용 전환 ── */
-@media (max-width: 1480px) and (min-width: 769px) {
+/* ── 1800px 이하: 네비탭 아이콘 전용 전환 ── */
+@media (max-width: 1800px) and (min-width: 769px) {
   .vtab-text { display: none; }
   .vtab { padding: 9px 11px; gap: 0; }
   .vtab-icon { font-size: 17px; }
