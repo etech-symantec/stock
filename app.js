@@ -4298,6 +4298,7 @@ function renderRealizedDashboard() {
     let chartLabels = [];
     let chartLineData = [];
     let chartBarData = [];
+    let chartTxInfo = [];
     let cumulativePnl = 0;
 
     const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -4344,6 +4345,18 @@ function renderRealizedDashboard() {
                 chartLabels.push(tx.date);
                 chartLineData.push(cumulativePnl);
                 chartBarData.push(pnlKrw);
+                chartTxInfo.push({ // 🌟 추가: 툴팁에 표시할 매매 정보
+                    symbol: tx.symbol,
+                    name: _getDisplayName(tx.symbol) || tx.symbol,
+                    qty: sellQty,
+                    sellPrice: tx.price,
+                    avgCost: currentAvg,
+                    pnl: pnl,
+                    roi: currentAvg > 0 ? (pnl / (currentAvg * sellQty)) * 100 : 0,
+                    owner: tx.owner || '',
+                    broker: broker,
+                    isKr: isKr
+                });
 
                 const currentDataIndex = chartBarData.length - 1;
                 if (realizedFilters.tradeIdx === null || realizedFilters.tradeIdx === currentDataIndex) {
@@ -4400,7 +4413,7 @@ function renderRealizedDashboard() {
     if (rrConv) rrConv.textContent = usdTotal !== 0 ? `≈ ₩${Math.round(Math.abs(realUsKrwNum)).toLocaleString()}` : '';
 
     // 5. 차트 그리기 함수 호출
-    renderRealizedChart(chartLabels, chartLineData, chartBarData);
+    renderRealizedChart(chartLabels, chartLineData, chartBarData, chartTxInfo);
 
     // 6. 종목별 통계 집계 → 랭킹 패널 렌더링
     const symStats = {};
@@ -4602,7 +4615,7 @@ function renderRealizedDashboard() {
 }
 
 // 🌟 실현수익 콤보 차트 (최종 수정본 - 에러 완벽 해결)
-function renderRealizedChart(labels, lineData, barData) {
+function renderRealizedChart(labels, lineData, barData, txInfo = []) {
     const canvas = document.getElementById('realizedChartCanvas');
     if (!canvas) return;
     if (realizedChartInst) { realizedChartInst.destroy(); realizedChartInst = null; }
@@ -4666,15 +4679,39 @@ function renderRealizedChart(labels, lineData, barData) {
                 },
                 tooltip: {
                     callbacks: {
+                        title: function(items) {
+                            const idx = items[0]?.dataIndex;
+                            const tx = txInfo[idx];
+                            if (!tx) return items[0]?.label || '';
+                            return `${items[0]?.label}  |  ${tx.name} (${tx.symbol})`;
+                        },
                         label: function(ctx) {
+                            const tx = txInfo[ctx.dataIndex];
                             if (ctx.dataset.label === '개별 매매 손익') {
                                 const origVal = barData[ctx.dataIndex] || 0;
                                 const sign = origVal >= 0 ? '+' : '-';
                                 const val = Math.round(Math.abs(origVal)).toLocaleString();
-                                return `${ctx.dataset.label}: ${sign}₩${val}`;
+                                const roiStr = tx ? ` (${tx.roi >= 0 ? '+' : ''}${tx.roi.toFixed(1)}%)` : '';
+                                return `${ctx.dataset.label}: ${sign}₩${val}${roiStr}`;
                             }
                             const val = Math.round(ctx.raw).toLocaleString();
                             return `${ctx.dataset.label}: ₩${val}`;
+                        },
+                        afterLabel: function(ctx) {
+                            if (ctx.dataset.label !== '개별 매매 손익') return '';
+                            const tx = txInfo[ctx.dataIndex];
+                            if (!tx) return '';
+                            const priceStr = tx.isKr
+                                ? `₩${Math.round(tx.sellPrice).toLocaleString()}`
+                                : `$${tx.sellPrice.toFixed(2)}`;
+                            const avgStr = tx.isKr
+                                ? `₩${Math.round(tx.avgCost).toLocaleString()}`
+                                : `$${tx.avgCost.toFixed(2)}`;
+                            return [
+                                `  📦 수량: ${tx.qty}주`,
+                                `  💰 매도가: ${priceStr}  /  평단가: ${avgStr}`,
+                                tx.owner ? `  👤 ${tx.owner}  |  ${tx.broker}` : `  🏦 ${tx.broker}`
+                            ];
                         }
                     }
                 }
