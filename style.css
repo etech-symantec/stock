@@ -348,7 +348,7 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .btn-danger:hover { background: var(--red-bg); color: var(--red); }
 
 #dividendDashboard { display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem; height: 100%; }
-#dividendDashboard > .page-controls-box { margin-top: 0; }
+#dividendDashboard > .page-controls-box { margin-top: 0; position: sticky; top: 0; z-index: 50; }
 .div-chart-area { flex: 1.5; min-height: 300px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
 .div-list-area { flex: 1; height: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
 .div-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
@@ -1873,16 +1873,10 @@ nav {
 }
 
 /* ── 거래내역 / 실현수익: 컨트롤 박스 없거나 마진 적용 안 될 때 패딩으로 보완 ── */
-#historyDashboard {
-  padding-top: 1.5rem;
-}
-#realizedDashboard {
-  padding-top: 1.5rem;
-}
+#historyDashboard { padding-top: 1.5rem; }
+#realizedDashboard { padding-top: 1.5rem; }
 /* realizedDashboard 안 page-controls-box는 패딩으로 이미 여백 확보됐으니 margin-top 제거 */
-#realizedDashboard > .page-controls-box {
-  margin-top: 0;
-}
+#realizedDashboard > .page-controls-box { margin-top: 0; position: sticky; top: 0; z-index: 50; }
 
 @media (max-width: 768px) {
   #historyDashboard,
