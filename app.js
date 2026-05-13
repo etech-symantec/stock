@@ -3388,13 +3388,7 @@ function renderDividendDashboard() {
   symArr.sort(divSortFns[currentDivSort] || divSortFns.yieldDesc);
  
   // 🌟 정렬 탭 UI — divStockList 바로 위에 동적 삽입
-  const _divListEl = document.getElementById('divStockList');
-  let _sortTabBar  = document.getElementById('divSortTabBar');
-  if (!_sortTabBar && _divListEl) {
-      _sortTabBar = document.createElement('div');
-      _sortTabBar.id = 'divSortTabBar';
-      _divListEl.parentNode.insertBefore(_sortTabBar, _divListEl);
-  }
+  const _sortTabBar = document.getElementById('divSortTabBar');
   if (_sortTabBar) {
       const _tb = (val, label, icon) => {
           const isActive = currentDivSort === val;
@@ -3420,15 +3414,12 @@ function renderDividendDashboard() {
       };
  
       _sortTabBar.innerHTML = `
-          <div style="
-              display: flex;
-              align-items: center;
-              gap: 6px;
-              margin-bottom: 14px;
-              padding-bottom: 14px;
-              border-bottom: 1px solid var(--border);
-              flex-wrap: wrap;
-          ">
+              <div style="
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                  flex-wrap: wrap;
+              ">
               <!-- ── 배당률 그룹 ── -->
               <div style="
                   display: flex;
