@@ -1484,7 +1484,7 @@ nav {
 
 .logo img {
   display: block;
-  width: 300px !important;
+  width: 340px !important;
   height: auto !important;      /* 비율에 맞춰 세로 길이는 자동 조절 */
   max-height: 50px !important;  /* 네비게이션 바(64px)를 뚫고 나가지 않도록 최대 높이 방어선 설정 */
   object-fit: contain;          /* 찌그러짐 방지 */
