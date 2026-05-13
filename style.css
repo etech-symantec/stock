@@ -1185,7 +1185,7 @@ nav {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  height: 60px !important;
+  height: 80px !important;  /* 최상단 바 높이 */
   padding: 0 1.5rem !important;
   background: var(--bg2);
   border-bottom: 1px solid var(--border2);
