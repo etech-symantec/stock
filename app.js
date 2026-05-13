@@ -3446,8 +3446,9 @@ function renderDividendDashboard() {
       // 정렬 방향 반영
       const sortKey = divRankingTab === 'yield' ? 'yieldPct' : 'total';
       symArr.sort((a, b) => divRankingSortDir === 'desc' ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]);
-
-  let listHtml = symArr.map(item => {
+    }
+  
+    let listHtml = symArr.map(item => {
     const isKRW = isKorean(item.symbol);
     const originAmt = isKRW ? symTotals[item.symbol].krw : symTotals[item.symbol].usd;
     
