@@ -1229,14 +1229,14 @@ nav {
 }
 .view-tabs::-webkit-scrollbar { display: none; }
 
-/* 각 탭 버튼 */
+/* ── 네비탭 공통 ── */
 .vtab {
-  padding: 6px 13px;
-  border-radius: 8px;
+  padding: 8px 16px;            /* 기존 6px 13px → 더 크게 */
+  border-radius: 9px;
   border: 1px solid transparent;
   background: none;
   color: var(--text3);
-  font-size: 12px;
+  font-size: 13px;              /* 기존 12px → 크게 */
   font-weight: 600;
   font-family: var(--font-sans);
   cursor: pointer;
@@ -1244,9 +1244,11 @@ nav {
   transition: all 0.18s ease;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   line-height: 1;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 .vtab:hover {
   color: var(--text2);
@@ -1256,6 +1258,78 @@ nav {
   background: var(--accent-bg);
   color: var(--accent);
   border-color: rgba(124, 106, 247, 0.28);
+  transform: none;
+  box-shadow: none;
+  transition: color 0.2s ease, background 0.22s ease, border-color 0.22s ease !important;
+}
+.vtab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(124, 106, 247, 0.08);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none;
+}
+.vtab:hover::before { opacity: 1; transform: scale(1); }
+.vtab:hover:not(.active) {
+  color: rgba(124, 106, 247, 0.75);
+  background: rgba(124, 106, 247, 0.06);
+  border-color: rgba(124, 106, 247, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(124, 106, 247, 0.1);
+}
+.vtab:active:not(.active) {
+  transform: translateY(0px) scale(0.97);
+  transition-duration: 0.08s !important;
+}
+
+/* ── 아이콘 / 텍스트 분리 ── */
+.vtab-icon { font-size: 15px; line-height: 1; flex-shrink: 0; }
+.vtab-text { flex-shrink: 0; }
+
+/* ── 뷰탭 컨테이너 — 여백 줄어들면 텍스트 숨김 ── */
+.view-tabs {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  display: flex !important;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  z-index: 1;
+  margin: 0 !important;
+  max-width: calc(100% - 600px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.view-tabs::-webkit-scrollbar { display: none; }
+
+/* 좌우 여백 부족 → 텍스트 숨기고 아이콘만 (1300px 이하) */
+@media (max-width: 1300px) and (min-width: 769px) {
+  .view-tabs { max-width: calc(100% - 520px); }
+}
+
+@media (max-width: 1100px) and (min-width: 769px) {
+  .vtab-text { display: none; }
+  .vtab { padding: 9px 11px; gap: 0; }
+  .vtab-icon { font-size: 17px; }
+  .view-tabs { max-width: calc(100% - 420px); }
+}
+
+/* 라이트 모드 */
+[data-theme="light"] .vtab:hover:not(.active) {
+  color: var(--accent);
+  background: rgba(98, 80, 224, 0.07);
+  border-color: rgba(98, 80, 224, 0.18);
+  box-shadow: 0 2px 8px rgba(98, 80, 224, 0.08);
 }
 
 /* ── 우측: 기간 + 테마 + 설정 ── */
