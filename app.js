@@ -1021,8 +1021,8 @@ function updateOwnerLabels() {
   const o1 = state.owners.user1;
   const o2 = state.owners.user2;
 
-  document.getElementById('tabUser1').textContent = `${o1.icon} ${o1.name}`;
-  document.getElementById('tabUser2').textContent = `${o2.icon} ${o2.name}`;
+  document.getElementById('tabUser1').innerHTML = `<span class="vtab-icon">${o1.icon}</span><span class="vtab-text">${o1.name}</span>`;
+  document.getElementById('tabUser2').innerHTML = `<span class="vtab-icon">${o2.icon}</span><span class="vtab-text">${o2.name}</span>`;
   document.getElementById('lblUser1').innerHTML = `${o1.icon} ${o1.name}`;
   document.getElementById('lblUser2').innerHTML = `${o2.icon} ${o2.name}`;
   document.getElementById('divTabUser1').textContent = `${o1.icon} ${o1.name}`;
