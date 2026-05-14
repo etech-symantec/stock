@@ -3039,7 +3039,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     }
                     let name = cell.getAttribute('data-name');
                     let val = cell.getAttribute('data-val');
-                    tooltipEl.innerHTML = `<div style="font-size:13px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:13px; text-align:center; color:var(--text);">${val}</div>`;
+                    tooltipEl.innerHTML = `<div style="font-size:26px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:26px; text-align:center; color:var(--text);">${val}</div>`;
                     tooltipEl.style.opacity = 1;
                 });
                 cell.addEventListener('mousemove', (e) => {
@@ -3223,8 +3223,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     if(splitTxt.length === 2) {
                       let name = splitTxt[0];
                       let formatVal = splitTxt[1]; 
-                      innerHtml += `<div style="font-size:13px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
-                      innerHtml += `<div style="font-size:13px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
+                      innerHtml += `<div style="font-size:26px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
+                      innerHtml += `<div style="font-size:26px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
                     } else {
                       innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
                     }
@@ -5079,6 +5079,11 @@ if (_origToggleSidebar) {
 // 🚀 초기화 (DOMContentLoaded)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+  // 툴팁 글자 크기 2배 (Chart.js 기본값: title 14px → 28px, body 12px → 24px)
+  Chart.defaults.plugins.tooltip.titleFont = { size: 28 };
+  Chart.defaults.plugins.tooltip.bodyFont  = { size: 24 };
+  Chart.defaults.plugins.tooltip.footerFont = { size: 24 };
+
   // 저장된 테마 복원 (없으면 시스템 설정 따름)
   const saved = localStorage.getItem('app_theme');
   if (saved) {
