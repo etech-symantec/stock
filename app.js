@@ -191,14 +191,20 @@ let accountPieChartInsts = [];
 let cachedMarketData = {}; 
 let localStockDB = []; 
 
-// 🌟 [추가됨] 로컬 스토리지에서 이전 차트 데이터(캐시)를 불러옵니다. (접속 속도 10배 향상)
 try {
-    let cacheTime = localStorage.getItem('sw_market_cache_time');
-    let now = Date.now();
-    // 마지막 접속 후 4시간(14400000ms) 이내라면 기존 데이터를 즉시 재사용합니다.
-    if (cacheTime && now - parseInt(cacheTime) < 14400000) {
-        let c = localStorage.getItem('sw_market_cache');
-        if (c) cachedMarketData = JSON.parse(c);
+    const cacheTime = parseInt(localStorage.getItem('sw_market_cache_time') || '0');
+    const now = Date.now();
+    const c = localStorage.getItem('sw_market_cache');
+    if (c && now - cacheTime < 14400000) { // 4시간 이내
+        cachedMarketData = JSON.parse(c);
+        // 30분 지난 항목은 quickLoad 플래그 리셋하여 현재가 재조회 유도
+        if (now - cacheTime > 1800000) {
+            Object.keys(cachedMarketData).forEach(k => {
+                if (!isKorean(k) && cachedMarketData[k] && !cachedMarketData[k]._failed) {
+                    cachedMarketData[k]._quickLoad = true;
+                }
+            });
+        }
     } else {
         localStorage.removeItem('sw_market_cache');
         localStorage.removeItem('sw_market_cache_time');
@@ -3522,20 +3528,27 @@ function renderDividendDashboard() {
 let currentModalTicker = '';
 let currentModalRange = state.range; // 처음 켤 때는 메인 대시보드 설정을 따라감
 
-function openChartModal(ticker) {
-  currentModalTicker = ticker;
-  currentModalRange = state.range; // 모달을 새로 열 때마다 메인 설정으로 초기화
-  
-  // 버튼 UI 초기화
-  document.querySelectorAll('.m-rtab').forEach(b => {
-      b.classList.remove('active');
-      if (b.textContent.toLowerCase() === currentModalRange.toLowerCase()) {
-          b.classList.add('active');
-      }
-  });
-  
-  renderModalChart();
-  document.getElementById('chartOverlay').classList.add('open');
+async function openChartModal(ticker) {
+    currentModalTicker = ticker;
+    currentModalRange = state.range;
+    document.getElementById('chartOverlay').classList.add('open');
+
+    // _quickLoad 상태면 (차트 미로드) 클릭 시 즉시 전체 차트 가져오기
+    if (cachedMarketData[ticker]?._quickLoad) {
+        document.getElementById('mTicker').textContent = '로딩 중...';
+        const fullData = await fetchYahooAPI(ticker);
+        if (fullData && !fullData._failed) {
+            cachedMarketData[ticker] = fullData;
+        }
+    }
+
+    // 버튼 UI 초기화
+    document.querySelectorAll('.m-rtab').forEach(b => {
+        b.classList.remove('active');
+        if (b.textContent.toLowerCase() === currentModalRange.toLowerCase()) b.classList.add('active');
+    });
+
+    renderModalChart();
 }
 
 function setModalRange(range, el) {
@@ -3585,53 +3598,74 @@ function renderModalChart() {
 // 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
 let isFetchingMarketData = false;
 async function fetchMissingMarketData(symbolsToFetch) {
-    if(isFetchingMarketData || !symbolsToFetch || symbolsToFetch.length === 0) return;
+    if (isFetchingMarketData || !symbolsToFetch?.length) return;
     isFetchingMarketData = true;
-    
-    // 🌟 [핵심 추가] 장부에 한 번이라도 기록된 종목(보유/매도)을 1순위로 끌어올리기
-    const transactedSymbols = new Set(state.transactions.map(tx => tx.symbol));
-    symbolsToFetch.sort((a, b) => {
-        const aOwned = transactedSymbols.has(a) ? 1 : 0;
-        const bOwned = transactedSymbols.has(b) ? 1 : 0;
-        return bOwned - aOwned; // 1(내 종목)이 0(단순 관심종목)보다 무조건 먼저 오게 정렬
-    });
-    const batchSize = 3;
-    
-    // 우측 하단에 조그맣게 '로딩 중' 알림 띄우기
+
+    // ── Phase 1: 현재가 일괄 (초고속) ───────────────────────
+    const usSymbols = symbolsToFetch.filter(s => !isKorean(s));
+    const krSymbols = symbolsToFetch.filter(s => isKorean(s));
+
     let loadingEl = document.getElementById('bgLoadingIndicator');
-    if(!loadingEl) {
+    if (!loadingEl) {
         loadingEl = document.createElement('div');
         loadingEl.id = 'bgLoadingIndicator';
-        loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--accent); color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition: 0.3s; opacity: 1;";
+        loadingEl.style.cssText = "position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:10px 16px;border-radius:20px;font-size:12px;font-weight:bold;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:0.3s;";
         document.body.appendChild(loadingEl);
     }
-    loadingEl.style.opacity = '1';
 
-    for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
-        if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 쾌속 로딩 중... (${Math.min(i + batchSize, symbolsToFetch.length)}/${symbolsToFetch.length})`;
-        const batch = symbolsToFetch.slice(i, i + batchSize);
-        await Promise.all(batch.map(async t => {
-            let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
-            let fetchedData = await fetchYahooData(fetchSym);
-            if (fetchedData && !fetchedData._failed) cachedMarketData[t] = fetchedData;
-            else cachedMarketData[t] = { _failed: true };
-        }));
-        
-        render();
-        
-        if (i + batchSize < symbolsToFetch.length) {
-            await new Promise(res => setTimeout(res, 100)); 
+    // 미국 주식: Bulk Quote로 한 방에
+    if (usSymbols.length > 0) {
+        loadingEl.style.opacity = '1';
+        loadingEl.textContent = `⚡ 현재가 로딩 중... (${usSymbols.length}종목 한번에)`;
+        const bulkResult = await fetchBulkQuotes(usSymbols);
+        Object.assign(cachedMarketData, bulkResult);
+        // 못 가져온 심볼은 실패 처리
+        usSymbols.forEach(s => { if (!cachedMarketData[s]) cachedMarketData[s] = { _failed: true }; });
+        render(); // Phase 1만으로 카드 즉시 그리기
+    }
+
+    // 한국 주식: 병렬로 빠르게 (배치 5개씩, 딜레이 없음)
+    if (krSymbols.length > 0) {
+        loadingEl.textContent = `🇰🇷 국내 주식 로딩 중... (${krSymbols.length}종목)`;
+        const batchSize = 5; // 기존 3 → 5로 상향
+        for (let i = 0; i < krSymbols.length; i += batchSize) {
+            const batch = krSymbols.slice(i, i + batchSize);
+            await Promise.all(batch.map(async s => {
+                const data = await fetchYahooData(s);
+                cachedMarketData[s] = data?._failed ? { _failed: true } : data;
+            }));
+            render();
+            // 딜레이 제거 (기존 100ms → 0ms)
         }
     }
-    
+
+    // ── Phase 2: 차트 데이터 백그라운드 로드 ────────────────
+    // _quickLoad 플래그가 있는 미국 주식의 차트 데이터를 지연 로드
+    const needChartLoad = usSymbols.filter(s => cachedMarketData[s]?._quickLoad);
+    if (needChartLoad.length > 0) {
+        loadingEl.textContent = `📈 차트 데이터 백그라운드 로딩 중...`;
+        const batchSize = 4;
+        for (let i = 0; i < needChartLoad.length; i += batchSize) {
+            const batch = needChartLoad.slice(i, i + batchSize);
+            await Promise.all(batch.map(async s => {
+                const data = await fetchYahooAPI(s); // 전체 차트 데이터
+                if (data && !data._failed) {
+                    cachedMarketData[s] = data; // quickLoad 덮어쓰기
+                }
+            }));
+            render(); // 차트 데이터 들어올 때마다 미니차트 업데이트
+            await new Promise(r => setTimeout(r, 50)); // 렌더 숨 고르기
+        }
+    }
+
     isFetchingMarketData = false;
-    if(loadingEl) loadingEl.style.opacity = '0';
-    
-    // 🌟 데이터를 다 가져오면 다음 번 광속 접속을 위해 기기에 임시 저장
-    try { 
-        localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
+    loadingEl.style.opacity = '0';
+
+    // 캐시 저장
+    try {
+        localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData));
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
-    } catch(e){}
+    } catch(e) {}
 }
 
 // ── 8. 메인 렌더 함수 (전체 흐름 제어) ──
@@ -5959,3 +5993,39 @@ document.addEventListener('mousedown', (e) => {
   if (dPop && dPop.style.display !== 'none' && !dPop.contains(e.target) && e.target !== dBtn)
     closeDividendDatePicker();
 });
+
+async function fetchBulkQuotes(symbols) {
+    // 미국 주식만 필터 (한국은 공공 API 별도)
+    const usSymbols = symbols.filter(s => !isKorean(s) && !s.endsWith('.DLST'));
+    if (usSymbols.length === 0) return {};
+
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${usSymbols.join(',')}&fields=regularMarketPrice,regularMarketPreviousClose,shortName,longName`;
+
+    const json = await fetchWithProxy(url, false);
+    if (!json?.quoteResponse?.result) return {};
+
+    const result = {};
+    json.quoteResponse.result.forEach(q => {
+        const last = q.regularMarketPrice;
+        const prev = q.regularMarketPreviousClose || last;
+        let name = q.shortName || q.longName || q.symbol;
+        
+        // localStockDB에 한국어 이름 있으면 그걸 우선 사용
+        const dbMatch = localStockDB.find(s => s.symbol === q.symbol);
+        if (dbMatch) name = dbMatch.name;
+
+        result[q.symbol] = {
+            symbol: q.symbol,
+            name: name,
+            currency: q.currency || 'USD',
+            last: last,
+            prev: prev,
+            // 차트 데이터는 아직 없음 — 나중에 채움
+            prices: [prev, last],
+            dates: ['prev', 'today'],
+            rawDates: [],
+            _quickLoad: true  // 차트 미로드 플래그
+        };
+    });
+    return result;
+}
