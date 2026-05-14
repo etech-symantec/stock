@@ -5532,12 +5532,20 @@ function injectRestartButton() {
     sec.className = 'settings-section tutorial-restart-section';
     sec.style.cssText = 'margin-top:16px; margin-bottom:0;';
     sec.innerHTML = `
-      <div class="settings-section-title">🎓 튜토리얼</div>
+      <div class="settings-section-title">📡 주가 데이터</div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <span id="marketDataLastUpdated" style="font-size:12px; color:var(--text2);"></span>
+        <button class="btn-restart-tutorial" onclick="forceMarketDataUpdate()" style="margin:0;">
+          <span>🔄</span> 캐시 삭제 후 최신화
+        </button>
+      </div>
+      <div class="settings-section-title" style="margin-top:12px;">🎓 튜토리얼</div>
       <button class="btn-restart-tutorial" onclick="restartTutorial()">
         <span>🔁</span> 빠른 가이드 다시 보기
       </button>
     `;
     settingsModal.appendChild(sec);
+    updateLastSyncTimeDisplay(); // 모달 열릴 때 시간 즉시 표시
 }
 
 // ── 초기화 ────────────────────────────────────────────────
