@@ -8025,9 +8025,19 @@
       "qty": -11,
       "price": 27450,
       "txType": "trade"
+    },
+    {
+      "id": 1778800856968,
+      "date": "2026-05-15",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "UNH",
+      "qty": -4,
+      "price": 401,
+      "txType": "trade"
     }
   ],
-  "range": "all",
+  "range": "1m",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
