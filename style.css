@@ -1318,7 +1318,7 @@ nav {
   #rtab-10y { display: none; }
 }
 
-/* ── 1800px 이하: 3Y 숨김 ── */
+/* ── 1800px 이하: 5Y 숨김 ── */
 @media (max-width: 1800px) and (min-width: 769px) {
   #rtab-5y { display: none; }
 }
