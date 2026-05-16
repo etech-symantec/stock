@@ -3039,7 +3039,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     }
                     let name = cell.getAttribute('data-name');
                     let val = cell.getAttribute('data-val');
-                    tooltipEl.innerHTML = `<div style="font-size:18px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:26px; text-align:center; color:var(--text);">${val}</div>`;
+                    tooltipEl.innerHTML = `<div style="font-size:16px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:16px; text-align:center; color:var(--text);">${val}</div>`;
                     tooltipEl.style.opacity = 1;
                 });
                 cell.addEventListener('mousemove', (e) => {
@@ -3223,8 +3223,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     if(splitTxt.length === 2) {
                       let name = splitTxt[0];
                       let formatVal = splitTxt[1]; 
-                      innerHtml += `<div style="font-size:18px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
-                      innerHtml += `<div style="font-size:18px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
+                      innerHtml += `<div style="font-size:16px; font-weight:700; display:flex; align-items:center;">${span}${name}</div>`;
+                      innerHtml += `<div style="font-size:16px; color:var(--text); padding-left:16px;">${formatVal}</div>`;
                     } else {
                       innerHtml += `<div style="font-size:12px; display:flex; align-items:center;">${span}${txt}</div>`;
                     }
