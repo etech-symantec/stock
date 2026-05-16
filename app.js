@@ -3710,14 +3710,14 @@ function updateRangeButtonReadiness() {
     const btn10y = document.getElementById('rtab-10y');
 
     if (btn5y) {
-        const ready = minLevel >= 2;
+        const ready = minLevel >= 3;
         btn5y.style.opacity    = ready ? '1'       : '0.35';
         btn5y.style.cursor     = ready ? 'pointer' : 'not-allowed';
-        btn5y.title            = ready ? ''        : '3년치 데이터 로딩 중...';
+        btn5y.title            = ready ? ''        : '5년치 데이터 로딩 중...';
         btn5y.style.transition = 'opacity 0.4s';
     }
     if (btn10y) {
-        const ready = minLevel >= 3;
+        const ready = minLevel >= 4;
         btn10y.style.opacity    = ready ? '1'       : '0.35';
         btn10y.style.cursor     = ready ? 'pointer' : 'not-allowed';
         btn10y.title            = ready ? ''        : '10년치 데이터 로딩 중...';
@@ -3783,15 +3783,21 @@ async function fetchMissingMarketData(symbolsToFetch) {
 }
 
 async function fetchExtendedMarketData(yahooRange, rangeLevel) {
-    // 이미 해당 레벨 이상의 데이터가 있는 종목은 건너뜀
+    // rangeLevel: 2=3y완료, 3=5y완료, 4=10y완료
+    const nextPhase = {
+        2: () => fetchExtendedMarketData('5y',  3),
+        3: () => fetchExtendedMarketData('10y', 4),
+        4: () => {}  // 마지막 단계
+    };
+    const label = { 2: '3년', 3: '5년', 4: '10년' }[rangeLevel] || '';
+
     const allSymbols = Object.keys(cachedMarketData).filter(sym =>
         cachedMarketData[sym] &&
         !cachedMarketData[sym]._failed &&
         (cachedMarketData[sym]._rangeLevel || 0) < rangeLevel
     );
     if (allSymbols.length === 0) {
-        // 이 단계 건너뛰고 다음 단계로
-        if (rangeLevel === 2) fetchExtendedMarketData('10y', 3);
+        nextPhase[rangeLevel]?.();
         return;
     }
 
@@ -3839,7 +3845,8 @@ async function fetchExtendedMarketData(yahooRange, rangeLevel) {
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
     } catch(e) {}
 
-    if (rangeLevel === 2) fetchExtendedMarketData('10y', 3);
+    if (rangeLevel === 2) fetchExtendedMarketData('5y', 3);
+    nextPhase[rangeLevel]?.();
 }
 
 // ── 8. 메인 렌더 함수 (전체 흐름 제어) ──
