@@ -3599,20 +3599,33 @@ function renderModalChart() {
       : '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
     const profitColor = v => v >= 0 ? '#00C578' : '#3A9AFF';
 
-    // ── 매매 요약 ──
-    let totalBuy = 0, totalSell = 0;
-    txs.forEach(t => {
-      if (t.qty > 0) totalBuy  += t.qty * t.price;
-      if (t.qty < 0) totalSell += Math.abs(t.qty) * t.price;
+    // ── 매매 요약 (실현수익 페이지와 동일한 평단가 추적 방식) ──
+    let totalBuy = 0, totalSell = 0, netProfit = 0;
+    let _holdings = {};
+    [...txs].sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(t => {
+        const broker = t.broker ? t.broker.trim() : '미지정';
+        const key = `${t.symbol}::${broker}`;
+        if (!_holdings[key]) _holdings[key] = { qty: 0, avg: 0 };
+        const h = _holdings[key];
+        if (t.qty > 0) {
+            totalBuy += t.qty * t.price;
+            const totalValue = (h.qty * h.avg) + (t.qty * t.price);
+            h.qty += t.qty;
+            h.avg = totalValue / h.qty;
+        } else if (t.qty < 0) {
+            const sellQty = Math.abs(t.qty);
+            totalSell += sellQty * t.price;
+            netProfit += (t.price - h.avg) * sellQty; // 실현수익 페이지와 동일한 계산
+            h.qty -= sellQty;
+            if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+        }
     });
-    const netProfit = totalSell - totalBuy;
 
     document.getElementById('mTotalBuy').textContent = fmt(totalBuy);
     document.getElementById('mTotalSell').textContent = fmt(totalSell);
     const netEl = document.getElementById('mNetProfit');
     netEl.textContent = (netProfit >= 0 ? '+' : '-') + fmt(netProfit);
     netEl.style.color = profitColor(netProfit);
-
     // ── 현재 보유 잔량 평가금 ──
     const allHoldings = calculateHoldings();
     const symHoldings = Object.values(allHoldings).filter(h => h.symbol === sym && h.qty > 0);
