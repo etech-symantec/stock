@@ -2056,9 +2056,12 @@ async function fetchWithProxy(targetUrl, useCache = true) {
 async function fetchExchangeRate() {
   if (isExchangeRateFetched) return;
   const data = await fetchYahooData('KRW=X');
-  if (data && data.last) { currentUsdKrw = data.last; isExchangeRateFetched = true; }
+  if (data && data.last) {
+    currentUsdKrw = data.last;
+    isExchangeRateFetched = true;
+    cachedMarketData['KRW=X'] = data;   // 5년치 이력도 캐시에 저장
+  }
 }
-
 // 📅 특정 날짜의 USD/KRW 환율 조회 (주말/휴장일은 가장 가까운 이전 영업일 값 사용)
 function getHistoricalFxRate(dateStr) {
     const fx = cachedMarketData['KRW=X'];
