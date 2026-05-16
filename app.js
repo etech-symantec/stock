@@ -4771,6 +4771,7 @@ function renderRealizedDashboard() {
     let realizedTxs = []; 
     let krwTotal = 0;
     let usdTotal = 0;
+    let usdTotalKrw = 0;
     let chartLabels = [];
     let chartLineData = [];
     let chartBarData = [];
@@ -4845,8 +4846,12 @@ function renderRealizedDashboard() {
                     });
                 }
                 
-                if (isKr) krwTotal += pnl;
-                else usdTotal += pnl;
+                if (isKr) {
+                    krwTotal += pnl;
+                } else {
+                    usdTotal += pnl;
+                    usdTotalKrw += pnl * txFxRate;
+                }
             }
         }
     });
@@ -4870,14 +4875,14 @@ function renderRealizedDashboard() {
 
     const totalEl = document.getElementById('realTotalConverted');
     if (totalEl) {
-        const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
+        const grandTotal = krwTotal + usdTotalKrw;
         const signG = grandTotal >= 0 ? '+' : '';
         totalEl.textContent = `${signG}₩ ${Math.round(Math.abs(grandTotal)).toLocaleString()}`;
         totalEl.style.color = grandTotal >= 0 ? '#00C578' : '#3A9AFF';
     }
 
     const realKrNum = krwTotal;
-    const realUsKrwNum = usdTotal * currentUsdKrw;
+    const realUsKrwNum = usdTotalKrw;
     const realGrand = Math.abs(realKrNum) + Math.abs(realUsKrwNum);
     const realKrPct = realGrand > 0 ? Math.round(Math.abs(realKrNum) / realGrand * 100) : 50;
     const realUsPct = 100 - realKrPct;
