@@ -3861,7 +3861,8 @@ async function render() {
   
   document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.rtab').forEach(b => {
-    if(b.textContent.toLowerCase() === state.range.toLowerCase()) b.classList.add('active');
+    const btnRange = b.id ? b.id.replace('rtab-', '') : '';
+    if (btnRange === state.range) b.classList.add('active');
   });
 
   const container = document.getElementById('gridContainer');
