@@ -3610,6 +3610,29 @@ function renderModalChart() {
       netEl.textContent = (netProfit >= 0 ? '+' : '-') + fmt(Math.abs(netProfit));
       netEl.style.color = profitColor(netProfit);
 
+      // 🌟 현재 보유 잔량 평가금 계산
+      const allHoldings = calculateHoldings();
+      const holdingQty = Object.values(allHoldings)
+          .filter(h => h.symbol === sym)
+          .reduce((sum, h) => sum + h.qty, 0);
+      const holdingAvg = Object.values(allHoldings)
+          .filter(h => h.symbol === sym && h.qty > 0)
+          .reduce((sum, h) => sum + h.avg * h.qty, 0) / (holdingQty || 1);
+
+      const holdingBox = document.getElementById('mHoldingBox');
+      if (holdingQty > 0) {
+          const holdingValue = holdingQty * currentPrice;
+          const holdingPnl = holdingValue - (holdingQty * holdingAvg);
+          const holdingRoi = holdingAvg > 0 ? (holdingPnl / (holdingQty * holdingAvg)) * 100 : 0;
+          holdingBox.style.display = 'block';
+          document.getElementById('mHoldingQty').textContent = `${holdingQty}주 보유`;
+          document.getElementById('mHoldingValue').textContent = fmt(holdingValue);
+          const holdingPnlEl = document.getElementById('mHoldingPnl');
+          holdingPnlEl.textContent = `${holdingPnl >= 0 ? '+' : '-'}${fmt(Math.abs(holdingPnl))} (${holdingRoi >= 0 ? '+' : ''}${holdingRoi.toFixed(2)}%)`;
+          holdingPnlEl.style.color = profitColor(holdingPnl);
+      } else {
+          holdingBox.style.display = 'none';
+      }
       // ── What if 계산 ──
       // 매수 수량 합계만 (매도 무시) → 전체 보유했다고 가정
       let totalQtyBought = 0, totalCost = 0;
