@@ -1972,7 +1972,7 @@ async function fetchYahooAPI(symbol, range = '1y') {
     }
     if(symbol === 'KRW=X') cName = 'USD/KRW 환율';
     
-    const rangeLevel = range === '1y' ? 1 : range === '3y' ? 2 : 3;
+    const rangeLevel = { '1y': 1, '3y': 2, '5y': 3, '10y': 4 }[range] || 1;
     return {
       symbol: symbol, name: cName, currency: meta.currency || 'USD',
       prices: validPrices, dates: validDates, rawDates: rawDates,
