@@ -62,6 +62,7 @@ let currentLocalTag = 'all';
 // 'yieldDesc' | 'yieldAsc' | 'totalDesc' | 'totalAsc'
 let currentDivSort = 'yieldDesc';
 let divRankingSortDir = 'desc'; // 'desc' | 'asc'
+let _histSelectedIds = new Set(); // 거래내역 체크된 항목 ID
 
 function setDivRankingSortDir(dir) {
     divRankingSortDir = dir;
@@ -1466,7 +1467,7 @@ function renderHistoryDashboard() {
   const sorted = filtered.sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
   
   if(sorted.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--text3);">조건에 맞는 거래 내역이 없습니다.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:40px; color:var(--text3);">조건에 맞는 거래 내역이 없습니다.</td></tr>`;
       return;
   }
   
@@ -1498,8 +1499,12 @@ function renderHistoryDashboard() {
 
       const oInfo = getOwnerInfo(tx.owner);
 
+      const isChecked = _histSelectedIds.has(tx.id);
       return `
-      <tr style="border-bottom: 1px solid var(--border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+      <tr style="border-bottom: 1px solid var(--border); transition: 0.2s; ${isChecked ? 'background:rgba(var(--accent-rgb, 99,102,241),0.07);' : ''}" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='${isChecked ? 'rgba(99,102,241,0.07)' : 'transparent'}'">
+          <td style="padding:12px 8px; text-align:center;">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleHistTxSelect(${tx.id}, this)" style="cursor:pointer; width:15px; height:15px;">
+          </td>
           <td style="padding:12px 16px; color:var(--text2);">${tx.date}</td>
           <td style="padding:12px 16px;"><span class="tx-owner-badge" onclick="toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="margin:0; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span></td>
           <td style="padding:12px 16px; color:var(--text2);">${tx.broker || '-'}</td>
@@ -1511,6 +1516,12 @@ function renderHistoryDashboard() {
           <td style="padding:12px 16px; text-align:center;"><div class="tx-actions" style="justify-content:center;"><button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button><button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button></div></td>
       </tr>`;
   }).join('');
+  const allCb = document.getElementById('histSelectAll');
+  if (allCb) {
+    const allChecked = sorted.length > 0 && sorted.every(tx => _histSelectedIds.has(tx.id));
+    allCb.checked = allChecked;
+    allCb.indeterminate = !allChecked && sorted.some(tx => _histSelectedIds.has(tx.id));
+  }
 }
 
 function setHistoryDatePreset(preset) {
@@ -1652,7 +1663,7 @@ function _getBdFilteredTxs() {
 }
 
 function openBulkDateModal() {
-  const filtered = _getBdFilteredTxs();
+  const filtered = state.transactions.filter(t => _histSelectedIds.has(t.id));
   _bdFilteredIds = filtered.map(t => t.id);
 
   const infoEl = document.getElementById('bulkDateTargetInfo');
@@ -1687,6 +1698,29 @@ function openBulkDateModal() {
 
   setBdTab('shift');
   document.getElementById('bulkDateOverlay').style.display = 'flex';
+}
+
+function toggleHistSelectAll(cb) {
+  const filtered = _getBdFilteredTxs();
+  if (cb.checked) {
+    filtered.forEach(tx => _histSelectedIds.add(tx.id));
+  } else {
+    filtered.forEach(tx => _histSelectedIds.delete(tx.id));
+  }
+  renderHistoryDashboard();
+}
+
+function toggleHistTxSelect(id, cb) {
+  if (cb.checked) _histSelectedIds.add(id);
+  else _histSelectedIds.delete(id);
+  // 전체선택 체크박스 상태 갱신
+  const filtered = _getBdFilteredTxs();
+  const allCb = document.getElementById('histSelectAll');
+  if (allCb) {
+    const allChecked = filtered.length > 0 && filtered.every(tx => _histSelectedIds.has(tx.id));
+    allCb.checked = allChecked;
+    allCb.indeterminate = !allChecked && filtered.some(tx => _histSelectedIds.has(tx.id));
+  }
 }
 
 function closeBulkDateModal() {
