@@ -4864,6 +4864,9 @@ function renderRealizedDashboard() {
     // 5. 차트 그리기 함수 호출
     renderRealizedChart(chartLabels, chartLineData, chartBarData, chartTxInfo);
 
+    // 5-1. 미국주식 양도소득세 패널 렌더링
+    renderCapitalGainsTax(currentRealizedOwnerFilter);
+
     // 6. 종목별 통계 집계 → 랭킹 패널 렌더링
     const symStats = {};
     const rankingTxs = realizedTxs;
@@ -5061,6 +5064,172 @@ function renderRealizedDashboard() {
         </tr>
         `;
     }).join('');
+}
+
+// ── 🇺🇸 미국주식 양도소득세 계산 패널 ────────────────────────────────────────
+let _cgTaxExpanded = true; // 패널 펼침/접힘 상태
+
+function renderCapitalGainsTax(ownerFilter) {
+    const panel = document.getElementById('capitalGainsTaxPanel');
+    if (!panel) return;
+
+    // ① 전체 거래에서 미국주식 매도분만 평단가 추적하며 연도별 손익 집계
+    //    (세금은 연간 전체 기준이므로 현재 필터 무관하게 ALL 계산)
+    const DEDUCTION = 2500000;   // 기본공제 250만원
+    const TAX_RATE  = 0.22;      // 22% (소득세 20% + 지방소득세 2%)
+
+    let ownerName = 'all';
+    if (ownerFilter === 'user1') ownerName = state.owners.user1.name;
+    if (ownerFilter === 'user2') ownerName = state.owners.user2.name;
+
+    const holdings = {};     // key: `symbol::broker`
+    const byYear   = {};     // key: '2024' → { gainUsd, lossUsd }
+
+    [...state.transactions]
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .forEach(tx => {
+            if (tx.txType === 'dividend' || tx.txType === 'transfer') return;
+            if (isKorean(tx.symbol)) return;   // 미국주식만
+            if (ownerName !== 'all' && tx.owner !== ownerName) return;
+
+            const broker = tx.broker ? tx.broker.trim() : '미지정';
+            const key    = `${tx.symbol}::${broker}`;
+            if (!holdings[key]) holdings[key] = { qty: 0, avg: 0 };
+            const h = holdings[key];
+
+            if (tx.qty > 0) {
+                const total = h.qty * h.avg + tx.qty * tx.price;
+                h.qty += tx.qty;
+                h.avg  = total / h.qty;
+            } else if (tx.qty < 0) {
+                const sellQty = Math.abs(tx.qty);
+                const pnl     = (tx.price - h.avg) * sellQty;   // USD
+                h.qty -= sellQty;
+                if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+
+                const year = tx.date.substring(0, 4);
+                if (!byYear[year]) byYear[year] = { gainUsd: 0, lossUsd: 0 };
+                if (pnl >= 0) byYear[year].gainUsd += pnl;
+                else          byYear[year].lossUsd += Math.abs(pnl);
+            }
+        });
+
+    const years = Object.keys(byYear).sort((a, b) => b - a); // 최신연도 먼저
+
+    if (years.length === 0) {
+        panel.innerHTML = '';
+        return;
+    }
+
+    // ② 연도별 세금 계산
+    const rows = years.map(year => {
+        const { gainUsd, lossUsd } = byYear[year];
+        const netUsd      = gainUsd - lossUsd;
+        const netKrw      = netUsd * currentUsdKrw;
+        const taxableKrw  = Math.max(0, netKrw - DEDUCTION);
+        const taxKrw      = Math.round(taxableKrw * TAX_RATE);
+        const isProfit    = netUsd > 0;
+        return { year, gainUsd, lossUsd, netUsd, netKrw, taxableKrw, taxKrw, isProfit };
+    });
+
+    // ③ 금액 포맷 헬퍼
+    const fmtUsd = v => {
+        const s = v < 0 ? '-' : (v > 0 ? '+' : '');
+        return `${s}$${Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+    const fmtKrw = v => {
+        const abs = Math.abs(v);
+        const s   = v < 0 ? '-' : (v > 0 ? '+' : '');
+        if (abs >= 100000000) return `${s}₩${(abs / 100000000).toFixed(2)}억`;
+        if (abs >= 10000)     return `${s}₩${Math.round(abs / 10000).toLocaleString()}만`;
+        return `${s}₩${Math.round(abs).toLocaleString()}`;
+    };
+
+    // ④ 총계 행
+    const totalNetKrw   = rows.reduce((s, r) => s + r.netKrw,  0);
+    const totalTaxKrw   = rows.reduce((s, r) => s + r.taxKrw,  0);
+
+    // ⑤ 패널 HTML
+    const headerHtml = `
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); cursor:pointer; user-select:none;"
+         onclick="document.getElementById('cgTaxBody').style.display=_cgTaxExpanded?'none':'block'; _cgTaxExpanded=!_cgTaxExpanded; document.getElementById('cgTaxChevron').textContent=_cgTaxExpanded?'▲':'▼';">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:15px;">🇺🇸</span>
+            <div>
+                <div style="font-size:13px; font-weight:700; color:var(--text);">미국주식 양도소득세 계산</div>
+                <div style="font-size:11px; color:var(--text3); margin-top:1px;">기본공제 250만원 · 세율 22% (소득세 20% + 지방소득세 2%)</div>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:14px;">
+            <div style="text-align:right;">
+                <div style="font-size:11px; color:var(--text3);">전체 예상 세금</div>
+                <div style="font-size:15px; font-weight:700; color:${totalTaxKrw > 0 ? '#ff4d6a' : 'var(--text3)'}; font-family:var(--font-mono);">
+                    ${totalTaxKrw > 0 ? `₩${Math.round(totalTaxKrw).toLocaleString()}` : '없음'}
+                </div>
+            </div>
+            <span id="cgTaxChevron" style="color:var(--text3); font-size:12px;">${_cgTaxExpanded ? '▲' : '▼'}</span>
+        </div>
+    </div>`;
+
+    const tableHtml = `
+    <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead>
+            <tr style="border-bottom:1px solid var(--border); background:var(--bg3);">
+                <th style="padding:9px 18px; text-align:left; font-weight:600; color:var(--text2); white-space:nowrap;">연도</th>
+                <th style="padding:9px 14px; text-align:right; font-weight:600; color:var(--text2); white-space:nowrap;">총 매도차익</th>
+                <th style="padding:9px 14px; text-align:right; font-weight:600; color:var(--text2); white-space:nowrap;">총 매도손실</th>
+                <th style="padding:9px 14px; text-align:right; font-weight:600; color:var(--text2); white-space:nowrap;">순손익 (USD)</th>
+                <th style="padding:9px 14px; text-align:right; font-weight:600; color:var(--text2); white-space:nowrap;">순손익 (환산 KRW)</th>
+                <th style="padding:9px 14px; text-align:right; font-weight:600; color:var(--text2); white-space:nowrap;">기본공제 후 과세표준</th>
+                <th style="padding:9px 18px; text-align:right; font-weight:600; color:#ff4d6a; white-space:nowrap;">예상 세금 (22%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${rows.map((r, i) => {
+                const netColor  = r.netUsd  > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
+                const taxColor  = r.taxKrw  > 0 ? '#ff4d6a' : 'var(--text3)';
+                const bg        = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)';
+                const taxableStr = r.taxableKrw > 0
+                    ? `<span style="color:#ff4d6a;">${fmtKrw(r.taxableKrw)}</span>`
+                    : `<span style="color:var(--text3);">—</span>`;
+                const taxStr = r.taxKrw > 0
+                    ? `<b style="color:${taxColor}; font-family:var(--font-mono);">₩${r.taxKrw.toLocaleString()}</b>`
+                    : `<span style="color:var(--text3); font-size:11px;">납부 없음</span>`;
+                const notice = r.netKrw > 0 && r.netKrw <= DEDUCTION
+                    ? `<div style="font-size:10px; color:var(--text3); margin-top:2px;">공제 범위 내</div>` : '';
+                return `
+                <tr style="border-bottom:1px solid var(--border); background:${bg}; transition:0.15s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='${bg}'">
+                    <td style="padding:11px 18px; font-weight:700; color:var(--text); font-size:13px;">${r.year}년</td>
+                    <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); color:#00C578;">+$${r.gainUsd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                    <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); color:#3A9AFF;">${r.lossUsd > 0 ? `-$${r.lossUsd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}` : '—'}</td>
+                    <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${netColor};">${fmtUsd(r.netUsd)}</td>
+                    <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); color:${netColor};">
+                        ${fmtKrw(r.netKrw)}
+                        <div style="font-size:10px; color:var(--text3); font-weight:400;">≈ ${currentUsdKrw.toLocaleString()}원/달러</div>
+                    </td>
+                    <td style="padding:11px 14px; text-align:right;">${taxableStr}${notice}</td>
+                    <td style="padding:11px 18px; text-align:right;">${taxStr}</td>
+                </tr>`;
+            }).join('')}
+        </tbody>
+        ${rows.length > 1 ? `
+        <tfoot>
+            <tr style="border-top:2px solid var(--border2); background:var(--bg3);">
+                <td style="padding:10px 18px; font-weight:700; color:var(--text2); font-size:12px;" colspan="4">합계</td>
+                <td style="padding:10px 14px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${totalNetKrw>0?'#00C578':totalNetKrw<0?'#3A9AFF':'var(--text3)'};">${fmtKrw(totalNetKrw)}</td>
+                <td></td>
+                <td style="padding:10px 18px; text-align:right; font-weight:700; font-family:var(--font-mono); color:${totalTaxKrw>0?'#ff4d6a':'var(--text3)'};">${totalTaxKrw>0?`₩${Math.round(totalTaxKrw).toLocaleString()}`:'—'}</td>
+            </tr>
+        </tfoot>` : ''}
+    </table>
+    </div>
+    <div style="padding:10px 18px; font-size:10px; color:var(--text3); border-top:1px solid var(--border); line-height:1.7; background:var(--bg3);">
+        ⚠️ 위 계산은 <b>참고용 추정치</b>입니다. 실제 신고 시에는 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요. 확정신고: 매년 5월 (전년도 양도분 기준).
+    </div>`;
+
+    panel.innerHTML = headerHtml + `<div id="cgTaxBody" style="display:${_cgTaxExpanded?'block':'none'};">${tableHtml}</div>`;
 }
 
 // 🌟 실현수익 콤보 차트 (최종 수정본 - 에러 완벽 해결)
