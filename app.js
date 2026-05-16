@@ -1931,14 +1931,14 @@ async function fetchPublicData(symbol) {
 }
 
 // 🌟 2. 야후 파이낸스 API 호출 함수 (미국 주식 및 대체용)
-async function fetchYahooAPI(symbol) {
+async function fetchYahooAPI(symbol, range = '1y') {
   // 비정상적인 포맷 차단
   if (!/^[A-Za-z0-9.=^-]+$/.test(symbol)) {
     return { _failed: true };
   }
   
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=3y&interval=1d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=1d`;
     const json = await fetchWithProxy(url, false);
     
     if (!json || !json.chart || !json.chart.result || json.chart.result.length === 0) return { _failed: true };
@@ -1972,11 +1972,13 @@ async function fetchYahooAPI(symbol) {
     }
     if(symbol === 'KRW=X') cName = 'USD/KRW 환율';
     
+    const rangeLevel = range === '1y' ? 1 : range === '3y' ? 2 : 3;
     return {
       symbol: symbol, name: cName, currency: meta.currency || 'USD',
       prices: validPrices, dates: validDates, rawDates: rawDates,
       last: validPrices[validPrices.length-1],
-      prev: validPrices[validPrices.length-2] || validPrices[validPrices.length-1]
+      prev: validPrices[validPrices.length-2] || validPrices[validPrices.length-1],
+      _rangeLevel: rangeLevel
     };
   } catch (e) {
     return { _failed: true };
@@ -1985,24 +1987,20 @@ async function fetchYahooAPI(symbol) {
 
 // 🌟 3. 최종 데이터 라우터 (이 함수가 순서를 제어합니다)
 // 기존 앱 로직에서 이 함수를 호출하므로 이름은 그대로 유지합니다.
-async function fetchYahooData(symbol) {
-    // 🌟 [추가] 상장폐지 종목은 API 호출을 아예 스킵하고 즉시 실패처리
+async function fetchYahooData(symbol, range = '1y') {
     if (symbol.endsWith('.DLST')) return { _failed: true };
-  
-    // 국내 주식 티커 형태 (예: 005930.KS) 인지 확인
     if (/^\d{6}\.K[SQ]$/.test(symbol)) {
-        // 1순위: 공공데이터포털 호출
-        let publicData = await fetchPublicData(symbol);
-        
-        if (publicData && !publicData._failed) {
-            return publicData; // 성공 시 바로 리턴
+        // Phase 1(1y)은 공공데이터 우선, Phase 2/3은 Yahoo 직접 사용
+        if (range === '1y') {
+            let publicData = await fetchPublicData(symbol);
+            if (publicData && !publicData._failed) {
+                publicData._rangeLevel = 1;
+                return publicData;
+            }
         }
-        
-        // 2순위: 공공데이터 실패 시 야후 파이낸스로 대비(Fallback)
-        return await fetchYahooAPI(symbol);
+        return await fetchYahooAPI(symbol, range);
     } else {
-        // 미국 주식, 환율 등은 1순위로 바로 야후 파이낸스 호출
-        return await fetchYahooAPI(symbol);
+        return await fetchYahooAPI(symbol, range);
     }
 }
 
@@ -3746,11 +3744,62 @@ async function fetchMissingMarketData(symbolsToFetch) {
     isFetchingMarketData = false;
     if(loadingEl) loadingEl.style.opacity = '0';
     
-    // 🌟 데이터를 다 가져오면 다음 번 광속 접속을 위해 기기에 임시 저장
     try { 
         localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
     } catch(e){}
+
+    // 🌟 Phase 1 완료 → Phase 2(3y), Phase 3(10y) 백그라운드 순차 실행
+    fetchExtendedMarketData('3y', 2);
+}
+
+async function fetchExtendedMarketData(yahooRange, rangeLevel) {
+    // 이미 해당 레벨 이상의 데이터가 있는 종목은 건너뜀
+    const allSymbols = Object.keys(cachedMarketData).filter(sym =>
+        cachedMarketData[sym] &&
+        !cachedMarketData[sym]._failed &&
+        (cachedMarketData[sym]._rangeLevel || 0) < rangeLevel
+    );
+    if (allSymbols.length === 0) {
+        // 이 단계 건너뛰고 다음 단계로
+        if (rangeLevel === 2) fetchExtendedMarketData('10y', 3);
+        return;
+    }
+
+    const batchSize = 2; // 백그라운드라 배치 작게
+    let loadingEl = document.getElementById('bgLoadingIndicator');
+    if (!loadingEl) {
+        loadingEl = document.createElement('div');
+        loadingEl.id = 'bgLoadingIndicator';
+        loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--accent); color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:0.3s; opacity:1;";
+        document.body.appendChild(loadingEl);
+    }
+    loadingEl.style.opacity = '1';
+    const label = rangeLevel === 2 ? '3년' : '10년';
+
+    for (let i = 0; i < allSymbols.length; i += batchSize) {
+        loadingEl.innerHTML = `📊 ${label}치 데이터 로딩 중... (${Math.min(i + batchSize, allSymbols.length)}/${allSymbols.length})`;
+        const batch = allSymbols.slice(i, i + batchSize);
+        await Promise.all(batch.map(async sym => {
+            const fetchSym = /^\d{6}$/.test(sym) ? sym + '.KS' : sym;
+            const data = await fetchYahooData(fetchSym, yahooRange);
+            if (data && !data._failed) {
+                // 기존 name 유지하면서 가격 데이터만 교체
+                cachedMarketData[sym] = { ...data, name: cachedMarketData[sym]?.name || data.name };
+            }
+        }));
+        render();
+        await new Promise(res => setTimeout(res, 500)); // 백그라운드: 여유있게 딜레이
+    }
+
+    loadingEl.style.opacity = '0';
+    try {
+        localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData));
+        localStorage.setItem('sw_market_cache_time', Date.now().toString());
+    } catch(e) {}
+
+    // Phase 2 완료 → Phase 3 시작
+    if (rangeLevel === 2) fetchExtendedMarketData('10y', 3);
 }
 
 // ── 8. 메인 렌더 함수 (전체 흐름 제어) ──
