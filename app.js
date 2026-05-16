@@ -1482,6 +1482,9 @@ function renderHistoryDashboard() {
       const typeColor = isDiv ? 'var(--green)'
           : isTransfer ? '#ffb703'
           : (isBuy ? 'var(--red)' : 'var(--blue)');
+      const isUs = !isKorean(tx.symbol) && !isDiv && !isTransfer;
+      const txFxRate = isUs ? getHistoricalFxRate(tx.date) : null;
+      const totalKrw  = isUs && txFxRate ? Math.round(totalAmt * txFxRate) : null;
       
       let stockName = tx.symbol;
       const dbMatch = localStockDB.find(s => s.symbol === tx.symbol);
@@ -1512,7 +1515,10 @@ function renderHistoryDashboard() {
           <td style="padding:12px 16px;"><div style="font-weight:700; color:var(--text);">${stockName}</div><div style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${tx.symbol.replace('.KS.DLST','').replace('.DLST','')}</div></td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : Math.abs(tx.qty)}</td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : formatPrice(tx.price, tx.symbol)}</td>
-          <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:var(--text);">${formatPrice(totalAmt, tx.symbol)}</td>
+          <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:var(--text);">
+              ${formatPrice(totalAmt, tx.symbol)}
+              ${totalKrw != null ? `<div style="font-size:10px; color:var(--text3); font-weight:400; margin-top:2px;">≈ ₩${totalKrw.toLocaleString()} <span style="opacity:0.6;">@${Math.round(txFxRate).toLocaleString()}</span></div>` : ''}
+          </td>
           <td style="padding:12px 16px; text-align:center;"><div class="tx-actions" style="justify-content:center;"><button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button><button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button></div></td>
       </tr>`;
   }).join('');
@@ -2053,6 +2059,21 @@ async function fetchExchangeRate() {
   if (data && data.last) { currentUsdKrw = data.last; isExchangeRateFetched = true; }
 }
 
+// 📅 특정 날짜의 USD/KRW 환율 조회 (주말/휴장일은 가장 가까운 이전 영업일 값 사용)
+function getHistoricalFxRate(dateStr) {
+    const fxData = cachedMarketData['KRW=X'];
+    if (fxData && !fxData._failed && fxData.rawDates && fxData.prices) {
+        // 정확한 날짜 매칭
+        const idx = fxData.rawDates.indexOf(dateStr);
+        if (idx !== -1 && fxData.prices[idx] != null) return fxData.prices[idx];
+        // 주말/공휴일 → 가장 가까운 이전 영업일 사용
+        for (let i = fxData.rawDates.length - 1; i >= 0; i--) {
+            if (fxData.rawDates[i] <= dateStr && fxData.prices[i] != null)
+                return fxData.prices[i];
+        }
+    }
+    return currentUsdKrw; // 캐시 없으면 현재 환율 fallback
+}
 
 // 🌟 1. 공공데이터포털 API 호출 함수 (국내 주식 전용)
 async function fetchPublicData(symbol) {
@@ -4788,7 +4809,8 @@ function renderRealizedDashboard() {
             const passName = (!realizedFilters.name || tx.symbol.toLowerCase().includes(realizedFilters.name.toLowerCase()) || (_getDisplayName(tx.symbol) || '').toLowerCase().includes(realizedFilters.name.toLowerCase()));
             
             if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal && passCustomDate && passBroker && passName) {
-                let pnlKrw = pnl * (isKr ? 1 : currentUsdKrw);
+                const txFxRate = isKr ? 1 : getHistoricalFxRate(tx.date);
+                let pnlKrw = pnl * txFxRate;
                 cumulativePnl += pnlKrw;
 
                 chartLabels.push(tx.date);
@@ -4812,7 +4834,8 @@ function renderRealizedDashboard() {
                     realizedTxs.push({
                         date: tx.date, symbol: tx.symbol, owner: tx.owner, broker: broker,
                         sellQty: sellQty, sellPrice: tx.price, avgCost: currentAvg,
-                        pnl: pnl, roi: currentAvg > 0 ? (pnl / (currentAvg * sellQty)) * 100 : 0
+                        pnl: pnl, roi: currentAvg > 0 ? (pnl / (currentAvg * sellQty)) * 100 : 0,
+                        txFxRate: isKr ? null : txFxRate   // ← 추가
                     });
                 }
                 
@@ -4873,8 +4896,9 @@ function renderRealizedDashboard() {
 
     rankingTxs.forEach(tx => {
         const isKr = isKorean(tx.symbol);
-        const pnlKrw = tx.pnl * (isKr ? 1 : currentUsdKrw);
-        const costKrw = (tx.avgCost * tx.sellQty) * (isKr ? 1 : currentUsdKrw);
+        const fxForTx = isKr ? 1 : (tx.txFxRate || currentUsdKrw);
+        const pnlKrw = tx.pnl * fxForTx;
+        const costKrw = (tx.avgCost * tx.sellQty) * fxForTx;
 
         if (!symStats[tx.symbol]) {
             let stockName = tx.symbol;
@@ -5059,7 +5083,10 @@ function renderRealizedDashboard() {
             <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${tx.sellQty}</td>
             <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${formatPrice(tx.sellPrice, tx.symbol)}</td>
             <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); color:var(--text3);">${formatPrice(tx.avgCost, tx.symbol)}</td>
-            <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${pnlColor};">${sign}${formatPrice(Math.abs(tx.pnl), tx.symbol)}</td>
+            <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${pnlColor};">
+                ${sign}${formatPrice(Math.abs(tx.pnl), tx.symbol)}
+                ${tx.txFxRate ? `<div style="font-size:10px; color:var(--text3); font-weight:400; margin-top:2px;">≈ ₩${(Math.abs(tx.pnl * tx.txFxRate) >= 1 ? Math.round(Math.abs(tx.pnl * tx.txFxRate)).toLocaleString() : (Math.abs(tx.pnl * tx.txFxRate)).toFixed(0))} <span style="opacity:0.6;">@${Math.round(tx.txFxRate).toLocaleString()}</span></div>` : ''}
+            </td>
             <td style="padding:12px 16px; text-align:right; font-weight:700; color:${pnlColor};">${sign}${tx.roi.toFixed(2)}%</td>
         </tr>
         `;
