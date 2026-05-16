@@ -5080,9 +5080,9 @@ if (_origToggleSidebar) {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   // 툴팁 글자 크기 2배 (Chart.js 기본값: title 14px → 28px, body 12px → 24px)
-  Chart.defaults.plugins.tooltip.titleFont = { size: 28 };
-  Chart.defaults.plugins.tooltip.bodyFont  = { size: 24 };
-  Chart.defaults.plugins.tooltip.footerFont = { size: 24 };
+  Chart.defaults.plugins.tooltip.titleFont = { size: 20 };
+  Chart.defaults.plugins.tooltip.bodyFont  = { size: 16 };
+  Chart.defaults.plugins.tooltip.footerFont = { size: 16 };
 
   // 저장된 테마 복원 (없으면 시스템 설정 따름)
   const saved = localStorage.getItem('app_theme');
