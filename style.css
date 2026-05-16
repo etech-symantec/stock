@@ -1333,8 +1333,8 @@ nav {
   #rtab-1y { display: none; }
 }
 
-/* ── 1800px 이하: 네비탭 아이콘 전용 전환 ── */
-@media (max-width: 1800px) and (min-width: 769px) {
+/* ── 1700px 이하: 네비탭 아이콘 전용 전환 ── */
+@media (max-width: 1700px) and (min-width: 769px) {
   .vtab-text { display: none; }
   .vtab { padding: 9px 11px; gap: 0; }
   .vtab-icon { font-size: 17px; }
