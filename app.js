@@ -3601,6 +3601,7 @@ function renderModalChart() {
 
     // ── 매매 요약 (실현수익 페이지와 동일한 평단가 추적 방식) ──
     let totalBuy = 0, totalSell = 0, netProfit = 0;
+    let totalBuyQty = 0, totalSellQty = 0; // 🌟 수량 추적 추가
     let _holdings = {};
     [...txs].sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(t => {
         const broker = t.broker ? t.broker.trim() : '미지정';
@@ -3609,20 +3610,27 @@ function renderModalChart() {
         const h = _holdings[key];
         if (t.qty > 0) {
             totalBuy += t.qty * t.price;
+            totalBuyQty += t.qty; // 🌟
             const totalValue = (h.qty * h.avg) + (t.qty * t.price);
             h.qty += t.qty;
             h.avg = totalValue / h.qty;
         } else if (t.qty < 0) {
             const sellQty = Math.abs(t.qty);
             totalSell += sellQty * t.price;
-            netProfit += (t.price - h.avg) * sellQty; // 실현수익 페이지와 동일한 계산
+            totalSellQty += sellQty; // 🌟
+            netProfit += (t.price - h.avg) * sellQty;
             h.qty -= sellQty;
             if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
         }
     });
 
-    document.getElementById('mTotalBuy').textContent = fmt(totalBuy);
+    const avgBuy  = totalBuyQty  > 0 ? totalBuy  / totalBuyQty  : 0;
+    const avgSell = totalSellQty > 0 ? totalSell / totalSellQty : 0;
+
+    document.getElementById('mTotalBuy').textContent  = fmt(totalBuy);
     document.getElementById('mTotalSell').textContent = fmt(totalSell);
+    document.getElementById('mAvgBuy').textContent  = totalBuyQty  > 0 ? fmt(avgBuy)  : '-';
+    document.getElementById('mAvgSell').textContent = totalSellQty > 0 ? fmt(avgSell) : '-';
     const netEl = document.getElementById('mNetProfit');
     netEl.textContent = (netProfit >= 0 ? '+' : '-') + fmt(netProfit);
     netEl.style.color = profitColor(netProfit);
