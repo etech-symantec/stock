@@ -1617,7 +1617,186 @@ function _histDrpClear(){_drp.dragStart=null;_drp.dragEnd=null;_renderHistDrpCal
 function _histDrpApply(){if(_drp.dragStart&&!_drp.dragEnd){historyFilters.dateFrom=_drp.dragStart;historyFilters.dateTo=_drp.dragStart;}else{historyFilters.dateFrom=_drp.dragStart||'';historyFilters.dateTo=_drp.dragEnd||'';}closeHistoryDatePicker();renderHistoryDashboard();}
 function _histDrpApplyMonth(){const y=_drp.year,m=_drp.month;historyFilters.dateFrom=`${y}-${String(m+1).padStart(2,'0')}-01`;historyFilters.dateTo=`${y}-${String(m+1).padStart(2,'0')}-${String(new Date(y,m+1,0).getDate()).padStart(2,'0')}`;closeHistoryDatePicker();renderHistoryDashboard();}
 
-// ── 배당통계 필터 헬퍼 ──────────────────────────────
+// ── 📅 날짜 일괄수정 ─────────────────────────────────────────────────────────
+let _bdCurrentTab = 'shift';
+let _bdFilteredIds = []; // 현재 필터 기준 대상 tx id 목록
+
+function _getBdFilteredTxs() {
+  // renderHistoryDashboard와 동일한 필터 로직으로 대상 목록 반환
+  return state.transactions.filter(tx => {
+    let pass = true;
+    const isKr = isKorean(tx.symbol);
+    if (historyFilters.owner === 'user1' && tx.owner !== state.owners.user1.name) pass = false;
+    if (historyFilters.owner === 'user2' && tx.owner !== state.owners.user2.name) pass = false;
+    if (historyFilters.market === 'kr' && !isKr) pass = false;
+    if (historyFilters.market === 'us' && isKr) pass = false;
+    if (historyFilters.type === 'buy' && (tx.txType !== 'trade' || tx.qty <= 0)) pass = false;
+    if (historyFilters.type === 'sell' && (tx.txType !== 'trade' || tx.qty >= 0)) pass = false;
+    if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
+    if (historyFilters.dateFrom && tx.date < historyFilters.dateFrom) pass = false;
+    if (historyFilters.dateTo   && tx.date > historyFilters.dateTo)   pass = false;
+    if (historyFilters.broker !== 'all' && (tx.broker || '') !== historyFilters.broker) pass = false;
+    if (historyFilters.search) {
+      let s = historyFilters.search.toLowerCase();
+      let stockName = tx.symbol;
+      const dbMatch = localStockDB.find(x => x.symbol === tx.symbol);
+      const cachedMatch = cachedMarketData[tx.symbol];
+      if (dbMatch) stockName = dbMatch.name;
+      else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+      if (!tx.symbol.toLowerCase().includes(s) && !stockName.toLowerCase().includes(s)) pass = false;
+    }
+    const cutoff = getCutoffDateFromRange(state.range);
+    if (tx.date < cutoff) pass = false;
+    return pass;
+  });
+}
+
+function openBulkDateModal() {
+  const filtered = _getBdFilteredTxs();
+  _bdFilteredIds = filtered.map(t => t.id);
+
+  const infoEl = document.getElementById('bulkDateTargetInfo');
+  const today = new Date().toISOString().slice(0, 10);
+  if (filtered.length === 0) {
+    infoEl.innerHTML = `<span style="color:var(--red);">⚠️ 현재 필터 조건에 해당하는 거래 내역이 없습니다.</span>`;
+    document.getElementById('btnBulkDateApply').disabled = true;
+    document.getElementById('btnBulkDateApply').style.opacity = '0.4';
+  } else {
+    const dates = filtered.map(t => t.date).sort();
+    infoEl.innerHTML = `
+      <b style="color:var(--text);">대상: ${filtered.length}건</b> &nbsp;|&nbsp;
+      기간: <span style="color:var(--accent);">${dates[0]}</span> ~ <span style="color:var(--accent);">${dates[dates.length - 1]}</span><br>
+      <span style="font-size:11px;">현재 필터 조건에 해당하는 내역에만 적용됩니다.</span>`;
+    document.getElementById('btnBulkDateApply').disabled = false;
+    document.getElementById('btnBulkDateApply').style.opacity = '1';
+  }
+
+  // 기본값 세팅
+  document.getElementById('bdShiftDays').value = 1;
+  document.getElementById('bdShiftDir').value = 'back';
+  document.getElementById('bdShiftDirLabel').textContent = '← 과거로';
+  const bdReplaceFrom = document.getElementById('bdReplaceFrom');
+  const bdReplaceTo = document.getElementById('bdReplaceTo');
+  const bdSetDate = document.getElementById('bdSetDate');
+  if (filtered.length > 0) {
+    bdReplaceFrom.value = filtered[0].date;
+    bdReplaceTo.value = today;
+    bdSetDate.value = today;
+  }
+  _updateBdPreviews();
+
+  setBdTab('shift');
+  document.getElementById('bulkDateOverlay').style.display = 'flex';
+}
+
+function closeBulkDateModal() {
+  document.getElementById('bulkDateOverlay').style.display = 'none';
+}
+
+function setBdTab(tab) {
+  _bdCurrentTab = tab;
+  const tabs = ['shift', 'replace', 'set'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`bdTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    const panel = document.getElementById(`bdPanel${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    if (!btn || !panel) return;
+    if (t === tab) {
+      btn.style.borderBottomColor = 'var(--accent)';
+      btn.style.color = 'var(--accent)';
+      btn.style.fontWeight = '700';
+      panel.style.display = 'block';
+    } else {
+      btn.style.borderBottomColor = 'transparent';
+      btn.style.color = 'var(--text2)';
+      btn.style.fontWeight = '400';
+      panel.style.display = 'none';
+    }
+  });
+  _updateBdPreviews();
+}
+
+function _shiftDate(dateStr, days, direction) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + (direction === 'forward' ? days : -days));
+  return d.toISOString().slice(0, 10);
+}
+
+function _updateBdPreviews() {
+  const filtered = _bdFilteredIds.map(id => state.transactions.find(t => t.id === id)).filter(Boolean);
+  if (!filtered.length) return;
+
+  // 이동 미리보기
+  const shiftDays = parseInt(document.getElementById('bdShiftDays')?.value) || 1;
+  const shiftDir = document.getElementById('bdShiftDir')?.value || 'back';
+  const sampleTx = filtered[0];
+  const sampleNewDate = _shiftDate(sampleTx.date, shiftDays, shiftDir);
+  const shiftPreview = document.getElementById('bdShiftPreview');
+  if (shiftPreview) {
+    shiftPreview.innerHTML = `예시: <b style="color:var(--text);">${sampleTx.date}</b> → <b style="color:var(--accent);">${sampleNewDate}</b> &nbsp;(${filtered.length}건 전체 적용)`;
+  }
+
+  // 치환 미리보기
+  const rfrom = document.getElementById('bdReplaceFrom')?.value;
+  const rto = document.getElementById('bdReplaceTo')?.value;
+  const matchCount = filtered.filter(t => t.date === rfrom).length;
+  const repPreview = document.getElementById('bdReplacePreview');
+  if (repPreview && rfrom && rto) {
+    repPreview.innerHTML = matchCount > 0
+      ? `<b style="color:var(--accent);">${rfrom}</b> 날짜를 가진 내역 <b style="color:var(--text);">${matchCount}건</b>이 <b style="color:var(--accent);">${rto}</b>으로 변경됩니다.`
+      : `<span style="color:var(--red);">현재 필터된 내역 중 <b>${rfrom}</b> 날짜를 가진 거래가 없습니다.</span>`;
+  }
+
+  // 설정 미리보기
+  const setDate = document.getElementById('bdSetDate')?.value;
+  const setPreview = document.getElementById('bdSetPreview');
+  if (setPreview && setDate) {
+    setPreview.innerHTML = `필터된 <b style="color:var(--text);">${filtered.length}건</b> 전체가 <b style="color:var(--accent);">${setDate}</b>으로 설정됩니다.`;
+  }
+}
+
+function applyBulkDate() {
+  const filtered = _bdFilteredIds.map(id => state.transactions.find(t => t.id === id)).filter(Boolean);
+  if (!filtered.length) { alert('대상 거래 내역이 없습니다.'); return; }
+
+  let changeCount = 0;
+
+  if (_bdCurrentTab === 'shift') {
+    const days = parseInt(document.getElementById('bdShiftDays').value);
+    const dir = document.getElementById('bdShiftDir').value;
+    if (!days || days < 1) { alert('이동할 일수를 올바르게 입력하세요.'); return; }
+    const dirLabel = dir === 'forward' ? `+${days}일 (미래)` : `-${days}일 (과거)`;
+    if (!confirm(`필터된 거래 ${filtered.length}건의 날짜를 ${dirLabel}로 이동합니다.\n계속하시겠습니까?`)) return;
+    filtered.forEach(tx => {
+      tx.date = _shiftDate(tx.date, days, dir);
+      changeCount++;
+    });
+
+  } else if (_bdCurrentTab === 'replace') {
+    const fromDate = document.getElementById('bdReplaceFrom').value;
+    const toDate = document.getElementById('bdReplaceTo').value;
+    if (!fromDate || !toDate) { alert('변경할 날짜와 바꿀 날짜를 모두 입력하세요.'); return; }
+    const targets = filtered.filter(t => t.date === fromDate);
+    if (!targets.length) { alert(`현재 필터된 내역 중 ${fromDate} 날짜를 가진 거래가 없습니다.`); return; }
+    if (!confirm(`${fromDate} 날짜를 가진 거래 ${targets.length}건을 ${toDate}으로 변경합니다.\n계속하시겠습니까?`)) return;
+    targets.forEach(tx => { tx.date = toDate; changeCount++; });
+
+  } else if (_bdCurrentTab === 'set') {
+    const setDate = document.getElementById('bdSetDate').value;
+    if (!setDate) { alert('설정할 날짜를 입력하세요.'); return; }
+    if (!confirm(`필터된 거래 ${filtered.length}건의 날짜를 모두 ${setDate}으로 설정합니다.\n계속하시겠습니까?`)) return;
+    filtered.forEach(tx => { tx.date = setDate; changeCount++; });
+  }
+
+  if (changeCount > 0) {
+    saveState();
+    closeBulkDateModal();
+    renderHistoryDashboard();
+    alert(`✅ ${changeCount}건의 날짜가 수정되었습니다.`);
+  }
+}
+// ── 날짜 일괄수정 끝 ─────────────────────────────────────────────────────────
+
+
 function updateDividendFilter(key, value) {
   dividendFilters[key] = value;
   renderDividendDashboard();
