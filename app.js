@@ -3554,7 +3554,7 @@ function renderModalChart() {
     if (range === '1d') return 2; if (range === '1w') return 6; if (range === '1m') return 22;
     if (range === '3m') return 63; if (range === '6m') return 126; if (range === '1y') return 252;
     if (range === '3y') return 756; if (range === '5y') return 1260; if (range === '10y') return 2520; 
-    if (range === 'all') return 99999; // 🌟 전체 기간일 때 데이터가 잘리지 않도록 매우 큰 값 반환
+    if (range === 'all') return 99999;
     return 252;
   };
   let sliceLen = getSliceLen(currentModalRange);
@@ -3578,7 +3578,6 @@ function renderModalChart() {
   chgEl.style.color = chgPct > 0 ? '#00C578' : '#3A9AFF';
   document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
   
-  // 변경 후
   if (modalChartInst) { modalChartInst.destroy(); modalChartInst = null; }
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker); }, 50);
 
@@ -3586,75 +3585,72 @@ function renderModalChart() {
   const sym = currentModalTicker;
   const txs = state.transactions.filter(t => t.symbol === sym && t.txType !== 'dividend' && t.txType !== 'transfer');
   const statsEl = document.getElementById('mTradeStats');
-  
+
   if (txs.length === 0) {
-      statsEl.style.display = 'none';
+    statsEl.style.display = 'none';
   } else {
-      statsEl.style.display = 'block';
-      
-      // ── 매매 요약 ──
-      let totalBuy = 0, totalSell = 0;
-      txs.forEach(t => {
-          if (t.qty > 0)  totalBuy  += t.qty * t.price;
-          if (t.qty < 0)  totalSell += Math.abs(t.qty) * t.price;
-      });
-      const netProfit = totalSell - totalBuy;
-      const isKr = isKorean(sym);
-      const fmt = v => isKr ? '₩' + Math.round(v).toLocaleString() : '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-      const sign = v => v >= 0 ? '+' : '-';
-      const profitColor = v => v >= 0 ? '#00C578' : '#3A9AFF';
+    statsEl.style.display = 'block';
 
-      document.getElementById('mTotalBuy').textContent = fmt(totalBuy);
-      document.getElementById('mTotalSell').textContent = fmt(totalSell);
-      const netEl = document.getElementById('mNetProfit');
-      netEl.textContent = (netProfit >= 0 ? '+' : '-') + fmt(Math.abs(netProfit));
-      netEl.style.color = profitColor(netProfit);
+    // 공통 헬퍼
+    const isKrStock = isKorean(sym);
+    const currentPrice = data.prices[data.prices.length - 1];
+    const fmt = v => isKrStock
+      ? '₩' + Math.round(Math.abs(v)).toLocaleString()
+      : '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+    const profitColor = v => v >= 0 ? '#00C578' : '#3A9AFF';
 
-      // 🌟 현재 보유 잔량 평가금 계산
-      const allHoldings = calculateHoldings();
-      const holdingQty = Object.values(allHoldings)
-          .filter(h => h.symbol === sym)
-          .reduce((sum, h) => sum + h.qty, 0);
-      const holdingAvg = Object.values(allHoldings)
-          .filter(h => h.symbol === sym && h.qty > 0)
-          .reduce((sum, h) => sum + h.avg * h.qty, 0) / (holdingQty || 1);
+    // ── 매매 요약 ──
+    let totalBuy = 0, totalSell = 0;
+    txs.forEach(t => {
+      if (t.qty > 0) totalBuy  += t.qty * t.price;
+      if (t.qty < 0) totalSell += Math.abs(t.qty) * t.price;
+    });
+    const netProfit = totalSell - totalBuy;
 
-      const holdingBox = document.getElementById('mHoldingBox');
-      if (holdingQty > 0) {
-          const holdingValue = holdingQty * currentPrice;
-          const holdingPnl = holdingValue - (holdingQty * holdingAvg);
-          const holdingRoi = holdingAvg > 0 ? (holdingPnl / (holdingQty * holdingAvg)) * 100 : 0;
-          holdingBox.style.display = 'block';
-          document.getElementById('mHoldingQty').textContent = `${holdingQty}주 보유`;
-          document.getElementById('mHoldingValue').textContent = fmt(holdingValue);
-          const holdingPnlEl = document.getElementById('mHoldingPnl');
-          holdingPnlEl.textContent = `${holdingPnl >= 0 ? '+' : '-'}${fmt(Math.abs(holdingPnl))} (${holdingRoi >= 0 ? '+' : ''}${holdingRoi.toFixed(2)}%)`;
-          holdingPnlEl.style.color = profitColor(holdingPnl);
-      } else {
-          holdingBox.style.display = 'none';
-      }
-      // ── What if 계산 ──
-      // 매수 수량 합계만 (매도 무시) → 전체 보유했다고 가정
-      let totalQtyBought = 0, totalCost = 0;
-      txs.filter(t => t.qty > 0).forEach(t => {
-          totalQtyBought += t.qty;
-          totalCost += t.qty * t.price;
-      });
-      const isKr = isKorean(sym);
-      const currentPrice = data.prices[data.prices.length - 1];
-      const fmt = v => isKr ? '₩' + Math.round(v).toLocaleString() : '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-      const profitColor = v => v >= 0 ? '#00C578' : '#3A9AFF';
-      const wiProfit = currentValue - totalCost;
-      const wiRoi = totalCost > 0 ? (wiProfit / totalCost) * 100 : 0;
+    document.getElementById('mTotalBuy').textContent = fmt(totalBuy);
+    document.getElementById('mTotalSell').textContent = fmt(totalSell);
+    const netEl = document.getElementById('mNetProfit');
+    netEl.textContent = (netProfit >= 0 ? '+' : '-') + fmt(netProfit);
+    netEl.style.color = profitColor(netProfit);
 
-      document.getElementById('mWiCost').textContent = fmt(totalCost);
-      document.getElementById('mWiValue').textContent = fmt(currentValue);
-      const wiProfitEl = document.getElementById('mWiProfit');
-      wiProfitEl.textContent = (wiProfit >= 0 ? '+' : '-') + fmt(Math.abs(wiProfit));
-      wiProfitEl.style.color = profitColor(wiProfit);
-      const wiRoiEl = document.getElementById('mWiRoi');
-      wiRoiEl.textContent = (wiRoi >= 0 ? '+' : '') + wiRoi.toFixed(2) + '%';
-      wiRoiEl.style.color = profitColor(wiRoi);
+    // ── 현재 보유 잔량 평가금 ──
+    const allHoldings = calculateHoldings();
+    const symHoldings = Object.values(allHoldings).filter(h => h.symbol === sym && h.qty > 0);
+    const holdingQty = symHoldings.reduce((s, h) => s + h.qty, 0);
+    const holdingCost = symHoldings.reduce((s, h) => s + h.qty * h.avg, 0);
+    const holdingBox = document.getElementById('mHoldingBox');
+    if (holdingQty > 0) {
+      const holdingValue = holdingQty * currentPrice;
+      const holdingPnl = holdingValue - holdingCost;
+      const holdingRoi = holdingCost > 0 ? (holdingPnl / holdingCost) * 100 : 0;
+      holdingBox.style.display = 'block';
+      document.getElementById('mHoldingQty').textContent = `${holdingQty}주 보유`;
+      document.getElementById('mHoldingValue').textContent = fmt(holdingValue);
+      const holdingPnlEl = document.getElementById('mHoldingPnl');
+      holdingPnlEl.textContent = `${holdingPnl >= 0 ? '+' : '-'}${fmt(holdingPnl)} (${holdingRoi >= 0 ? '+' : ''}${holdingRoi.toFixed(2)}%)`;
+      holdingPnlEl.style.color = profitColor(holdingPnl);
+    } else {
+      holdingBox.style.display = 'none';
+    }
+
+    // ── What if 계산 ──
+    let totalQtyBought = 0, totalCost = 0;
+    txs.filter(t => t.qty > 0).forEach(t => {
+      totalQtyBought += t.qty;
+      totalCost += t.qty * t.price;
+    });
+    const wiValue = totalQtyBought * currentPrice;
+    const wiProfit = wiValue - totalCost;
+    const wiRoi = totalCost > 0 ? (wiProfit / totalCost) * 100 : 0;
+
+    document.getElementById('mWiCost').textContent = fmt(totalCost);
+    document.getElementById('mWiValue').textContent = fmt(wiValue);
+    const wiProfitEl = document.getElementById('mWiProfit');
+    wiProfitEl.textContent = (wiProfit >= 0 ? '+' : '-') + fmt(wiProfit);
+    wiProfitEl.style.color = profitColor(wiProfit);
+    const wiRoiEl = document.getElementById('mWiRoi');
+    wiRoiEl.textContent = (wiRoi >= 0 ? '+' : '') + wiRoi.toFixed(2) + '%';
+    wiRoiEl.style.color = profitColor(wiRoi);
   }
 }
 
