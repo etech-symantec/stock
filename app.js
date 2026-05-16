@@ -3640,8 +3640,10 @@ function renderModalChart() {
           totalQtyBought += t.qty;
           totalCost += t.qty * t.price;
       });
+      const isKr = isKorean(sym);
       const currentPrice = data.prices[data.prices.length - 1];
-      const currentValue = totalQtyBought * currentPrice;
+      const fmt = v => isKr ? '₩' + Math.round(v).toLocaleString() : '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+      const profitColor = v => v >= 0 ? '#00C578' : '#3A9AFF';
       const wiProfit = currentValue - totalCost;
       const wiRoi = totalCost > 0 ? (wiProfit / totalCost) * 100 : 0;
 
