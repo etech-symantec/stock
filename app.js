@@ -1931,7 +1931,7 @@ async function fetchPublicData(symbol) {
 }
 
 // 🌟 2. 야후 파이낸스 API 호출 함수 (미국 주식 및 대체용)
-async function fetchYahooAPI(symbol, range = '1y') {
+async function fetchYahooAPI(symbol, range = '10y') {
   // 비정상적인 포맷 차단
   if (!/^[A-Za-z0-9.=^-]+$/.test(symbol)) {
     return { _failed: true };
@@ -1986,12 +1986,11 @@ async function fetchYahooAPI(symbol, range = '1y') {
 }
 
 // 🌟 3. 최종 데이터 라우터 (이 함수가 순서를 제어합니다)
-// 기존 앱 로직에서 이 함수를 호출하므로 이름은 그대로 유지합니다.
-async function fetchYahooData(symbol, range = '1y') {
+async function fetchYahooData(symbol, range = '10y') {
     if (symbol.endsWith('.DLST')) return { _failed: true };
     if (/^\d{6}\.K[SQ]$/.test(symbol)) {
         // Phase 1(1y)은 공공데이터 우선, Phase 2/3은 Yahoo 직접 사용
-        if (range === '1y') {
+        if (range === '1y' || range === '10y') {
             let publicData = await fetchPublicData(symbol);
             if (publicData && !publicData._failed) {
                 publicData._rangeLevel = 1;
@@ -3771,15 +3770,17 @@ async function fetchMissingMarketData(symbolsToFetch) {
     
     isFetchingMarketData = false;
     if(loadingEl) loadingEl.style.opacity = '0';
-    updateRangeButtonReadiness(); // 🌟 1년치 완료 후 버튼 상태 갱신
-    
+
+    // 🌟 10년치를 한 번에 받으므로 모든 버튼 즉시 활성화
+    const btn5y  = document.getElementById('rtab-5y');
+    const btn10y = document.getElementById('rtab-10y');
+    if (btn5y)  { btn5y.style.opacity  = '1'; btn5y.style.cursor  = 'pointer'; btn5y.title  = ''; }
+    if (btn10y) { btn10y.style.opacity = '1'; btn10y.style.cursor = 'pointer'; btn10y.title = ''; }
+
     try { 
         localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
     } catch(e){}
-
-    // 🌟 Phase 1 완료 → Phase 2(3y), Phase 3(10y) 백그라운드 순차 실행
-    fetchExtendedMarketData('3y', 2);
 }
 
 async function fetchExtendedMarketData(yahooRange, rangeLevel) {
