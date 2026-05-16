@@ -3578,8 +3578,59 @@ function renderModalChart() {
   chgEl.style.color = chgPct > 0 ? '#00C578' : '#3A9AFF';
   document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
   
+  // 변경 후
   if (modalChartInst) { modalChartInst.destroy(); modalChartInst = null; }
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker); }, 50);
+
+  // 🌟 매매기록 요약 + What if 계산
+  const sym = currentModalTicker;
+  const txs = state.transactions.filter(t => t.symbol === sym && t.txType !== 'dividend' && t.txType !== 'transfer');
+  const statsEl = document.getElementById('mTradeStats');
+  
+  if (txs.length === 0) {
+      statsEl.style.display = 'none';
+  } else {
+      statsEl.style.display = 'block';
+      
+      // ── 매매 요약 ──
+      let totalBuy = 0, totalSell = 0;
+      txs.forEach(t => {
+          if (t.qty > 0)  totalBuy  += t.qty * t.price;
+          if (t.qty < 0)  totalSell += Math.abs(t.qty) * t.price;
+      });
+      const netProfit = totalSell - totalBuy;
+      const isKr = isKorean(sym);
+      const fmt = v => isKr ? '₩' + Math.round(v).toLocaleString() : '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+      const sign = v => v >= 0 ? '+' : '-';
+      const profitColor = v => v >= 0 ? '#00C578' : '#3A9AFF';
+
+      document.getElementById('mTotalBuy').textContent = fmt(totalBuy);
+      document.getElementById('mTotalSell').textContent = fmt(totalSell);
+      const netEl = document.getElementById('mNetProfit');
+      netEl.textContent = (netProfit >= 0 ? '+' : '-') + fmt(Math.abs(netProfit));
+      netEl.style.color = profitColor(netProfit);
+
+      // ── What if 계산 ──
+      // 매수 수량 합계만 (매도 무시) → 전체 보유했다고 가정
+      let totalQtyBought = 0, totalCost = 0;
+      txs.filter(t => t.qty > 0).forEach(t => {
+          totalQtyBought += t.qty;
+          totalCost += t.qty * t.price;
+      });
+      const currentPrice = data.prices[data.prices.length - 1];
+      const currentValue = totalQtyBought * currentPrice;
+      const wiProfit = currentValue - totalCost;
+      const wiRoi = totalCost > 0 ? (wiProfit / totalCost) * 100 : 0;
+
+      document.getElementById('mWiCost').textContent = fmt(totalCost);
+      document.getElementById('mWiValue').textContent = fmt(currentValue);
+      const wiProfitEl = document.getElementById('mWiProfit');
+      wiProfitEl.textContent = (wiProfit >= 0 ? '+' : '-') + fmt(Math.abs(wiProfit));
+      wiProfitEl.style.color = profitColor(wiProfit);
+      const wiRoiEl = document.getElementById('mWiRoi');
+      wiRoiEl.textContent = (wiRoi >= 0 ? '+' : '') + wiRoi.toFixed(2) + '%';
+      wiRoiEl.style.color = profitColor(wiRoi);
+  }
 }
 
 // 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
