@@ -2061,15 +2061,13 @@ async function fetchExchangeRate() {
 
 // 📅 특정 날짜의 USD/KRW 환율 조회 (주말/휴장일은 가장 가까운 이전 영업일 값 사용)
 function getHistoricalFxRate(dateStr) {
-    const fxData = cachedMarketData['KRW=X'];
-    if (fxData && !fxData._failed && fxData.rawDates && fxData.prices) {
-        // 정확한 날짜 매칭
-        const idx = fxData.rawDates.indexOf(dateStr);
-        if (idx !== -1 && fxData.prices[idx] != null) return fxData.prices[idx];
-        // 주말/공휴일 → 가장 가까운 이전 영업일 사용
-        for (let i = fxData.rawDates.length - 1; i >= 0; i--) {
-            if (fxData.rawDates[i] <= dateStr && fxData.prices[i] != null)
-                return fxData.prices[i];
+    const fx = cachedMarketData['KRW=X'];
+    if (fx && !fx._failed && fx.rawDates && fx.prices) {
+        const idx = fx.rawDates.indexOf(dateStr);
+        if (idx !== -1 && fx.prices[idx] != null) return fx.prices[idx];
+        // 주말·공휴일 → 가장 가까운 이전 영업일
+        for (let i = fx.rawDates.length - 1; i >= 0; i--) {
+            if (fx.rawDates[i] <= dateStr && fx.prices[i] != null) return fx.prices[i];
         }
     }
     return currentUsdKrw; // 캐시 없으면 현재 환율 fallback
@@ -3171,13 +3169,13 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       }
     }
 
-    let krwDiv = 0, usdDiv = 0;
+    let krwDiv = 0, usdDivKrw = 0;
     let filterName = 'all';
     if (currentView === 'user1') filterName = state.owners.user1.name;
     if (currentView === 'user2') filterName = state.owners.user2.name;
 
     // 누적 실현수익 계산
-    let cumulRealKr = 0, cumulRealUs = 0;
+    let cumulRealKr = 0, cumulRealUsKrw = 0;
     const holdingsForReal = {};
     const sortedForReal = [...state.transactions]
         .filter(t => filterName === 'all' || t.owner === filterName)
@@ -3185,7 +3183,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     sortedForReal.forEach(tx => {
         if (tx.txType === 'dividend' || tx.txType === 'transfer') {
             if (tx.txType === 'dividend') {
-                if (isKorean(tx.symbol)) krwDiv += tx.price; else usdDiv += tx.price;
+                if (isKorean(tx.symbol)) krwDiv += tx.price;
+                else usdDivKrw += tx.price * getHistoricalFxRate(tx.date);
             }
             return;
         }
@@ -3199,17 +3198,17 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
             const sellQty = Math.abs(tx.qty);
             const pnl = (tx.price - h.avg) * sellQty;
             if (isKorean(tx.symbol)) cumulRealKr += pnl;
-            else cumulRealUs += pnl;
+            else cumulRealUsKrw += pnl * getHistoricalFxRate(tx.date);
             h.qty -= sellQty;
             if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
         }
     });
     // dividend 는 위에서 처리했으니 중복 계산 방지를 위해 아래 루프는 제거
     
-    const globalDiv = krwDiv + (usdDiv * currentUsdKrw);
+    const globalDiv = krwDiv + usdDivKrw;
     const globalCost = krwSummary.totalCost + (usdSummary.totalCost * currentUsdKrw);
     const globalEval = krwSummary.totalEval + (usdSummary.totalEval * currentUsdKrw);
-    const cumulRealTotal = cumulRealKr + (cumulRealUs * currentUsdKrw);
+    const cumulRealTotal = cumulRealKr + cumulRealUsKrw;
     // 누적 자산 = 현재 평가액 + 누적 실현수익
     const globalCumulative = globalEval + cumulRealTotal;
 
@@ -3509,8 +3508,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
 function renderDividendDashboard() {
   updateViewHeader('🌿', '배당통계');
-  let krwTotal = 0, usdTotal = 0;
-  let monthlyKrw = {}, monthlyUsd = {};
+  let krwTotal = 0, usdTotal = 0, usdTotalKrw = 0;
+  let monthlyKrw = {}, monthlyUsd = {}, monthlyUsdKrw = {};
   let symTotals = {};
   let divYields = {}; 
 
@@ -3585,8 +3584,15 @@ function renderDividendDashboard() {
      if (!symTotals[sym]) symTotals[sym] = { krw: 0, usd: 0 };
      if (!divYields[sym]) divYields[sym] = { totalDiv: 0, totalEvalAtDiv: 0, payCount: 0, firstDate: tx.date, lastDate: tx.date };
 
-     if (isKRW) { krwTotal += amt; monthlyKrw[month] += amt; symTotals[sym].krw += amt; }
-     else { usdTotal += amt; monthlyUsd[month] += amt; symTotals[sym].usd += amt; }
+     if (isKRW) {
+        krwTotal += amt; monthlyKrw[month] += amt; symTotals[sym].krw += amt;
+    } else {
+        const txFx = getHistoricalFxRate(tx.date);
+        usdTotal += amt; monthlyUsd[month] += amt; symTotals[sym].usd += amt;
+        usdTotalKrw += amt * txFx;
+        monthlyUsdKrw[month] = (monthlyUsdKrw[month] || 0) + (amt * txFx);
+        symTotals[sym].usdKrw = (symTotals[sym].usdKrw || 0) + (amt * txFx);
+    }
      
      divYields[sym].totalDiv += amt;
      divYields[sym].payCount += 1;
@@ -3622,7 +3628,7 @@ function renderDividendDashboard() {
 
   // 배당 비율바 + 환산액
   const divKrwNum = krwTotal;
-  const divUsdKrwNum = usdTotal * currentUsdKrw;
+  const divUsdKrwNum = usdTotalKrw;
   const divGrand = divKrwNum + divUsdKrwNum;
   const divKrPct = divGrand > 0 ? Math.round(divKrwNum / divGrand * 100) : 50;
   const divUsPct = 100 - divKrPct;
@@ -3635,7 +3641,7 @@ function renderDividendDashboard() {
   if (rPUs) rPUs.textContent = `${divUsPct}% 🇺🇸`;
   if (rConv) rConv.textContent = usdTotal > 0 ? `≈ ₩${Math.round(divUsdKrwNum).toLocaleString()}` : '';
     
-  const grandTotal = krwTotal + (usdTotal * currentUsdKrw);
+  const grandTotal = krwTotal + usdTotalKrw;
   document.getElementById('divTotalConverted').textContent = `₩ ${Math.round(grandTotal).toLocaleString()}`;
 
   // 🌟 배당 리스트 정렬 기준 적용 (배당률 순 vs 배당금 순)
@@ -3650,7 +3656,7 @@ function renderDividendDashboard() {
     }
     return { 
         symbol: sym, 
-        total: symTotals[sym].krw + (symTotals[sym].usd * currentUsdKrw), 
+        total: symTotals[sym].krw + (symTotals[sym].usdKrw || 0),
         yieldPct: yPct 
     };
   });
@@ -3757,7 +3763,7 @@ function renderDividendDashboard() {
 
   const allMonths = Array.from(new Set([...Object.keys(monthlyKrw), ...Object.keys(monthlyUsd)])).sort();
   const krwData = allMonths.map(m => monthlyKrw[m] || 0);
-  const usdConvertedData = allMonths.map(m => (monthlyUsd[m] || 0) * currentUsdKrw);
+  const usdConvertedData = allMonths.map(m => monthlyUsdKrw[m] || 0);
 
   if(divMonthlyChartInst) { divMonthlyChartInst.destroy(); divMonthlyChartInst = null; }
   const ctx = document.getElementById('divMonthlyCanvas').getContext('2d');
@@ -4896,9 +4902,9 @@ function renderRealizedDashboard() {
 
     rankingTxs.forEach(tx => {
         const isKr = isKorean(tx.symbol);
-        const fxForTx = isKr ? 1 : (tx.txFxRate || currentUsdKrw);
-        const pnlKrw = tx.pnl * fxForTx;
-        const costKrw = (tx.avgCost * tx.sellQty) * fxForTx;
+        const fxForRank = isKr ? 1 : (tx.txFxRate || currentUsdKrw);
+        const pnlKrw    = tx.pnl * fxForRank;
+        const costKrw   = (tx.avgCost * tx.sellQty) * fxForRank;
 
         if (!symStats[tx.symbol]) {
             let stockName = tx.symbol;
@@ -5135,9 +5141,10 @@ function renderCapitalGainsTax(ownerFilter) {
                 if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
 
                 const year = tx.date.substring(0, 4);
-                if (!byYear[year]) byYear[year] = { gainUsd: 0, lossUsd: 0 };
-                if (pnl >= 0) byYear[year].gainUsd += pnl;
-                else          byYear[year].lossUsd += Math.abs(pnl);
+                if (!byYear[year]) byYear[year] = { gainUsd: 0, lossUsd: 0, gainKrw: 0, lossKrw: 0 };
+                const txFx = getHistoricalFxRate(tx.date);
+                if (pnl >= 0) { byYear[year].gainUsd += pnl; byYear[year].gainKrw += pnl * txFx; }
+                else          { byYear[year].lossUsd += Math.abs(pnl); byYear[year].lossKrw += Math.abs(pnl) * txFx; }
             }
         });
 
@@ -5150,9 +5157,9 @@ function renderCapitalGainsTax(ownerFilter) {
 
     // ② 연도별 세금 계산
     const rows = years.map(year => {
-        const { gainUsd, lossUsd } = byYear[year];
-        const netUsd      = gainUsd - lossUsd;
-        const netKrw      = netUsd * currentUsdKrw;
+        const { gainUsd, lossUsd, gainKrw, lossKrw } = byYear[year];
+        const netUsd = gainUsd - lossUsd;
+        const netKrw = (gainKrw || 0) - (lossKrw || 0);  // 거래일 환율 기준
         const taxableKrw  = Math.max(0, netKrw - DEDUCTION);
         const taxKrw      = Math.round(taxableKrw * TAX_RATE);
         const isProfit    = netUsd > 0;
@@ -5234,7 +5241,7 @@ function renderCapitalGainsTax(ownerFilter) {
                     <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${netColor};">${fmtUsd(r.netUsd)}</td>
                     <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); color:${netColor};">
                         ${fmtKrw(r.netKrw)}
-                        <div style="font-size:10px; color:var(--text3); font-weight:400;">≈ ${currentUsdKrw.toLocaleString()}원/달러</div>
+                        <div style="font-size:10px; color:var(--text3); font-weight:400;">거래일 환율 적용</div>
                     </td>
                     <td style="padding:11px 14px; text-align:right;">${taxableStr}${notice}</td>
                     <td style="padding:11px 18px; text-align:right;">${taxStr}</td>
