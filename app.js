@@ -284,7 +284,7 @@ function getColors(prices) {
 }
 
 // 🌟 미니 차트 & 종목 모달 통합 차트 생성기 (연도 표시 + 매매 마커 완벽 복구!)
-function buildChart(canvasId, prices, passedDates, mini, symbol) {
+function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all') {
   const {line, fill} = getColors(prices);
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
@@ -318,47 +318,68 @@ function buildChart(canvasId, prices, passedDates, mini, symbol) {
   
   // 🌟 거래 내역 마커 찍기
   if (symbol && state.transactions) {
-      const buyData = [];
-      const sellData = [];
-      
-      const txs = state.transactions.filter(t => t.symbol === symbol && t.txType !== 'dividend');
+      const owners = state.owners;
+      const u1 = owners.user1, u2 = owners.user2;
+
+      // ownerFilter에 따라 표시할 소유자 목록 결정
+      const activeOwners = ownerFilter === 'all'
+          ? [u1.name, u2.name]
+          : [ownerFilter];
+
+      // 소유자별 색상 (매수: 붉은 계열, 매도: 파란 계열)
+      const ownerBuyColor  = { [u1.name]: '#ff4d6a', [u2.name]: '#ff9f43' };
+      const ownerSellColor = { [u1.name]: '#4d9fff', [u2.name]: '#00c896' };
+
+      const txs = state.transactions.filter(t =>
+          t.symbol === symbol &&
+          t.txType !== 'dividend' &&
+          activeOwners.includes(t.owner)
+      );
+
+      // 소유자별로 분리된 dataset 생성
+      const datasetMap = {}; // key: `${owner}_buy` or `${owner}_sell`
+
       txs.forEach(tx => {
           let dateIdx = displayRawDates.indexOf(tx.date);
-          
-          // 차트에 정확한 날짜가 없으면 가장 가까운 다음 날짜로 위치 보정
           if (dateIdx === -1) {
-              for(let k = 0; k < displayRawDates.length; k++) {
+              for (let k = 0; k < displayRawDates.length; k++) {
                   if (displayRawDates[k] >= tx.date) { dateIdx = k; break; }
               }
-              if (dateIdx === -1 && tx.date <= displayRawDates[displayRawDates.length-1]) {
+              if (dateIdx === -1 && tx.date <= displayRawDates[displayRawDates.length - 1]) {
                   dateIdx = displayRawDates.length - 1;
               }
           }
-          
-          // 💡 확실하게 Chart.js가 인식하는 {x, y, qty} 좌표 구조로 데이터 추가!
-          if (dateIdx !== -1) {
-              if (tx.qty > 0) {
-                  buyData.push({ x: displayDates[dateIdx], y: tx.price, qty: tx.qty });
-              } else if (tx.qty < 0) {
-                  sellData.push({ x: displayDates[dateIdx], y: tx.price, qty: Math.abs(tx.qty) });
-              }
+          if (dateIdx === -1) return;
+
+          const isBuy = tx.qty > 0;
+          const key = `${tx.owner}_${isBuy ? 'buy' : 'sell'}`;
+          if (!datasetMap[key]) {
+              const isSingleOwner = activeOwners.length === 1;
+              const ownerLabel = isSingleOwner ? '' : ` (${tx.owner})`;
+              datasetMap[key] = {
+                  label: isBuy ? `매수${ownerLabel}` : `매도${ownerLabel}`,
+                  data: [], type: 'line', showLine: false,
+                  pointStyle: 'triangle',
+                  rotation: isBuy ? 0 : 180,
+                  backgroundColor: isBuy ? ownerBuyColor[tx.owner] || '#ff4d6a' : ownerSellColor[tx.owner] || '#4d9fff',
+                  borderColor: '#fff',
+                  borderWidth: mini ? 1 : 1.5,
+                  pointRadius: mini ? 4 : 8,
+                  pointHoverRadius: mini ? 6 : 10,
+                  order: isBuy ? 1 : 2,
+                  _owner: tx.owner,
+                  _isBuy: isBuy
+              };
           }
+          datasetMap[key].data.push({
+              x: displayDates[dateIdx],
+              y: tx.price,
+              qty: Math.abs(tx.qty),
+              owner: tx.owner
+          });
       });
-      
-      if (buyData.length > 0) {
-          datasets.push({
-              label: '매수', data: buyData, type: 'line', showLine: false,
-              pointStyle: 'triangle', backgroundColor: '#ff4d6a', borderColor: '#fff',
-              borderWidth: mini ? 1 : 1.5, pointRadius: mini ? 4 : 8, pointHoverRadius: mini ? 6 : 10, order: 1
-          });
-      }
-      if (sellData.length > 0) {
-          datasets.push({
-              label: '매도', data: sellData, type: 'line', showLine: false,
-              pointStyle: 'triangle', rotation: 180, backgroundColor: '#4d9fff', borderColor: '#fff',
-              borderWidth: mini ? 1 : 1.5, pointRadius: mini ? 4 : 8, pointHoverRadius: mini ? 6 : 10, order: 2
-          });
-      }
+
+      Object.values(datasetMap).forEach(ds => datasets.push(ds));
   }
 
   return new Chart(canvas, {
@@ -373,8 +394,13 @@ function buildChart(canvasId, prices, passedDates, mini, symbol) {
                 callbacks: {
                     label: function(ctx) {
                         const sym = symbol || '';
-                        if (ctx.dataset.label === '매수' && ctx.raw) return `🔴 매수: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주)`;
-                        if (ctx.dataset.label === '매도' && ctx.raw) return `🔵 매도: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주)`;
+                        const ds = ctx.dataset;
+                        if (ds._isBuy !== undefined && ctx.raw) {
+                            const icon = ds._isBuy ? '🔴' : '🔵';
+                            const action = ds._isBuy ? '매수' : '매도';
+                            const ownerTag = ctx.raw.owner ? ` · ${ctx.raw.owner}` : '';
+                            return `${icon} ${action}: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주${ownerTag})`;
+                        }
                         let val = typeof ctx.raw === 'object' ? ctx.raw.y : ctx.raw;
                         return `주가: ${formatPrice(val, sym)}`;
                     }
@@ -3579,7 +3605,7 @@ function renderModalChart() {
   document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
   
   if (modalChartInst) { modalChartInst.destroy(); modalChartInst = null; }
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker); }, 50);
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, currentView === 'all' ? 'all' : (currentView === 'user1' ? state.owners.user1.name : state.owners.user2.name)); }, 50);
 
   // 🌟 매매기록 요약 + What if 계산
   const sym = currentModalTicker;
@@ -4030,7 +4056,7 @@ async function render() {
       const displayPrices = item.data.prices.slice(-item.sliceLen);
       const displayDates = item.data.dates.slice(-item.sliceLen);
       // 👇 이 줄의 맨 끝에 item.symbol 을 전달하도록 수정합니다!
-      chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true, item.symbol);
+      chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true, item.symbol, currentView === 'all' ? 'all' : (currentView === 'user1' ? state.owners.user1.name : state.owners.user2.name));
     }
   });
 }
