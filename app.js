@@ -3017,8 +3017,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                     let tickerDisp = (w > 20 && h > 30) ? `<div style="font-size:${fontSz-3}px; opacity:0.7; margin-top:2px;">${it.symbol.split('.')[0]}</div>` : '';
 
                     html += `
-                      <div class="treemap-cell" style="left:${x}%; top:${y}%; width:${w}%; height:${h}%; background:${bg};" 
-                           data-name="${it.name}" data-val="₩${Math.round(it.value).toLocaleString()}">
+                        <div class="treemap-cell" style="left:${x}%; top:${y}%; width:${w}%; height:${h}%; background:${bg}; cursor:pointer;" 
+                             data-name="${it.name}" data-val="₩${Math.round(it.value).toLocaleString()}" data-symbol="${it.symbol}">
                         <div style="font-weight:bold; font-size:${fontSz}px; text-align:center; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${it.name}">${it.name}</div>
                         ${tickerDisp}
                         <div style="font-size:${fontSz-1}px; margin-top:2px; opacity:0.9;">${sign}${it.change.toFixed(2)}%</div>
@@ -3075,6 +3075,10 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                 cell.addEventListener('mouseleave', () => {
                     let tooltipEl = document.getElementById('chartjs-tooltip');
                     if(tooltipEl) tooltipEl.style.opacity = 0;
+                });
+                cell.addEventListener('click', () => {
+                    const sym = cell.getAttribute('data-symbol');
+                    if (sym) openChartModal(sym);
                 });
             });
         }
