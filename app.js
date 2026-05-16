@@ -3810,7 +3810,6 @@ async function fetchExtendedMarketData(yahooRange, rangeLevel) {
         document.body.appendChild(loadingEl);
     }
     loadingEl.style.opacity = '1';
-    const label = rangeLevel === 2 ? '3년' : '10년';
 
     for (let i = 0; i < allSymbols.length; i += batchSize) {
         const batch = allSymbols.slice(i, i + batchSize);
@@ -3845,7 +3844,6 @@ async function fetchExtendedMarketData(yahooRange, rangeLevel) {
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
     } catch(e) {}
 
-    if (rangeLevel === 2) fetchExtendedMarketData('5y', 3);
     nextPhase[rangeLevel]?.();
 }
 
