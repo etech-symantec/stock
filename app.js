@@ -4150,8 +4150,10 @@ async function render() {
     if (item.data && item.data.prices && !item._isFallback) {
       const displayPrices = item.data.prices.slice(-item.sliceLen);
       const displayDates = item.data.dates.slice(-item.sliceLen);
-      // 👇 이 줄의 맨 끝에 item.symbol 을 전달하도록 수정합니다!
-      chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true, item.symbol, currentView === 'all' ? 'all' : (currentView === 'user1' ? state.owners.user1.name : state.owners.user2.name));
+      const _ownerFilter = currentView === 'user1' ? state.owners.user1.name
+                         : currentView === 'user2' ? state.owners.user2.name
+                         : 'all'; // watch, all 등 나머지는 전체 표시
+      chartInstances[item.uniqueId] = buildChart(item.uniqueId, displayPrices, displayDates, true, item.symbol, _ownerFilter);
     }
   });
 }
