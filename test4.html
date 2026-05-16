@@ -798,7 +798,7 @@
     <div id="mTradeStats" style="display:none; margin-top:16px; border-top:1px solid var(--border2); padding-top:14px;">
       <!-- 매매 요약 -->
       <div style="font-size:12px; font-weight:600; color:var(--text2); margin-bottom:8px;">📋 매매 기록 요약</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
         <div style="background:var(--bg3); border-radius:8px; padding:8px 10px;">
           <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">총 매수금</div>
           <div id="mTotalBuy" style="font-family:var(--font-mono); font-size:13px; font-weight:700;"></div>
@@ -810,6 +810,12 @@
         <div style="background:var(--bg3); border-radius:8px; padding:8px 10px;">
           <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">실현 순수익</div>
           <div id="mNetProfit" style="font-family:var(--font-mono); font-size:13px; font-weight:700;"></div>
+        </div>
+        <!-- 🌟 보유 잔량 있을 때만 표시 -->
+        <div id="mHoldingBox" style="display:none; background:var(--bg3); border-radius:8px; padding:8px 10px;">
+          <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">현재 평가금 <span id="mHoldingQty" style="color:var(--accent);"></span></div>
+          <div id="mHoldingValue" style="font-family:var(--font-mono); font-size:13px; font-weight:700;"></div>
+          <div id="mHoldingPnl" style="font-family:var(--font-mono); font-size:11px; margin-top:2px;"></div>
         </div>
       </div>
       <!-- What if -->
