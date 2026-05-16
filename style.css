@@ -1347,17 +1347,17 @@ nav {
 
 /* ── 1360px 이하: 6M 숨김 ── */
 @media (max-width: 1360px) and (min-width: 769px) {
-  #rtab-6m { display: none; }
+  #rtab-6m { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
 }
 
 /* ── 1240px 이하: 3M 숨김 ── */
 @media (max-width: 1240px) and (min-width: 769px) {
-  #rtab-3m { display: none; }
+  #rtab-3m { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
 }
 
 /* ── 1100px 이하: 1M 숨김 ── */
 @media (max-width: 1100px) and (min-width: 769px) {
-  #rtab-1m { display: none; }
+  #rtab-1m { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
   #tabUser1 .vtab-text, #tabUser2 .vtab-text { display: none; }
   #tabUser1, #tabUser2 { padding: 9px 11px; gap: 0; }
 }
