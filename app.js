@@ -3699,13 +3699,41 @@ function renderModalChart() {
   }
 }
 
-// 🌟 [추가됨] 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
+// 🌟 5Y/10Y 버튼 준비 상태 업데이트
+function updateRangeButtonReadiness() {
+    const allSymbols = Object.keys(cachedMarketData).filter(s => cachedMarketData[s] && !cachedMarketData[s]._failed);
+    if (allSymbols.length === 0) return;
+
+    const minLevel = Math.min(...allSymbols.map(s => cachedMarketData[s]._rangeLevel || 0));
+
+    const btn5y  = document.getElementById('rtab-5y');
+    const btn10y = document.getElementById('rtab-10y');
+
+    if (btn5y) {
+        const ready = minLevel >= 2;
+        btn5y.style.opacity    = ready ? '1'       : '0.35';
+        btn5y.style.cursor     = ready ? 'pointer' : 'not-allowed';
+        btn5y.title            = ready ? ''        : '3년치 데이터 로딩 중...';
+        btn5y.style.transition = 'opacity 0.4s';
+    }
+    if (btn10y) {
+        const ready = minLevel >= 3;
+        btn10y.style.opacity    = ready ? '1'       : '0.35';
+        btn10y.style.cursor     = ready ? 'pointer' : 'not-allowed';
+        btn10y.title            = ready ? ''        : '10년치 데이터 로딩 중...';
+        btn10y.style.transition = 'opacity 0.4s';
+    }
+}
+// 🌟 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
 let isFetchingMarketData = false;
 async function fetchMissingMarketData(symbolsToFetch) {
     if(isFetchingMarketData || !symbolsToFetch || symbolsToFetch.length === 0) return;
     isFetchingMarketData = true;
+
+    // 🌟 Phase 1 시작 시 5Y/10Y 버튼 즉시 흐리게
+    updateRangeButtonReadiness();
     
-    // 🌟 [핵심 추가] 장부에 한 번이라도 기록된 종목(보유/매도)을 1순위로 끌어올리기
+    // 🌟 장부에 한 번이라도 기록된 종목(보유/매도)을 1순위로 끌어올리기
     const transactedSymbols = new Set(state.transactions.map(tx => tx.symbol));
     symbolsToFetch.sort((a, b) => {
         const aOwned = transactedSymbols.has(a) ? 1 : 0;
@@ -3743,6 +3771,7 @@ async function fetchMissingMarketData(symbolsToFetch) {
     
     isFetchingMarketData = false;
     if(loadingEl) loadingEl.style.opacity = '0';
+    updateRangeButtonReadiness(); // 🌟 1년치 완료 후 버튼 상태 갱신
     
     try { 
         localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
@@ -3778,27 +3807,38 @@ async function fetchExtendedMarketData(yahooRange, rangeLevel) {
     const label = rangeLevel === 2 ? '3년' : '10년';
 
     for (let i = 0; i < allSymbols.length; i += batchSize) {
-        loadingEl.innerHTML = `📊 ${label}치 데이터 로딩 중... (${Math.min(i + batchSize, allSymbols.length)}/${allSymbols.length})`;
         const batch = allSymbols.slice(i, i + batchSize);
+
+        // 🌟 현재 로딩 중인 종목명 표시
+        const batchNames = batch.map(s => {
+            const d = cachedMarketData[s];
+            return (d && d.name) ? d.name : s;
+        }).join(', ');
+        loadingEl.innerHTML = `📊 ${label}치 로딩 중 (${Math.min(i + batchSize, allSymbols.length)}/${allSymbols.length})<br><span style="font-size:10px; opacity:0.8;">${batchNames}</span>`;
+
         await Promise.all(batch.map(async sym => {
             const fetchSym = /^\d{6}$/.test(sym) ? sym + '.KS' : sym;
             const data = await fetchYahooData(fetchSym, yahooRange);
             if (data && !data._failed) {
-                // 기존 name 유지하면서 가격 데이터만 교체
                 cachedMarketData[sym] = { ...data, name: cachedMarketData[sym]?.name || data.name };
             }
         }));
+
+        updateRangeButtonReadiness(); // 🌟 배치마다 버튼 상태 갱신
         render();
-        await new Promise(res => setTimeout(res, 500)); // 백그라운드: 여유있게 딜레이
+        await new Promise(res => setTimeout(res, 500));
     }
 
+    // 🌟 완료 메시지 잠깐 표시 후 숨김
+    loadingEl.innerHTML = `✅ ${label}치 데이터 준비 완료!`;
+    await new Promise(res => setTimeout(res, 1200));
     loadingEl.style.opacity = '0';
+
     try {
         localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData));
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
     } catch(e) {}
 
-    // Phase 2 완료 → Phase 3 시작
     if (rangeLevel === 2) fetchExtendedMarketData('10y', 3);
 }
 
