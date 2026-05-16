@@ -3629,8 +3629,8 @@ function renderModalChart() {
 
     document.getElementById('mTotalBuy').textContent  = fmt(totalBuy);
     document.getElementById('mTotalSell').textContent = fmt(totalSell);
-    document.getElementById('mAvgBuy').textContent  = totalBuyQty  > 0 ? fmt(avgBuy)  : '-';
-    document.getElementById('mAvgSell').textContent = totalSellQty > 0 ? fmt(avgSell) : '-';
+    document.getElementById('mAvgBuy').textContent  = totalBuyQty  > 0 ? `평균 ${fmt(avgBuy)}`  : '';
+    document.getElementById('mAvgSell').textContent = totalSellQty > 0 ? `평균 ${fmt(avgSell)}` : '';
     const netEl = document.getElementById('mNetProfit');
     netEl.textContent = (netProfit >= 0 ? '+' : '-') + fmt(netProfit);
     netEl.style.color = profitColor(netProfit);
