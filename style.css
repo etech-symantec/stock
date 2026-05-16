@@ -1608,10 +1608,11 @@ nav {
   background: var(--accent);
   color: #fff;
   box-shadow: 0 2px 8px rgba(124, 106, 247, 0.4);
-  transform: none;
+  transform: scale(1.2);
   transition:
     background 0.2s ease,
-    box-shadow 0.2s ease !important;
+    box-shadow 0.2s ease,
+    transform 0.2s ease !important;
 }
 
 /* 클릭 시 눌리는 효과 */
