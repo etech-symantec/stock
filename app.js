@@ -1931,7 +1931,7 @@ async function fetchPublicData(symbol) {
 }
 
 // 🌟 2. 야후 파이낸스 API 호출 함수 (미국 주식 및 대체용)
-async function fetchYahooAPI(symbol, range = '10y') {
+async function fetchYahooAPI(symbol, range = '5y') {
   // 비정상적인 포맷 차단
   if (!/^[A-Za-z0-9.=^-]+$/.test(symbol)) {
     return { _failed: true };
@@ -1972,7 +1972,7 @@ async function fetchYahooAPI(symbol, range = '10y') {
     }
     if(symbol === 'KRW=X') cName = 'USD/KRW 환율';
     
-    const rangeLevel = { '1y': 1, '3y': 2, '5y': 3, '10y': 4 }[range] || 1;
+    const rangeLevel = { '1y': 1, '3y': 2, '5y': 3 }[range] || 1;
     return {
       symbol: symbol, name: cName, currency: meta.currency || 'USD',
       prices: validPrices, dates: validDates, rawDates: rawDates,
@@ -1986,7 +1986,7 @@ async function fetchYahooAPI(symbol, range = '10y') {
 }
 
 // 🌟 3. 최종 데이터 라우터 (이 함수가 순서를 제어합니다)
-async function fetchYahooData(symbol, range = '10y') {
+async function fetchYahooData(symbol, range = '5y') {
     if (symbol.endsWith('.DLST')) return { _failed: true };
     if (/^\d{6}\.K[SQ]$/.test(symbol)) {
         // Phase 1(1y)은 공공데이터 우선, Phase 2/3은 Yahoo 직접 사용
