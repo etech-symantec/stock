@@ -3602,7 +3602,10 @@ function renderModalChart() {
   document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
   
   if (modalChartInst) { modalChartInst.destroy(); modalChartInst = null; }
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, currentView === 'all' ? 'all' : (currentView === 'user1' ? state.owners.user1.name : state.owners.user2.name)); }, 50);
+  const _modalOwnerFilter = currentView === 'user1' ? state.owners.user1.name
+                          : currentView === 'user2' ? state.owners.user2.name
+                          : 'all'; // watch, all 등 나머지는 전체 표시
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, _modalOwnerFilter); }, 50);
 
   // 🌟 매매기록 요약 + What if 계산
   const sym = currentModalTicker;
