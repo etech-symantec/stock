@@ -1313,11 +1313,6 @@ nav {
 }
 .view-tabs::-webkit-scrollbar { display: none; }
 
-/* ── 1900px 이하: 10Y 숨김 ── */
-@media (max-width: 1900px) and (min-width: 769px) {
-  #rtab-10y { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
-}
-
 /* ── 1800px 이하: 5Y 숨김 ── */
 @media (max-width: 1800px) and (min-width: 769px) {
   #rtab-5y  { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
