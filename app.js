@@ -39,6 +39,7 @@ function getCutoffDateFromRange(range) {
     else if (range === '6m') d.setMonth(d.getMonth() - 6);
     else if (range === '1y') d.setFullYear(d.getFullYear() - 1);
     else if (range === '3y') d.setFullYear(d.getFullYear() - 3);
+    else if (range === '5y') d.setFullYear(d.getFullYear() - 5);
     return d.toISOString().split('T')[0];
 }
 let currentDivFilter = 'all';
@@ -1485,11 +1486,6 @@ function renderHistoryDashboard() {
           }
           if (!tx.symbol.toLowerCase().includes(s) && !stockName.toLowerCase().includes(s)) pass = false;
       }
-
-      // 🌟 글로벌 기간 설정 연동 필터 (1D~3Y)
-      const cutoff = getCutoffDateFromRange(state.range);
-      if (tx.date < cutoff) pass = false;
-
       return pass;
   });
 
