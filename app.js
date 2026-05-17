@@ -763,8 +763,8 @@ function importCsvData(event) {
 
         let txType = 'trade';
         if (typeStr.includes('배당') || typeStr.toLowerCase() === 'dividend') { txType = 'dividend'; qty = 0; }
-        else if (typeStr.includes('매도') || typeStr.toLowerCase() === 'sell') { txType = 'sell'; qty = -Math.abs(qty); }
-        else if (typeStr.includes('매수') || typeStr.toLowerCase() === 'buy') { txType = 'buy'; qty = Math.abs(qty); }
+        else if (typeStr.includes('매도') || typeStr.toLowerCase() === 'sell') { txType = 'trade'; qty = -Math.abs(qty); }
+        else if (typeStr.includes('매수') || typeStr.toLowerCase() === 'buy')  { txType = 'trade'; qty =  Math.abs(qty); }
 
         let ownerMapped = owner;
         if (owner === '소유자1') ownerMapped = state.owners.user1.name;
@@ -1461,8 +1461,8 @@ function renderHistoryDashboard() {
       if (historyFilters.market === 'us' && isKr) pass = false;
       
       // 거래 유형 필터
-      if (historyFilters.type === 'buy'  && (tx.qty <= 0  || (tx.txType && tx.txType !== 'trade'))) pass = false;
-      if (historyFilters.type === 'sell' && (tx.qty >= 0  || (tx.txType && tx.txType !== 'trade'))) pass = false;
+      if (historyFilters.type === 'buy'  && !(tx.qty > 0 && (!tx.txType || tx.txType === 'trade' || tx.txType === 'buy')))  pass = false;
+      if (historyFilters.type === 'sell' && !(tx.qty < 0 && (!tx.txType || tx.txType === 'trade' || tx.txType === 'sell'))) pass = false;
       if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
 
       // 거래내역 자체 기간 필터
