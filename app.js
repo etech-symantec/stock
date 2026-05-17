@@ -1414,12 +1414,35 @@ function renderHistoryDashboard() {
         <span onclick="historyFilters.dateFrom='';historyFilters.dateTo='';renderHistoryDashboard();"
           style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
     }
-    if (historyFilters.broker !== 'all') {
-      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">계좌: ${historyFilters.broker}
-        <span onclick="historyFilters.broker='all';renderHistoryDashboard();"
+    if (historyFilters.owner !== 'all') {
+      const oLabel = historyFilters.owner === 'user1' ? state.owners.user1.name : state.owners.user2.name;
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">소유자: ${oLabel}
+        <span onclick="historyFilters.owner='all'; document.querySelectorAll('.hist-owner-filter').forEach((b,i)=>b.classList.toggle('active',i===0)); renderHistoryDashboard();"
           style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
     }
-    if (html) html += `<button class="f-btn" onclick="resetHistoryFilters()" style="font-size:11px;color:var(--red);border-color:var(--red);">✕ 초기화</button>`;
+    if (historyFilters.market !== 'all') {
+      const mLabel = historyFilters.market === 'kr' ? '국내' : '해외';
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">시장: ${mLabel}
+        <span onclick="_setHistMktBtn(document.getElementById('histMktAll')); updateHistoryFilter('market','all');"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (historyFilters.type !== 'all') {
+      const tLabel = { buy:'매수', sell:'매도', dividend:'배당' }[historyFilters.type] || historyFilters.type;
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">유형: ${tLabel}
+        <span onclick="_setHistTypeBtn(document.getElementById('histTypeAll')); updateHistoryFilter('type','all');"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (historyFilters.broker !== 'all') {
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">계좌: ${historyFilters.broker}
+        <span onclick="historyFilters.broker='all'; document.getElementById('histBrokerFilter').value='all'; renderHistoryDashboard();"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (historyFilters.search) {
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">종목: ${historyFilters.search}
+        <span onclick="historyFilters.search=''; document.getElementById('histNameSearch').value=''; renderHistoryDashboard();"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (html) html += `<button class="btn-sm" onclick="resetHistoryFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
     badgesEl.innerHTML = html;
   }
   
@@ -3707,12 +3730,29 @@ function renderDividendDashboard() {
         <span onclick="dividendFilters.dateFrom='';dividendFilters.dateTo='';renderDividendDashboard();"
           style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
     }
-    if (dividendFilters.broker !== 'all') {
-      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">계좌: ${dividendFilters.broker}
-        <span onclick="dividendFilters.broker='all';renderDividendDashboard();"
+    if (currentDivFilter !== 'all') {
+      const oLabel = currentDivFilter === 'user1' ? state.owners.user1.name : state.owners.user2.name;
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">소유자: ${oLabel}
+        <span onclick="currentDivFilter='all'; document.querySelectorAll('.div-owner-filter').forEach((b,i)=>b.classList.toggle('active',i===0)); renderDividendDashboard();"
           style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
     }
-    if (html) html += `<button class="f-btn" onclick="resetDividendFilters()" style="font-size:11px;color:var(--red);border-color:var(--red);">✕ 초기화</button>`;
+    if (dividendFilters.market !== 'all') {
+      const mLabel = dividendFilters.market === 'kr' ? '국내' : '해외';
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">시장: ${mLabel}
+        <span onclick="_setDivMktBtn(document.getElementById('divMktAll')); updateDividendFilter('market','all');"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (dividendFilters.broker !== 'all') {
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">계좌: ${dividendFilters.broker}
+        <span onclick="dividendFilters.broker='all'; document.getElementById('divBrokerFilter').value='all'; renderDividendDashboard();"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (dividendFilters.search) {
+      html += `<div class="f-btn active" style="cursor:default;font-size:11px;">종목: ${dividendFilters.search}
+        <span onclick="dividendFilters.search=''; document.getElementById('divNameSearch').value=''; renderDividendDashboard();"
+          style="margin-left:6px;cursor:pointer;font-weight:bold;color:var(--text2);">✕</span></div>`;
+    }
+    if (html) html += `<button class="btn-sm" onclick="resetDividendFilters()" style="height:26px; padding:0 10px; color:var(--red); border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); font-size:11px;">초기화 🔄</button>`;
     divBadgesEl.innerHTML = html;
   }
 
