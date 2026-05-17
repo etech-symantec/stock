@@ -1611,18 +1611,20 @@ function renderHistoryRanking(txs) {
 
     // ── 공통 랭킹 row ────────────────────────────────────────────────────
     const rankRow = (sym, rank, valueHtml, barPct, color) => `
+    const medalMap = { 1: '🥇', 2: '🥈', 3: '🥉' };
+    const medal = medalMap[rank] || `<span style="font-size:11px; color:var(--text3); font-weight:700; min-width:18px; display:inline-block; text-align:center;">${rank}</span>`;
     <div style="padding:8px 10px; border-radius:8px; transition:0.15s;"
          onmouseover="this.style.background='rgba(255,255,255,0.04)'"
          onmouseout="this.style.background='transparent'">
       <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-        <span style="font-size:11px; font-weight:700; color:var(--text3); width:18px; text-align:right; flex-shrink:0;">${rank}</span>
+        <span style="font-size:15px; flex-shrink:0;">${medal}</span>
         <div style="flex:1; min-width:0;">
           <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${getName(sym)}</div>
           <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${sym.replace(/\.KS\.DLST|\.DLST|\.KS/g,'')}</div>
         </div>
         <div style="text-align:right; flex-shrink:0; font-family:var(--font-mono); font-size:11px; font-weight:700; color:${color}; line-height:1.4;">${valueHtml}</div>
       </div>
-      <div style="height:3px; border-radius:2px; background:var(--bg3); overflow:hidden; margin-left:26px;">
+      <div style="height:3px; border-radius:2px; background:var(--bg3); overflow:hidden;">
         <div style="height:100%; width:${Math.min(100,barPct)}%; background:${color}; border-radius:2px; transition:width 0.4s;"></div>
       </div>
     </div>`;
