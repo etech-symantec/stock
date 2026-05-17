@@ -1461,8 +1461,8 @@ function renderHistoryDashboard() {
       if (historyFilters.market === 'us' && isKr) pass = false;
       
       // 거래 유형 필터
-      if (historyFilters.type === 'buy' && (tx.txType !== 'trade' || tx.qty <= 0)) pass = false;
-      if (historyFilters.type === 'sell' && (tx.txType !== 'trade' || tx.qty >= 0)) pass = false;
+      if (historyFilters.type === 'buy'  && (tx.qty <= 0  || (tx.txType && tx.txType !== 'trade'))) pass = false;
+      if (historyFilters.type === 'sell' && (tx.qty >= 0  || (tx.txType && tx.txType !== 'trade'))) pass = false;
       if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
 
       // 거래내역 자체 기간 필터
