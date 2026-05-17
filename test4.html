@@ -713,33 +713,30 @@
               <div class="stat-banner-sub">국내 + 해외 합산</div>
             </div>
             <div class="stat-banner-right">
-              <div class="stat-markets">
-                <div class="stat-market">
-                  <span class="stat-flag">🇰🇷</span>
-                  <div class="stat-market-info">
+              <div class="stat-markets" style="flex-direction:row; align-items:stretch; gap:0; flex:1;">
+
+                <!-- 🇰🇷 국내주식 실현수익 -->
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding-right:14px; border-right:1px solid var(--border);">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="stat-flag">🇰🇷</span>
                     <div class="stat-market-label">국내주식 실현수익</div>
-                    <div id="realTotalKrw" class="stat-market-val" style="color:var(--profit);">—</div>
                   </div>
+                  <div id="realTotalKrw" class="stat-market-val" style="color:var(--profit);">—</div>
                 </div>
-                <div class="stat-market">
-                  <span class="stat-flag">🇺🇸</span>
-                  <div class="stat-market-info">
+
+                <!-- 🇺🇸 해외주식 실현수익 -->
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding:0 14px; border-right:1px solid var(--border);">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="stat-flag">🇺🇸</span>
                     <div class="stat-market-label">해외주식 실현수익</div>
-                    <div id="realTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
-                    <div id="realTotalUsdConverted" class="stat-market-converted">—</div>
-                    <div id="capitalGainsTaxPanel" style="margin-top:8px;"></div>
                   </div>
+                  <div id="realTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
+                  <div id="realTotalUsdConverted" class="stat-market-converted">—</div>
                 </div>
-              </div>
-              <div class="stat-ratio-row">
-                <div class="stat-ratio-bar">
-                  <div id="realRatioKr" class="stat-ratio-kr" style="background:var(--profit);"></div>
-                  <div class="stat-ratio-us" style="background:var(--blue);"></div>
-                </div>
-                <div class="stat-ratio-pcts">
-                  <span id="realRatioPctKr" style="color:var(--profit);">🇰🇷 —</span>
-                  <span id="realRatioPctUs" style="color:var(--blue);">— 🇺🇸</span>
-                </div>
+
+                <!-- 📋 양도소득세 -->
+                <div id="capitalGainsTaxPanel" style="flex:1; display:flex; flex-direction:column; justify-content:center; padding-left:14px; min-width:0;"></div>
+
               </div>
             </div>
           </div>
