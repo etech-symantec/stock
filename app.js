@@ -5191,26 +5191,35 @@ function renderCapitalGainsTax(ownerFilter) {
     const totalNetKrw   = rows.reduce((s, r) => s + r.netKrw,  0);
     const totalTaxKrw   = rows.reduce((s, r) => s + r.taxKrw,  0);
 
-    // ⑤ 패널 HTML
-    const headerHtml = `
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-top:1px solid var(--border); margin-top:4px; cursor:pointer; user-select:none;"
-         onclick="document.getElementById('cgTaxBody').style.display=_cgTaxExpanded?'none':'block'; _cgTaxExpanded=!_cgTaxExpanded; document.getElementById('cgTaxChevron').textContent=_cgTaxExpanded?'▲':'▼';">
-        <div>
-            <div style="font-size:11px; font-weight:700; color:var(--text);">📋 양도소득세 계산</div>
-            <div style="font-size:10px; color:var(--text3); margin-top:1px;">공제 250만 · 세율 22%</div>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
+    // ⑤ 올해 연도 확인
+    const thisYear = String(new Date().getFullYear());
+    const curRow = rows.find(r => r.year === thisYear);
+
+    // 올해 한 줄 인라인 렌더
+    const curRowHtml = (() => {
+        const r = curRow;
+        if (!r) return `<div style="font-size:11px; color:var(--text3); padding:4px 0;">${thisYear}년 매도 내역 없음</div>`;
+        const netColor = r.netUsd > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
+        const taxStr = r.taxKrw > 0
+            ? `<span style="color:#ff4d6a; font-weight:700; font-family:var(--font-mono);">₩${r.taxKrw.toLocaleString()}</span>`
+            : `<span style="color:var(--text3); font-size:10px;">납부 없음</span>`;
+        return `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:5px 0;">
+            <div>
+                <div style="font-size:10px; color:var(--text3);">순손익</div>
+                <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:${netColor};">${fmtUsd(r.netUsd)}</div>
+                <div style="font-size:10px; color:${netColor};">${fmtKrw(r.netKrw)}</div>
+            </div>
             <div style="text-align:right;">
                 <div style="font-size:10px; color:var(--text3);">예상 세금</div>
-                <div style="font-size:13px; font-weight:700; color:${totalTaxKrw > 0 ? '#ff4d6a' : 'var(--text3)'}; font-family:var(--font-mono);">
-                    ${totalTaxKrw > 0 ? `₩${Math.round(totalTaxKrw).toLocaleString()}` : '없음'}
-                </div>
+                ${taxStr}
+                ${r.netKrw > 0 && r.netKrw <= DEDUCTION ? `<div style="font-size:9px; color:var(--text3);">공제 범위 내</div>` : ''}
             </div>
-            <span id="cgTaxChevron" style="color:var(--text3); font-size:11px;">${_cgTaxExpanded ? '▲' : '▼'}</span>
-        </div>
-    </div>`;
+        </div>`;
+    })();
 
-    const tableHtml = `
+    // 전체 테이블 (모달용 빌더 - 클로저로 데이터 캡처)
+    const buildFullTableHtml = () => `
     <div style="overflow-x:auto;">
     <table style="width:100%; border-collapse:collapse; font-size:12px;">
         <thead>
@@ -5226,9 +5235,10 @@ function renderCapitalGainsTax(ownerFilter) {
         </thead>
         <tbody>
             ${rows.map((r, i) => {
-                const netColor  = r.netUsd  > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
-                const taxColor  = r.taxKrw  > 0 ? '#ff4d6a' : 'var(--text3)';
-                const bg        = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)';
+                const netColor   = r.netUsd > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
+                const taxColor   = r.taxKrw > 0 ? '#ff4d6a' : 'var(--text3)';
+                const isThisYear = r.year === thisYear;
+                const bg         = isThisYear ? 'rgba(124,106,247,0.07)' : (i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)');
                 const taxableStr = r.taxableKrw > 0
                     ? `<span style="color:#ff4d6a;">${fmtKrw(r.taxableKrw)}</span>`
                     : `<span style="color:var(--text3);">—</span>`;
@@ -5240,7 +5250,10 @@ function renderCapitalGainsTax(ownerFilter) {
                 return `
                 <tr style="border-bottom:1px solid var(--border); background:${bg}; transition:0.15s;"
                     onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='${bg}'">
-                    <td style="padding:11px 18px; font-weight:700; color:var(--text); font-size:13px;">${r.year}년</td>
+                    <td style="padding:11px 18px; font-weight:700; color:var(--text); font-size:13px;">
+                        ${r.year}년
+                        ${isThisYear ? `<span style="font-size:10px; color:#7c6af7; background:rgba(124,106,247,0.15); padding:1px 6px; border-radius:4px; margin-left:4px;">올해</span>` : ''}
+                    </td>
                     <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); color:#00C578;">+$${r.gainUsd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
                     <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); color:#3A9AFF;">${r.lossUsd > 0 ? `-$${r.lossUsd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}` : '—'}</td>
                     <td style="padding:11px 14px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${netColor};">${fmtUsd(r.netUsd)}</td>
@@ -5268,7 +5281,44 @@ function renderCapitalGainsTax(ownerFilter) {
         ⚠️ 위 계산은 <b>참고용 추정치</b>입니다. 실제 신고 시에는 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요. 확정신고: 매년 5월 (전년도 양도분 기준).
     </div>`;
 
-    panel.innerHTML = headerHtml + `<div id="cgTaxBody" style="display:${_cgTaxExpanded?'block':'none'}; margin-top:6px; border-radius:6px; overflow:hidden; border:1px solid var(--border);">${tableHtml}</div>`;
+    // 모달 열기 함수 등록 (클로저로 최신 데이터 캡처)
+    window._openCgTaxModal = () => {
+        let overlay = document.getElementById('cgTaxModalOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'cgTaxModalOverlay';
+            overlay.className = 'overlay';
+            overlay.onclick = e => { if (e.target === overlay) overlay.style.display = 'none'; };
+            document.body.appendChild(overlay);
+        }
+        overlay.innerHTML = `
+        <div class="modal" onclick="event.stopPropagation()"
+             style="max-width:860px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
+                <div>
+                    <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 미국주식 양도소득세 계산 — 전체 연도</div>
+                    <div style="font-size:11px; color:var(--text3); margin-top:2px;">기본공제 250만원 · 세율 22% (소득세 20% + 지방소득세 2%)</div>
+                </div>
+                <button class="btn-sm" onclick="document.getElementById('cgTaxModalOverlay').style.display='none'">닫기</button>
+            </div>
+            <div style="flex:1; overflow-y:auto;">${buildFullTableHtml()}</div>
+        </div>`;
+        overlay.style.display = 'flex';
+    };
+
+    // 인라인 패널: 올해만 표시 + 더 보기 버튼
+    panel.innerHTML = `
+    <div style="border-top:1px solid var(--border); margin-top:6px; padding-top:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+            <div style="font-size:10px; font-weight:700; color:var(--text2);">📋 ${thisYear}년 양도소득세</div>
+            <button onclick="window._openCgTaxModal()"
+                style="font-size:10px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0; font-family:var(--font-sans);">
+                전체 보기 ▶
+            </button>
+        </div>
+        ${curRowHtml}
+        <div style="font-size:9px; color:var(--text3); margin-top:3px;">공제 250만 · 세율 22% · 거래일 환율 적용</div>
+    </div>`;
 }
 
 // 🌟 실현수익 콤보 차트 (최종 수정본 - 에러 완벽 해결)
