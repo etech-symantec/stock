@@ -63,6 +63,12 @@ let currentLocalTag = 'all';
 let currentDivSort = 'yieldDesc';
 let divRankingSortDir = 'desc'; // 'desc' | 'asc'
 let _histSelectedIds = new Set(); // 거래내역 체크된 항목 ID
+let historyRankingTab = 'bigbuy'; // 'bigbuy' | 'hold' | 'freq' | 'total'
+
+function setHistoryRankingTab(tab) {
+    historyRankingTab = tab;
+    renderHistoryDashboard();
+}
 
 function setDivRankingSortDir(dir) {
     divRankingSortDir = dir;
@@ -1528,6 +1534,163 @@ function renderHistoryDashboard() {
     allCb.checked = allChecked;
     allCb.indeterminate = !allChecked && sorted.some(tx => _histSelectedIds.has(tx.id));
   }
+  renderHistoryRanking(filtered);
+}
+
+function renderHistoryRanking(txs) {
+    const panel = document.getElementById('historyRankingPanel');
+    if (!panel) return;
+
+    const today = new Date();
+
+    // 금액 포맷
+    const fmtW = v => {
+        const a = Math.abs(v);
+        if (a >= 100000000) return `₩${(a/100000000).toFixed(1)}억`;
+        if (a >= 10000)     return `₩${Math.round(a/10000).toLocaleString()}만`;
+        return `₩${Math.round(a).toLocaleString()}`;
+    };
+
+    // 종목명 헬퍼
+    const getName = sym => {
+        const db = localStockDB.find(x => x.symbol === sym);
+        const c  = cachedMarketData[sym];
+        if (db) return db.name;
+        if (c && !c._failed && c.name) return c.name;
+        return sym.replace(/\.KS\.DLST|\.DLST|\.KS/g, '');
+    };
+
+    // ── 1. 💰 단일 최대 매수: 종목별 가장 큰 단건 매수 금액 (KRW 환산) ──
+    const bigBuyMap = {};
+    txs.filter(t => t.txType === 'trade' && t.qty > 0).forEach(t => {
+        const fx  = !isKorean(t.symbol) ? getHistoricalFxRate(t.date) : 1;
+        const amt = t.qty * t.price * fx;
+        if (!bigBuyMap[t.symbol] || amt > bigBuyMap[t.symbol].amt)
+            bigBuyMap[t.symbol] = { amt, date: t.date };
+    });
+    const bigBuyRank = Object.entries(bigBuyMap)
+        .map(([sym, d]) => ({ sym, ...d }))
+        .sort((a, b) => b.amt - a.amt).slice(0, 20);
+
+    // ── 2. ⏳ 장기 보유: 현재 보유 종목의 최초 매수일 ~ 오늘 ──────────────
+    const netQty = {}, firstBuy = {};
+    [...state.transactions]
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .filter(t => t.txType === 'trade' || t.txType === 'transfer')
+        .forEach(t => {
+            netQty[t.symbol] = (netQty[t.symbol] || 0) + t.qty;
+            if (t.qty > 0 && !firstBuy[t.symbol]) firstBuy[t.symbol] = t.date;
+        });
+    const holdRank = Object.entries(netQty)
+        .filter(([sym, qty]) => qty > 0.0001 && firstBuy[sym])
+        .map(([sym]) => ({
+            sym,
+            days: Math.floor((today - new Date(firstBuy[sym])) / 86400000),
+            firstDate: firstBuy[sym]
+        }))
+        .sort((a, b) => b.days - a.days).slice(0, 20);
+
+    // ── 3. 🔄 거래 빈도: 종목별 총 매매 횟수 ────────────────────────────
+    const freqMap = {};
+    txs.filter(t => t.txType === 'trade').forEach(t => {
+        freqMap[t.symbol] = (freqMap[t.symbol] || 0) + 1;
+    });
+    const freqRank = Object.entries(freqMap)
+        .map(([sym, cnt]) => ({ sym, cnt }))
+        .sort((a, b) => b.cnt - a.cnt).slice(0, 20);
+
+    // ── 4. 📦 누적 매수액: 종목별 총 매수금액 합산 ───────────────────────
+    const totalMap = {};
+    txs.filter(t => t.txType === 'trade' && t.qty > 0).forEach(t => {
+        const fx  = !isKorean(t.symbol) ? getHistoricalFxRate(t.date) : 1;
+        totalMap[t.symbol] = (totalMap[t.symbol] || 0) + t.qty * t.price * fx;
+    });
+    const totalRank = Object.entries(totalMap)
+        .map(([sym, amt]) => ({ sym, amt }))
+        .sort((a, b) => b.amt - a.amt).slice(0, 20);
+
+    // ── 공통 랭킹 row ────────────────────────────────────────────────────
+    const rankRow = (sym, rank, valueHtml, barPct, color) => `
+    <div style="padding:8px 10px; border-radius:8px; transition:0.15s;"
+         onmouseover="this.style.background='rgba(255,255,255,0.04)'"
+         onmouseout="this.style.background='transparent'">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+        <span style="font-size:11px; font-weight:700; color:var(--text3); width:18px; text-align:right; flex-shrink:0;">${rank}</span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${getName(sym)}</div>
+          <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${sym.replace(/\.KS\.DLST|\.DLST|\.KS/g,'')}</div>
+        </div>
+        <div style="text-align:right; flex-shrink:0; font-family:var(--font-mono); font-size:11px; font-weight:700; color:${color}; line-height:1.4;">${valueHtml}</div>
+      </div>
+      <div style="height:3px; border-radius:2px; background:var(--bg3); overflow:hidden; margin-left:26px;">
+        <div style="height:100%; width:${Math.min(100,barPct)}%; background:${color}; border-radius:2px; transition:width 0.4s;"></div>
+      </div>
+    </div>`;
+
+    // ── 탭 버튼 ─────────────────────────────────────────────────────────
+    const tabBtn = (tab, label) => {
+        const on = historyRankingTab === tab;
+        return `<button onclick="setHistoryRankingTab('${tab}')"
+            style="flex:1; padding:9px 4px; font-size:11px; font-weight:700; border:none;
+                   background:transparent; color:${on?'var(--accent)':'var(--text3)'};
+                   cursor:pointer; border-bottom:2px solid ${on?'var(--accent)':'transparent'};
+                   transition:0.2s; font-family:var(--font-sans); white-space:nowrap;">${label}</button>`;
+    };
+
+    // ── 탭별 리스트 렌더 ─────────────────────────────────────────────────
+    let listHtml = '';
+    const empty = msg => `<div style="text-align:center; padding:30px 0; font-size:12px; color:var(--text3);">${msg}</div>`;
+
+    if (historyRankingTab === 'bigbuy') {
+        if (!bigBuyRank.length) { listHtml = empty('매수 내역 없음'); }
+        else {
+            const max = bigBuyRank[0].amt;
+            listHtml = bigBuyRank.map((d, i) =>
+                rankRow(d.sym, i+1,
+                    `${fmtW(d.amt)}<div style="font-size:9px;color:var(--text3);font-weight:400;margin-top:1px;">${d.date}</div>`,
+                    (d.amt/max)*100, '#7c6af7')
+            ).join('');
+        }
+    } else if (historyRankingTab === 'hold') {
+        if (!holdRank.length) { listHtml = empty('현재 보유 종목 없음'); }
+        else {
+            const max = holdRank[0].days;
+            listHtml = holdRank.map((d, i) =>
+                rankRow(d.sym, i+1,
+                    `${d.days.toLocaleString()}일<div style="font-size:9px;color:var(--text3);font-weight:400;margin-top:1px;">${d.firstDate} 첫 매수</div>`,
+                    (d.days/max)*100, '#00C578')
+            ).join('');
+        }
+    } else if (historyRankingTab === 'freq') {
+        if (!freqRank.length) { listHtml = empty('거래 내역 없음'); }
+        else {
+            const max = freqRank[0].cnt;
+            listHtml = freqRank.map((d, i) =>
+                rankRow(d.sym, i+1, `${d.cnt}회`, (d.cnt/max)*100, '#ffb703')
+            ).join('');
+        }
+    } else if (historyRankingTab === 'total') {
+        if (!totalRank.length) { listHtml = empty('매수 내역 없음'); }
+        else {
+            const max = totalRank[0].amt;
+            listHtml = totalRank.map((d, i) =>
+                rankRow(d.sym, i+1, fmtW(d.amt), (d.amt/max)*100, '#3A9AFF')
+            ).join('');
+        }
+    }
+
+    panel.innerHTML = `
+    <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
+      <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0;">
+        ${tabBtn('bigbuy', '💰 단일 최대')}
+        ${tabBtn('hold',   '⏳ 장기 보유')}
+        ${tabBtn('freq',   '🔄 거래 빈도')}
+        ${tabBtn('total',  '📦 누적 매수')}
+      </div>
+      <div style="padding:6px 8px; flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:2px;">
+        ${listHtml}
+      </div>
+    </div>`;
 }
 
 function setHistoryDatePreset(preset) {
