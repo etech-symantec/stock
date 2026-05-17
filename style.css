@@ -1896,7 +1896,8 @@ nav {
 #historyDashboard { padding-top: 1.5rem; }
 #realizedDashboard { padding-top: 1.5rem; }
 /* realizedDashboard 안 page-controls-box는 패딩으로 이미 여백 확보됐으니 margin-top 제거 */
-#realizedDashboard > .page-controls-box { margin-top: 0; position: sticky; top: 0; z-index: 50; }
+#realizedDashboard > .page-controls-box,
+#historyDashboard > .page-controls-box  { margin-top: 0; position: sticky; top: 0; z-index: 50; }
 
 @media (max-width: 768px) {
   #historyDashboard,
