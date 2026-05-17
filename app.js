@@ -1610,13 +1610,14 @@ function renderHistoryRanking(txs) {
         .sort((a, b) => b.amt - a.amt).slice(0, 20);
 
     // ── 공통 랭킹 row ────────────────────────────────────────────────────
-    const rankRow = (sym, rank, valueHtml, barPct, color) => `
+    const rankRow = (sym, rank, valueHtml, barPct, color) => {
     const medalMap = { 1: '🥇', 2: '🥈', 3: '🥉' };
     const medal = medalMap[rank] || `<span style="font-size:11px; color:var(--text3); font-weight:700; min-width:18px; display:inline-block; text-align:center;">${rank}</span>`;
+    return `
     <div style="padding:8px 10px; border-radius:8px; transition:0.15s;"
          onmouseover="this.style.background='rgba(255,255,255,0.04)'"
          onmouseout="this.style.background='transparent'">
-      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+      <div style="display:flex; align-items:center; gap:6px; margin-bottom:5px;">
         <span style="font-size:15px; flex-shrink:0;">${medal}</span>
         <div style="flex:1; min-width:0;">
           <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${getName(sym)}</div>
@@ -1628,6 +1629,7 @@ function renderHistoryRanking(txs) {
         <div style="height:100%; width:${Math.min(100,barPct)}%; background:${color}; border-radius:2px; transition:width 0.4s;"></div>
       </div>
     </div>`;
+    };
 
     // ── 탭 버튼 ─────────────────────────────────────────────────────────
     const tabBtn = (tab, label) => {
