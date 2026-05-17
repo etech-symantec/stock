@@ -1581,7 +1581,7 @@ function renderHistoryRanking(txs) {
 
     // ── 1. 💰 단일 최대 매수: 종목별 가장 큰 단건 매수 금액 (KRW 환산) ──
     const bigBuyMap = {};
-    txs.filter(t => t.txType === 'trade' && t.qty > 0).forEach(t => {
+    txs.filter(t => (!t.txType || t.txType === 'trade' || t.txType === 'buy') && t.qty > 0).forEach(t => {
         const fx  = !isKorean(t.symbol) ? getHistoricalFxRate(t.date) : 1;
         const amt = t.qty * t.price * fx;
         if (!bigBuyMap[t.symbol] || amt > bigBuyMap[t.symbol].amt)
@@ -1611,7 +1611,7 @@ function renderHistoryRanking(txs) {
 
     // ── 3. 🔄 거래 빈도: 종목별 총 매매 횟수 ────────────────────────────
     const freqMap = {};
-    txs.filter(t => t.txType === 'trade').forEach(t => {
+    txs.filter(t => !t.txType || t.txType === 'trade' || t.txType === 'buy' || t.txType === 'sell').forEach(t => {
         freqMap[t.symbol] = (freqMap[t.symbol] || 0) + 1;
     });
     const freqRank = Object.entries(freqMap)
@@ -1620,7 +1620,7 @@ function renderHistoryRanking(txs) {
 
     // ── 4. 📦 누적 매수액: 종목별 총 매수금액 합산 ───────────────────────
     const totalMap = {};
-    txs.filter(t => t.txType === 'trade' && t.qty > 0).forEach(t => {
+    txs.filter(t => (!t.txType || t.txType === 'trade' || t.txType === 'buy') && t.qty > 0).forEach(t => {
         const fx  = !isKorean(t.symbol) ? getHistoricalFxRate(t.date) : 1;
         totalMap[t.symbol] = (totalMap[t.symbol] || 0) + t.qty * t.price * fx;
     });
