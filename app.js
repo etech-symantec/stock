@@ -1595,10 +1595,16 @@ function renderHistoryRanking(txs) {
     const netQty = {}, firstBuy = {};
     [...state.transactions]
         .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .filter(t => t.txType === 'trade' || t.txType === 'transfer')
+        .filter(t => !t.txType || t.txType === 'trade' || t.txType === 'buy' || t.txType === 'sell' || t.txType === 'transfer')
         .forEach(t => {
-            netQty[t.symbol] = (netQty[t.symbol] || 0) + t.qty;
-            if (t.qty > 0 && !firstBuy[t.symbol]) firstBuy[t.symbol] = t.date;
+            const prev = netQty[t.symbol] || 0;
+            netQty[t.symbol] = prev + t.qty;
+            // 잔고가 0 이하로 떨어지면 firstBuy 초기화 (전량 매도 후 재매수 대비)
+            if (netQty[t.symbol] <= 0.0001) {
+                delete firstBuy[t.symbol];
+            } else if (t.qty > 0 && !firstBuy[t.symbol]) {
+                firstBuy[t.symbol] = t.date;
+            }
         });
     const holdRank = Object.entries(netQty)
         .filter(([sym, qty]) => qty > 0.0001 && firstBuy[sym])
