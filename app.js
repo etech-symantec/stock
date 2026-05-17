@@ -5308,16 +5308,19 @@ function renderCapitalGainsTax(ownerFilter) {
 
     // 인라인 패널: 올해만 표시 + 더 보기 버튼
     panel.innerHTML = `
-    <div style="border-top:1px solid var(--border); margin-top:6px; padding-top:6px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-            <div style="font-size:10px; font-weight:700; color:var(--text2);">📋 ${thisYear}년 양도소득세</div>
+    <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+                <span class="stat-flag">📋</span>
+                <div class="stat-market-label">${thisYear}년 양도소득세</div>
+            </div>
             <button onclick="window._openCgTaxModal()"
-                style="font-size:10px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0; font-family:var(--font-sans);">
+                style="font-size:10px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0; font-family:var(--font-sans); white-space:nowrap;">
                 전체 보기 ▶
             </button>
         </div>
         ${curRowHtml}
-        <div style="font-size:9px; color:var(--text3); margin-top:3px;">공제 250만 · 세율 22% · 거래일 환율 적용</div>
+        <div style="font-size:9px; color:var(--text3); margin-top:4px;">공제 250만 · 세율 22% · 거래일 환율 적용</div>
     </div>`;
 }
 
