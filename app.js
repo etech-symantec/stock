@@ -5193,23 +5193,20 @@ function renderCapitalGainsTax(ownerFilter) {
 
     // ⑤ 패널 HTML
     const headerHtml = `
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); cursor:pointer; user-select:none;"
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-top:1px solid var(--border); margin-top:4px; cursor:pointer; user-select:none;"
          onclick="document.getElementById('cgTaxBody').style.display=_cgTaxExpanded?'none':'block'; _cgTaxExpanded=!_cgTaxExpanded; document.getElementById('cgTaxChevron').textContent=_cgTaxExpanded?'▲':'▼';">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:15px;">🇺🇸</span>
-            <div>
-                <div style="font-size:13px; font-weight:700; color:var(--text);">미국주식 양도소득세 계산</div>
-                <div style="font-size:11px; color:var(--text3); margin-top:1px;">기본공제 250만원 · 세율 22% (소득세 20% + 지방소득세 2%)</div>
-            </div>
+        <div>
+            <div style="font-size:11px; font-weight:700; color:var(--text);">📋 양도소득세 계산</div>
+            <div style="font-size:10px; color:var(--text3); margin-top:1px;">공제 250만 · 세율 22%</div>
         </div>
-        <div style="display:flex; align-items:center; gap:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
             <div style="text-align:right;">
-                <div style="font-size:11px; color:var(--text3);">전체 예상 세금</div>
-                <div style="font-size:15px; font-weight:700; color:${totalTaxKrw > 0 ? '#ff4d6a' : 'var(--text3)'}; font-family:var(--font-mono);">
+                <div style="font-size:10px; color:var(--text3);">예상 세금</div>
+                <div style="font-size:13px; font-weight:700; color:${totalTaxKrw > 0 ? '#ff4d6a' : 'var(--text3)'}; font-family:var(--font-mono);">
                     ${totalTaxKrw > 0 ? `₩${Math.round(totalTaxKrw).toLocaleString()}` : '없음'}
                 </div>
             </div>
-            <span id="cgTaxChevron" style="color:var(--text3); font-size:12px;">${_cgTaxExpanded ? '▲' : '▼'}</span>
+            <span id="cgTaxChevron" style="color:var(--text3); font-size:11px;">${_cgTaxExpanded ? '▲' : '▼'}</span>
         </div>
     </div>`;
 
@@ -5271,7 +5268,7 @@ function renderCapitalGainsTax(ownerFilter) {
         ⚠️ 위 계산은 <b>참고용 추정치</b>입니다. 실제 신고 시에는 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요. 확정신고: 매년 5월 (전년도 양도분 기준).
     </div>`;
 
-    panel.innerHTML = headerHtml + `<div id="cgTaxBody" style="display:${_cgTaxExpanded?'block':'none'};">${tableHtml}</div>`;
+    panel.innerHTML = headerHtml + `<div id="cgTaxBody" style="display:${_cgTaxExpanded?'block':'none'}; margin-top:6px; border-radius:6px; overflow:hidden; border:1px solid var(--border);">${tableHtml}</div>`;
 }
 
 // 🌟 실현수익 콤보 차트 (최종 수정본 - 에러 완벽 해결)
