@@ -1653,7 +1653,7 @@ nav {
   padding: 18px 24px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 210px;
   border-right: 1px solid var(--border);
   flex-shrink: 0;
