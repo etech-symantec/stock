@@ -1780,6 +1780,20 @@ nav {
   .stat-markets { flex-direction: column; }
 }
 
+/* 실현수익 배너 3컬럼 — 폰트 확대 */
+#realStatBanner .stat-market-label {
+  font-size: 12px;
+}
+#realStatBanner .stat-market-val {
+  font-size: 26px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+#realStatBanner .stat-market-converted {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 /* ── 범용 뷰 헤더 — 모든 탭 상단 여백 통일 ── */
 .view-header {
   display: none;
