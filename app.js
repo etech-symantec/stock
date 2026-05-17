@@ -5198,22 +5198,22 @@ function renderCapitalGainsTax(ownerFilter) {
     // 올해 한 줄 인라인 렌더
     const curRowHtml = (() => {
         const r = curRow;
-        if (!r) return `<div style="font-size:11px; color:var(--text3); padding:4px 0;">${thisYear}년 매도 내역 없음</div>`;
+        if (!r) return `<div style="font-size:12px; color:var(--text3); padding:6px 0;">${thisYear}년 매도 내역 없음</div>`;
         const netColor = r.netUsd > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
         const taxStr = r.taxKrw > 0
-            ? `<span style="color:#ff4d6a; font-weight:700; font-family:var(--font-mono);">₩${r.taxKrw.toLocaleString()}</span>`
-            : `<span style="color:var(--text3); font-size:10px;">납부 없음</span>`;
+            ? `<span style="font-family:var(--font-mono); font-size:26px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</span>`
+            : `<span style="font-size:13px; color:var(--text3);">납부 없음</span>`;
         return `
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:5px 0;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0;">
             <div>
-                <div style="font-size:10px; color:var(--text3);">순손익</div>
-                <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:${netColor};">${fmtUsd(r.netUsd)}</div>
-                <div style="font-size:10px; color:${netColor};">${fmtKrw(r.netKrw)}</div>
+                <div style="font-size:12px; color:var(--text3); font-weight:700; letter-spacing:0.03em; margin-bottom:3px;">순손익</div>
+                <div style="font-family:var(--font-mono); font-size:26px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:${netColor};">${fmtUsd(r.netUsd)}</div>
+                <div style="font-size:12px; color:${netColor}; font-family:var(--font-mono); margin-top:4px;">${fmtKrw(r.netKrw)}</div>
             </div>
             <div style="text-align:right;">
-                <div style="font-size:10px; color:var(--text3);">예상 세금</div>
+                <div style="font-size:12px; color:var(--text3); font-weight:700; letter-spacing:0.03em; margin-bottom:3px;">예상 세금</div>
                 ${taxStr}
-                ${r.netKrw > 0 && r.netKrw <= DEDUCTION ? `<div style="font-size:9px; color:var(--text3);">공제 범위 내</div>` : ''}
+                ${r.netKrw > 0 && r.netKrw <= DEDUCTION ? `<div style="font-size:11px; color:var(--text3); margin-top:4px;">공제 범위 내</div>` : ''}
             </div>
         </div>`;
     })();
