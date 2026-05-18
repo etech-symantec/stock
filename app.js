@@ -1565,14 +1565,11 @@ function renderHistoryRanking(txs) {
     const o2 = state.owners.user2;
     const ownerFilter = historyFilters.owner; // 'all' | 'user1' | 'user2'
 
-    const ownerGroups = ownerFilter === 'all'
-        ? [
-            { key: 'user1', name: o1.name, icon: o1.icon, color: o1.color, txs: txs.filter(t => t.owner === o1.name), allTxs: state.transactions.filter(t => t.owner === o1.name) },
-            { key: 'user2', name: o2.name, icon: o2.icon, color: o2.color, txs: txs.filter(t => t.owner === o2.name), allTxs: state.transactions.filter(t => t.owner === o2.name) },
-          ]
-        : ownerFilter === 'user1'
-            ? [{ key: 'user1', name: o1.name, icon: o1.icon, color: o1.color, txs, allTxs: state.transactions.filter(t => t.owner === o1.name) }]
-            : [{ key: 'user2', name: o2.name, icon: o2.icon, color: o2.color, txs, allTxs: state.transactions.filter(t => t.owner === o2.name) }];
+    const ownerGroups = ownerFilter === 'user1'
+        ? [{ key: 'user1', name: o1.name, icon: o1.icon, color: o1.color, txs, allTxs: state.transactions.filter(t => t.owner === o1.name) }]
+        : ownerFilter === 'user2'
+            ? [{ key: 'user2', name: o2.name, icon: o2.icon, color: o2.color, txs, allTxs: state.transactions }]
+            : [{ key: 'all', name: '전체', icon: '📊', color: 'var(--accent)', txs, allTxs: state.transactions }];
 
     // 금액 포맷
     const fmtW = v => {
@@ -1742,12 +1739,7 @@ function renderHistoryRanking(txs) {
           </div>`;
     };
 
-    const sectionsHtml = ownerFilter === 'all'
-        ? `<div style="display:flex; flex:1; overflow:hidden;">
-             <div style="flex:1; min-width:0; border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden;">${renderOwnerSection(ownerGroups[0])}</div>
-             <div style="flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden;">${renderOwnerSection(ownerGroups[1])}</div>
-           </div>`
-        : `<div style="flex:1; overflow:hidden; display:flex; flex-direction:column;">${renderOwnerSection(ownerGroups[0])}</div>`;
+    const sectionsHtml = `<div style="flex:1; overflow:hidden; display:flex; flex-direction:column;">${renderOwnerSection(ownerGroups[0])}</div>`;
 
     panel.innerHTML = `
     <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
