@@ -1870,8 +1870,12 @@ nav {
   max-width: none !important;
   overflow-x: visible !important;
   scrollbar-width: none;
-  background: var(--bg3);
+  background: var(--bg3) !important;
   margin: 0 !important;
+  
+  /* 👇 테두리가 이상하게 보이는 현상을 해결하기 위해 아래 두 줄 추가 */
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important; 
 }
 
 /* ── 관심목록(watch): listOptionsBar → 박스형 ── */
