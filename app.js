@@ -1672,7 +1672,7 @@ function renderHistoryRanking(txs) {
     const tabBtn = (tab, label) => {
         const on = historyRankingTab === tab;
         return `<button onclick="setHistoryRankingTab('${tab}')"
-            style="flex:1; padding:9px 4px; font-size:11px; font-weight:700; border:none;
+            style="flex:1; padding:9px 6px; font-size:13px; font-weight:700; border:none;
                    background:transparent; color:${on?'var(--accent)':'var(--text3)'};
                    cursor:pointer; border-bottom:2px solid ${on?'var(--accent)':'transparent'};
                    transition:0.2s; font-family:var(--font-sans); white-space:nowrap;">${label}</button>`;
@@ -3942,7 +3942,7 @@ function renderDividendDashboard() {
       const tabBtn = (tab, label) => {
           const isActive = divRankingTab === tab;
           return `<button onclick="currentDivSort='${tab}${divRankingSortDir==='desc'?'Desc':'Asc'}'; renderDividendDashboard();"
-              style="flex:1; padding:9px 6px; font-size:11px; font-weight:700; border:none;
+              style="flex:1; padding:9px 6px; font-size:13px; font-weight:700; border:none;
                      background:transparent; color:${isActive?'#00C578':'var(--text3)'};
                      cursor:pointer; border-bottom:2px solid ${isActive?'#00C578':'transparent'};
                      transition:0.2s; font-family:var(--font-sans);">
@@ -5257,7 +5257,7 @@ function renderRealizedDashboard() {
             const tabBtn = (tab, label) => {
                 const isActive = realizedRankingTab === tab;
                 return `<button onclick="setRealizedRankingTab('${tab}')"
-                    style="flex:1; padding:9px 6px; font-size:11px; font-weight:700; border:none;
+                    style="flex:1; padding:9px 6px; font-size:13px; font-weight:700;
                            background:transparent; color:${isActive?'#00C578':'var(--text3)'};
                            cursor:pointer; border-bottom:2px solid ${isActive?'#00C578':'transparent'};
                            transition:0.2s; font-family:var(--font-sans);">
