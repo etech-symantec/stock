@@ -1793,6 +1793,9 @@ nav {
   font-size: 12px;
   margin-top: 4px;
 }
+#realStatBanner .stat-banner-right {
+    padding: 0;
+}
 
 /* ── 범용 뷰 헤더 — 모든 탭 상단 여백 통일 ── */
 .view-header {
