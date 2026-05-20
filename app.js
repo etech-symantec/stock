@@ -5271,7 +5271,7 @@ function renderRealizedDashboard() {
             };
 
             rankingPanelEl.innerHTML = `
-            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
+            <div style="background:var(--bg2); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
               <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
                 ${tabBtn('pnl', '💵 수익금')}
                 ${tabBtn('roi', '📊 수익률')}
