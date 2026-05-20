@@ -1745,11 +1745,13 @@ function renderHistoryRanking(txs) {
 
     panel.innerHTML = `
     <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
-      <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
-        ${tabBtn('bigbuy', '💰 단일 최대')}
-        ${tabBtn('hold',   '⏳ 장기 보유')}
-        ${tabBtn('freq',   '🔄 거래 빈도')}
-        ${tabBtn('total',  '📦 누적 매수')}
+      <div style="padding:10px 12px; border-bottom:1px solid var(--border); flex-shrink:0;">
+        <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
+          ${tabBtn('bigbuy', '💰 단일 최대')}
+          ${tabBtn('hold',   '⏳ 장기 보유')}
+          ${tabBtn('freq',   '🔄 거래 빈도')}
+          ${tabBtn('total',  '📦 누적 매수')}
+        </div>
       </div>
       ${sectionsHtml}
     </div>`;
@@ -5273,16 +5275,18 @@ function renderRealizedDashboard() {
             };
 
             rankingPanelEl.innerHTML = `
-            <div style="background:var(--bg2); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
-              <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
-                ${tabBtn('pnl', '💵 수익금')}
-                ${tabBtn('roi', '📊 수익률')}
-                ${tabBtn('speed', '⚡ 단타왕')}
-                <div style="margin-left:auto; display:flex; align-items:center; padding:0 8px; gap:4px; border-left:1px solid var(--border);">
-                  <button onclick="setRealizedRankingSortDir('desc')"
-                    style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='desc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='desc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='desc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↓</button>
-                  <button onclick="setRealizedRankingSortDir('asc')"
-                    style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='asc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='asc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='asc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↑</button>
+            <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
+              <div style="padding:10px 12px; border-bottom:1px solid var(--border); flex-shrink:0;">
+                <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
+                  ${tabBtn('pnl', '💵 수익금')}
+                  ${tabBtn('roi', '📊 수익률')}
+                  ${tabBtn('speed', '⚡ 단타왕')}
+                  <div style="margin-left:auto; display:flex; align-items:center; padding:0 8px; gap:4px; border-left:1px solid var(--border);">
+                    <button onclick="setRealizedRankingSortDir('desc')"
+                      style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='desc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='desc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='desc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↓</button>
+                    <button onclick="setRealizedRankingSortDir('asc')"
+                      style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='asc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='asc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='asc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↑</button>
+                  </div>
                 </div>
               </div>
               <div style="padding:6px 8px; display:flex; flex-direction:column; gap:2px; flex:1; overflow-y:auto;">
