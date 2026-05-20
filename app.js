@@ -4372,7 +4372,12 @@ async function render() {
     renderHistoryDashboard();
     return;
   } else if (currentView === 'realized') { 
-    dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
+    dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; 
+    listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
+    
+    // ✅ [추가] 실현수익 페이지 진입 시 다른 탭의 잔여 클래스 간섭을 완전히 제거 및 청소
+    if (listOptions) listOptions.classList.remove('non-sticky'); 
+    
     if(realDash) realDash.style.display = 'flex';
     renderRealizedDashboard();
     return;
