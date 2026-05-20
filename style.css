@@ -1793,9 +1793,6 @@ nav {
   font-size: 12px;
   margin-top: 4px;
 }
-#realStatBanner .stat-banner-right {
-    padding: 0;
-}
 
 /* ── 범용 뷰 헤더 — 모든 탭 상단 여백 통일 ── */
 .view-header {
@@ -1870,12 +1867,8 @@ nav {
   max-width: none !important;
   overflow-x: visible !important;
   scrollbar-width: none;
-  background: var(--bg3) !important;
+  background: var(--bg3);
   margin: 0 !important;
-  
-  /* 👇 테두리가 이상하게 보이는 현상을 해결하기 위해 아래 두 줄 추가 */
-  border: 1px solid var(--border) !important;
-  box-shadow: none !important; 
 }
 
 /* ── 관심목록(watch): listOptionsBar → 박스형 ── */
