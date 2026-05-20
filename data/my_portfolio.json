@@ -8122,7 +8122,7 @@
       "owner": "끄니",
       "broker": "키움",
       "symbol": "005935.KS",
-      "qty": 14,
+      "qty": -14,
       "price": 180000,
       "txType": "trade"
     }
