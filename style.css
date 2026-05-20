@@ -2003,3 +2003,10 @@ nav {
     font-family: var(--font-sans);
     font-size: 11px;
 }
+/* 거래내역, 실현수익, 배당통계 페이지 레이아웃 통일 */
+.dashboard-page {
+    flex-direction: column;
+    padding-bottom: 40px;
+    padding-top: 1.5rem; /* 배당통계 상단 여백 기준 */
+    height: 100%;
+}
