@@ -1675,7 +1675,9 @@ function renderHistoryRanking(txs) {
             style="flex:1; padding:9px 6px; font-size:13px; font-weight:700; border:none;
                    background:transparent; color:${on?'var(--accent)':'var(--text3)'};
                    cursor:pointer; border-bottom:2px solid ${on?'var(--accent)':'transparent'};
-                   transition:0.2s; font-family:var(--font-sans); white-space:nowrap;">${label}</button>`;
+                   transition:0.2s; font-family:var(--font-sans);">
+            ${label}
+        </button>`;
     };
 
     const empty = msg => `<div style="text-align:center; padding:30px 0; font-size:12px; color:var(--text3);">${msg}</div>`;
@@ -1743,7 +1745,7 @@ function renderHistoryRanking(txs) {
 
     panel.innerHTML = `
     <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
-      <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0;">
+      <div style="display:flex; border-bottom:1px solid var(--border); flex-shrink:0; align-items:stretch;">
         ${tabBtn('bigbuy', '💰 단일 최대')}
         ${tabBtn('hold',   '⏳ 장기 보유')}
         ${tabBtn('freq',   '🔄 거래 빈도')}
@@ -5278,9 +5280,9 @@ function renderRealizedDashboard() {
                 ${tabBtn('speed', '⚡ 단타왕')}
                 <div style="margin-left:auto; display:flex; align-items:center; padding:0 8px; gap:4px; border-left:1px solid var(--border);">
                   <button onclick="setRealizedRankingSortDir('desc')"
-                    style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='desc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='desc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='desc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; white-space:nowrap; line-height:1;">↓</button>
+                    style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='desc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='desc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='desc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↓</button>
                   <button onclick="setRealizedRankingSortDir('asc')"
-                    style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='asc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='asc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='asc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; white-space:nowrap; line-height:1;">↑</button>
+                    style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${realizedRankingSortDir==='asc'?'var(--accent)':'var(--border)'}; background:${realizedRankingSortDir==='asc'?'var(--accent-bg)':'transparent'}; color:${realizedRankingSortDir==='asc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↑</button>
                 </div>
               </div>
               <div style="padding:6px 8px; display:flex; flex-direction:column; gap:2px; flex:1; overflow-y:auto;">
