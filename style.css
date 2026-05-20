@@ -354,7 +354,9 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .div-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .div-item:last-child { border-bottom: none; }
 
-#historyDashboard { display: none; flex-direction: column; padding-bottom: 40px; height: 100%; }
+/* 배당통계와 동일하게 상하 패딩 통일 */
+#historyDashboard { display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem; height: 100%; }
+#realizedDashboard { display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem; height: 100%; }
 .history-table-container { flex: 1; overflow-y: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); }
 .history-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
 .history-table th { padding: 12px 16px; color: var(--text3); font-weight: 700; background: var(--bg3); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -1830,8 +1832,8 @@ nav {
 }
 
 /* ── 거래내역 / 실현수익 상단 필터행 여백 ── */
-#historyDashboard > div:first-child { margin-top: 0; }
-#realizedDashboard > div:first-child { margin-top: 0; }
+#historyDashboard > div:first-child { margin-top: 0; position: sticky; top: 0; z-index: 50; }
+#realizedDashboard > div:first-child { margin-top: 0; position: sticky; top: 0; z-index: 50; }
 
 /* =====================================================
    📦 페이지 컨트롤 박스
