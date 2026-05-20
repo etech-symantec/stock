@@ -5262,7 +5262,7 @@ function renderRealizedDashboard() {
             const tabBtn = (tab, label) => {
                 const isActive = realizedRankingTab === tab;
                 return `<button onclick="setRealizedRankingTab('${tab}')"
-                    style="flex:1; padding:9px 6px; font-size:13px; font-weight:700;
+                    style="flex:1; padding:9px 6px; font-size:13px; font-weight:700; border:none;
                            background:transparent; color:${isActive?'#00C578':'var(--text3)'};
                            cursor:pointer; border-bottom:2px solid ${isActive?'#00C578':'transparent'};
                            transition:0.2s; font-family:var(--font-sans);">
