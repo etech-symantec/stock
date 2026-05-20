@@ -8115,6 +8115,16 @@
       "qty": -30,
       "price": 177000,
       "txType": "trade"
+    },
+    {
+      "id": 1779285474909,
+      "date": "2026-05-20",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": 14,
+      "price": 180000,
+      "txType": "trade"
     }
   ],
   "range": "all",
