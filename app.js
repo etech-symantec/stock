@@ -65,9 +65,15 @@ let currentDivSort = 'yieldDesc';
 let divRankingSortDir = 'desc'; // 'desc' | 'asc'
 let _histSelectedIds = new Set(); // 거래내역 체크된 항목 ID
 let historyRankingTab = 'bigbuy'; // 'bigbuy' | 'hold' | 'freq' | 'total'
+let historyRankingSortDir = 'desc'; // 'desc' 내림차순 | 'asc' 오름차순
 
 function setHistoryRankingTab(tab) {
     historyRankingTab = tab;
+    renderHistoryDashboard();
+}
+
+function setHistoryRankingSortDir(dir) {
+    historyRankingSortDir = dir;
     renderHistoryDashboard();
 }
 
@@ -1590,6 +1596,8 @@ function renderHistoryRanking(txs) {
 
     // 소유자별 랭킹 계산
     const calcRanks = ({ txs: otxs, allTxs }) => {
+        const sortMult = historyRankingSortDir === 'asc' ? -1 : 1;
+
         // 1. 단일 최대 매수
         const bigBuyMap = {};
         otxs.filter(t => (!t.txType || t.txType === 'trade' || t.txType === 'buy') && t.qty > 0).forEach(t => {
@@ -1600,7 +1608,7 @@ function renderHistoryRanking(txs) {
         });
         const bigBuyRank = Object.entries(bigBuyMap)
             .map(([sym, d]) => ({ sym, ...d }))
-            .sort((a, b) => b.amt - a.amt).slice(0, 20);
+            .sort((a, b) => (b.amt - a.amt) * sortMult).slice(0, 20);
 
         // 2. 장기 보유 (소유자별 전체 거래 기준)
         const netQty = {}, firstBuy = {};
@@ -1622,7 +1630,7 @@ function renderHistoryRanking(txs) {
                 days: Math.floor((today - new Date(firstBuy[sym])) / 86400000),
                 firstDate: firstBuy[sym]
             }))
-            .sort((a, b) => b.days - a.days).slice(0, 20);
+            .sort((a, b) => (b.days - a.days) * sortMult).slice(0, 20);
 
         // 3. 거래 빈도
         const freqMap = {};
@@ -1631,7 +1639,7 @@ function renderHistoryRanking(txs) {
         });
         const freqRank = Object.entries(freqMap)
             .map(([sym, cnt]) => ({ sym, cnt }))
-            .sort((a, b) => b.cnt - a.cnt).slice(0, 20);
+            .sort((a, b) => (b.cnt - a.cnt) * sortMult).slice(0, 20);
 
         // 4. 누적 매수액
         const totalMap = {};
@@ -1641,11 +1649,11 @@ function renderHistoryRanking(txs) {
         });
         const totalRank = Object.entries(totalMap)
             .map(([sym, amt]) => ({ sym, amt }))
-            .sort((a, b) => b.amt - a.amt).slice(0, 20);
+            .sort((a, b) => (b.amt - a.amt) * sortMult).slice(0, 20);
 
         return { bigBuyRank, holdRank, freqRank, totalRank };
     };
-
+  
     // 공통 랭킹 row
     const rankRow = (sym, rank, valueHtml, barPct, color) => {
         const medalMap = { 1: '🥇', 2: '🥈', 3: '🥉' };
@@ -1692,37 +1700,37 @@ function renderHistoryRanking(txs) {
         if (historyRankingTab === 'bigbuy') {
             if (!bigBuyRank.length) { listHtml = empty('매수 내역 없음'); }
             else {
-                const max = bigBuyRank[0].amt;
+                const max = Math.max(...bigBuyRank.map(d => d.amt));
                 listHtml = bigBuyRank.map((d, i) =>
                     rankRow(d.sym, i+1,
                         `${fmtW(d.amt)}<div style="font-size:9px;color:var(--text3);font-weight:400;margin-top:1px;">${d.date}</div>`,
-                        (d.amt/max)*100, '#7c6af7')
+                        max === 0 ? 0 : (d.amt/max)*100, '#7c6af7')
                 ).join('');
             }
         } else if (historyRankingTab === 'hold') {
             if (!holdRank.length) { listHtml = empty('현재 보유 종목 없음'); }
             else {
-                const max = holdRank[0].days;
+                const max = Math.max(...holdRank.map(d => d.days));
                 listHtml = holdRank.map((d, i) =>
                     rankRow(d.sym, i+1,
                         `${d.days.toLocaleString()}일<div style="font-size:9px;color:var(--text3);font-weight:400;margin-top:1px;">${d.firstDate} 첫 매수</div>`,
-                        (d.days/max)*100, '#00C578')
+                        max === 0 ? 0 : (d.days/max)*100, '#00C578')
                 ).join('');
             }
         } else if (historyRankingTab === 'freq') {
             if (!freqRank.length) { listHtml = empty('거래 내역 없음'); }
             else {
-                const max = freqRank[0].cnt;
+                const max = Math.max(...freqRank.map(d => d.cnt));
                 listHtml = freqRank.map((d, i) =>
-                    rankRow(d.sym, i+1, `${d.cnt}회`, (d.cnt/max)*100, '#ffb703')
+                    rankRow(d.sym, i+1, `${d.cnt}회`, max === 0 ? 0 : (d.cnt/max)*100, '#ffb703')
                 ).join('');
             }
         } else if (historyRankingTab === 'total') {
             if (!totalRank.length) { listHtml = empty('매수 내역 없음'); }
             else {
-                const max = totalRank[0].amt;
+                const max = Math.max(...totalRank.map(d => d.amt));
                 listHtml = totalRank.map((d, i) =>
-                    rankRow(d.sym, i+1, fmtW(d.amt), (d.amt/max)*100, '#3A9AFF')
+                    rankRow(d.sym, i+1, fmtW(d.amt), max === 0 ? 0 : (d.amt/max)*100, '#3A9AFF')
                 ).join('');
             }
         }
@@ -1751,6 +1759,12 @@ function renderHistoryRanking(txs) {
           ${tabBtn('hold',   '⏳ 장기 보유')}
           ${tabBtn('freq',   '🔄 거래 빈도')}
           ${tabBtn('total',  '📦 누적 매수')}
+          <div style="margin-left:auto; display:flex; align-items:center; padding:0 8px; gap:4px; border-left:1px solid var(--border);">
+            <button onclick="setHistoryRankingSortDir('desc')"
+              style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${historyRankingSortDir==='desc'?'var(--accent)':'var(--border)'}; background:${historyRankingSortDir==='desc'?'var(--accent-bg)':'transparent'}; color:${historyRankingSortDir==='desc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↓</button>
+            <button onclick="setHistoryRankingSortDir('asc')"
+              style="padding:4px 7px; font-size:11px; border-radius:4px; border:1px solid ${historyRankingSortDir==='asc'?'var(--accent)':'var(--border)'}; background:${historyRankingSortDir==='asc'?'var(--accent-bg)':'transparent'}; color:${historyRankingSortDir==='asc'?'var(--accent)':'var(--text3)'}; cursor:pointer; font-family:var(--font-sans); transition:0.15s; line-height:1;">↑</button>
+          </div>
         </div>
       </div>
       ${sectionsHtml}
