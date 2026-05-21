@@ -1608,7 +1608,7 @@ function renderHistoryRanking(txs) {
         });
         const bigBuyRank = Object.entries(bigBuyMap)
             .map(([sym, d]) => ({ sym, ...d }))
-            .sort((a, b) => (b.amt - a.amt) * sortMult).slice(0, 20);
+            .sort((a, b) => (b.amt - a.amt) * sortMult);
 
         // 2. 장기 보유 (소유자별 전체 거래 기준)
         const netQty = {}, firstBuy = {};
@@ -1630,7 +1630,7 @@ function renderHistoryRanking(txs) {
                 days: Math.floor((today - new Date(firstBuy[sym])) / 86400000),
                 firstDate: firstBuy[sym]
             }))
-            .sort((a, b) => (b.days - a.days) * sortMult).slice(0, 20);
+            .sort((a, b) => (b.days - a.days) * sortMult);
 
         // 3. 거래 빈도
         const freqMap = {};
@@ -1639,7 +1639,7 @@ function renderHistoryRanking(txs) {
         });
         const freqRank = Object.entries(freqMap)
             .map(([sym, cnt]) => ({ sym, cnt }))
-            .sort((a, b) => (b.cnt - a.cnt) * sortMult).slice(0, 20);
+            .sort((a, b) => (b.cnt - a.cnt) * sortMult);
 
         // 4. 누적 매수액
         const totalMap = {};
@@ -1649,7 +1649,7 @@ function renderHistoryRanking(txs) {
         });
         const totalRank = Object.entries(totalMap)
             .map(([sym, amt]) => ({ sym, amt }))
-            .sort((a, b) => (b.amt - a.amt) * sortMult).slice(0, 20);
+            .sort((a, b) => (b.amt - a.amt) * sortMult);
 
         return { bigBuyRank, holdRank, freqRank, totalRank };
     };
