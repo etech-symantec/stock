@@ -5564,8 +5564,30 @@ function renderCapitalGainsTax(ownerFilter) {
     </div>`;
 
     // ── 연도 상세 모달 ──
-    window._openCgTaxModal = null;
     window._cgTradesByYear = tradesByYear;
+    window._openCgTaxModal = function() {
+        let overlay = document.getElementById('cgFullTableOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'cgFullTableOverlay';
+            overlay.className = 'overlay';
+            overlay.onclick = e => { if (e.target === overlay) overlay.style.display = 'none'; };
+            document.body.appendChild(overlay);
+        }
+        overlay.innerHTML = `
+            <div class="modal" onclick="event.stopPropagation()"
+                 style="max-width:900px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
+                <div>
+                  <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 미국주식 양도소득세 연도별 요약</div>
+                  <div style="font-size:11px; color:var(--text3); margin-top:2px;">기본공제 250만원 · 세율 22% · 거래일 환율 적용</div>
+                </div>
+                <button class="btn-sm" onclick="document.getElementById('cgFullTableOverlay').style.display='none'">닫기</button>
+              </div>
+              <div style="flex:1; overflow-y:auto;">${buildFullTableHtml()}</div>
+            </div>`;
+        overlay.style.display = 'flex';
+    };
     
     window._openCgYearDetail = function(year) {
         const trades = (window._cgTradesByYear || {})[year] || [];
