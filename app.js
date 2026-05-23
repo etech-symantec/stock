@@ -5389,7 +5389,8 @@ function renderCapitalGainsTax(ownerFilter) {
     if (ownerFilter === 'user2') ownerName = state.owners.user2.name;
 
     const holdings = {};     // key: `symbol::broker`
-    const byYear   = {};     // key: '2024' → { gainUsd, lossUsd }
+    const byYear = {};     // key: '2024' → { gainUsd, lossUsd }
+    const tradesByYear = {};
 
     [...state.transactions]
         .sort((a, b) => new Date(a.date) - new Date(b.date))
@@ -5408,14 +5409,29 @@ function renderCapitalGainsTax(ownerFilter) {
                 h.qty += tx.qty;
                 h.avg  = total / h.qty;
             } else if (tx.qty < 0) {
+                const avgCost = h.avg;   // ← 차감 전에 먼저 캡처
                 const sellQty = Math.abs(tx.qty);
-                const pnl     = (tx.price - h.avg) * sellQty;   // USD
+                const pnl     = (tx.price - avgCost) * sellQty;
                 h.qty -= sellQty;
                 if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
-
+            
                 const year = tx.date.substring(0, 4);
                 if (!byYear[year]) byYear[year] = { gainUsd: 0, lossUsd: 0, gainKrw: 0, lossKrw: 0 };
+                if (!tradesByYear[year]) tradesByYear[year] = [];
                 const txFx = getHistoricalFxRate(tx.date);
+            
+                // ── 개별 거래 저장 ──
+                tradesByYear[year].push({
+                    date: tx.date, symbol: tx.symbol,
+                    name: (() => {
+                        const m = localStockDB && localStockDB.find(s => s.symbol === tx.symbol);
+                        const c = cachedMarketData[tx.symbol];
+                        return m ? m.name : (c && !c._failed && c.name ? c.name : tx.symbol);
+                    })(),
+                    qty: sellQty, sellPrice: tx.price, avgCost, pnl, txFx,
+                    broker, owner: tx.owner
+                });
+            
                 if (pnl >= 0) { byYear[year].gainUsd += pnl; byYear[year].gainKrw += pnl * txFx; }
                 else          { byYear[year].lossUsd += Math.abs(pnl); byYear[year].lossKrw += Math.abs(pnl) * txFx; }
             }
@@ -5513,8 +5529,9 @@ function renderCapitalGainsTax(ownerFilter) {
                 const notice = r.netKrw > 0 && r.netKrw <= DEDUCTION
                     ? `<div style="font-size:10px; color:var(--text3); margin-top:2px;">공제 범위 내</div>` : '';
                 return `
-                <tr style="border-bottom:1px solid var(--border); background:${bg}; transition:0.15s;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='${bg}'">
+                <tr style="border-bottom:1px solid var(--border); background:${bg}; transition:0.15s; cursor:pointer;"
+                    onclick="window._openCgYearDetail('${r.year}')"
+                    onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='${bg}'">
                     <td style="padding:11px 18px; font-weight:700; color:var(--text); font-size:13px;">
                         ${r.year}년
                         ${isThisYear ? `<span style="font-size:10px; color:#7c6af7; background:rgba(124,106,247,0.15); padding:1px 6px; border-radius:4px; margin-left:4px;">올해</span>` : ''}
@@ -5546,27 +5563,104 @@ function renderCapitalGainsTax(ownerFilter) {
         ⚠️ 위 계산은 <b>참고용 추정치</b>입니다. 실제 신고 시에는 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요. 확정신고: 매년 5월 (전년도 양도분 기준).
     </div>`;
 
-    // 모달 열기 함수 등록 (클로저로 최신 데이터 캡처)
-    window._openCgTaxModal = () => {
-        let overlay = document.getElementById('cgTaxModalOverlay');
+    // ── 연도 상세 모달 ──
+    window._cgTradesByYear = tradesByYear;
+    
+    window._openCgYearDetail = function(year) {
+        const trades = (window._cgTradesByYear || {})[year] || [];
+        const DEDUCTION = 2500000, TAX_RATE = 0.22;
+    
+        let gainUsd=0, lossUsd=0, gainKrw=0, lossKrw=0;
+        trades.forEach(t => {
+            if (t.pnl >= 0) { gainUsd += t.pnl; gainKrw += t.pnl * t.txFx; }
+            else { lossUsd += Math.abs(t.pnl); lossKrw += Math.abs(t.pnl) * t.txFx; }
+        });
+        const netUsd = gainUsd - lossUsd;
+        const netKrw = gainKrw - lossKrw;
+        const taxableKrw = Math.max(0, netKrw - DEDUCTION);
+        const taxKrw = Math.round(taxableKrw * TAX_RATE);
+    
+        const fmtU = v => (v < 0 ? '-' : '+') + '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+        const fmtW = v => {
+            const a = Math.abs(v), s = v < 0 ? '-' : '+';
+            if (a >= 100000000) return s + '₩' + (a/100000000).toFixed(2) + '억';
+            if (a >= 10000)     return s + '₩' + Math.round(a/10000).toLocaleString() + '만';
+            return s + '₩' + Math.round(a).toLocaleString();
+        };
+    
+        let overlay = document.getElementById('cgYearDetailOverlay');
         if (!overlay) {
             overlay = document.createElement('div');
-            overlay.id = 'cgTaxModalOverlay';
+            overlay.id = 'cgYearDetailOverlay';
             overlay.className = 'overlay';
             overlay.onclick = e => { if (e.target === overlay) overlay.style.display = 'none'; };
             document.body.appendChild(overlay);
         }
+    
+        const rowsHtml = [...trades].sort((a,b) => a.date.localeCompare(b.date)).map(t => {
+            const pc = t.pnl >= 0 ? '#00C578' : '#3A9AFF';
+            const roi = t.avgCost > 0 ? ((t.pnl / (t.avgCost * t.qty)) * 100).toFixed(1) : '0.0';
+            return `
+            <tr style="border-bottom:1px solid var(--border);"
+                onmouseover="this.style.background='rgba(255,255,255,0.03)'"
+                onmouseout="this.style.background='transparent'">
+              <td style="padding:10px 12px; color:var(--text2); white-space:nowrap;">${t.date}</td>
+              <td style="padding:10px 12px;">
+                <div style="font-weight:700; color:var(--text); font-size:13px;">${t.name}</div>
+                <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${t.symbol}</div>
+              </td>
+              <td style="padding:10px 12px; color:var(--text2); font-size:12px;">${t.broker}</td>
+              <td style="padding:10px 12px; text-align:right; font-family:var(--font-mono);">${t.qty}</td>
+              <td style="padding:10px 12px; text-align:right; font-family:var(--font-mono);">$${t.sellPrice.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+              <td style="padding:10px 12px; text-align:right; font-family:var(--font-mono); color:var(--text3);">$${t.avgCost.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+              <td style="padding:10px 12px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${pc};">${fmtU(t.pnl)}<div style="font-size:10px; font-weight:400; opacity:0.7;">${t.pnl>=0?'+':''}${roi}%</div></td>
+              <td style="padding:10px 12px; text-align:right; font-family:var(--font-mono); color:${pc}; font-size:12px;">${fmtW(t.pnl * t.txFx)}<div style="font-size:9px; opacity:0.55;">@${Math.round(t.txFx).toLocaleString()}</div></td>
+            </tr>`;
+        }).join('');
+    
         overlay.innerHTML = `
         <div class="modal" onclick="event.stopPropagation()"
-             style="max-width:860px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
-                <div>
-                    <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 미국주식 양도소득세 계산 — 전체 연도</div>
-                    <div style="font-size:11px; color:var(--text3); margin-top:2px;">기본공제 250만원 · 세율 22% (소득세 20% + 지방소득세 2%)</div>
-                </div>
-                <button class="btn-sm" onclick="document.getElementById('cgTaxModalOverlay').style.display='none'">닫기</button>
+             style="max-width:840px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
+            <div>
+              <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 ${year}년 미국주식 양도소득세 상세</div>
+              <div style="font-size:11px; color:var(--text3); margin-top:2px;">총 ${trades.length}건 매도 · 기본공제 250만원 · 세율 22%</div>
             </div>
-            <div style="flex:1; overflow-y:auto;">${buildFullTableHtml()}</div>
+            <button class="btn-sm" onclick="document.getElementById('cgYearDetailOverlay').style.display='none'">닫기</button>
+          </div>
+    
+          <!-- 요약 카드 -->
+          <div style="display:flex; gap:10px; padding:12px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0; flex-wrap:wrap;">
+            ${[
+              ['총 매도차익', '+$'+gainUsd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}), '#00C578'],
+              ['총 매도손실', lossUsd>0?'-$'+lossUsd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}):'—', '#3A9AFF'],
+              ['순손익 (USD)', fmtU(netUsd), netUsd>=0?'#00C578':'#3A9AFF'],
+              ['순손익 (KRW)', fmtW(netKrw), netKrw>=0?'#00C578':'#3A9AFF'],
+              ['과세표준', taxableKrw>0?fmtW(taxableKrw):'공제 범위 내', taxableKrw>0?'#ff4d6a':'var(--text3)'],
+              ['예상 세금', taxKrw>0?'₩'+taxKrw.toLocaleString():'납부 없음', taxKrw>0?'#ff4d6a':'var(--text3)'],
+            ].map(([label, val, color]) => `
+              <div style="flex:1; min-width:110px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
+                <div style="font-size:10px; color:var(--text3); margin-bottom:4px;">${label}</div>
+                <div style="font-weight:700; color:${color}; font-family:var(--font-mono); font-size:13px; line-height:1.3;">${val}</div>
+              </div>`).join('')}
+          </div>
+    
+          <!-- 거래 목록 -->
+          <div style="flex:1; overflow-y:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:12px;">
+              <thead style="position:sticky; top:0; background:var(--bg3); z-index:1;">
+                <tr style="border-bottom:1px solid var(--border);">
+                  ${['날짜','종목','계좌','수량','매도가','평단가','손익 (USD)','손익 (KRW)'].map(
+                    (h,i) => `<th style="padding:9px 12px; text-align:${i>=3?'right':'left'}; font-weight:600; color:var(--text2); white-space:nowrap;">${h}</th>`
+                  ).join('')}
+                </tr>
+              </thead>
+              <tbody>${rowsHtml || '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3);">거래 내역 없음</td></tr>'}</tbody>
+            </table>
+          </div>
+          <div style="padding:8px 20px; font-size:10px; color:var(--text3); border-top:1px solid var(--border); background:var(--bg3); line-height:1.7;">
+            ⚠️ 참고용 추정치입니다. 실제 신고 시 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요.
+          </div>
         </div>`;
         overlay.style.display = 'flex';
     };
