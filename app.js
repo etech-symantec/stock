@@ -1496,6 +1496,49 @@ function renderHistoryDashboard() {
   });
 
   const sorted = filtered.sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+  // ── 필터 요약바 ──────────────────────────────────────────
+  const summaryEl = document.getElementById('histSummaryBar');
+  if (summaryEl) {
+      const isAnyFilterActive = historyFilters.market !== 'all' || historyFilters.type !== 'all' ||
+          historyFilters.search || historyFilters.dateFrom || historyFilters.dateTo ||
+          historyFilters.broker !== 'all' || historyFilters.owner !== 'all';
+  
+      const tradeTxs = sorted.filter(t => t.txType !== 'dividend' && t.txType !== 'transfer');
+  
+      if (!isAnyFilterActive || tradeTxs.length === 0) {
+          summaryEl.style.display = 'none';
+      } else {
+          let buyKrw = 0, sellKrw = 0;
+          tradeTxs.forEach(tx => {
+              const amt = Math.abs(tx.qty) * tx.price;
+              const fxRate = !isKorean(tx.symbol) ? getHistoricalFxRate(tx.date) : 1;
+              const amtKrw = amt * fxRate;
+              if (tx.qty > 0) buyKrw += amtKrw;
+              else sellKrw += amtKrw;
+          });
+          const net = sellKrw - buyKrw;
+          const fmtW = v => {
+              const abs = Math.abs(v);
+              if (abs >= 100000000) return '₩' + (abs/100000000).toFixed(1) + '억';
+              if (abs >= 10000) return '₩' + Math.round(abs/10000).toLocaleString() + '만';
+              return '₩' + Math.round(abs).toLocaleString();
+          };
+          summaryEl.style.display = 'block';
+          summaryEl.innerHTML = `
+              <div style="display:flex; gap:20px; align-items:center; padding:10px 16px;
+                          background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+                          font-size:12px; flex-wrap:wrap;">
+                  <span style="color:var(--text3); font-weight:700;">📋 ${tradeTxs.length}건</span>
+                  <span>매수 <b style="color:var(--red);">${fmtW(buyKrw)}</b></span>
+                  <span>매도 <b style="color:var(--blue);">${fmtW(sellKrw)}</b></span>
+                  <span style="border-left:1px solid var(--border); padding-left:20px;">
+                      ${net >= 0 ? '순매도' : '순매수'}
+                      <b style="color:${net >= 0 ? 'var(--blue)' : 'var(--red)'};">${fmtW(Math.abs(net))}</b>
+                  </span>
+                  <span style="color:var(--text3); font-size:10px; margin-left:auto;">* 미국주식은 거래일 환율 환산</span>
+              </div>`;
+      }
+  }
   
   if(sorted.length === 0) {
       tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:40px; color:var(--text3);">조건에 맞는 거래 내역이 없습니다.</td></tr>`;
