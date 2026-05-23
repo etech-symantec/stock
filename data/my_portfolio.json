@@ -8135,6 +8135,16 @@
       "qty": -13,
       "price": 192.7,
       "txType": "trade"
+    },
+    {
+      "id": 1779502665841,
+      "date": "2026-05-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "META",
+      "qty": -2,
+      "price": 610,
+      "txType": "trade"
     }
   ],
   "range": "all",
