@@ -5564,6 +5564,7 @@ function renderCapitalGainsTax(ownerFilter) {
     </div>`;
 
     // ── 연도 상세 모달 ──
+    window._openCgTaxModal = null;
     window._cgTradesByYear = tradesByYear;
     
     window._openCgYearDetail = function(year) {
@@ -5673,7 +5674,7 @@ function renderCapitalGainsTax(ownerFilter) {
                 <span class="stat-flag">📋</span>
                 <div class="stat-market-label">${thisYear}년 양도소득세</div>
             </div>
-            <button onclick="window._openCgTaxModal()"
+            <button onclick="if(typeof window._openCgTaxModal==='function') window._openCgTaxModal(); else alert('데이터를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')"
                 style="font-size:10px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0; font-family:var(--font-sans); white-space:nowrap;">
                 전체 보기 ▶
             </button>
