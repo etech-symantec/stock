@@ -1898,6 +1898,9 @@ function _renderHistDrpCalendar() {
   }
   const selText=(rs&&re&&rs!==re)?`${rs} ~ ${re}`:(rs?`${rs} (두 번째 날짜 선택 가능)`:'날짜 클릭: 하루 / 두 번 클릭: 기간');
   el.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);" onmousedown="event.stopPropagation()">
+    <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+      ${_yearBtnsHtml('_histDrpApplyYear')}
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <button onclick="_histDrpNav(-1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">◀</button>
       <span onclick="_histDrpApplyMonth()" style="font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;">${y}년 ${monthNames[m]}</span>
@@ -2171,6 +2174,9 @@ function _renderDivDrpCalendar() {
   }
   const selText=(rs&&re&&rs!==re)?`${rs} ~ ${re}`:(rs?`${rs} (두 번째 날짜 선택 가능)`:'날짜 클릭: 하루 / 두 번 클릭: 기간');
   el.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);" onmousedown="event.stopPropagation()">
+    <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+      ${_yearBtnsHtml('_divDrpApplyYear')}
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <button onclick="_divDrpNav(-1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">◀</button>
       <span onclick="_divDrpApplyMonth()" style="font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;">${y}년 ${monthNames[m]}</span>
@@ -7020,6 +7026,9 @@ function _renderDrpCalendar() {
 
   el.innerHTML = `
     <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);" onmousedown="event.stopPropagation()">
+      <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+        ${_yearBtnsHtml('_drpApplyYear')}
+      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <button onclick="_drpNav(-1)" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;padding:4px 10px;font-size:12px;">◀</button>
         <span onclick="_drpApplyMonth()" style="font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;" title="클릭하면 이 달 전체로 필터">${y}년 ${monthNames[m]}</span>
@@ -7095,3 +7104,41 @@ document.addEventListener('mousedown', (e) => {
   if (dPop && dPop.style.display !== 'none' && !dPop.contains(e.target) && e.target !== dBtn)
     closeDividendDatePicker();
 });
+
+function _getAvailableYears() {
+    const years = new Set([new Date().getFullYear()]);
+    state.transactions.forEach(tx => {
+        if (tx.date) years.add(parseInt(tx.date.substring(0, 4)));
+    });
+    return [...years].sort((a, b) => b - a);
+}
+
+function _yearBtnsHtml(applyFn) {
+    return _getAvailableYears().map(y =>
+        `<button onclick="${applyFn}(${y})"
+            style="padding:4px 9px; font-size:11px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; font-family:var(--font-sans); transition:0.15s;"
+            onmouseover="this.style.background='rgba(124,106,247,0.15)';this.style.color='var(--accent)';this.style.borderColor='var(--accent)';"
+            onmouseout="this.style.background='transparent';this.style.color='var(--text2)';this.style.borderColor='var(--border)';">${y}</button>`
+    ).join('');
+}
+
+function _histDrpApplyYear(y) {
+    historyFilters.dateFrom = `${y}-01-01`;
+    historyFilters.dateTo   = `${y}-12-31`;
+    closeHistoryDatePicker();
+    renderHistoryDashboard();
+}
+
+function _drpApplyYear(y) {
+    realizedFilters.dateFrom = `${y}-01-01`;
+    realizedFilters.dateTo   = `${y}-12-31`;
+    closeRealizedDatePicker();
+    renderRealizedDashboard();
+}
+
+function _divDrpApplyYear(y) {
+    dividendFilters.dateFrom = `${y}-01-01`;
+    dividendFilters.dateTo   = `${y}-12-31`;
+    closeDividendDatePicker();
+    renderDividendDashboard();
+}
