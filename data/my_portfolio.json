@@ -8145,6 +8145,16 @@
       "qty": -2,
       "price": 610,
       "txType": "trade"
+    },
+    {
+      "id": 1779502684138,
+      "date": "2026-05-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "MSFT",
+      "qty": -5,
+      "price": 419,
+      "txType": "trade"
     }
   ],
   "range": "all",
