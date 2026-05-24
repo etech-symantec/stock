@@ -467,6 +467,12 @@ function formatPrice(val, symbol) {
   if (isKorean(symbol)) return '₩' + Math.round(val).toLocaleString();
   return '$' + val.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
+function currencyTag(symbol) {
+    const isKr = isKorean(symbol);
+    return isKr
+        ? `<span style="font-size:9px;font-weight:700;color:var(--green);background:rgba(0,200,122,0.12);border:1px solid rgba(0,200,122,0.3);padding:0 4px;border-radius:3px;margin-right:4px;font-family:var(--font-sans);vertical-align:middle;">KRW</span>`
+        : `<span style="font-size:9px;font-weight:700;color:#a78bfa;background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.3);padding:0 4px;border-radius:3px;margin-right:4px;font-family:var(--font-sans);vertical-align:middle;">USD</span>`;
+}
 
 function getOwnerInfo(ownerName) {
   if (state.owners && ownerName === state.owners.user1.name) return state.owners.user1;
@@ -1609,8 +1615,8 @@ function renderHistoryDashboard() {
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : Math.abs(tx.qty)}</td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${isDiv ? '-' : formatPrice(tx.price, tx.symbol)}</td>
           <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:var(--text);">
-              ${formatPrice(totalAmt, tx.symbol)}
-              ${totalKrw != null ? `<div style="font-size:10px; color:var(--text3); font-weight:400; margin-top:2px;">≈ ₩${totalKrw.toLocaleString()} <span style="opacity:0.6;">@${Math.round(txFxRate).toLocaleString()}</span></div>` : ''}
+              ${currencyTag(tx.symbol)}${formatPrice(totalAmt, tx.symbol)}
+              ${totalKrw != null ? `<div style="font-size:10px; font-weight:600; margin-top:3px; color:var(--green);">≈ ₩${totalKrw.toLocaleString()} <span style="color:var(--text3);font-weight:400;font-size:9px;">@${Math.round(txFxRate).toLocaleString()}</span></div>` : ''}
           </td>
           <td style="padding:12px 16px; text-align:center;"><div class="tx-actions" style="justify-content:center;"><button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button><button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button></div></td>
       </tr>`;
@@ -5440,8 +5446,8 @@ function renderRealizedDashboard() {
             <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono);">${formatPrice(tx.sellPrice, tx.symbol)}</td>
             <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); color:var(--text3);">${formatPrice(tx.avgCost, tx.symbol)}</td>
             <td style="padding:12px 16px; text-align:right; font-family:var(--font-mono); font-weight:700; color:${pnlColor};">
-                ${sign}${formatPrice(Math.abs(tx.pnl), tx.symbol)}
-                ${tx.txFxRate ? `<div style="font-size:10px; color:var(--text3); font-weight:400; margin-top:2px;">≈ ₩${(Math.abs(tx.pnl * tx.txFxRate) >= 1 ? Math.round(Math.abs(tx.pnl * tx.txFxRate)).toLocaleString() : (Math.abs(tx.pnl * tx.txFxRate)).toFixed(0))} <span style="opacity:0.6;">@${Math.round(tx.txFxRate).toLocaleString()}</span></div>` : ''}
+                ${currencyTag(tx.symbol)}${sign}${formatPrice(Math.abs(tx.pnl), tx.symbol)}
+                ${tx.txFxRate ? `<div style="font-size:10px; font-weight:600; margin-top:3px; color:${pnlColor}; opacity:0.85;">${sign}₩${(Math.abs(tx.pnl * tx.txFxRate) >= 1 ? Math.round(Math.abs(tx.pnl * tx.txFxRate)).toLocaleString() : (Math.abs(tx.pnl * tx.txFxRate)).toFixed(0))} <span style="color:var(--text3);font-weight:400;font-size:9px;">@${Math.round(tx.txFxRate).toLocaleString()}</span></div>` : ''}
             </td>
             <td style="padding:12px 16px; text-align:right; font-weight:700; color:${pnlColor};">${sign}${tx.roi.toFixed(2)}%</td>
         </tr>
@@ -5874,10 +5880,14 @@ function renderRealizedChart(labels, lineData, barData, txInfo = []) {
                                     dayInfo.trades.forEach(t => {
                                         const tSign = t.pnl >= 0 ? '+' : '-';
                                         const pnlAmt = Math.abs(t.pnlKrw);
-                                        const pnlStr = pnlAmt >= 10000
-                                            ? tSign + '₩' + Math.round(pnlAmt/10000).toLocaleString() + '만'
+                                        let krwStr = pnlAmt >= 10000
+                                            ? tSign + '₩' + Math.round(pnlAmt / 10000).toLocaleString() + '만'
                                             : tSign + '₩' + Math.round(pnlAmt).toLocaleString();
-                                        lines.push(`  📌 ${t.name} (${t.qty}주)  →  ${pnlStr}`);
+                                        const usdStr = !t.isKr
+                                            ? `  (${t.pnl >= 0 ? '+' : ''}$${Math.abs(t.pnl).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})})`
+                                            : '';
+                                        const flag = t.isKr ? '🇰🇷' : '🇺🇸';
+                                        lines.push(`  📌 ${flag} ${t.name} (${t.qty}주)  →  ${krwStr}${usdStr}`);
                                     });
                                 }
                                 return lines;
@@ -5890,9 +5900,19 @@ function renderRealizedChart(labels, lineData, barData, txInfo = []) {
                             if (!dayInfo || !dayInfo.trades) return '';
                             const lines = [];
                             dayInfo.trades.forEach(tx => {
-                                const priceStr = tx.isKr ? `₩${Math.round(tx.sellPrice).toLocaleString()}` : `$${tx.sellPrice.toFixed(2)}`;
-                                const avgStr   = tx.isKr ? `₩${Math.round(tx.avgCost).toLocaleString()}`   : `$${tx.avgCost.toFixed(2)}`;
-                                lines.push(`     매도 ${priceStr} / 평단 ${avgStr}`);
+                                if (tx.isKr) {
+                                    lines.push(`     🇰🇷 매도 ₩${Math.round(tx.sellPrice).toLocaleString()} / 평단 ₩${Math.round(tx.avgCost).toLocaleString()}`);
+                                } else {
+                                    lines.push(`     🇺🇸 매도 $${tx.sellPrice.toFixed(2)} / 평단 $${tx.avgCost.toFixed(2)}`);
+                                    if (tx.txFxRate) {
+                                        const krwAmt = Math.abs(tx.pnlKrw);
+                                        const krwSign = tx.pnlKrw >= 0 ? '+' : '-';
+                                        const krwStr = krwAmt >= 10000
+                                            ? krwSign + '₩' + Math.round(krwAmt / 10000).toLocaleString() + '만'
+                                            : krwSign + '₩' + Math.round(krwAmt).toLocaleString();
+                                        lines.push(`        ↳ 환율 @${Math.round(tx.txFxRate).toLocaleString()} → ${krwStr}`);
+                                    }
+                                }
                                 if (tx.owner) lines.push(`     👤 ${tx.owner}  |  ${tx.broker}`);
                             });
                             return lines;
