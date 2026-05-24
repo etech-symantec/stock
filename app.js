@@ -5111,6 +5111,7 @@ function renderRealizedDashboard() {
     let chartBarData = [];
     let chartTxInfo = [];
     let cumulativePnl = 0;
+    let dailyData = {};
 
     const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
 
@@ -5149,37 +5150,24 @@ function renderRealizedDashboard() {
             const passBroker = (!realizedFilters.broker || broker === realizedFilters.broker);
             const passName = (!realizedFilters.name || tx.symbol.toLowerCase().includes(realizedFilters.name.toLowerCase()) || (_getDisplayName(tx.symbol) || '').toLowerCase().includes(realizedFilters.name.toLowerCase()));
             
+            // 변경 후
             if (passYear && passMonth && passOwner && passMarket && passSymbol && passPeriodLocal && passCustomDate && passBroker && passName) {
                 const txFxRate = isKr ? 1 : getHistoricalFxRate(tx.date);
                 let pnlKrw = pnl * txFxRate;
-                cumulativePnl += pnlKrw;
-
-                chartLabels.push(tx.date);
-                chartLineData.push(cumulativePnl);
-                chartBarData.push(pnlKrw);
-                chartTxInfo.push({ // 🌟 추가: 툴팁에 표시할 매매 정보
+            
+                // 같은 날짜 매도 내역은 하나로 합산
+                if (!dailyData[tx.date]) dailyData[tx.date] = { pnlKrw: 0, trades: [] };
+                dailyData[tx.date].pnlKrw += pnlKrw;
+                dailyData[tx.date].trades.push({
                     symbol: tx.symbol,
                     name: _getDisplayName(tx.symbol) || tx.symbol,
-                    qty: sellQty,
-                    sellPrice: tx.price,
-                    avgCost: currentAvg,
-                    pnl: pnl,
+                    qty: sellQty, sellPrice: tx.price, avgCost: currentAvg,
+                    pnl: pnl, pnlKrw: pnlKrw,
                     roi: currentAvg > 0 ? (pnl / (currentAvg * sellQty)) * 100 : 0,
-                    owner: tx.owner || '',
-                    broker: broker,
-                    isKr: isKr
+                    owner: tx.owner || '', broker: broker, isKr: isKr,
+                    txFxRate: isKr ? null : txFxRate
                 });
-
-                const currentDataIndex = chartBarData.length - 1;
-                if (realizedFilters.tradeIdx === null || realizedFilters.tradeIdx === currentDataIndex) {
-                    realizedTxs.push({
-                        date: tx.date, symbol: tx.symbol, owner: tx.owner, broker: broker,
-                        sellQty: sellQty, sellPrice: tx.price, avgCost: currentAvg,
-                        pnl: pnl, roi: currentAvg > 0 ? (pnl / (currentAvg * sellQty)) * 100 : 0,
-                        txFxRate: isKr ? null : txFxRate   // ← 추가
-                    });
-                }
-                
+            
                 if (isKr) {
                     krwTotal += pnl;
                 } else {
@@ -5187,6 +5175,27 @@ function renderRealizedDashboard() {
                     usdTotalKrw += pnl * txFxRate;
                 }
             }
+        }
+    });
+
+    // 날짜별 정렬 후 차트 배열 구성
+    const _sortedDates = Object.keys(dailyData).sort();
+    _sortedDates.forEach((date, dateIdx) => {
+        const day = dailyData[date];
+        cumulativePnl += day.pnlKrw;
+        chartLabels.push(date);
+        chartLineData.push(cumulativePnl);
+        chartBarData.push(day.pnlKrw);
+        chartTxInfo.push({ date, pnlKrw: day.pnlKrw, trades: day.trades });
+
+        if (realizedFilters.tradeIdx === null || realizedFilters.tradeIdx === dateIdx) {
+            day.trades.forEach(t => {
+                realizedTxs.push({
+                    date: date, symbol: t.symbol, owner: t.owner, broker: t.broker,
+                    sellQty: t.qty, sellPrice: t.sellPrice, avgCost: t.avgCost,
+                    pnl: t.pnl, roi: t.roi, txFxRate: t.txFxRate
+                });
+            });
         }
     });
 
@@ -5841,37 +5850,52 @@ function renderRealizedChart(labels, lineData, barData, txInfo = []) {
                     callbacks: {
                         title: function(items) {
                             const idx = items[0]?.dataIndex;
-                            const tx = txInfo[idx];
-                            if (!tx) return items[0]?.label || '';
-                            return `${items[0]?.label}  |  ${tx.name} (${tx.symbol})`;
+                            const dayInfo = txInfo[idx];
+                            if (!dayInfo || !dayInfo.trades) return items[0]?.label || '';
+                            if (dayInfo.trades.length === 1) {
+                                return `${items[0]?.label}  |  ${dayInfo.trades[0].name} (${dayInfo.trades[0].symbol})`;
+                            }
+                            return `${items[0]?.label}  |  ${dayInfo.trades.length}건 매도`;
                         },
                         label: function(ctx) {
-                            const tx = txInfo[ctx.dataIndex];
+                            const dayInfo = txInfo[ctx.dataIndex];
                             if (ctx.dataset.label === '개별 매매 손익') {
                                 const origVal = barData[ctx.dataIndex] || 0;
-                                const sign = origVal >= 0 ? '+' : '-';
-                                const val = Math.round(Math.abs(origVal)).toLocaleString();
-                                const roiStr = tx ? ` (${tx.roi >= 0 ? '+' : ''}${tx.roi.toFixed(1)}%)` : '';
-                                return `${ctx.dataset.label}: ${sign}₩${val}${roiStr}`;
+                                if (origVal === 0) return null;
+                                const fmtKrw = v => {
+                                    const a = Math.abs(v), s = v >= 0 ? '+' : '-';
+                                    if (a >= 100000000) return s + '₩' + (a/100000000).toFixed(1) + '억';
+                                    if (a >= 10000) return s + '₩' + Math.round(a/10000).toLocaleString() + '만';
+                                    return s + '₩' + Math.round(a).toLocaleString();
+                                };
+                                const sign = origVal >= 0 ? '▲ ' : '▼ ';
+                                const lines = [`💰 일별 실현수익: ${sign}${fmtKrw(origVal)}`];
+                                if (dayInfo && dayInfo.trades) {
+                                    dayInfo.trades.forEach(t => {
+                                        const tSign = t.pnl >= 0 ? '+' : '-';
+                                        const pnlAmt = Math.abs(t.pnlKrw);
+                                        const pnlStr = pnlAmt >= 10000
+                                            ? tSign + '₩' + Math.round(pnlAmt/10000).toLocaleString() + '만'
+                                            : tSign + '₩' + Math.round(pnlAmt).toLocaleString();
+                                        lines.push(`  📌 ${t.name} (${t.qty}주)  →  ${pnlStr}`);
+                                    });
+                                }
+                                return lines;
                             }
-                            const val = Math.round(ctx.raw).toLocaleString();
-                            return `${ctx.dataset.label}: ₩${val}`;
+                            return `${ctx.dataset.label}: ₩${Math.round(ctx.raw).toLocaleString()}`;
                         },
                         afterLabel: function(ctx) {
                             if (ctx.dataset.label !== '개별 매매 손익') return '';
-                            const tx = txInfo[ctx.dataIndex];
-                            if (!tx) return '';
-                            const priceStr = tx.isKr
-                                ? `₩${Math.round(tx.sellPrice).toLocaleString()}`
-                                : `$${tx.sellPrice.toFixed(2)}`;
-                            const avgStr = tx.isKr
-                                ? `₩${Math.round(tx.avgCost).toLocaleString()}`
-                                : `$${tx.avgCost.toFixed(2)}`;
-                            return [
-                                `  📦 수량: ${tx.qty}주`,
-                                `  💰 매도가: ${priceStr}  /  평단가: ${avgStr}`,
-                                tx.owner ? `  👤 ${tx.owner}  |  ${tx.broker}` : `  🏦 ${tx.broker}`
-                            ];
+                            const dayInfo = txInfo[ctx.dataIndex];
+                            if (!dayInfo || !dayInfo.trades) return '';
+                            const lines = [];
+                            dayInfo.trades.forEach(tx => {
+                                const priceStr = tx.isKr ? `₩${Math.round(tx.sellPrice).toLocaleString()}` : `$${tx.sellPrice.toFixed(2)}`;
+                                const avgStr   = tx.isKr ? `₩${Math.round(tx.avgCost).toLocaleString()}`   : `$${tx.avgCost.toFixed(2)}`;
+                                lines.push(`     매도 ${priceStr} / 평단 ${avgStr}`);
+                                if (tx.owner) lines.push(`     👤 ${tx.owner}  |  ${tx.broker}`);
+                            });
+                            return lines;
                         }
                     }
                 }
