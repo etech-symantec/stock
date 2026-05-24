@@ -294,15 +294,35 @@
             </div>
           </div>
           <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
-             <div style="display:flex; align-items:center; justify-content:space-between; margin:0 0 10px 0;">
-               <div class="section-title" style="margin:0; font-size:12px; color:var(--text3)">포트폴리오 맵</div>
-               <div id="treemapSelectToolbar" style="display:none; gap:8px; align-items:center; flex-wrap:wrap;">
-                 <span id="treemapSelectCount" style="font-size:11px; color:var(--text2);">0종목 선택됨</span>
-                 <div id="treemapSelectResult" style="font-size:12px; font-weight:700; color:var(--green); font-family:var(--font-mono);"></div>
-                 <button onclick="exitTreemapSelectMode()" style="font-size:11px; padding:3px 10px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer;">선택 해제 ✕</button>
-               </div>
-             </div>
-             <div id="allocationTreemap" style="flex:1; position:relative; min-height: 180px; width: 100%; border-radius: 8px; overflow: hidden; background:var(--bg3);"></div>
+            <!-- 타이틀 + 힌트 -->
+            <div style="display:flex; align-items:center; gap:8px; margin:0 0 8px 0; flex-wrap:wrap;">
+              <div class="section-title" style="margin:0; font-size:12px; color:var(--text3);">포트폴리오 맵</div>
+              <span style="font-size:10px; color:var(--text3); background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:2px 8px; white-space:nowrap;">
+                👆 클릭 → 상세 &nbsp;|&nbsp; 꾹 누르기 → 선택 합산
+              </span>
+            </div>
+
+            <!-- 선택 모드 툴바 (평소엔 숨김) -->
+            <div id="treemapSelectToolbar" style="display:none; flex-direction:column; gap:8px; margin-bottom:8px; padding:10px 12px; background:var(--bg2); border:1px solid var(--border); border-radius:8px;">
+              <!-- 줄1: 일괄 선택 필터 -->
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <span style="font-size:10px; color:var(--text3); flex-shrink:0; font-weight:600;">일괄 선택</span>
+                <button id="tmFilterKr" onclick="_selectTreemapByMarket('kr')"
+                  class="btn-sm" style="font-size:11px;">🇰🇷 국장</button>
+                <button id="tmFilterUs" onclick="_selectTreemapByMarket('us')"
+                  class="btn-sm" style="font-size:11px;">🇺🇸 미장</button>
+                <div id="treemapTagButtons" style="display:contents;"></div>
+              </div>
+              <!-- 줄2: 선택 결과 + 종료 버튼 -->
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span id="treemapSelectCount" style="font-size:11px; color:var(--text2);">0종목 선택</span>
+                <span id="treemapSelectResult" style="font-size:13px; font-weight:700; font-family:var(--font-mono); color:var(--green);"></span>
+                <button onclick="exitTreemapSelectMode()"
+                  style="margin-left:auto; font-size:11px; padding:3px 10px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer;">선택 해제 ✕</button>
+              </div>
+            </div>
+
+            <div id="allocationTreemap" style="flex:1; position:relative; min-height:180px; width:100%; border-radius:8px; overflow:hidden; background:var(--bg3);"></div>
           </div>
         </div>
 
