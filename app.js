@@ -5247,6 +5247,52 @@ function renderRealizedDashboard() {
     // 5. 차트 그리기 함수 호출
     renderRealizedChart(chartLabels, chartLineData, chartBarData, chartTxInfo);
 
+    // 필터 요약바
+    const realSummaryBar = document.getElementById('realSummaryBar');
+    if (realSummaryBar) {
+        const isAnyFilterActive = realizedFilters.symbol || realizedFilters.tradeIdx !== null ||
+            realizedFilters.market !== 'all' || selectedYear !== 'all' || selectedMonth !== 'all' ||
+            currentRealizedOwnerFilter !== 'all' || realizedFilters.dateFrom || realizedFilters.dateTo ||
+            realizedFilters.broker || realizedFilters.name;
+
+        if (!isAnyFilterActive || realizedTxs.length === 0) {
+            realSummaryBar.style.display = 'none';
+        } else {
+            const uniqueSymbols = new Set(realizedTxs.map(t => t.symbol)).size;
+            let netPnlKrw = 0, totalCostKrw = 0;
+            realizedTxs.forEach(t => {
+                const isKr = isKorean(t.symbol);
+                const fx = isKr ? 1 : (t.txFxRate || currentUsdKrw);
+                netPnlKrw += t.pnl * fx;
+                totalCostKrw += t.avgCost * t.sellQty * fx;
+            });
+            const netRoi = totalCostKrw > 0 ? (netPnlKrw / totalCostKrw) * 100 : 0;
+            const isPos = netPnlKrw >= 0;
+            const sign = isPos ? '+' : '';
+            const pnlColor = isPos ? 'var(--green)' : 'var(--blue)';
+            const fmtW = v => {
+                const abs = Math.abs(v);
+                if (abs >= 100000000) return (v < 0 ? '-' : '+') + '₩' + (abs / 100000000).toFixed(1) + '억';
+                if (abs >= 10000)     return (v < 0 ? '-' : '+') + '₩' + Math.round(abs / 10000).toLocaleString() + '만';
+                return (v < 0 ? '-' : '+') + '₩' + Math.round(abs).toLocaleString();
+            };
+            realSummaryBar.style.display = 'block';
+            realSummaryBar.innerHTML = `
+                <div style="display:flex; gap:20px; align-items:center; padding:10px 16px;
+                            background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+                            font-size:12px; flex-wrap:wrap; margin-bottom:12px;">
+                    <span style="color:var(--text3); font-weight:700;">📊 ${realizedTxs.length}건 · ${uniqueSymbols}종목 매도</span>
+                    <span style="border-left:1px solid var(--border); padding-left:20px;">
+                        순 실현수익 <b style="color:${pnlColor}; font-family:var(--font-mono);">${fmtW(netPnlKrw)}</b>
+                    </span>
+                    <span>
+                        순 수익률 <b style="color:${pnlColor}; font-family:var(--font-mono);">${sign}${netRoi.toFixed(2)}%</b>
+                    </span>
+                    <span style="color:var(--text3); font-size:10px; margin-left:auto;">* 미국주식은 거래일 환율 환산</span>
+                </div>`;
+        }
+    }
+
     // 5-1. 미국주식 양도소득세 패널 렌더링
     renderCapitalGainsTax(currentRealizedOwnerFilter);
 
