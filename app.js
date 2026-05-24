@@ -55,6 +55,9 @@ let realizedChartInst = null; // 🌟 실현수익 차트 저장 변수
 let realizedFilters = { market: 'all', symbol: null, tradeIdx: null, period: 'all', year: 'all', month: 'all', dateFrom: '', dateTo: '', broker: '', name: '' };
 // 🌟 실현수익 랭킹 탭 상태 (pnl: 수익금 | roi: 수익률)
 let realizedRankingTab = 'pnl';
+// 🌟 포트폴리오 맵 선택 모드
+let _treemapSelectMode = false;
+let _treemapSelectedSymbols = new Map(); // symbol → value(KRW)
 // 기존 realizedRankingPeriod 변수 삭제됨
 let realizedRankingSortDir = 'desc'; // 'desc' 내림차순 | 'asc' 오름차순
 // 🌟 종목 리스트 검색 및 태그 필터 상태 변수
@@ -3603,33 +3606,66 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
             renderTreemapNode(treemapData, x, y, w, h);
             tmContainer.innerHTML = html;
 
+            // 🌟 포트폴리오 맵 셀 이벤트: 일반 클릭 → 종목창 / 롱프레스 → 선택 모드
             document.querySelectorAll('.treemap-cell').forEach(cell => {
+                let _pressTimer = null;
+                const LONG_PRESS_MS = 500;
+
+                // --- 툴팁 ---
                 cell.addEventListener('mouseenter', (e) => {
+                    if (_treemapSelectMode) return; // 선택 모드에선 툴팁 숨김
                     let tooltipEl = document.getElementById('chartjs-tooltip');
                     if (!tooltipEl) {
                         tooltipEl = document.createElement('div');
                         tooltipEl.id = 'chartjs-tooltip';
                         document.body.appendChild(tooltipEl);
                     }
-                    let name = cell.getAttribute('data-name');
-                    let val = cell.getAttribute('data-val');
-                    tooltipEl.innerHTML = `<div style="font-size:16px; font-weight:700; margin-bottom:4px; text-align:center;">${name}</div><div style="font-size:16px; text-align:center; color:var(--text);">${val}</div>`;
+                    tooltipEl.innerHTML = `<div style="font-size:16px;font-weight:700;margin-bottom:4px;text-align:center;">${cell.getAttribute('data-name')}</div><div style="font-size:16px;text-align:center;color:var(--text);">${cell.getAttribute('data-val')}</div>`;
                     tooltipEl.style.opacity = 1;
                 });
                 cell.addEventListener('mousemove', (e) => {
-                    let tooltipEl = document.getElementById('chartjs-tooltip');
-                    if(tooltipEl) {
-                      tooltipEl.style.left = e.pageX + 'px';
-                      tooltipEl.style.top = (e.pageY - 10) + 'px';
-                    }
+                    const tooltipEl = document.getElementById('chartjs-tooltip');
+                    if (tooltipEl) { tooltipEl.style.left = e.pageX + 'px'; tooltipEl.style.top = (e.pageY - 10) + 'px'; }
                 });
                 cell.addEventListener('mouseleave', () => {
-                    let tooltipEl = document.getElementById('chartjs-tooltip');
-                    if(tooltipEl) tooltipEl.style.opacity = 0;
+                    const tooltipEl = document.getElementById('chartjs-tooltip');
+                    if (tooltipEl) tooltipEl.style.opacity = 0;
+                    if (_pressTimer) { clearTimeout(_pressTimer); _pressTimer = null; }
                 });
-                cell.addEventListener('click', () => {
+
+                // --- 롱프레스 감지 (마우스) ---
+                cell.addEventListener('mousedown', (e) => {
+                    _pressTimer = setTimeout(() => {
+                        _pressTimer = null;
+                        _enterTreemapSelectMode(cell);
+                    }, LONG_PRESS_MS);
+                });
+                cell.addEventListener('mouseup', () => {
+                    if (_pressTimer) { clearTimeout(_pressTimer); _pressTimer = null; }
+                });
+
+                // --- 롱프레스 감지 (터치) ---
+                cell.addEventListener('touchstart', (e) => {
+                    _pressTimer = setTimeout(() => {
+                        _pressTimer = null;
+                        _enterTreemapSelectMode(cell);
+                    }, LONG_PRESS_MS);
+                }, { passive: true });
+                cell.addEventListener('touchend', () => {
+                    if (_pressTimer) { clearTimeout(_pressTimer); _pressTimer = null; }
+                });
+                cell.addEventListener('touchmove', () => {
+                    if (_pressTimer) { clearTimeout(_pressTimer); _pressTimer = null; }
+                });
+
+                // --- 클릭 ---
+                cell.addEventListener('click', (e) => {
                     const sym = cell.getAttribute('data-symbol');
-                    if (sym) openChartModal(sym);
+                    if (_treemapSelectMode) {
+                        _toggleTreemapCell(cell, sym);
+                    } else {
+                        if (sym) openChartModal(sym);
+                    }
                 });
             });
         }
@@ -7250,4 +7286,105 @@ function _divDrpApplyYear(y) {
     dividendFilters.dateTo   = `${y}-12-31`;
     closeDividendDatePicker();
     renderDividendDashboard();
+}
+
+// ==========================================
+// 🗺️ 포트폴리오 맵 선택 모드 함수
+// ==========================================
+function _enterTreemapSelectMode(triggerCell) {
+    _treemapSelectMode = true;
+    _treemapSelectedSymbols.clear();
+
+    // 처음 롱프레스한 셀 자동 선택
+    const sym = triggerCell.getAttribute('data-symbol');
+    const val = _parseTreemapVal(triggerCell.getAttribute('data-val'));
+    _treemapSelectedSymbols.set(sym, val);
+    _applyTreemapCellStyle(triggerCell, true);
+
+    // 툴바 표시
+    const toolbar = document.getElementById('treemapSelectToolbar');
+    if (toolbar) toolbar.style.display = 'flex';
+
+    _updateTreemapSelectUI();
+
+    // 커서 변경
+    document.querySelectorAll('.treemap-cell').forEach(c => c.style.cursor = 'pointer');
+}
+
+function _toggleTreemapCell(cell, sym) {
+    const val = _parseTreemapVal(cell.getAttribute('data-val'));
+    if (_treemapSelectedSymbols.has(sym)) {
+        _treemapSelectedSymbols.delete(sym);
+        _applyTreemapCellStyle(cell, false);
+    } else {
+        _treemapSelectedSymbols.set(sym, val);
+        _applyTreemapCellStyle(cell, true);
+    }
+    _updateTreemapSelectUI();
+}
+
+function _applyTreemapCellStyle(cell, selected) {
+    if (selected) {
+        cell.style.outline = '2.5px solid #fff';
+        cell.style.outlineOffset = '-2px';
+        cell.style.opacity = '1';
+        cell.style.zIndex = '2';
+        cell.style.position = 'absolute'; // treemap-cell은 이미 absolute
+    } else {
+        cell.style.outline = 'none';
+        cell.style.opacity = '0.6';
+        cell.style.zIndex = '';
+    }
+}
+
+function _updateTreemapSelectUI() {
+    const count = _treemapSelectedSymbols.size;
+    const totalVal = [..._treemapSelectedSymbols.values()].reduce((s, v) => s + v, 0);
+
+    const countEl = document.getElementById('treemapSelectCount');
+    const resultEl = document.getElementById('treemapSelectResult');
+    if (countEl) countEl.textContent = `${count}종목 선택됨`;
+    if (resultEl) {
+        if (count === 0) {
+            resultEl.textContent = '';
+        } else {
+            const abs = Math.abs(totalVal);
+            let fmtVal;
+            if (abs >= 100000000) fmtVal = '₩' + (abs / 100000000).toFixed(2) + '억';
+            else if (abs >= 10000) fmtVal = '₩' + Math.round(abs / 10000).toLocaleString() + '만';
+            else fmtVal = '₩' + Math.round(abs).toLocaleString();
+            resultEl.textContent = `= ${fmtVal}`;
+        }
+    }
+
+    // 미선택 셀 반투명 처리
+    document.querySelectorAll('.treemap-cell').forEach(c => {
+        const s = c.getAttribute('data-symbol');
+        if (!_treemapSelectedSymbols.has(s)) {
+            c.style.opacity = count > 0 ? '0.45' : '1';
+            c.style.outline = 'none';
+        }
+    });
+}
+
+function exitTreemapSelectMode() {
+    _treemapSelectMode = false;
+    _treemapSelectedSymbols.clear();
+
+    const toolbar = document.getElementById('treemapSelectToolbar');
+    if (toolbar) toolbar.style.display = 'none';
+
+    // 모든 셀 원래 스타일로
+    document.querySelectorAll('.treemap-cell').forEach(c => {
+        c.style.opacity = '1';
+        c.style.outline = 'none';
+        c.style.zIndex = '';
+        c.style.cursor = 'pointer';
+    });
+}
+
+function _parseTreemapVal(valStr) {
+    // '₩1,234,567' → 1234567
+    if (!valStr) return 0;
+    return parseInt(valStr.replace(/[₩,]/g, ''), 10) || 0;
 }
