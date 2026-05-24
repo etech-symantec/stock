@@ -1293,6 +1293,25 @@ function addOrUpdateTransaction() {
   let qty   = parseFloat(document.getElementById('txQty').value)   || 0;
   let price = parseFloat(document.getElementById('txPrice').value) || 0;
 
+  // ✅ 아래 유효성 검사 추가
+  if (!date) {
+    alert('📅 날짜를 입력해주세요.'); 
+    document.getElementById('txDate').focus(); return;
+  }
+  if (!symbol) {
+    alert('🔍 종목을 입력해주세요.'); 
+    document.getElementById('txSymbol').focus(); return;
+  }
+  if (typeVal !== 'dividend' && qty <= 0) {
+    alert('📦 수량을 입력해주세요. (0보다 커야 합니다)'); 
+    document.getElementById('txQty').focus(); return;
+  }
+  if (price <= 0) {
+    const label = typeVal === 'dividend' ? '배당금액' : '단가';
+    alert(`💰 ${label}을 입력해주세요. (0보다 커야 합니다)`); 
+    document.getElementById('txPrice').focus(); return;
+  }
+
   if (typeVal === 'dividend' && document.getElementById('applyDivTax').checked) {
       const taxRate = isKorean(symbol) ? 0.154 : 0.15;
       price = price * (1 - taxRate);
@@ -2900,7 +2919,7 @@ function renderTodayStocksPanel(displayItems) {
             
             // 🌟 2줄 레이아웃: 종목명 풀네임(줄바꿈 허용) 윗줄, 등락률 아랫줄 우측 배치
             return `
-            <div style="padding:10px 12px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha}; margin-bottom:5px; display:flex; flex-direction:column; gap:6px;">
+            <div onclick="openChartModal('${r.symbol}')" style="padding:10px 12px; background:${bgAlpha}; border-radius:8px; border:1px solid ${borderAlpha}; margin-bottom:5px; display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:opacity 0.15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                 <div style="font-size:12px; font-weight:700; color:var(--text); line-height:1.4; word-break:keep-all;">
                     ${r.name}
                 </div>
