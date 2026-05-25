@@ -8176,19 +8176,9 @@
       "qty": -3,
       "price": 413.8,
       "txType": "trade"
-    },
-    {
-      "id": 1779600040639,
-      "date": "2026-05-24",
-      "owner": "끄니",
-      "broker": "",
-      "symbol": "ㅁㄴㅇㄻㄴㅇ",
-      "qty": 11,
-      "price": 22,
-      "txType": "trade"
     }
   ],
-  "range": "1m",
+  "range": "all",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
