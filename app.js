@@ -5331,9 +5331,6 @@ function renderRealizedDashboard() {
         }
     }
 
-    // 5-1. 미국주식 양도소득세 패널 렌더링
-    renderCapitalGainsTax(currentRealizedOwnerFilter);
-
     // 6. 종목별 통계 집계 → 랭킹 패널 렌더링
     const symStats = {};
     const rankingTxs = realizedTxs;
@@ -5538,6 +5535,7 @@ function renderRealizedDashboard() {
         `;
     }).join('');
   updateRfpSankey(krwTotal, usdTotalKrw);
+  renderCapitalGainsTax(currentRealizedOwnerFilter);
 }
 
 // ── 🇺🇸 미국주식 양도소득세 계산 패널 ────────────────────────────────────────
