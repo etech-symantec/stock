@@ -764,21 +764,36 @@
               <div class="rfp-label-sm">총 실현수익 (환산)</div>
               <div id="realTotalConverted" class="rfp-main-val">—</div>
               <div class="rfp-hint">국내 + 해외 합산</div>
+              <div class="rfp-ratio-bar-wrap">
+                <div class="rfp-ratio-bar">
+                  <div id="rfpRatioKrFill" class="rfp-ratio-kr-fill" style="width:50%"></div>
+                  <div class="rfp-ratio-us-fill"></div>
+                </div>
+                <div class="rfp-ratio-labels">
+                  <span id="rfpRatioKrPct" style="color:var(--profit)">🇰🇷 —</span>
+                  <span id="rfpRatioUsPct" style="color:var(--loss)">— 🇺🇸</span>
+                </div>
+              </div>
             </div>
           
-            <!-- ② 분기 커넥터 (총 → 국내/해외) -->
-            <div class="rfp-fork" aria-hidden="true">
-              <div class="rfp-branch rfp-branch-top"></div>
-              <div class="rfp-branch rfp-branch-bottom"></div>
+            <!-- ② Sankey SVG 흐름 -->
+            <div class="rfp-sankey">
+              <svg class="rfp-sankey-svg" id="rfpSankeySvg"
+                   viewBox="0 0 90 290" preserveAspectRatio="none"
+                   xmlns="http://www.w3.org/2000/svg">
+                <!-- JS가 path 채움 -->
+              </svg>
             </div>
           
-            <!-- ③ 국내 / 해외 카드 -->
+            <!-- ③ 국내/해외 카드 -->
             <div class="rfp-markets">
               <div class="rfp-mcard rfp-mcard-kr">
                 <span class="rfp-mflag">🇰🇷</span>
                 <div>
                   <div class="rfp-label-sm">국내주식 실현수익</div>
                   <div id="realTotalKrw" class="rfp-mval rfp-c-profit">—</div>
+                  <div id="rfpKrPct" class="rfp-pct-badge"
+                       style="background:rgba(0,200,122,0.15);color:var(--profit)">—</div>
                 </div>
               </div>
               <div class="rfp-mcard rfp-mcard-us">
@@ -787,6 +802,8 @@
                   <div class="rfp-label-sm">해외주식 실현수익</div>
                   <div id="realTotalUsd" class="rfp-mval rfp-c-loss">—</div>
                   <div id="realTotalUsdConverted" class="rfp-hint">—</div>
+                  <div id="rfpUsPct" class="rfp-pct-badge"
+                       style="background:rgba(58,154,255,0.15);color:var(--loss)">—</div>
                 </div>
               </div>
             </div>
