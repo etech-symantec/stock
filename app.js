@@ -6888,14 +6888,19 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
         }
 
         // 배당 지급일 기준 보유 수량 계산
-        let qtyAtDiv = 0;
+        let qtyAtDiv = 0, totalCost = 0;
         state.transactions.forEach(t => {
             if (t.symbol === tx.symbol && t.txType !== 'dividend' && t.date <= tx.date
                 && t.broker === tx.broker && t.owner === tx.owner) {
+                if (t.qty > 0) totalCost += t.qty * t.price;
+                else if (qtyAtDiv > 0) totalCost += t.qty * (totalCost / qtyAtDiv);
                 qtyAtDiv += t.qty;
             }
         });
-        qtyAtDiv = Math.round(qtyAtDiv * 10000) / 10000; // 부동소수점 보정
+        qtyAtDiv = Math.round(qtyAtDiv * 10000) / 10000;
+        const avgCost = qtyAtDiv > 0 ? totalCost / qtyAtDiv : 0;
+        const yieldPct = (dps !== null && avgCost > 0) ? (dps / avgCost) * 100 : null;
+        const yieldStr = yieldPct !== null ? yieldPct.toFixed(2) + '%' : '—';
 
         // 1주당 배당금 (qtyAtDiv > 0 일 때만)
         const dps = qtyAtDiv > 0 ? tx.price / qtyAtDiv : null;
@@ -6912,6 +6917,7 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
               <td style="font-size:12px; color:var(--text2);">${tx.owner || '—'}</td>
               <td style="text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--text);">${qtyStr}</td>
               <td style="text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--text2);">${dpsStr}</td>
+              <td style="text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--green);">${yieldStr}</td>
               <td style="text-align:right; color:var(--green); font-weight:700; font-family:var(--font-mono); font-size:13px;">${formatPrice(tx.price, tx.symbol)}</td>
             </tr>`;
         } else {
@@ -6925,6 +6931,7 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
               <td style="font-size:12px; color:var(--text2);">${tx.broker || '—'}</td>
               <td style="font-size:12px; color:var(--text2);">${tx.owner || '—'}</td>
               <td style="text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--text);">${qtyStr}</td>
+              <td style="text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--green);">${yieldStr}</td>
               <td style="text-align:right; color:var(--green); font-weight:700; font-family:var(--font-mono); font-size:13px;">${formatPrice(tx.price, tx.symbol)}</td>
             </tr>`;
         }
@@ -6940,6 +6947,7 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
               <th>소유자</th>
               <th style="text-align:right;">보유 수량</th>
               <th style="text-align:right;">1주당 배당금</th>
+              <th style="text-align:right;">배당률(YOC)</th>
               <th style="text-align:right;">배당금</th>`;
         } else {
             thead.innerHTML = `
@@ -6948,10 +6956,10 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
               <th>계좌</th>
               <th>소유자</th>
               <th style="text-align:right;">보유 수량</th>
+              <th style="text-align:right;">배당률(YOC)</th>
               <th style="text-align:right;">배당금</th>`;
         }
     }
-
     tbody.innerHTML = rows.join('');
 }
 
