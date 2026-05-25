@@ -6901,12 +6901,10 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
         });
         qtyAtDiv = Math.round(qtyAtDiv * 10000) / 10000;
         const avgCost = qtyAtDiv > 0 ? totalCost / qtyAtDiv : 0;
-        const yieldPct = (dps !== null && avgCost > 0) ? (dps / avgCost) * 100 : null;
-        const yieldStr = yieldPct !== null ? yieldPct.toFixed(2) + '%' : '—';
-
-        // 1주당 배당금 (qtyAtDiv > 0 일 때만)
         const dps = qtyAtDiv > 0 ? tx.price / qtyAtDiv : null;
         const dpsStr = dps !== null ? formatPrice(dps, tx.symbol) : '—';
+        const yieldPct = (dps !== null && avgCost > 0) ? (dps / avgCost) * 100 : null;
+        const yieldStr = yieldPct !== null ? yieldPct.toFixed(2) + '%' : '—';
 
         const symDisp = tx.symbol.replace(/\.KS\.DLST|\.DLST|\.KS/g, '');
         const qtyStr = qtyAtDiv > 0 ? qtyAtDiv.toLocaleString() + '주' : '—';
