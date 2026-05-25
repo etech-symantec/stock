@@ -5537,7 +5537,7 @@ function renderRealizedDashboard() {
         </tr>
         `;
     }).join('');
-  updateRfpSankey(Math.abs(krTotal), Math.abs(usConverted));
+  updateRfpSankey(Math.abs(krwTotal), Math.abs(usdTotalKrw));
 }
 
 // ── 🇺🇸 미국주식 양도소득세 계산 패널 ────────────────────────────────────────
