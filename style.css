@@ -2016,3 +2016,188 @@ nav {
     padding-top: 1.5rem; /* 배당통계 상단 여백 기준 */
     height: 100%;
 }
+
+/* =====================================================
+   💵 실현수익 플로우 패널 (Sankey-style)
+   ===================================================== */
+
+.real-flow-panel {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+  min-height: 185px;
+  overflow: hidden;
+}
+
+/* ① 총 실현수익 */
+.rfp-total {
+  flex-shrink: 0;
+  width: 176px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, rgba(58,154,255,0.09), rgba(58,154,255,0.03));
+  border: 1px solid rgba(58,154,255,0.22);
+  border-radius: 12px;
+}
+.rfp-icon { font-size: 20px; }
+.rfp-label-sm {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3);
+}
+.rfp-main-val {
+  font-family: var(--font-mono);
+  font-size: 22px; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.2;
+  color: var(--loss);
+}
+.rfp-hint {
+  font-size: 10px; color: var(--text3); font-family: var(--font-mono);
+}
+
+/* ② 분기 커넥터 */
+.rfp-fork {
+  width: 36px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  position: relative;
+  margin: 0 4px;
+}
+/* 수평선: 총 실현수익 → 분기점 */
+.rfp-fork::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0;
+  width: 38%; height: 2px;
+  background: rgba(124,106,247,0.45);
+  transform: translateY(-50%);
+}
+.rfp-branch { flex: 1; margin-left: 38%; }
+
+/* 위쪽 갈래: 꺾어서 국내로 */
+.rfp-branch-top {
+  border-left: 2px solid rgba(0,200,122,0.5);
+  border-top:  2px solid rgba(0,200,122,0.5);
+  border-radius: 8px 0 0 0;
+}
+/* 아래쪽 갈래: 꺾어서 해외로 */
+.rfp-branch-bottom {
+  border-left:   2px solid rgba(58,154,255,0.5);
+  border-bottom: 2px solid rgba(58,154,255,0.5);
+  border-radius: 0 0 0 8px;
+}
+
+/* ③ 국내/해외 카드 묶음 */
+.rfp-markets {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-self: stretch;
+}
+.rfp-mcard {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 188px;
+}
+.rfp-mcard:hover {
+  border-color: var(--border2);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.rfp-mcard-kr  { border-left: 3px solid var(--profit); background: rgba(0,200,122,0.04); }
+.rfp-mcard-us  { border-left: 3px solid var(--loss);   background: rgba(58,154,255,0.04); }
+.rfp-mcard-tax {
+  border-left: 3px solid rgba(255,77,106,0.7);
+  background: rgba(255,77,106,0.04);
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0;
+}
+.rfp-mflag { font-size: 20px; flex-shrink: 0; line-height: 1; }
+.rfp-mval {
+  font-family: var(--font-mono);
+  font-size: 15px; font-weight: 700; line-height: 1.3; margin-top: 3px;
+}
+.rfp-c-profit { color: var(--profit); }
+.rfp-c-loss   { color: var(--loss); }
+
+/* ④ 해외 → 양도세 화살표 */
+.rfp-arrow {
+  width: 30px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0 4px;
+}
+.rfp-arrow-space { flex: 1; }
+.rfp-arrow-line  {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.rfp-arrow-line::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 9px; height: 2px;
+  background: rgba(255,77,106,0.45);
+  transform: translateY(-50%);
+}
+.rfp-arrow-line::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 50%;
+  transform: translateY(-50%);
+  border-left: 7px solid rgba(255,77,106,0.6);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+/* ⑤ 양도소득세 래퍼 */
+.rfp-tax-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.rfp-tax-space { flex: 1; }
+
+/* 라이트모드 */
+[data-theme="light"] .rfp-total {
+  background: linear-gradient(135deg, rgba(42,125,225,0.07), rgba(42,125,225,0.02));
+  border-color: rgba(42,125,225,0.2);
+}
+[data-theme="light"] .rfp-mcard-kr { background: rgba(0,154,92,0.04); }
+[data-theme="light"] .rfp-mcard-us { background: rgba(42,125,225,0.04); }
+[data-theme="light"] .rfp-mcard-tax { background: rgba(224,32,64,0.04); }
+
+/* 모바일 */
+@media (max-width: 900px) {
+  .real-flow-panel {
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: auto;
+  }
+  .rfp-fork, .rfp-arrow { display: none; }
+  .rfp-total { width: 100%; }
+  .rfp-markets { flex-direction: row; flex-wrap: wrap; width: 100%; }
+  .rfp-mcard { min-width: 0; flex: 1 1 140px; }
+  .rfp-tax-wrap { width: 100%; flex-direction: row; }
+  .rfp-tax-space { display: none; }
+  .rfp-mcard-tax { flex: 1; }
+}
