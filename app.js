@@ -6036,29 +6036,49 @@ function renderRealizedChart(labels, lineData, barData, txInfo = []) {
 }
 
 /**
- * 실현수익 Sankey 패널 (양도소득세 포함 및 부드러운 곡선 UI 적용)
+ * 실현수익 Sankey 패널 (전체보기 버튼 복구 및 부드러운 곡선 UI 적용)
  */
 function updateRfpSankey(krwTotal, usdTotalKrw) {
-  // 1. 기존의 딱딱한 생키 다이어그램 영역을 찾아 새 컨테이너로 부드럽게 교체
-  let container = document.getElementById('newSankeyContainer');
-  if (!container) {
-      const oldSvg = document.getElementById('rfpSankeySvg');
-      if (!oldSvg) return;
-      
-      // 기존 UI가 담긴 부모 박스를 탐색하여 통째로 교체합니다.
-      let parent = oldSvg.parentElement;
-      while(parent && parent.tagName !== 'BODY') {
-          if (parent.querySelector('#rfpRatioKrFill')) break; 
-          parent = parent.parentElement;
+  const oldSvg = document.getElementById('rfpSankeySvg');
+  if (!oldSvg) return;
+  
+  let parent = oldSvg.parentElement;
+  while(parent && parent.tagName !== 'BODY') {
+      if (parent.querySelector('#rfpRatioKrFill') || parent.querySelector('.rfp-tax-wrap')) break; 
+      parent = parent.parentElement;
+  }
+  if(!parent || parent.tagName === 'BODY') parent = oldSvg.parentElement.parentElement;
+
+  // 1️⃣ 기존 영역이 지워지기 전에 '전체보기' 버튼 훔쳐오기 (onclick 속성 보존)
+  let viewAllBtnHTML = "";
+  const allElements = parent.querySelectorAll('*');
+  for (let el of allElements) {
+      if (el.textContent && el.textContent.includes('전체보기')) {
+          // 버튼이거나 클릭 이벤트가 있는 태그만 타겟팅
+          if (el.hasAttribute('onclick') || el.tagName === 'BUTTON' || el.tagName === 'A') {
+              let clone = el.cloneNode(true);
+              // 새 디자인에 맞게 버튼 스타일 살짝 다듬기
+              clone.style.fontSize = '11px';
+              clone.style.padding = '3px 8px';
+              clone.style.background = 'var(--bg3, rgba(255,255,255,0.05))';
+              clone.style.border = '1px solid var(--border, rgba(255,255,255,0.1))';
+              clone.style.borderRadius = '4px';
+              clone.style.color = 'var(--text2, #8890a4)';
+              clone.style.cursor = 'pointer';
+              clone.style.textDecoration = 'none';
+              clone.style.marginLeft = '8px';
+              viewAllBtnHTML = clone.outerHTML;
+              break;
+          }
       }
-      if(!parent || parent.tagName === 'BODY') parent = oldSvg.parentElement.parentElement;
-      
-      container = document.createElement('div');
-      container.id = 'newSankeyContainer';
-      parent.parentNode.replaceChild(container, parent);
   }
 
-  // 2. 양도소득세 및 순수익 계산 (기본공제 250만원, 22% 세율 적용)
+  // 2️⃣ 기존 부모를 새 다이어그램 컨테이너로 교체
+  let container = document.createElement('div');
+  container.id = 'newSankeyContainer';
+  parent.parentNode.replaceChild(container, parent);
+
+  // 3️⃣ 양도소득세 및 순수익 계산 (기본공제 250만 원, 22% 세율)
   let estimatedTax = 0;
   if (usdTotalKrw > 2500000) {
       estimatedTax = (usdTotalKrw - 2500000) * 0.22;
@@ -6066,7 +6086,7 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
   const usNetTotal = usdTotalKrw - estimatedTax;
   const combinedTotal = krwTotal + usdTotalKrw;
 
-  // 3. 부드러운 곡선의 생키 다이어그램 HTML 렌더링
+  // 4️⃣ 생키 다이어그램 HTML 렌더링 (추출한 전체보기 버튼 삽입)
   container.innerHTML = `
   <div class="sankey-board">
     
@@ -6109,7 +6129,8 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
     </div>
 
     <div class="sankey-col">
-      <div style="height: 50%;"></div> <div style="height: 50%; display: flex; flex-direction: column; justify-content: space-around;">
+      <div style="height: 50%;"></div> 
+      <div style="height: 50%; display: flex; flex-direction: column; justify-content: space-around;">
         
         <div class="sankey-node us-net">
           <div class="sankey-title">미국 순수익</div>
@@ -6118,17 +6139,14 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
           </div>
         </div>
         
-        ${estimatedTax > 0 ? `
-        <div class="sankey-node us-tax">
-          <div class="sankey-title">예상 양도소득세</div>
-          <div class="sankey-val" style="color: var(--red)">
-            -${Math.round(estimatedTax).toLocaleString()}원
+        <div class="sankey-node us-tax" style="${estimatedTax <= 0 ? 'border-left-color: var(--text3); opacity: 0.6;' : ''}">
+          <div class="sankey-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>예상 양도소득세</span>
+            ${viewAllBtnHTML} </div>
+          <div class="sankey-val" style="color: ${estimatedTax > 0 ? 'var(--red)' : 'var(--text3)'}">
+            ${estimatedTax > 0 ? '-' + Math.round(estimatedTax).toLocaleString() + '원' : '0원 (공제 이내)'}
           </div>
-        </div>` : `
-        <div class="sankey-node us-tax" style="border-left-color: var(--text3); opacity: 0.6;">
-          <div class="sankey-title">예상 양도소득세</div>
-          <div class="sankey-val" style="color: var(--text3)">0원 (공제 이내)</div>
-        </div>`}
+        </div>
         
       </div>
     </div>
