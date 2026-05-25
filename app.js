@@ -6890,8 +6890,9 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
         // 배당 지급일 기준 보유 수량 계산
         let qtyAtDiv = 0;
         state.transactions.forEach(t => {
-            if (t.symbol === tx.symbol && t.txType !== 'dividend' && t.date <= tx.date) {
-                if (filterName === 'all' || t.owner === tx.owner) qtyAtDiv += t.qty;
+            if (t.symbol === tx.symbol && t.txType !== 'dividend' && t.date <= tx.date
+                && t.broker === tx.broker && t.owner === tx.owner) {
+                qtyAtDiv += t.qty;
             }
         });
         qtyAtDiv = Math.round(qtyAtDiv * 10000) / 10000; // 부동소수점 보정
