@@ -4152,6 +4152,7 @@ function renderDividendDashboard() {
       scales: { x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } }, y: { stacked: true, ticks: { color: '#8890a4' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } } }
     }
   });
+  renderDivHistoryTable(divTxs);
   renderUpcomingDividends();
 }
 
@@ -6829,6 +6830,40 @@ if (document.readyState === 'loading') {
 }
 
 })(); // IIFE 끝
+
+function renderDivHistoryTable(divTxs) {
+    const tbody = document.getElementById('divHistoryTableBody');
+    if (!tbody) return;
+
+    const sorted = [...divTxs].sort((a, b) => b.date.localeCompare(a.date));
+
+    if (sorted.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text3); padding:30px;">조회된 배당 내역이 없습니다.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = sorted.map(tx => {
+        let name = tx.symbol;
+        if (localStockDB && localStockDB.length > 0) {
+            const m = localStockDB.find(s => s.symbol === tx.symbol);
+            if (m) name = m.name;
+        }
+        if (cachedMarketData[tx.symbol] && !cachedMarketData[tx.symbol]._failed && cachedMarketData[tx.symbol].name) {
+            name = cachedMarketData[tx.symbol].name;
+        }
+
+        return `<tr>
+          <td style="font-family:var(--font-mono); font-size:12px; color:var(--text3); white-space:nowrap;">${tx.date}</td>
+          <td>
+            <div style="font-weight:700; color:var(--text); font-size:13px; max-width:140px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${name}">${name}</div>
+            <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${tx.symbol.replace(/\.KS\.DLST|\.DLST|\.KS/g,'')}</div>
+          </td>
+          <td style="font-size:12px; color:var(--text2);">${tx.broker || '—'}</td>
+          <td style="font-size:12px; color:var(--text2);">${tx.owner || '—'}</td>
+          <td style="text-align:right; color:var(--green); font-weight:700; font-family:var(--font-mono); font-size:13px;">${formatPrice(tx.price, tx.symbol)}</td>
+        </tr>`;
+    }).join('');
+}
 
 // 🌟 보유 종목들의 최근 배당 기록을 바탕으로 다음 예상 배당금 계산
 function renderUpcomingDividends() {
