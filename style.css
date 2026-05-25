@@ -2226,3 +2226,89 @@ nav {
 #realStatBanner .stat-market-label { font-size: 12px; }
 #realStatBanner .stat-market-val { font-size: 26px; line-height: 1.15; letter-spacing: -0.02em; }
 #realStatBanner .stat-market-converted { font-size: 12px; margin-top: 4px; }
+
+
+/* =======================================
+   ✨ 부드러운 생키 다이어그램 스타일
+   ======================================= */
+.sankey-board {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  height: 220px; /* 전체 컨테이너 높이 */
+  margin-top: 16px;
+  font-family: var(--font-sans);
+}
+
+.sankey-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* 박스(노드) 디자인 */
+.sankey-node {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  text-align: right; /* 숫자는 우측 정렬 */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s, border-color 0.2s;
+}
+.sankey-node:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+}
+
+.sankey-title {
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 6px;
+  text-align: left;
+}
+.sankey-val {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+
+/* 박스 좌측 컬러 포인트 */
+.sankey-node.total { border-left: 4px solid var(--accent); }
+.sankey-node.kr { border-left: 4px solid var(--profit); }
+.sankey-node.us, .sankey-node.us-net { border-left: 4px solid var(--blue); }
+.sankey-node.us-tax { border-left: 4px solid var(--red); }
+
+/* SVG 연결선 래퍼 (박스 사이 공간) */
+.sankey-svg-wrap {
+  flex: 0.6; 
+  position: relative;
+  z-index: 1;
+}
+.sankey-svg-wrap svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+/* 부드러운 곡선 설정 */
+.sankey-path {
+  fill: none;
+  stroke-width: 6;
+  stroke-opacity: 0.25;
+  vector-effect: non-scaling-stroke; /* 화면 크기가 변해도 선 굵기 유지 */
+  stroke-linecap: round;
+  transition: stroke-opacity 0.3s, stroke-width 0.3s;
+}
+.sankey-path.dashed {
+  stroke-dasharray: 6, 6; /* 세금 라인은 점선으로 표현 */
+}
+.sankey-path:hover {
+  stroke-opacity: 0.6;
+  stroke-width: 8;
+  cursor: pointer;
+}
