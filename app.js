@@ -3670,6 +3670,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
         }
     }
 
+    renderTagBar(treemapData);
+
     const krwPnl = krwSummary.totalEval - krwSummary.totalCost;
     const krwRoi = krwSummary.totalCost > 0 ? (krwPnl / krwSummary.totalCost * 100) : 0;
     
@@ -7578,4 +7580,88 @@ function exitTreemapSelectMode() {
         c.style.opacity = '1';
         c.style.outline = 'none';
     });
+}
+
+// ==========================================
+// 🏷️ 태그 비중 막대 차트
+// ==========================================
+function renderTagBar(treemapData) {
+    const el = document.getElementById('tagBarChart');
+    if (!el) return;
+
+    // 태그 자체가 없으면 숨김
+    if (!state.tags || Object.keys(state.tags).length === 0) {
+        el.style.display = 'none';
+        return;
+    }
+
+    const totalVal = treemapData.reduce((s, d) => s + d.value, 0);
+    if (totalVal === 0) { el.style.display = 'none'; return; }
+
+    // 태그별 평가금액 집계 (태그 여러 개면 균등 분배)
+    const tagMap = {};
+    let untaggedVal = 0;
+
+    treemapData.forEach(d => {
+        const tagStr = (state.tags[d.symbol] || '').trim();
+        const tags = tagStr ? tagStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+        if (tags.length === 0) {
+            untaggedVal += d.value;
+        } else {
+            tags.forEach(tag => {
+                tagMap[tag] = (tagMap[tag] || 0) + d.value / tags.length;
+            });
+        }
+    });
+
+    const tagEntries = Object.entries(tagMap).sort((a, b) => b[1] - a[1]);
+    if (tagEntries.length === 0) { el.style.display = 'none'; return; }
+
+    // 색상 팔레트
+    const palette = [
+        '#4f8ef7','#f7874f','#4fd47a','#f7d44f','#a44ff7',
+        '#f74f7a','#4fd4f7','#f7b44f','#7af74f','#f74fce'
+    ];
+
+    const segments = tagEntries.map(([tag, val], i) => ({
+        tag, val, pct: val / totalVal * 100, color: palette[i % palette.length]
+    }));
+    if (untaggedVal > 0) {
+        segments.push({
+            tag: '미분류', val: untaggedVal,
+            pct: untaggedVal / totalVal * 100,
+            color: 'var(--bg3)'
+        });
+    }
+
+    // 막대 세그먼트
+    const barHTML = segments.map(s => `
+        <div title="${s.tag}: ${s.pct.toFixed(1)}%"
+             style="width:${s.pct.toFixed(3)}%; height:100%; background:${s.color};
+                    position:relative; overflow:hidden; transition:opacity 0.15s; cursor:default;"
+             onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+            ${s.pct >= 6 ? `
+            <span style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+                          font-size:10px; font-weight:700; color:#fff; white-space:nowrap;
+                          text-shadow:0 1px 3px rgba(0,0,0,0.65);">${s.pct.toFixed(1)}%</span>` : ''}
+        </div>`).join('');
+
+    // 범례
+    const legendHTML = segments.map(s => `
+        <div style="display:flex; align-items:center; gap:4px; white-space:nowrap;">
+            <span style="width:9px; height:9px; border-radius:2px; background:${s.color};
+                         flex-shrink:0; display:inline-block; border:1px solid rgba(255,255,255,0.15);"></span>
+            <span style="font-size:11px; color:var(--text2);">${s.tag}</span>
+            <span style="font-size:11px; color:var(--text3); font-family:var(--font-mono);">${s.pct.toFixed(1)}%</span>
+        </div>`).join('');
+
+    el.style.display = 'block';
+    el.innerHTML = `
+        <div style="height:20px; width:100%; border-radius:4px; overflow:hidden;
+                    display:flex; gap:1px; margin-bottom:7px;">
+            ${barHTML}
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px 14px;">
+            ${legendHTML}
+        </div>`;
 }
