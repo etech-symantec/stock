@@ -4484,12 +4484,11 @@ async function render() {
   const pChartRowWrap = document.getElementById('chartRowWrapper'); 
   const divDash = document.getElementById('dividendDashboard');
   const listOptions = document.getElementById('listOptionsBar');
-  const watchlistSearch = document.getElementById('watchlistSearchGroup'); // 🌟 추가된 검색창 요소 찾기
-  const mobileSearch = document.getElementById('mobileSearchBar'); // 모바일용 검색창
+  const watchlistSearch = document.getElementById('watchlistSearchGroup');
+  const mobileSearch = document.getElementById('mobileSearchBar');
   const histDash = document.getElementById('historyDashboard');
   const realDash = document.getElementById('realizedDashboard');
 
-  // 🌟 여기서부터 각 탭마다 보여줄 화면과 숨길 화면을 아주 엄격하게 통제합니다! 🌟
   if (currentView === 'dividend') {
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
@@ -4506,7 +4505,7 @@ async function render() {
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; 
     listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
     
-    // ✅ [추가] 실현수익 페이지 진입 시 다른 탭의 잔여 클래스 간섭을 완전히 제거 및 청소
+    // 실현수익 페이지 진입 시 다른 탭의 잔여 클래스 간섭을 완전히 제거 및 청소
     if (listOptions) listOptions.classList.remove('non-sticky'); 
     
     if(realDash) realDash.style.display = 'flex';
@@ -5538,6 +5537,7 @@ function renderRealizedDashboard() {
         </tr>
         `;
     }).join('');
+  updateRfpSankey(Math.abs(krTotal), Math.abs(usConverted));
 }
 
 // ── 🇺🇸 미국주식 양도소득세 계산 패널 ────────────────────────────────────────
@@ -6033,6 +6033,74 @@ function renderRealizedChart(labels, lineData, barData, txInfo = []) {
             }
         }
     });
+}
+
+/**
+ * 실현수익 Sankey 패널 비중 업데이트
+ * @param {number} krAbs  국내 실현수익 절댓값 (원화 환산)
+ * @param {number} usAbs  해외 실현수익 절댓값 (원화 환산)
+ */
+function updateRfpSankey(krAbs, usAbs) {
+  const total = krAbs + usAbs || 1;
+  const krRatio = krAbs / total;          // 0~1
+  const usRatio = 1 - krRatio;
+
+  // ── 비중 바 & 라벨 ──
+  const krPct = Math.round(krRatio * 100);
+  const usPct = 100 - krPct;
+  const krFill = document.getElementById('rfpRatioKrFill');
+  if (krFill) krFill.style.width = krPct + '%';
+  const el = (id) => document.getElementById(id);
+  if (el('rfpRatioKrPct')) el('rfpRatioKrPct').textContent = `🇰🇷 ${krPct}%`;
+  if (el('rfpRatioUsPct')) el('rfpRatioUsPct').textContent = `${usPct}% 🇺🇸`;
+  if (el('rfpKrPct')) el('rfpKrPct').textContent = `${krPct}% 비중`;
+  if (el('rfpUsPct')) el('rfpUsPct').textContent = `${usPct}% 비중`;
+
+  // ── SVG Sankey ──
+  const svg = el('rfpSankeySvg');
+  if (!svg) return;
+
+  const H = 290;                        // viewBox 높이
+  const W = 90;
+  const krH = Math.round(krRatio * H); // 왼쪽 KR 밴드 높이
+  const midY = H / 2;                  // 오른쪽은 카드 2개 균등분할
+
+  // 접근색 (CSS 변수를 JS에서 직접 읽기)
+  const st = getComputedStyle(document.documentElement);
+  const profitC = st.getPropertyValue('--profit').trim() || '#00c87a';
+  const lossC   = st.getPropertyValue('--loss').trim()   || '#3A9AFF';
+
+  // KR 밴드: 왼쪽 (0→krH), 오른쪽 (0→midY)
+  const krPath = `
+    M 0 0
+    C ${W*0.5} 0, ${W*0.5} 0, ${W} 0
+    L ${W} ${midY}
+    C ${W*0.5} ${midY}, ${W*0.5} ${krH}, 0 ${krH}
+    Z
+  `;
+  // US 밴드: 왼쪽 (krH→H), 오른쪽 (midY→H)
+  const usPath = `
+    M 0 ${krH}
+    C ${W*0.5} ${krH}, ${W*0.5} ${midY}, ${W} ${midY}
+    L ${W} ${H}
+    C ${W*0.5} ${H}, ${W*0.5} ${H}, 0 ${H}
+    Z
+  `;
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="gKr" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="${profitC}" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="${profitC}" stop-opacity="0.18"/>
+      </linearGradient>
+      <linearGradient id="gUs" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="${lossC}" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="${lossC}" stop-opacity="0.18"/>
+      </linearGradient>
+    </defs>
+    <path d="${krPath}" fill="url(#gKr)"/>
+    <path d="${usPath}" fill="url(#gUs)"/>
+  `;
 }
 
 // ==========================================
