@@ -4152,6 +4152,7 @@ function renderDividendDashboard() {
       scales: { x: { stacked: true, ticks: { color: '#8890a4' }, grid: { display: false } }, y: { stacked: true, ticks: { color: '#8890a4' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } } }
     }
   });
+  window._lastDivTxs = divTxs;
   renderDivHistoryTable(divTxs);
   renderUpcomingDividends();
 }
@@ -6831,11 +6832,24 @@ if (document.readyState === 'loading') {
 
 })(); // IIFE 끝
 
-function renderDivHistoryTable(divTxs) {
+function renderDivHistoryTable(divTxs, filterSymbol = null) {
     const tbody = document.getElementById('divHistoryTableBody');
     if (!tbody) return;
 
-    const sorted = [...divTxs].sort((a, b) => b.date.localeCompare(a.date));
+    const sorted = [...divTxs]
+        .filter(tx => !filterSymbol || tx.symbol === filterSymbol)
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+    // 헤더 영역에 필터 표시 + 해제 버튼
+    const headerEl = tbody.closest('.history-table-container')?.previousElementSibling;
+    if (headerEl) {
+        const badge = filterSymbol
+            ? `<span style="margin-left:8px; font-size:11px; font-weight:500; color:var(--accent); background:var(--accent-bg); border:1px solid var(--accent); border-radius:4px; padding:2px 8px; cursor:pointer;" onclick="renderDivHistoryTable(window._lastDivTxs)">
+                 ${filterSymbol.replace(/\.KS\.DLST|\.DLST|\.KS/g,'')} ✕
+               </span>`
+            : '';
+        headerEl.innerHTML = `💚 배당 수령 내역${badge}`;
+    }
 
     if (sorted.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text3); padding:30px;">조회된 배당 내역이 없습니다.</td></tr>';
@@ -6959,7 +6973,8 @@ function renderUpcomingDividends() {
         let formattedTotal = formatPrice(item.expectedTotal, item.symbol);
         
         return `
-          <tr>
+          <tr style="cursor:pointer;" onclick="renderDivHistoryTable(window._lastDivTxs||[], '${item.symbol}'); this.closest('.history-table-container').previousElementSibling?.scrollIntoView({behavior:'smooth',block:'nearest'});"
+              onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background=''">
             <td>
               <div style="font-weight:700; color:var(--text); font-size:13px; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${item.name}">${item.name}</div>
               <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${item.symbol}</div>
