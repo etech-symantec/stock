@@ -6849,6 +6849,43 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
         .filter(tx => !filterSymbol || tx.symbol === filterSymbol)
         .sort((a, b) => b.date.localeCompare(a.date));
 
+    // 💡 1,000만원 투자 시 세후 월 배당 계산 (종목 필터링 시만)
+    let monthlyHint = '';
+    if (filterSymbol && sorted.length > 0) {
+        // 최근 1년치 우선, 없으면 전체 이력으로 연간 DPS 합산
+        const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear() - 1);
+        const cutoffStr = cutoff.toISOString().slice(0, 10);
+        const baseTxs = sorted.filter(tx => tx.date >= cutoffStr);
+        const targetTxs = baseTxs.length > 0 ? baseTxs : sorted;
+
+        let annualDps = 0;
+        targetTxs.forEach(tx => {
+            let qty = 0;
+            state.transactions.forEach(t => {
+                if (t.symbol === tx.symbol && t.txType !== 'dividend' && t.date <= tx.date
+                    && t.broker === tx.broker && t.owner === tx.owner) qty += t.qty;
+            });
+            qty = Math.round(qty * 10000) / 10000;
+            if (qty > 0) annualDps += tx.price / qty;
+        });
+
+        // 현재가 → KRW 환산
+        const isKr = isKorean(filterSymbol);
+        let curPrice = 0;
+        if (cachedMarketData[filterSymbol] && !cachedMarketData[filterSymbol]._failed)
+            curPrice = cachedMarketData[filterSymbol].last || 0;
+        if (!isKr && curPrice > 0) curPrice *= currentUsdKrw;
+
+        if (annualDps > 0 && curPrice > 0) {
+            const shares = 10000000 / curPrice;
+            const monthly = shares * (annualDps / 12) * (1 - 0.154);
+            monthlyHint = `<span style="font-size:10px; color:var(--text3); margin-left:10px;">
+                💡 1,000만원 투자 시 월 <b style="color:var(--green); font-family:var(--font-mono);">
+                ₩${Math.round(monthly).toLocaleString()}</b> 세후 (최근 배당 기준)
+              </span>`;
+        }
+    }
+
     // 헤더에 필터 배지 표시
     const headerEl = tbody.closest('.history-table-container')?.previousElementSibling;
     if (headerEl) {
@@ -6869,7 +6906,7 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
                  ${filterDisplayName} ✕
                </span>`
             : '';
-        headerEl.innerHTML = `💚 배당 수령 내역${badge}`;
+        headerEl.innerHTML = `💚 배당 수령 내역${badge}${monthlyHint}`;
     }
 
     if (sorted.length === 0) {
