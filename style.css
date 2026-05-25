@@ -2018,7 +2018,7 @@ nav {
 }
 
 /* =====================================================
-   💵 실현수익 플로우 패널 (Sankey-style)
+   💵 실현수익 플로우 패널 (Sankey-style) — 개선버전
    ===================================================== */
 
 .real-flow-panel {
@@ -2030,111 +2030,135 @@ nav {
   padding: 20px;
   margin-bottom: 15px;
   flex-shrink: 0;
-  min-height: 185px;
+  min-height: 250px;
   overflow: hidden;
+  gap: 0;
 }
 
 /* ① 총 실현수익 */
 .rfp-total {
   flex-shrink: 0;
-  width: 176px;
+  width: 220px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 5px;
-  padding: 18px 20px;
-  background: linear-gradient(135deg, rgba(58,154,255,0.09), rgba(58,154,255,0.03));
-  border: 1px solid rgba(58,154,255,0.22);
-  border-radius: 12px;
+  gap: 8px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, rgba(58,154,255,0.12), rgba(58,154,255,0.04));
+  border: 1px solid rgba(58,154,255,0.28);
+  border-radius: 14px;
 }
-.rfp-icon { font-size: 20px; }
+.rfp-icon { font-size: 26px; }
 .rfp-label-sm {
-  font-size: 10px; font-weight: 700;
+  font-size: 11px; font-weight: 700;
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3);
 }
 .rfp-main-val {
   font-family: var(--font-mono);
-  font-size: 22px; font-weight: 700;
-  letter-spacing: -0.02em; line-height: 1.2;
+  font-size: 30px; font-weight: 700;
+  letter-spacing: -0.03em; line-height: 1.2;
   color: var(--loss);
 }
 .rfp-hint {
-  font-size: 10px; color: var(--text3); font-family: var(--font-mono);
+  font-size: 11px; color: var(--text3); font-family: var(--font-mono);
 }
 
-/* ② 분기 커넥터 */
-.rfp-fork {
-  width: 36px;
-  flex-shrink: 0;
+/* 비중 미니 바 */
+.rfp-ratio-bar-wrap { margin-top: 6px; }
+.rfp-ratio-bar {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--bg3);
   display: flex;
-  flex-direction: column;
-  align-self: stretch;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.rfp-ratio-kr-fill {
+  height: 100%;
+  background: var(--profit);
+  border-radius: 4px 0 0 4px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.rfp-ratio-us-fill {
+  flex: 1;
+  height: 100%;
+  background: var(--loss);
+  border-radius: 0 4px 4px 0;
+  opacity: 0.75;
+}
+.rfp-ratio-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* ② Sankey SVG 흐름 */
+.rfp-sankey {
+  width: 90px;
+  flex-shrink: 0;
+  margin: -20px 0;
   position: relative;
-  margin: 0 4px;
+  overflow: visible;
 }
-/* 수평선: 총 실현수익 → 분기점 */
-.rfp-fork::before {
-  content: '';
-  position: absolute;
-  top: 50%; left: 0;
-  width: 38%; height: 2px;
-  background: rgba(124,106,247,0.45);
-  transform: translateY(-50%);
-}
-.rfp-branch { flex: 1; margin-left: 38%; }
-
-/* 위쪽 갈래: 꺾어서 국내로 */
-.rfp-branch-top {
-  border-left: 2px solid rgba(0,200,122,0.5);
-  border-top:  2px solid rgba(0,200,122,0.5);
-  border-radius: 8px 0 0 0;
-}
-/* 아래쪽 갈래: 꺾어서 해외로 */
-.rfp-branch-bottom {
-  border-left:   2px solid rgba(58,154,255,0.5);
-  border-bottom: 2px solid rgba(58,154,255,0.5);
-  border-radius: 0 0 0 8px;
+.rfp-sankey-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-/* ③ 국내/해외 카드 묶음 */
+/* ③ 국내/해외 카드 */
 .rfp-markets {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
   align-self: stretch;
+  justify-content: center;
 }
 .rfp-mcard {
   flex: 1;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 16px;
+  border-radius: 12px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
-  min-width: 188px;
+  min-width: 220px;
 }
 .rfp-mcard:hover {
   border-color: var(--border2);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 }
-.rfp-mcard-kr  { border-left: 3px solid var(--profit); background: rgba(0,200,122,0.04); }
-.rfp-mcard-us  { border-left: 3px solid var(--loss);   background: rgba(58,154,255,0.04); }
+.rfp-mcard-kr  { border-left: 4px solid var(--profit); background: rgba(0,200,122,0.05); }
+.rfp-mcard-us  { border-left: 4px solid var(--loss);   background: rgba(58,154,255,0.05); }
 .rfp-mcard-tax {
-  border-left: 3px solid rgba(255,77,106,0.7);
+  border-left: 4px solid rgba(255,77,106,0.7);
   background: rgba(255,77,106,0.04);
   align-items: flex-start;
   flex-direction: column;
   gap: 0;
 }
-.rfp-mflag { font-size: 20px; flex-shrink: 0; line-height: 1; }
+.rfp-mflag { font-size: 26px; flex-shrink: 0; line-height: 1; }
 .rfp-mval {
   font-family: var(--font-mono);
-  font-size: 15px; font-weight: 700; line-height: 1.3; margin-top: 3px;
+  font-size: 20px; font-weight: 700; line-height: 1.3; margin-top: 4px;
 }
 .rfp-c-profit { color: var(--profit); }
 .rfp-c-loss   { color: var(--loss); }
+
+/* 비중 배지 */
+.rfp-pct-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
 
 /* ④ 해외 → 양도세 화살표 */
 .rfp-arrow {
@@ -2188,12 +2212,8 @@ nav {
 
 /* 모바일 */
 @media (max-width: 900px) {
-  .real-flow-panel {
-    flex-wrap: wrap;
-    gap: 12px;
-    min-height: auto;
-  }
-  .rfp-fork, .rfp-arrow { display: none; }
+  .real-flow-panel { flex-wrap: wrap; gap: 12px; min-height: auto; }
+  .rfp-sankey, .rfp-arrow { display: none; }
   .rfp-total { width: 100%; }
   .rfp-markets { flex-direction: row; flex-wrap: wrap; width: 100%; }
   .rfp-mcard { min-width: 0; flex: 1 1 140px; }
@@ -2201,3 +2221,8 @@ nav {
   .rfp-tax-space { display: none; }
   .rfp-mcard-tax { flex: 1; }
 }
+
+/* 실현수익 배너 3컬럼 — 폰트 확대 */
+#realStatBanner .stat-market-label { font-size: 12px; }
+#realStatBanner .stat-market-val { font-size: 26px; line-height: 1.15; letter-spacing: -0.02em; }
+#realStatBanner .stat-market-converted { font-size: 12px; margin-top: 4px; }
