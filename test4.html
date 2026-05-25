@@ -559,20 +559,47 @@
             <div style="height:180px; position:relative;"><canvas id="divMonthlyCanvas"></canvas></div>
           </div>
       
-          <div class="history-table-container">
-            <table class="history-table">
-              <thead>
-                <tr>
-                  <th>종목</th>
-                  <th style="text-align:center;">배당 주기(월)</th>
-                  <th style="text-align:center;">다음 예상월</th>
-                  <th style="text-align:right;">1주당 배당금</th>
-                  <th style="text-align:right;">보유 수량</th>
-                  <th style="text-align:right;">예상 총액</th>
-                </tr>
-              </thead>
-              <tbody id="upcomingDivTableBody"></tbody>
-            </table>
+          <!-- 💚 배당 수령 내역 -->
+          <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+            <div style="padding:12px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:700; color:var(--text2);">
+              💚 배당 수령 내역
+            </div>
+            <div class="history-table-container" style="max-height:320px; overflow-y:auto;">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>종목</th>
+                    <th>계좌</th>
+                    <th>소유자</th>
+                    <th style="text-align:right;">배당금</th>
+                  </tr>
+                </thead>
+                <tbody id="divHistoryTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 🔮 종목별 예정 배당 -->
+          <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+            <div style="padding:12px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:700; color:var(--text2);">
+              🔮 종목별 예정 배당
+            </div>
+            <div class="history-table-container">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>종목</th>
+                    <th style="text-align:center;">배당 주기(월)</th>
+                    <th style="text-align:center;">다음 예상월</th>
+                    <th style="text-align:right;">1주당 배당금</th>
+                    <th style="text-align:right;">보유 수량</th>
+                    <th style="text-align:right;">예상 총액</th>
+                  </tr>
+                </thead>
+                <tbody id="upcomingDivTableBody"></tbody>
+              </table>
+            </div>
           </div>
       
         </div>
