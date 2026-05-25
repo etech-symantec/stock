@@ -6850,12 +6850,21 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
     // 헤더에 필터 배지 표시
     const headerEl = tbody.closest('.history-table-container')?.previousElementSibling;
     if (headerEl) {
+        let filterDisplayName = filterSymbol;
+        if (localStockDB?.length > 0) {
+            const m = localStockDB.find(s => s.symbol === filterSymbol);
+            if (m) filterDisplayName = m.name;
+        }
+        if (cachedMarketData[filterSymbol]?.name && !cachedMarketData[filterSymbol]._failed) {
+            filterDisplayName = cachedMarketData[filterSymbol].name;
+        }
+
         const badge = filterSymbol
             ? `<span style="margin-left:8px; font-size:11px; font-weight:500; color:var(--accent);
                             background:var(--accent-bg); border:1px solid var(--accent);
                             border-radius:4px; padding:2px 8px; cursor:pointer;"
                      onclick="renderDivHistoryTable(window._lastDivTxs)">
-                 ${filterSymbol.replace(/\.KS\.DLST|\.DLST|\.KS/g,'')} ✕
+                 ${filterDisplayName} ✕
                </span>`
             : '';
         headerEl.innerHTML = `💚 배당 수령 내역${badge}`;
