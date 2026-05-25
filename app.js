@@ -6836,15 +6836,25 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
     const tbody = document.getElementById('divHistoryTableBody');
     if (!tbody) return;
 
+    // 소유자 필터 (상위와 동기화)
+    let filterName = 'all';
+    if (typeof currentDivFilter !== 'undefined') {
+        if (currentDivFilter === 'user1') filterName = state.owners.user1.name;
+        if (currentDivFilter === 'user2') filterName = state.owners.user2.name;
+    }
+
     const sorted = [...divTxs]
         .filter(tx => !filterSymbol || tx.symbol === filterSymbol)
         .sort((a, b) => b.date.localeCompare(a.date));
 
-    // 헤더 영역에 필터 표시 + 해제 버튼
+    // 헤더에 필터 배지 표시
     const headerEl = tbody.closest('.history-table-container')?.previousElementSibling;
     if (headerEl) {
         const badge = filterSymbol
-            ? `<span style="margin-left:8px; font-size:11px; font-weight:500; color:var(--accent); background:var(--accent-bg); border:1px solid var(--accent); border-radius:4px; padding:2px 8px; cursor:pointer;" onclick="renderDivHistoryTable(window._lastDivTxs)">
+            ? `<span style="margin-left:8px; font-size:11px; font-weight:500; color:var(--accent);
+                            background:var(--accent-bg); border:1px solid var(--accent);
+                            border-radius:4px; padding:2px 8px; cursor:pointer;"
+                     onclick="renderDivHistoryTable(window._lastDivTxs)">
                  ${filterSymbol.replace(/\.KS\.DLST|\.DLST|\.KS/g,'')} ✕
                </span>`
             : '';
@@ -6852,31 +6862,87 @@ function renderDivHistoryTable(divTxs, filterSymbol = null) {
     }
 
     if (sorted.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text3); padding:30px;">조회된 배당 내역이 없습니다.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="${filterSymbol ? 6 : 6}" style="text-align:center; color:var(--text3); padding:30px;">조회된 배당 내역이 없습니다.</td></tr>`;
         return;
     }
 
-    tbody.innerHTML = sorted.map(tx => {
+    // 각 건마다 당시 보유 수량 계산
+    const rows = sorted.map(tx => {
+        // 종목명
         let name = tx.symbol;
-        if (localStockDB && localStockDB.length > 0) {
+        if (localStockDB?.length > 0) {
             const m = localStockDB.find(s => s.symbol === tx.symbol);
             if (m) name = m.name;
         }
-        if (cachedMarketData[tx.symbol] && !cachedMarketData[tx.symbol]._failed && cachedMarketData[tx.symbol].name) {
+        if (cachedMarketData[tx.symbol]?.name && !cachedMarketData[tx.symbol]._failed) {
             name = cachedMarketData[tx.symbol].name;
         }
 
-        return `<tr>
-          <td style="font-family:var(--font-mono); font-size:12px; color:var(--text3); white-space:nowrap;">${tx.date}</td>
-          <td>
-            <div style="font-weight:700; color:var(--text); font-size:13px; max-width:140px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${name}">${name}</div>
-            <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${tx.symbol.replace(/\.KS\.DLST|\.DLST|\.KS/g,'')}</div>
-          </td>
-          <td style="font-size:12px; color:var(--text2);">${tx.broker || '—'}</td>
-          <td style="font-size:12px; color:var(--text2);">${tx.owner || '—'}</td>
-          <td style="text-align:right; color:var(--green); font-weight:700; font-family:var(--font-mono); font-size:13px;">${formatPrice(tx.price, tx.symbol)}</td>
-        </tr>`;
-    }).join('');
+        // 배당 지급일 기준 보유 수량 계산
+        let qtyAtDiv = 0;
+        state.transactions.forEach(t => {
+            if (t.symbol === tx.symbol && t.txType !== 'dividend' && t.date <= tx.date) {
+                if (filterName === 'all' || t.owner === tx.owner) qtyAtDiv += t.qty;
+            }
+        });
+        qtyAtDiv = Math.round(qtyAtDiv * 10000) / 10000; // 부동소수점 보정
+
+        // 1주당 배당금 (qtyAtDiv > 0 일 때만)
+        const dps = qtyAtDiv > 0 ? tx.price / qtyAtDiv : null;
+        const dpsStr = dps !== null ? formatPrice(dps, tx.symbol) : '—';
+
+        const symDisp = tx.symbol.replace(/\.KS\.DLST|\.DLST|\.KS/g, '');
+        const qtyStr = qtyAtDiv > 0 ? qtyAtDiv.toLocaleString() + '주' : '—';
+
+        if (filterSymbol) {
+            // 종목 필터링 시: 종목 열 숨기고 1주당 배당금 표시
+            return `<tr>
+              <td style="font-family:var(--font-mono); font-size:12px; color:var(--text3); white-space:nowrap;">${tx.date}</td>
+              <td style="font-size:12px; color:var(--text2);">${tx.broker || '—'}</td>
+              <td style="font-size:12px; color:var(--text2);">${tx.owner || '—'}</td>
+              <td style="text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--text);">${qtyStr}</td>
+              <td style="text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--text2);">${dpsStr}</td>
+              <td style="text-align:right; color:var(--green); font-weight:700; font-family:var(--font-mono); font-size:13px;">${formatPrice(tx.price, tx.symbol)}</td>
+            </tr>`;
+        } else {
+            // 전체 목록: 종목 열 표시, 1주당 배당금 숨김
+            return `<tr>
+              <td style="font-family:var(--font-mono); font-size:12px; color:var(--text3); white-space:nowrap;">${tx.date}</td>
+              <td>
+                <div style="font-weight:700; color:var(--text); font-size:13px; max-width:140px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${name}">${name}</div>
+                <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${symDisp}</div>
+              </td>
+              <td style="font-size:12px; color:var(--text2);">${tx.broker || '—'}</td>
+              <td style="font-size:12px; color:var(--text2);">${tx.owner || '—'}</td>
+              <td style="text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--text);">${qtyStr}</td>
+              <td style="text-align:right; color:var(--green); font-weight:700; font-family:var(--font-mono); font-size:13px;">${formatPrice(tx.price, tx.symbol)}</td>
+            </tr>`;
+        }
+    });
+
+    // 헤더도 filterSymbol 여부에 따라 동적으로 교체
+    const thead = tbody.closest('table')?.querySelector('thead tr');
+    if (thead) {
+        if (filterSymbol) {
+            thead.innerHTML = `
+              <th>날짜</th>
+              <th>계좌</th>
+              <th>소유자</th>
+              <th style="text-align:right;">보유 수량</th>
+              <th style="text-align:right;">1주당 배당금</th>
+              <th style="text-align:right;">배당금</th>`;
+        } else {
+            thead.innerHTML = `
+              <th>날짜</th>
+              <th>종목</th>
+              <th>계좌</th>
+              <th>소유자</th>
+              <th style="text-align:right;">보유 수량</th>
+              <th style="text-align:right;">배당금</th>`;
+        }
+    }
+
+    tbody.innerHTML = rows.join('');
 }
 
 // 🌟 보유 종목들의 최근 배당 기록을 바탕으로 다음 예상 배당금 계산
