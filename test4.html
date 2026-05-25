@@ -756,44 +756,53 @@
         <!-- ▶ 오른쪽 콘텐츠 -->
         <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:15px;">
 
-          <div class="stat-banner" id="realStatBanner">
-            <div class="stat-banner-accent" style="background:var(--blue);"></div>
-            <div class="stat-banner-total">
-              <div class="stat-banner-label">
-                <span class="stat-dot" style="background:var(--blue);"></span>
-                총 실현수익 (환산)
-              </div>
-              <div id="realTotalConverted" class="stat-banner-val" style="color:var(--blue);">—</div>
-              <div class="stat-banner-sub">국내 + 해외 합산</div>
+          <div class="real-flow-panel" id="realStatBanner">
+          
+            <!-- ① 총 실현수익 -->
+            <div class="rfp-total">
+              <div class="rfp-icon">💵</div>
+              <div class="rfp-label-sm">총 실현수익 (환산)</div>
+              <div id="realTotalConverted" class="rfp-main-val">—</div>
+              <div class="rfp-hint">국내 + 해외 합산</div>
             </div>
-            <div class="stat-banner-right">
-              <div class="stat-markets" style="flex-direction:row; align-items:stretch; gap:0; flex:1;">
-
-                <!-- 🇰🇷 국내주식 실현수익 -->
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-start; padding: 14px 14px 12px 20px; border-right:1px solid var(--border);">
-                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-                    <span class="stat-flag">🇰🇷</span>
-                    <div class="stat-market-label">국내주식 실현수익</div>
-                  </div>
-                  <div id="realTotalKrw" class="stat-market-val" style="color:var(--profit);">—</div>
+          
+            <!-- ② 분기 커넥터 (총 → 국내/해외) -->
+            <div class="rfp-fork" aria-hidden="true">
+              <div class="rfp-branch rfp-branch-top"></div>
+              <div class="rfp-branch rfp-branch-bottom"></div>
+            </div>
+          
+            <!-- ③ 국내 / 해외 카드 -->
+            <div class="rfp-markets">
+              <div class="rfp-mcard rfp-mcard-kr">
+                <span class="rfp-mflag">🇰🇷</span>
+                <div>
+                  <div class="rfp-label-sm">국내주식 실현수익</div>
+                  <div id="realTotalKrw" class="rfp-mval rfp-c-profit">—</div>
                 </div>
-
-                <!-- 🇺🇸 해외주식 실현수익 -->
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-start; padding: 14px 14px 12px 14px; border-right:1px solid var(--border);">
-                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-                    <span class="stat-flag">🇺🇸</span>
-                    <div class="stat-market-label">해외주식 실현수익</div>
-                  </div>
-                  <div id="realTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
-                  <div id="realTotalUsdConverted" class="stat-market-converted">—</div>
+              </div>
+              <div class="rfp-mcard rfp-mcard-us">
+                <span class="rfp-mflag">🇺🇸</span>
+                <div>
+                  <div class="rfp-label-sm">해외주식 실현수익</div>
+                  <div id="realTotalUsd" class="rfp-mval rfp-c-loss">—</div>
+                  <div id="realTotalUsdConverted" class="rfp-hint">—</div>
                 </div>
-
-                <!-- 📋 양도소득세 -->
-                <div id="capitalGainsTaxPanel" style="flex:2; display:flex; flex-direction:column; justify-content:flex-start; padding: 14px 20px 12px 14px; min-width:0;">
-                </div>
-
               </div>
             </div>
+          
+            <!-- ④ 해외 → 양도세 화살표 -->
+            <div class="rfp-arrow" aria-hidden="true">
+              <div class="rfp-arrow-space"></div>
+              <div class="rfp-arrow-line"></div>
+            </div>
+          
+            <!-- ⑤ 양도소득세 -->
+            <div class="rfp-tax-wrap">
+              <div class="rfp-tax-space"></div>
+              <div id="capitalGainsTaxPanel" class="rfp-mcard rfp-mcard-tax"></div>
+            </div>
+          
           </div>
 
           <div id="realizedChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex-shrink:0;">
