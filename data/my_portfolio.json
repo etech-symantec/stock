@@ -8264,6 +8264,16 @@
       "qty": -6,
       "price": 217.5,
       "txType": "trade"
+    },
+    {
+      "id": 1779806160111,
+      "date": "2026-05-26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "AVGO",
+      "qty": -4,
+      "price": 429.5,
+      "txType": "trade"
     }
   ],
   "range": "all",
