@@ -6047,12 +6047,6 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
   }
   if(!parent || parent.tagName === 'BODY') parent = oldSvg.parentElement.parentElement;
 
-  // 1️⃣ 전체보기 버튼 직접 생성
-  const viewAllBtnHTML = `<button onclick="if(typeof window._openCgTaxModal==='function') window._openCgTaxModal();"
-    style="font-size:10px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0; font-family:var(--font-sans); white-space:nowrap; margin-left:8px;">
-    전체 보기 ▶
-  </button>`;
-
   // 2️⃣ 기존 부모를 새 다이어그램 컨테이너로 교체
   let container = document.createElement('div');
   container.id = 'newSankeyContainer';
@@ -6119,15 +6113,8 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
           </div>
         </div>
         
-        <div class="sankey-node us-tax" style="${estimatedTax <= 0 ? 'border-left-color: var(--text3); opacity: 0.6;' : ''}">
-          <div class="sankey-title" style="display: flex; justify-content: space-between; align-items: center;">
-            <span>예상 양도소득세</span>
-            ${viewAllBtnHTML} </div>
-          <div class="sankey-val" style="color: ${estimatedTax > 0 ? 'var(--red)' : 'var(--text3)'}">
-            ${estimatedTax > 0 ? '-' + Math.round(estimatedTax).toLocaleString() + '원' : '0원 (공제 이내)'}
-          </div>
+        <div id="capitalGainsTaxPanel" class="rfp-mcard rfp-mcard-tax sankey-node us-tax" style="${estimatedTax <= 0 ? 'border-left-color: var(--text3); opacity: 0.6;' : ''}">
         </div>
-        
       </div>
     </div>
 
