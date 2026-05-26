@@ -8254,6 +8254,16 @@
       "qty": -10,
       "price": 217,
       "txType": "trade"
+    },
+    {
+      "id": 1779805955522,
+      "date": "2026-05-26",
+      "owner": "끄니",
+      "broker": "KB (RIA)",
+      "symbol": "NVDA",
+      "qty": -6,
+      "price": 217.5,
+      "txType": "trade"
     }
   ],
   "range": "all",
