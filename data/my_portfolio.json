@@ -8186,6 +8186,16 @@
       "qty": -160,
       "price": 24700,
       "txType": "trade"
+    },
+    {
+      "id": 1779780953320,
+      "date": "2026-05-26",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "478150.KS",
+      "qty": -70,
+      "price": 24570,
+      "txType": "trade"
     }
   ],
   "range": "all",
