@@ -8224,6 +8224,16 @@
       "qty": -57,
       "price": 216,
       "txType": "trade"
+    },
+    {
+      "id": 1779805511365,
+      "date": "2026-05-26",
+      "owner": "끄니",
+      "broker": "KB (RIA)",
+      "symbol": "AAPL",
+      "qty": -36,
+      "price": 310.8,
+      "txType": "trade"
     }
   ],
   "range": "all",
