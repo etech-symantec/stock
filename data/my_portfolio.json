@@ -8274,6 +8274,16 @@
       "qty": -4,
       "price": 429.5,
       "txType": "trade"
+    },
+    {
+      "id": 1779806171085,
+      "date": "2026-05-26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "PLTR",
+      "qty": -6,
+      "price": 135.15,
+      "txType": "trade"
     }
   ],
   "range": "all",
