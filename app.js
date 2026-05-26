@@ -6037,22 +6037,9 @@ function renderRealizedChart(labels, lineData, barData, txInfo = []) {
  * 실현수익 Sankey 패널 (전체보기 버튼 복구 및 부드러운 곡선 UI 적용)
  */
 function updateRfpSankey(krwTotal, usdTotalKrw) {
-  const oldSvg = document.getElementById('rfpSankeySvg');
-  if (!oldSvg) return;
-  
-  let parent = oldSvg.parentElement;
-  while(parent && parent.tagName !== 'BODY') {
-      if (parent.querySelector('#rfpRatioKrFill') || parent.querySelector('.rfp-tax-wrap')) break; 
-      parent = parent.parentElement;
-  }
-  if(!parent || parent.tagName === 'BODY') parent = oldSvg.parentElement.parentElement;
+  const container = document.getElementById('realStatBanner');
+  if (!container) return;
 
-  // 2️⃣ 기존 부모를 새 다이어그램 컨테이너로 교체
-  let container = document.createElement('div');
-  container.id = 'newSankeyContainer';
-  parent.parentNode.replaceChild(container, parent);
-
-  // 3️⃣ 양도소득세 및 순수익 계산 (기본공제 250만 원, 22% 세율)
   let estimatedTax = 0;
   if (usdTotalKrw > 2500000) {
       estimatedTax = (usdTotalKrw - 2500000) * 0.22;
@@ -6060,66 +6047,55 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
   const usNetTotal = usdTotalKrw - estimatedTax;
   const combinedTotal = krwTotal + usdTotalKrw;
 
-  // 4️⃣ 생키 다이어그램 HTML 렌더링 (추출한 전체보기 버튼 삽입)
   container.innerHTML = `
   <div class="sankey-board">
-    
     <div class="sankey-col">
       <div class="sankey-node total">
         <div class="sankey-title">합산 손익</div>
-        <div class="sankey-val" style="color: ${combinedTotal >= 0 ? 'var(--profit)' : 'var(--loss)'}">
+        <div class="sankey-val" style="color:${combinedTotal >= 0 ? 'var(--profit)' : 'var(--loss)'}">
           ${combinedTotal >= 0 ? '+' : ''}${Math.round(combinedTotal).toLocaleString()}원
         </div>
       </div>
     </div>
-
     <div class="sankey-svg-wrap">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none">
         <path d="M 0,50 C 50,50 50,25 100,25" class="sankey-path" stroke="var(--profit)" />
         <path d="M 0,50 C 50,50 50,75 100,75" class="sankey-path" stroke="var(--blue)" />
       </svg>
     </div>
-
-    <div class="sankey-col" style="justify-content: space-around;">
+    <div class="sankey-col" style="justify-content:space-around;">
       <div class="sankey-node kr">
         <div class="sankey-title">🇰🇷 국내주식</div>
-        <div class="sankey-val" style="color: ${krwTotal >= 0 ? 'var(--text)' : 'var(--loss)'}">
+        <div class="sankey-val" style="color:${krwTotal >= 0 ? 'var(--text)' : 'var(--loss)'}">
           ${krwTotal >= 0 ? '+' : ''}${Math.round(krwTotal).toLocaleString()}원
         </div>
       </div>
       <div class="sankey-node us">
         <div class="sankey-title">🇺🇸 미국주식</div>
-        <div class="sankey-val" style="color: ${usdTotalKrw >= 0 ? 'var(--text)' : 'var(--loss)'}">
+        <div class="sankey-val" style="color:${usdTotalKrw >= 0 ? 'var(--text)' : 'var(--loss)'}">
           ${usdTotalKrw >= 0 ? '+' : ''}${Math.round(usdTotalKrw).toLocaleString()}원
         </div>
       </div>
     </div>
-
     <div class="sankey-svg-wrap">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none">
         <path d="M 0,75 C 50,75 50,62.5 100,62.5" class="sankey-path" stroke="var(--blue)" />
         ${estimatedTax > 0 ? `<path d="M 0,75 C 50,75 50,87.5 100,87.5" class="sankey-path dashed" stroke="var(--red)" />` : ''}
       </svg>
     </div>
-
     <div class="sankey-col">
-      <div style="height: 50%;"></div> 
-      <div style="height: 50%; display: flex; flex-direction: column; justify-content: space-around;">
-        
+      <div style="height:50%;"></div>
+      <div style="height:50%; display:flex; flex-direction:column; justify-content:space-around;">
         <div class="sankey-node us-net">
           <div class="sankey-title">미국 순수익</div>
-          <div class="sankey-val" style="color: ${usNetTotal >= 0 ? 'var(--text)' : 'var(--loss)'}">
+          <div class="sankey-val" style="color:${usNetTotal >= 0 ? 'var(--text)' : 'var(--loss)'}">
             ${usNetTotal >= 0 ? '+' : ''}${Math.round(usNetTotal).toLocaleString()}원
           </div>
         </div>
-        
-        <div id="capitalGainsTaxPanel" class="rfp-mcard rfp-mcard-tax sankey-node us-tax" style="${estimatedTax <= 0 ? 'border-left-color: var(--text3); opacity: 0.6;' : ''}">
-        </div>
+        <div id="capitalGainsTaxPanel" class="rfp-mcard rfp-mcard-tax" style="${estimatedTax <= 0 ? 'border-left-color:var(--text3);opacity:0.6;' : ''}"></div>
       </div>
     </div>
-
-  </div>
-  `;
+  </div>`;
 }
 
 // ==========================================
