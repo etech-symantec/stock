@@ -8284,6 +8284,16 @@
       "qty": -6,
       "price": 135.15,
       "txType": "trade"
+    },
+    {
+      "id": 1779806183365,
+      "date": "2026-05-26",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "SMR",
+      "qty": -6,
+      "price": 12.4,
+      "txType": "trade"
     }
   ],
   "range": "all",
