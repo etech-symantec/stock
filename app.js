@@ -6047,29 +6047,11 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
   }
   if(!parent || parent.tagName === 'BODY') parent = oldSvg.parentElement.parentElement;
 
-  // 1️⃣ 기존 영역이 지워지기 전에 '전체보기' 버튼 훔쳐오기 (onclick 속성 보존)
-  let viewAllBtnHTML = "";
-  const allElements = parent.querySelectorAll('*');
-  for (let el of allElements) {
-      if (el.textContent && el.textContent.includes('전체보기')) {
-          // 버튼이거나 클릭 이벤트가 있는 태그만 타겟팅
-          if (el.hasAttribute('onclick') || el.tagName === 'BUTTON' || el.tagName === 'A') {
-              let clone = el.cloneNode(true);
-              // 새 디자인에 맞게 버튼 스타일 살짝 다듬기
-              clone.style.fontSize = '11px';
-              clone.style.padding = '3px 8px';
-              clone.style.background = 'var(--bg3, rgba(255,255,255,0.05))';
-              clone.style.border = '1px solid var(--border, rgba(255,255,255,0.1))';
-              clone.style.borderRadius = '4px';
-              clone.style.color = 'var(--text2, #8890a4)';
-              clone.style.cursor = 'pointer';
-              clone.style.textDecoration = 'none';
-              clone.style.marginLeft = '8px';
-              viewAllBtnHTML = clone.outerHTML;
-              break;
-          }
-      }
-  }
+  // 1️⃣ 전체보기 버튼 직접 생성
+  const viewAllBtnHTML = `<button onclick="if(typeof window._openCgTaxModal==='function') window._openCgTaxModal();"
+    style="font-size:10px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0; font-family:var(--font-sans); white-space:nowrap; margin-left:8px;">
+    전체 보기 ▶
+  </button>`;
 
   // 2️⃣ 기존 부모를 새 다이어그램 컨테이너로 교체
   let container = document.createElement('div');
