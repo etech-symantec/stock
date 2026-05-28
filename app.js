@@ -16,13 +16,14 @@ function loadState() {
          };
       }
       if(!parsed.oldNames) parsed.oldNames = {}; // 🌟 구 종목명 저장용 객체 추가
+      if(!parsed.riaAccounts) parsed.riaAccounts = [];
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } } };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [] };
 }
 
 let state = loadState();
@@ -501,6 +502,15 @@ function openMasterSettingsModal() {
   document.getElementById('ghToken').value = s.token;
   document.getElementById('ghAutoSync').checked = s.autoSync;
   document.getElementById('masterSettingsOverlay').classList.add('open');
+}
+
+function saveRiaAccounts() {
+    const val = document.getElementById('inputRiaAccounts').value;
+    state.riaAccounts = val.split(',').map(s => s.trim()).filter(Boolean);
+    saveState();
+    renderCapitalGainsTax(currentRealizedOwnerFilter);
+    const btn = document.getElementById('btnSaveRia');
+    if (btn) { btn.textContent = '✅ 저장됨'; setTimeout(() => btn.textContent = '저장', 1500); }
 }
 
 function openOwnerModal() {
@@ -5611,14 +5621,117 @@ function renderCapitalGainsTax(ownerFilter) {
     }
 
     // ② 연도별 세금 계산
+    // ── 2026 RIA 가중치 헬퍼 ──────────────────────────────────
+    function _ria2026Weight(dateStr) {
+        const m = parseInt(dateStr.substring(5, 7), 10);
+        if (m <= 5) return 1.0;
+        if (m <= 7) return 0.8;
+        return 0.5;
+    }
+    
+    const riaAccounts = (state.riaAccounts || []).map(s => s.trim()).filter(Boolean);
+    
     const rows = years.map(year => {
         const { gainUsd, lossUsd, gainKrw, lossKrw } = byYear[year];
         const netUsd = gainUsd - lossUsd;
-        const netKrw = (gainKrw || 0) - (lossKrw || 0);  // 거래일 환율 기준
-        const taxableKrw  = Math.max(0, netKrw - DEDUCTION);
-        const taxKrw      = Math.round(taxableKrw * TAX_RATE);
-        const isProfit    = netUsd > 0;
-        return { year, gainUsd, lossUsd, netUsd, netKrw, taxableKrw, taxKrw, isProfit };
+        const netKrw = (gainKrw || 0) - (lossKrw || 0);
+    
+        // ── 2026 RIA 특례 계산 ─────────────────────────────────
+        let riaDeduction = 0;
+        let riaNote = '';
+    
+        if (year === '2026' && riaAccounts.length > 0) {
+            // ① RIA 계좌 내 매도 거래만 추출
+            const riaSells = state.transactions.filter(t =>
+                t.date.startsWith('2026') &&
+                t.qty < 0 &&
+                t.txType !== 'dividend' && t.txType !== 'transfer' &&
+                !isKorean(t.symbol) &&
+                (ownerName === 'all' || t.owner === ownerName) &&
+                riaAccounts.includes((t.broker || '').trim())
+            );
+    
+            // 평단가 재추적 (holdings 이미 계산된 것 재사용)
+            const _riaHoldings = {};
+            [...state.transactions]
+                .filter(t => t.txType !== 'dividend' && t.txType !== 'transfer' && !isKorean(t.symbol))
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .forEach(tx => {
+                    if (ownerName !== 'all' && tx.owner !== ownerName) return;
+                    const key = `${tx.symbol}::${(tx.broker||'').trim()}`;
+                    if (!_riaHoldings[key]) _riaHoldings[key] = { qty: 0, avg: 0 };
+                    const h = _riaHoldings[key];
+                    if (tx.qty > 0) {
+                        const tv = h.qty * h.avg + tx.qty * tx.price;
+                        h.qty += tx.qty; h.avg = tv / h.qty;
+                    } else if (tx.qty < 0) {
+                        h.qty += tx.qty; if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+                    }
+                });
+    
+            // 트래킹용 별도 holdings (순서대로 다시)
+            const _h2 = {};
+            let riaWeightedSell = 0;   // 가중 매도금액 (분모)
+            let riaWeightedGain = 0;   // 조정 전 공제액 (분자)
+    
+            [...state.transactions]
+                .filter(t => t.txType !== 'dividend' && t.txType !== 'transfer' && !isKorean(t.symbol))
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .forEach(tx => {
+                    if (ownerName !== 'all' && tx.owner !== ownerName) return;
+                    const broker = (tx.broker || '').trim();
+                    const key = `${tx.symbol}::${broker}`;
+                    if (!_h2[key]) _h2[key] = { qty: 0, avg: 0 };
+                    const h = _h2[key];
+                    if (tx.qty > 0) {
+                        const tv = h.qty * h.avg + tx.qty * tx.price;
+                        h.qty += tx.qty; h.avg = tv / h.qty;
+                    } else if (tx.qty < 0 && tx.date.startsWith('2026') && riaAccounts.includes(broker)) {
+                        const sellQty = Math.abs(tx.qty);
+                        const fx = getHistoricalFxRate(tx.date);
+                        const sellAmtKrw = tx.price * sellQty * fx;
+                        const costAmtKrw = h.avg * sellQty * fx;
+                        const gainKrwTx  = sellAmtKrw - costAmtKrw;
+                        const w = _ria2026Weight(tx.date);
+                        riaWeightedSell += sellAmtKrw * w;
+                        if (gainKrwTx > 0) riaWeightedGain += gainKrwTx * w; // 이익분만 공제
+                        h.qty -= sellQty; if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+                    } else if (tx.qty < 0) {
+                        const sellQty = Math.abs(tx.qty);
+                        h.qty -= sellQty; if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+                    }
+                });
+    
+            // ② RIA 외 계좌 순매수금액 (가중치 적용)
+            let nonRiaNetBuy = 0;
+            state.transactions
+                .filter(t =>
+                    t.date.startsWith('2026') &&
+                    t.txType !== 'dividend' && t.txType !== 'transfer' &&
+                    !isKorean(t.symbol) &&
+                    (ownerName === 'all' || t.owner === ownerName) &&
+                    !riaAccounts.includes((t.broker || '').trim())
+                )
+                .forEach(tx => {
+                    const fx = getHistoricalFxRate(tx.date);
+                    const w  = _ria2026Weight(tx.date);
+                    // 매수: 양수, 매도: 음수 → 순매수
+                    nonRiaNetBuy += tx.qty * tx.price * fx * w;
+                });
+    
+            // ③ 최종 공제액
+            if (riaWeightedSell > 0 && riaWeightedGain > 0) {
+                const ratio = Math.min(1, Math.max(0, nonRiaNetBuy / riaWeightedSell));
+                riaDeduction = Math.max(0, riaWeightedGain * (1 - ratio));
+                riaNote = `RIA 조정 전 공제 ₩${Math.round(riaWeightedGain).toLocaleString()} × (1 - ${Math.round(nonRiaNetBuy).toLocaleString()}/${Math.round(riaWeightedSell).toLocaleString()})`;
+            }
+        }
+    
+        const taxableKrw = Math.max(0, netKrw - DEDUCTION - riaDeduction);
+        const taxKrw     = Math.round(taxableKrw * TAX_RATE);
+        const isProfit   = netUsd > 0;
+        return { year, gainUsd, lossUsd, netUsd, netKrw, taxableKrw, taxKrw, isProfit,
+                 riaDeduction, riaNote };
     });
 
     // ③ 금액 포맷 헬퍼
@@ -5687,7 +5800,8 @@ function renderCapitalGainsTax(ownerFilter) {
                 const isThisYear = r.year === thisYear;
                 const bg         = isThisYear ? 'rgba(124,106,247,0.07)' : (i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)');
                 const taxableStr = r.taxableKrw > 0
-                    ? `<span style="color:#ff4d6a;">${fmtKrw(r.taxableKrw)}</span>`
+                    ? `<span style="color:#ff4d6a;">${fmtKrw(r.taxableKrw)}</span>
+                       ${r.riaDeduction > 0 ? `<div style="font-size:9px;color:var(--green);margin-top:2px;">RIA공제 -₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</div>` : ''}`
                     : `<span style="color:var(--text3);">—</span>`;
                 const taxStr = r.taxKrw > 0
                     ? `<b style="color:${taxColor}; font-family:var(--font-mono);">₩${r.taxKrw.toLocaleString()}</b>`
