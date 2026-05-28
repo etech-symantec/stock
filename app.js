@@ -5639,7 +5639,10 @@ function renderCapitalGainsTax(ownerFilter) {
     }
     
     const riaAccounts = (state.riaAccounts || []).map(s => s.trim()).filter(Boolean);
-    
+    const isRiaBroker = b => {
+        const s = (b || '').trim();
+        return s.toUpperCase().includes('RIA') || riaAccounts.includes(s);
+    };
     const rows = years.map(year => {
         const { gainUsd, lossUsd, gainKrw, lossKrw } = byYear[year];
         const netUsd = gainUsd - lossUsd;
@@ -5649,7 +5652,7 @@ function renderCapitalGainsTax(ownerFilter) {
         let riaDeduction = 0;
         let riaNote = '';
     
-        if (year === '2026' && riaAccounts.length > 0) {
+        if (year === '2026') {
             // ① RIA 계좌 내 매도 거래만 추출
             const riaSells = state.transactions.filter(t =>
                 t.date.startsWith('2026') &&
@@ -5657,7 +5660,7 @@ function renderCapitalGainsTax(ownerFilter) {
                 t.txType !== 'dividend' && t.txType !== 'transfer' &&
                 !isKorean(t.symbol) &&
                 (ownerName === 'all' || t.owner === ownerName) &&
-                riaAccounts.includes((t.broker || '').trim())
+                isRiaBroker(t.broker)
             );
     
             // 평단가 재추적 (holdings 이미 계산된 것 재사용)
@@ -5695,7 +5698,7 @@ function renderCapitalGainsTax(ownerFilter) {
                     if (tx.qty > 0) {
                         const tv = h.qty * h.avg + tx.qty * tx.price;
                         h.qty += tx.qty; h.avg = tv / h.qty;
-                    } else if (tx.qty < 0 && tx.date.startsWith('2026') && riaAccounts.includes(broker)) {
+                    } else if (tx.qty < 0 && tx.date.startsWith('2026') && isRiaBroker(broker)) {
                         const sellQty = Math.abs(tx.qty);
                         const fx = getHistoricalFxRate(tx.date);
                         const sellAmtKrw = tx.price * sellQty * fx;
@@ -5719,7 +5722,7 @@ function renderCapitalGainsTax(ownerFilter) {
                     t.txType !== 'dividend' && t.txType !== 'transfer' &&
                     !isKorean(t.symbol) &&
                     (ownerName === 'all' || t.owner === ownerName) &&
-                    !riaAccounts.includes((t.broker || '').trim())
+                    !isRiaBroker(t.broker)
                 )
                 .forEach(tx => {
                     const fx = getHistoricalFxRate(tx.date);
