@@ -5857,6 +5857,7 @@ function renderCapitalGainsTax(ownerFilter) {
 
     // ── 연도 상세 모달 ──
     window._cgTradesByYear = tradesByYear;
+    window._cgRows = rows;
     window._openCgTaxModal = function() {
         let overlay = document.getElementById('cgFullTableOverlay');
         if (!overlay) {
@@ -5892,7 +5893,10 @@ function renderCapitalGainsTax(ownerFilter) {
         });
         const netUsd = gainUsd - lossUsd;
         const netKrw = gainKrw - lossKrw;
-        const taxableKrw = Math.max(0, netKrw - DEDUCTION);
+        const savedRow = (window._cgRows || []).find(r => r.year === year);
+        const riaDeduction = savedRow ? savedRow.riaDeduction : 0;
+        const riaNote = savedRow ? savedRow.riaNote : '';
+        const taxableKrw = Math.max(0, netKrw - DEDUCTION - riaDeduction);
         const taxKrw = Math.round(taxableKrw * TAX_RATE);
     
         const fmtU = v => (v < 0 ? '-' : '+') + '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -5951,7 +5955,11 @@ function renderCapitalGainsTax(ownerFilter) {
               ['총 매도손실', lossUsd>0?'-$'+lossUsd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}):'—', '#3A9AFF'],
               ['순손익 (USD)', fmtU(netUsd), netUsd>=0?'#00C578':'#3A9AFF'],
               ['순손익 (KRW)', fmtW(netKrw), netKrw>=0?'#00C578':'#3A9AFF'],
-              ['과세표준', taxableKrw>0?fmtW(taxableKrw):'공제 범위 내', taxableKrw>0?'#ff4d6a':'var(--text3)'],
+              ['과세표준',
+                taxableKrw > 0
+                  ? fmtW(taxableKrw) + (riaDeduction > 0 ? `<div style="font-size:9px;color:#00C578;margin-top:2px;">RIA공제 -₩${Math.round(riaDeduction/10000).toLocaleString()}만</div>` : '')
+                  : '공제 범위 내',
+                taxableKrw > 0 ? '#ff4d6a' : 'var(--text3)'],
               ['예상 세금', taxKrw>0?'₩'+taxKrw.toLocaleString():'납부 없음', taxKrw>0?'#ff4d6a':'var(--text3)'],
             ].map(([label, val, color]) => `
               <div style="flex:1; min-width:110px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
