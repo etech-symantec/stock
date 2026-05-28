@@ -501,6 +501,9 @@ function openMasterSettingsModal() {
   document.getElementById('ghRepo').value = s.repo;
   document.getElementById('ghToken').value = s.token;
   document.getElementById('ghAutoSync').checked = s.autoSync;
+  // RIA 계좌 값 복원
+  const riaEl = document.getElementById('inputRiaAccounts');
+  if (riaEl) riaEl.value = (state.riaAccounts || []).join(', ');
   document.getElementById('masterSettingsOverlay').classList.add('open');
 }
 
@@ -508,9 +511,15 @@ function saveRiaAccounts() {
     const val = document.getElementById('inputRiaAccounts').value;
     state.riaAccounts = val.split(',').map(s => s.trim()).filter(Boolean);
     saveState();
+    triggerAutoSync();
     renderCapitalGainsTax(currentRealizedOwnerFilter);
     const btn = document.getElementById('btnSaveRia');
-    if (btn) { btn.textContent = '✅ 저장됨'; setTimeout(() => btn.textContent = '저장', 1500); }
+    if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = '✅ 저장됨';
+        btn.disabled = true;
+        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
+    }
 }
 
 function openOwnerModal() {
