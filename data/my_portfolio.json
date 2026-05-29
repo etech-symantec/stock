@@ -9026,6 +9026,16 @@
       "qty": 2,
       "price": 7.53,
       "txType": "trade"
+    },
+    {
+      "id": 1780064624029,
+      "date": "2023-12-12",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "SOFI",
+      "qty": 10,
+      "price": 7.92,
+      "txType": "trade"
     }
   ],
   "range": "all",
