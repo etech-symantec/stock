@@ -8935,6 +8935,16 @@
       "qty": 100,
       "price": 17220,
       "txType": "trade"
+    },
+    {
+      "id": 1780064393346,
+      "date": "2026-01-08",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "ORCL",
+      "qty": 5,
+      "price": 193.09,
+      "txType": "trade"
     }
   ],
   "range": "all",
