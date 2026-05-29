@@ -134,7 +134,8 @@
     "NVDY",
     "ㅁㄴㅇㄻㄴㅇ",
     "0047R0",
-    "SOFI"
+    "SOFI",
+    "ARKK"
   ],
   "transactions": [
     {
@@ -9055,6 +9056,16 @@
       "symbol": "SOFI",
       "qty": 6,
       "price": 8.42,
+      "txType": "trade"
+    },
+    {
+      "id": 1780064684341,
+      "date": "2023-08-29",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "ARKK",
+      "qty": 5,
+      "price": 41,
       "txType": "trade"
     }
   ],
