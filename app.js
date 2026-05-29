@@ -2300,6 +2300,14 @@ function setupSearch(inputId, dropdownId, onSelect, filterId) {
     } else {
         results = filteredDB.filter(s => s.symbol.toLowerCase().startsWith(cleanQuery) || s.name.toLowerCase().startsWith(cleanQuery));
     }
+
+    // 🌟 이미 등록된 종목을 최상단으로 정렬
+    const registeredSet = new Set(state.tickers);
+    results.sort((a, b) => {
+        const aReg = registeredSet.has(a.symbol) ? 0 : 1;
+        const bReg = registeredSet.has(b.symbol) ? 0 : 1;
+        return aReg - bReg;
+    });
     
     if (results.length === 0) {
   dropdown.innerHTML = `
@@ -2318,15 +2326,20 @@ function setupSearch(inputId, dropdownId, onSelect, filterId) {
   return;
 }
     
-    dropdown.innerHTML = results.map(q => `
+    dropdown.innerHTML = results.map(q => {
+      const isRegistered = registeredSet.has(q.symbol);
+      const badge = isRegistered
+        ? `<span style="font-size:9px; font-weight:700; color:var(--green); background:rgba(0,200,122,0.12); border:1px solid rgba(0,200,122,0.35); padding:1px 5px; border-radius:3px; margin-left:4px; vertical-align:middle;">보유/관심</span>`
+        : '';
+      return `
       <li class="search-item" onclick="${onSelect}('${q.symbol}', '${q.name.replace(/'/g, "\\'")}')">
         <div style="display:flex; flex-direction:column; gap:2px; max-width:70%;">
-          <span style="font-weight:500; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}</span>
+          <span style="font-weight:500; font-size:13px; color:${isRegistered ? 'var(--green)' : 'var(--text)'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.name}${badge}</span>
           <span style="font-size:10px; color:var(--text3);">${q.exch}</span>
         </div>
         <span style="color:var(--accent); font-family:var(--font-mono); font-size:12px; font-weight:700;">${q.symbol}</span>
-      </li>
-    `).join('');
+      </li>`;
+    }).join('');
     dropdown.style.display = 'block';
   };
 
