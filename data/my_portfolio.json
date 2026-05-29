@@ -9107,6 +9107,16 @@
       "qty": 20,
       "price": 6.45,
       "txType": "trade"
+    },
+    {
+      "id": 1780064760957,
+      "date": "2023-01-23",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "TSLA",
+      "qty": 2,
+      "price": 132,
+      "txType": "trade"
     }
   ],
   "range": "all",
