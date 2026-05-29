@@ -8725,6 +8725,16 @@
       "qty": -10,
       "price": 77700,
       "txType": "trade"
+    },
+    {
+      "id": 1780042817448,
+      "date": "2025-11-07",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "005930.KS",
+      "qty": -14,
+      "price": 99700,
+      "txType": "trade"
     }
   ],
   "range": "all",
