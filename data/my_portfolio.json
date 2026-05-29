@@ -8985,6 +8985,16 @@
       "qty": 2,
       "price": 212.22,
       "txType": "trade"
+    },
+    {
+      "id": 1780064496446,
+      "date": "2025-03-20",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "BA",
+      "qty": 1,
+      "price": 159.33,
+      "txType": "trade"
     }
   ],
   "range": "all",
