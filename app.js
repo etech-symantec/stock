@@ -5794,13 +5794,13 @@ function renderCapitalGainsTax(ownerFilter) {
         if (!r) return `<div style="font-size:12px; color:var(--text3); padding:6px 0;">${thisYear}년 매도 내역 없음</div>`;
         const netColor = r.netUsd > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
         const taxStr = r.taxKrw > 0
-            ? `<span style="font-family:var(--font-mono); font-size:26px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</span>`
+            ? `<span style="font-family:var(--font-mono); font-size:17px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</span>`
             : `<span style="font-size:13px; color:var(--text3);">납부 없음</span>`;
         return `
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0;">
             <div>
                 <div style="font-size:12px; color:var(--text3); font-weight:700; letter-spacing:0.03em; margin-bottom:3px;">순손익</div>
-                <div style="font-family:var(--font-mono); font-size:26px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:${netColor};">${fmtUsd(r.netUsd)}</div>
+                <div style="font-family:var(--font-mono); font-size:17px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:${netColor};">${fmtUsd(r.netUsd)}</div>
                 <div style="font-size:12px; color:${netColor}; font-family:var(--font-mono); margin-top:4px;">${fmtKrw(r.netKrw)}</div>
             </div>
             <div style="text-align:right;">
