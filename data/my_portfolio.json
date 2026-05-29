@@ -9227,6 +9227,16 @@
       "qty": 50,
       "price": 20.82,
       "txType": "trade"
+    },
+    {
+      "id": 1780065040407,
+      "date": "2021-02-19",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "ARKK",
+      "qty": 6,
+      "price": 156.5,
+      "txType": "trade"
     }
   ],
   "range": "all",
