@@ -6184,7 +6184,7 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
   // 2️⃣ 기존 부모를 새 다이어그램 컨테이너로 교체
   let container = document.createElement('div');
   container.id = 'newSankeyContainer';
-  container.style.cssText = 'overflow:hidden; width:100%; min-width:0; box-sizing:border-box;';
+  container.style.cssText = 'width:100%; min-width:0; box-sizing:border-box;';
   parent.parentNode.replaceChild(container, parent);
 
   // 3️⃣ 양도소득세 및 순수익 계산 (기본공제 250만 원, 22% 세율)
@@ -6197,7 +6197,7 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
 
   // 4️⃣ 생키 다이어그램 HTML 렌더링 (추출한 전체보기 버튼 삽입)
   container.innerHTML = `
-  <div class="sankey-board" style="overflow:hidden; width:100%; min-width:0; box-sizing:border-box;">
+  <div class="sankey-board" style="width:100%; min-width:0; box-sizing:border-box;">
     
     <div class="sankey-col">
       <div class="sankey-node total">
@@ -6238,8 +6238,8 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
     </div>
 
     <div class="sankey-col">
-      <div style="height: 50%;"></div> 
-      <div style="height: 50%; display: flex; flex-direction: column; justify-content: space-around;">
+      <div style="height: 20%;"></div> 
+      <div style="height: 80%; display: flex; flex-direction: column; justify-content: space-around;">
         
         <div class="sankey-node us-net">
           <div class="sankey-title">미국 순수익</div>
