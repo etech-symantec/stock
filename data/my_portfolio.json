@@ -8334,6 +8334,16 @@
       "qty": -40,
       "price": 25700,
       "txType": "trade"
+    },
+    {
+      "id": 1780018657996,
+      "date": "2026-05-28",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "122870.KQ",
+      "qty": -18,
+      "price": 45500,
+      "txType": "trade"
     }
   ],
   "range": "all",
