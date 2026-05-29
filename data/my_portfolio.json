@@ -9117,6 +9117,16 @@
       "qty": 2,
       "price": 132,
       "txType": "trade"
+    },
+    {
+      "id": 1780064779992,
+      "date": "2022-05-16",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "AAPL",
+      "qty": 2,
+      "price": 152,
+      "txType": "trade"
     }
   ],
   "range": "all",
