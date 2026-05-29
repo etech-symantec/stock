@@ -8414,9 +8414,19 @@
       "qty": -10,
       "price": 220000,
       "txType": "trade"
+    },
+    {
+      "id": 1780026800495,
+      "date": "2026-02-27",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "0047R0.KS",
+      "qty": 50,
+      "price": 12620,
+      "txType": "trade"
     }
   ],
-  "range": "6m",
+  "range": "all",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
