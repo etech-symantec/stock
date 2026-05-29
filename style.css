@@ -2140,6 +2140,7 @@ nav {
   align-items: flex-start;
   flex-direction: column;
   gap: 0;
+  padding: 10px 14px;
 }
 .rfp-mflag { font-size: 26px; flex-shrink: 0; line-height: 1; }
 .rfp-mval {
@@ -2235,7 +2236,7 @@ nav {
   display: flex;
   align-items: stretch;
   gap: 0;
-  height: 220px; /* 전체 컨테이너 높이 */
+  height: 260px; /* 전체 컨테이너 높이 */
   margin-top: 16px;
   font-family: var(--font-sans);
 }
