@@ -9127,6 +9127,16 @@
       "qty": 2,
       "price": 152,
       "txType": "trade"
+    },
+    {
+      "id": 1780064803438,
+      "date": "2022-03-22",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "SOFI",
+      "qty": 45,
+      "price": 8.9,
+      "txType": "trade"
     }
   ],
   "range": "all",
