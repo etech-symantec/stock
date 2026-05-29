@@ -9087,6 +9087,16 @@
       "qty": 1,
       "price": 161.52,
       "txType": "trade"
+    },
+    {
+      "id": 1780064718281,
+      "date": "2023-04-14",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "AAPL",
+      "qty": 1,
+      "price": 161.8,
+      "txType": "trade"
     }
   ],
   "range": "all",
