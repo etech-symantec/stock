@@ -1250,7 +1250,15 @@ function editTransaction(id) {
   sb.classList.add('highlight-edit');
 
   document.getElementById('txDate').value = tx.date;
-  document.getElementById('txSymbol').value = tx.symbol.replace('.KS', '');
+  let _editDisplayName = tx.symbol;
+  const _editDbMatch = localStockDB && localStockDB.find(s => s.symbol === tx.symbol);
+  if (_editDbMatch) _editDisplayName = _editDbMatch.name;
+  else if (cachedMarketData[tx.symbol] && !cachedMarketData[tx.symbol]._failed && cachedMarketData[tx.symbol].name) {
+      _editDisplayName = cachedMarketData[tx.symbol].name;
+  }
+  const _editSymInput = document.getElementById('txSymbol');
+  _editSymInput.value = _editDisplayName;
+  _editSymInput.dataset.symbol = tx.symbol;
   document.getElementById('txQty').value = Math.abs(tx.qty);
   document.getElementById('txPrice').value = tx.price;
   document.getElementById('txBroker').value = tx.broker || '';
