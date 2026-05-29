@@ -133,7 +133,8 @@
     "CRM",
     "NVDY",
     "ㅁㄴㅇㄻㄴㅇ",
-    "0047R0"
+    "0047R0",
+    "SOFI"
   ],
   "transactions": [
     {
@@ -9004,6 +9005,16 @@
       "symbol": "BA",
       "qty": 2,
       "price": 159.28,
+      "txType": "trade"
+    },
+    {
+      "id": 1780064587939,
+      "date": "2024-03-13",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "SOFI",
+      "qty": 10,
+      "price": 7.64,
       "txType": "trade"
     }
   ],
