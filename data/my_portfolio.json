@@ -8765,6 +8765,16 @@
       "qty": 2,
       "price": 176.92,
       "txType": "trade"
+    },
+    {
+      "id": 1780043064535,
+      "date": "2026-01-27",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "CRM",
+      "qty": 2,
+      "price": 228.72,
+      "txType": "trade"
     }
   ],
   "range": "all",
