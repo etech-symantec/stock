@@ -9067,6 +9067,16 @@
       "qty": 5,
       "price": 41,
       "txType": "trade"
+    },
+    {
+      "id": 1780064693455,
+      "date": "2023-08-29",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "ARKK",
+      "qty": 5,
+      "price": 42.15,
+      "txType": "trade"
     }
   ],
   "range": "all",
