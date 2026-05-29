@@ -9237,6 +9237,16 @@
       "qty": 6,
       "price": 156.5,
       "txType": "trade"
+    },
+    {
+      "id": 1780065065029,
+      "date": "2021-02-11",
+      "owner": "미니",
+      "broker": "미래에셋",
+      "symbol": "AAPL",
+      "qty": 6,
+      "price": 136.5,
+      "txType": "trade"
     }
   ],
   "range": "all",
