@@ -5672,6 +5672,7 @@ function renderCapitalGainsTax(ownerFilter) {
         // ── 2026 RIA 특례 계산 ─────────────────────────────────
         let riaDeduction = 0;
         let riaNote = '';
+        let nonRiaDetails = [];
     
         if (year === '2026') {
             const _h2 = {};
@@ -5719,8 +5720,27 @@ function renderCapitalGainsTax(ownerFilter) {
                 .forEach(tx => {
                     const fx = getHistoricalFxRate(tx.date);
                     const w  = _ria2026Weight(tx.date);
-                    // 매수: 양수, 매도: 음수 → 순매수
-                    nonRiaNetBuy += tx.qty * tx.price * fx * w;
+                    const calcAmount = tx.qty * tx.price * fx * w; // 가중치 반영 금액
+                    nonRiaNetBuy += calcAmount;
+
+                    // 🌟 [추가] 어떤 종목이 어떻게 계산되었는지 상세 기록
+                    let stockName = tx.symbol;
+                    if (localStockDB && localStockDB.length > 0) {
+                        const m = localStockDB.find(s => s.symbol === tx.symbol);
+                        if (m) stockName = m.name;
+                    }
+                    if (cachedMarketData[tx.symbol] && !cachedMarketData[tx.symbol]._failed && cachedMarketData[tx.symbol].name) {
+                        stockName = cachedMarketData[tx.symbol].name;
+                    }
+                    
+                    nonRiaDetails.push({
+                        date: tx.date,
+                        symbol: stockName,
+                        broker: tx.broker || '미지정',
+                        type: tx.qty > 0 ? '매수' : '매도',
+                        weight: w * 100,
+                        calcAmt: calcAmount
+                    });
                 });
     
             // ③ 최종 공제액
@@ -5735,7 +5755,7 @@ function renderCapitalGainsTax(ownerFilter) {
         const taxKrw     = Math.round(taxableKrw * TAX_RATE);
         const isProfit   = netUsd > 0;
         return { year, gainUsd, lossUsd, netUsd, netKrw, taxableKrw, taxKrw, isProfit,
-                 riaDeduction, riaNote };
+                 riaDeduction, riaNote, nonRiaDetails };
     });
 
     // ③ 금액 포맷 헬퍼
@@ -5923,6 +5943,7 @@ function renderCapitalGainsTax(ownerFilter) {
         const savedRow = (window._cgRows || []).find(r => r.year === year);
         const riaDeduction = savedRow ? savedRow.riaDeduction : 0;
         const riaNote = savedRow ? savedRow.riaNote : '';
+        const nonRiaDetails = savedRow ? savedRow.nonRiaDetails : [];
         const taxableKrw = Math.max(0, netKrw - DEDUCTION - riaDeduction);
         const taxKrw = Math.round(taxableKrw * TAX_RATE);
     
@@ -6029,6 +6050,44 @@ function renderCapitalGainsTax(ownerFilter) {
               <div style="font-family:var(--font-mono); color:var(--text3); margin-bottom:10px; font-size:10px; word-break:break-all; background:var(--bg2); padding:6px 10px; border-radius:6px;">
                 계산식: ${riaNote || '—'}
               </div>
+              
+              ${nonRiaDetails && nonRiaDetails.length > 0 ? `
+              <div style="margin-bottom:10px; background:var(--bg2); border:1px solid rgba(255,255,255,0.1); border-radius:6px; overflow:hidden;">
+                <div style="padding:6px 10px; font-size:11px; font-weight:700; color:var(--text); background:var(--bg3); border-bottom:1px solid rgba(255,255,255,0.1);">
+                  📋 타계좌(RIA 외) 해외주식 상세 거래 내역
+                </div>
+                <div style="max-height:150px; overflow-y:auto;" class="custom-scrollbar">
+                  <table style="width:100%; border-collapse:collapse; font-size:10px; text-align:right;">
+                    <thead style="background:rgba(255,255,255,0.02); color:var(--text3); position:sticky; top:0;">
+                      <tr>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);">일자</th>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);">종목(계좌)</th>
+                        <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">유형</th>
+                        <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">가중치</th>
+                        <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">반영금액(KRW)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${nonRiaDetails.map(d => `
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <td style="padding:6px 8px; text-align:left; color:var(--text2);">${d.date}</td>
+                        <td style="padding:6px 8px; text-align:left;">
+                          <span style="color:var(--text); font-weight:bold;">${d.symbol}</span><br>
+                          <span style="color:var(--text3); font-size:9px;">${d.broker}</span>
+                        </td>
+                        <td style="padding:6px 8px; color:${d.type==='매수'?'var(--red)':'var(--blue)'}; font-weight:bold;">${d.type}</td>
+                        <td style="padding:6px 8px; color:var(--text2);">${d.weight}%</td>
+                        <td style="padding:6px 8px; font-family:var(--font-mono); font-weight:bold; color:${d.calcAmt>0?'var(--red)':'var(--blue)'};">
+                          ${d.calcAmt > 0 ? '+' : ''}${Math.round(d.calcAmt).toLocaleString()}원
+                        </td>
+                      </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              ` : ''}
+              
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
                   RIA 공제 <b style="color:var(--green); font-family:var(--font-mono);">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b>
