@@ -5661,6 +5661,7 @@ function renderCapitalGainsTax(ownerFilter) {
     
     const riaAccounts = (state.riaAccounts || []).map(s => s.trim()).filter(Boolean);
     const isRiaBroker = b => {
+        if (riaAccounts.length === 0) return false;   // ← 이 한 줄 추가
         const s = (b || '').trim();
         return s.toUpperCase().includes('RIA') || riaAccounts.includes(s);
     };
@@ -5796,6 +5797,9 @@ function renderCapitalGainsTax(ownerFilter) {
         const taxStr = r.taxKrw > 0
             ? `<span style="font-family:var(--font-mono); font-size:17px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</span>`
             : `<span style="font-size:13px; color:var(--text3);">납부 없음</span>`;
+        const riaInfoHtml = r.riaDeduction > 0
+            ? `<div style="font-size:10px; color:var(--green); font-family:var(--font-mono); margin-top:3px;">📌 RIA공제 −₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</div>`
+            : '';
         return `
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0;">
             <div>
@@ -5806,6 +5810,7 @@ function renderCapitalGainsTax(ownerFilter) {
             <div style="text-align:right;">
                 <div style="font-size:12px; color:var(--text3); font-weight:700; letter-spacing:0.03em; margin-bottom:3px;">예상 세금</div>
                 ${taxStr}
+                ${riaInfoHtml}
                 ${r.netKrw > 0 && r.netKrw <= DEDUCTION ? `<div style="font-size:11px; color:var(--text3); margin-top:4px;">공제 범위 내</div>` : ''}
             </div>
         </div>`;
