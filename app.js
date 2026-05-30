@@ -6192,89 +6192,95 @@ function renderRealizedChart(labels, lineData, barData, txInfo = []) {
  * 실현수익 Sankey 패널 (전체보기 버튼 복구 및 부드러운 곡선 UI 적용)
  */
 function updateRfpSankey(krwTotal, usdTotalKrw) {
-  const oldSvg = document.getElementById('rfpSankeySvg');
-  if (!oldSvg) return;
-  
-  let parent = oldSvg.parentElement;
-  while(parent && parent.tagName !== 'BODY') {
-      if (parent.querySelector('#rfpRatioKrFill') || parent.querySelector('.rfp-tax-wrap')) break; 
-      parent = parent.parentElement;
-  }
-  if(!parent || parent.tagName === 'BODY') parent = oldSvg.parentElement.parentElement;
+  let container = document.getElementById('newSankeyContainer');
 
-  // 2️⃣ 기존 부모를 새 다이어그램 컨테이너로 교체
-  let container = document.createElement('div');
-  container.id = 'newSankeyContainer';
-  container.style.cssText = 'width:100%; min-width:0; box-sizing:border-box;';
-  parent.parentNode.replaceChild(container, parent);
+  if (!container) {
+    const oldSvg = document.getElementById('rfpSankeySvg');
+    if (!oldSvg) return;
+
+    let parent = oldSvg.parentElement;
+    while(parent && parent.tagName !== 'BODY') {
+        if (parent.querySelector('#rfpRatioKrFill') || parent.querySelector('.rfp-tax-wrap')) break;
+        parent = parent.parentElement;
+    }
+    if(!parent || parent.tagName === 'BODY') parent = oldSvg.parentElement.parentElement;
+
+    container = document.createElement('div');
+    container.id = 'newSankeyContainer';
+    container.style.cssText = 'width:100%; min-width:0; box-sizing:border-box;';
+    parent.parentNode.replaceChild(container, parent);
+  }
 
   // 3️⃣ 양도소득세 및 순수익 계산 (기본공제 250만 원, 22% 세율)
-  let estimatedTax = 0;
-  if (usdTotalKrw > 2500000) {
-      estimatedTax = (usdTotalKrw - 2500000) * 0.22;
-  }
-  const usNetTotal = usdTotalKrw - estimatedTax;
   const combinedTotal = krwTotal + usdTotalKrw;
+  const totalColor = combinedTotal >= 0 ? 'var(--profit)' : 'var(--loss)';
+  const krColor    = krwTotal     >= 0 ? 'var(--profit)' : 'var(--loss)';
+  const usColor    = usdTotalKrw  >= 0 ? 'var(--profit)' : 'var(--loss)';
 
-  // 4️⃣ 생키 다이어그램 HTML 렌더링 (추출한 전체보기 버튼 삽입)
+  const _fmt = v => {
+    const abs = Math.abs(v), s = v >= 0 ? '+' : '-';
+    if (abs >= 100000000) return s + '₩' + (abs/100000000).toFixed(1) + '억';
+    if (abs >= 10000)     return s + '₩' + Math.round(abs/10000).toLocaleString() + '만';
+    return s + '₩' + Math.round(abs).toLocaleString();
+  };
+
+  const absKr = Math.abs(krwTotal), absUs = Math.abs(usdTotalKrw);
+  const grandAbs = absKr + absUs;
+  const krPct = grandAbs > 0 ? Math.round(absKr / grandAbs * 100) : 50;
+  const usPct = 100 - krPct;
+
   container.innerHTML = `
-  <div class="sankey-board" style="width:100%; min-width:0; box-sizing:border-box;">
-    
-    <div class="sankey-col">
-      <div class="sankey-node total">
-        <div class="sankey-title">합산 손익</div>
-        <div class="sankey-val" style="color: ${combinedTotal >= 0 ? 'var(--profit)' : 'var(--loss)'}">
-          ${combinedTotal >= 0 ? '+' : ''}${Math.round(combinedTotal).toLocaleString()}원
+    <div class="stat-banner" style="margin-bottom:15px; flex-shrink:0; align-items:stretch;">
+      <div class="stat-banner-accent" style="background:${totalColor};"></div>
+
+      <div class="stat-banner-total">
+        <div class="stat-banner-label">
+          <span class="stat-dot" style="background:${totalColor};"></span>
+          합산 손익
         </div>
+        <div style="font-family:var(--font-mono); font-size:22px; font-weight:700; color:${totalColor}; margin-top:6px; line-height:1.2;">${_fmt(combinedTotal)}</div>
+        <div style="font-size:10px; color:var(--text3); margin-top:5px;">국내 + 해외 합산</div>
       </div>
-    </div>
 
-    <div class="sankey-svg-wrap">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M 0,50 C 50,50 50,25 100,25" class="sankey-path" stroke="var(--profit)" />
-        <path d="M 0,50 C 50,50 50,75 100,75" class="sankey-path" stroke="var(--blue)" />
-      </svg>
-    </div>
+      <div class="stat-banner-right">
+        <div class="stat-markets" style="align-items:stretch;">
 
-    <div class="sankey-col" style="justify-content: space-around;">
-      <div class="sankey-node kr">
-        <div class="sankey-title">🇰🇷 국내주식</div>
-        <div class="sankey-val" style="color: ${krwTotal >= 0 ? 'var(--text)' : 'var(--loss)'}">
-          ${krwTotal >= 0 ? '+' : ''}${Math.round(krwTotal).toLocaleString()}원
+          <!-- 국내주식 -->
+          <div class="stat-market">
+            <span class="stat-flag">🇰🇷</span>
+            <div class="stat-market-info">
+              <div class="stat-market-label">국내주식</div>
+              <div class="stat-market-val" style="color:${krColor};">${_fmt(krwTotal)}</div>
+            </div>
+          </div>
+
+          <!-- 미국주식 + 양도세 -->
+          <div class="stat-market" style="flex-direction:column; align-items:stretch; gap:0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="stat-flag">🇺🇸</span>
+              <div class="stat-market-info">
+                <div class="stat-market-label">미국주식 순수익</div>
+                <div class="stat-market-val" style="color:${usColor};">${_fmt(usdTotalKrw)}</div>
+              </div>
+            </div>
+            <div id="capitalGainsTaxPanel" style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);"></div>
+          </div>
+
         </div>
-      </div>
-      <div class="sankey-node us">
-        <div class="sankey-title">🇺🇸 미국주식</div>
-        <div class="sankey-val" style="color: ${usdTotalKrw >= 0 ? 'var(--text)' : 'var(--loss)'}">
-          ${usdTotalKrw >= 0 ? '+' : ''}${Math.round(usdTotalKrw).toLocaleString()}원
-        </div>
-      </div>
-    </div>
 
-    <div class="sankey-svg-wrap">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M 0,75 C 50,75 50,62.5 100,62.5" class="sankey-path" stroke="var(--blue)" />
-        ${estimatedTax > 0 ? `<path d="M 0,75 C 50,75 50,87.5 100,87.5" class="sankey-path dashed" stroke="var(--red)" />` : ''}
-      </svg>
-    </div>
-
-    <div class="sankey-col">
-      <div style="height: 20%;"></div> 
-      <div style="height: 80%; display: flex; flex-direction: column; justify-content: space-around;">
-        
-        <div class="sankey-node us-net">
-          <div class="sankey-title">미국 순수익</div>
-          <div class="sankey-val" style="color: ${usNetTotal >= 0 ? 'var(--text)' : 'var(--loss)'}">
-            ${usNetTotal >= 0 ? '+' : ''}${Math.round(usNetTotal).toLocaleString()}원
+        <!-- 비중 바 -->
+        <div class="stat-ratio-row">
+          <div class="stat-ratio-bar">
+            <div class="stat-ratio-kr-fill" id="rfpRatioKrFill" style="width:${krPct}%; background:var(--profit);"></div>
+            <div class="stat-ratio-us-fill" style="background:var(--loss);"></div>
+          </div>
+          <div class="stat-ratio-pcts">
+            <span style="color:var(--profit);">🇰🇷 ${krPct}%</span>
+            <span style="color:var(--loss);">${usPct}% 🇺🇸</span>
           </div>
         </div>
-        
-        <div id="capitalGainsTaxPanel" class="rfp-mcard rfp-mcard-tax sankey-node us-tax" style="${estimatedTax <= 0 ? 'border-left-color: var(--text3); opacity: 0.6;' : ''}">
-        </div>
       </div>
     </div>
-
-  </div>
   `;
 }
 
