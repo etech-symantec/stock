@@ -5661,7 +5661,6 @@ function renderCapitalGainsTax(ownerFilter) {
     
     const riaAccounts = (state.riaAccounts || []).map(s => s.trim()).filter(Boolean);
     const isRiaBroker = b => {
-        if (riaAccounts.length === 0) return false;   // ← 이 한 줄 추가
         const s = (b || '').trim();
         return s.toUpperCase().includes('RIA') || riaAccounts.includes(s);
     };
@@ -5675,35 +5674,6 @@ function renderCapitalGainsTax(ownerFilter) {
         let riaNote = '';
     
         if (year === '2026') {
-            // ① RIA 계좌 내 매도 거래만 추출
-            const riaSells = state.transactions.filter(t =>
-                t.date.startsWith('2026') &&
-                t.qty < 0 &&
-                t.txType !== 'dividend' && t.txType !== 'transfer' &&
-                !isKorean(t.symbol) &&
-                (ownerName === 'all' || t.owner === ownerName) &&
-                isRiaBroker(t.broker)
-            );
-    
-            // 평단가 재추적 (holdings 이미 계산된 것 재사용)
-            const _riaHoldings = {};
-            [...state.transactions]
-                .filter(t => t.txType !== 'dividend' && t.txType !== 'transfer' && !isKorean(t.symbol))
-                .sort((a, b) => new Date(a.date) - new Date(b.date))
-                .forEach(tx => {
-                    if (ownerName !== 'all' && tx.owner !== ownerName) return;
-                    const key = `${tx.symbol}::${(tx.broker||'').trim()}`;
-                    if (!_riaHoldings[key]) _riaHoldings[key] = { qty: 0, avg: 0 };
-                    const h = _riaHoldings[key];
-                    if (tx.qty > 0) {
-                        const tv = h.qty * h.avg + tx.qty * tx.price;
-                        h.qty += tx.qty; h.avg = tv / h.qty;
-                    } else if (tx.qty < 0) {
-                        h.qty += tx.qty; if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
-                    }
-                });
-    
-            // 트래킹용 별도 holdings (순서대로 다시)
             const _h2 = {};
             let riaWeightedSell = 0;   // 가중 매도금액 (분모)
             let riaWeightedGain = 0;   // 조정 전 공제액 (분자)
@@ -5799,7 +5769,9 @@ function renderCapitalGainsTax(ownerFilter) {
             : `<span style="font-size:13px; color:var(--text3);">납부 없음</span>`;
         const riaInfoHtml = r.riaDeduction > 0
             ? `<div style="font-size:10px; color:var(--green); font-family:var(--font-mono); margin-top:3px;">📌 RIA공제 −₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</div>`
-            : '';
+            : (riaAccounts.length === 0 && year === '2026')
+                ? `<div style="font-size:10px; color:var(--text3); margin-top:3px;">⚙️ RIA 계좌 미설정 — <span style="cursor:pointer; text-decoration:underline;" onclick="openMasterSettingsModal()">설정에서 등록</span></div>`
+                : '';
         return `
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0;">
             <div>
