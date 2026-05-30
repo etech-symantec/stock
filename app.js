@@ -5880,6 +5880,35 @@ function renderCapitalGainsTax(ownerFilter) {
         overlay.style.display = 'flex';
     };
     
+    /**
+     * 🇺🇸 미국주식 양도소득세 연도별 상세 모달
+     *
+     * ── 기본 계산 ────────────────────────────────────────────────
+     * ① 과세표준 = 총 매도차익(KRW) − 총 매도손실(KRW) − 기본공제(250만) − RIA 특례공제
+     * ② 예상 세금 = 과세표준 × 22%  (소득세 20% + 지방소득세 2%)
+     * ③ 환산: 각 거래일의 USD/KRW 대고객 매매기준율 적용
+     *
+     * ── 2026 RIA 계좌 특례공제 계산 ─────────────────────────────
+     * RIA(개인종합자산관리계좌) 경유 매도분에 한해 추가 공제 적용
+     *
+     * 핵심 개념:
+     *   "RIA 계좌 매도 이익 중, 비(非)RIA 계좌에서
+     *    같은 기간 추가 매수한 비율만큼은 공제 불가"
+     *
+     * 변수 정의 (모두 가중치 적용 후 KRW 환산 기준):
+     *   A = RIA 계좌 매도 이익 합계
+     *   B = RIA 계좌 매도 금액 합계
+     *   C = 비RIA 계좌 순매수 금액 합계
+     *
+     *   공제액 = A × (1 − C/B)   ← C ≥ B 이면 공제 없음
+     *
+     * 기간별 가중치 (2026년):
+     *   1~5월  → ×1.0  (100%)
+     *   6~7월  → ×0.8  ( 80%)
+     *   8월~   → ×0.5  ( 50%)
+     *
+     * ※ 참고용 추정치 — 실제 신고 시 세무사 확인 필요
+     */
     window._openCgYearDetail = function(year) {
         const trades = (window._cgTradesByYear || {})[year] || [];
         const DEDUCTION = 2500000, TAX_RATE = 0.22;
@@ -5954,9 +5983,13 @@ function renderCapitalGainsTax(ownerFilter) {
               ['순손익 (USD)', fmtU(netUsd), netUsd>=0?'#00C578':'#3A9AFF'],
               ['순손익 (KRW)', fmtW(netKrw), netKrw>=0?'#00C578':'#3A9AFF'],
               ['과세표준',
-                taxableKrw > 0
-                  ? fmtW(taxableKrw) + (riaDeduction > 0 ? `<div style="font-size:9px;color:#00C578;margin-top:2px;">RIA공제 -₩${Math.round(riaDeduction/10000).toLocaleString()}만</div>` : '')
-                  : '공제 범위 내',
+                (() => {
+                  if (taxableKrw <= 0) return '공제 범위 내';
+                  let sub = riaDeduction > 0
+                    ? `기본공제 −₩250만<br>RIA공제 −₩${Math.round(riaDeduction/10000).toLocaleString()}만`
+                    : `기본공제 −₩250만 적용`;
+                  return fmtW(taxableKrw) + `<div style="font-size:9px;margin-top:3px;line-height:1.6;color:${riaDeduction>0?'var(--green)':'var(--text3)'};">${sub}</div>`;
+                })(),
                 taxableKrw > 0 ? '#ff4d6a' : 'var(--text3)'],
               ['예상 세금', taxKrw>0?'₩'+taxKrw.toLocaleString():'납부 없음', taxKrw>0?'#ff4d6a':'var(--text3)'],
             ].map(([label, val, color]) => `
@@ -5985,6 +6018,44 @@ function renderCapitalGainsTax(ownerFilter) {
             </div>`}
           </div>` : ''}
     
+          <!-- RIA 특례공제 상세 (2026년만 표시) -->
+          ${year === '2026' ? `
+          <div style="padding:12px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0;">
+            ${riaDeduction > 0 ? `
+            <div style="padding:12px 14px; background:rgba(0,200,122,0.07); border:1px solid rgba(0,200,122,0.22); border-radius:8px; font-size:11px; line-height:1.8;">
+              <div style="font-weight:700; color:var(--green); margin-bottom:6px; font-size:12px;">
+                📌 2026 RIA 계좌 특례공제 적용 결과
+              </div>
+              <div style="font-family:var(--font-mono); color:var(--text3); margin-bottom:10px; font-size:10px; word-break:break-all; background:var(--bg2); padding:6px 10px; border-radius:6px;">
+                계산식: ${riaNote || '—'}
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                  RIA 공제 <b style="color:var(--green); font-family:var(--font-mono);">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b>
+                </span>
+                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                  기본공제 <b style="font-family:var(--font-mono);">−₩250만</b>
+                </span>
+                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                  과세표준 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxableKrw > 0 ? fmtW(taxableKrw) : '공제 범위 내'}</b>
+                </span>
+                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                  예상 세금 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxKrw > 0 ? '₩' + taxKrw.toLocaleString() : '납부 없음'}</b>
+                </span>
+              </div>
+            </div>` : `
+            <div style="padding:10px 12px; background:rgba(255,183,3,0.06); border:1px solid rgba(255,183,3,0.18); border-radius:8px; font-size:11px; color:var(--text2); line-height:1.8;">
+              ⚙️ <b>RIA 계좌 미설정</b> — 2026년 특례공제를 자동 계산하려면
+              <span style="color:var(--accent); text-decoration:underline; cursor:pointer;"
+                onclick="document.getElementById('cgYearDetailOverlay').style.display='none'; openMasterSettingsModal()">
+                설정에서 RIA 계좌를 등록
+              </span>하세요.
+              <div style="margin-top:5px; font-size:10px; color:var(--text3);">
+                💡 공제 공식: RIA 매도이익 × (1 − 비RIA 순매수 ÷ RIA 매도금액) &nbsp;|&nbsp; 가중치: 1~5월 ×1.0 / 6~7월 ×0.8 / 8월~ ×0.5
+              </div>
+            </div>`}
+          </div>` : ''}
+
           <!-- 거래 목록 -->
           <div style="flex:1; overflow-y:auto;">
             <table style="width:100%; border-collapse:collapse; font-size:12px;">
