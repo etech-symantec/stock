@@ -5769,7 +5769,7 @@ function renderCapitalGainsTax(ownerFilter) {
             : `<span style="font-size:13px; color:var(--text3);">납부 없음</span>`;
         const riaInfoHtml = r.riaDeduction > 0
             ? `<div style="font-size:10px; color:var(--green); font-family:var(--font-mono); margin-top:3px;">📌 RIA공제 −₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</div>`
-            : (riaAccounts.length === 0 && year === '2026')
+            : (riaAccounts.length === 0 && thisYear === '2026')
                 ? `<div style="font-size:10px; color:var(--text3); margin-top:3px;">⚙️ RIA 계좌 미설정 — <span style="cursor:pointer; text-decoration:underline;" onclick="openMasterSettingsModal()">설정에서 등록</span></div>`
                 : '';
         return `
@@ -5937,7 +5937,7 @@ function renderCapitalGainsTax(ownerFilter) {
     
         overlay.innerHTML = `
         <div class="modal" onclick="event.stopPropagation()"
-             style="max-width:840px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
+             style="max-width:1100px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
           <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
             <div>
               <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 ${year}년 미국주식 양도소득세 상세</div>
@@ -5965,6 +5965,25 @@ function renderCapitalGainsTax(ownerFilter) {
                 <div style="font-weight:700; color:${color}; font-family:var(--font-mono); font-size:13px; line-height:1.3;">${val}</div>
               </div>`).join('')}
           </div>
+          ${(riaDeduction > 0 || (year === '2026' && riaAccounts.length === 0)) ? `
+          <div style="padding:10px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0;">
+            ${riaDeduction > 0 ? `
+            <div style="padding:10px 14px; background:rgba(0,200,122,0.08); border:1px solid rgba(0,200,122,0.25); border-radius:8px; font-size:11px; color:var(--text2); line-height:1.7;">
+              <b style="color:var(--green); font-size:12px;">📌 RIA 계좌 특례 공제 계산 상세</b>
+              <div style="font-family:var(--font-mono); margin-top:4px; color:var(--text3); word-break:break-all;">${riaNote}</div>
+              <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:8px; font-family:var(--font-mono);">
+                <span>RIA 조정 공제: <b style="color:var(--green);">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b></span>
+                <span>기본공제: <b>−₩250만</b></span>
+                <span>과세표준: <b style="color:#ff4d6a;">${taxableKrw > 0 ? fmtW(taxableKrw) : '공제 범위 내'}</b></span>
+                <span>예상 세금 (22%): <b style="color:#ff4d6a;">${taxKrw > 0 ? '₩' + taxKrw.toLocaleString() : '납부 없음'}</b></span>
+              </div>
+            </div>` : `
+            <div style="padding:8px 12px; background:rgba(255,183,3,0.07); border:1px solid rgba(255,183,3,0.2); border-radius:8px; font-size:11px; color:var(--text2); line-height:1.7;">
+              ⚙️ <b>RIA 계좌 미설정</b> — 2026년 양도소득세 특례 공제를 자동 계산하려면
+              <span style="color:var(--accent); text-decoration:underline; cursor:pointer;"
+                onclick="document.getElementById('cgYearDetailOverlay').style.display='none'; openMasterSettingsModal()">설정에서 RIA 계좌를 등록</span>하세요.
+            </div>`}
+          </div>` : ''}
     
           <!-- 거래 목록 -->
           <div style="flex:1; overflow-y:auto;">
