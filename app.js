@@ -5987,6 +5987,21 @@ function renderCapitalGainsTax(ownerFilter) {
      *
      * ※ 참고용 추정치 — 실제 신고 시 세무사 확인 필요
      */
+
+    // 🌟 [추가] 모달창 전용: 수동 지정 종목 저장 및 즉시 재계산 함수
+    window.saveCustomOverseasModal = function(year) {
+        const val = document.getElementById('inputCustomOverseasModal').value;
+        state.customOverseasAssets = val.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+        saveState();
+        triggerAutoSync();
+        
+        // 백그라운드 패널의 양도세 재계산 (이 함수가 window._cgRows 등을 최신화함)
+        renderCapitalGainsTax(currentRealizedOwnerFilter); 
+        
+        // 현재 보고 있는 상세 모달창을 최신 데이터로 다시 그리기 (깜빡임 없이 갱신)
+        window._openCgYearDetail(year); 
+    };
+    
     window._openCgYearDetail = function(year) {
         const trades = (window._cgTradesByYear || {})[year] || [];
         const DEDUCTION = 2500000, TAX_RATE = 0.22;
@@ -6109,6 +6124,7 @@ function renderCapitalGainsTax(ownerFilter) {
                 계산식: ${riaNote || '—'}
               </div>
               
+              <!-- 🌟 타계좌(RIA 외) 해외주식 상세 거래 내역 표 -->
               ${nonRiaDetails && nonRiaDetails.length > 0 ? `
               <div style="margin-bottom:10px; background:var(--bg2); border:1px solid rgba(255,255,255,0.1); border-radius:6px; overflow:hidden;">
                 <div style="padding:6px 10px; font-size:11px; font-weight:700; color:var(--text); background:var(--bg3); border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -6145,6 +6161,46 @@ function renderCapitalGainsTax(ownerFilter) {
                 </div>
               </div>
               ` : ''}
+              
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                  RIA 공제 <b style="color:var(--green); font-family:var(--font-mono);">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b>
+                </span>
+                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                  기본공제 <b style="font-family:var(--font-mono);">−₩250만</b>
+                </span>
+                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                  과세표준 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxableKrw > 0 ? fmtW(taxableKrw) : '공제 범위 내'}</b>
+                </span>
+                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                  예상 세금 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxKrw > 0 ? '₩' + taxKrw.toLocaleString() : '납부 없음'}</b>
+                </span>
+              </div>
+            </div>` : `
+            <div style="padding:10px 12px; background:rgba(255,183,3,0.06); border:1px solid rgba(255,183,3,0.18); border-radius:8px; font-size:11px; color:var(--text2); line-height:1.8;">
+              ⚙️ <b>RIA 계좌 미설정</b> — 2026년 특례공제를 자동 계산하려면
+              <span style="color:var(--accent); text-decoration:underline; cursor:pointer;"
+                onclick="document.getElementById('cgYearDetailOverlay').style.display='none'; openMasterSettingsModal()">
+                설정에서 RIA 계좌를 등록
+              </span>하세요.
+              <div style="margin-top:5px; font-size:10px; color:var(--text3);">
+                💡 공제 공식: RIA 매도이익 × (1 − 비RIA 순매수 ÷ RIA 매도금액) &nbsp;|&nbsp; 가중치: 1~5월 ×1.0 / 6~7월 ×0.8 / 8월~ ×0.5
+              </div>
+            </div>`}
+          </div>
+          
+          <!-- 🌟 [추가] 모달 내부에 배치된 수동 지정 UI -->
+          <div style="padding:12px 20px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0;">
+             <div style="font-weight:700; color:var(--text); font-size:12px; margin-bottom:6px;">🌐 국내 상장 해외자산 수동 지정</div>
+             <div style="font-size:10px; color:var(--text3); margin-bottom:8px; line-height:1.5;">
+               자동으로 계산에 포함되지 않는 국내 상장 해외 ETF(예: KODEX 미국AI전력핵심인프라) 등을 수동으로 입력해 RIA 양도세 페널티 계산에 포함시킵니다. (종목명 또는 단축코드 입력, 쉼표 구분)
+             </div>
+             <div style="display:flex; gap:8px;">
+               <input type="text" id="inputCustomOverseasModal" class="form-input" style="flex:1; height:32px; font-size:11px; margin:0;" placeholder="예: KODEX 글로벌반도체, 252670" value="${(state.customOverseasAssets || []).join(', ')}">
+               <button class="btn-sm" style="background:var(--accent); color:#fff; font-weight:bold; height:32px; padding:0 15px; border:none;" onclick="window.saveCustomOverseasModal('${year}')">저장 및 재계산</button>
+             </div>
+          </div>
+          ` : ''}
               
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
