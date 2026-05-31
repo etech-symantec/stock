@@ -6060,7 +6060,7 @@ function renderCapitalGainsTax(ownerFilter) {
     
         overlay.innerHTML = `
         <div class="modal" onclick="event.stopPropagation()"
-             style="max-width:1100px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
+             style="max-width:1300px; width:95vw; max-height:95vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
           <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
             <div>
               <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 ${year}년 미국주식 양도소득세 상세</div>
@@ -6120,7 +6120,7 @@ function renderCapitalGainsTax(ownerFilter) {
               <div style="font-weight:700; color:var(--green); margin-bottom:6px; font-size:12px;">
                 📌 2026 RIA 계좌 특례공제 적용 결과
               </div>
-              <div style="font-family:var(--font-mono); color:var(--text3); margin-bottom:10px; font-size:10px; word-break:break-all; background:var(--bg2); padding:6px 10px; border-radius:6px;">
+              <div style="font-family:var(--font-mono); color:var(--text3); margin-bottom:10px; font-size:11px; line-height:1.4; word-break:break-all; background:var(--bg2); padding:8px 12px; border-radius:6px;">
                 계산식: ${riaNote || '—'}
               </div>
               
@@ -6130,8 +6130,8 @@ function renderCapitalGainsTax(ownerFilter) {
                 <div style="padding:6px 10px; font-size:11px; font-weight:700; color:var(--text); background:var(--bg3); border-bottom:1px solid rgba(255,255,255,0.1);">
                   📋 타계좌(RIA 외) 해외주식 상세 거래 내역
                 </div>
-                <div style="max-height:150px; overflow-y:auto;" class="custom-scrollbar">
-                  <table style="width:100%; border-collapse:collapse; font-size:10px; text-align:right;">
+                <div style="max-height:280px; overflow-y:auto;" class="custom-scrollbar">
+                  <table style="width:100%; border-collapse:collapse; font-size:11.5px; text-align:right;">
                     <thead style="background:rgba(255,255,255,0.02); color:var(--text3); position:sticky; top:0;">
                       <tr>
                         <th style="padding:6px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);">일자</th>
