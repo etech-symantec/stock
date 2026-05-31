@@ -5943,23 +5943,7 @@ function renderCapitalGainsTax(ownerFilter) {
             overlay.onclick = e => { if (e.target === overlay) overlay.style.display = 'none'; };
             document.body.appendChild(overlay);
         }
-        const _nonRiaRowsHtml = (nonRiaDetails || []).map(d => {
-        const typeColor = d.type === '매수' ? 'var(--red)' : 'var(--blue)';
-        const amtColor  = d.calcAmt > 0    ? 'var(--red)' : 'var(--blue)';
-        const amtSign   = d.calcAmt > 0    ? '+'          : '';
-        return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-          <td style="padding:6px 8px; text-align:left; color:var(--text2);">${d.date}</td>
-          <td style="padding:6px 8px; text-align:left;">
-            <span style="color:var(--text); font-weight:bold;">${d.symbol}</span><br>
-            <span style="color:var(--text3); font-size:9px;">${d.broker}</span>
-          </td>
-          <td style="padding:6px 8px; font-weight:bold; color:${typeColor};">${d.type}</td>
-          <td style="padding:6px 8px; color:var(--text2);">${d.weight}%</td>
-          <td style="padding:6px 8px; font-family:var(--font-mono); font-weight:bold; color:${amtColor};">
-            ${amtSign}${Math.round(d.calcAmt).toLocaleString()}원
-          </td>
-        </tr>`;
-    }).join('');
+        
         overlay.innerHTML = `
             <div class="modal" onclick="event.stopPropagation()"
                  style="max-width:900px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
