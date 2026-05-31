@@ -6083,7 +6083,7 @@ function renderCapitalGainsTax(ownerFilter) {
         const customSet = new Set((state.customOverseasAssets || []).map(s => s.toUpperCase()));
 
         state.transactions.forEach(tx => {
-            if (isKorean(tx.symbol)) {
+            if (isKorean(tx.symbol) && tx.qty > 0 && tx.date.startsWith(year)) {
                 let sName = tx.symbol;
                 if (typeof localStockDB !== 'undefined' && localStockDB.length > 0) {
                     const m = localStockDB.find(x => x.symbol === tx.symbol);
