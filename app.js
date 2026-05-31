@@ -6203,6 +6203,13 @@ function renderCapitalGainsTax(ownerFilter) {
              </div>
 
           </div> <!-- // 하단 2분할 영역 끝 -->
+          </div> <div style="padding:10px 20px; font-size:10px; color:var(--text3); border-top:1px solid var(--border); background:var(--bg3); line-height:1.7; flex-shrink:0;">
+            ⚠️ 참고용 추정치입니다. 실제 신고 시 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요.
+          </div>
+        </div>`;
+        
+    overlay.style.display = 'flex';
+}
 
 // 🌟 실현수익 콤보 차트 (최종 수정본 - 에러 완벽 해결)
 function renderRealizedChart(labels, lineData, barData, txInfo = []) {
