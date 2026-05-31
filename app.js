@@ -5773,9 +5773,15 @@ function renderCapitalGainsTax(ownerFilter) {
                     return isTargetAsset;
                 })
                 .forEach(tx => {
-                    const fx = getHistoricalFxRate(tx.date);
+                    // 🌟 [수정] 국내 주식(원화 거래)이면 환율 1 적용, 해외 주식(달러 거래)이면 해당일 환율 적용
+                    const fx = isKorean(tx.symbol) ? 1 : getHistoricalFxRate(tx.date);
                     const w  = _ria2026Weight(tx.date);
                     const calcAmount = tx.qty * tx.price * fx * w; // 가중치 반영 금액
+                    
+                    nonRiaNetBuy += calcAmount;
+
+                    // 🌟 어떤 종목이 어떻게 계산되었는지 상세 기록 (이하 기존 코드 동일)
+                    let stockName = tx.symbol;
                     nonRiaNetBuy += calcAmount;
 
                     // 🌟 [추가] 어떤 종목이 어떻게 계산되었는지 상세 기록
