@@ -15,8 +15,9 @@ function loadState() {
            user2: { name: parsed.ownerNames?.user2 || '소유자2', color: '#00c87a', icon: '👤' }
          };
       }
-      if(!parsed.oldNames) parsed.oldNames = {}; // 🌟 구 종목명 저장용 객체 추가
+      if(!parsed.oldNames) parsed.oldNames = {}; 
       if(!parsed.riaAccounts) parsed.riaAccounts = [];
+      if(!parsed.customOverseasAssets) parsed.customOverseasAssets = []; // 🌟 수동 지정 해외자산 추가
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
@@ -504,7 +505,29 @@ function openMasterSettingsModal() {
   // RIA 계좌 값 복원
   const riaEl = document.getElementById('inputRiaAccounts');
   if (riaEl) riaEl.value = (state.riaAccounts || []).join(', ');
+  // 🌟 [추가] 모달 열 때 수동 해외자산 목록 불러오기
+  const customOverseasEl = document.getElementById('inputCustomOverseas');
+  if (customOverseasEl) customOverseasEl.value = (state.customOverseasAssets || []).join(', ');
+
   document.getElementById('masterSettingsOverlay').classList.add('open');
+}
+
+// 🌟 [추가] 수동 해외자산 목록 저장 함수
+function saveCustomOverseas() {
+    const val = document.getElementById('inputCustomOverseas').value;
+    // 쉼표로 구분된 종목명/티커를 대문자로 변환하고 공백 제거하여 배열로 저장
+    state.customOverseasAssets = val.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    saveState();
+    triggerAutoSync();
+    renderCapitalGainsTax(currentRealizedOwnerFilter); // 저장 시 양도세 즉시 재계산
+    
+    const btn = document.getElementById('btnSaveCustomOverseas');
+    if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = '✅ 저장됨';
+        btn.disabled = true;
+        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
+    }
 }
 
 function saveRiaAccounts() {
@@ -5709,6 +5732,8 @@ function renderCapitalGainsTax(ownerFilter) {
     
             // ② RIA 외 계좌 순매수금액 (가중치 적용)
             let nonRiaNetBuy = 0;
+            const customOverseas = state.customOverseasAssets || []; // 🌟 수동 지정 종목 배열
+            
             state.transactions
                 .filter(t => {
                     // 1. 기본 조건 필터 (2026년, 매수/매도 거래, 해당 소유자, RIA 계좌 제외)
@@ -5718,8 +5743,12 @@ function renderCapitalGainsTax(ownerFilter) {
                     if (isRiaBroker(t.broker)) return false;
 
                     // 2. 🌟 [수정] 해외주식 및 미국 관련 국내 ETF 판별
-                    let isTargetAsset = !isKorean(t.symbol); // 기본 해외주식은 무조건 포함
-                    
+                    let isTargetAsset = !isKorean(t.symbol);
+                    // 🌟 1. 수동 지정된 종목인지 검사 (종목코드 일치 확인)
+                    if (!isTargetAsset && customOverseas.includes(t.symbol.toUpperCase())) {
+                        isTargetAsset = true;
+                    }
+                    // 2. 수동 지정이 안 되어있다면 키워드 및 이름 검사
                     if (!isTargetAsset) {
                         // 국내 종목인 경우 종목명을 가져와서 검사
                         let stockName = t.symbol;
@@ -5731,17 +5760,14 @@ function renderCapitalGainsTax(ownerFilter) {
                             stockName = cachedMarketData[t.symbol].name;
                         }
                         
-                        // 공백을 제거하고 소문자로 변환하여 키워드 매칭 정확도 향상
-                        const cleanName = stockName.replace(/\s+/g, '').toLowerCase();
-                        
-                        // 포함시킬 키워드 목록 (요청하신 종목 + 대표 지수/빅테크 포함)
-                        const usKeywords = [
-                            '미국', '테슬라', '팔란티어', '구글', '애플', 
-                            '나스닥', 's&p', '다우존스', '엔비디아', '마이크로소프트'
-                        ];
-                        
-                        // 키워드 중 하나라도 포함되어 있으면 타계좌 해외자산 순매수로 간주
-                        isTargetAsset = usKeywords.some(kw => cleanName.includes(kw));
+                        // 🌟 종목명(한글 등)으로 직접 수동 지정된 경우인지 확인
+                        if (customOverseas.includes(stockName.toUpperCase())) {
+                            isTargetAsset = true;
+                        } else {
+                            const cleanName = stockName.replace(/\s+/g, '').toLowerCase();
+                            const usKeywords = ['미국', '테슬라', '팔란티어', '구글', '애플', '나스닥', 's&p', '다우존스', '엔비디아', '마이크로소프트'];
+                            isTargetAsset = usKeywords.some(kw => cleanName.includes(kw));
+                        }
                     }
                     
                     return isTargetAsset;
