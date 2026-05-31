@@ -6114,95 +6114,134 @@ function renderCapitalGainsTax(ownerFilter) {
     
           <!-- RIA 특례공제 상세 (2026년만 표시) -->
           ${year === '2026' ? `
-          <div style="padding:12px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0;">
-            ${riaDeduction > 0 ? `
-            <div style="padding:12px 14px; background:rgba(0,200,122,0.07); border:1px solid rgba(0,200,122,0.22); border-radius:8px; font-size:11px; line-height:1.8;">
-              <div style="font-weight:700; color:var(--green); margin-bottom:6px; font-size:12px;">
-                📌 2026 RIA 계좌 특례공제 적용 결과
-              </div>
-              <div style="font-family:var(--font-mono); color:var(--text3); margin-bottom:10px; font-size:11px; line-height:1.4; word-break:break-all; background:var(--bg2); padding:8px 12px; border-radius:6px;">
-                계산식: ${riaNote || '—'}
-              </div>
-              
-              <!-- 🌟 타계좌(RIA 외) 해외주식 상세 거래 내역 표 -->
-              ${nonRiaDetails && nonRiaDetails.length > 0 ? `
-              <div style="margin-bottom:10px; background:var(--bg2); border:1px solid rgba(255,255,255,0.1); border-radius:6px; overflow:hidden;">
-                <div style="padding:6px 10px; font-size:11px; font-weight:700; color:var(--text); background:var(--bg3); border-bottom:1px solid rgba(255,255,255,0.1);">
-                  📋 타계좌(RIA 외) 해외주식 상세 거래 내역
-                </div>
-                <div style="max-height:280px; overflow-y:auto;" class="custom-scrollbar">
-                  <table style="width:100%; border-collapse:collapse; font-size:11.5px; text-align:right;">
-                    <thead style="background:rgba(255,255,255,0.02); color:var(--text3); position:sticky; top:0;">
-                      <tr>
-                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);">일자</th>
-                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);">종목(계좌)</th>
-                        <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">유형</th>
-                        <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">가중치</th>
-                        <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">반영금액(KRW)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      ${nonRiaDetails.map(d => `
-                      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <td style="padding:6px 8px; text-align:left; color:var(--text2);">${d.date}</td>
-                        <td style="padding:6px 8px; text-align:left;">
-                          <span style="color:var(--text); font-weight:bold;">${d.symbol}</span><br>
-                          <span style="color:var(--text3); font-size:9px;">${d.broker}</span>
-                        </td>
-                        <td style="padding:6px 8px; color:${d.type==='매수'?'var(--red)':'var(--blue)'}; font-weight:bold;">${d.type}</td>
-                        <td style="padding:6px 8px; color:var(--text2);">${d.weight}%</td>
-                        <td style="padding:6px 8px; font-family:var(--font-mono); font-weight:bold; color:${d.calcAmt>0?'var(--red)':'var(--blue)'};">
-                          ${d.calcAmt > 0 ? '+' : ''}${Math.round(d.calcAmt).toLocaleString()}원
-                        </td>
-                      </tr>
-                      `).join('')}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              ` : ''}
-              
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
-                  RIA 공제 <b style="color:var(--green); font-family:var(--font-mono);">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b>
-                </span>
-                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
-                  기본공제 <b style="font-family:var(--font-mono);">−₩250만</b>
-                </span>
-                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
-                  과세표준 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxableKrw > 0 ? fmtW(taxableKrw) : '공제 범위 내'}</b>
-                </span>
-                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
-                  예상 세금 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxKrw > 0 ? '₩' + taxKrw.toLocaleString() : '납부 없음'}</b>
-                </span>
-              </div>
-            </div>` : `
-            <div style="padding:10px 12px; background:rgba(255,183,3,0.06); border:1px solid rgba(255,183,3,0.18); border-radius:8px; font-size:11px; color:var(--text2); line-height:1.8;">
-              ⚙️ <b>RIA 계좌 미설정</b> — 2026년 특례공제를 자동 계산하려면
-              <span style="color:var(--accent); text-decoration:underline; cursor:pointer;"
-                onclick="document.getElementById('cgYearDetailOverlay').style.display='none'; openMasterSettingsModal()">
-                설정에서 RIA 계좌를 등록
-              </span>하세요.
-              <div style="margin-top:5px; font-size:10px; color:var(--text3);">
-                💡 공제 공식: RIA 매도이익 × (1 − 비RIA 순매수 ÷ RIA 매도금액) &nbsp;|&nbsp; 가중치: 1~5월 ×1.0 / 6~7월 ×0.8 / 8월~ ×0.5
-              </div>
-            </div>`}
-          </div>
-          
-          <!-- 🌟 [추가] 모달 내부에 배치된 수동 지정 UI -->
-          <div style="padding:12px 20px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0;">
-             <div style="font-weight:700; color:var(--text); font-size:12px; margin-bottom:6px;">🌐 국내 상장 해외자산 수동 지정</div>
-             <div style="font-size:10px; color:var(--text3); margin-bottom:8px; line-height:1.5;">
-               자동으로 계산에 포함되지 않는 국내 상장 해외 ETF(예: KODEX 미국AI전력핵심인프라) 등을 수동으로 입력해 RIA 양도세 페널티 계산에 포함시킵니다. (종목명 또는 단축코드 입력, 쉼표 구분)
-             </div>
-             <div style="display:flex; gap:8px;">
-               <input type="text" id="inputCustomOverseasModal" class="form-input" style="flex:1; height:32px; font-size:11px; margin:0;" placeholder="예: KODEX 글로벌반도체, 252670" value="${(state.customOverseasAssets || []).join(', ')}">
-               <button class="btn-sm" style="background:var(--accent); color:#fff; font-weight:bold; height:32px; padding:0 15px; border:none;" onclick="window.saveCustomOverseasModal('${year}')">저장 및 재계산</button>
-             </div>
-          </div>
-          ` : ''}
+          <!-- 2026: 좌우 2분할 레이아웃 -->
+          <div style="flex:1; display:flex; min-height:0; overflow:hidden;">
 
-          <!-- 거래 목록 -->
+            <!-- ▌좌측: 수동 지정 + RIA 적용 결과 -->
+            <div style="flex:0 0 420px; overflow-y:auto; border-right:1px solid var(--border);
+                        padding:14px 16px; display:flex; flex-direction:column; gap:12px;
+                        background:var(--bg3);">
+
+              <!-- 🌐 국내 상장 해외자산 수동 지정 (최상단) -->
+              <div style="padding:12px 14px; background:var(--bg2); border:1px solid var(--border2); border-radius:8px;">
+                <div style="font-weight:700; color:var(--text); font-size:12px; margin-bottom:6px;">🌐 국내 상장 해외자산 수동 지정</div>
+                <div style="font-size:10px; color:var(--text3); margin-bottom:8px; line-height:1.5;">
+                  자동으로 포함되지 않는 국내 상장 해외 ETF 등을 수동 입력해 RIA 양도세 페널티 계산에 포함시킵니다. (종목명 또는 단축코드, 쉼표 구분)
+                </div>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="inputCustomOverseasModal" class="form-input"
+                    style="flex:1; height:32px; font-size:11px; margin:0;"
+                    placeholder="예: KODEX 글로벌반도체, 252670"
+                    value="${(state.customOverseasAssets || []).join(', ')}">
+                  <button class="btn-sm"
+                    style="background:var(--accent); color:#fff; font-weight:bold; height:32px; padding:0 15px; border:none;"
+                    onclick="window.saveCustomOverseasModal('${year}')">저장 및 재계산</button>
+                </div>
+              </div>
+
+              <!-- 📌 RIA 계좌 특례공제 적용 결과 -->
+              ${riaDeduction > 0 ? `
+              <div style="padding:12px 14px; background:rgba(0,200,122,0.07);
+                          border:1px solid rgba(0,200,122,0.22); border-radius:8px;
+                          font-size:11px; line-height:1.8;">
+                <div style="font-weight:700; color:var(--green); margin-bottom:6px; font-size:12px;">
+                  📌 2026 RIA 계좌 특례공제 적용 결과
+                </div>
+                <div style="font-family:var(--font-mono); color:var(--text3); margin-bottom:10px;
+                            font-size:11px; line-height:1.4; word-break:break-all;
+                            background:var(--bg2); padding:8px 12px; border-radius:6px;">
+                  계산식: ${riaNote || '—'}
+                </div>
+                ${nonRiaDetails && nonRiaDetails.length > 0 ? `
+                <div style="margin-bottom:10px; background:var(--bg2);
+                            border:1px solid rgba(255,255,255,0.1); border-radius:6px; overflow:hidden;">
+                  <div style="padding:6px 10px; font-size:11px; font-weight:700; color:var(--text);
+                              background:var(--bg3); border-bottom:1px solid rgba(255,255,255,0.1);">
+                    📋 타계좌(RIA 외) 해외주식 상세 거래 내역
+                  </div>
+                  <div style="max-height:260px; overflow-y:auto;" class="custom-scrollbar">
+                    <table style="width:100%; border-collapse:collapse; font-size:11.5px; text-align:right;">
+                      <thead style="background:rgba(255,255,255,0.02); color:var(--text3); position:sticky; top:0;">
+                        <tr>
+                          <th style="padding:6px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);">일자</th>
+                          <th style="padding:6px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);">종목(계좌)</th>
+                          <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">유형</th>
+                          <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">가중치</th>
+                          <th style="padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.1);">반영금액(KRW)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${nonRiaDetails.map(d => `
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                          <td style="padding:6px 8px; text-align:left; color:var(--text2);">${d.date}</td>
+                          <td style="padding:6px 8px; text-align:left;">
+                            <span style="color:var(--text); font-weight:bold;">${d.symbol}</span><br>
+                            <span style="color:var(--text3); font-size:9px;">${d.broker}</span>
+                          </td>
+                          <td style="padding:6px 8px; color:${d.type==='매수'?'var(--red)':'var(--blue)'}; font-weight:bold;">${d.type}</td>
+                          <td style="padding:6px 8px; color:var(--text2);">${d.weight}%</td>
+                          <td style="padding:6px 8px; font-family:var(--font-mono); font-weight:bold;
+                                     color:${d.calcAmt>0?'var(--red)':'var(--blue)'};">
+                            ${d.calcAmt > 0 ? '+' : ''}${Math.round(d.calcAmt).toLocaleString()}원
+                          </td>
+                        </tr>`).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>` : ''}
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                    RIA 공제 <b style="color:var(--green); font-family:var(--font-mono);">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b>
+                  </span>
+                  <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                    기본공제 <b style="font-family:var(--font-mono);">−₩250만</b>
+                  </span>
+                  <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                    과세표준 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxableKrw > 0 ? fmtW(taxableKrw) : '공제 범위 내'}</b>
+                  </span>
+                  <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
+                    예상 세금 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxKrw > 0 ? '₩' + taxKrw.toLocaleString() : '납부 없음'}</b>
+                  </span>
+                </div>
+              </div>` : `
+              <div style="padding:10px 12px; background:rgba(255,183,3,0.06);
+                          border:1px solid rgba(255,183,3,0.18); border-radius:8px;
+                          font-size:11px; color:var(--text2); line-height:1.8;">
+                ⚙️ <b>RIA 계좌 미설정</b> — 2026년 특례공제를 자동 계산하려면
+                <span style="color:var(--accent); text-decoration:underline; cursor:pointer;"
+                  onclick="document.getElementById('cgYearDetailOverlay').style.display='none'; openMasterSettingsModal()">
+                  설정에서 RIA 계좌를 등록
+                </span>하세요.
+                <div style="margin-top:5px; font-size:10px; color:var(--text3);">
+                  💡 공제 공식: RIA 매도이익 × (1 − 비RIA 순매수 ÷ RIA 매도금액) &nbsp;|&nbsp; 가중치: 1~5월 ×1.0 / 6~7월 ×0.8 / 8월~ ×0.5
+                </div>
+              </div>`}
+            </div>
+
+            <!-- ▌우측: 일반 미국주식 거래내역 -->
+            <div style="flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0;">
+              <div style="flex:1; overflow-y:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                  <thead style="position:sticky; top:0; background:var(--bg3); z-index:1;">
+                    <tr style="border-bottom:1px solid var(--border);">
+                      ${['날짜','종목','계좌','수량','매도가','평단가','손익 (USD)','손익 (KRW)'].map(
+                        (h,i) => `<th style="padding:9px 12px; text-align:${i>=3?'right':'left'}; font-weight:600; color:var(--text2); white-space:nowrap;">${h}</th>`
+                      ).join('')}
+                    </tr>
+                  </thead>
+                  <tbody>${rowsHtml || '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3);">거래 내역 없음</td></tr>'}</tbody>
+                </table>
+              </div>
+              <div style="padding:8px 20px; font-size:10px; color:var(--text3);
+                          border-top:1px solid var(--border); background:var(--bg3);
+                          line-height:1.7; flex-shrink:0;">
+                ⚠️ 참고용 추정치입니다. 실제 신고 시 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요.
+              </div>
+            </div>
+          </div>
+
+          ` : `
+          <!-- 2026 이외 연도: 거래 목록만 표시 -->
           <div style="flex:1; overflow-y:auto;">
             <table style="width:100%; border-collapse:collapse; font-size:12px;">
               <thead style="position:sticky; top:0; background:var(--bg3); z-index:1;">
@@ -6215,11 +6254,12 @@ function renderCapitalGainsTax(ownerFilter) {
               <tbody>${rowsHtml || '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3);">거래 내역 없음</td></tr>'}</tbody>
             </table>
           </div>
-          <div style="padding:8px 20px; font-size:10px; color:var(--text3); border-top:1px solid var(--border); background:var(--bg3); line-height:1.7;">
+          <div style="padding:8px 20px; font-size:10px; color:var(--text3);
+                      border-top:1px solid var(--border); background:var(--bg3); line-height:1.7;">
             ⚠️ 참고용 추정치입니다. 실제 신고 시 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요.
           </div>
         </div>`;
-        overlay.style.display = 'flex';
+    overlay.style.display = 'flex';
     };
 
     // 인라인 패널: 올해만 표시 + 더 보기 버튼
