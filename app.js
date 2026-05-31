@@ -5773,18 +5773,14 @@ function renderCapitalGainsTax(ownerFilter) {
                     return isTargetAsset;
                 })
                 .forEach(tx => {
-                    // 🌟 [수정] 국내 주식(원화 거래)이면 환율 1 적용, 해외 주식(달러 거래)이면 해당일 환율 적용
+                    // 1. 환율 및 가중치 계산 (국내주식은 환율 1 적용)
                     const fx = isKorean(tx.symbol) ? 1 : getHistoricalFxRate(tx.date);
                     const w  = _ria2026Weight(tx.date);
-                    const calcAmount = tx.qty * tx.price * fx * w; // 가중치 반영 금액
+                    const calcAmount = tx.qty * tx.price * fx * w; 
                     
                     nonRiaNetBuy += calcAmount;
 
-                    // 🌟 어떤 종목이 어떻게 계산되었는지 상세 기록 (이하 기존 코드 동일)
-                    let stockName = tx.symbol;
-                    nonRiaNetBuy += calcAmount;
-
-                    // 🌟 [추가] 어떤 종목이 어떻게 계산되었는지 상세 기록
+                    // 2. 종목명 추출 (let 선언은 여기서 딱 한 번만!)
                     let stockName = tx.symbol;
                     if (localStockDB && localStockDB.length > 0) {
                         const m = localStockDB.find(s => s.symbol === tx.symbol);
@@ -5794,6 +5790,7 @@ function renderCapitalGainsTax(ownerFilter) {
                         stockName = cachedMarketData[tx.symbol].name;
                     }
                     
+                    // 3. 상세 내역 배열에 푸시
                     nonRiaDetails.push({
                         date: tx.date,
                         symbol: stockName,
