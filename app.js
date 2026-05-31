@@ -8162,3 +8162,28 @@ function renderTagBar(treemapData) {
             ${legendHTML}
         </div>`;
 }
+
+// ==========================================
+// 🌟 ESC 키를 누르면 열려있는 모든 모달 닫기
+// ==========================================
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' || event.key === 'Esc') {
+        
+        // 1. 'open' 클래스로 제어되는 모달 닫기 (예: 전체 설정 창)
+        document.querySelectorAll('.overlay.open').forEach(modal => {
+            modal.classList.remove('open');
+        });
+
+        // 2. 'display' 속성으로 제어되는 모달 닫기 (예: 양도소득세 상세 모달 등)
+        document.querySelectorAll('.overlay').forEach(modal => {
+            // 화면에 보이고 있는 상태라면(none이 아니라면) 닫기
+            if (modal.style.display !== 'none' && modal.style.display !== '') {
+                modal.style.display = 'none';
+            }
+        });
+        
+        // (선택) 만약 별도의 ID로만 제어되는 팝업이 있다면 아래처럼 추가 가능
+        // const specificModal = document.getElementById('someModalId');
+        // if (specificModal) specificModal.style.display = 'none';
+    }
+});
