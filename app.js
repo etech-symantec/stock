@@ -6207,6 +6207,7 @@ function renderCapitalGainsTax(ownerFilter) {
           </div>
         </div>`;        
     overlay.style.display = 'flex';
+    }
 }
 
 // 🌟 실현수익 콤보 차트 (최종 수정본 - 에러 완벽 해결)
