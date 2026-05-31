@@ -5710,13 +5710,42 @@ function renderCapitalGainsTax(ownerFilter) {
             // ② RIA 외 계좌 순매수금액 (가중치 적용)
             let nonRiaNetBuy = 0;
             state.transactions
-                .filter(t =>
-                    t.date.startsWith('2026') &&
-                    t.txType !== 'dividend' && t.txType !== 'transfer' &&
-                    !isKorean(t.symbol) &&
-                    (ownerName === 'all' || t.owner === ownerName) &&
-                    !isRiaBroker(t.broker)
-                )
+                .filter(t => {
+                    // 1. 기본 조건 필터 (2026년, 매수/매도 거래, 해당 소유자, RIA 계좌 제외)
+                    if (!t.date.startsWith('2026')) return false;
+                    if (t.txType === 'dividend' || t.txType === 'transfer') return false;
+                    if (ownerName !== 'all' && t.owner !== ownerName) return false;
+                    if (isRiaBroker(t.broker)) return false;
+
+                    // 2. 🌟 [수정] 해외주식 및 미국 관련 국내 ETF 판별
+                    let isTargetAsset = !isKorean(t.symbol); // 기본 해외주식은 무조건 포함
+                    
+                    if (!isTargetAsset) {
+                        // 국내 종목인 경우 종목명을 가져와서 검사
+                        let stockName = t.symbol;
+                        if (localStockDB && localStockDB.length > 0) {
+                            const m = localStockDB.find(s => s.symbol === t.symbol);
+                            if (m) stockName = m.name;
+                        }
+                        if (cachedMarketData[t.symbol] && !cachedMarketData[t.symbol]._failed && cachedMarketData[t.symbol].name) {
+                            stockName = cachedMarketData[t.symbol].name;
+                        }
+                        
+                        // 공백을 제거하고 소문자로 변환하여 키워드 매칭 정확도 향상
+                        const cleanName = stockName.replace(/\s+/g, '').toLowerCase();
+                        
+                        // 포함시킬 키워드 목록 (요청하신 종목 + 대표 지수/빅테크 포함)
+                        const usKeywords = [
+                            '미국', '테슬라', '팔란티어', '구글', '애플', 
+                            '나스닥', 's&p', '다우존스', '엔비디아', '마이크로소프트'
+                        ];
+                        
+                        // 키워드 중 하나라도 포함되어 있으면 타계좌 해외자산 순매수로 간주
+                        isTargetAsset = usKeywords.some(kw => cleanName.includes(kw));
+                    }
+                    
+                    return isTargetAsset;
+                })
                 .forEach(tx => {
                     const fx = getHistoricalFxRate(tx.date);
                     const w  = _ria2026Weight(tx.date);
