@@ -6077,10 +6077,44 @@ function renderCapitalGainsTax(ownerFilter) {
             </tr>`;
         }).join('');
 
+        // --- 🌟 추가: 드롭다운용 국내 종목 필터링 로직 ---
+        const domesticMap = new Map();
+        const nonRiaNames = (nonRiaDetails || []).map(d => d.symbol); 
+        const customSet = new Set((state.customOverseasAssets || []).map(s => s.toUpperCase()));
+
+        state.transactions.forEach(tx => {
+            if (isKorean(tx.symbol)) {
+                let sName = tx.symbol;
+                if (typeof localStockDB !== 'undefined' && localStockDB.length > 0) {
+                    const m = localStockDB.find(x => x.symbol === tx.symbol);
+                    if (m) sName = m.name;
+                }
+                if (cachedMarketData[tx.symbol] && !cachedMarketData[tx.symbol]._failed && cachedMarketData[tx.symbol].name) {
+                    sName = cachedMarketData[tx.symbol].name;
+                }
+                // 수동 지정되었거나 이미 타계좌 목록에 잡힌 종목(ex. '미국' 키워드 등)은 제외
+                if (!customSet.has(tx.symbol.toUpperCase()) && 
+                    !customSet.has(sName.toUpperCase()) && 
+                    !nonRiaNames.includes(sName)) {
+                    domesticMap.set(tx.symbol, sName);
+                }
+            }
+        });
+
+        let dropdownOptions = `<option value="">➕ 내 계좌의 다른 국내 종목 추가하기</option>`;
+        // 가나다 이름순으로 정렬해서 보기 편하게 만듦
+        Array.from(domesticMap.entries())
+            .sort((a, b) => a[1].localeCompare(b[1]))
+            .forEach(([sym, name]) => {
+                dropdownOptions += `<option value="${name}">${name} (${sym.replace('.KS', '')})</option>`;
+            });
+        // ------------------------------------
+
         overlay.innerHTML = `
         <div class="modal" onclick="event.stopPropagation()"
              style="max-width:1300px; width:95vw; max-height:95vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
           
+          <!-- 상단 헤더 -->
           <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
             <div>
               <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 ${year}년 미국주식 양도소득세 상세</div>
@@ -6089,6 +6123,7 @@ function renderCapitalGainsTax(ownerFilter) {
             <button class="btn-sm" onclick="document.getElementById('cgYearDetailOverlay').style.display='none'">닫기</button>
           </div>
     
+          <!-- 요약 카드 (전체 폭) -->
           <div style="display:flex; gap:10px; padding:12px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0; flex-wrap:wrap;">
             ${[
               ['총 매도차익', '+$'+gainUsd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}), '#00C578'],
@@ -6099,9 +6134,9 @@ function renderCapitalGainsTax(ownerFilter) {
                 (() => {
                   if (taxableKrw <= 0) return '공제 범위 내';
                   let sub = riaDeduction > 0
-                    ? `기본공제 −₩250만<br>RIA공제 −₩${Math.round(riaDeduction/10000).toLocaleString()}만`
-                    : `기본공제 −₩250만 적용`;
-                  return fmtW(taxableKrw) + `<div style="font-size:9px;margin-top:3px;line-height:1.6;color:${riaDeduction>0?'var(--green)':'var(--text3)'};">${sub}</div>`;
+                    ? \`기본공제 −₩250만<br>RIA공제 −₩\${Math.round(riaDeduction/10000).toLocaleString()}만\`
+                    : \`기본공제 −₩250만 적용\`;
+                  return fmtW(taxableKrw) + \`<div style="font-size:9px;margin-top:3px;line-height:1.6;color:\${riaDeduction>0?'var(--green)':'var(--text3)'};">\${sub}</div>\`;
                 })(),
                 taxableKrw > 0 ? '#ff4d6a' : 'var(--text3)'],
               ['예상 세금', taxKrw>0?'₩'+taxKrw.toLocaleString():'납부 없음', taxKrw>0?'#ff4d6a':'var(--text3)'],
@@ -6114,9 +6149,10 @@ function renderCapitalGainsTax(ownerFilter) {
 
           <!-- 2026년 전용: RIA 특례공제 레이아웃 -->
           ${year === '2026' ? `
-          <div style="padding:14px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0; max-height:42vh; overflow-y:auto; display:flex; flex-direction:column; gap:12px;" class="custom-scrollbar">
+          <div style="padding:14px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0; display:flex; flex-direction:column; gap:12px;">
             
             ${riaDeduction > 0 ? `
+            <!-- 1. 상단: 타이틀 및 계산식 (전체 폭) -->
             <div>
               <div style="font-weight:700; color:var(--green); margin-bottom:6px; font-size:12.5px;">
                 📌 RIA 계좌 특례 공제 계산 상세
@@ -6126,13 +6162,16 @@ function renderCapitalGainsTax(ownerFilter) {
               </div>
             </div>
 
+            <!-- 2. 하단: 좌우 2분할 -->
             <div style="display:flex; gap:14px; align-items:stretch;">
               
+              <!-- 좌측: 타계좌 거래내역 -->
               <div style="flex:1; min-width:0; background:var(--bg); border:1px solid var(--border); border-radius:8px; display:flex; flex-direction:column; overflow:hidden;">
                 <div style="padding:10px 14px; font-size:12px; font-weight:700; color:var(--text); border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02);">
                   📋 타계좌(RIA 외) 해외주식 상세 거래 내역
                 </div>
-                <div style="flex:1; overflow-y:auto; min-height:150px; max-height:220px;" class="custom-scrollbar">
+                <!-- 🌟 수정: max-height 제한을 풀고 flex:1을 주어 빈 여백 없이 꽉 채움 -->
+                <div style="flex:1; overflow-y:auto;" class="custom-scrollbar">
                   <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:right;">
                     <thead style="background:rgba(255,255,255,0.02); color:var(--text3); position:sticky; top:0;">
                       <tr>
@@ -6150,19 +6189,37 @@ function renderCapitalGainsTax(ownerFilter) {
                 </div>
               </div>
 
+              <!-- 우측: 수동 지정 & 적용 결과 -->
               <div style="flex:0 0 380px; display:flex; flex-direction:column; gap:12px;">
                 
+                <!-- 🌟 수정: 수동 지정 UI (드롭다운 포함) -->
                 <div style="padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:8px;">
                    <div style="font-weight:700; color:var(--text); font-size:12px; margin-bottom:4px;">🌐 국내 상장 해외자산 수동 지정</div>
                    <div style="font-size:10px; color:var(--text3); margin-bottom:8px; line-height:1.4;">
-                     자동 계산에 포함되지 않는 국내 상장 해외 ETF 등을 수동으로 입력해 페널티 계산에 포함시킵니다. (쉼표 구분)
+                     자동 계산에 포함되지 않는 국내 상장 해외 ETF 등을 수동으로 추가합니다. (종목 선택 또는 쉼표 구분 입력)
                    </div>
-                   <div style="display:flex; gap:6px;">
-                     <input type="text" id="inputCustomOverseasModal" class="form-input" style="flex:1; height:28px; font-size:11px; margin:0; background:var(--bg2);" placeholder="예: KODEX 글로벌반도체, 252670" value="${(state.customOverseasAssets || []).join(', ')}">
-                     <button class="btn-sm" style="background:var(--accent); color:#fff; font-weight:bold; height:28px; padding:0 12px; border:none;" onclick="window.saveCustomOverseasModal('${year}')">저장</button>
+                   <div style="display:flex; flex-direction:column; gap:6px;">
+                     <!-- 드롭다운 메뉴 -->
+                     <select class="form-input" style="height:28px; font-size:11px; padding:0 8px; cursor:pointer; background:var(--bg2); border:1px solid var(--border);"
+                             onchange="
+                               const val = this.value; 
+                               if(!val) return; 
+                               const inp = document.getElementById('inputCustomOverseasModal');
+                               let arr = inp.value.split(',').map(s=>s.trim()).filter(Boolean);
+                               if(!arr.includes(val)) { arr.push(val); inp.value = arr.join(', '); }
+                               this.value = '';
+                             ">
+                       ${dropdownOptions}
+                     </select>
+                     <!-- 텍스트 입력 및 저장 버튼 -->
+                     <div style="display:flex; gap:6px;">
+                       <input type="text" id="inputCustomOverseasModal" class="form-input" style="flex:1; height:28px; font-size:11px; margin:0; background:var(--bg2);" placeholder="직접 입력 시 쉼표 구분" value="${(state.customOverseasAssets || []).join(', ')}">
+                       <button class="btn-sm" style="background:var(--accent); color:#fff; font-weight:bold; height:28px; padding:0 12px; border:none;" onclick="window.saveCustomOverseasModal('${year}')">저장</button>
+                     </div>
                    </div>
                 </div>
 
+                <!-- 적용 결과 UI -->
                 <div style="padding:10px 14px; background:var(--bg); border:1px solid var(--border); border-radius:8px; flex:1; display:flex; flex-direction:column; justify-content:center;">
                     <div style="font-weight:700; color:var(--green); margin-bottom:8px; font-size:12px;">📌 RIA 계좌 특례공제 적용 결과</div>
                     <div style="display:flex; flex-direction:column; gap:6px;">
@@ -6202,6 +6259,7 @@ function renderCapitalGainsTax(ownerFilter) {
           </div>
           ` : ''}
 
+          <!-- 일반 미국주식 거래내역 (하단 전체 폭) -->
           <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:var(--bg);">
              <div style="padding:14px 20px; font-weight:700; color:var(--text); font-size:13px; border-bottom:1px solid var(--border); background:var(--bg3); flex-shrink:0;">
                 🇺🇸 일반 미국주식 매도 거래내역
@@ -6218,6 +6276,7 @@ function renderCapitalGainsTax(ownerFilter) {
                  <tbody>${rowsHtml || '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3);">거래 내역이 없습니다.</td></tr>'}</tbody>
                </table>
              </div>
+             <!-- 하단 경고 문구 -->
              <div style="padding:10px 20px; font-size:10px; color:var(--text3); border-top:1px solid var(--border); background:var(--bg3); line-height:1.7; flex-shrink:0;">
                ⚠️ 참고용 추정치입니다. 실제 신고 시 환율 기준일(매도일 기준 대고객 매매기준율), 해외 원천징수세액 공제 등을 반드시 확인하세요.
              </div>
