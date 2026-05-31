@@ -8164,26 +8164,41 @@ function renderTagBar(treemapData) {
 }
 
 // ==========================================
-// 🌟 ESC 키를 누르면 열려있는 모든 모달 닫기
+// 🌟 ESC 키를 누르면 가장 위에 있는 모달 1개만 닫기
 // ==========================================
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape' || event.key === 'Esc') {
         
-        // 1. 'open' 클래스로 제어되는 모달 닫기 (예: 전체 설정 창)
-        document.querySelectorAll('.overlay.open').forEach(modal => {
-            modal.classList.remove('open');
+        // 1. 현재 화면에 표시된(열려있는) 모든 모달(.overlay) 찾기
+        const overlays = Array.from(document.querySelectorAll('.overlay'));
+        const visibleModals = overlays.filter(modal => {
+            const isDisplayOn = modal.style.display !== 'none' && modal.style.display !== '';
+            const isOpenClass = modal.classList.contains('open');
+            return isDisplayOn || isOpenClass;
         });
 
-        // 2. 'display' 속성으로 제어되는 모달 닫기 (예: 양도소득세 상세 모달 등)
-        document.querySelectorAll('.overlay').forEach(modal => {
-            // 화면에 보이고 있는 상태라면(none이 아니라면) 닫기
-            if (modal.style.display !== 'none' && modal.style.display !== '') {
-                modal.style.display = 'none';
+        // 열려있는 모달이 없으면 반응하지 않음
+        if (visibleModals.length === 0) return;
+
+        // 2. 가장 화면 위쪽에 있는 모달(최상단) 판별하기
+        // (z-index가 가장 높거나, 같다면 HTML 코드상 가장 마지막에 작성되어 위로 덮인 요소)
+        let topModal = visibleModals[0];
+        let maxZ = parseInt(window.getComputedStyle(topModal).zIndex) || 0;
+
+        for (let i = 1; i < visibleModals.length; i++) {
+            const z = parseInt(window.getComputedStyle(visibleModals[i]).zIndex) || 0;
+            // z-index가 더 크거나 같으면 (배열 뒤쪽일수록 나중에 렌더링되므로 위쪽임) 교체
+            if (z >= maxZ) {
+                maxZ = z;
+                topModal = visibleModals[i];
             }
-        });
-        
-        // (선택) 만약 별도의 ID로만 제어되는 팝업이 있다면 아래처럼 추가 가능
-        // const specificModal = document.getElementById('someModalId');
-        // if (specificModal) specificModal.style.display = 'none';
+        }
+
+        // 3. 판별된 최상단 모달 딱 1개만 닫기
+        if (topModal.classList.contains('open')) {
+            topModal.classList.remove('open');
+        } else {
+            topModal.style.display = 'none';
+        }
     }
 });
