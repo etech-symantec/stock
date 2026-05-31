@@ -6163,15 +6163,14 @@ function renderCapitalGainsTax(ownerFilter) {
             </div>
 
             <!-- 2. 하단: 좌우 2분할 -->
-            <div style="display:flex; gap:14px; align-items:stretch;">
+            <div style="display:flex; gap:14px; align-items:flex-start;">
               
               <!-- 좌측: 타계좌 거래내역 -->
               <div style="flex:1; min-width:0; background:var(--bg); border:1px solid var(--border); border-radius:8px; display:flex; flex-direction:column; overflow:hidden;">
                 <div style="padding:10px 14px; font-size:12px; font-weight:700; color:var(--text); border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02);">
                   📋 타계좌(RIA 외) 해외주식 상세 거래 내역
                 </div>
-                <!-- 🌟 수정: max-height 제한을 풀고 flex:1을 주어 빈 여백 없이 꽉 채움 -->
-                <div style="flex:1; overflow-y:auto;" class="custom-scrollbar">
+                <div style="max-height:280px; overflow-y:auto;" class="custom-scrollbar">
                   <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:right;">
                     <thead style="background:rgba(255,255,255,0.02); color:var(--text3); position:sticky; top:0;">
                       <tr>
