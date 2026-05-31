@@ -6114,36 +6114,33 @@ function renderCapitalGainsTax(ownerFilter) {
 
           <!-- 2026년 전용: RIA 특례공제 레이아웃 -->
           ${year === '2026' ? `
-          <div style="padding:16px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0; display:flex; flex-direction:column; gap:16px;">
+          <div style="padding:14px 20px; background:var(--bg3); border-bottom:1px solid var(--border); flex-shrink:0; max-height:42vh; overflow-y:auto; display:flex; flex-direction:column; gap:12px;" class="custom-scrollbar">
             
             ${riaDeduction > 0 ? `
-            <!-- 1. 상단: 타이틀 및 계산식 (전체 폭) -->
             <div>
-              <div style="font-weight:700; color:var(--green); margin-bottom:8px; font-size:13px;">
+              <div style="font-weight:700; color:var(--green); margin-bottom:6px; font-size:12.5px;">
                 📌 RIA 계좌 특례 공제 계산 상세
               </div>
-              <div style="font-family:var(--font-mono); color:var(--text3); margin:0; font-size:12px; line-height:1.5; word-break:break-all; background:var(--bg); padding:10px 14px; border-radius:8px; border:1px solid var(--border);">
+              <div style="font-family:var(--font-mono); color:var(--text3); margin:0; font-size:11px; line-height:1.4; word-break:break-all; background:var(--bg); padding:8px 12px; border-radius:6px; border:1px solid var(--border);">
                 계산식: ${riaNote || '—'}
               </div>
             </div>
 
-            <!-- 2. 하단: 좌우 2분할 -->
-            <div style="display:flex; gap:16px; align-items:stretch;">
+            <div style="display:flex; gap:14px; align-items:stretch;">
               
-              <!-- 좌측: 타계좌 거래내역 -->
               <div style="flex:1; min-width:0; background:var(--bg); border:1px solid var(--border); border-radius:8px; display:flex; flex-direction:column; overflow:hidden;">
-                <div style="padding:12px 14px; font-size:13px; font-weight:700; color:var(--text); border-bottom:1px solid var(--border);">
+                <div style="padding:10px 14px; font-size:12px; font-weight:700; color:var(--text); border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02);">
                   📋 타계좌(RIA 외) 해외주식 상세 거래 내역
                 </div>
-                <div style="flex:1; overflow-y:auto; min-height:250px;" class="custom-scrollbar">
-                  <table style="width:100%; border-collapse:collapse; font-size:11.5px; text-align:right;">
+                <div style="flex:1; overflow-y:auto; min-height:150px; max-height:220px;" class="custom-scrollbar">
+                  <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:right;">
                     <thead style="background:rgba(255,255,255,0.02); color:var(--text3); position:sticky; top:0;">
                       <tr>
-                        <th style="padding:8px 10px; text-align:left; border-bottom:1px solid var(--border);">일자</th>
-                        <th style="padding:8px 10px; text-align:left; border-bottom:1px solid var(--border);">종목(계좌)</th>
-                        <th style="padding:8px 10px; border-bottom:1px solid var(--border);">유형</th>
-                        <th style="padding:8px 10px; border-bottom:1px solid var(--border);">가중치</th>
-                        <th style="padding:8px 10px; border-bottom:1px solid var(--border);">반영금액(KRW)</th>
+                        <th style="padding:6px 10px; text-align:left; border-bottom:1px solid var(--border);">일자</th>
+                        <th style="padding:6px 10px; text-align:left; border-bottom:1px solid var(--border);">종목(계좌)</th>
+                        <th style="padding:6px 10px; border-bottom:1px solid var(--border);">유형</th>
+                        <th style="padding:6px 10px; border-bottom:1px solid var(--border);">가중치</th>
+                        <th style="padding:6px 10px; border-bottom:1px solid var(--border);">반영금액(KRW)</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -6153,40 +6150,37 @@ function renderCapitalGainsTax(ownerFilter) {
                 </div>
               </div>
 
-              <!-- 우측: 수동 지정 & 적용 결과 -->
-              <div style="flex:0 0 380px; display:flex; flex-direction:column; gap:16px;">
+              <div style="flex:0 0 380px; display:flex; flex-direction:column; gap:12px;">
                 
-                <!-- 수동 지정 UI -->
-                <div style="padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:8px;">
-                   <div style="font-weight:700; color:var(--text); font-size:13px; margin-bottom:6px;">🌐 국내 상장 해외자산 수동 지정</div>
-                   <div style="font-size:11px; color:var(--text3); margin-bottom:10px; line-height:1.5;">
+                <div style="padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:8px;">
+                   <div style="font-weight:700; color:var(--text); font-size:12px; margin-bottom:4px;">🌐 국내 상장 해외자산 수동 지정</div>
+                   <div style="font-size:10px; color:var(--text3); margin-bottom:8px; line-height:1.4;">
                      자동 계산에 포함되지 않는 국내 상장 해외 ETF 등을 수동으로 입력해 페널티 계산에 포함시킵니다. (쉼표 구분)
                    </div>
                    <div style="display:flex; gap:6px;">
-                     <input type="text" id="inputCustomOverseasModal" class="form-input" style="flex:1; height:32px; font-size:11px; margin:0; background:var(--bg2);" placeholder="예: KODEX 글로벌반도체, 252670" value="${(state.customOverseasAssets || []).join(', ')}">
-                     <button class="btn-sm" style="background:var(--accent); color:#fff; font-weight:bold; height:32px; padding:0 12px; border:none;" onclick="window.saveCustomOverseasModal('${year}')">저장</button>
+                     <input type="text" id="inputCustomOverseasModal" class="form-input" style="flex:1; height:28px; font-size:11px; margin:0; background:var(--bg2);" placeholder="예: KODEX 글로벌반도체, 252670" value="${(state.customOverseasAssets || []).join(', ')}">
+                     <button class="btn-sm" style="background:var(--accent); color:#fff; font-weight:bold; height:28px; padding:0 12px; border:none;" onclick="window.saveCustomOverseasModal('${year}')">저장</button>
                    </div>
                 </div>
 
-                <!-- 적용 결과 UI -->
-                <div style="padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:8px; flex:1; display:flex; flex-direction:column;">
-                    <div style="font-weight:700; color:var(--green); margin-bottom:12px; font-size:13px;">📌 RIA 계좌 특례공제 적용 결과</div>
-                    <div style="display:flex; flex-direction:column; gap:8px; flex:1; justify-content:center;">
-                      <div style="background:rgba(0,200,122,0.05); border:1px solid rgba(0,200,122,0.2); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:12px; color:var(--text2); font-weight:bold;">RIA 조정 공제</span>
-                        <b style="color:var(--green); font-family:var(--font-mono); font-size:15px;">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b>
+                <div style="padding:10px 14px; background:var(--bg); border:1px solid var(--border); border-radius:8px; flex:1; display:flex; flex-direction:column; justify-content:center;">
+                    <div style="font-weight:700; color:var(--green); margin-bottom:8px; font-size:12px;">📌 RIA 계좌 특례공제 적용 결과</div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <div style="background:rgba(0,200,122,0.05); border:1px solid rgba(0,200,122,0.2); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11.5px; color:var(--text2); font-weight:bold;">RIA 조정 공제</span>
+                        <b style="color:var(--green); font-family:var(--font-mono); font-size:14px;">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b>
                       </div>
-                      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:12px; color:var(--text2);">기본공제</span>
-                        <b style="font-family:var(--font-mono); font-size:14px; color:var(--text);">−₩250만</b>
+                      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11.5px; color:var(--text2);">기본공제</span>
+                        <b style="font-family:var(--font-mono); font-size:13px; color:var(--text);">−₩250만</b>
                       </div>
-                      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:12px; color:var(--text2);">과세표준</span>
-                        <b style="color:#ff4d6a; font-family:var(--font-mono); font-size:14px;">${taxableKrw > 0 ? fmtW(taxableKrw) : '공제 범위 내'}</b>
+                      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11.5px; color:var(--text2);">과세표준</span>
+                        <b style="color:#ff4d6a; font-family:var(--font-mono); font-size:13px;">${taxableKrw > 0 ? fmtW(taxableKrw) : '공제 범위 내'}</b>
                       </div>
-                      <div style="background:rgba(255,77,106,0.05); border:1px solid rgba(255,77,106,0.2); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:12px; color:var(--text2); font-weight:bold;">예상 세금 (22%)</span>
-                        <b style="color:#ff4d6a; font-family:var(--font-mono); font-size:16px;">${taxKrw > 0 ? '₩' + taxKrw.toLocaleString() : '납부 없음'}</b>
+                      <div style="background:rgba(255,77,106,0.05); border:1px solid rgba(255,77,106,0.2); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11.5px; color:var(--text2); font-weight:bold;">예상 세금 (22%)</span>
+                        <b style="color:#ff4d6a; font-family:var(--font-mono); font-size:14.5px;">${taxKrw > 0 ? '₩' + taxKrw.toLocaleString() : '납부 없음'}</b>
                       </div>
                     </div>
                 </div>
