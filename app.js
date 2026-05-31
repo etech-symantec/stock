@@ -6201,33 +6201,6 @@ function renderCapitalGainsTax(ownerFilter) {
              </div>
           </div>
           ` : ''}
-              
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
-                  RIA 공제 <b style="color:var(--green); font-family:var(--font-mono);">−₩${Math.round(riaDeduction/10000).toLocaleString()}만</b>
-                </span>
-                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
-                  기본공제 <b style="font-family:var(--font-mono);">−₩250만</b>
-                </span>
-                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
-                  과세표준 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxableKrw > 0 ? fmtW(taxableKrw) : '공제 범위 내'}</b>
-                </span>
-                <span style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 12px; font-size:11px;">
-                  예상 세금 <b style="color:#ff4d6a; font-family:var(--font-mono);">${taxKrw > 0 ? '₩' + taxKrw.toLocaleString() : '납부 없음'}</b>
-                </span>
-              </div>
-            </div>` : `
-            <div style="padding:10px 12px; background:rgba(255,183,3,0.06); border:1px solid rgba(255,183,3,0.18); border-radius:8px; font-size:11px; color:var(--text2); line-height:1.8;">
-              ⚙️ <b>RIA 계좌 미설정</b> — 2026년 특례공제를 자동 계산하려면
-              <span style="color:var(--accent); text-decoration:underline; cursor:pointer;"
-                onclick="document.getElementById('cgYearDetailOverlay').style.display='none'; openMasterSettingsModal()">
-                설정에서 RIA 계좌를 등록
-              </span>하세요.
-              <div style="margin-top:5px; font-size:10px; color:var(--text3);">
-                💡 공제 공식: RIA 매도이익 × (1 − 비RIA 순매수 ÷ RIA 매도금액) &nbsp;|&nbsp; 가중치: 1~5월 ×1.0 / 6~7월 ×0.8 / 8월~ ×0.5
-              </div>
-            </div>`}
-          </div>` : ''}
 
           <!-- 거래 목록 -->
           <div style="flex:1; overflow-y:auto;">
