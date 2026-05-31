@@ -5554,6 +5554,10 @@ function renderRealizedDashboard() {
         }
     }
 
+    // 양도소득세 패널은 필터 결과와 무관하게 항상 렌더링
+    updateRfpSankey(krwTotal, usdTotalKrw);
+    renderCapitalGainsTax(currentRealizedOwnerFilter);
+
     // 7. 거래 내역 표 렌더링
     const tbody = document.getElementById('realizedTableBody');
     if (realizedTxs.length === 0) {
