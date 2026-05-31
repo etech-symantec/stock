@@ -6134,9 +6134,9 @@ function renderCapitalGainsTax(ownerFilter) {
                 (() => {
                   if (taxableKrw <= 0) return '공제 범위 내';
                   let sub = riaDeduction > 0
-                    ? \`기본공제 −₩250만<br>RIA공제 −₩\${Math.round(riaDeduction/10000).toLocaleString()}만\`
-                    : \`기본공제 −₩250만 적용\`;
-                  return fmtW(taxableKrw) + \`<div style="font-size:9px;margin-top:3px;line-height:1.6;color:\${riaDeduction>0?'var(--green)':'var(--text3)'};">\${sub}</div>\`;
+                    ? `기본공제 −₩250만<br>RIA공제 −₩${Math.round(riaDeduction/10000).toLocaleString()}만`
+                    : `기본공제 −₩250만 적용`;
+                    return fmtW(taxableKrw) + `<div style="font-size:9px;margin-top:3px;line-height:1.6;color:${riaDeduction>0?'var(--green)':'var(--text3)'};">${sub}</div>`;
                 })(),
                 taxableKrw > 0 ? '#ff4d6a' : 'var(--text3)'],
               ['예상 세금', taxKrw>0?'₩'+taxKrw.toLocaleString():'납부 없음', taxKrw>0?'#ff4d6a':'var(--text3)'],
