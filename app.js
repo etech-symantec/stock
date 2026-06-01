@@ -17,6 +17,7 @@ function loadState() {
       }
       if(!parsed.oldNames) parsed.oldNames = {}; 
       if(!parsed.riaAccounts) parsed.riaAccounts = [];
+      if(!parsed.riaExcludeSymbols) parsed.riaExcludeSymbols = [];
       if(!parsed.customOverseasAssets) parsed.customOverseasAssets = []; // 🌟 수동 지정 해외자산 추가
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
@@ -24,7 +25,7 @@ function loadState() {
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [] };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [] };
 }
 
 let state = loadState();
@@ -5741,6 +5742,7 @@ function renderCapitalGainsTax(ownerFilter) {
                     if (t.txType === 'dividend' || t.txType === 'transfer') return false;
                     if (ownerName !== 'all' && t.owner !== ownerName) return false;
                     if (isRiaBroker(t.broker)) return false;
+                    if ((state.riaExcludeSymbols||[]).includes(t.symbol)) return false;
 
                     // 2. 🌟 [수정] 해외주식 및 미국 관련 국내 ETF 판별
                     let isTargetAsset = !isKorean(t.symbol);
@@ -5794,6 +5796,7 @@ function renderCapitalGainsTax(ownerFilter) {
                     nonRiaDetails.push({
                         date: tx.date,
                         symbol: stockName,
+                        ticker: tx.symbol,
                         broker: tx.broker || '미지정',
                         type: tx.qty > 0 ? '매수' : '매도',
                         weight: w * 100,
@@ -6002,7 +6005,17 @@ function renderCapitalGainsTax(ownerFilter) {
         // 현재 보고 있는 상세 모달창을 최신 데이터로 다시 그리기 (깜빡임 없이 갱신)
         window._openCgYearDetail(year); 
     };
-    
+
+    window.toggleRiaExclude = function(ticker, year) {
+        if (!state.riaExcludeSymbols) state.riaExcludeSymbols = [];
+        const idx = state.riaExcludeSymbols.indexOf(ticker);
+        if (idx === -1) state.riaExcludeSymbols.push(ticker);
+        else state.riaExcludeSymbols.splice(idx, 1);
+        saveState();
+        renderCapitalGainsTax(currentRealizedOwnerFilter);
+        window._openCgYearDetail(year);
+    };
+
     window._openCgYearDetail = function(year) {
         const trades = (window._cgTradesByYear || {})[year] || [];
         const DEDUCTION = 2500000, TAX_RATE = 0.22;
@@ -6063,6 +6076,7 @@ function renderCapitalGainsTax(ownerFilter) {
             const typeColor = d.type === '매수' ? 'var(--red)' : 'var(--blue)';
             const amtColor  = d.calcAmt > 0    ? 'var(--red)' : 'var(--blue)';
             const amtSign   = d.calcAmt > 0    ? '+'          : '';
+            const ticker    = d.ticker || d.symbol;
             return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
               <td style="padding:8px 10px; text-align:left; color:var(--text2);">${d.date}</td>
               <td style="padding:8px 10px; text-align:left;">
@@ -6073,6 +6087,13 @@ function renderCapitalGainsTax(ownerFilter) {
               <td style="padding:8px 10px; color:var(--text2);">${d.weight}%</td>
               <td style="padding:8px 10px; font-family:var(--font-mono); font-weight:bold; color:${amtColor};">
                 ${amtSign}${Math.round(d.calcAmt).toLocaleString()}원
+              </td>
+              <td style="padding:8px 10px; text-align:center;">
+                <button onclick="window.toggleRiaExclude('${ticker}', '${year}')"
+                  style="padding:2px 7px; font-size:10px; border-radius:4px; border:1px solid rgba(255,77,106,0.4); background:rgba(255,77,106,0.08); color:var(--red); cursor:pointer; font-family:var(--font-sans); transition:0.15s; white-space:nowrap;"
+                  onmouseover="this.style.background='rgba(255,77,106,0.2)'"
+                  onmouseout="this.style.background='rgba(255,77,106,0.08)'"
+                  title="이 종목을 계산에서 제외">✕ 제외</button>
               </td>
             </tr>`;
         }).join('');
@@ -6179,6 +6200,7 @@ function renderCapitalGainsTax(ownerFilter) {
                         <th style="padding:6px 10px; border-bottom:1px solid var(--border);">유형</th>
                         <th style="padding:6px 10px; border-bottom:1px solid var(--border);">가중치</th>
                         <th style="padding:6px 10px; border-bottom:1px solid var(--border);">반영금액(KRW)</th>
+                        <th style="padding:6px 10px; border-bottom:1px solid var(--border);">제외</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -6202,8 +6224,23 @@ function renderCapitalGainsTax(ownerFilter) {
                     </div>`;
                 })()}
               </div>
-
-              <!-- 우측: 수동 지정 & 적용 결과 -->
+                ${(state.riaExcludeSymbols||[]).length > 0 ? `
+                <div style="padding:8px 12px; border-top:1px solid rgba(255,77,106,0.2); background:rgba(255,77,106,0.04); flex-shrink:0;">
+                  <div style="font-size:10px; color:var(--text3); font-weight:700; margin-bottom:5px;">🚫 제외된 종목 (클릭하면 복원)</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                    ${(state.riaExcludeSymbols||[]).map(sym => {
+                        let symName = sym;
+                        if (localStockDB && localStockDB.length > 0) { const m = localStockDB.find(s => s.symbol === sym); if (m) symName = m.name; }
+                        if (cachedMarketData[sym] && !cachedMarketData[sym]._failed && cachedMarketData[sym].name) symName = cachedMarketData[sym].name;
+                        return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;border:1px solid rgba(255,77,106,0.3);background:rgba(255,77,106,0.08);font-size:11px;color:var(--red);">
+                          ${symName}
+                          <button onclick="window.toggleRiaExclude('${sym}','${year}')"
+                            style="background:none;border:none;color:var(--green);cursor:pointer;font-size:12px;padding:0;line-height:1;font-weight:700;" title="제외 취소 (복원)">↩</button>
+                        </span>`;
+                    }).join('')}
+                  </div>
+                </div>` : ''}
+              </div>
 
               <!-- 우측: 수동 지정 & 적용 결과 -->
               <div style="flex:0 0 380px; display:flex; flex-direction:column; gap:12px;">
