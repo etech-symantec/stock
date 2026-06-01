@@ -6186,7 +6186,24 @@ function renderCapitalGainsTax(ownerFilter) {
                     </tbody>
                   </table>
                 </div>
+                ${(() => {
+                    const totalBuy  = (nonRiaDetails||[]).filter(d=>d.calcAmt>0).reduce((s,d)=>s+d.calcAmt,0);
+                    const totalSell = (nonRiaDetails||[]).filter(d=>d.calcAmt<0).reduce((s,d)=>s+Math.abs(d.calcAmt),0);
+                    const net = totalBuy - totalSell;
+                    const fmt = v => { const a=Math.abs(v); if(a>=100000000) return '₩'+(a/100000000).toFixed(1)+'억'; if(a>=10000) return '₩'+Math.round(a/10000).toLocaleString()+'만'; return '₩'+Math.round(a).toLocaleString(); };
+                    const netColor = net>0?'var(--red)':net<0?'var(--blue)':'var(--text3)';
+                    return `<div style="padding:8px 14px; border-top:1px solid var(--border); background:rgba(255,255,255,0.025); display:flex; gap:16px; flex-wrap:wrap; font-size:11px; flex-shrink:0; align-items:center;">
+                        <span style="color:var(--text3); font-weight:700;">합계</span>
+                        <span>총 매수 <b style="color:var(--red); font-family:var(--font-mono);">+${fmt(totalBuy)}</b></span>
+                        <span style="color:var(--border);">|</span>
+                        <span>총 매도 <b style="color:var(--blue); font-family:var(--font-mono);">-${fmt(totalSell)}</b></span>
+                        <span style="color:var(--border);">|</span>
+                        <span>순매수 <b style="color:${netColor}; font-family:var(--font-mono);">${net>=0?'+':'-'}${fmt(Math.abs(net))}</b></span>
+                    </div>`;
+                })()}
               </div>
+
+              <!-- 우측: 수동 지정 & 적용 결과 -->
 
               <!-- 우측: 수동 지정 & 적용 결과 -->
               <div style="flex:0 0 380px; display:flex; flex-direction:column; gap:12px;">
