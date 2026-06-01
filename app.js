@@ -6163,8 +6163,8 @@ function renderCapitalGainsTax(ownerFilter) {
               ['예상 세금', taxKrw>0?'₩'+taxKrw.toLocaleString():'납부 없음', taxKrw>0?'#ff4d6a':'var(--text3)'],
             ].map(([label, val, color]) => `
               <div style="flex:1; min-width:110px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
-                <div style="font-size:10px; color:var(--text3); margin-bottom:4px;">${label}</div>
-                <div style="font-weight:700; color:${color}; font-family:var(--font-mono); font-size:13px; line-height:1.3;">${val}</div>
+                <div style="font-size:13px; color:var(--text3); margin-bottom:4px;">${label}</div>
+                <div style="font-weight:700; color:${color}; font-family:var(--font-mono); font-size:16px; line-height:1.3;">${val}</div>
               </div>`).join('')}
           </div>
 
