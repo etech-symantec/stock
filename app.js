@@ -5840,55 +5840,6 @@ function renderCapitalGainsTax(ownerFilter) {
     const thisYear = String(new Date().getFullYear());
     const curRow = rows.find(r => r.year === thisYear);
 
-    // 올해 한 줄 인라인 렌더
-    const curRowHtml = (() => {
-        const r = curRow;
-        if (!r) return `<div style="font-size:12px; color:var(--text3); padding:6px 0;">${thisYear}년 매도 내역 없음</div>`;
-        const netColor = r.netUsd > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
-        const taxStr = r.taxKrw > 0
-            ? `<span style="font-family:var(--font-mono); font-size:17px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</span>`
-            : `<span style="font-size:13px; color:var(--text3);">납부 없음</span>`;
-        const riaInfoHtml = r.riaDeduction > 0
-            ? `<div style="font-size:10px; color:var(--green); font-family:var(--font-mono); margin-top:3px;">📌 RIA공제 −₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</div>`
-            : (riaAccounts.length === 0 && thisYear === '2026')
-                ? `<div style="font-size:10px; color:var(--text3); margin-top:3px;">⚙️ RIA 계좌 미설정 — <span style="cursor:pointer; text-decoration:underline;" onclick="openMasterSettingsModal()">설정에서 등록</span></div>`
-                : '';
-        return `
-    <div style="padding:2px 0;">
-      <div style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:${netColor}; margin-bottom:8px; letter-spacing:-0.02em;">${fmtUsd(r.netUsd)}</div>
-      <div style="background:var(--bg3); border-radius:8px; padding:9px 12px; font-size:11px; line-height:2.1; font-family:var(--font-mono);">
-        <div style="display:flex; justify-content:space-between;">
-          <span style="color:var(--text3);">순손익 (KRW)</span>
-          <span style="color:${netColor}; font-weight:700;">${fmtKrw(r.netKrw)}</span>
-        </div>
-        ${r.riaDeduction > 0 ? `
-        <div style="display:flex; justify-content:space-between;">
-          <span style="color:var(--green);">— RIA 특례공제</span>
-          <span style="color:var(--green); font-weight:700;">−₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</span>
-        </div>` : ''}
-        <div style="display:flex; justify-content:space-between;">
-          <span style="color:var(--text3);">— 기본공제</span>
-          <span style="color:var(--text2);">−₩250만</span>
-        </div>
-        <div style="border-top:1px dashed var(--border2); margin:3px 0 0; padding-top:5px; display:flex; justify-content:space-between; font-weight:700;">
-          <span style="color:var(--text);">＝ 과세표준</span>
-          <span style="color:${r.taxableKrw > 0 ? '#ff9f43' : 'var(--text3)'};">${r.taxableKrw > 0 ? fmtKrw(r.taxableKrw) : '공제 범위 내'}</span>
-        </div>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:7px; padding:9px 12px;
-                  background:${r.taxKrw > 0 ? 'rgba(255,77,106,0.07)' : 'rgba(0,200,122,0.07)'};
-                  border-radius:8px; border:1px solid ${r.taxKrw > 0 ? 'rgba(255,77,106,0.25)' : 'rgba(0,200,122,0.25)'};">
-        <span style="font-size:11px; color:var(--text2); font-weight:600;">▶ 예상 세금 (× 22%)</span>
-        ${r.taxKrw > 0
-          ? `<b style="font-family:var(--font-mono); font-size:16px; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</b>`
-          : `<b style="font-size:13px; color:var(--green);">납부 없음 ✓</b>`}
-      </div>
-      ${r.riaDeduction > 0 ? `
-      <div style="margin-top:6px; font-size:10px; color:var(--text3); text-align:right; font-family:var(--font-mono);">
-        💡 RIA 덕분에 절감: <span style="color:var(--green); font-weight:700;">−₩${Math.round(r.riaDeduction * 0.22 / 10000).toLocaleString()}만</span>
-      </div>` : ''}
-    </div>`;
-
     // 전체 테이블 (모달용 빌더 - 클로저로 데이터 캡처)
     const buildFullTableHtml = () => `
     <div style="overflow-x:auto;">
@@ -6378,7 +6329,57 @@ function renderCapitalGainsTax(ownerFilter) {
         </div>`;
         
     overlay.style.display = 'flex';
-    }
+    };
+
+    // 올해 한 줄 인라인 렌더
+    const curRowHtml = (() => {
+        const r = curRow;
+        if (!r) return `<div style="font-size:12px; color:var(--text3); padding:6px 0;">${thisYear}년 매도 내역 없음</div>`;
+        const netColor = r.netUsd > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
+        const taxStr = r.taxKrw > 0
+            ? `<span style="font-family:var(--font-mono); font-size:17px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</span>`
+            : `<span style="font-size:13px; color:var(--text3);">납부 없음</span>`;
+        const riaInfoHtml = r.riaDeduction > 0
+            ? `<div style="font-size:10px; color:var(--green); font-family:var(--font-mono); margin-top:3px;">📌 RIA공제 −₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</div>`
+            : (riaAccounts.length === 0 && thisYear === '2026')
+                ? `<div style="font-size:10px; color:var(--text3); margin-top:3px;">⚙️ RIA 계좌 미설정 — <span style="cursor:pointer; text-decoration:underline;" onclick="openMasterSettingsModal()">설정에서 등록</span></div>`
+                : '';
+        return `
+    <div style="padding:2px 0;">
+      <div style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:${netColor}; margin-bottom:8px; letter-spacing:-0.02em;">${fmtUsd(r.netUsd)}</div>
+      <div style="background:var(--bg3); border-radius:8px; padding:9px 12px; font-size:11px; line-height:2.1; font-family:var(--font-mono);">
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--text3);">순손익 (KRW)</span>
+          <span style="color:${netColor}; font-weight:700;">${fmtKrw(r.netKrw)}</span>
+        </div>
+        ${r.riaDeduction > 0 ? `
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--green);">— RIA 특례공제</span>
+          <span style="color:var(--green); font-weight:700;">−₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</span>
+        </div>` : ''}
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--text3);">— 기본공제</span>
+          <span style="color:var(--text2);">−₩250만</span>
+        </div>
+        <div style="border-top:1px dashed var(--border2); margin:3px 0 0; padding-top:5px; display:flex; justify-content:space-between; font-weight:700;">
+          <span style="color:var(--text);">＝ 과세표준</span>
+          <span style="color:${r.taxableKrw > 0 ? '#ff9f43' : 'var(--text3)'};">${r.taxableKrw > 0 ? fmtKrw(r.taxableKrw) : '공제 범위 내'}</span>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:7px; padding:9px 12px;
+                  background:${r.taxKrw > 0 ? 'rgba(255,77,106,0.07)' : 'rgba(0,200,122,0.07)'};
+                  border-radius:8px; border:1px solid ${r.taxKrw > 0 ? 'rgba(255,77,106,0.25)' : 'rgba(0,200,122,0.25)'};">
+        <span style="font-size:11px; color:var(--text2); font-weight:600;">▶ 예상 세금 (× 22%)</span>
+        ${r.taxKrw > 0
+          ? `<b style="font-family:var(--font-mono); font-size:16px; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</b>`
+          : `<b style="font-size:13px; color:var(--green);">납부 없음 ✓</b>`}
+      </div>
+      ${r.riaDeduction > 0 ? `
+      <div style="margin-top:6px; font-size:10px; color:var(--text3); text-align:right; font-family:var(--font-mono);">
+        💡 RIA 덕분에 절감: <span style="color:var(--green); font-weight:700;">−₩${Math.round(r.riaDeduction * 0.22 / 10000).toLocaleString()}만</span>
+      </div>` : ''}
+    </div>`;
+    })();
 
     // 인라인 패널: 올해만 표시 + 더 보기 버튼
     panel.innerHTML = `
