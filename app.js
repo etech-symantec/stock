@@ -6223,25 +6223,24 @@ function renderCapitalGainsTax(ownerFilter) {
                         <span>순매수 <b style="color:${netColor}; font-family:var(--font-mono);">${net>=0?'+':'-'}${fmt(Math.abs(net))}</b></span>
                     </div>`;
                 })()}
-              </div>
-            </div>
+                
               ${(state.riaExcludeSymbols||[]).length > 0 ? `
-              <div style="padding:8px 12px; border-top:1px solid rgba(255,77,106,0.2); background:rgba(255,77,106,0.04); flex-shrink:0;">
-                <div style="font-size:10px; color:var(--text3); font-weight:700; margin-bottom:5px;">🚫 제외된 종목 (클릭하면 복원)</div>
-                <div style="display:flex; flex-wrap:wrap; gap:4px;">
-                  ${(state.riaExcludeSymbols||[]).map(sym => {
-                      let symName = sym;
-                      if (localStockDB && localStockDB.length > 0) { const m = localStockDB.find(s => s.symbol === sym); if (m) symName = m.name; }
-                      if (cachedMarketData[sym] && !cachedMarketData[sym]._failed && cachedMarketData[sym].name) symName = cachedMarketData[sym].name;
-                      return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;border:1px solid rgba(255,77,106,0.3);background:rgba(255,77,106,0.08);font-size:11px;color:var(--red);">
-                        ${symName}
-                        <button onclick="window.toggleRiaExclude('${sym}','${year}')"
-                          style="background:none;border:none;color:var(--green);cursor:pointer;font-size:12px;padding:0;line-height:1;font-weight:700;" title="제외 취소 (복원)">↩</button>
-                      </span>`;
-                  }).join('')}
-                </div>
-              </div>` : ''}
-            </div>
+                <div style="padding:8px 12px; border-top:1px solid rgba(255,77,106,0.2); background:rgba(255,77,106,0.04); flex-shrink:0;">
+                  <div style="font-size:10px; color:var(--text3); font-weight:700; margin-bottom:5px;">🚫 제외된 종목 (클릭하면 복원)</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                    ${(state.riaExcludeSymbols||[]).map(sym => {
+                        let symName = sym;
+                        if (localStockDB && localStockDB.length > 0) { const m = localStockDB.find(s => s.symbol === sym); if (m) symName = m.name; }
+                        if (cachedMarketData[sym] && !cachedMarketData[sym]._failed && cachedMarketData[sym].name) symName = cachedMarketData[sym].name;
+                        return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;border:1px solid rgba(255,77,106,0.3);background:rgba(255,77,106,0.08);font-size:11px;color:var(--red);">
+                          ${symName}
+                          <button onclick="window.toggleRiaExclude('${sym}','${year}')"
+                            style="background:none;border:none;color:var(--green);cursor:pointer;font-size:12px;padding:0;line-height:1;font-weight:700;" title="제외 취소 (복원)">↩</button>
+                        </span>`;
+                    }).join('')}
+                  </div>
+                </div>` : ''}
+              </div>
 
               <!-- 우측: 수동 지정 & 적용 결과 -->
               <div style="flex:0 0 380px; display:flex; flex-direction:column; gap:12px;">
