@@ -5952,8 +5952,8 @@ function renderCapitalGainsTax(ownerFilter) {
                  style="max-width:900px; width:95vw; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; padding:0;">
               <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
                 <div>
-                  <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 미국주식 양도소득세 연도별 요약</div>
-                  <div style="font-size:11px; color:var(--text3); margin-top:2px;">기본공제 250만원 · 세율 22% · 거래일 환율 적용</div>
+                  <div style="font-size:18px; font-weight:700; color:var(--text);">🇺🇸 미국주식 양도소득세 연도별 요약</div>
+                  <div style="font-size:13px; color:var(--text3); margin-top:2px;">기본공제 250만원 · 세율 22% · 거래일 환율 적용</div>
                 </div>
                 <button class="btn-sm" onclick="document.getElementById('cgFullTableOverlay').style.display='none'">닫기</button>
               </div>
@@ -6138,8 +6138,8 @@ function renderCapitalGainsTax(ownerFilter) {
           <!-- 상단 헤더 -->
           <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
             <div>
-              <div style="font-size:15px; font-weight:700; color:var(--text);">🇺🇸 ${year}년 미국주식 양도소득세 상세</div>
-              <div style="font-size:11px; color:var(--text3); margin-top:2px;">총 ${trades.length}건 매도 · 기본공제 250만원 · 세율 22%</div>
+              <div style="font-size:18px; font-weight:700; color:var(--text);">🇺🇸 ${year}년 미국주식 양도소득세 상세</div>
+              <div style="font-size:13px; color:var(--text3); margin-top:2px;">총 ${trades.length}건 매도 · 기본공제 250만원 · 세율 22%</div>
             </div>
             <button class="btn-sm" onclick="document.getElementById('cgYearDetailOverlay').style.display='none'">닫기</button>
           </div>
@@ -6175,10 +6175,10 @@ function renderCapitalGainsTax(ownerFilter) {
             ${riaDeduction > 0 ? `
             <!-- 1. 상단: 타이틀 및 계산식 (전체 폭) -->
             <div>
-              <div style="font-weight:700; color:var(--green); margin-bottom:6px; font-size:12.5px;">
+              <div style="font-weight:700; color:var(--green); margin-bottom:6px; font-size:15px;">
                 📌 RIA 계좌 특례 공제 계산 상세
               </div>
-              <div style="font-family:var(--font-mono); color:var(--text3); margin:0; font-size:11px; line-height:1.4; word-break:break-all; background:var(--bg); padding:8px 12px; border-radius:6px; border:1px solid var(--border);">
+              <div style="font-family:var(--font-mono); color:var(--text3); margin:0; font-size:13px; line-height:1.4; word-break:break-all; background:var(--bg); padding:8px 12px; border-radius:6px; border:1px solid var(--border);">
                 계산식: ${riaNote || '—'}
               </div>
             </div>
@@ -6214,7 +6214,7 @@ function renderCapitalGainsTax(ownerFilter) {
                     const net = totalBuy - totalSell;
                     const fmt = v => { const a=Math.abs(v); if(a>=100000000) return '₩'+(a/100000000).toFixed(1)+'억'; if(a>=10000) return '₩'+Math.round(a/10000).toLocaleString()+'만'; return '₩'+Math.round(a).toLocaleString(); };
                     const netColor = net>0?'var(--red)':net<0?'var(--blue)':'var(--text3)';
-                    return `<div style="padding:8px 14px; border-top:1px solid var(--border); background:rgba(255,255,255,0.025); display:flex; gap:16px; flex-wrap:wrap; font-size:11px; flex-shrink:0; align-items:center;">
+                    return `<div style="padding:8px 14px; border-top:1px solid var(--border); background:rgba(255,255,255,0.025); display:flex; gap:16px; flex-wrap:wrap; font-size:14px; flex-shrink:0; align-items:center;">
                         <span style="color:var(--text3); font-weight:700;">합계</span>
                         <span>총 매수 <b style="color:var(--red); font-family:var(--font-mono);">+${fmt(totalBuy)}</b></span>
                         <span style="color:var(--border);">|</span>
