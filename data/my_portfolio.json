@@ -9328,6 +9328,8 @@
   },
   "riaAccounts": [],
   "customOverseasAssets": [
-    "TIME 글로벌우주테크&방산액티브"
-  ]
+    "TIME 글로벌우주테크&방산액티브",
+    "TIGER BBIG"
+  ],
+  "riaExcludeSymbols": []
 }
