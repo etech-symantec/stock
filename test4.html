@@ -57,31 +57,6 @@
   </div>
 </nav>
 
-<div id="marketSignalBar" style="background: var(--bg2); border-bottom: 1px solid var(--border); padding: 8px 16px; display: none; align-items: center; justify-content: space-between; font-size: 12px; font-family: var(--font-sans); z-index: 50; position: relative;">
-  <div style="display: flex; align-items: center; gap: 16px; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
-    
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span style="font-weight: 700; color: var(--text);">📡 Market Signal</span>
-      <span id="ms-score" style="font-family: var(--font-mono); font-weight: 700; font-size: 15px;">-</span>
-      <span id="ms-badge" style="padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; border: 1px solid transparent;">LOADING</span>
-    </div>
-    
-    <div style="width: 1px; height: 12px; background: var(--border2);"></div>
-    
-    <div style="display: flex; gap: 14px; color: var(--text2); font-family: var(--font-mono); font-size: 11px;">
-      <span>TQQQ <strong id="ms-tqqq" style="color:var(--text); font-size:12px;"></strong></span>
-      <span>Buffett <strong id="ms-buffett" style="font-size:12px;"></strong></span>
-      <span>F&G <strong id="ms-fg" style="font-size:12px;"></strong></span>
-      <span>RSI(14) <strong id="ms-rsi" style="font-size:12px;"></strong></span>
-    </div>
-    
-  </div>
-  
-  <div style="font-size: 10px; color: var(--text3); flex-shrink: 0; margin-left: 10px; font-family: var(--font-mono);">
-    <span id="ms-date"></span>
-  </div>
-</div>
-
 <!-- 📱 모바일 검색바 (768px 이하에서만 표시) -->
 <div class="mobile-search-bar" id="mobileSearchBar">
   <select id="mobileSearchFilter" class="search-input" style="width:85px; border-radius:20px; height:40px; padding:0 8px; cursor:pointer; font-size:12px; border:1px solid var(--border2); background:var(--bg3); color:var(--text);" onchange="document.getElementById('mainSearchFilter').value=this.value">
@@ -278,6 +253,30 @@
   </aside>
 
   <main class="dashboard-main">
+
+    <!-- 🌟 Market Signal 우측 상단 플로팅 요소 (배경 없음) -->
+    <div id="marketSignalBar" style="position: absolute; top: 20px; right: 24px; display: none; align-items: center; gap: 16px; font-size: 12px; font-family: var(--font-sans); z-index: 50;">
+      
+      <!-- 핵심 지표 요약 -->
+      <div style="display: flex; gap: 14px; color: var(--text2); font-family: var(--font-mono); font-size: 12px;">
+        <span>TQQQ <strong id="ms-tqqq" style="color:var(--text);"></strong></span>
+        <span>Buffett <strong id="ms-buffett"></strong></span>
+        <span>F&G <strong id="ms-fg"></strong></span>
+        <span>RSI(14) <strong id="ms-rsi"></strong></span>
+      </div>
+      
+      <!-- 구분선 -->
+      <div style="width: 1px; height: 12px; background: var(--border2);"></div>
+      
+      <!-- 복합 지수 및 상태 뱃지 -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-weight: 700; color: var(--text);">Signal</span>
+        <span id="ms-score" style="font-family: var(--font-mono); font-weight: 700; font-size: 15px;">-</span>
+        <span id="ms-badge" style="padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; border: 1px solid transparent;">LOADING</span>
+      </div>
+      
+    </div>
+    
     <div id="viewHeader" class="view-header"></div>
     <div id="dashboardTopWrapper" class="dashboard-top-wrapper">
       <div class="dashboard-top">
