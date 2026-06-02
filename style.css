@@ -348,7 +348,7 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .btn-danger:hover { background: var(--red-bg); color: var(--red); }
 
 #dividendDashboard, #historyDashboard, #realizedDashboard { 
-    display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem; height: 100%; 
+    display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem; min-height: 100%; height: auto; 
 }
 #dividendDashboard > .page-controls-box,
 #historyDashboard > .page-controls-box,
@@ -2014,7 +2014,7 @@ nav {
     flex-direction: column;
     padding-bottom: 40px;
     padding-top: 1.5rem; /* 배당통계 상단 여백 기준 */
-    height: 100%;
+    min-height: 100%; height: auto;
 }
 
 /* =====================================================
