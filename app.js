@@ -8338,15 +8338,14 @@ async function initMarketSignalBar() {
     }).filter(r => r.Date);
 
     if (!rows.length) return;
-    const latest = rows[rows.length - 1]; // 최신 데이터 추출
+    const latest = rows[rows.length - 1]; 
 
-    // 1. 바 표시 및 날짜 업데이트
+    // 1. 컨테이너 표시 (성공 시에만 노출)
     document.getElementById('marketSignalBar').style.display = 'flex';
-    document.getElementById('ms-date').textContent = latest.Date;
     
     // 2. 복합 매수 신호 지수 처리
     const score = parseFloat(latest.Composite_Index);
-    let label = '매수 자제', color = 'var(--loss)', bg = 'var(--loss-bg)';
+    let label = '매수 자제', color = 'var(--loss)', bg = 'transparent';
     
     if (score >= 400) { 
       label = '강한 매수'; color = 'var(--profit)'; bg = 'var(--profit-bg)'; 
@@ -8390,5 +8389,4 @@ async function initMarketSignalBar() {
   }
 }
 
-// 스크립트 로드 시 즉시 실행
 document.addEventListener('DOMContentLoaded', initMarketSignalBar);
