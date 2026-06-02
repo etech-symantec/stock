@@ -8320,3 +8320,75 @@ document.addEventListener('keydown', function(event) {
         }
     }
 });
+
+async function initMarketSignalBar() {
+  try {
+    // 캐시 방지용 타임스탬프 추가하여 CSV 가져오기
+    const res = await fetch(`data/indicators.csv?t=${new Date().getTime()}`);
+    if (!res.ok) throw new Error('CSV not found');
+    const text = await res.text();
+    
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim());
+    const rows = lines.slice(1).map(line => {
+      const vals = line.split(',').map(v => v.trim());
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = vals[i] ?? '');
+      return obj;
+    }).filter(r => r.Date);
+
+    if (!rows.length) return;
+    const latest = rows[rows.length - 1]; // 최신 데이터 추출
+
+    // 1. 바 표시 및 날짜 업데이트
+    document.getElementById('marketSignalBar').style.display = 'flex';
+    document.getElementById('ms-date').textContent = latest.Date;
+    
+    // 2. 복합 매수 신호 지수 처리
+    const score = parseFloat(latest.Composite_Index);
+    let label = '매수 자제', color = 'var(--loss)', bg = 'var(--loss-bg)';
+    
+    if (score >= 400) { 
+      label = '강한 매수'; color = 'var(--profit)'; bg = 'var(--profit-bg)'; 
+    } else if (score >= 200) { 
+      label = '분할 매수'; color = '#00c87a'; bg = 'rgba(0,200,122,0.15)'; 
+    } else if (score >= 100) { 
+      label = '관망'; color = '#ffb703'; bg = 'rgba(255,183,3,0.15)'; 
+    }
+    
+    const scoreEl = document.getElementById('ms-score');
+    scoreEl.textContent = isNaN(score) ? '—' : score.toFixed(0);
+    scoreEl.style.color = color;
+    
+    const badge = document.getElementById('ms-badge');
+    badge.textContent = label;
+    badge.style.color = color;
+    badge.style.backgroundColor = bg;
+    badge.style.borderColor = color;
+
+    // 3. 개별 지표 렌더링 및 색상 로직
+    const tqqq = parseFloat(latest.TQQQ);
+    document.getElementById('ms-tqqq').textContent = isNaN(tqqq) ? 'N/A' : '$' + tqqq.toFixed(2);
+    
+    const buff = parseFloat(latest.Buffett_Indicator);
+    const buffEl = document.getElementById('ms-buffett');
+    buffEl.textContent = isNaN(buff) ? 'N/A' : buff.toFixed(1) + '%';
+    buffEl.style.color = buff < 100 ? 'var(--profit)' : (buff < 160 ? '#ffb703' : 'var(--loss)');
+
+    const fg = parseFloat(latest.Fear_Greed);
+    const fgEl = document.getElementById('ms-fg');
+    fgEl.textContent = isNaN(fg) ? 'N/A' : fg.toFixed(1);
+    fgEl.style.color = fg < 25 ? 'var(--profit)' : (fg < 75 ? '#ffb703' : 'var(--loss)');
+
+    const rsi = parseFloat(latest.RSI_14);
+    const rsiEl = document.getElementById('ms-rsi');
+    rsiEl.textContent = isNaN(rsi) ? 'N/A' : rsi.toFixed(1);
+    rsiEl.style.color = rsi < 30 ? 'var(--profit)' : (rsi < 70 ? '#ffb703' : 'var(--loss)');
+
+  } catch (e) {
+    console.warn('Market Signal Bar 로드 실패:', e);
+  }
+}
+
+// 스크립트 로드 시 즉시 실행
+document.addEventListener('DOMContentLoaded', initMarketSignalBar);
