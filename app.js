@@ -8323,7 +8323,6 @@ document.addEventListener('keydown', function(event) {
 
 async function initMarketSignalBar() {
   try {
-    // 캐시 방지용 타임스탬프 추가하여 CSV 가져오기
     const res = await fetch(`data/indicators.csv?t=${new Date().getTime()}`);
     if (!res.ok) throw new Error('CSV not found');
     const text = await res.text();
@@ -8340,10 +8339,10 @@ async function initMarketSignalBar() {
     if (!rows.length) return;
     const latest = rows[rows.length - 1]; 
 
-    // 1. 컨테이너 표시 (성공 시에만 노출)
+    // 데이터가 성공적으로 불러와지면 UI 표시 (flex로 전환)
     document.getElementById('marketSignalBar').style.display = 'flex';
     
-    // 2. 복합 매수 신호 지수 처리
+    // 복합 매수 신호 지수 처리
     const score = parseFloat(latest.Composite_Index);
     let label = '매수 자제', color = 'var(--loss)', bg = 'transparent';
     
@@ -8365,7 +8364,7 @@ async function initMarketSignalBar() {
     badge.style.backgroundColor = bg;
     badge.style.borderColor = color;
 
-    // 3. 개별 지표 렌더링 및 색상 로직
+    // 개별 지표 렌더링
     const tqqq = parseFloat(latest.TQQQ);
     document.getElementById('ms-tqqq').textContent = isNaN(tqqq) ? 'N/A' : '$' + tqqq.toFixed(2);
     
