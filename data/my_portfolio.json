@@ -9258,6 +9258,16 @@
       "qty": 50,
       "price": 49870,
       "txType": "trade"
+    },
+    {
+      "id": 1780360573804,
+      "date": "2026-05-29",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "487240.KS",
+      "qty": 50,
+      "price": 46200,
+      "txType": "trade"
     }
   ],
   "range": "all",
