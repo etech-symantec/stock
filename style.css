@@ -348,7 +348,8 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .btn-danger:hover { background: var(--red-bg); color: var(--red); }
 
 #dividendDashboard, #historyDashboard, #realizedDashboard { 
-    display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem; min-height: 100%; height: auto; 
+    display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem;
+    flex: 1; min-height: 0; overflow-y: auto;
 }
 #dividendDashboard > .page-controls-box,
 #historyDashboard > .page-controls-box,
