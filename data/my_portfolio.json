@@ -135,7 +135,8 @@
     "ㅁㄴㅇㄻㄴㅇ",
     "0047R0",
     "SOFI",
-    "ARKK"
+    "ARKK",
+    "396500.KS"
   ],
   "transactions": [
     {
@@ -9246,6 +9247,16 @@
       "symbol": "458730.KS",
       "qty": -582,
       "price": 15600,
+      "txType": "trade"
+    },
+    {
+      "id": 1780360552419,
+      "date": "2026-05-29",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "396500.KS",
+      "qty": 50,
+      "price": 49870,
       "txType": "trade"
     }
   ],
