@@ -103,30 +103,30 @@ def get_buffett_indicators():
             # 5-1. 미국 버핏 지수
             try:
                 page.goto("https://www.gurufocus.com/stock-market-valuations.php", timeout=60000)
-                # 데이터가 모두 화면에 렌더링될 때까지 충분히 대기
                 page.wait_for_load_state("networkidle", timeout=30000)
                 page.wait_for_timeout(3000)
                 
-                us_text = page.inner_text("body")
+                # 💡 핵심: 태그가 벗겨진 텍스트 대신 '전체 HTML 소스코드'를 가져옵니다.
+                html_source = page.content()
                 
-                # 💡 요청하신 수식 형태(줄바꿈 포함)를 정확히 잡아내는 정규식
+                # 💡 사용자가 발견한 HTML 태그를 기반으로 정밀 타겟팅
                 patterns_us = [
-                    # 1순위: "Buffett Indicator = $69.15T \n $31.57T \n = 219%" 패턴
-                    # 중간에 어떤 글자나 줄바꿈이 오더라도 최대 50자 이내에 있는 "= 숫자%"를 찾습니다.
-                    r"Buffett\s+Indicator\s*=\s*\$[\s\S]{1,50}?=\s*(\d{2,4}(?:\.\d+)?)\s*%",
+                    # 1순위: Buffett Indicator 글자 근처의 text-(색상) 및 fw-bold 태그 내부 숫자 추출
+                    # (시장이 폭락하면 글자색이 text-danger에서 text-success로 바뀔 수 있으므로 색상 이름은 가변 처리)
+                    r"Buffett\s+Indicator[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*text-[a-z]+[^>]*[\"'][^>]*>\s*<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%",
                     
-                    # 2순위: "US Market Valuation: 219%" 패턴 (사이트 레이아웃 변경 대비)
-                    r"US\s+Market\s+Valuation:\s*(\d{2,4}(?:\.\d+)?)\s*%",
+                    # 2순위: 혹시 색상 태그가 사라지고 fw-bold 태그만 남을 경우 방어
+                    r"Buffett\s+Indicator[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%",
                     
-                    # 3순위: 기타 텍스트 패턴
-                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP:\s*(\d{2,4}(?:\.\d+)?)\s*%"
+                    # 3순위: US Market Valuation 이라는 제목으로 적혀있을 경우
+                    r"US\s+Market\s+Valuation[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%"
                 ]
                 
                 for pat in patterns_us:
-                    m_us = re.search(pat, us_text, re.IGNORECASE)
+                    m_us = re.search(pat, html_source, re.IGNORECASE)
                     if m_us:
                         us_val = float(m_us.group(1))
-                        break  # 값을 찾으면 즉시 종료
+                        break
             except Exception as e:
                 print(f"   ⚠️ 미국 버핏 지수 파싱 오류: {e}")
 
@@ -136,16 +136,16 @@ def get_buffett_indicators():
                 page.wait_for_load_state("networkidle", timeout=30000)
                 page.wait_for_timeout(3000)
                 
-                gl_text = page.inner_text("body")
+                html_source_gl = page.content()
                 
-                # 글로벌 지수도 동일한 수식 패턴일 경우를 대비해 정규식 강화
+                # 글로벌 지수도 HTML 태그 기반으로 추출 방식 통일
                 patterns_gl = [
-                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP\s*=\s*\$[\s\S]{1,50}?=\s*(\d{2,4}(?:\.\d+)?)\s*%",
-                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP[^\d]{0,40}(\d{2,4}(?:\.\d+)?)\s*%"
+                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*text-[a-z]+[^>]*[\"'][^>]*>\s*<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%",
+                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%"
                 ]
                 
                 for pat in patterns_gl:
-                    m_gl = re.search(pat, gl_text, re.IGNORECASE)
+                    m_gl = re.search(pat, html_source_gl, re.IGNORECASE)
                     if m_gl: 
                         global_val = float(m_gl.group(1))
                         break
