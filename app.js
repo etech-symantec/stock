@@ -4552,24 +4552,24 @@ async function render() {
   const mobileSearch = document.getElementById('mobileSearchBar');
   const histDash = document.getElementById('historyDashboard');
   const realDash = document.getElementById('realizedDashboard');
-  const _msBar = document.getElementById('marketSignalBar');
-
+  const msBar = document.getElementById('marketSignalBar');
+  
   if (currentView === 'dividend') {
-    if (_msBar) _msBar.style.display = 'none';
+    if (msBar) msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
     divDash.style.display = 'flex';
     renderDividendDashboard();
     return;
   } else if (currentView === 'history') {
-    if (_msBar) _msBar.style.display = 'none';
+    if (msBar) msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
     histDash.style.display = 'flex';
     renderHistoryDashboard();
     return;
   } else if (currentView === 'realized') {
-    if (_msBar) _msBar.style.display = 'none';
+    if (msBar) msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; 
     listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
     
@@ -4580,7 +4580,7 @@ async function render() {
     renderRealizedDashboard();
     return;
   } else if (currentView === 'watch') {
-    if (_msBar) _msBar.style.display = 'none';
+    if (msBar) msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; 
     container.style.display = 'block'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
