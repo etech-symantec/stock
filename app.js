@@ -8477,7 +8477,7 @@ const FONT_SIZE_LEVELS = { xs: 0.82, sm: 0.91, md: 1.0, lg: 1.1, xl: 1.22 };
 
 function applyFontSize(level) {
     const zoom = FONT_SIZE_LEVELS[level] || 1.0;
-    document.documentElement.style.fontSize = (zoom * 16) + 'px';
+    document.body.style.fontSize = (zoom * 100) + '%';
     localStorage.setItem(FONT_SIZE_KEY, level);
 
     // 버튼 active 상태 동기화
