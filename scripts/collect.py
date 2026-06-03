@@ -91,9 +91,10 @@ def get_buffett_indicators():
     global_val = None
     try:
         from playwright.sync_api import sync_playwright
+        import re
+        
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            # 봇 차단 방지를 위해 일반 크롬 브라우저와 동일한 User-Agent 사용
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             )
@@ -102,24 +103,30 @@ def get_buffett_indicators():
             # 5-1. 미국 버핏 지수
             try:
                 page.goto("https://www.gurufocus.com/stock-market-valuations.php", timeout=60000)
-                # JS가 숫자를 렌더링할 때까지 네트워크 안정을 대기
+                # 데이터가 모두 화면에 렌더링될 때까지 충분히 대기
                 page.wait_for_load_state("networkidle", timeout=30000)
-                page.wait_for_timeout(2000)  # 추가 2초 딜레이
+                page.wait_for_timeout(3000)
                 
                 us_text = page.inner_text("body")
                 
-                # 첨부된 스크린샷 기반 정규식 패턴 수정
+                # 💡 요청하신 수식 형태(줄바꿈 포함)를 정확히 잡아내는 정규식
                 patterns_us = [
-                    r"US\s+Market\s+Valuation:\s*(\d{2,3}(?:\.\d+)?)\s*%",
-                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP:\s*(\d{2,3}(?:\.\d+)?)\s*%",
-                    r"Buffett\s+Indicator[^\d]{0,40}(\d{2,3}(?:\.\d+)?)\s*%"
+                    # 1순위: "Buffett Indicator = $69.15T \n $31.57T \n = 219%" 패턴
+                    # 중간에 어떤 글자나 줄바꿈이 오더라도 최대 50자 이내에 있는 "= 숫자%"를 찾습니다.
+                    r"Buffett\s+Indicator\s*=\s*\$[\s\S]{1,50}?=\s*(\d{2,4}(?:\.\d+)?)\s*%",
+                    
+                    # 2순위: "US Market Valuation: 219%" 패턴 (사이트 레이아웃 변경 대비)
+                    r"US\s+Market\s+Valuation:\s*(\d{2,4}(?:\.\d+)?)\s*%",
+                    
+                    # 3순위: 기타 텍스트 패턴
+                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP:\s*(\d{2,4}(?:\.\d+)?)\s*%"
                 ]
                 
                 for pat in patterns_us:
                     m_us = re.search(pat, us_text, re.IGNORECASE)
                     if m_us:
                         us_val = float(m_us.group(1))
-                        break  # 값을 찾으면 루프 종료
+                        break  # 값을 찾으면 즉시 종료
             except Exception as e:
                 print(f"   ⚠️ 미국 버핏 지수 파싱 오류: {e}")
 
@@ -127,12 +134,21 @@ def get_buffett_indicators():
             try:
                 page.goto("https://www.gurufocus.com/global-market-valuation.php", timeout=60000)
                 page.wait_for_load_state("networkidle", timeout=30000)
-                page.wait_for_timeout(2000)
+                page.wait_for_timeout(3000)
                 
                 gl_text = page.inner_text("body")
-                m_gl = re.search(r"Ratio of Total Market Cap over GDP[^\d]{0,40}(\d{2,3}(?:\.\d+)?)\s*%", gl_text, re.IGNORECASE)
-                if m_gl: 
-                    global_val = float(m_gl.group(1))
+                
+                # 글로벌 지수도 동일한 수식 패턴일 경우를 대비해 정규식 강화
+                patterns_gl = [
+                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP\s*=\s*\$[\s\S]{1,50}?=\s*(\d{2,4}(?:\.\d+)?)\s*%",
+                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP[^\d]{0,40}(\d{2,4}(?:\.\d+)?)\s*%"
+                ]
+                
+                for pat in patterns_gl:
+                    m_gl = re.search(pat, gl_text, re.IGNORECASE)
+                    if m_gl: 
+                        global_val = float(m_gl.group(1))
+                        break
             except Exception as e:
                 print(f"   ⚠️ 글로벌 버핏 지수 파싱 오류: {e}")
 
