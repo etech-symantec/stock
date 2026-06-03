@@ -11,15 +11,14 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    /* 라이트 테마로 변경 */
     --bg:       #ffffff;
     --panel:    #f8f9fa;
     --card:     #ffffff;
     --border:   #e2e8f0;
-    --buy:      #059669; /* 가독성을 위해 어두운 초록 */
-    --sell:     #e11d48; /* 가독성을 위해 어두운 빨강 */
-    --warn:     #d97706; /* 가독성을 위해 어두운 주황 */
-    --info:     #2563eb; /* 가독성을 위해 어두운 파랑 */
+    --buy:      #059669;
+    --sell:     #e11d48;
+    --warn:     #d97706;
+    --info:     #2563eb;
     --txt:      #1e293b;
     --txt2:     #64748b;
     --txt3:     #0f172a;
@@ -39,16 +38,14 @@
     overflow-x: hidden;
   }
 
-  /* ── Noise texture overlay ── */
   body::before {
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
     background-size: 256px;
-    opacity: 0.2; /* 라이트 모드에 맞게 투명도 조절 */
+    opacity: 0.2;
   }
 
-  /* ── Grid bg ── */
   body::after {
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -255,7 +252,6 @@
 
   .card-desc { font-size: 12px; color: var(--txt2); line-height: 1.6; }
 
-  /* Expand panel */
   .card-detail {
     max-height: 0; overflow: hidden;
     transition: max-height .4s ease;
@@ -330,11 +326,10 @@
   tbody td.is-sell { color: var(--sell); }
   tbody td.is-warn { color: var(--warn); }
 
-  /* composite pill in table */
   .cpill {
     display: inline-block; padding: 3px 10px; border-radius: 20px;
     font-size: 11px; border: 1px solid;
-    background: white; /* 라이트모드용 배경 */
+    background: white;
   }
 
   /* ── Footer ── */
@@ -383,6 +378,144 @@
     border-radius: 4px;
   }
   @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* ── Category Cards (블로그 4대 카테고리) ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 800px) { .cat-grid { grid-template-columns: 1fr; } }
+
+  .cat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--cat-color, var(--txt2));
+    border-radius: 14px;
+    overflow: hidden;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .cat-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,.07);
+    transform: translateY(-2px);
+  }
+
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 24px 18px;
+    background: var(--cat-bg, rgba(0,0,0,.03));
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cat-num {
+    font-family: var(--font-hd);
+    font-size: 40px;
+    line-height: 1;
+    color: var(--cat-color, var(--txt2));
+    opacity: 0.25;
+    min-width: 44px;
+    letter-spacing: 1px;
+  }
+
+  .cat-title {
+    font-family: var(--font-num);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--txt3);
+    margin-bottom: 3px;
+  }
+
+  .cat-sub {
+    font-size: 11px;
+    color: var(--txt2);
+    letter-spacing: 0.3px;
+  }
+
+  .cat-items { padding: 4px 0; }
+
+  .cat-item {
+    padding: 13px 24px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 3px 12px;
+    align-items: start;
+    transition: background .15s;
+  }
+  .cat-item:last-child { border-bottom: none; }
+  .cat-item:hover { background: rgba(0,0,0,.018); }
+
+  .cat-item-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--txt3);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .cat-badge {
+    font-family: var(--font-num);
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--cat-color, var(--txt2));
+    background: var(--cat-bg, rgba(0,0,0,.05));
+    border: 1px solid var(--cat-color, var(--border));
+    opacity: 0.85;
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .cat-item-note {
+    font-size: 11px;
+    color: var(--txt2);
+    line-height: 1.5;
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .cat-link {
+    font-family: var(--font-num);
+    font-size: 10px;
+    color: var(--cat-color, var(--info));
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    opacity: 0.75;
+    transition: opacity .2s;
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    padding: 4px 0 4px 8px;
+    border-left: 1px solid var(--border);
+  }
+  .cat-link:hover { opacity: 1; text-decoration: underline; }
+
+  /* ── Morning Routine Table ── */
+  .routine-note {
+    background: rgba(5,150,105,.07);
+    border: 1px solid rgba(5,150,105,.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: #065f46;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .routine-table thead th { background: rgba(0,0,0,.02); }
+  .routine-table tbody td { vertical-align: middle; font-size: 12px; }
+  .routine-table .situation { font-size: 14px; font-weight: 600; }
+  .routine-table .forecast { font-size: 12px; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -400,7 +533,7 @@
   </header>
 
   <div class="note fade-up delay-1" style="margin-top:28px;">
-    💡 이 대시보드는 매수 타이밍을 포착하기 위한 4가지 지표를 종합합니다. 각 카드를 클릭하면 지표 해석 기준을 확인할 수 있습니다. <strong style="color:var(--info)">복합 지수가 높을수록 (≥300) 분할매수를 고려해볼 시점</strong>입니다. 투자 판단은 본인 책임입니다.
+    💡 이 대시보드는 매수 타이밍을 포착하기 위한 4가지 지표를 종합합니다. 각 카드를 클릭하면 지표 해석 기준을 확인할 수 있습니다. <strong style="color:var(--info)">복합 지수가 높을수록 (≥300) 분할매수를 고려해볼 시점</strong>입니다. 아래 <strong style="color:var(--info)">4대 지표 카테고리</strong>에서 시장을 다각도로 점검하세요. 투자 판단은 본인 책임입니다.
   </div>
 
   <div class="hero fade-up delay-2">
@@ -452,20 +585,204 @@
     </table>
   </div>
 
-  <p class="section-title fade-up delay-5" style="margin-top:52px;">지표 해석 가이드</p>
+  <!-- ══════════════════════════════════════════════
+       4대 지표 카테고리 (블로그 erke2000 참고)
+  ══════════════════════════════════════════════ -->
+  <p class="section-title fade-up delay-5" style="margin-top:52px;">4대 지표 카테고리</p>
 
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;" class="fade-up delay-6">
+  <div class="cat-grid fade-up delay-6">
+
+    <!-- ① 심리 / 리스크 -->
+    <div class="cat-card" style="--cat-color:var(--sell);--cat-bg:rgba(225,29,72,.06);">
+      <div class="cat-header">
+        <span class="cat-num">01</span>
+        <div>
+          <p class="cat-title">심리 / 리스크</p>
+          <p class="cat-sub">시장 참여자의 공포·탐욕 수준을 측정</p>
+        </div>
+      </div>
+      <div class="cat-items">
+        <div class="cat-item">
+          <span class="cat-item-name">VIX <span class="cat-badge">공포 지수</span></span>
+          <span class="cat-item-note">S&P 500 옵션 변동성 | &lt;20 안정 / &gt;30 경계 / &gt;40 패닉</span>
+          <a href="https://www.investing.com/indices/volatility-s-p-500" target="_blank" class="cat-link">Investing.com ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">MOVE 지수 <span class="cat-badge">채권 VIX</span></span>
+          <span class="cat-item-note">미국 국채 변동성 | VIX보다 선행하는 위기 신호</span>
+          <a href="https://www.tradingview.com/symbols/INDEX-MOVE/" target="_blank" class="cat-link">TradingView ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">하이일드 스프레드 <span class="cat-badge">신용 위험</span></span>
+          <span class="cat-item-note">회사채-국채 금리 차 | 확대 = 기업 부도 위험↑</span>
+          <a href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2" target="_blank" class="cat-link">FRED ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">CNN Fear &amp; Greed <span class="cat-badge">투자 심리</span></span>
+          <span class="cat-item-note">7개 지표 종합 0~100 | &lt;25 극단 공포 = 역발상 매수 기회</span>
+          <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" class="cat-link">CNN Markets ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② 자금 환경 -->
+    <div class="cat-card" style="--cat-color:var(--info);--cat-bg:rgba(37,99,235,.06);">
+      <div class="cat-header">
+        <span class="cat-num">02</span>
+        <div>
+          <p class="cat-title">자금 환경</p>
+          <p class="cat-sub">주식 시장으로 돈이 들어올지 나갈지 결정</p>
+        </div>
+      </div>
+      <div class="cat-items">
+        <div class="cat-item">
+          <span class="cat-item-name">미국 10년물 금리 <span class="cat-badge">돈의 값</span></span>
+          <span class="cat-item-note">전 세계 자산 가격의 기준점 | 하락 = 기술·성장주 유리</span>
+          <a href="https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield" target="_blank" class="cat-link">Investing.com ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">달러 인덱스 DXY <span class="cat-badge">돈의 방향</span></span>
+          <span class="cat-item-note">주요 6개 통화 대비 달러 가치 | 100 기준 강세/약세 판단</span>
+          <a href="https://www.investing.com/currencies/us-dollar-index" target="_blank" class="cat-link">Investing.com ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">원/달러 환율 <span class="cat-badge">외국인 수급</span></span>
+          <span class="cat-item-note">달러 강세 체감 지표 | 상승(원화 약세) = 외국인 이탈</span>
+          <a href="https://finance.naver.com/marketindex/" target="_blank" class="cat-link">네이버 증권 ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">신용잔고 Margin Debt <span class="cat-badge">레버리지</span></span>
+          <span class="cat-item-note">빚내서 주식 산 규모 | 급증 후 급감 = 강제 청산 위험</span>
+          <a href="https://www.finra.org/investors/learn-to-invest/advanced-investing/margin-statistics" target="_blank" class="cat-link">FINRA ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 경기 선행 -->
+    <div class="cat-card" style="--cat-color:var(--warn);--cat-bg:rgba(217,119,6,.06);">
+      <div class="cat-header">
+        <span class="cat-num">03</span>
+        <div>
+          <p class="cat-title">경기 선행</p>
+          <p class="cat-sub">실물 경기 방향을 미리 감지</p>
+        </div>
+      </div>
+      <div class="cat-items">
+        <div class="cat-item">
+          <span class="cat-item-name">러셀 2000 <span class="cat-badge">중소형주</span></span>
+          <span class="cat-item-note">미국 중소형주 2,000개 | 대형주보다 경기에 민감하게 반응</span>
+          <a href="https://www.investing.com/indices/smallcap-2000" target="_blank" class="cat-link">Investing.com ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">구리 가격 Dr. Copper <span class="cat-badge">산업 수요</span></span>
+          <span class="cat-item-note">전선·건설·전자 핵심 소재 | 상승 = 경기 회복 신호</span>
+          <a href="https://www.investing.com/commodities/copper" target="_blank" class="cat-link">Investing.com ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">BDI 발틱 운임 지수 <span class="cat-badge">물동량</span></span>
+          <span class="cat-item-note">원자재 벌크선 운임비 | 상승 = 글로벌 물동량·경기 활성화</span>
+          <a href="https://www.investing.com/indices/baltic-dry" target="_blank" class="cat-link">Investing.com ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">한국 수출 데이터 <span class="cat-badge">코스피 선행</span></span>
+          <span class="cat-item-note">매월 1·10·20일 발표 | 수출 증가 = 코스피 상장사 실적 선행</span>
+          <a href="https://unipass.customs.go.kr/ets/" target="_blank" class="cat-link">관세청 ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 밸류에이션 -->
+    <div class="cat-card" style="--cat-color:var(--buy);--cat-bg:rgba(5,150,105,.06);">
+      <div class="cat-header">
+        <span class="cat-num">04</span>
+        <div>
+          <p class="cat-title">밸류에이션</p>
+          <p class="cat-sub">지금 주가가 비싼지 싼지 장기적으로 판단</p>
+        </div>
+      </div>
+      <div class="cat-items">
+        <div class="cat-item">
+          <span class="cat-item-name">버핏 지수 <span class="cat-badge">시총/GDP</span></span>
+          <span class="cat-item-note">&lt;100% 저평가 · 120~130% 고평가 · &gt;200% 극단 경고</span>
+          <a href="https://currentmarketvaluation.com/models/buffett-indicator.php" target="_blank" class="cat-link">Current MV ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">버핏 지수 글로벌 <span class="cat-badge">국가별</span></span>
+          <span class="cat-item-note">전 세계·국가별 버핏 지수 | 한국 등 개별 국가 수치 확인</span>
+          <a href="https://www.gurufocus.com/global-market-valuation.php" target="_blank" class="cat-link">Gurufocus ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">CAPE Shiller PE <span class="cat-badge">밸류에이션</span></span>
+          <span class="cat-item-note">물가 조정 10년 평균 PER | &gt;30 = 역사적 고평가 (닷컴 버블 수준)</span>
+          <a href="https://www.multpl.com/shiller-pe" target="_blank" class="cat-link">Multpl.com ↗</a>
+        </div>
+        <div class="cat-item">
+          <span class="cat-item-name">통합 밸류에이션 <span class="cat-badge">장기 추세</span></span>
+          <span class="cat-item-note">버핏 지수·CAPE 등 복수 지표 한눈에 비교 가능</span>
+          <a href="https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/" target="_blank" class="cat-link">LongTermTrends ↗</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cat-grid -->
+
+  <!-- ══════════════════════════════════════════════
+       매일 아침 모닝 루틴 체크
+  ══════════════════════════════════════════════ -->
+  <p class="section-title fade-up" style="margin-top:52px;">☀️ 매일 아침 모닝 루틴 체크</p>
+
+  <div class="routine-note fade-up">
+    핵심 3가지 지표는 <strong>국채 금리 (돈의 흐름) · 달러 인덱스 (외국인 수급) · VIX (시장 심리)</strong>입니다. 세 지표가 서로 톱니바퀴처럼 연결되어 있으니 함께 확인하세요. <strong>세 지표가 모두 급등하는 날</strong>은 현금을 아끼고 관망하는 것이 최선입니다.
+  </div>
+
+  <div class="table-wrap fade-up">
+    <table class="routine-table">
+      <thead>
+        <tr>
+          <th>상황</th>
+          <th>국채 금리</th>
+          <th>달러 인덱스</th>
+          <th>VIX 지수</th>
+          <th>시장 예상 (오늘의 날씨)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="situation" style="color:var(--buy)">👍 최고</td>
+          <td class="is-buy">↓ 하락</td>
+          <td class="is-buy">↓ 하락</td>
+          <td class="is-buy">↓ 하락</td>
+          <td class="forecast" style="color:var(--buy)">🌤 <strong>"맑음"</strong> — 외국인도 오고, 심리도 좋고, 유동성도 풍부. 상승장 환경.</td>
+        </tr>
+        <tr>
+          <td class="situation" style="color:var(--sell)">👎 최악</td>
+          <td class="is-sell">↑ 급등</td>
+          <td class="is-sell">↑ 급등</td>
+          <td class="is-sell">↑ 급등</td>
+          <td class="forecast" style="color:var(--sell)">⛈ <strong>"폭우"</strong> — 돈 빠져나가고, 겁먹고, 이자 부담 커짐. 현금 보유 최선.</td>
+        </tr>
+        <tr>
+          <td class="situation" style="color:var(--warn)">🤔 혼조</td>
+          <td class="is-sell">↑ 상승</td>
+          <td class="is-buy">↓ 하락</td>
+          <td style="color:var(--txt2)">↔ 횡보</td>
+          <td class="forecast" style="color:var(--warn)">🌥 <strong>"흐림"</strong> — 서로 신호가 엇갈림. 개별 종목 장세가 될 가능성.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       지표 해석 가이드 (대시보드 내 지표)
+  ══════════════════════════════════════════════ -->
+  <p class="section-title fade-up" style="margin-top:52px;">대시보드 지표 해석 가이드</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;" class="fade-up">
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
       <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--info);margin-bottom:12px;">버핏지수 (Buffett Indicator)</p>
-      
-      <div style="padding:12px; background:rgba(37,99,235,0.05); border-radius:8px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:12px; color:var(--txt2); font-weight:500;">관련 지표: 러셀 2000</span>
-        <strong style="color:var(--info); font-size:14px; font-family:var(--font-num);" id="guide-rut">로딩 중...</strong>
-      </div>
-      
       <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
-        <strong style="color:var(--txt3)">미국 전체 주식 시가총액 / GDP</strong>로 주식시장 전반의 고평가 여부를 판단합니다. 워런 버핏이 "어느 시점이든 주식 시장의 가치가 어느 정도인지 측정할 수 있는 최고의 단일 척도"라고 극찬한 지표이기도 합니다.<br><br>
+        <strong style="color:var(--txt3)">미국 전체 주식 시가총액 / GDP</strong>로 주식시장 전반의 고평가 여부를 판단합니다. 워런 버핏이 "주식 시장 가치를 측정할 수 있는 최고의 단일 척도"라고 극찬한 지표입니다.<br><br>
         <span style="color:var(--buy)">●</span> &lt;100% — 저평가, 매수 유리<br>
         <span style="color:var(--warn)">●</span> 100~160% — 다소 고평가<br>
         <span style="color:var(--sell)">●</span> &gt;200% — 극단적 고평가 (경고 수준)
@@ -473,13 +790,7 @@
     </div>
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
-      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sell);margin-bottom:12px;">Fear & Greed 타임라인</p>
-      
-      <div style="padding:12px; background:rgba(225,29,72,0.05); border-radius:8px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:12px; color:var(--txt2); font-weight:500;">관련 지표: VIX (변동성)</span>
-        <strong style="color:var(--sell); font-size:14px; font-family:var(--font-num);" id="guide-vix">로딩 중...</strong>
-      </div>
-      
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sell);margin-bottom:12px;">Fear &amp; Greed 타임라인</p>
       <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
         <strong style="color:var(--txt3)">CNN이 집계하는 시장 심리 지표</strong>로 변동성·모멘텀·옵션·안전자산 수요 등 7개 지표를 종합합니다. 극단적 공포일수록 역발상 매수 기회입니다.
       </p>
@@ -495,12 +806,6 @@
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
       <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warn);margin-bottom:12px;">RSI (14)</p>
-      
-      <div style="padding:12px; background:rgba(217,119,6,0.05); border-radius:8px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:12px; color:var(--txt2); font-weight:500;">관련 지표: S&P 500</span>
-        <strong style="color:var(--warn); font-size:14px; font-family:var(--font-num);" id="guide-sp500">로딩 중...</strong>
-      </div>
-      
       <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
         <strong style="color:var(--txt3)">14일 상대강도지수</strong>로 S&P 500의 단기 과매수·과매도를 판단합니다.<br><br>
         <span style="color:var(--buy)">●</span> &lt;30 — 과매도, 반등 가능성<br>
@@ -520,7 +825,7 @@
 
   </div>
 
-  <footer class="fade-up delay-6">
+  <footer class="fade-up" style="margin-top:64px;">
     <span>데이터 출처: Yahoo Finance · gurufocus.com · CNN Markets</span>
     <span>GitHub Actions 매일 자동 수집 — 전일 미국 시장 종가 기준</span>
   </footer>
@@ -590,10 +895,11 @@ const CARDS_META = [
   {
     key: 'TQQQ', label: 'TQQQ Price', unit: 'USD',
     color: 'var(--info)', dotColor: '#3b82f6',
-    range: [0, 200], barColor: (v) => 'var(--info)',
+    range: [0, 200],
+    barColor: (v) => 'var(--info)',
     desc: 'ProShares Ultra QQQ — 나스닥 100의 3배 레버리지 ETF. 고위험·고수익 상품이므로 시장 타이밍이 중요합니다.',
-    details: (v, latestRow) => [
-      { label: '기준 지수 (QQQ)', val: latestRow.QQQ && latestRow.QQQ !== 'N/A' ? `$${parseFloat(latestRow.QQQ).toFixed(2)}` : 'N/A' },
+    details: (v) => [
+      { label: '기준 지수', val: 'NASDAQ-100 (QQQ)' },
       { label: '레버리지', val: '3× 일간' },
       { label: '운용사', val: 'ProShares' },
     ],
@@ -605,9 +911,9 @@ const CARDS_META = [
     color: 'var(--info)', dotColor: '#60a5fa',
     range: [50, 300], barColor: buffColor,
     desc: '워런 버핏이 측정 가능한 최고의 단일 척도라고 극찬한 주식시장 과열 지표. 시장이 경제 규모 대비 얼마나 비싼지 나타냅니다.',
-    details: (v, latestRow) => [
-      { label: '러셀 2000 (참고지수)', val: latestRow.Russell2000 && latestRow.Russell2000 !== 'N/A' ? parseFloat(latestRow.Russell2000).toLocaleString() : 'N/A' },
+    details: (v) => [
       { label: '상태', val: v < 100 ? '🟢 저평가' : v < 160 ? '🟡 다소 고평가' : '🔴 극단 고평가' },
+      { label: '역대 평균', val: '약 85~90%' },
       { label: '버핏 경고선', val: '>200%' },
     ],
     fmt: (v) => parseFloat(v).toFixed(1),
@@ -618,7 +924,7 @@ const CARDS_META = [
     color: 'var(--sell)', dotColor: '#f43f5e',
     range: [0, 100], barColor: fgColor,
     desc: 'CNN이 집계하는 시장 심리 지수 타임라인. 현재 시장의 공포와 탐욕 수준이 어느 위치에 있는지 시각적으로 확인합니다.',
-    details: (v, latestRow) => {
+    details: (v) => {
       const pos = Math.min(Math.max(v, 0), 100);
       const timelineHtml = `
         <div style="width:100%; height:4px; background:linear-gradient(90deg, var(--buy), var(--warn), var(--sell)); border-radius:2px; position:relative; margin:12px 0;">
@@ -628,7 +934,7 @@ const CARDS_META = [
       return [
         { label: '타임라인', val: timelineHtml },
         { label: '현재 심리', val: v < 25 ? '😱 극단적 공포' : v < 50 ? '😨 공포' : v < 75 ? '😏 탐욕' : '🤑 극단적 탐욕' },
-        { label: 'VIX (변동성 지수)', val: latestRow.VIX && latestRow.VIX !== 'N/A' ? parseFloat(latestRow.VIX).toFixed(2) : 'N/A' },
+        { label: '매수 구간', val: '0 ~ 25' },
       ];
     },
     fmt: (v) => parseFloat(v).toFixed(1),
@@ -638,9 +944,9 @@ const CARDS_META = [
     color: 'var(--warn)', dotColor: '#f59e0b',
     range: [0, 100], barColor: rsiColor,
     desc: '14일 RSI. S&P 500을 기준으로 30 이하면 과매도로 반등 가능성, 70 이상이면 과매수로 조정 위험이 높아집니다.',
-    details: (v, latestRow) => [
-      { label: 'S&P 500 지수', val: latestRow.SP500 && latestRow.SP500 !== 'N/A' ? parseFloat(latestRow.SP500).toLocaleString() : 'N/A' },
+    details: (v) => [
       { label: '현재 상태', val: v < 30 ? '📉 과매도' : v < 50 ? '↘ 약세권' : v < 70 ? '↗ 강세권' : '📈 과매수' },
+      { label: '과매도 기준', val: '< 30' },
       { label: '과매수 기준', val: '> 70' },
     ],
     fmt: (v) => parseFloat(v).toFixed(1),
@@ -662,7 +968,7 @@ function renderCards(latest) {
     const displayVal = isNA ? 'N/A' : meta.fmt(num);
     const suffix = meta.unitSuffix || '';
 
-    const details = meta.details ? meta.details(num, latest) : [];
+    const details = meta.details ? meta.details(num) : [];
 
     const card = document.createElement('div');
     card.className = 'card fade-up delay-' + (i + 3);
@@ -692,7 +998,6 @@ function renderCards(latest) {
     grid.appendChild(card);
   });
 
-  // animate mini bars after paint
   setTimeout(() => {
     document.querySelectorAll('.mini-fill').forEach(el => {
       el.style.width = el.dataset.pct + '%';
@@ -733,7 +1038,6 @@ function renderHistory(rows) {
 /* ── Main init ── */
 async function init() {
   try {
-    // 🔥 캐시 방지를 위해 URL에 타임스탬프를 추가 (GitHub Pages 강력 캐싱 우회)
     const res  = await fetch(`data/indicators.csv?t=${new Date().getTime()}`);
     if (!res.ok) throw new Error('CSV not found');
     const text = await res.text();
@@ -743,10 +1047,6 @@ async function init() {
 
     const latest = rows[rows.length - 1];
     document.getElementById('latest-date').textContent = latest.Date ?? '—';
-
-    if(document.getElementById('guide-rut')) document.getElementById('guide-rut').textContent = latest.Russell2000 && latest.Russell2000 !== 'N/A' ? parseFloat(latest.Russell2000).toLocaleString() : 'N/A';
-    if(document.getElementById('guide-vix')) document.getElementById('guide-vix').textContent = latest.VIX && latest.VIX !== 'N/A' ? parseFloat(latest.VIX).toFixed(2) : 'N/A';
-    if(document.getElementById('guide-sp500')) document.getElementById('guide-sp500').textContent = latest.SP500 && latest.SP500 !== 'N/A' ? parseFloat(latest.SP500).toLocaleString() : 'N/A';
 
     renderHero(latest);
     renderCards(latest);
