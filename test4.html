@@ -254,44 +254,77 @@
 
   <main class="dashboard-main">
     <!-- 🌟 통합 대시보드 전용 Market Signal (모던 캡슐 스타일) -->
-    <div id="marketSignalBar" style="display: none; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 0.6rem; margin-bottom: -0.8rem;">
-      
-      <!-- 1. Signal 뱃지 캡슐 -->
-      <div style="display: flex; align-items: center; gap: 10px; background: var(--bg2); border: 1px solid var(--border); padding: 10px 16px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-        <span style="font-size: 13px; color: var(--text2); font-weight: 700; font-family: var(--font-sans);">📡 Signal</span>
-        <span id="ms-score" style="font-family: var(--font-mono); font-weight: 800; font-size: 16px;">-</span>
-        <span id="ms-badge" style="padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid transparent;">LOADING</span>
-      </div>
-      
-      <!-- 2. 주요 지표 요약 캡슐 -->
-      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--border); padding: 10px 18px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-        
-        <div style="display: flex; align-items: baseline; gap: 6px;">
-          <span style="font-size: 11px; color: var(--text3); font-family: var(--font-sans); font-weight: 600;">TQQQ</span>
-          <strong id="ms-tqqq" style="font-family: var(--font-mono); font-size: 14px; color: var(--text);">-</strong>
+    <div id="marketSignalBar" style="display:none; margin-top:0.6rem; margin-bottom:0.6rem;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:stretch;">
+    
+        <!-- 종합 신호 -->
+        <div style="display:flex; align-items:center; gap:12px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:12px 18px; flex-shrink:0;">
+          <div style="font-size:20px; line-height:1;">📡</div>
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--text3); letter-spacing:0.05em; margin-bottom:4px;">종합 신호</div>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span id="ms-score" style="font-family:var(--font-mono); font-size:22px; font-weight:800; line-height:1;">—</span>
+              <span id="ms-badge" style="padding:3px 10px; border-radius:20px; font-size:11px; font-weight:800; border:1px solid transparent;">—</span>
+            </div>
+          </div>
         </div>
-        
-        <div style="width: 1px; height: 14px; background: var(--border2);"></div>
-        
-        <div style="display: flex; align-items: baseline; gap: 6px;">
-          <span style="font-size: 11px; color: var(--text3); font-family: var(--font-sans); font-weight: 600;">Buffett</span>
-          <strong id="ms-buffett" style="font-family: var(--font-mono); font-size: 14px;">-</strong>
+    
+        <!-- 구분선 -->
+        <div style="width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin:4px 0;"></div>
+    
+        <!-- TQQQ -->
+        <div class="ms-indicator-card" id="ms-card-tqqq">
+          <div class="ms-ind-label">TQQQ</div>
+          <div id="ms-tqqq" class="ms-ind-val">—</div>
+          <div class="ms-ind-gauge-wrap">
+            <div class="ms-ind-gauge-track">
+              <div id="ms-tqqq-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div>
+            </div>
+          </div>
+          <div id="ms-tqqq-hint" class="ms-ind-hint">—</div>
         </div>
-        
-        <div style="width: 1px; height: 14px; background: var(--border2);"></div>
-        
-        <div style="display: flex; align-items: baseline; gap: 6px;">
-          <span style="font-size: 11px; color: var(--text3); font-family: var(--font-sans); font-weight: 600;">F&G</span>
-          <strong id="ms-fg" style="font-family: var(--font-mono); font-size: 14px;">-</strong>
+    
+        <!-- 버핏 지수 -->
+        <div class="ms-indicator-card" id="ms-card-buffett">
+          <div class="ms-ind-label">버핏 지수</div>
+          <div id="ms-buffett" class="ms-ind-val">—</div>
+          <div class="ms-ind-gauge-wrap">
+            <div class="ms-ind-gauge-track">
+              <div id="ms-buffett-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div>
+              <!-- 기준선: 100% -->
+              <div style="position:absolute; left:60%; top:0; bottom:0; width:1.5px; background:rgba(255,255,255,0.25);"></div>
+            </div>
+          </div>
+          <div id="ms-buffett-hint" class="ms-ind-hint">—</div>
         </div>
-        
-        <div style="width: 1px; height: 14px; background: var(--border2);"></div>
-        
-        <div style="display: flex; align-items: baseline; gap: 6px;">
-          <span style="font-size: 11px; color: var(--text3); font-family: var(--font-sans); font-weight: 600;">RSI(14)</span>
-          <strong id="ms-rsi" style="font-family: var(--font-mono); font-size: 14px;">-</strong>
+    
+        <!-- 공포탐욕 -->
+        <div class="ms-indicator-card" id="ms-card-fg">
+          <div class="ms-ind-label">공포 & 탐욕</div>
+          <div id="ms-fg" class="ms-ind-val">—</div>
+          <div class="ms-ind-gauge-wrap">
+            <div class="ms-ind-gauge-track ms-ind-gauge-rainbow">
+              <div id="ms-fg-dot" style="position:absolute; top:50%; transform:translate(-50%,-50%); width:8px; height:8px; border-radius:50%; background:#fff; box-shadow:0 0 4px rgba(0,0,0,0.5); transition:left 0.5s; left:50%;"></div>
+            </div>
+          </div>
+          <div id="ms-fg-hint" class="ms-ind-hint">—</div>
         </div>
-        
+    
+        <!-- RSI(14) -->
+        <div class="ms-indicator-card" id="ms-card-rsi">
+          <div class="ms-ind-label">RSI(14)</div>
+          <div id="ms-rsi" class="ms-ind-val">—</div>
+          <div class="ms-ind-gauge-wrap">
+            <div class="ms-ind-gauge-track">
+              <div id="ms-rsi-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div>
+              <!-- 기준선: 30 / 70 -->
+              <div style="position:absolute; left:30%; top:0; bottom:0; width:1.5px; background:rgba(255,255,255,0.3);"></div>
+              <div style="position:absolute; left:70%; top:0; bottom:0; width:1.5px; background:rgba(255,255,255,0.3);"></div>
+            </div>
+          </div>
+          <div id="ms-rsi-hint" class="ms-ind-hint">—</div>
+        </div>
+    
       </div>
     </div>
     <div id="viewHeader" class="view-header"></div>
