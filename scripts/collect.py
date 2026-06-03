@@ -62,25 +62,65 @@ def get_high_yield_spread():
 # ──────────────────────────────────────────────
 def get_fear_greed():
     try:
-        url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
-        headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
-        resp = requests.get(url, headers=headers, timeout=10)
-        return round(float(resp.json()["fear_and_greed"]["score"]), 1)
-    except:
-        return None
+        from playwright.sync_api import sync_playwright
+        import re
+        
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            )
+            page = context.new_page()
+            
+            # CNN Fear & Greed 페이지 접속
+            page.goto("https://edition.cnn.com/markets/fear-and-greed", timeout=60000)
+            
+            # 💡 사용자가 찾아낸 클래스(.market-fng-gauge__dial-number-value)가 렌더링될 때까지 대기
+            page.wait_for_selector(".market-fng-gauge__dial-number-value", timeout=20000)
+            
+            # 화면에 뜬 해당 요소의 텍스트를 바로 긁어옴 (예: "54")
+            val_text = page.locator(".market-fng-gauge__dial-number-value").first.inner_text()
+            
+            browser.close()
+            
+            # 안전하게 숫자만 파싱하여 float 형태로 반환
+            match = re.search(r"(\d+(?:\.\d+)?)", val_text)
+            if match:
+                return float(match.group(1))
+                
+    except Exception as e:
+        print(f"   ⚠️ Fear & Greed 수집 오류: {e}")
+        
+    return None
 
 # ──────────────────────────────────────────────
 # 4. CAPE PE (Shiller PE) - multpl.com 크롤링
 # ──────────────────────────────────────────────
 def get_cape_pe():
     try:
+        import re
+        from bs4 import BeautifulSoup
+        
         url = "https://www.multpl.com/shiller-pe"
-        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        # 봇 차단 방지를 위한 브라우저 헤더
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        resp = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(resp.text, 'html.parser')
-        val_text = soup.find(id="estimate").text.strip().replace('\n', '').replace('+', '')
-        return round(float(val_text), 2)
+        
+        # 💡 알려주신 id="current" 구역을 1순위로 찾고, 혹시 장 중에 id="estimate"로 바뀔 경우도 대비
+        target_div = soup.find(id="current") or soup.find(id="estimate")
+        
+        if target_div:
+            # 텍스트 전체에서 줄바꿈이나 공백 무시하고 첫 번째로 등장하는 '숫자.숫자' 형태(예: 42.84)만 추출
+            match = re.search(r"(\d{2,3}\.\d{1,2})", target_div.text)
+            if match:
+                return float(match.group(1))
+                
     except Exception as e:
         print(f"   ⚠️ CAPE PE 수집 오류: {e}")
+        
     return None
 
 # ──────────────────────────────────────────────
