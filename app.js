@@ -4552,20 +4552,24 @@ async function render() {
   const mobileSearch = document.getElementById('mobileSearchBar');
   const histDash = document.getElementById('historyDashboard');
   const realDash = document.getElementById('realizedDashboard');
+  const _msBar = document.getElementById('marketSignalBar');
 
   if (currentView === 'dividend') {
+    if (_msBar) _msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
     divDash.style.display = 'flex';
     renderDividendDashboard();
     return;
   } else if (currentView === 'history') {
+    if (_msBar) _msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
     histDash.style.display = 'flex';
     renderHistoryDashboard();
     return;
-  } else if (currentView === 'realized') { 
+  } else if (currentView === 'realized') {
+    if (_msBar) _msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; 
     listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
     
@@ -4576,6 +4580,7 @@ async function render() {
     renderRealizedDashboard();
     return;
   } else if (currentView === 'watch') {
+    if (_msBar) _msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; 
     container.style.display = 'block'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
@@ -4586,6 +4591,7 @@ async function render() {
     if (_lob) _lob.classList.add('non-sticky');
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
+    if(msBar && msBar.getAttribute('data-loaded')) msBar.style.display = 'flex';
     dash.style.display = 'flex'; pChartRowWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
     if(watchlistSearch) watchlistSearch.style.display = 'none';
@@ -8340,7 +8346,7 @@ async function initMarketSignalBar() {
     const latest = rows[rows.length - 1]; 
 
     // 데이터가 성공적으로 불러와지면 UI 표시 (flex로 전환)
-    document.getElementById('marketSignalBar').style.display = 'flex';
+    document.getElementById('marketSignalBar').setAttribute('data-loaded', '1');
     
     // 복합 매수 신호 지수 처리
     const score = parseFloat(latest.Composite_Index);
