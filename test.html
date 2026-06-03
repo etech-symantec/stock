@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two the Moon</title>
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+<input type="file" id="importCsvFile" accept=".csv" style="display: none;" onchange="importCsvData(event)">
+
+<nav>
+  <!-- 좌측: 로고 -->
+  <div class="nav-left">
+    <div class="logo">
+      <img id="logoImg" src="/img/logo_dark_tp.png" alt="Two the Moon">
+    </div>
+  </div>  <!-- ✅ nav-left 여기서 닫기 -->
+
+  <!-- 중앙: 네비탭 -->
+  <div class="view-tabs">
+    <button class="vtab active" onclick="setView('all', this)"><span class="vtab-icon">📊</span><span class="vtab-text">전체보기</span></button>
+    <button class="vtab" id="tabUser1" onclick="setView('user1', this)"><span class="vtab-icon">👤</span><span class="vtab-text">소유자1</span></button>
+    <button class="vtab" id="tabUser2" onclick="setView('user2', this)"><span class="vtab-icon">👥</span><span class="vtab-text">소유자2</span></button>
+    <button class="vtab" onclick="setView('watch', this)"><span class="vtab-icon">⭐</span><span class="vtab-text">관심종목</span></button>
+    <button class="vtab" onclick="setView('history', this)"><span class="vtab-icon">📋</span><span class="vtab-text">거래내역</span></button>
+    <button class="vtab" onclick="setView('realized', this)" style="color:var(--blue)"><span class="vtab-icon">💵</span><span class="vtab-text">실현수익</span></button>
+    <button class="vtab" id="tabDividend" onclick="setView('dividend', this)" style="color:var(--green)"><span class="vtab-icon">🌿</span><span class="vtab-text">배당통계</span></button>
+  </div>
+
+  <!-- 우측: 기간 + 테마 + 설정 -->
+  <div class="nav-right" style="display:flex; align-items:center; gap:10px;">
+    <div class="range-group" style="margin:0;">
+      <button class="rtab" id="rtab-1d" onclick="setRange('1d',this)">1D</button>
+      <button class="rtab" id="rtab-1w" onclick="setRange('1w',this)">1W</button>
+      <button class="rtab" id="rtab-1m" onclick="setRange('1m',this)">1M</button>
+      <button class="rtab" id="rtab-3m" onclick="setRange('3m',this)">3M</button>
+      <button class="rtab" id="rtab-6m" onclick="setRange('6m',this)">6M</button>
+      <button class="rtab active" id="rtab-1y" onclick="setRange('1y',this)">1Y</button>
+      <button class="rtab" id="rtab-3y" onclick="setRange('3y',this)">3Y</button>
+      <button class="rtab" id="rtab-5y" onclick="setRange('5y',this)">5Y</button>
+      <button class="rtab" id="rtab-all" onclick="setRange('all',this)">전체</button>
+    </div>
+    <div class="sync-status" id="syncStatus">
+      <div class="sync-spinner" id="syncSpinner"></div>
+      <span id="syncText"></span>
+    </div>
+    <button class="btn-theme-toggle" onclick="toggleTheme()" id="btnThemeToggle" title="라이트/다크 모드 전환">🌙</button>
+    <button class="btn-sm" onclick="openMasterSettingsModal()" title="전체 설정 및 데이터 관리">⚙️ 설정</button>
+    <button class="btn-mobile-menu" onclick="openMobileMenu()" title="메뉴">☰</button>
+  </div>
+</nav>
+
+<!-- 📱 모바일 검색바 (768px 이하에서만 표시) -->
+<div class="mobile-search-bar" id="mobileSearchBar">
+  <select id="mobileSearchFilter" class="search-input" style="width:85px; border-radius:20px; height:40px; padding:0 8px; cursor:pointer; font-size:12px; border:1px solid var(--border2); background:var(--bg3); color:var(--text);" onchange="document.getElementById('mainSearchFilter').value=this.value">
+    <option value="all">🌐 전체</option>
+    <option value="kr">🇰🇷 한국</option>
+    <option value="us">🇺🇸 미국</option>
+  </select>
+  <div style="position:relative; flex:1;">
+    <input type="text" id="mobileTickerInput" class="search-input" placeholder="종목명/Ticker 검색" autocomplete="off"
+      style="width:100%; padding:8px 36px 8px 16px; border-radius:20px; background:var(--bg3); border:1px solid var(--border2); color:var(--text); font-size:12px; font-family:var(--font-sans); outline:none;"
+      oninput="document.getElementById('tickerInput').value=this.value; document.getElementById('tickerInput').dispatchEvent(new Event('input'))"/>
+    <button class="btn-add-icon" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:var(--accent); border:none; color:#fff; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:16px; line-height:1;" onclick="addManualTicker()">＋</button>
+  </div>
+</div>
+
+<!-- 📱 모바일 내비 드로어 -->
+<div class="mobile-nav-drawer" id="mobileNavDrawer">
+  <div class="mobile-nav-backdrop" onclick="closeMobileMenu()"></div>
+  <div class="mobile-nav-panel">
+    <div class="mobile-nav-header">
+      <span class="mobile-nav-title">메뉴</span>
+      <button class="mobile-nav-close" onclick="closeMobileMenu()">✕</button>
+    </div>
+    <button class="vtab active" id="mDrawerTabAll" onclick="setView('all',this);closeMobileMenu()">📊 전체보기</button>
+    <button class="vtab" id="mDrawerTabUser1" onclick="setView('user1',this);closeMobileMenu()">👤 소유자1</button>
+    <button class="vtab" id="mDrawerTabUser2" onclick="setView('user2',this);closeMobileMenu()">👤 소유자2</button>
+    <button class="vtab" id="mDrawerTabWatch" onclick="setView('watch',this);closeMobileMenu()">⭐ 관심종목</button>
+    <button class="vtab" id="mDrawerTabHistory" onclick="setView('history',this);closeMobileMenu()">📋 거래 내역</button>
+    <button class="vtab" id="mDrawerTabRealized" onclick="setView('realized',this);closeMobileMenu()" style="color:var(--blue)">📈 실현수익</button>
+    <button class="vtab" id="mDrawerTabDividend" onclick="setView('dividend',this);closeMobileMenu()" style="color:var(--green)">🌿 배당통계</button>
+    <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:8px;">
+      <button class="btn-sm" style="justify-content:center;" onclick="toggleSidebar();closeMobileMenu()">✏️ 거래 장부 열기</button>
+      <button class="btn-sm" style="justify-content:center;" onclick="openMasterSettingsModal();closeMobileMenu()">⚙️ 설정</button>
+    </div>
+  </div>
+</div>
+
+<!-- 📱 모바일 하단 탭바 -->
+<div class="mobile-bottom-bar" id="mobileBottomBar">
+  <button class="mobile-tab-btn active" id="mbTabAll" onclick="setView('all',this)">
+    <span class="tab-icon">📊</span><span>전체</span>
+  </button>
+  <button class="mobile-tab-btn" id="mbTabWatch" onclick="setView('watch',this)">
+    <span class="tab-icon">⭐</span><span>관심</span>
+  </button>
+  <button class="mobile-tab-btn" id="mbTabLedger" onclick="toggleSidebar()">
+    <span class="tab-icon">✏️</span><span>장부</span>
+  </button>
+  <button class="mobile-tab-btn" id="mbTabHistory" onclick="setView('history',this)">
+    <span class="tab-icon">📋</span><span>내역</span>
+  </button>
+  <button class="mobile-tab-btn" id="mbTabMore" onclick="openMobileMenu()">
+    <span class="tab-icon">☰</span><span>더보기</span>
+  </button>
+</div>
+
+<div class="layout-wrapper">
+  <button id="btnOpenSidebar" onclick="toggleSidebar()" title="장부 열기">▶</button>
+
+  <aside class="ledger-sidebar" id="sidebar">
+    <div class="sidebar-header" style="padding: 10px 20px;">
+      <div class="sidebar-tabs">
+        <button class="s-tab active" id="tabLedger" onclick="setSidebarView('ledger')">✏️ 거래 장부</button>
+        <button class="s-tab" id="tabYield" onclick="setSidebarView('yield')">🏆 평가 자산 랭킹</button>
+      </div>
+      <button class="btn-icon-sm" onclick="toggleSidebar()" title="장부 접기">◀</button>
+    </div>
+    
+    <div id="sidebarLedgerView" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+      <div class="tx-form">
+        <div id="editModeBanner" class="edit-mode-banner">
+          수정 모드 활성화 중
+          <button class="btn-cancel-edit" onclick="cancelEdit()">취소 ✕</button>
+        </div>
+
+        <!-- 소유자 선택 -->
+        <div class="form-group tx-owner-type-wrap">
+          <div class="tx-meta-row">
+            <div class="tx-meta-block">
+              <div class="tx-meta-label">
+                <span>소유자</span>
+                <button class="btn-edit-owners" onclick="openOwnerModal()" title="소유자 이름/테마 설정">설정 ⚙️</button>
+              </div>
+              <div class="toggle-group tx-owner-group">
+                <input type="radio" id="owner1" name="txOwner" value="user1" checked class="hidden-radio">
+                <label for="owner1" class="toggle-btn" id="lblUser1">소유자1</label>
+                <input type="radio" id="owner2" name="txOwner" value="user2" class="hidden-radio">
+                <label for="owner2" class="toggle-btn" id="lblUser2">소유자2</label>
+              </div>
+            </div>
+          </div>
+          <!-- 거래 유형 -->
+          <div class="tx-meta-row" style="margin-top:6px;">
+            <div class="tx-meta-block">
+              <div class="tx-meta-label"><span>거래 유형</span></div>
+              <div class="toggle-group tx-type-group">
+                <input type="radio" id="typeBuy" name="txType" value="buy" checked onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeBuy" class="toggle-btn type-buy">
+                  <span class="type-icon">🔴</span><span class="type-text">매수</span>
+                </label>
+                <input type="radio" id="typeSell" name="txType" value="sell" onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeSell" class="toggle-btn type-sell">
+                  <span class="type-icon">🔵</span><span class="type-text">매도</span>
+                </label>
+                <input type="radio" id="typeDiv" name="txType" value="dividend" onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeDiv" class="toggle-btn type-div">
+                  <span class="type-icon">💚</span><span class="type-text">배당</span>
+                </label>
+                <input type="radio" id="typeTransfer" name="txType" value="transfer" onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeTransfer" class="toggle-btn type-transfer">
+                  <span class="type-icon">🔀</span><span class="type-text">이동</span>
+                </label>
+                <input type="radio" id="typeSplitTx" name="txType" value="split" onchange="toggleTxType()" class="hidden-radio">
+                <label for="typeSplitTx" class="toggle-btn type-split">
+                  <span class="type-icon">✂️</span><span class="type-text">분할</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>발생 일자</label>
+          <input type="date" id="txDate" class="form-input">
+        </div>
+        <div class="form-group tx-search-container" style="z-index: 99999;">
+            <label>종목</label>
+            <div style="display:flex; gap:5px;">
+                <select id="sideSearchFilter" class="form-input" style="width:85px; padding:0 5px; cursor:pointer;">
+                    <option value="all">🌐 전체</option>
+                    <option value="kr">🇰🇷 한국</option>
+                    <option value="us">🇺🇸 미국</option>
+                </select>
+                <div style="position:relative; flex:1;">
+                    <input type="text" id="txSymbol" class="form-input" autocomplete="off" style="width:100%;">
+                    <ul id="txDropdown" class="tx-dropdown" style="position:absolute; top:calc(100% + 5px); left:-90px; width:calc(100% + 90px); min-width:290px; max-height:250px; overflow-y:auto; z-index:99999; background:var(--bg2); border:1px solid var(--border2); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.6); margin:0; padding:0; display:none;"></ul>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;" id="txQtyWrap">
+            <label>수량</label>
+            <input type="number" id="txQty" class="form-input" placeholder="0">
+          </div>
+          <div class="form-group" style="flex:1; position:relative;" id="txPriceWrap">
+            <label id="txPriceLabel">단가 (1주당 가격)</label>
+            <input type="number" id="txPrice" class="form-input" placeholder="0" step="0.01">
+            <div id="divTaxWrap" style="display:none; margin-top:6px;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="checkbox" id="applyDivTax" checked>
+                <span style="font-size:10px; color:var(--text2); text-transform:none;">세전 금액 (저장 시 세금 자동 차감)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 이동 전용: 출발 계좌 -->
+        <div class="form-group" id="txTransferFromWrap" style="display:none;">
+          <label>출발 계좌 <span id="txTransferFromInfo" style="font-size:10px; color:var(--green); margin-left:6px; font-weight:700;"></span></label>
+          <select id="txTransferFrom" class="form-input" onchange="onLedgerTransferFromChange()">
+            <option value="">먼저 종목을 선택하세요</option>
+          </select>
+        </div>
+
+        <!-- 분할 전용: 비율 입력 -->
+        <div class="form-group" id="txSplitRatioWrap" style="display:none;">
+          <label>분할 비율 &nbsp;<span style="font-size:10px; color:var(--text3);">구 주식 수 : 신 주식 수</span></label>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="number" id="txSplitOld" class="form-input" value="1" min="1" style="text-align:center; width:70px;" oninput="updateLedgerSplitPreview()">
+            <span style="font-size:18px; color:var(--text2); font-weight:700; flex-shrink:0;">:</span>
+            <input type="number" id="txSplitNew" class="form-input" placeholder="예: 5" min="1" style="text-align:center; width:70px;" oninput="updateLedgerSplitPreview()">
+          </div>
+          <div id="txSplitPreview" style="margin-top:8px; font-size:11px;"></div>
+        </div>
+
+        <div class="form-group" id="txBrokerGroup">
+          <label id="txBrokerLabel">계좌명 (선택)</label>
+          <input type="text" id="txBroker" class="form-input" placeholder="예: 키움증권, 토스 등">
+          <div id="brokerTags" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+        </div>
+        <input type="hidden" id="editingTxId" value="">
+        <button class="btn-submit" id="btnSubmitTx" onclick="addOrUpdateTransaction()">내역 추가하기</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px 20px 10px;">
+        <div class="tx-history-title" style="padding:0;">최근 거래 내역</div>
+      </div>
+      <ul class="tx-list" id="txList" style="padding-top:0;"></ul>
+    </div>
+
+    <div id="sidebarYieldView" style="display: none; flex-direction: column; flex: 1; overflow-y: auto; padding: 15px 20px;">
+      <div id="sidebarYieldList" style="display:flex; flex-direction:column; gap:6px;"></div>
+    </div>
+  </aside>
+
+  <main class="dashboard-main">
+    <!-- 🌟 통합 대시보드 전용 Market Signal (모던 캡슐 스타일) -->
+    <div id="marketSignalBar" style="display:none; margin-top:0.6rem; margin-bottom:0.6rem;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:stretch;">
+    
+        <!-- 종합 신호 -->
+        <div style="display:flex; align-items:center; gap:12px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:12px 18px; flex-shrink:0;">
+          <div style="font-size:20px; line-height:1;">📡</div>
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--text3); letter-spacing:0.05em; margin-bottom:4px;">종합 신호</div>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span id="ms-score" style="font-family:var(--font-mono); font-size:22px; font-weight:800; line-height:1;">—</span>
+              <span id="ms-badge" style="padding:3px 10px; border-radius:20px; font-size:11px; font-weight:800; border:1px solid transparent;">—</span>
+            </div>
+          </div>
+        </div>
+    
+        <!-- 구분선 -->
+        <div style="width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin:4px 0;"></div>
+    
+        <!-- TQQQ -->
+        <div class="ms-indicator-card" id="ms-card-tqqq">
+          <div class="ms-ind-label">TQQQ</div>
+          <div id="ms-tqqq" class="ms-ind-val">—</div>
+          <div class="ms-ind-gauge-wrap">
+            <div class="ms-ind-gauge-track">
+              <div id="ms-tqqq-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div>
+            </div>
+          </div>
+          <div id="ms-tqqq-hint" class="ms-ind-hint">—</div>
+        </div>
+    
+        <!-- 버핏 지수 -->
+        <div class="ms-indicator-card" id="ms-card-buffett">
+          <div class="ms-ind-label">버핏 지수</div>
+          <div id="ms-buffett" class="ms-ind-val">—</div>
+          <div class="ms-ind-gauge-wrap">
+            <div class="ms-ind-gauge-track">
+              <div id="ms-buffett-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div>
+              <!-- 기준선: 100% -->
+              <div style="position:absolute; left:60%; top:0; bottom:0; width:1.5px; background:rgba(255,255,255,0.25);"></div>
+            </div>
+          </div>
+          <div id="ms-buffett-hint" class="ms-ind-hint">—</div>
+        </div>
+    
+        <!-- 공포탐욕 -->
+        <div class="ms-indicator-card" id="ms-card-fg">
+          <div class="ms-ind-label">공포 & 탐욕</div>
+          <div id="ms-fg" class="ms-ind-val">—</div>
+          <div class="ms-ind-gauge-wrap">
+            <div class="ms-ind-gauge-track ms-ind-gauge-rainbow">
+              <div id="ms-fg-dot" style="position:absolute; top:50%; transform:translate(-50%,-50%); width:8px; height:8px; border-radius:50%; background:#fff; box-shadow:0 0 4px rgba(0,0,0,0.5); transition:left 0.5s; left:50%;"></div>
+            </div>
+          </div>
+          <div id="ms-fg-hint" class="ms-ind-hint">—</div>
+        </div>
+    
+        <!-- RSI(14) -->
+        <div class="ms-indicator-card" id="ms-card-rsi">
+          <div class="ms-ind-label">RSI(14)</div>
+          <div id="ms-rsi" class="ms-ind-val">—</div>
+          <div class="ms-ind-gauge-wrap">
+            <div class="ms-ind-gauge-track">
+              <div id="ms-rsi-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div>
+              <!-- 기준선: 30 / 70 -->
+              <div style="position:absolute; left:30%; top:0; bottom:0; width:1.5px; background:rgba(255,255,255,0.3);"></div>
+              <div style="position:absolute; left:70%; top:0; bottom:0; width:1.5px; background:rgba(255,255,255,0.3);"></div>
+            </div>
+          </div>
+          <div id="ms-rsi-hint" class="ms-ind-hint">—</div>
+        </div>
+    
+      </div>
+    </div>
+    <div id="viewHeader" class="view-header"></div>
+    <div id="dashboardTopWrapper" class="dashboard-top-wrapper">
+      <div class="dashboard-top">
+        <div class="country-panel">
+          <div class="cp-header">
+            <div class="cp-title">🌐 통합 자산</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="font-size:11px; color:var(--text2);" id="globalExchangeRate">환율 조회 중...</div>
+              <div style="display:flex; gap:2px; background:var(--bg3); padding:2px; border-radius:6px; border:1px solid var(--border);">
+                <button id="btnGlobalCurrent" onclick="setGlobalAssetView('current')"
+                  style="padding:3px 8px; font-size:10px; font-weight:700; border:none; border-radius:4px; cursor:pointer; transition:0.2s; background:var(--bg3); color:var(--text); font-family:var(--font-sans);">
+                  현재 보유
+                </button>
+                <button id="btnGlobalCumulative" onclick="setGlobalAssetView('cumulative')"
+                  style="padding:3px 8px; font-size:10px; font-weight:700; border:none; border-radius:4px; cursor:pointer; transition:0.2s; background:transparent; color:var(--text2); font-family:var(--font-sans);">
+                  누적 자산
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="gs-group" style="display:flex; gap:15px; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:-5px;">
+            <div style="flex:1;">
+              <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">통합 투자 원금</div>
+              <div id="globalTotalCost" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--text);">—</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">누적 배당금</div>
+              <div id="globalTotalDiv" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--green);">—</div>
+            </div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box" style="flex:1.2;">
+              <div class="cp-sum-label" id="globalTotalValLabel">통합 평가 자산</div>
+              <div class="cp-sum-val" id="globalTotalVal" style="color:var(--blue); font-size:22px;">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">통합 수익금 (수익률)</div>
+              <div class="cp-sum-val" id="globalTotalRoi">—</div>
+            </div>
+          </div>
+          <div class="cp-accounts" style="flex:1; justify-content:center; padding-bottom:10px;">
+            <!-- 타이틀 + 힌트 -->
+            <div style="display:flex; align-items:center; gap:8px; margin:0 0 8px 0; flex-wrap:wrap;">
+              <div class="section-title" style="margin:0; font-size:12px; color:var(--text3);">포트폴리오 맵</div>
+              <span style="font-size:10px; color:var(--text3); background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:2px 8px; white-space:nowrap;">
+                👆 클릭 → 상세 &nbsp;|&nbsp; 꾹 누르기 → 선택 합산
+              </span>
+            </div>
+
+            <!-- 선택 모드 툴바 (평소엔 숨김) -->
+            <div id="treemapSelectToolbar" style="display:none; flex-direction:column; gap:8px; margin-bottom:8px; padding:10px 12px; background:var(--bg2); border:1px solid var(--border); border-radius:8px;">
+              <!-- 줄1: 일괄 선택 필터 -->
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <span style="font-size:10px; color:var(--text3); flex-shrink:0; font-weight:600;">일괄 선택</span>
+                <button id="tmFilterKr" onclick="_selectTreemapByMarket('kr')"
+                  class="btn-sm" style="font-size:11px;">🇰🇷 국장</button>
+                <button id="tmFilterUs" onclick="_selectTreemapByMarket('us')"
+                  class="btn-sm" style="font-size:11px;">🇺🇸 미장</button>
+                <div id="treemapTagButtons" style="display:contents;"></div>
+              </div>
+              <!-- 줄2: 선택 결과 + 종료 버튼 -->
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span id="treemapSelectCount" style="font-size:11px; color:var(--text2);">0종목 선택</span>
+                <span id="treemapSelectResult" style="font-size:13px; font-weight:700; font-family:var(--font-mono); color:var(--green);"></span>
+                <button onclick="exitTreemapSelectMode()"
+                  style="margin-left:auto; font-size:11px; padding:3px 10px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer;">선택 해제 ✕</button>
+              </div>
+            </div>
+
+            <div id="allocationTreemap" style="flex:1; position:relative; min-height:180px; width:100%; border-radius:8px; overflow:hidden; background:var(--bg3);"></div>
+            <div id="tagBarChart" style="margin-top:10px; display:none;"></div>
+          </div>
+        </div>
+
+        <div class="country-panel">
+          <div class="cp-header">
+            <div class="cp-title">🇰🇷 국내 주식</div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 투자액</div>
+              <div class="cp-sum-val" id="krwTotalCost">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 평가액</div>
+              <div class="cp-sum-val" id="krwTotalEval">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">수익금 (수익률)</div>
+              <div class="cp-sum-val" id="krwTotalPnl">—</div>
+            </div>
+          </div>
+          <div class="cp-accounts" id="krwAccountList"></div>
+        </div>
+
+        <div class="country-panel">
+          <div class="cp-header">
+            <div class="cp-title">🇺🇸 미국 주식</div>
+          </div>
+          <div class="cp-summary">
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 투자액</div>
+              <div class="cp-sum-val" id="usdTotalCost">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">총 평가액</div>
+              <div class="cp-sum-val" id="usdTotalEval">—</div>
+            </div>
+            <div class="cp-sum-box">
+              <div class="cp-sum-label">수익금 (수익률)</div>
+              <div class="cp-sum-val" id="usdTotalPnl">—</div>
+            </div>
+          </div>
+          <div class="cp-accounts" id="usdAccountList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="chartRowWrapper" style="display:none; gap:16px; margin-bottom:20px; flex-shrink:0; align-items:stretch; height:450px;">
+      
+      <div id="portfolioChartWrapper" style="display:none; flex-direction:column; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex:1; height:100%; box-sizing:border-box; margin:0;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px; flex-shrink:0;">
+            📈 자산 성장 추이
+            <span style="font-size:11px; font-weight:normal; color:var(--text3);">당시 보유 총 투자액 / 평가액</span>
+        </div>
+        <div class="chart-zoom-bar" style="flex-shrink:0;">
+          <div class="chart-zoom-hint">🔍 <span>드래그</span>로 확대</div>
+          <button class="btn-zoom-reset" id="btnPortfolioZoomReset" onclick="resetPortfolioChartZoom()">✕ 전체</button>
+        </div>
+        <div style="flex:1; position:relative; min-height:0; overflow:hidden;">
+          <canvas id="portfolioChartCanvas" style="cursor:crosshair; width:100%; height:100%;"></canvas>
+        </div>
+      </div>
+    
+      <div id="todayStocksPanel" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex:1; min-width:0; display:none; height:100%; margin-bottom:0;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border); flex-shrink:0;">
+          <span style="font-size:14px; font-weight:700; color:var(--text); white-space:nowrap;">📊 오늘 종목 현황</span>
+          
+          <div style="display:flex; align-items:baseline; gap:8px;">
+            <span id="todayStocksTotalPnl" style="font-size:12px; font-family:var(--font-mono); font-weight:700;"></span>
+            <span id="todayStocksTotalChange" style="font-size:18px; font-weight:700; font-family:var(--font-mono);">—</span>
+          </div>
+        </div>
+      
+        <div id="todayStocksList" style="flex:1; overflow:hidden; display:flex; flex-direction:column; min-height:0;"></div>
+      </div>
+    </div>
+
+    <div class="list-options-bar" id="listOptionsBar" style="display:none; margin-bottom:20px; flex-direction:column; gap:12px; align-items:flex-start;">
+      <div id="localTagFilterContainer" class="inline-filter-group" style="display:flex; gap:6px; flex-wrap:wrap; background:transparent; border:none; padding:0;"></div>
+  
+      <div class="list-title-wrap" style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:10px; border-top:1px solid var(--border); padding-top:12px;">
+          
+          <div style="display:flex; align-items:center; gap:8px;">
+              <input type="text" class="form-input" placeholder="🔍 종목명 / 티커 검색" oninput="updateLocalSearch(this.value)" style="width:200px; height:38px; margin:0; font-size:13px;">
+              
+              <div id="watchlistSearchGroup" style="display:none; align-items:center; gap:6px; background:var(--bg2); padding:4px 6px; border-radius:8px; border:1px solid var(--border);">
+                  <select id="mainSearchFilter" class="form-input" style="width:75px; margin:0; height:30px; font-size:12px; padding:0 5px; border:none; background:var(--bg3); cursor:pointer;">
+                      <option value="all">전체</option>
+                      <option value="kr">한국</option>
+                      <option value="us">미국</option>
+                  </select>
+                  <div style="position:relative; display:flex; gap:4px;">
+                      <input type="text" id="tickerInput" class="form-input" placeholder="관심종목 추가..." autocomplete="off" style="width:160px; margin:0; height:30px; font-size:12px; border:none; background:transparent;" />
+                      <button class="btn-submit" onclick="addManualTicker()" style="height:30px; margin:0; padding:0 12px; background:var(--accent); font-size:12px; border:none; border-radius:6px; font-weight:bold; white-space:nowrap; cursor:pointer;">추가</button>
+                      <ul id="searchDropdown" class="search-dropdown" style="position:absolute; top:calc(100% + 5px); left:0; width:100%; min-width:260px; max-height:250px; overflow-y:auto; z-index:99999; background:var(--bg2); border:1px solid var(--border2); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.6); margin:0; padding:0; display:none;"></ul>
+                  </div>
+              </div>
+          </div>
+          
+          <div style="display:flex; align-items:center; gap:8px; margin-left:auto; flex-wrap:wrap;">
+              
+              <select class="form-input" onchange="setSortMode(this.value)" style="width:110px; height:38px; margin:0; font-size:12px; cursor:pointer;">
+                  <option value="changeDesc">등락률 순</option>
+                  <option value="evalDesc">평가금액 순</option>
+                  <option value="roiDesc">수익률 순</option>
+              </select>
+              <button class="btn-sm" id="btnSortDir" onclick="toggleSortDirection()" style="height:38px; padding:0 10px; font-size:14px;" title="오름차순/내림차순">⬇️</button>
+              
+              <div style="display:flex; background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; height:38px;">
+                  <button id="btnViewCard" class="btn-sm" style="background:var(--bg3); color:var(--text); border:none; border-radius:0; padding:0 10px;" onclick="setListStyle('card')" title="카드형 보기">🗂️ 카드</button>
+                  <button id="btnViewList" class="btn-sm" style="background:transparent; color:var(--text2); border:none; border-radius:0; padding:0 10px;" onclick="setListStyle('list')" title="리스트형 보기">📄 리스트</button>
+              </div>
+    
+              <div style="display:flex; background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; height:38px;">
+                  <button id="btnLayoutVertical" class="btn-sm" style="background:var(--bg3); color:var(--text); border:none; border-radius:0; padding:0 10px;" onclick="setRegionLayout('vertical')">↕️</button>
+                  <button id="btnLayoutHorizontal" class="btn-sm" style="background:transparent; color:var(--text2); border:none; border-radius:0; padding:0 10px;" onclick="setRegionLayout('horizontal')">↔️</button>
+              </div>
+          </div>
+      </div>
+  </div>
+    
+    <div class="grid-container" id="gridContainer"></div>
+
+    <div id="dividendDashboard" class="dashboard-page" style="display:none;">
+      <div class="page-controls-box" style="flex-wrap:wrap; gap:10px; align-items:center;">
+    
+        <!-- 기간 직접 선택 -->
+        <div style="position:relative;">
+          <button id="btnDividendDatePicker" class="f-btn" onclick="openDividendDatePicker()"
+            style="border-color:var(--border2); display:flex; align-items:center; gap:6px; height:34px; padding:0 14px;">
+            📅 기간 선택
+          </button>
+          <div id="dividendDatePickerPop" style="display:none; position:absolute; top:calc(100% + 6px); left:0; z-index:9999;"></div>
+        </div>
+    
+        <!-- 소유자 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">소유자</span>
+          <button class="f-btn active div-filter" onclick="setDivFilter('all', this)">전체</button>
+          <button class="f-btn div-filter" id="divTabUser1" onclick="setDivFilter('user1', this)">소유자1</button>
+          <button class="f-btn div-filter" id="divTabUser2" onclick="setDivFilter('user2', this)">소유자2</button>
+        </div>
+    
+        <!-- 시장 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">시장</span>
+          <button class="f-btn active" id="divMktAll" onclick="_setDivMktBtn(this); updateDividendFilter('market','all')">🌐 전체</button>
+          <button class="f-btn" id="divMktKr" onclick="_setDivMktBtn(this); updateDividendFilter('market','kr')">🇰🇷 국내</button>
+          <button class="f-btn" id="divMktUs" onclick="_setDivMktBtn(this); updateDividendFilter('market','us')">🇺🇸 해외</button>
+        </div>
+    
+        <!-- 계좌 선택 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">계좌</span>
+          <select id="divBrokerFilter" onchange="updateDividendFilter('broker', this.value)"
+            style="height:30px; padding:0 8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); cursor:pointer; outline:none;">
+            <option value="all">전체</option>
+          </select>
+        </div>
+    
+        <!-- 종목명 검색 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">종목명</span>
+          <input type="text" id="divNameSearch" placeholder="종목명 / 티커"
+            oninput="updateDividendFilter('search', this.value.trim())"
+            style="height:30px; padding:0 10px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none; width:130px;">
+        </div>
+    
+        <!-- 활성 필터 배지 -->
+        <div id="dividendActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:auto;"></div>
+    
+      </div>
+
+      <!-- 두 컬럼 레이아웃 -->
+      <div style="display:flex; gap:15px; align-items:flex-start;">
+      
+        <!-- ◀ 왼쪽: 효자 종목 패널 (sticky) -->
+        <div style="width:440px; flex-shrink:0; position:sticky; top:78px; height:calc(100vh - 210px); display:flex; flex-direction:column;">
+          <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; height:100%;">
+            <div style="padding:10px 12px; border-bottom:1px solid var(--border); flex-shrink:0;">
+              
+              <div id="divSortTabBar"></div>
+            </div>
+            <div id="divStockList" style="flex:1; overflow-y:auto; padding:6px 8px;"></div>
+          </div>
+        </div>
+      
+        <!-- ▶ 오른쪽 콘텐츠 -->
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:15px;">
+      
+          <div class="stat-banner" id="divStatBanner">
+            <div class="stat-banner-accent" style="background:var(--green);"></div>
+            <div class="stat-banner-total">
+              <div class="stat-banner-label">
+                <span class="stat-dot" style="background:var(--green);"></span>
+                누적 배당금 (환산)
+              </div>
+              <div id="divTotalConverted" class="stat-banner-val" style="color:var(--green);">—</div>
+              <div class="stat-banner-sub">국내 + 해외 합산</div>
+            </div>
+            <div class="stat-banner-right">
+              <div class="stat-markets">
+                <div class="stat-market">
+                  <span class="stat-flag">🇰🇷</span>
+                  <div class="stat-market-info">
+                    <div class="stat-market-label">국내주식 배당금</div>
+                    <div id="divTotalKrw" class="stat-market-val" style="color:var(--green);">—</div>
+                  </div>
+                </div>
+                <div class="stat-market">
+                  <span class="stat-flag">🇺🇸</span>
+                  <div class="stat-market-info">
+                    <div class="stat-market-label">해외주식 배당금</div>
+                    <div id="divTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
+                    <div id="divTotalUsdConverted" class="stat-market-converted">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="stat-ratio-row">
+                <div class="stat-ratio-bar">
+                  <div id="divRatioKr" class="stat-ratio-kr" style="background:var(--green);"></div>
+                  <div class="stat-ratio-us" style="background:var(--blue);"></div>
+                </div>
+                <div class="stat-ratio-pcts">
+                  <span id="divRatioPctKr" style="color:var(--green);">🇰🇷 —</span>
+                  <span id="divRatioPctUs" style="color:var(--blue);">— 🇺🇸</span>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+          <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px;">
+            <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px;">📊 월별 배당금 추이 (합산 ₩)</div>
+            <div style="height:180px; position:relative;"><canvas id="divMonthlyCanvas"></canvas></div>
+          </div>
+      
+          <!-- 💚 배당 수령 내역 -->
+          <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+            <div style="padding:12px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:700; color:var(--text2);">
+              💚 배당 수령 내역
+            </div>
+            <div class="history-table-container" style="max-height:320px; overflow-y:auto;">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>종목</th>
+                    <th>계좌</th>
+                    <th>소유자</th>
+                    <th style="text-align:right;">배당금</th>
+                  </tr>
+                </thead>
+                <tbody id="divHistoryTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 🔮 종목별 예정 배당 -->
+          <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+            <div style="padding:12px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:700; color:var(--text2);">
+              🔮 종목별 예정 배당
+            </div>
+            <div class="history-table-container">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>종목</th>
+                    <th style="text-align:center;">배당 주기(월)</th>
+                    <th style="text-align:center;">다음 예상월</th>
+                    <th style="text-align:right;">1주당 배당금</th>
+                    <th style="text-align:right;">보유 수량</th>
+                    <th style="text-align:right;">예상 총액</th>
+                  </tr>
+                </thead>
+                <tbody id="upcomingDivTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+    </div>
+
+    <div id="historyDashboard" class="dashboard-page" style="display:none;">
+      <!-- ▲ 상단 필터바 (전체 너비) -->
+      <div id="historyControlsBox" class="page-controls-box" style="flex-wrap:wrap; gap:10px; align-items:center;">
+        <div style="position:relative;">
+          <button id="btnHistoryDatePicker" class="f-btn" onclick="openHistoryDatePicker()"
+            style="border-color:var(--border2); display:flex; align-items:center; gap:6px; height:34px; padding:0 14px;">
+            📅 기간 선택
+          </button>
+          <div id="historyDatePickerPop" style="display:none; position:absolute; top:calc(100% + 6px); left:0; z-index:9999;"></div>
+        </div>
+        <div class="inline-filter-group">
+          <span class="filter-label">소유자</span>
+          <button class="f-btn active hist-owner-filter" onclick="setHistoryOwnerFilter('all', this)">전체</button>
+          <button class="f-btn hist-owner-filter" id="histTabUser1" onclick="setHistoryOwnerFilter('user1', this)">소유자1</button>
+          <button class="f-btn hist-owner-filter" id="histTabUser2" onclick="setHistoryOwnerFilter('user2', this)">소유자2</button>
+        </div>
+        <div class="inline-filter-group">
+          <span class="filter-label">시장</span>
+          <button class="f-btn active" id="histMktAll" onclick="_setHistMktBtn(this); updateHistoryFilter('market','all')">🌐 전체</button>
+          <button class="f-btn" id="histMktKr" onclick="_setHistMktBtn(this); updateHistoryFilter('market','kr')">🇰🇷 국내</button>
+          <button class="f-btn" id="histMktUs" onclick="_setHistMktBtn(this); updateHistoryFilter('market','us')">🇺🇸 해외</button>
+        </div>
+        <div class="inline-filter-group">
+          <span class="filter-label">유형</span>
+          <button class="f-btn active" id="histTypeAll" onclick="_setHistTypeBtn(this); updateHistoryFilter('type','all')">전체</button>
+          <button class="f-btn" id="histTypeBuy" onclick="_setHistTypeBtn(this); updateHistoryFilter('type','buy')">🔴 매수</button>
+          <button class="f-btn" id="histTypeSell" onclick="_setHistTypeBtn(this); updateHistoryFilter('type','sell')">🔵 매도</button>
+          <button class="f-btn" id="histTypeDiv" onclick="_setHistTypeBtn(this); updateHistoryFilter('type','dividend')">💚 배당</button>
+        </div>
+        <div class="inline-filter-group">
+          <span class="filter-label">계좌</span>
+          <select id="histBrokerFilter" onchange="updateHistoryFilter('broker', this.value)"
+            style="height:30px; padding:0 8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); cursor:pointer; outline:none;">
+            <option value="all">전체</option>
+          </select>
+        </div>
+        <div class="inline-filter-group">
+          <span class="filter-label">종목명</span>
+          <input type="text" id="histNameSearch" placeholder="종목명 / 티커"
+            oninput="updateHistoryFilter('search', this.value.trim())"
+            style="height:30px; padding:0 10px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none; width:130px;">
+        </div>
+        <button class="f-btn" onclick="openBulkDateModal()" title="현재 필터된 거래 내역의 날짜를 일괄 수정"
+          style="border-color:var(--accent); color:var(--accent); gap:5px; height:34px; padding:0 14px; display:flex; align-items:center;">
+          📅 날짜 일괄수정
+        </button>
+        <div id="historyActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:auto;"></div>
+      </div>
+
+      <!-- ▼ 메인 바디: 왼쪽 랭킹 + 오른쪽 테이블 -->
+      <div style="display:flex; gap:15px; align-items:flex-start;">
+
+        <!-- ◀ 좌측 랭킹 패널 -->
+        <div id="historyRankingPanel" style="width:440px; flex-shrink:0; position:sticky; top:78px; height:calc(100vh - 210px); display:flex; flex-direction:column;">
+        </div>
+
+        <!-- ▶ 우측: 테이블 -->
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:15px;">
+
+          <div id="histSummaryBar" style="display:none; margin-bottom:10px;"></div>
+          <div class="history-table-container">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th style="width:40px; text-align:center; padding:12px 8px;">
+                    <input type="checkbox" id="histSelectAll" onclick="toggleHistSelectAll(this)" title="전체 선택/해제">
+                  </th>
+                  <th>일자</th>
+                  <th>소유자</th>
+                  <th>계좌</th>
+                  <th>유형</th>
+                  <th>종목</th>
+                  <th style="text-align:right;">수량</th>
+                  <th style="text-align:right;">단가/배당</th>
+                  <th style="text-align:right;">총액</th>
+                  <th style="text-align:center;">작업</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
+
+        </div><!-- /우측 -->
+      </div><!-- /flex wrapper -->
+    </div>
+
+    <div id="realizedDashboard" class="dashboard-page" style="display:none;">
+      <div class="page-controls-box" style="flex-wrap:wrap; gap:10px; align-items:center;">
+        <!-- 기간 직접 선택 -->
+        <div style="position:relative;">
+          <button id="btnRealizedDatePicker" class="f-btn"
+            onclick="openRealizedDatePicker()"
+            style="border-color:var(--border2); display:flex; align-items:center; gap:6px; height:34px; padding:0 14px;">
+            📅 기간 선택
+          </button>
+          <div id="realizedDatePickerPop"
+            style="display:none; position:absolute; top:calc(100% + 6px); left:0; z-index:9999;">
+          </div>
+        </div>
+      
+        <!-- 소유자 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">소유자</span>
+          <button class="f-btn active real-filter" onclick="setRealizedOwnerFilter('all', this)">전체</button>
+          <button class="f-btn real-filter" id="realTabUser1" onclick="setRealizedOwnerFilter('user1', this)">소유자1</button>
+          <button class="f-btn real-filter" id="realTabUser2" onclick="setRealizedOwnerFilter('user2', this)">소유자2</button>
+        </div>
+      
+        <!-- 시장 필터 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">시장</span>
+          <button class="f-btn active" id="realMktAll" onclick="_setRealMktBtn(this); updateRealizedFilter('market','all')">🌐 전체</button>
+          <button class="f-btn" id="realMktKr" onclick="_setRealMktBtn(this); updateRealizedFilter('market','kr')">🇰🇷 국내</button>
+          <button class="f-btn" id="realMktUs" onclick="_setRealMktBtn(this); updateRealizedFilter('market','us')">🇺🇸 해외</button>
+        </div>
+
+        <!-- 계좌 선택 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">계좌</span>
+          <select id="realBrokerSearch" onchange="updateRealizedFilter('broker', this.value)"
+            style="height:30px; padding:0 8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); cursor:pointer; outline:none;">
+            <option value="">전체</option>
+          </select>
+        </div>
+        
+        <!-- 종목명 선택 -->
+        <div class="inline-filter-group">
+          <span class="filter-label">종목명</span>
+          <input type="text" id="realNameSearch" placeholder="종목명 / 티커"
+            oninput="updateRealizedFilter('name', this.value.trim())"
+            style="height:30px; padding:0 10px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg2); color:var(--text); outline:none; width:130px;">
+        </div>
+      
+        <!-- 활성 필터 배지 -->
+        <div id="realizedActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:auto;"></div>
+      
+      </div>
+    
+      <!-- 메인 바디: 왼쪽 랭킹 + 오른쪽 차트/요약/표 -->
+      <div style="display:flex; gap:15px; align-items:flex-start;">
+
+        <!-- ◀ 왼쪽 랭킹 패널 (sticky + 화면 높이 자동 맞춤) -->
+        <div id="realizedRankingPanel" style="width:440px; flex-shrink:0; position:sticky; top:78px; height:calc(100vh - 210px); display:flex; flex-direction:column;">
+          <!-- JS로 동적 렌더링 -->
+        </div>
+
+        <!-- ▶ 오른쪽 콘텐츠 -->
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:15px;">
+
+          <div class="real-flow-panel" id="realStatBanner">
+          
+            <!-- ① 총 실현수익 -->
+            <div class="rfp-total">
+              <div class="rfp-icon">💵</div>
+              <div class="rfp-label-sm">총 실현수익 (환산)</div>
+              <div id="realTotalConverted" class="rfp-main-val">—</div>
+              <div class="rfp-hint">국내 + 해외 합산</div>
+              <div class="rfp-ratio-bar-wrap">
+                <div class="rfp-ratio-bar">
+                  <div id="rfpRatioKrFill" class="rfp-ratio-kr-fill" style="width:50%"></div>
+                  <div class="rfp-ratio-us-fill"></div>
+                </div>
+                <div class="rfp-ratio-labels">
+                  <span id="rfpRatioKrPct" style="color:var(--profit)">🇰🇷 —</span>
+                  <span id="rfpRatioUsPct" style="color:var(--loss)">— 🇺🇸</span>
+                </div>
+              </div>
+            </div>
+          
+            <!-- ② Sankey SVG 흐름 -->
+            <div class="rfp-sankey">
+              <svg class="rfp-sankey-svg" id="rfpSankeySvg"
+                   viewBox="0 0 90 290" preserveAspectRatio="none"
+                   xmlns="http://www.w3.org/2000/svg">
+                <!-- JS가 path 채움 -->
+              </svg>
+            </div>
+          
+            <!-- ③ 국내/해외 카드 -->
+            <div class="rfp-markets">
+              <div class="rfp-mcard rfp-mcard-kr">
+                <span class="rfp-mflag">🇰🇷</span>
+                <div>
+                  <div class="rfp-label-sm">국내주식 실현수익</div>
+                  <div id="realTotalKrw" class="rfp-mval rfp-c-profit">—</div>
+                  <div id="rfpKrPct" class="rfp-pct-badge"
+                       style="background:rgba(0,200,122,0.15);color:var(--profit)">—</div>
+                </div>
+              </div>
+              <div class="rfp-mcard rfp-mcard-us">
+                <span class="rfp-mflag">🇺🇸</span>
+                <div>
+                  <div class="rfp-label-sm">해외주식 실현수익</div>
+                  <div id="realTotalUsd" class="rfp-mval rfp-c-loss">—</div>
+                  <div id="realTotalUsdConverted" class="rfp-hint">—</div>
+                  <div id="rfpUsPct" class="rfp-pct-badge"
+                       style="background:rgba(58,154,255,0.15);color:var(--loss)">—</div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- ④ 해외 → 양도세 화살표 -->
+            <div class="rfp-arrow" aria-hidden="true">
+              <div class="rfp-arrow-space"></div>
+              <div class="rfp-arrow-line"></div>
+            </div>
+          
+            <!-- ⑤ 양도소득세 -->
+            <div class="rfp-tax-wrap">
+              <div class="rfp-tax-space"></div>
+              <div id="capitalGainsTaxPanel" class="rfp-mcard rfp-mcard-tax"></div>
+            </div>
+          
+          </div>
+
+          <div id="realizedChartWrapper" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; flex-direction:column; flex-shrink:0;">
+            <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                💰 누적 실현수익 흐름 <span style="font-size:11px; font-weight:normal; color:var(--text3);">(확정 수익의 합계 추이)</span>
+            </div>
+            <div style="height:180px; position:relative;"><canvas id="realizedChartCanvas"></canvas></div>
+          </div>
+
+          <!-- 필터 적용 시 요약바 -->
+          <div id="realSummaryBar" style="display:none;"></div>
+
+          <div class="history-table-container">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>매도 일자</th>
+                  <th>종목</th>
+                  <th>계좌/소유자</th>
+                  <th style="text-align:right;">매도 수량</th>
+                  <th style="text-align:right;">매도 단가</th>
+                  <th style="text-align:right;">매수 평단가</th>
+                  <th style="text-align:right;">실현 수익금</th>
+                  <th style="text-align:right;">수익률</th>
+                </tr>
+              </thead>
+              <tbody id="realizedTableBody"></tbody>
+            </table>
+          </div>
+
+        </div><!-- /right -->
+      </div><!-- /flex wrapper -->
+      
+    </div> </main> </div>
+
+<!-- 🌟 개별 종목 차트 모달 -->
+<div class="overlay" id="chartOverlay" onclick="closeModal('chartOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+      <div>
+        <div id="mTicker" style="font-size:18px; font-weight:700;"></div>
+        <div id="mBroker" style="font-family:var(--font-mono); font-size:12px; color:var(--text3); margin-top:2px;"></div>
+      </div>
+      <button class="btn-sm" onclick="closeModal('chartOverlay')">닫기</button>
+    </div>
+    <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
+      <div id="mPrice" style="font-family:var(--font-mono); font-size:28px; font-weight:700;"></div>
+      <div id="mChange" style="font-size:14px; font-weight:500; padding:3px 10px; border-radius:20px;"></div>
+    </div>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div id="mMeta" style="font-size:12px; color:var(--text3);"></div>
+        
+        <!-- 🌟 모달 전용 기간 설정 탭 추가 -->
+        <div class="range-group" id="modalRangeGroup" style="transform: scale(0.9); transform-origin: right center; margin: 0;">
+          <button class="rtab m-rtab" onclick="setModalRange('1m', this)">1M</button>
+          <button class="rtab m-rtab" onclick="setModalRange('3m', this)">3M</button>
+          <button class="rtab m-rtab" onclick="setModalRange('6m', this)">6M</button>
+          <button class="rtab m-rtab" onclick="setModalRange('1y', this)">1Y</button>
+          <button class="rtab m-rtab" onclick="setModalRange('3y', this)">3Y</button>
+          <button class="rtab m-rtab" onclick="setModalRange('5y', this)">5Y</button>
+        </div>
+    </div>
+    
+    <!-- 변경 후 -->
+    <div style="height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
+
+    <!-- 🌟 매매기록 요약 + What if 섹션 -->
+    <div id="mTradeStats" style="display:none; margin-top:16px; border-top:1px solid var(--border2); padding-top:14px;">
+      <!-- 매매 요약 -->
+      <div style="font-size:12px; font-weight:600; color:var(--text2); margin-bottom:8px;">📋 매매 기록 요약</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+        <div style="background:var(--bg3); border-radius:8px; padding:8px 10px;">
+          <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">총 매수금</div>
+          <div id="mTotalBuy" style="font-family:var(--font-mono); font-size:13px; font-weight:700;"></div>
+          <div id="mAvgBuy" style="font-family:var(--font-mono); font-size:10px; color:var(--text3); margin-top:3px;"></div>
+        </div>
+        <div style="background:var(--bg3); border-radius:8px; padding:8px 10px;">
+          <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">총 매도금</div>
+          <div id="mTotalSell" style="font-family:var(--font-mono); font-size:13px; font-weight:700;"></div>
+          <div id="mAvgSell" style="font-family:var(--font-mono); font-size:10px; color:var(--text3); margin-top:3px;"></div>
+        </div>
+        <div style="background:var(--bg3); border-radius:8px; padding:8px 10px;">
+          <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">실현 순수익</div>
+          <div id="mNetProfit" style="font-family:var(--font-mono); font-size:13px; font-weight:700;"></div>
+        </div>
+        <!-- 🌟 보유 잔량 있을 때만 표시 -->
+        <div id="mHoldingBox" style="display:none; background:var(--bg3); border-radius:8px; padding:8px 10px;">
+          <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">현재 평가금 <span id="mHoldingQty" style="color:var(--accent);"></span></div>
+          <div id="mHoldingValue" style="font-family:var(--font-mono); font-size:13px; font-weight:700;"></div>
+          <div id="mHoldingPnl" style="font-family:var(--font-mono); font-size:11px; margin-top:2px;"></div>
+        </div>
+      </div>
+      <!-- What if -->
+      <div style="background:var(--bg3); border:1px solid var(--border2); border-radius:10px; padding:12px 14px;">
+        <div style="font-size:12px; font-weight:700; color:var(--text1); margin-bottom:6px;">🤔 What if..?</div>
+        <div style="font-size:11px; color:var(--text3); margin-bottom:8px;">매도하지 않고 지금까지 전부 보유했다면</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div>
+            <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">총 매수 원금</div>
+            <div id="mWiCost" style="font-family:var(--font-mono); font-size:13px; font-weight:600;"></div>
+          </div>
+          <div>
+            <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">현재 평가금액</div>
+            <div id="mWiValue" style="font-family:var(--font-mono); font-size:13px; font-weight:600;"></div>
+          </div>
+          <div>
+            <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">평가 손익</div>
+            <div id="mWiProfit" style="font-family:var(--font-mono); font-size:14px; font-weight:700;"></div>
+          </div>
+          <div>
+            <div style="font-size:10px; color:var(--text3); margin-bottom:3px;">수익률</div>
+            <div id="mWiRoi" style="font-family:var(--font-mono); font-size:14px; font-weight:700;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="overlay" id="ownerOverlay" onclick="closeModal('ownerOverlay')">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 style="font-size:16px;">👥 소유자 설정</h3>
+      <button class="btn-sm" onclick="closeModal('ownerOverlay')">닫기</button>
+    </div>
+    <div style="font-size:11px; color:var(--text2); margin-bottom:20px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px;">
+      장부와 대시보드에 표시될 소유자의 이름, 고유 아이콘 및 테마 색상을 변경할 수 있습니다.
+    </div>
+    
+    <div class="form-group" style="margin-bottom:12px; display:flex; gap:10px;">
+      <div style="flex:1">
+         <label>소유자1 이름</label>
+         <input type="text" id="inputOwner1Name" class="form-input" placeholder="예: 아빠">
+      </div>
+      <div style="width: 60px;">
+         <label>아이콘</label>
+         <input type="text" id="inputOwner1Icon" class="form-input" placeholder="👤" style="text-align:center;">
+      </div>
+      <div style="width: 50px;">
+         <label>색상</label>
+         <input type="color" id="inputOwner1Color" style="width:100%; height:38px; padding:0; border:none; border-radius:6px; cursor:pointer;">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:20px; display:flex; gap:10px;">
+      <div style="flex:1">
+         <label>소유자2 이름</label>
+         <input type="text" id="inputOwner2Name" class="form-input" placeholder="예: 엄마">
+      </div>
+      <div style="width: 60px;">
+         <label>아이콘</label>
+         <input type="text" id="inputOwner2Icon" class="form-input" placeholder="👤" style="text-align:center;">
+      </div>
+      <div style="width: 50px;">
+         <label>색상</label>
+         <input type="color" id="inputOwner2Color" style="width:100%; height:38px; padding:0; border:none; border-radius:6px; cursor:pointer;">
+      </div>
+    </div>
+
+    <button class="btn-submit" style="background:var(--accent); width:100%; margin-top:10px;" onclick="saveOwnerNames()">변경 사항 저장</button>
+  </div>
+</div>
+
+<div class="overlay" id="masterSettingsOverlay" onclick="closeModal('masterSettingsOverlay')">
+  <div class="modal" style="max-width: 500px;" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="font-size:18px;">⚙️ Two the Moon 거래내역 설정</h3>
+      <button class="btn-sm" onclick="closeModal('masterSettingsOverlay')">닫기</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">☁️ GitHub 클라우드 동기화</div>
+      <div style="font-size:11px; color:var(--text2); margin-bottom:15px;">
+        개인 GitHub 저장소를 연결하여 모든 기기에서 장부를 안전하게 동기화합니다.
+      </div>
+      <div class="form-group" style="margin-bottom:10px; display:flex; gap:10px;">
+        <div style="flex:1;">
+          <input type="text" id="ghUser" class="form-input" placeholder="GitHub 아이디 (예: username)">
+        </div>
+        <div style="flex:1;">
+          <input type="text" id="ghRepo" class="form-input" placeholder="저장소 이름 (예: stock-data)">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:15px;">
+        <input type="password" id="ghToken" class="form-input" placeholder="Personal Access Token (ghp_...)">
+      </div>
+      
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; background:var(--bg); border-radius:6px; border:1px solid var(--border); margin-bottom:15px;">
+        <span style="font-size:12px; font-weight:700;">🔄 내역 수정 시 자동 저장(Sync)</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="ghAutoSync">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="pullFromGithub(false)">⬇️ 클라우드에서 불러오기</button>
+        <button class="btn-submit" style="background:var(--accent);" onclick="pushToGithub(false)">⬆️ 클라우드에 백업</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">💻 기기 로컬 데이터 및 CSV 관리</div>
+      <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="exportData()">⬇️ JSON 파일로 로컬 백업</button>
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="document.getElementById('importFile').click()">⬆️ JSON 파일로 불러오기</button>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="downloadCsvSample()">⬇️ CSV 양식 파일 받기</button>
+        <button class="btn-submit" style="flex:1; background:rgba(0, 200, 122, 0.15); border:1px solid rgba(0, 200, 122, 0.4); color:var(--green);" onclick="document.getElementById('importCsvFile').click()">📄 CSV 파일로 일괄 업로드</button>
+      </div>
+    </div>
+
+    <div class="settings-section" style="border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); margin-bottom:0;">
+      <div class="settings-section-title" style="color:var(--red);">🚨 모든 데이터 영구 삭제 (초기화)</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11px; color:var(--text2);">저장된 모든 장부 내역을 완전히 비웁니다.</span>
+        <button class="btn-danger" style="background:var(--red); color:#fff; padding:6px 12px; font-weight:bold; border:none;" onclick="resetAllTransactions()">전체 초기화 실행</button>
+      </div>
+    </div>
+
+    <div class="settings-section" style="margin-top:16px;">
+      <div class="settings-section-title">🎨 수익 / 손실 색상</div>
+     
+      <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+     
+        <!-- 수익 색상 -->
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="font-size:12px; color:var(--text2); width:60px; flex-shrink:0;">수익 색상</label>
+          <input
+            type="color"
+            id="inputColorProfit"
+            value="#00C578"
+            oninput="updateColorPreview()"
+            style="width:40px; height:34px; border:none; background:none; cursor:pointer; padding:0; border-radius:6px;"
+          >
+          <span
+            id="colorPreviewProfit"
+            style="
+              flex:1; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:700;
+              text-align:center; border:1px solid; transition:0.2s;
+              background:rgba(0,200,122,0.15); color:#00C578; border-color:rgba(0,200,122,0.4);
+            "
+          >+12.34%&nbsp; ▲ 수익</span>
+        </div>
+     
+        <!-- 손실 색상 -->
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="font-size:12px; color:var(--text2); width:60px; flex-shrink:0;">손실 색상</label>
+          <input
+            type="color"
+            id="inputColorLoss"
+            value="#3A9AFF"
+            oninput="updateColorPreview()"
+            style="width:40px; height:34px; border:none; background:none; cursor:pointer; padding:0; border-radius:6px;"
+          >
+          <span
+            id="colorPreviewLoss"
+            style="
+              flex:1; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:700;
+              text-align:center; border:1px solid; transition:0.2s;
+              background:rgba(58,154,255,0.15); color:#3A9AFF; border-color:rgba(58,154,255,0.4);
+            "
+          >-8.76%&nbsp; ▼ 손실</span>
+        </div>
+     
+        <!-- 프리셋 버튼 -->
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
+          <span style="font-size:11px; color:var(--text3); align-self:center; margin-right:2px;">프리셋:</span>
+     
+          <!-- 기본 (초록/파랑) -->
+          <button type="button" onclick="applyColorPreset('#00C578','#3A9AFF')"
+            style="padding:4px 10px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#00C578; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#3A9AFF; display:inline-block;"></span>
+            기본
+          </button>
+     
+          <!-- 전통 (빨강/파랑) -->
+          <button type="button" onclick="applyColorPreset('#FF4D6A','#3A9AFF')"
+            style="padding:4px 10px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#FF4D6A; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#3A9AFF; display:inline-block;"></span>
+            전통 (빨강↑)
+          </button>
+     
+          <!-- 미국식 (초록/빨강) -->
+          <button type="button" onclick="applyColorPreset('#00C578','#FF4D6A')"
+            style="padding:4px 10px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#00C578; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#FF4D6A; display:inline-block;"></span>
+            미국식 (빨강↓)
+          </button>
+     
+          <!-- 파스텔 -->
+          <button type="button" onclick="applyColorPreset('#5BB88E','#7B9FD4')"
+            style="padding:4px 10px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#5BB88E; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#7B9FD4; display:inline-block;"></span>
+            파스텔
+          </button>
+        </div>
+     
+        <!-- 저장 / 초기화 버튼 -->
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <button id="btnSaveColorPrefs" type="button" onclick="saveColorPrefs()"
+            style="flex:1; padding:8px; font-size:12px; font-weight:700; border-radius:6px; border:none; background:var(--accent); color:#fff; cursor:pointer; transition:0.15s;">
+            💾 색상 저장하기
+          </button>
+          <button type="button" onclick="resetColorPrefs()"
+            style="padding:8px 14px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer;">
+            기본값
+          </button>
+        </div>
+     
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="csvMappingOverlay" onclick="cancelCsvImport()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:500px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-shrink:0; padding: 20px 20px 0;">
+      <h3 style="font-size:16px;">⚠️ 알 수 없는 종목 연결</h3>
+    </div>
+    
+    <div style="font-size:11px; color:var(--text2); margin-bottom:15px; line-height:1.5; background:var(--bg3); padding:10px; border-radius:6px; flex-shrink:0; margin: 0 20px 15px;">
+      아래 종목들은 자동으로 티커를 찾지 못했습니다.<br>
+      빈칸에 <b>종목명이나 영문 티커(예: AAPL)</b>를 검색하여 선택해주세요.
+    </div>
+
+    <div id="unmatchedContainer" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding: 0 20px 20px;">
+    </div>
+
+    <div style="display:flex; gap:10px; flex-shrink:0; padding: 15px 20px; border-top: 1px solid var(--border);">
+      <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="cancelCsvImport()">작업 취소</button>
+      <button class="btn-submit" style="flex:1; background:var(--accent);" onclick="processPendingCsv()">선택 완료 및 저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="tagOverlay" onclick="closeModal('tagOverlay')">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 style="font-size:16px;">🏷️ 종목 태그 / 메모 설정</h3>
+      <button class="btn-sm" onclick="closeModal('tagOverlay')">닫기</button>
+    </div>
+    <div class="form-group">
+      <label id="tagModalTickerLabel" style="font-size:13px; font-weight:bold; color:var(--accent); margin-bottom:10px;"></label>
+      <input type="text" id="inputStockTag" class="form-input" placeholder="예: 2차전지, 배당용, 장기투자 (쉼표로 구분)" maxlength="100">
+      <div style="font-size:11px; color:var(--text3); margin-top:6px; text-align:right;">쉼표(,)로 구분하여 최대 5개 입력 가능</div>
+    </div>
+    <input type="hidden" id="tagModalSymbol" value="">
+    <div style="display:flex; gap:10px; margin-top:15px;">
+      <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="saveStockTag('')">태그 삭제</button>
+      <button class="btn-submit" style="flex:1; background:var(--accent);" onclick="saveStockTag()">태그 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 📅 날짜 일괄수정 모달 -->
+<div class="overlay" id="bulkDateOverlay" onclick="closeBulkDateModal()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:460px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <h3 style="font-size:16px;">📅 날짜 일괄수정</h3>
+      <button class="btn-sm" onclick="closeBulkDateModal()">닫기</button>
+    </div>
+
+    <!-- 대상 건수 안내 -->
+    <div id="bulkDateTargetInfo" style="background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:var(--text2); line-height:1.6;"></div>
+
+    <!-- 탭 선택 -->
+    <div style="display:flex; border-bottom:1px solid var(--border); margin-bottom:18px; gap:2px;">
+      <button id="bdTabShift"  class="bd-tab active" onclick="setBdTab('shift')"  style="padding:8px 16px; font-size:13px; border:none; border-bottom:2px solid var(--accent); background:transparent; color:var(--accent); cursor:pointer; font-weight:700;">📆 날짜 이동</button>
+      <button id="bdTabReplace" class="bd-tab"        onclick="setBdTab('replace')" style="padding:8px 16px; font-size:13px; border:none; border-bottom:2px solid transparent; background:transparent; color:var(--text2); cursor:pointer;">🔄 날짜 치환</button>
+      <button id="bdTabSet"    class="bd-tab"         onclick="setBdTab('set')"    style="padding:8px 16px; font-size:13px; border:none; border-bottom:2px solid transparent; background:transparent; color:var(--text2); cursor:pointer;">📌 날짜 설정</button>
+    </div>
+
+    <!-- 패널: 날짜 이동 -->
+    <div id="bdPanelShift">
+      <div style="font-size:12px; color:var(--text3); margin-bottom:12px;">필터된 모든 거래의 날짜를 지정한 일수만큼 앞/뒤로 이동합니다.</div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button onclick="document.getElementById('bdShiftDir').value='back'; document.getElementById('bdShiftDirLabel').textContent='← 과거로'; _updateBdPreviews();" 
+          style="flex:1; padding:8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg3); color:var(--text); cursor:pointer;" 
+          id="btnShiftBack">← 과거로</button>
+        <button onclick="document.getElementById('bdShiftDir').value='forward'; document.getElementById('bdShiftDirLabel').textContent='미래로 →'; _updateBdPreviews();"
+          style="flex:1; padding:8px; font-size:12px; border-radius:6px; border:1px solid var(--border2); background:var(--bg3); color:var(--text); cursor:pointer;"
+          id="btnShiftFwd">미래로 →</button>
+      </div>
+      <input type="hidden" id="bdShiftDir" value="back">
+      <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
+        <label style="font-size:12px; color:var(--text2); white-space:nowrap;"><span id="bdShiftDirLabel">← 과거로</span></label>
+        <input type="number" id="bdShiftDays" class="form-input" placeholder="이동할 일수" min="1" max="3650" value="1" style="flex:1; height:36px; font-size:13px;" oninput="_updateBdPreviews()">
+        <span style="font-size:12px; color:var(--text2);">일</span>
+      </div>
+      <div id="bdShiftPreview" style="margin-top:10px; font-size:11px; color:var(--text3); min-height:18px;"></div>
+    </div>
+
+    <!-- 패널: 날짜 치환 -->
+    <div id="bdPanelReplace" style="display:none;">
+      <div style="font-size:12px; color:var(--text3); margin-bottom:12px;">특정 날짜를 가진 거래를 모두 찾아 다른 날짜로 바꿉니다.</div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label style="font-size:12px;">변경할 날짜 (현재)</label>
+        <input type="date" id="bdReplaceFrom" class="form-input" style="height:36px;" oninput="_updateBdPreviews()">
+      </div>
+      <div class="form-group">
+        <label style="font-size:12px;">바꿀 날짜 (새로운 날짜)</label>
+        <input type="date" id="bdReplaceTo" class="form-input" style="height:36px;" oninput="_updateBdPreviews()">
+      </div>
+      <div id="bdReplacePreview" style="margin-top:8px; font-size:11px; color:var(--text3); min-height:18px;"></div>
+    </div>
+
+    <!-- 패널: 날짜 설정 -->
+    <div id="bdPanelSet" style="display:none;">
+      <div style="font-size:12px; color:var(--text3); margin-bottom:12px;">필터된 모든 거래의 날짜를 하나의 날짜로 통일합니다.</div>
+      <div class="form-group">
+        <label style="font-size:12px;">설정할 날짜</label>
+        <input type="date" id="bdSetDate" class="form-input" style="height:36px;" oninput="_updateBdPreviews()">
+      </div>
+      <div id="bdSetPreview" style="margin-top:8px; font-size:11px; color:var(--text3); min-height:18px;"></div>
+    </div>
+
+    <!-- 확인 버튼 -->
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="closeBulkDateModal()">취소</button>
+      <button class="btn-submit" id="btnBulkDateApply" style="flex:1; background:var(--accent);" onclick="applyBulkDate()">✔ 적용하기</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
