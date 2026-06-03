@@ -8466,5 +8466,47 @@ async function initMarketSignalBar() {
     console.warn('Market Signal Bar 로드 실패:', e);
   }
 }
-
 document.addEventListener('DOMContentLoaded', initMarketSignalBar);
+
+
+// ==========================================
+// 🔤 전체 폰트 크기 설정
+// ==========================================
+const FONT_SIZE_KEY = 'ttm_font_size';
+const FONT_SIZE_LEVELS = { xs: '11px', sm: '13px', md: '14px', lg: '16px', xl: '18px' };
+
+function applyFontSize(level) {
+    const size = FONT_SIZE_LEVELS[level] || '14px';
+    document.documentElement.style.setProperty('--font-base', size);
+    document.body.style.fontSize = size;
+    localStorage.setItem(FONT_SIZE_KEY, level);
+
+    // 버튼 active 상태 동기화
+    document.querySelectorAll('.font-size-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-level') === level;
+        btn.style.background    = isActive ? 'var(--accent)'    : 'transparent';
+        btn.style.color         = isActive ? '#fff'             : 'var(--text2)';
+        btn.style.borderColor   = isActive ? 'var(--accent)'    : 'var(--border2)';
+        btn.style.fontWeight    = isActive ? '700'              : '500';
+    });
+}
+
+function loadFontSize() {
+    const saved = localStorage.getItem(FONT_SIZE_KEY) || 'md';
+    applyFontSize(saved);
+}
+
+// 페이지 로드 시 즉시 적용 (깜빡임 방지)
+loadFontSize();
+
+// 설정 모달이 열릴 때마다 버튼 상태 동기화
+(function watchFontSettingsModal() {
+    const overlay = document.getElementById('masterSettingsOverlay');
+    if (!overlay) { setTimeout(watchFontSettingsModal, 300); return; }
+    new MutationObserver(() => {
+        if (overlay.classList.contains('open')) {
+            const saved = localStorage.getItem(FONT_SIZE_KEY) || 'md';
+            applyFontSize(saved);
+        }
+    }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
+})();
