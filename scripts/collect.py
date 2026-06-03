@@ -100,45 +100,41 @@ def get_buffett_indicators():
             )
             page = context.new_page()
 
-            # 5-1. 미국 버핏 지수
+            # 5-1. 미국 버핏 지수 (GuruFocus 복귀 및 문장 정밀 타겟팅)
             try:
                 page.goto("https://www.gurufocus.com/stock-market-valuations.php", timeout=60000)
                 page.wait_for_load_state("networkidle", timeout=30000)
-                page.wait_for_timeout(3000)
+                page.wait_for_timeout(2000)
                 
-                # 💡 핵심: 태그가 벗겨진 텍스트 대신 '전체 HTML 소스코드'를 가져옵니다.
+                us_text = page.inner_text("body")
                 html_source = page.content()
                 
-                # 💡 사용자가 발견한 HTML 태그를 기반으로 정밀 타겟팅
+                # 💡 사용자가 짚어준 정확한 문장 패턴을 1순위로 배치
                 patterns_us = [
-                    # 1순위: Buffett Indicator 글자 근처의 text-(색상) 및 fw-bold 태그 내부 숫자 추출
-                    # (시장이 폭락하면 글자색이 text-danger에서 text-success로 바뀔 수 있으므로 색상 이름은 가변 처리)
-                    r"Buffett\s+Indicator[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*text-[a-z]+[^>]*[\"'][^>]*>\s*<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%",
+                    # 1순위: "Based on the historical ratio of total market cap over GDP (currently at 238.8%)"
+                    r"Based\s+on\s+the\s+historical\s+ratio\s+of\s+total\s+market\s+cap\s+over\s+GDP\s*\(currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%\)",
                     
-                    # 2순위: 혹시 색상 태그가 사라지고 fw-bold 태그만 남을 경우 방어
-                    r"Buffett\s+Indicator[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%",
-                    
-                    # 3순위: US Market Valuation 이라는 제목으로 적혀있을 경우
-                    r"US\s+Market\s+Valuation[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%"
+                    # 2순위: 혹시 문장이 살짝 바뀌거나 다른 위치에 있을 경우를 대비한 기존 껍데기 패턴
+                    r"<span[^>]*class=[\"'][^>]*text-(?:danger|success|warning|info)[^>]*[\"'][^>]*>\s*<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%",
+                    r"US\s+Market\s+Valuation:\s*(\d{2,4}(?:\.\d+)?)\s*%"
                 ]
                 
                 for pat in patterns_us:
-                    m_us = re.search(pat, html_source, re.IGNORECASE)
-                    if m_us:
-                        us_val = float(m_us.group(1))
+                    m = re.search(pat, us_text, re.IGNORECASE) or re.search(pat, html_source, re.IGNORECASE)
+                    if m:
+                        us_val = float(m.group(1))
                         break
             except Exception as e:
                 print(f"   ⚠️ 미국 버핏 지수 파싱 오류: {e}")
 
-            # 5-2. 글로벌 버핏 지수
+            # 5-2. 글로벌 버핏 지수 (GuruFocus 글로벌)
             try:
                 page.goto("https://www.gurufocus.com/global-market-valuation.php", timeout=60000)
                 page.wait_for_load_state("networkidle", timeout=30000)
-                page.wait_for_timeout(3000)
+                page.wait_for_timeout(2000)
                 
                 html_source_gl = page.content()
                 
-                # 글로벌 지수도 HTML 태그 기반으로 추출 방식 통일
                 patterns_gl = [
                     r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*text-[a-z]+[^>]*[\"'][^>]*>\s*<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%",
                     r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%"
@@ -154,7 +150,7 @@ def get_buffett_indicators():
 
             browser.close()
     except Exception as e:
-        print(f"   ⚠️ 버핏 지수 Playwright 실행 환경 오류: {e}")
+        print(f"   ⚠️ 버핏 지수 Playwright 환경 오류: {e}")
         
     return us_val, global_val
 
