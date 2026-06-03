@@ -8473,12 +8473,11 @@ document.addEventListener('DOMContentLoaded', initMarketSignalBar);
 // 🔤 전체 폰트 크기 설정
 // ==========================================
 const FONT_SIZE_KEY = 'ttm_font_size';
-const FONT_SIZE_LEVELS = { xs: '11px', sm: '13px', md: '14px', lg: '16px', xl: '18px' };
+const FONT_SIZE_LEVELS = { xs: 0.82, sm: 0.91, md: 1.0, lg: 1.1, xl: 1.22 };
 
 function applyFontSize(level) {
-    const size = FONT_SIZE_LEVELS[level] || '14px';
-    document.documentElement.style.setProperty('--font-base', size);
-    document.body.style.fontSize = size;
+    const zoom = FONT_SIZE_LEVELS[level] || 1.0;
+    document.documentElement.style.zoom = zoom;
     localStorage.setItem(FONT_SIZE_KEY, level);
 
     // 버튼 active 상태 동기화
