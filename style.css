@@ -2258,3 +2258,85 @@ nav {
     background: #ffffff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
+
+/* =====================================================
+   📡 Market Signal Bar — 지표 카드 스타일
+   ===================================================== */
+.ms-indicator-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 110px;
+  flex: 1;
+  transition: border-color 0.2s;
+}
+.ms-indicator-card:hover { border-color: var(--border2); }
+
+.ms-ind-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ms-ind-val {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.ms-ind-gauge-wrap {
+  margin: 2px 0;
+}
+
+.ms-ind-gauge-track {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--bg3);
+  position: relative;
+  overflow: visible;
+}
+
+.ms-ind-gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.4s;
+}
+
+/* 공포탐욕 레인보우 게이지 */
+.ms-ind-gauge-rainbow {
+  background: linear-gradient(
+    to right,
+    #3A9AFF 0%,
+    #4d9fff 20%,
+    #ffb703 45%,
+    #ff9f43 55%,
+    #ff4d6a 80%,
+    #ff2255 100%
+  );
+  overflow: hidden;
+}
+
+.ms-ind-hint {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.02em;
+}
+
+/* 라이트 모드 */
+[data-theme="light"] .ms-indicator-card {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.1);
+}
+[data-theme="light"] .ms-ind-gauge-track {
+  background: rgba(0,0,0,0.07);
+}
