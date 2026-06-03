@@ -8345,51 +8345,122 @@ async function initMarketSignalBar() {
     }).filter(r => r.Date);
 
     if (!rows.length) return;
-    const latest = rows[rows.length - 1]; 
+    const latest = rows[rows.length - 1];
 
-    // 데이터가 성공적으로 불러와지면 UI 표시 (flex로 전환)
+    document.getElementById('marketSignalBar').style.display = 'block';
     document.getElementById('marketSignalBar').setAttribute('data-loaded', '1');
-    
-    // 복합 매수 신호 지수 처리
-    const score = parseFloat(latest.Composite_Index);
-    let label = '매수 자제', color = 'var(--loss)', bg = 'transparent';
-    
-    if (score >= 400) { 
-      label = '강한 매수'; color = 'var(--profit)'; bg = 'var(--profit-bg)'; 
-    } else if (score >= 200) { 
-      label = '분할 매수'; color = '#00c87a'; bg = 'rgba(0,200,122,0.15)'; 
-    } else if (score >= 100) { 
-      label = '관망'; color = '#ffb703'; bg = 'rgba(255,183,3,0.15)'; 
-    }
-    
-    const scoreEl = document.getElementById('ms-score');
-    scoreEl.textContent = isNaN(score) ? '—' : score.toFixed(0);
-    scoreEl.style.color = color;
-    
-    const badge = document.getElementById('ms-badge');
-    badge.textContent = label;
-    badge.style.color = color;
-    badge.style.backgroundColor = bg;
-    badge.style.borderColor = color;
 
-    // 개별 지표 렌더링
+    // ── 헬퍼 ──────────────────────────────────────────
+    const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+    // ── 1. 종합 신호 ──────────────────────────────────
+    const score = parseFloat(latest.Composite_Index);
+    let signalLabel = '매수 자제', signalColor = 'var(--loss)', signalBg = 'rgba(58,154,255,0.12)';
+    if (score >= 400)      { signalLabel = '강한 매수';  signalColor = 'var(--profit)'; signalBg = 'rgba(0,200,122,0.15)'; }
+    else if (score >= 200) { signalLabel = '분할 매수';  signalColor = '#00c87a';        signalBg = 'rgba(0,200,122,0.1)'; }
+    else if (score >= 100) { signalLabel = '관 망';      signalColor = '#ffb703';        signalBg = 'rgba(255,183,3,0.12)'; }
+
+    const scoreEl = document.getElementById('ms-score');
+    scoreEl.textContent = isNaN(score) ? '—' : Math.round(score);
+    scoreEl.style.color = signalColor;
+
+    const badge = document.getElementById('ms-badge');
+    badge.textContent = signalLabel;
+    badge.style.color = signalColor;
+    badge.style.backgroundColor = signalBg;
+    badge.style.borderColor = signalColor;
+
+    // ── 2. TQQQ ──────────────────────────────────────
     const tqqq = parseFloat(latest.TQQQ);
-    document.getElementById('ms-tqqq').textContent = isNaN(tqqq) ? 'N/A' : '$' + tqqq.toFixed(2);
-    
+    const tqqqEl = document.getElementById('ms-tqqq');
+    const tqqqGauge = document.getElementById('ms-tqqq-gauge');
+    const tqqqHint = document.getElementById('ms-tqqq-hint');
+    if (!isNaN(tqqq)) {
+      tqqqEl.textContent = '$' + tqqq.toFixed(2);
+      // 0~200 범위 기준 게이지
+      const pct = clamp((tqqq / 150) * 100, 5, 95);
+      tqqqGauge.style.width = pct + '%';
+      let tColor, tHint;
+      if (tqqq >= 100) { tColor = 'var(--profit)'; tHint = '강세 구간'; }
+      else if (tqqq >= 50) { tColor = '#ffb703'; tHint = '중립 구간'; }
+      else { tColor = 'var(--loss)'; tHint = '약세 구간'; }
+      tqqqEl.style.color = tColor;
+      tqqqGauge.style.background = tColor;
+      tqqqHint.textContent = tHint;
+      tqqqHint.style.color = tColor;
+    } else {
+      tqqqEl.textContent = 'N/A';
+      tqqqHint.textContent = '데이터 없음';
+    }
+
+    // ── 3. 버핏 지수 ──────────────────────────────────
     const buff = parseFloat(latest.Buffett_Indicator);
     const buffEl = document.getElementById('ms-buffett');
-    buffEl.textContent = isNaN(buff) ? 'N/A' : buff.toFixed(1) + '%';
-    buffEl.style.color = buff < 100 ? 'var(--profit)' : (buff < 160 ? '#ffb703' : 'var(--loss)');
+    const buffGauge = document.getElementById('ms-buffett-gauge');
+    const buffHint = document.getElementById('ms-buffett-hint');
+    if (!isNaN(buff)) {
+      buffEl.textContent = buff.toFixed(1) + '%';
+      // 0~200% 범위 기준 게이지 (100%가 중간)
+      const pct = clamp((buff / 200) * 100, 2, 98);
+      buffGauge.style.width = pct + '%';
+      let bColor, bHint;
+      if (buff < 80)       { bColor = 'var(--profit)'; bHint = '저평가 구간'; }
+      else if (buff < 100) { bColor = '#00c87a';        bHint = '적정 수준'; }
+      else if (buff < 130) { bColor = '#ffb703';        bHint = '다소 고평가'; }
+      else                 { bColor = 'var(--loss)';    bHint = '고평가 경계'; }
+      buffEl.style.color = bColor;
+      buffGauge.style.background = bColor;
+      buffHint.textContent = bHint;
+      buffHint.style.color = bColor;
+    } else {
+      buffEl.textContent = 'N/A';
+      buffHint.textContent = '데이터 없음';
+    }
 
+    // ── 4. 공포탐욕 ──────────────────────────────────
     const fg = parseFloat(latest.Fear_Greed);
     const fgEl = document.getElementById('ms-fg');
-    fgEl.textContent = isNaN(fg) ? 'N/A' : fg.toFixed(1);
-    fgEl.style.color = fg < 25 ? 'var(--profit)' : (fg < 75 ? '#ffb703' : 'var(--loss)');
+    const fgDot = document.getElementById('ms-fg-dot');
+    const fgHint = document.getElementById('ms-fg-hint');
+    if (!isNaN(fg)) {
+      fgEl.textContent = fg.toFixed(1);
+      fgDot.style.left = clamp(fg, 2, 98) + '%';
+      let fColor, fHint;
+      if (fg < 25)       { fColor = '#3A9AFF'; fHint = '극단적 공포 🟢'; }
+      else if (fg < 45)  { fColor = '#4d9fff'; fHint = '공포 구간'; }
+      else if (fg < 55)  { fColor = '#ffb703'; fHint = '중립'; }
+      else if (fg < 75)  { fColor = '#ff9f43'; fHint = '탐욕 구간'; }
+      else               { fColor = '#ff4d6a'; fHint = '극단적 탐욕 🔴'; }
+      fgEl.style.color = fColor;
+      fgHint.textContent = fHint;
+      fgHint.style.color = fColor;
+    } else {
+      fgEl.textContent = 'N/A';
+      fgHint.textContent = '데이터 없음';
+    }
 
+    // ── 5. RSI(14) ────────────────────────────────────
     const rsi = parseFloat(latest.RSI_14);
     const rsiEl = document.getElementById('ms-rsi');
-    rsiEl.textContent = isNaN(rsi) ? 'N/A' : rsi.toFixed(1);
-    rsiEl.style.color = rsi < 30 ? 'var(--profit)' : (rsi < 70 ? '#ffb703' : 'var(--loss)');
+    const rsiGauge = document.getElementById('ms-rsi-gauge');
+    const rsiHint = document.getElementById('ms-rsi-hint');
+    if (!isNaN(rsi)) {
+      rsiEl.textContent = rsi.toFixed(1);
+      const pct = clamp(rsi, 2, 98);
+      rsiGauge.style.width = pct + '%';
+      let rColor, rHint;
+      if (rsi < 30)      { rColor = 'var(--profit)'; rHint = '과매도 🟢'; }
+      else if (rsi < 50) { rColor = '#4d9fff';        rHint = '하락세'; }
+      else if (rsi < 70) { rColor = '#ffb703';        rHint = '상승세'; }
+      else               { rColor = '#ff4d6a';        rHint = '과매수 🔴'; }
+      rsiEl.style.color = rColor;
+      rsiGauge.style.background = rColor;
+      rsiHint.textContent = rHint;
+      rsiHint.style.color = rColor;
+    } else {
+      rsiEl.textContent = 'N/A';
+      rsiHint.textContent = '데이터 없음';
+    }
 
   } catch (e) {
     console.warn('Market Signal Bar 로드 실패:', e);
