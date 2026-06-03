@@ -93,26 +93,53 @@ def get_buffett_indicators():
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            context = browser.new_context(user_agent="Mozilla/5.0")
+            # 봇 차단 방지를 위해 일반 크롬 브라우저와 동일한 User-Agent 사용
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            )
             page = context.new_page()
 
             # 5-1. 미국 버핏 지수
-            page.goto("https://www.gurufocus.com/stock-market-valuations.php", timeout=60000)
-            page.wait_for_timeout(2000)
-            us_text = page.inner_text("body")
-            m_us = re.search(r"Buffett\s+Indicator[^\d]{0,40}(\d{2,3}(?:\.\d+)?)\s*%", us_text, re.IGNORECASE)
-            if m_us: us_val = float(m_us.group(1))
+            try:
+                page.goto("https://www.gurufocus.com/stock-market-valuations.php", timeout=60000)
+                # JS가 숫자를 렌더링할 때까지 네트워크 안정을 대기
+                page.wait_for_load_state("networkidle", timeout=30000)
+                page.wait_for_timeout(2000)  # 추가 2초 딜레이
+                
+                us_text = page.inner_text("body")
+                
+                # 첨부된 스크린샷 기반 정규식 패턴 수정
+                patterns_us = [
+                    r"US\s+Market\s+Valuation:\s*(\d{2,3}(?:\.\d+)?)\s*%",
+                    r"Ratio\s+of\s+Total\s+Market\s+Cap\s+over\s+GDP:\s*(\d{2,3}(?:\.\d+)?)\s*%",
+                    r"Buffett\s+Indicator[^\d]{0,40}(\d{2,3}(?:\.\d+)?)\s*%"
+                ]
+                
+                for pat in patterns_us:
+                    m_us = re.search(pat, us_text, re.IGNORECASE)
+                    if m_us:
+                        us_val = float(m_us.group(1))
+                        break  # 값을 찾으면 루프 종료
+            except Exception as e:
+                print(f"   ⚠️ 미국 버핏 지수 파싱 오류: {e}")
 
             # 5-2. 글로벌 버핏 지수
-            page.goto("https://www.gurufocus.com/global-market-valuation.php", timeout=60000)
-            page.wait_for_timeout(2000)
-            gl_text = page.inner_text("body")
-            m_gl = re.search(r"Ratio of Total Market Cap over GDP[^\d]{0,40}(\d{2,3}(?:\.\d+)?)\s*%", gl_text, re.IGNORECASE)
-            if m_gl: global_val = float(m_gl.group(1))
+            try:
+                page.goto("https://www.gurufocus.com/global-market-valuation.php", timeout=60000)
+                page.wait_for_load_state("networkidle", timeout=30000)
+                page.wait_for_timeout(2000)
+                
+                gl_text = page.inner_text("body")
+                m_gl = re.search(r"Ratio of Total Market Cap over GDP[^\d]{0,40}(\d{2,3}(?:\.\d+)?)\s*%", gl_text, re.IGNORECASE)
+                if m_gl: 
+                    global_val = float(m_gl.group(1))
+            except Exception as e:
+                print(f"   ⚠️ 글로벌 버핏 지수 파싱 오류: {e}")
 
             browser.close()
     except Exception as e:
-        print(f"   ⚠️ 버핏 지수 Playwright 오류: {e}")
+        print(f"   ⚠️ 버핏 지수 Playwright 실행 환경 오류: {e}")
+        
     return us_val, global_val
 
 # ──────────────────────────────────────────────
