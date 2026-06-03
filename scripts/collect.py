@@ -188,12 +188,27 @@ def calculate_composite(buffett, fg, rsi) -> float:
     s = _score_buffett(buffett) * _score_fg(fg) * _score_rsi(rsi) * 1000
     return round(s, 2)
 
+# ──────────────────────────────────────────────
+# 추가: VIX, 러셀 2000, S&P 500, QQQ 종가 수집
+# ──────────────────────────────────────────────
+def get_extra_indices():
+    """VIX, 러셀 2000, S&P 500, QQQ 종가 수집"""
+    indices = {"VIX": "^VIX", "Russell2000": "^RUT", "SP500": "^GSPC", "QQQ": "QQQ"}
+    results = {}
+    for name, ticker in indices.items():
+        try:
+            hist = yf.Ticker(ticker).history(period="5d")
+            results[name] = round(float(hist["Close"].iloc[-1]), 2) if not hist.empty else None
+        except Exception as e:
+            print(f"   ⚠️ {name} 수집 오류: {e}")
+            results[name] = None
+    return results
 
 # ──────────────────────────────────────────────
 # 5. CSV 저장 (당일 데이터 있으면 덮어쓰기)
 # ──────────────────────────────────────────────
 
-FIELDNAMES = ["Date", "TQQQ", "Buffett_Indicator", "Fear_Greed", "RSI_14", "Composite_Index"]
+FIELDNAMES = ["Date", "TQQQ", "Buffett_Indicator", "Fear_Greed", "RSI_14", "Composite_Index", "VIX", "Russell2000", "SP500", "QQQ"]
 
 def save_to_csv(row: dict):
     csv_path = Path("data/indicators.csv")
@@ -265,6 +280,10 @@ def main():
     # ④ 복합 지수
     composite = calculate_composite(buffett, fg, rsi)
 
+    print("\n▶ 추가 보조 지표(VIX, 러셀2000 등) 수집 중...")
+    extras = get_extra_indices()
+    print(f"   VIX: {extras.get('VIX')}, Russell: {extras.get('Russell2000')}")
+
     # ⑤ 저장
     row = {
         "Date":               today,
@@ -273,6 +292,10 @@ def main():
         "Fear_Greed":         fg        if fg       is not None else "N/A",
         "RSI_14":             rsi       if rsi      is not None else "N/A",
         "Composite_Index":    composite,
+        "VIX":                extras.get("VIX")         if extras.get("VIX") is not None else "N/A",
+        "Russell2000":        extras.get("Russell2000") if extras.get("Russell2000") is not None else "N/A",
+        "SP500":              extras.get("SP500")       if extras.get("SP500") is not None else "N/A",
+        "QQQ":                extras.get("QQQ")         if extras.get("QQQ") is not None else "N/A",
     }
 
     save_to_csv(row)
