@@ -458,6 +458,12 @@
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
       <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--info);margin-bottom:12px;">버핏지수 (Buffett Indicator)</p>
+      
+      <div style="padding:12px; background:rgba(37,99,235,0.05); border-radius:8px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; color:var(--txt2); font-weight:500;">관련 지표: 러셀 2000</span>
+        <strong style="color:var(--info); font-size:14px; font-family:var(--font-num);" id="guide-rut">로딩 중...</strong>
+      </div>
+      
       <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
         <strong style="color:var(--txt3)">미국 전체 주식 시가총액 / GDP</strong>로 주식시장 전반의 고평가 여부를 판단합니다. 워런 버핏이 "어느 시점이든 주식 시장의 가치가 어느 정도인지 측정할 수 있는 최고의 단일 척도"라고 극찬한 지표이기도 합니다.<br><br>
         <span style="color:var(--buy)">●</span> &lt;100% — 저평가, 매수 유리<br>
@@ -467,7 +473,13 @@
     </div>
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
-      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sell);margin-bottom:12px;">Fear &amp; Greed 타임라인</p>
+      <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sell);margin-bottom:12px;">Fear & Greed 타임라인</p>
+      
+      <div style="padding:12px; background:rgba(225,29,72,0.05); border-radius:8px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; color:var(--txt2); font-weight:500;">관련 지표: VIX (변동성)</span>
+        <strong style="color:var(--sell); font-size:14px; font-family:var(--font-num);" id="guide-vix">로딩 중...</strong>
+      </div>
+      
       <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
         <strong style="color:var(--txt3)">CNN이 집계하는 시장 심리 지표</strong>로 변동성·모멘텀·옵션·안전자산 수요 등 7개 지표를 종합합니다. 극단적 공포일수록 역발상 매수 기회입니다.
       </p>
@@ -483,6 +495,12 @@
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;">
       <p style="font-family:var(--font-num);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warn);margin-bottom:12px;">RSI (14)</p>
+      
+      <div style="padding:12px; background:rgba(217,119,6,0.05); border-radius:8px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; color:var(--txt2); font-weight:500;">관련 지표: S&P 500</span>
+        <strong style="color:var(--warn); font-size:14px; font-family:var(--font-num);" id="guide-sp500">로딩 중...</strong>
+      </div>
+      
       <p style="font-size:12px;color:var(--txt2);line-height:1.8;">
         <strong style="color:var(--txt3)">14일 상대강도지수</strong>로 S&P 500의 단기 과매수·과매도를 판단합니다.<br><br>
         <span style="color:var(--buy)">●</span> &lt;30 — 과매도, 반등 가능성<br>
@@ -572,11 +590,10 @@ const CARDS_META = [
   {
     key: 'TQQQ', label: 'TQQQ Price', unit: 'USD',
     color: 'var(--info)', dotColor: '#3b82f6',
-    range: [0, 200],
-    barColor: (v) => 'var(--info)',
+    range: [0, 200], barColor: (v) => 'var(--info)',
     desc: 'ProShares Ultra QQQ — 나스닥 100의 3배 레버리지 ETF. 고위험·고수익 상품이므로 시장 타이밍이 중요합니다.',
-    details: (v) => [
-      { label: '기준 지수', val: 'NASDAQ-100 (QQQ)' },
+    details: (v, latestRow) => [
+      { label: '기준 지수 (QQQ)', val: latestRow.QQQ && latestRow.QQQ !== 'N/A' ? `$${parseFloat(latestRow.QQQ).toFixed(2)}` : 'N/A' },
       { label: '레버리지', val: '3× 일간' },
       { label: '운용사', val: 'ProShares' },
     ],
@@ -588,9 +605,9 @@ const CARDS_META = [
     color: 'var(--info)', dotColor: '#60a5fa',
     range: [50, 300], barColor: buffColor,
     desc: '워런 버핏이 측정 가능한 최고의 단일 척도라고 극찬한 주식시장 과열 지표. 시장이 경제 규모 대비 얼마나 비싼지 나타냅니다.',
-    details: (v) => [
+    details: (v, latestRow) => [
+      { label: '러셀 2000 (참고지수)', val: latestRow.Russell2000 && latestRow.Russell2000 !== 'N/A' ? parseFloat(latestRow.Russell2000).toLocaleString() : 'N/A' },
       { label: '상태', val: v < 100 ? '🟢 저평가' : v < 160 ? '🟡 다소 고평가' : '🔴 극단 고평가' },
-      { label: '역대 평균', val: '약 85~90%' },
       { label: '버핏 경고선', val: '>200%' },
     ],
     fmt: (v) => parseFloat(v).toFixed(1),
@@ -601,8 +618,7 @@ const CARDS_META = [
     color: 'var(--sell)', dotColor: '#f43f5e',
     range: [0, 100], barColor: fgColor,
     desc: 'CNN이 집계하는 시장 심리 지수 타임라인. 현재 시장의 공포와 탐욕 수준이 어느 위치에 있는지 시각적으로 확인합니다.',
-    details: (v) => {
-      // 타임라인 UI를 문자열 템플릿으로 제공
+    details: (v, latestRow) => {
       const pos = Math.min(Math.max(v, 0), 100);
       const timelineHtml = `
         <div style="width:100%; height:4px; background:linear-gradient(90deg, var(--buy), var(--warn), var(--sell)); border-radius:2px; position:relative; margin:12px 0;">
@@ -612,7 +628,7 @@ const CARDS_META = [
       return [
         { label: '타임라인', val: timelineHtml },
         { label: '현재 심리', val: v < 25 ? '😱 극단적 공포' : v < 50 ? '😨 공포' : v < 75 ? '😏 탐욕' : '🤑 극단적 탐욕' },
-        { label: '매수 구간', val: '0 ~ 25' },
+        { label: 'VIX (변동성 지수)', val: latestRow.VIX && latestRow.VIX !== 'N/A' ? parseFloat(latestRow.VIX).toFixed(2) : 'N/A' },
       ];
     },
     fmt: (v) => parseFloat(v).toFixed(1),
@@ -622,9 +638,9 @@ const CARDS_META = [
     color: 'var(--warn)', dotColor: '#f59e0b',
     range: [0, 100], barColor: rsiColor,
     desc: '14일 RSI. S&P 500을 기준으로 30 이하면 과매도로 반등 가능성, 70 이상이면 과매수로 조정 위험이 높아집니다.',
-    details: (v) => [
+    details: (v, latestRow) => [
+      { label: 'S&P 500 지수', val: latestRow.SP500 && latestRow.SP500 !== 'N/A' ? parseFloat(latestRow.SP500).toLocaleString() : 'N/A' },
       { label: '현재 상태', val: v < 30 ? '📉 과매도' : v < 50 ? '↘ 약세권' : v < 70 ? '↗ 강세권' : '📈 과매수' },
-      { label: '과매도 기준', val: '< 30' },
       { label: '과매수 기준', val: '> 70' },
     ],
     fmt: (v) => parseFloat(v).toFixed(1),
@@ -646,7 +662,7 @@ function renderCards(latest) {
     const displayVal = isNA ? 'N/A' : meta.fmt(num);
     const suffix = meta.unitSuffix || '';
 
-    const details = meta.details ? meta.details(num) : [];
+    const details = meta.details ? meta.details(num, latest) : [];
 
     const card = document.createElement('div');
     card.className = 'card fade-up delay-' + (i + 3);
@@ -727,6 +743,10 @@ async function init() {
 
     const latest = rows[rows.length - 1];
     document.getElementById('latest-date').textContent = latest.Date ?? '—';
+
+    if(document.getElementById('guide-rut')) document.getElementById('guide-rut').textContent = latest.Russell2000 && latest.Russell2000 !== 'N/A' ? parseFloat(latest.Russell2000).toLocaleString() : 'N/A';
+    if(document.getElementById('guide-vix')) document.getElementById('guide-vix').textContent = latest.VIX && latest.VIX !== 'N/A' ? parseFloat(latest.VIX).toFixed(2) : 'N/A';
+    if(document.getElementById('guide-sp500')) document.getElementById('guide-sp500').textContent = latest.SP500 && latest.SP500 !== 'N/A' ? parseFloat(latest.SP500).toLocaleString() : 'N/A';
 
     renderHero(latest);
     renderCards(latest);
