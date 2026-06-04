@@ -139,48 +139,77 @@ def get_us_buffett_indicator():
     return us_val
 
 # ──────────────────────────────────────────────
-# 6. 한국 버핏 지수 (Naver 금융 + FRED 직접 계산)
+# 6. 한국 버핏 지수 (IndexerGo 크롤링)
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] 네이버 금융 + FRED 계산 엔진 가동...")
+    print("\n   ▶️ [한국 버핏지수] IndexerGo 사이트 접속 중...")
     try:
-        headers = {"User-Agent": "Mozilla/5.0"}
+        import re
+        import requests
         
-        # 1. KOSPI & KOSDAQ 시가총액 (조 단위)
-        def get_market_cap(code):
-            url = f"https://finance.naver.com/sise/sise_index.naver?code={code}"
-            resp = requests.get(url, headers=headers, timeout=10)
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            th = soup.find('th', string='시가총액')
-            if th:
-                text = th.find_next_sibling('td').text.strip()
-                m = re.search(r"([\d,]+)조\s*([\d,]*)", text)
+        url = "https://www.indexergo.com/series/?frq=D&idxDetail=20104"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+
+        # ==========================================
+        # 💡 [1순위] 빠르고 가벼운 Requests 스캔
+        # ==========================================
+        try:
+            resp = requests.get(url, headers=headers, timeout=15)
+            if resp.status_code == 200:
+                # 사용자가 짚어준 `<span class="ms-1 text-lg"> 숫자%</span>` 껍데기 타겟팅
+                m = re.search(r"class=[\"'][^>]*ms-1\s+text-lg[^>]*[\"'][^>]*>\s*([\d,]+(?:\.\d+)?)\s*%", resp.text, re.IGNORECASE)
                 if m:
-                    jo = float(m.group(1).replace(',', ''))
-                    eok = float(m.group(2).replace(',', '')) if m.group(2) else 0
-                    return jo + (eok / 10000)
-            return 0
+                    # 천 단위 콤마(,)가 있을 경우 제거 후 float 변환
+                    kr_val = float(m.group(1).replace(',', ''))
+                    print(f"      ✅ [1순위/Requests] 한국 버핏 지수 발견: {kr_val}%")
+                else:
+                    print("      ⚠️ Requests 접속은 성공했으나, 화면에 숫자가 바로 뜨지 않습니다. (동적 렌더링 의심)")
+            else:
+                print(f"      ⚠️ Requests 접속 차단 (상태코드: {resp.status_code})")
+        except Exception as e:
+            print(f"      ⚠️ 1순위 통신 에러: {e}")
 
-        kospi_cap = get_market_cap("KOSPI")
-        kosdaq_cap = get_market_cap("KOSDAQ")
-        total_cap_trillion = kospi_cap + kosdaq_cap
-        print(f"      - 한국 전체 시가총액: {total_cap_trillion:,.1f}조 원")
+        # ==========================================
+        # 💡 [2순위] 자바스크립트 동적 렌더링 대기 (Playwright)
+        # ==========================================
+        if kr_val is None:
+            print("      ▶️ 1순위 실패. Playwright를 이용해 JS 렌더링을 기다립니다...")
+            try:
+                from playwright.sync_api import sync_playwright
+                with sync_playwright() as p:
+                    browser = p.chromium.launch(headless=True)
+                    context = browser.new_context(user_agent=headers["User-Agent"])
+                    
+                    # 속도 향상: 불필요한 이미지/폰트 로딩 차단
+                    context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+                    page = context.new_page()
 
-        # 2. 한국 명목 GDP (FRED: KORNGDP)
-        resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=KORNGDP", timeout=10)
-        lines_gdp = [line for line in resp_gdp.text.split('\n') if line.strip() and not line.startswith('DATE')]
-        gdp_date, gdp_val = lines_gdp[-1].split(',')
-        gdp_trillion = float(gdp_val) / 1000
-        print(f"      - 한국 명목 GDP ({gdp_date}): {gdp_trillion:,.1f}조 원")
-
-        # 3. 버핏 지수 계산
-        if total_cap_trillion > 0 and gdp_trillion > 0:
-            kr_val = round((total_cap_trillion / gdp_trillion) * 100, 1)
-            print(f"      ✅ [계산 완료] 한국 버핏 지수: {kr_val}%")
+                    page.goto(url, timeout=30000)
+                    
+                    # 짚어주신 클래스 이름(.ms-1.text-lg)이 화면에 붙을 때까지 최대 15초 대기
+                    page.wait_for_selector(".ms-1.text-lg", state="attached", timeout=15000)
+                    page.wait_for_timeout(2000) # 숫자 업데이트 안정화 2초 대기
+                    
+                    html_content = page.content()
+                    m2 = re.search(r"class=[\"'][^>]*ms-1\s+text-lg[^>]*[\"'][^>]*>\s*([\d,]+(?:\.\d+)?)\s*%", html_content, re.IGNORECASE)
+                    
+                    if m2:
+                        kr_val = float(m2.group(1).replace(',', ''))
+                        print(f"      ✅ [2순위/Playwright] 한국 버핏 지수 발견: {kr_val}%")
+                    
+                    browser.close()
+            except Exception as e:
+                print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
 
     except Exception as e:
-        print(f"      ⚠️ 한국 버핏 지수 연산 실패: {e}")
+        print(f"      ⚠️ 한국 버핏 지수 환경 오류: {e}")
+
+    if kr_val is None:
+         print("      ❌ 한국 버핏 지수를 수집하지 못했습니다. N/A로 기록됩니다.")
+
     return kr_val
 
 # ──────────────────────────────────────────────
