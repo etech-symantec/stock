@@ -527,12 +527,102 @@ def get_bdi_index():
 
     return bdi_val
 
+# ──────────────────────────────────────────────
+# (추가) 한국 수출액 (관세청 TRASS 무역통계)
+# ──────────────────────────────────────────────
+def get_kr_export():
+    export_val = None
+    print("\n   ▶️ [한국 수출액] 관세청(TRASS) 접속 중...")
+    try:
+        import re
+        from bs4 import BeautifulSoup
+
+        url = "https://tradedata.go.kr/cts/index.do"
+
+        # ==========================================
+        # 💡 [1순위] Cloudscraper + BeautifulSoup
+        # ==========================================
+        print("      ▶️ 1순위: Cloudscraper 스텔스 엔진 가동...")
+        try:
+            import cloudscraper
+            scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
+            resp = scraper.get(url, timeout=15)
+            
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                
+                # 짚어주신 id="pprcOvrlExp" 인 div 태그 탐색
+                target_div = soup.find('div', id='pprcOvrlExp')
+                if target_div:
+                    target_strong = target_div.find('strong')
+                    if target_strong:
+                        # "수출              877억 달러" 텍스트에서 숫자만 정교하게 추출
+                        m = re.search(r"([\d,\.]+)\s*억", target_strong.text)
+                        if m:
+                            export_val = float(m.group(1).replace(',', ''))
+                            print(f"      ✅ [1순위/BS4] 한국 수출액 발견: {export_val} 억 달러")
+                
+                if export_val is None:
+                    print("      ⚠️ 접속은 성공했으나 id='pprcOvrlExp' 데이터를 찾지 못했습니다.")
+            else:
+                print(f"      ⚠️ Cloudscraper 접속 차단 (상태코드: {resp.status_code})")
+        except Exception as e:
+            print(f"      ⚠️ 1순위 통신 에러: {e}")
+
+        # ==========================================
+        # 💡 [2순위] 로봇 탐지 회피형 Playwright
+        # ==========================================
+        if export_val is None:
+            print("      ▶️ 2순위: Playwright 브라우저 렌더링 대기...")
+            try:
+                from playwright.sync_api import sync_playwright
+                with sync_playwright() as p:
+                    browser = p.chromium.launch(
+                        headless=True,
+                        args=["--disable-blink-features=AutomationControlled"]
+                    )
+                    context = browser.new_context(user_agent="Mozilla/5.0")
+                    # 이미지/미디어 차단으로 렌더링 속도 최적화
+                    context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+                    page = context.new_page()
+
+                    page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                    page.goto(url, timeout=30000)
+                    
+                    # css selector를 이용해 짚어주신 구조 직격 타겟팅
+                    target_selector = "div#pprcOvrlExp strong"
+                    page.wait_for_selector(target_selector, state="attached", timeout=15000)
+                    
+                    raw_text = page.locator(target_selector).first.inner_text()
+                    
+                    m = re.search(r"([\d,\.]+)\s*억", raw_text)
+                    if m:
+                        export_val = float(m.group(1).replace(',', ''))
+                        print(f"      ✅ [2순위/Playwright] 한국 수출액 발견: {export_val} 억 달러")
+                    else:
+                        print(f"      ⚠️ 렌더링 완료 후에도 숫자 패턴을 찾지 못했습니다. (추출 텍스트: '{raw_text}')")
+                        
+                    browser.close()
+            except Exception as e:
+                print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
+
+    except Exception as e:
+        print(f"      ⚠️ 한국 수출액 환경 오류: {e}")
+
+    if export_val is None:
+         print("      ❌ 한국 수출액을 수집하지 못했습니다. N/A로 기록됩니다.")
+
+    return export_val
+
+# ──────────────────────────────────────────────
+# 기존 7번 구역 하단 get_monthly_and_special() 덮어쓰기
+# ──────────────────────────────────────────────
 def get_monthly_and_special():
     return {
         "Margin_Debt_US": get_us_margin_debt(), 
         "Margin_Debt_KR": get_kr_margin_debt(), 
-        "KR_Export": None, 
-        "BDI_Index": get_bdi_index() # <- 💡 새로 만든 함수가 여기서 실행되어 BDI 값을 넘깁니다.
+        "KR_Export": get_kr_export(),   # <- 💡 새로 만든 수출액 함수 연결
+        "BDI_Index": get_bdi_index()
     }
 
 # ──────────────────────────────────────────────
