@@ -17,42 +17,30 @@ from pathlib import Path
 # 1. Yahoo Finance 기본 지표 수집
 # ──────────────────────────────────────────────
 def get_yfinance_indicators():
-    """VIX, MOVE, 10년물, 달러, 환율, 러셀2000, 구리"""
     symbols = {
-        "VIX": "^VIX",                  # VIX 지수
-        "MOVE": "^MOVE",                # ICE BofA MOVE 지수
-        "US10Y": "^TNX",                # 미국 10년물 국채 금리
-        "DXY": "DX-Y.NYB",              # 달러 인덱스
-        "USDKRW": "KRW=X",              # 원/달러 환율
-        "Russell2000": "^RUT",          # 러셀 2000
-        "Copper": "HG=F",               # 구리 선물 가격
+        "VIX": "^VIX", "MOVE": "^MOVE", "US10Y": "^TNX", 
+        "DXY": "DX-Y.NYB", "USDKRW": "KRW=X", "Russell2000": "^RUT", "Copper": "HG=F"
     }
     results = {}
     for name, ticker in symbols.items():
         try:
             hist = yf.Ticker(ticker).history(period="5d")
-            if not hist.empty:
-                results[name] = round(float(hist["Close"].iloc[-1]), 2)
-            else:
-                results[name] = None
+            results[name] = round(float(hist["Close"].iloc[-1]), 2) if not hist.empty else None
         except Exception as e:
             print(f"   ⚠️ {name} 수집 오류: {e}")
             results[name] = None
     return results
 
 # ──────────────────────────────────────────────
-# 2. 하이일드 스프레드 (FRED CSV 연동)
+# 2. 하이일드 스프레드 (FRED)
 # ──────────────────────────────────────────────
 def get_high_yield_spread():
-    """ICE BofA US High Yield Index Option-Adjusted Spread"""
     try:
         url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2"
         resp = requests.get(url, timeout=10)
-        resp.raise_for_status()
         lines = [line for line in resp.text.split('\n') if line.strip()]
-        val = lines[-1].split(',')[-1] # 가장 마지막 데이터
-        if val != '.':
-            return float(val)
+        val = lines[-1].split(',')[-1]
+        if val != '.': return float(val)
     except Exception as e:
         print(f"   ⚠️ 하이일드 수집 오류: {e}")
     return None
@@ -63,91 +51,50 @@ def get_high_yield_spread():
 def get_fear_greed():
     try:
         from playwright.sync_api import sync_playwright
-        import re
-        
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-            )
+            context = browser.new_context(user_agent="Mozilla/5.0")
             page = context.new_page()
-            
-            # CNN Fear & Greed 페이지 접속
             page.goto("https://edition.cnn.com/markets/fear-and-greed", timeout=60000)
-            
-            # 💡 사용자가 찾아낸 클래스(.market-fng-gauge__dial-number-value)가 렌더링될 때까지 대기
             page.wait_for_selector(".market-fng-gauge__dial-number-value", timeout=20000)
-            
-            # 화면에 뜬 해당 요소의 텍스트를 바로 긁어옴 (예: "54")
             val_text = page.locator(".market-fng-gauge__dial-number-value").first.inner_text()
-            
             browser.close()
-            
-            # 안전하게 숫자만 파싱하여 float 형태로 반환
             match = re.search(r"(\d+(?:\.\d+)?)", val_text)
-            if match:
-                return float(match.group(1))
-                
+            if match: return float(match.group(1))
     except Exception as e:
         print(f"   ⚠️ Fear & Greed 수집 오류: {e}")
-        
     return None
 
 # ──────────────────────────────────────────────
-# 4. CAPE PE (Shiller PE) - multpl.com 크롤링
+# 4. CAPE PE (Shiller PE)
 # ──────────────────────────────────────────────
 def get_cape_pe():
     try:
-        import re
-        from bs4 import BeautifulSoup
-        
         url = "https://www.multpl.com/shiller-pe"
-        # 봇 차단 방지를 위한 브라우저 헤더
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
+        headers = {"User-Agent": "Mozilla/5.0"}
         resp = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(resp.text, 'html.parser')
-        
-        # 💡 알려주신 id="current" 구역을 1순위로 찾고, 혹시 장 중에 id="estimate"로 바뀔 경우도 대비
         target_div = soup.find(id="current") or soup.find(id="estimate")
-        
         if target_div:
-            # 텍스트 전체에서 줄바꿈이나 공백 무시하고 첫 번째로 등장하는 '숫자.숫자' 형태(예: 42.84)만 추출
             match = re.search(r"(\d{2,3}\.\d{1,2})", target_div.text)
-            if match:
-                return float(match.group(1))
-                
+            if match: return float(match.group(1))
     except Exception as e:
         print(f"   ⚠️ CAPE PE 수집 오류: {e}")
-        
     return None
 
 # ──────────────────────────────────────────────
-# 5. 버핏 지수 (1순위: Longtermtrends / 2순위: FRED 공공데이터 자체 계산)
+# 5. 미국 버핏 지수 (Longtermtrends -> FRED 자체계산)
 # ──────────────────────────────────────────────
-def get_buffett_indicators():
+def get_us_buffett_indicator():
     us_val = None
-    global_val = None
-    import re
-    import requests
-    
-    # ==========================================
-    # 💡 [1순위] Longtermtrends (Playwright)
-    # ==========================================
     print("\n   ▶️ [1순위] Longtermtrends Playwright 접속 중...")
     try:
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                viewport={"width": 1920, "height": 1080}
-            )
-            
+            context = browser.new_context(viewport={"width": 1920, "height": 1080}, user_agent="Mozilla/5.0")
             context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
             page = context.new_page()
-
             page.goto("https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/", timeout=40000)
             page.wait_for_selector("#buffett-ratio", state="attached", timeout=20000)
             page.wait_for_timeout(3000)
@@ -157,89 +104,98 @@ def get_buffett_indicators():
             if m_alt:
                 us_val = float(m_alt.group(1))
                 print(f"      ✅ [1순위] Longtermtrends 미국 수치 발견: {us_val}%")
-            else:
-                print(f"      ⚠️ 1순위 실패: 껍데기는 찾았으나 숫자가 비어있습니다.")
-                
-            resp_gl = requests.get("https://www.gurufocus.com/global-market-valuation.php", headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
-            if resp_gl.status_code == 200:
-                m_gl = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
-                if m_gl: global_val = float(m_gl.group(1))
-
             browser.close()
     except Exception as e:
         print(f"      ⚠️ Playwright 1순위 수집 중 오류: {e}")
 
-    # ==========================================
-    # 💡 [2순위] 자체 계산 (FRED 공공데이터: Wilshire 5000 시총 / GDP)
-    # ==========================================
     if us_val is None:
-        print("\n   ▶️ [2순위] 1순위 실패. FRED 공공 데이터를 활용해 버핏 지수를 직접 계산합니다...")
+        print("   ▶️ [2순위] 1순위 실패. FRED 공공 데이터를 활용해 미국 버핏 지수를 직접 계산합니다...")
         try:
-            # 1. FRED 최신 미국 GDP 가져오기
             resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDP", timeout=10)
             lines_gdp = [line for line in resp_gdp.text.split('\n') if line.strip() and not line.startswith('DATE')]
-            
-            # 날짜와 수치 분리 (예: "2024-01-01,27938.831")
             gdp_date, gdp_val = lines_gdp[-1].split(',')
             latest_gdp = float(gdp_val)
-            print(f"      - [FRED API] 미국 명목 GDP ({gdp_date} 기준): ${latest_gdp:,.1f} Billion")
+            print(f"      - 미국 명목 GDP ({gdp_date}): ${latest_gdp:,.1f}B")
             
-            # 2. FRED 최신 Wilshire 5000 지수 가져오기
             resp_wil = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=WILL5000PRFC", timeout=10)
             lines_wil = [line for line in resp_wil.text.split('\n') if line.strip() and not line.startswith('DATE')]
-            
             latest_wilshire = None
             wil_date = None
             for line in reversed(lines_wil):
                 parts = line.split(',')
-                if parts[-1] != '.':  # 주말/휴일 결측치 무시
+                if parts[-1] != '.':
                     wil_date = parts[0]
                     latest_wilshire = float(parts[-1])
                     break
             
-            if latest_wilshire:
-                print(f"      - [FRED API] Wilshire 5000 지수 ({wil_date} 기준): {latest_wilshire:,.2f} pt")
-            
             if latest_gdp and latest_wilshire:
-                # Wilshire 5000 지수 1포인트는 약 1.35 Billion 달러의 시총 (Longtermtrends 스케일 보정치)
+                print(f"      - Wilshire 5000 ({wil_date}): {latest_wilshire:,.2f}pt")
                 market_cap_billions = latest_wilshire * 1.35 
-                print(f"      - [계산식] 추산된 미국 시가총액 (지수 * 1.35): ${market_cap_billions:,.1f} Billion")
-                
-                # 수식 산출: (시가총액 / GDP) * 100
-                calculated_val = (market_cap_billions / latest_gdp) * 100
-                us_val = round(calculated_val, 1)
-                
-                print(f"      ✅ [2순위] FRED 자체 산출 완료: ({market_cap_billions:,.1f} / {latest_gdp:,.1f}) * 100 = {us_val}%")
+                us_val = round((market_cap_billions / latest_gdp) * 100, 1)
+                print(f"      ✅ [2순위] FRED 자체 산출 완료: {us_val}%")
         except Exception as e:
-            print(f"      ⚠️ FRED 직접 계산 실패: {e}")
+            print(f"      ⚠️ FRED 계산 실패: {e}")
 
-    if us_val is None:
-        print("\n   ❌ 모든 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
+    return us_val
 
-    return us_val, global_val
-    
 # ──────────────────────────────────────────────
-# 6. 월간/특수 데이터 (Mockup or Placeholder)
+# 6. 한국 버핏 지수 (Naver 금융 + FRED 직접 계산)
+# ──────────────────────────────────────────────
+def get_kr_buffett_indicator():
+    kr_val = None
+    print("\n   ▶️ [한국 버핏지수] 네이버 금융 + FRED 계산 엔진 가동...")
+    try:
+        headers = {"User-Agent": "Mozilla/5.0"}
+        
+        # 1. KOSPI & KOSDAQ 시가총액 (조 단위)
+        def get_market_cap(code):
+            url = f"https://finance.naver.com/sise/sise_index.naver?code={code}"
+            resp = requests.get(url, headers=headers, timeout=10)
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            th = soup.find('th', string='시가총액')
+            if th:
+                text = th.find_next_sibling('td').text.strip()
+                m = re.search(r"([\d,]+)조\s*([\d,]*)", text)
+                if m:
+                    jo = float(m.group(1).replace(',', ''))
+                    eok = float(m.group(2).replace(',', '')) if m.group(2) else 0
+                    return jo + (eok / 10000)
+            return 0
+
+        kospi_cap = get_market_cap("KOSPI")
+        kosdaq_cap = get_market_cap("KOSDAQ")
+        total_cap_trillion = kospi_cap + kosdaq_cap
+        print(f"      - 한국 전체 시가총액: {total_cap_trillion:,.1f}조 원")
+
+        # 2. 한국 명목 GDP (FRED: KORNGDP)
+        resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=KORNGDP", timeout=10)
+        lines_gdp = [line for line in resp_gdp.text.split('\n') if line.strip() and not line.startswith('DATE')]
+        gdp_date, gdp_val = lines_gdp[-1].split(',')
+        gdp_trillion = float(gdp_val) / 1000
+        print(f"      - 한국 명목 GDP ({gdp_date}): {gdp_trillion:,.1f}조 원")
+
+        # 3. 버핏 지수 계산
+        if total_cap_trillion > 0 and gdp_trillion > 0:
+            kr_val = round((total_cap_trillion / gdp_trillion) * 100, 1)
+            print(f"      ✅ [계산 완료] 한국 버핏 지수: {kr_val}%")
+
+    except Exception as e:
+        print(f"      ⚠️ 한국 버핏 지수 연산 실패: {e}")
+    return kr_val
+
+# ──────────────────────────────────────────────
+# 7. 월간/특수 데이터
 # ──────────────────────────────────────────────
 def get_monthly_and_special():
-    """
-    BDI, 신용잔고, 수출데이터는 매일 실시간 수집이 어렵거나 월 1회 발표됩니다.
-    실제 프로젝트에서는 별도의 유료 API(TradingEconomics 등)나 
-    한국은행 Open API 등을 붙여야 하므로 현재는 None 또는 기본값 처리합니다.
-    """
-    return {
-        "Margin_Debt": None,   # FINRA 월간 발표 데이터
-        "KR_Export": None,     # 산업통상자원부 월간 데이터
-        "BDI_Index": None,     # 무료 API 부재 (웹 크롤링 시 차단 잦음)
-    }
+    return {"Margin_Debt": None, "KR_Export": None, "BDI_Index": None}
 
 # ──────────────────────────────────────────────
-# 7. CSV 저장 로직
+# 8. CSV 저장 로직
 # ──────────────────────────────────────────────
-# 필드명 대거 확장
+# ⭐ Buffett_Global을 Buffett_KR로 변경
 FIELDNAMES = [
     "Date", "VIX", "MOVE", "US10Y", "DXY", "USDKRW", "Russell2000", "Copper",
-    "High_Yield", "Fear_Greed", "CAPE_PE", "Buffett_US", "Buffett_Global",
+    "High_Yield", "Fear_Greed", "CAPE_PE", "Buffett_US", "Buffett_KR",
     "Margin_Debt", "KR_Export", "BDI_Index", "Integrated_Valuation"
 ]
 
@@ -251,7 +207,6 @@ def save_to_csv(row: dict):
     if csv_path.exists():
         with open(csv_path, "r", newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
-            # 새 필드가 기존 CSV에 없을 수 있으므로 필드 일치 작업 필요
             for existing in reader:
                 if existing.get("Date") != row["Date"]:
                     rows.append(existing)
@@ -261,7 +216,6 @@ def save_to_csv(row: dict):
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         writer.writeheader()
-        # 누락된 키는 'N/A'로 채움
         for r in rows:
             clean_row = {k: r.get(k, "N/A") for k in FIELDNAMES}
             writer.writerow(clean_row)
@@ -274,31 +228,21 @@ def main():
     today = date.today().strftime("%Y-%m-%d")
     print(f"📊 대규모 시장 지표 수집 시작: {today}\n")
 
-    print("▶ 1. Yahoo Finance 지표 수집 중...")
     yf_data = get_yfinance_indicators()
-    
-    print("▶ 2. 하이일드 스프레드 수집 중...")
     high_yield = get_high_yield_spread()
-    
-    print("▶ 3. Fear & Greed 수집 중...")
     fg = get_fear_greed()
-    
-    print("▶ 4. CAPE PE 수집 중...")
     cape_pe = get_cape_pe()
     
-    print("▶ 5. 버핏 지수(미국/글로벌) 수집 중...")
-    buff_us, buff_gl = get_buffett_indicators()
+    buff_us = get_us_buffett_indicator()
+    buff_kr = get_kr_buffett_indicator()
     
-    print("▶ 6. 특수/월간 데이터 세팅 중...")
     special = get_monthly_and_special()
 
-    # 통합 벨류에이션 (단순 예시: 버핏과 CAPE를 조합한 가상 지수 계산)
-    # 실제 본인만의 로직(예: (Buffett/150 + CAPE/30)*50)으로 커스텀 가능
+    # 통합 밸류에이션 (단순 예시)
     integrated_val = None
     if buff_us and cape_pe:
         integrated_val = round(((buff_us / 150) * 50) + ((cape_pe / 35) * 50), 1)
 
-    # 데이터 병합
     row = {
         "Date": today,
         "VIX": yf_data.get("VIX"),
@@ -312,18 +256,16 @@ def main():
         "Fear_Greed": fg,
         "CAPE_PE": cape_pe,
         "Buffett_US": buff_us,
-        "Buffett_Global": buff_gl,
+        "Buffett_KR": buff_kr, # ⭐ 새로 추가된 한국 버핏지수 매핑
         "Margin_Debt": special.get("Margin_Debt"),
         "KR_Export": special.get("KR_Export"),
         "BDI_Index": special.get("BDI_Index"),
         "Integrated_Valuation": integrated_val
     }
 
-    # None 값 N/A 처리
     for k, v in row.items():
         if v is None: row[k] = "N/A"
 
-    # 수집 결과 콘솔 출력
     for k, v in row.items():
         print(f"   {k.ljust(20)} : {v}")
 
