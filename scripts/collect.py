@@ -372,12 +372,95 @@ def get_kr_margin_debt():
         
     return kr_margin
 
+# ──────────────────────────────────────────────
+# (추가) BDI 지수 (TradingEconomics 크롤링)
+# ──────────────────────────────────────────────
+def get_bdi_index():
+    bdi_val = None
+    print("\n   ▶️ [BDI 지수] TradingEconomics 접속 중...")
+    try:
+        import re
+        from bs4 import BeautifulSoup
+
+        url = "https://ko.tradingeconomics.com/commodity/baltic"
+
+        # ==========================================
+        # 💡 [1순위] Cloudscraper + BeautifulSoup
+        # ==========================================
+        try:
+            import cloudscraper
+            scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
+            resp = scraper.get(url, timeout=15)
+            
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                
+                # 사용자가 알려준 정확한 식별자(data-symbol="BDIY:IND")로 행(tr)을 먼저 찾고, 그 안의 id="p" 탐색
+                target_tr = soup.find('tr', {'data-symbol': 'BDIY:IND'})
+                if target_tr:
+                    target_td = target_tr.find('td', id='p')
+                    if target_td:
+                        # 콤마 제거 및 실수 변환 (예: "3,124.00 " -> 3124.0)
+                        clean_text = target_td.get_text(strip=True).replace(',', '')
+                        bdi_val = float(clean_text)
+                        print(f"      ✅ [1순위/BS4] BDI 지수 발견: {bdi_val} pt")
+                else:
+                    print("      ⚠️ 접속은 성공했으나 data-symbol='BDIY:IND' 태그를 찾지 못했습니다.")
+            else:
+                print(f"      ⚠️ Cloudscraper 접속 차단 (상태코드: {resp.status_code})")
+        except Exception as e:
+            print(f"      ⚠️ 1순위 통신 에러: {e}")
+
+        # ==========================================
+        # 💡 [2순위] 로봇 탐지 회피형 Playwright
+        # ==========================================
+        if bdi_val is None:
+            print("      ▶️ 2순위: Playwright 브라우저 렌더링 대기...")
+            try:
+                from playwright.sync_api import sync_playwright
+                with sync_playwright() as p:
+                    browser = p.chromium.launch(
+                        headless=True,
+                        args=["--disable-blink-features=AutomationControlled"]
+                    )
+                    context = browser.new_context(user_agent="Mozilla/5.0")
+                    context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+                    page = context.new_page()
+
+                    page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                    page.goto(url, timeout=30000)
+                    
+                    # css selector를 이용해 짚어주신 구조 직격 타겟팅
+                    target_selector = 'tr[data-symbol="BDIY:IND"] td#p'
+                    page.wait_for_selector(target_selector, state="attached", timeout=15000)
+                    
+                    raw_text = page.locator(target_selector).first.inner_text()
+                    
+                    if raw_text:
+                        clean_text = raw_text.replace(',', '').strip()
+                        bdi_val = float(clean_text)
+                        print(f"      ✅ [2순위/Playwright] BDI 지수 발견: {bdi_val} pt")
+                    else:
+                        print("      ⚠️ 렌더링 완료 후에도 텍스트가 비어있습니다.")
+                        
+                    browser.close()
+            except Exception as e:
+                print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
+
+    except Exception as e:
+        print(f"      ⚠️ BDI 지수 환경 오류: {e}")
+
+    if bdi_val is None:
+         print("      ❌ BDI 지수를 수집하지 못했습니다. N/A로 기록됩니다.")
+
+    return bdi_val
+
 def get_monthly_and_special():
     return {
         "Margin_Debt_US": get_us_margin_debt(), 
         "Margin_Debt_KR": get_kr_margin_debt(), 
         "KR_Export": None, 
-        "BDI_Index": None
+        "BDI_Index": get_bdi_index() # <- 💡 새로 만든 함수가 여기서 실행되어 BDI 값을 넘깁니다.
     }
 
 # ──────────────────────────────────────────────
