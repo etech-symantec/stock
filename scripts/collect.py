@@ -124,7 +124,7 @@ def get_cape_pe():
     return None
 
 # ──────────────────────────────────────────────
-# 5. 버핏 지수 (미국 & 글로벌) - 동적 JS 렌더링 우회 엔진
+# 5. 버핏 지수 (미국 & 글로벌) - 상세 로깅 및 동적 JS 렌더링 우회 엔진
 # ──────────────────────────────────────────────
 def get_buffett_indicators():
     us_val = None
@@ -137,27 +137,85 @@ def get_buffett_indicators():
             browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
         )
         
-        # 💡 [1순위] GuruFocus (cloudscraper) - 서버 환경에 따라 막힐 확률 높음
-        print("   ▶️ [1순위] GuruFocus(미국) 우회 접속 중...")
-        resp_us = scraper.get("https://www.gurufocus.com/stock-market-valuations.php", timeout=15)
-        if resp_us.status_code == 200:
-            m_us = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
-            if m_us: us_val = float(m_us.group(1))
+        # ==========================================
+        # 💡 [1순위] GuruFocus (미국) - 상세 로깅 적용
+        # ==========================================
+        print("\n   ▶️ [1순위/상세로그] GuruFocus(미국) Cloudscraper 우회 접속 시도...")
+        url_us = "https://www.gurufocus.com/stock-market-valuations.php"
+        print(f"      - 대상 URL: {url_us}")
         
-        resp_gl = scraper.get("https://www.gurufocus.com/global-market-valuation.php", timeout=15)
-        if resp_gl.status_code == 200:
-            m_gl = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
-            if m_gl: global_val = float(m_gl.group(1))
+        try:
+            resp_us = scraper.get(url_us, timeout=20)
+            print(f"      - 응답 코드: {resp_us.status_code}")
             
-        if us_val: print(f"   ✅ [1순위] GuruFocus 미국 수치 발견: {us_val}%")
-        if global_val: print(f"   ✅ [1순위] GuruFocus 글로벌 수치 발견: {global_val}%")
+            if resp_us.status_code == 200:
+                print("      - 응답 성공(200). 'currently at' 텍스트 탐색을 시작합니다.")
+                m_us = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
+                
+                if m_us:
+                    us_val = float(m_us.group(1))
+                    print(f"      ✅ [1순위] 미국 수치 1차 탐색 성공: {us_val}%")
+                else:
+                    print("      ⚠️ [실패] 1차 텍스트 패턴 탐색 실패. 2차(HTML 껍데기) 탐색을 시도합니다.")
+                    
+                    # 2차 탐색: 텍스트가 바뀌었을 경우 HTML 태그 껍데기로 찾기
+                    m_us_alt = re.search(r"US\s+Market\s+Valuation[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
+                    
+                    if m_us_alt:
+                        us_val = float(m_us_alt.group(1))
+                        print(f"      ✅ [1순위] 미국 수치 2차 태그 탐색 성공: {us_val}%")
+                    else:
+                        print("      ⚠️ [치명적 실패] 상태코드는 200이지만 모든 패턴 탐색에 실패했습니다.")
+                        print("      - 원인 추정 1: Cloudflare의 '사람 확인(캡챠)' 페이지가 200 코드로 반환됨.")
+                        print("      - 원인 추정 2: GuruFocus 사이트의 HTML 구조가 완전히 변경됨.")
+                        # 수신된 텍스트의 앞 150글자만 잘라서 출력해 실제 원인 파악
+                        snippet = resp_us.text[:150].replace('\n', ' ')
+                        print(f"      - 수신된 HTML 일부: {snippet} ...")
+                        
+            elif resp_us.status_code in [403, 429, 503]:
+                print(f"      ⚠️ [실패] Cloudflare 방어막에 의해 접속이 완벽히 차단되었습니다. (상태코드: {resp_us.status_code})")
+            else:
+                print(f"      ⚠️ [실패] 예상치 못한 오류 코드 발생 (상태코드: {resp_us.status_code})")
+                
+        except Exception as req_e:
+            print(f"      ⚠️ [에러] 미국 HTTP 요청 중 예외 발생: {req_e}")
+
+        # ==========================================
+        # 💡 [1순위] GuruFocus (글로벌) - 상세 로깅 적용
+        # ==========================================
+        print("\n   ▶️ [1순위/상세로그] GuruFocus(글로벌) Cloudscraper 우회 접속 시도...")
+        url_gl = "https://www.gurufocus.com/global-market-valuation.php"
+        
+        try:
+            resp_gl = scraper.get(url_gl, timeout=20)
+            print(f"      - 응답 코드: {resp_gl.status_code}")
+            
+            if resp_gl.status_code == 200:
+                m_gl = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
+                if m_gl:
+                    global_val = float(m_gl.group(1))
+                    print(f"      ✅ [1순위] 글로벌 수치 1차 탐색 성공: {global_val}%")
+                else:
+                    m_gl_alt = re.search(r"Ratio\s+of\s+Total\s+Market\s+Cap[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
+                    if m_gl_alt:
+                        global_val = float(m_gl_alt.group(1))
+                        print(f"      ✅ [1순위] 글로벌 수치 2차 태그 탐색 성공: {global_val}%")
+                    else:
+                        print("      ⚠️ [실패] 글로벌 수치 패턴 탐색 실패.")
+            else:
+                print(f"      ⚠️ [실패] 글로벌 접속 차단됨 (상태코드: {resp_gl.status_code})")
+                
+        except Exception as req_e_gl:
+            print(f"      ⚠️ [에러] 글로벌 HTTP 요청 중 예외 발생: {req_e_gl}")
 
     except Exception as e:
         print(f"   ⚠️ Cloudscraper 구동 예외 발생: {e}")
 
-    # 💡 [2순위] Longtermtrends (Playwright) - JS가 숫자를 그릴 때까지 대기
+    # ==========================================
+    # 💡 [2순위] Longtermtrends (Playwright 대기 로직 유지)
+    # ==========================================
     if us_val is None:
-        print("   ▶️ [2순위] GuruFocus 차단됨. Longtermtrends(대안) Playwright 접속 중...")
+        print("\n   ▶️ [2순위] GuruFocus 수집 실패. Longtermtrends Playwright 접속 중...")
         try:
             from playwright.sync_api import sync_playwright
             with sync_playwright() as p:
@@ -167,35 +225,28 @@ def get_buffett_indicators():
                     viewport={"width": 1920, "height": 1080}
                 )
                 
-                # 이미지, 미디어는 차단하되 자바스크립트는 허용 (숫자를 그려야 하므로)
                 context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
                 page = context.new_page()
 
-                # Longtermtrends 미국 지수 페이지 이동
                 page.goto("https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/", timeout=40000)
                 
-                # 🔥 핵심: id="buffett-ratio" 요소가 화면에 나타날 때까지 기다림
                 page.wait_for_selector("#buffett-ratio", state="attached", timeout=20000)
-                # 🔥 핵심: 자바스크립트가 데이터를 연산해서 요소 안에 숫자를 꽂아넣을 시간(3초)을 명시적으로 부여
                 page.wait_for_timeout(3000)
                 
-                # HTML 전체를 뒤지는 대신, 해당 요소의 순수 텍스트만 콕 집어서 가져옴
                 raw_text = page.locator("#buffett-ratio").inner_text()
-                
-                # 가져온 텍스트에서 숫자만 추출
                 m_alt = re.search(r"(\d{2,4}(?:\.\d+)?)", raw_text)
                 if m_alt:
                     us_val = float(m_alt.group(1))
-                    print(f"   ✅ [2순위] Longtermtrends 미국 수치 발견: {us_val}%")
+                    print(f"      ✅ [2순위] Longtermtrends 미국 수치 발견: {us_val}%")
                 else:
-                    print(f"   ⚠️ 껍데기는 찾았으나 숫자가 비어있습니다. (현재 텍스트: '{raw_text}')")
+                    print(f"      ⚠️ 껍데기는 찾았으나 숫자가 비어있습니다. (현재 텍스트: '{raw_text}')")
                 
                 browser.close()
         except Exception as e:
-            print(f"   ⚠️ Playwright 2순위 수집 실패: {e}")
+            print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
 
     if us_val is None:
-        print("   ❌ 모든 우회 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
+        print("\n   ❌ 모든 우회 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
 
     return us_val, global_val
     
