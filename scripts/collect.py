@@ -528,51 +528,110 @@ def get_bdi_index():
     return bdi_val
 
 # ──────────────────────────────────────────────
-# (추가) 한국 수출액 (한국은행 ECOS 우회 수집 - 정밀 타겟팅)
+# (추가) 한국 수출액 (TradingEconomics 크롤링)
 # ──────────────────────────────────────────────
 def get_kr_export():
     export_val = None
-    print("\n   ▶️ [한국 수출액] 관세청 차단 우회 -> 한국은행 ECOS 접속 중...")
+    print("\n   ▶️ [한국 수출액] TradingEconomics 접속 중...")
     try:
         import re
-        from playwright.sync_api import sync_playwright
+        from bs4 import BeautifulSoup
 
-        with sync_playwright() as p:
-            browser = p.chromium.launch(
-                headless=True,
-                args=["--disable-blink-features=AutomationControlled"]
-            )
-            context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+        url = "https://ko.tradingeconomics.com/south-korea/exports"
+
+        # ==========================================
+        # 💡 [1순위] Cloudscraper + BeautifulSoup
+        # ==========================================
+        try:
+            import cloudscraper
+            scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
+            resp = scraper.get(url, timeout=15)
             
-            # 불필요한 미디어 차단 (속도 최적화)
-            context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
-            page = context.new_page()
-
-            page.goto("https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100", timeout=40000)
-            
-            # 💡 수정 1: 그냥 '수출'이 아니라 정확히 '수출(통관기준)' 텍스트가 렌더링될 때까지 대기
-            page.wait_for_selector("text=\"수출(통관기준)\"", state="attached", timeout=20000)
-            page.wait_for_timeout(2000) # 데이터가 표에 완전히 채워질 시간 부여
-
-            html_ecos = page.content()
-
-            # 💡 수정 2: 정규식 강제 고정. (?:...)? 같은 옵션을 빼고 반드시 '수출(통관기준)' 뒤에 오는 숫자만 추출
-            m = re.search(r"수출\(통관기준\)[^<]*</span>\s*<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)", html_ecos)
-
-            if m:
-                # 1. '백만 달러' 단위로 숫자 추출 (예: 58,145)
-                val_millions = float(m.group(1).replace(',', ''))
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.text, 'html.parser')
                 
-                # 2. 대시보드 표기에 맞게 '억 달러' 단위로 자동 환산 (백만 달러 / 100)
-                export_val = round(val_millions / 100, 1)
+                exp_num = None
+                yoy_num = None
                 
-                print(f"      ✅ [수집 완료] 한국 수출액(ECOS): {export_val} 억 달러 (원문: {val_millions:,.0f} 백만달러)")
+                # 1. 수출 절대액 추출 (USD - 백만)
+                exp_a = soup.find('a', href='/south-korea/exports')
+                if exp_a and exp_a.find_parent('tr'):
+                    tds = exp_a.find_parent('tr').find_all('td')
+                    if len(tds) >= 2:
+                        val_str = tds[1].text.strip().replace(',', '')
+                        # 백만 달러를 대시보드 표기용인 '억 달러'로 환산 (나누기 100)
+                        exp_num = round(float(val_str) / 100, 1)
+                        
+                # 2. 수출 전년동기대비(YoY) 추출 (%)
+                yoy_a = soup.find('a', href='/south-korea/exports-yoy')
+                if yoy_a and yoy_a.find_parent('tr'):
+                    tds = yoy_a.find_parent('tr').find_all('td')
+                    if len(tds) >= 2:
+                        yoy_num = float(tds[1].text.strip().replace(',', ''))
+
+                if exp_num:
+                    if yoy_num:
+                        # 관세청에서 원하셨던 "절대액 + 증감률" 형태로 결합 (예: "877.5 (53.2%)")
+                        export_val = f"{exp_num} ({yoy_num}%)"
+                        print(f"      ✅ [1순위/BS4] 한국 수출액 및 YoY 발견: {export_val} 억 달러")
+                    else:
+                        export_val = exp_num
+                        print(f"      ✅ [1순위/BS4] 한국 수출액 발견 (YoY 누락): {export_val} 억 달러")
             else:
-                print("      ⚠️ ECOS 접속은 성공했으나 '수출(통관기준)' 데이터를 찾지 못했습니다.")
+                print(f"      ⚠️ Cloudscraper 접속 차단 (상태코드: {resp.status_code})")
+        except Exception as e:
+            print(f"      ⚠️ 1순위 통신 에러: {e}")
 
-            browser.close()
+        # ==========================================
+        # 💡 [2순위] 로봇 탐지 회피형 Playwright
+        # ==========================================
+        if export_val is None:
+            print("      ▶️ 2순위: Playwright 브라우저 렌더링 대기...")
+            try:
+                from playwright.sync_api import sync_playwright
+                with sync_playwright() as p:
+                    browser = p.chromium.launch(
+                        headless=True,
+                        args=["--disable-blink-features=AutomationControlled"]
+                    )
+                    context = browser.new_context(user_agent="Mozilla/5.0")
+                    context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+                    page = context.new_page()
+
+                    page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                    page.goto(url, timeout=30000)
+                    
+                    # CSS 선택자를 사용해 정확히 해당 링크가 들어있는 줄(tr)의 2번째 칸(td)을 타겟팅
+                    target_exp = 'tr:has(a[href="/south-korea/exports"]) td:nth-child(2)'
+                    page.wait_for_selector(target_exp, state="attached", timeout=15000)
+                    
+                    raw_exp = page.locator(target_exp).first.inner_text().strip().replace(',', '')
+                    exp_num = round(float(raw_exp) / 100, 1) if raw_exp else None
+                    
+                    # YoY 지표는 없어도 에러를 내지 않도록 예외 처리
+                    target_yoy = 'tr:has(a[href="/south-korea/exports-yoy"]) td:nth-child(2)'
+                    yoy_num = None
+                    try:
+                        raw_yoy = page.locator(target_yoy).first.inner_text(timeout=5000).strip().replace(',', '')
+                        yoy_num = float(raw_yoy) if raw_yoy else None
+                    except:
+                        pass
+                        
+                    if exp_num:
+                        if yoy_num:
+                            export_val = f"{exp_num} ({yoy_num}%)"
+                        else:
+                            export_val = exp_num
+                        print(f"      ✅ [2순위/Playwright] 한국 수출액 발견: {export_val} 억 달러")
+                    else:
+                        print("      ⚠️ 화면 렌더링 완료 후에도 데이터를 찾지 못했습니다.")
+                        
+                    browser.close()
+            except Exception as e:
+                print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
+
     except Exception as e:
-        print(f"      ⚠️ 한국 수출액 수집 실패: {e}")
+        print(f"      ⚠️ 한국 수출액 환경 오류: {e}")
 
     if export_val is None:
          print("      ❌ 한국 수출액을 수집하지 못했습니다. N/A로 기록됩니다.")
