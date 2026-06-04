@@ -136,7 +136,8 @@
     "0047R0",
     "SOFI",
     "ARKK",
-    "396500.KS"
+    "396500.KS",
+    "234340.KQ"
   ],
   "transactions": [
     {
@@ -9360,7 +9361,7 @@
       "txType": "trade"
     }
   ],
-  "range": "all",
+  "range": "1y",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
