@@ -139,122 +139,87 @@ def get_us_buffett_indicator():
     return us_val
 
 # ──────────────────────────────────────────────
-# 6. 한국 버핏 지수 (IndexerGo 크롤링 + 우회/자체계산 방어막)
+# 6. 한국 버핏 지수 (KRX 한국거래소 + FRED 공식 데이터 직접 계산)
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] IndexerGo 사이트 접속 중...")
+    print("\n   ▶️ [한국 버핏지수] KRX(한국거래소) + FRED 계산 엔진 가동...")
     try:
         import re
-        from bs4 import BeautifulSoup
+        import requests
         
-        url = "https://www.indexergo.com/series/?frq=D&idxDetail=20104"
-
+        total_cap_billion = 0
+        
         # ==========================================
-        # 💡 [1순위] Cloudscraper + BeautifulSoup (가장 우아한 방법)
+        # 1. KRX 한국거래소 시가총액 수집 (Playwright)
         # ==========================================
-        print("      ▶️ 1순위: Cloudscraper 스텔스 엔진 가동...")
+        print("      ▶️ KRX 공식 데이터 포털 접속 중...")
         try:
-            import cloudscraper
-            scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
-            resp = scraper.get(url, timeout=15)
-            
-            if resp.status_code == 200:
-                # 정규식 대신 HTML DOM 트리 파서를 이용해 정확히 태그를 찾아냅니다.
-                soup = BeautifulSoup(resp.text, 'html.parser')
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                context = browser.new_context(
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                )
                 
-                # CSS 선택자로 class="ms-1 text-lg" 인 span 태그를 정확히 탐색
-                target_span = soup.select_one('span.ms-1.text-lg')
+                # 불필요한 미디어 차단 (속도 향상)
+                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+                page = context.new_page()
+
+                # KRX 메인 페이지 접속
+                page.goto("https://data.krx.co.kr/contents/MDC/MAIN/main/index.cmd", timeout=40000)
                 
-                if target_span:
-                    # 빈칸과 '%' 기호, ',' 기호를 말끔히 지우고 숫자로 변환 (예: " 292.09%" -> 292.09)
-                    clean_text = target_span.get_text(strip=True).replace('%', '').replace(',', '')
-                    kr_val = float(clean_text)
-                    print(f"      ✅ [1순위/BS4] 한국 버핏 지수 발견: {kr_val}%")
+                # '시가총액(십억원)' 텍스트가 화면에 렌더링될 때까지 대기
+                page.wait_for_selector("text=시가총액(십억원)", state="attached", timeout=20000)
+                page.wait_for_timeout(2000) # 테이블 데이터가 완전히 그려질 시간 부여
+                
+                html_content = page.content()
+                
+                # 💡 사용자가 제시한 HTML 구조 기반 초정밀 정규식 타겟팅
+                # "시가총액(십억원)" 텍스트 뒤에 오는 첫 번째 td(코스피)와 두 번째 td(코스닥)의 숫자를 그룹화
+                m = re.search(r"시가총액\(십억원\)[^<]*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>", html_content, re.IGNORECASE)
+                
+                if m:
+                    kospi_val = float(m.group(1).replace(',', ''))
+                    kosdaq_val = float(m.group(2).replace(',', ''))
+                    total_cap_billion = kospi_val + kosdaq_val
+                    
+                    print(f"      - [KRX] 코스피 시총: {kospi_val:,.0f} 십억원")
+                    print(f"      - [KRX] 코스닥 시총: {kosdaq_val:,.0f} 십억원")
+                    print(f"      - [합산] 한국 전체 시가총액: {total_cap_billion:,.0f} 십억원 ({total_cap_billion/1000:,.1f} 조원)")
                 else:
-                    print("      ⚠️ 접속은 성공했으나 <span class='ms-1 text-lg'> 태그를 찾지 못했습니다.")
-            else:
-                print(f"      ⚠️ Cloudscraper 접속 차단 (상태코드: {resp.status_code})")
+                    print("      ⚠️ KRX 접속은 성공했으나 시가총액 데이터를 찾지 못했습니다.")
+                    
+                browser.close()
         except Exception as e:
-            print(f"      ⚠️ 1순위 통신 에러: {e}")
+            print(f"      ⚠️ KRX 시가총액 수집 실패: {e}")
 
         # ==========================================
-        # 💡 [2순위] 로봇 탐지 회피형 Playwright
+        # 2. FRED 명목 GDP 수집 및 버핏 지수 계산
         # ==========================================
-        if kr_val is None:
-            print("      ▶️ 2순위: Playwright 브라우저 렌더링 대기...")
-            try:
-                from playwright.sync_api import sync_playwright
-                with sync_playwright() as p:
-                    browser = p.chromium.launch(
-                        headless=True,
-                        args=["--disable-blink-features=AutomationControlled"]
-                    )
-                    context = browser.new_context(
-                        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                        viewport={"width": 1920, "height": 1080}
-                    )
-                    context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
-                    page = context.new_page()
-
-                    page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-
-                    page.goto(url, timeout=40000)
-                    
-                    # 알려주신 클래스 이름이 화면에 나타날 때까지 대기
-                    page.wait_for_selector("span.ms-1.text-lg", state="attached", timeout=20000)
-                    page.wait_for_timeout(2000)
-                    
-                    # Playwright의 로케이터를 사용해 해당 태그의 텍스트만 콕 집어옴
-                    raw_text = page.locator("span.ms-1.text-lg").first.inner_text()
-                    
-                    if raw_text:
-                        clean_text = raw_text.replace('%', '').replace(',', '').strip()
-                        kr_val = float(clean_text)
-                        print(f"      ✅ [2순위/Playwright] 한국 버핏 지수 발견: {kr_val}%")
-                    else:
-                        print("      ⚠️ 화면 렌더링 완료 후에도 요소를 찾지 못했습니다.")
-                    
-                    browser.close()
-            except Exception as e:
-                print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
-
-        # ==========================================
-        # 💡 [3순위] 최후의 보루: 자체 계산 (Naver + FRED)
-        # ==========================================
-        if kr_val is None:
-            print("      ▶️ 3순위: 자체 계산(네이버/FRED 데이터) 엔진 가동...")
-            try:
-                import requests
-                headers_alt = {"User-Agent": "Mozilla/5.0"}
+        if total_cap_billion > 0:
+            print("      ▶️ FRED 공공 데이터(한국 명목 GDP) 접속 중...")
+            resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=KORNGDP", timeout=10)
+            
+            # CSV 유효성 검증
+            lines_gdp = [line for line in resp_gdp.text.split('\n') if ',' in line and line[0].isdigit()]
+            
+            if lines_gdp:
+                gdp_date, gdp_val = lines_gdp[-1].split(',')
+                if gdp_val.strip() == '.': gdp_date, gdp_val = lines_gdp[-2].split(',')
                 
-                def get_market_cap(code):
-                    res = requests.get(f"https://finance.naver.com/sise/sise_index.naver?code={code}", headers=headers_alt, timeout=10)
-                    m_cap = re.search(r"시가총액.*?<td[^>]*>([\d,]+)조\s*([\d,]*)", res.text, re.IGNORECASE | re.DOTALL)
-                    if m_cap:
-                        jo = float(m_cap.group(1).replace(',', ''))
-                        eok_str = m_cap.group(2).replace(',', '')
-                        eok = float(eok_str) if eok_str else 0
-                        return jo + (eok / 10000)
-                    return 0
-
-                total_cap = get_market_cap("KOSPI") + get_market_cap("KOSDAQ")
+                # FRED의 단위 역시 '10억 원(십억원, Billion KRW)'이므로 단위가 완벽히 일치합니다.
+                gdp_billion = float(gdp_val)
+                print(f"      - [FRED] 한국 명목 GDP ({gdp_date}): {gdp_billion:,.0f} 십억원 ({gdp_billion/1000:,.1f} 조원)")
                 
-                resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=KORNGDP", headers=headers_alt, timeout=10)
-                lines_gdp = [line for line in resp_gdp.text.split('\n') if ',' in line and line[0].isdigit()]
-                
-                if lines_gdp and total_cap > 0:
-                    gdp_date, gdp_val = lines_gdp[-1].split(',')
-                    if gdp_val.strip() == '.': gdp_date, gdp_val = lines_gdp[-2].split(',')
-                    gdp_tril = float(gdp_val) / 1000
-                    
-                    kr_val = round((total_cap / gdp_tril) * 100, 1)
-                    print(f"      ✅ [3순위/자체계산] 한국 버핏 지수 산출 완료: {kr_val}%")
-            except Exception as e:
-                print(f"      ⚠️ 3순위 자체 계산 실패: {e}")
+                # 수식 산출: (시가총액 / GDP) * 100
+                kr_val = round((total_cap_billion / gdp_billion) * 100, 1)
+                print(f"      ✅ [계산 완료] 한국 버핏 지수: ({total_cap_billion:,.0f} / {gdp_billion:,.0f}) * 100 = {kr_val}%")
+            else:
+                print("      ⚠️ FRED에서 GDP 데이터를 가져오지 못했습니다.")
 
     except Exception as e:
-        print(f"      ⚠️ 한국 버핏 지수 환경 오류: {e}")
+        print(f"      ⚠️ 한국 버핏 지수 전체 연산 실패: {e}")
 
     if kr_val is None:
          print("      ❌ 한국 버핏 지수를 수집하지 못했습니다. N/A로 기록됩니다.")
