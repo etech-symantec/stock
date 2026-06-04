@@ -46,24 +46,63 @@ def get_high_yield_spread():
     return None
 
 # ──────────────────────────────────────────────
-# 3. Fear & Greed Index (CNN)
+# 3. Fear & Greed Index (CNN 공포탐욕지수)
 # ──────────────────────────────────────────────
 def get_fear_greed():
+    fg_val = None
+    print("\n   ▶️ [Fear & Greed] CNN 사이트 접속 중...")
     try:
         from playwright.sync_api import sync_playwright
+        import re
+
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context(user_agent="Mozilla/5.0")
+            # 봇 탐지 회피를 위한 브라우저 설정
+            browser = p.chromium.launch(
+                headless=True,
+                args=["--disable-blink-features=AutomationControlled"]
+            )
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080}
+            )
+            
+            # 속도 최적화: 텍스트 렌더링에 불필요한 이미지/미디어 로딩 차단
+            context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
             page = context.new_page()
-            page.goto("https://edition.cnn.com/markets/fear-and-greed", timeout=60000)
-            page.wait_for_selector(".market-fng-gauge__dial-number-value", timeout=20000)
-            val_text = page.locator(".market-fng-gauge__dial-number-value").first.inner_text()
+
+            page.goto("https://edition.cnn.com/markets/fear-and-greed", timeout=40000)
+            
+            # 💡 사용자가 짚어준 핵심 클래스 타겟팅
+            target_selector = ".market-fng-gauge__dial-number-value"
+            
+            # 해당 요소가 브라우저에 붙을 때까지 최대 20초 대기
+            page.wait_for_selector(target_selector, state="attached", timeout=20000)
+            
+            # 자바스크립트가 숫자를 계산해서 밀어넣을 시간(2초) 부여
+            page.wait_for_timeout(2000)
+            
+            # 로케이터를 이용해 화면에 보이는 텍스트(예: "54")만 콕 집어옴
+            raw_text = page.locator(target_selector).first.inner_text()
+            
+            if raw_text:
+                # 불필요한 공백이나 문자가 섞여 있을 경우를 대비해 순수 숫자만 추출
+                m = re.search(r"(\d+(?:\.\d+)?)", raw_text)
+                if m:
+                    fg_val = float(m.group(1))
+                    print(f"      ✅ [수집 완료] CNN 공포탐욕지수: {fg_val}")
+                else:
+                    print(f"      ⚠️ 숫자를 파싱하지 못했습니다. (텍스트: '{raw_text}')")
+            else:
+                print("      ⚠️ 요소는 찾았으나 텍스트가 비어있습니다.")
+                
             browser.close()
-            match = re.search(r"(\d+(?:\.\d+)?)", val_text)
-            if match: return float(match.group(1))
     except Exception as e:
-        print(f"   ⚠️ Fear & Greed 수집 오류: {e}")
-    return None
+        print(f"      ⚠️ Fear & Greed 수집 실패: {e}")
+
+    if fg_val is None:
+         print("      ❌ Fear & Greed 지수를 수집하지 못했습니다. N/A로 기록됩니다.")
+
+    return fg_val
 
 # ──────────────────────────────────────────────
 # 4. CAPE PE (Shiller PE)
