@@ -138,23 +138,38 @@ def get_buffett_indicators():
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             )
+            
+            # 💡 핵심 1: 광고 및 불필요한 미디어 트래픽 원천 차단 함수
+            def cancel_ads(route):
+                url = route.request.url
+                # 이미지, 영상, 폰트 및 구글/크리테오 등 주요 광고 네트워크 도메인 접속 쳐내기
+                if route.request.resource_type in ["image", "media", "font"] or \
+                   any(ad in url for ad in ["googlesyndication", "doubleclick", "googleads", "criteo"]):
+                    route.abort()
+                else:
+                    route.continue_()
+            
+            # 브라우저 컨텍스트에 통신 차단 규칙 적용
+            context.route("**/*", cancel_ads)
+            
             page = context.new_page()
 
-            # 5-1. 미국 버핏 지수 (GuruFocus 복귀 및 문장 정밀 타겟팅)
+            # 5-1. 미국 버핏 지수
             try:
                 page.goto("https://www.gurufocus.com/stock-market-valuations.php", timeout=60000)
                 page.wait_for_load_state("networkidle", timeout=30000)
                 page.wait_for_timeout(2000)
                 
+                # 💡 핵심 2: 만약 자체 팝업이 떴을 경우를 대비해 ESC 키를 누르고, HTML 구조에서 iframe(광고틀) 강제 삭제
+                page.keyboard.press("Escape")
+                page.evaluate("document.querySelectorAll('iframe, .popup, .modal, ins').forEach(el => el.remove());")
+                page.wait_for_timeout(1000)
+                
                 us_text = page.inner_text("body")
                 html_source = page.content()
                 
-                # 💡 사용자가 짚어준 정확한 문장 패턴을 1순위로 배치
                 patterns_us = [
-                    # 1순위: "Based on the historical ratio of total market cap over GDP (currently at 238.8%)"
                     r"Based\s+on\s+the\s+historical\s+ratio\s+of\s+total\s+market\s+cap\s+over\s+GDP\s*\(currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%\)",
-                    
-                    # 2순위: 혹시 문장이 살짝 바뀌거나 다른 위치에 있을 경우를 대비한 기존 껍데기 패턴
                     r"<span[^>]*class=[\"'][^>]*text-(?:danger|success|warning|info)[^>]*[\"'][^>]*>\s*<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%",
                     r"US\s+Market\s+Valuation:\s*(\d{2,4}(?:\.\d+)?)\s*%"
                 ]
@@ -167,11 +182,16 @@ def get_buffett_indicators():
             except Exception as e:
                 print(f"   ⚠️ 미국 버핏 지수 파싱 오류: {e}")
 
-            # 5-2. 글로벌 버핏 지수 (GuruFocus 글로벌)
+            # 5-2. 글로벌 버핏 지수
             try:
                 page.goto("https://www.gurufocus.com/global-market-valuation.php", timeout=60000)
                 page.wait_for_load_state("networkidle", timeout=30000)
                 page.wait_for_timeout(2000)
+                
+                # 동일한 팝업 클리닝 적용
+                page.keyboard.press("Escape")
+                page.evaluate("document.querySelectorAll('iframe, .popup, .modal, ins').forEach(el => el.remove());")
+                page.wait_for_timeout(1000)
                 
                 html_source_gl = page.content()
                 
@@ -183,16 +203,7 @@ def get_buffett_indicators():
                 for pat in patterns_gl:
                     m_gl = re.search(pat, html_source_gl, re.IGNORECASE)
                     if m_gl: 
-                        global_val = float(m_gl.group(1))
-                        break
-            except Exception as e:
-                print(f"   ⚠️ 글로벌 버핏 지수 파싱 오류: {e}")
-
-            browser.close()
-    except Exception as e:
-        print(f"   ⚠️ 버핏 지수 Playwright 환경 오류: {e}")
-        
-    return us_val, global_val
+                        global_val = float
 
 # ──────────────────────────────────────────────
 # 6. 월간/특수 데이터 (Mockup or Placeholder)
