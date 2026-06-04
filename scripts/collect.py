@@ -124,109 +124,67 @@ def get_cape_pe():
     return None
 
 # ──────────────────────────────────────────────
-# 5. 버핏 지수 (미국 & 글로벌) - 3중 다중 엔진 (GuruFocus + Longtermtrends)
+# 5. 버핏 지수 (미국 & 글로벌) - Cloudflare 우회 엔진 (cloudscraper)
 # ──────────────────────────────────────────────
 def get_buffett_indicators():
     us_val = None
     global_val = None
     import re
-    import requests
     
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Referer": "https://www.google.com/"
-    }
-
-    # 💡 1순위 타격: Requests (GuruFocus)
     try:
-        resp_us = requests.get("https://www.gurufocus.com/stock-market-valuations.php", headers=headers, timeout=15)
-        if resp_us.status_code != 200:
-            print(f"   ⚠️ [1순위] GuruFocus 미국 접속 차단 (상태코드: {resp_us.status_code})")
-        else:
+        # 💡 일반 requests 대신 Cloudflare 방어막을 뚫는 전문 스크래퍼 가동
+        import cloudscraper
+        scraper = cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'windows',
+                'desktop': True
+            }
+        )
+
+        # 💡 1순위: GuruFocus 스텔스 접속
+        print("   ▶️ [1순위] Cloudscraper 엔진으로 GuruFocus(미국) 우회 접속 중...")
+        resp_us = scraper.get("https://www.gurufocus.com/stock-market-valuations.php", timeout=20)
+        
+        if resp_us.status_code == 200:
             m_us = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
             if m_us:
                 us_val = float(m_us.group(1))
-                print(f"   ✅ [1순위/Requests] GuruFocus 미국 수치 발견: {us_val}%")
+                print(f"   ✅ [1순위] GuruFocus 미국 수치 발견: {us_val}%")
+            else:
+                print("   ⚠️ GuruFocus 미국 페이지 우회는 성공했으나 수치를 찾지 못했습니다.")
+        else:
+            print(f"   ⚠️ GuruFocus 미국 여전히 차단됨 (상태코드: {resp_us.status_code})")
 
-        resp_gl = requests.get("https://www.gurufocus.com/global-market-valuation.php", headers=headers, timeout=15)
+        print("   ▶️ [1순위] Cloudscraper 엔진으로 GuruFocus(글로벌) 우회 접속 중...")
+        resp_gl = scraper.get("https://www.gurufocus.com/global-market-valuation.php", timeout=20)
         if resp_gl.status_code == 200:
             m_gl = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
             if m_gl:
                 global_val = float(m_gl.group(1))
-                print(f"   ✅ [1순위/Requests] GuruFocus 글로벌 수치 발견: {global_val}%")
-                
-    except Exception as e:
-        print(f"   ⚠️ [1순위] 통신 에러: {e}")
+                print(f"   ✅ [1순위] GuruFocus 글로벌 수치 발견: {global_val}%")
 
-    # 💡 2순위 타격: Playwright (GuruFocus)
-    if us_val is None or global_val is None:
-        try:
-            print("   ▶️ 2순위(Playwright) 엔진을 가동합니다...")
-            from playwright.sync_api import sync_playwright
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                context = browser.new_context(user_agent=headers["User-Agent"])
-                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
-                page = context.new_page()
-
-                if us_val is None:
-                    page.goto("https://www.gurufocus.com/stock-market-valuations.php", timeout=30000)
-                    page.wait_for_load_state("domcontentloaded", timeout=15000)
-                    m = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", page.content(), re.IGNORECASE)
-                    if m: 
-                        us_val = float(m.group(1))
-                        print(f"   ✅ [2순위/Playwright] GuruFocus 미국 수치 발견: {us_val}%")
-
-                if global_val is None:
-                    page.goto("https://www.gurufocus.com/global-market-valuation.php", timeout=30000)
-                    page.wait_for_load_state("domcontentloaded", timeout=15000)
-                    m2 = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", page.content(), re.IGNORECASE)
-                    if m2: 
-                        global_val = float(m2.group(1))
-                        print(f"   ✅ [2순위/Playwright] GuruFocus 글로벌 수치 발견: {global_val}%")
-                        
-                browser.close()
-        except Exception as e:
-            print(f"   ⚠️ [2순위] Playwright 수집 실패: {e}")
-
-    # 💡 3순위 타격: Longtermtrends (사용자 요청 신규 우회 경로)
-    if us_val is None:
-        print("   ⚠️ GuruFocus 1, 2순위 모두 실패. 대안 사이트(Longtermtrends)로 우회합니다...")
-        try:
-            url_alt = "https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/"
+        # 💡 2순위: GuruFocus가 막혔을 경우 Longtermtrends로 즉시 우회
+        if us_val is None:
+            print("   ▶️ [2순위] GuruFocus 실패. 대안 사이트(Longtermtrends) 우회 접속 중...")
+            resp_alt = scraper.get("https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/", timeout=20)
             
-            # 먼저 빠르고 가벼운 Requests로 스캔
-            resp_alt = requests.get(url_alt, headers=headers, timeout=15)
-            
-            # 사용자가 발견한 <span id="buffett-ratio"> 껍데기 타겟팅
-            m_alt = re.search(r"id=[\"']buffett-ratio[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)", resp_alt.text, re.IGNORECASE)
-            
-            if m_alt:
-                us_val = float(m_alt.group(1))
-                print(f"   ✅ [3순위/Requests] Longtermtrends 미국 수치 발견: {us_val}%")
+            if resp_alt.status_code == 200:
+                # 사용자가 지정한 <span id="buffett-ratio"> 껍데기 타겟팅
+                m_alt = re.search(r"id=[\"']buffett-ratio[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)", resp_alt.text, re.IGNORECASE)
+                if m_alt:
+                    us_val = float(m_alt.group(1))
+                    print(f"   ✅ [2순위] Longtermtrends 미국 수치 발견: {us_val}%")
+                else:
+                    print("   ⚠️ Longtermtrends 페이지 우회는 성공했으나 수치를 찾지 못했습니다.")
             else:
-                # Requests가 차단되었다면 Playwright로 다시 시도
-                print("   ▶️ Longtermtrends Requests 실패. Playwright로 재시도합니다...")
-                from playwright.sync_api import sync_playwright
-                with sync_playwright() as p:
-                    browser = p.chromium.launch(headless=True)
-                    context = browser.new_context(user_agent=headers["User-Agent"])
-                    page = context.new_page()
-                    page.goto(url_alt, timeout=30000)
-                    page.wait_for_load_state("domcontentloaded", timeout=15000)
-                    
-                    m_alt_pw = re.search(r"id=[\"']buffett-ratio[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)", page.content(), re.IGNORECASE)
-                    if m_alt_pw:
-                        us_val = float(m_alt_pw.group(1))
-                        print(f"   ✅ [3순위/Playwright] Longtermtrends 미국 수치 발견: {us_val}%")
-                    
-                    browser.close()
-        except Exception as e:
-            print(f"   ⚠️ [3순위] Longtermtrends 수집 실패: {e}")
+                print(f"   ⚠️ Longtermtrends마저 차단됨 (상태코드: {resp_alt.status_code})")
+
+    except Exception as e:
+        print(f"   ⚠️ 버핏 지수 Cloudscraper 실행 환경 오류: {e}")
 
     if us_val is None:
-        print("   ❌ 모든 버핏 지수 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
+        print("   ❌ 모든 우회 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
             
     return us_val, global_val
     
