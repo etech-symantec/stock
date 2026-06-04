@@ -279,34 +279,29 @@ def get_us_margin_debt():
         import requests
 
         # ==========================================
-        # 💡 [1순위] YCharts (Requests 일반 접속 - 빠르고 가벼움)
+        # 💡 [1순위] YCharts 일반 접속 (빠르고 가벼움)
         # ==========================================
         print("      ▶️ 1순위: YCharts 일반 접속 중...")
         try:
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+            headers = {"User-Agent": "Mozilla/5.0"}
             resp = requests.get("https://ycharts.com/indicators/finra_margin_debt", headers=headers, timeout=10)
-            
             if resp.status_code == 200:
-                # HTML 전체에서 값 추출 (예: "Last Value 1.304T" 또는 "1.304T for May 2024")
-                m = re.search(r"Last\s+Value[\s\S]{1,150}?([\d\.]+)([TBM])", resp.text, re.IGNORECASE)
-                if not m:
-                    m = re.search(r"([\d\.]+)([TBM])\s*for\s+[A-Za-z]+\s+\d{4}", resp.text, re.IGNORECASE)
-                    
+                m = re.search(r"current level of\s+([\d\.]+)([TBM])", resp.text, re.IGNORECASE) or \
+                    re.search(r"Last\s+Value[\s\S]{1,150}?([\d\.]+)([TBM])", resp.text, re.IGNORECASE)
                 if m:
                     val = float(m.group(1))
                     unit = m.group(2).upper()
-                    
                     if unit == 'T': us_margin = val
                     elif unit == 'B': us_margin = round(val / 1000, 3)
                     elif unit == 'M': us_margin = round(val / 1000000, 3)
                     print(f"      ✅ [1순위/YCharts] 미국 신용잔고 발견: {us_margin} 조 달러")
             else:
-                print(f"      ⚠️ YCharts 일반 접속 차단 (상태코드: {resp.status_code})")
+                print(f"      ⚠️ YCharts 차단됨 (상태코드: {resp.status_code})")
         except Exception as e:
-            print(f"      ⚠️ 1순위 통신 에러: {e}")
+            print(f"      ⚠️ 1순위 에러: {e}")
 
         # ==========================================
-        # 💡 [2순위] FINRA (Cloudscraper 스텔스 우회)
+        # 💡 [2순위] FINRA (Cloudscraper 우회)
         # ==========================================
         if us_margin is None:
             print("      ▶️ 2순위: FINRA 홈페이지 우회 접속 중...")
@@ -314,7 +309,6 @@ def get_us_margin_debt():
                 import cloudscraper
                 scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
                 resp = scraper.get("https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics", timeout=15)
-                
                 if resp.status_code == 200:
                     m = re.search(r"<td>\s*(?:[A-Za-z]+\s*-\s*\d{2}|\d{4}-\d{2})\s*</td>\s*<td>\s*\$?\s*([\d,]+)\s*</td>", resp.text, re.IGNORECASE)
                     if m:
@@ -322,31 +316,63 @@ def get_us_margin_debt():
                         us_margin = round(val_millions / 1000000, 3)
                         print(f"      ✅ [2순위/FINRA] 미국 신용잔고 발견: {us_margin} 조 달러")
                 else:
-                    print(f"      ⚠️ FINRA 우회 접속 차단 (상태코드: {resp.status_code})")
+                    print(f"      ⚠️ FINRA 차단됨 (상태코드: {resp.status_code})")
             except Exception as e:
-                print(f"      ⚠️ 2순위 통신 에러: {e}")
+                print(f"      ⚠️ 2순위 에러: {e}")
 
         # ==========================================
-        # 💡 [3순위] YCharts (Playwright 강제 렌더링)
+        # 💡 [3순위] FINRA (Playwright 강제 렌더링 - 신규 도입!)
         # ==========================================
         if us_margin is None:
-            print("      ▶️ 3순위: Playwright를 이용한 YCharts 강제 렌더링 대기...")
+            print("      ▶️ 3순위: Playwright를 이용한 FINRA 공식 페이지 접속...")
             try:
                 from playwright.sync_api import sync_playwright
                 with sync_playwright() as p:
                     browser = p.chromium.launch(headless=True, args=["--disable-blink-features=AutomationControlled"])
-                    context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                    context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                     page = context.new_page()
+                    page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                    
+                    page.goto("https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics", timeout=30000)
+                    page.wait_for_selector("table", state="attached", timeout=15000)
+                    
+                    # 💡 HTML 껍데기를 무시하고 표 안의 텍스트만 빼옵니다.
+                    table_text = page.locator("table").first.inner_text()
+                    m = re.search(r"(?:[A-Za-z]+\s*-\s*\d{2}|\d{4}-\d{2})\s+([\d,]+)", table_text)
+                    if m:
+                        val_millions = float(m.group(1).replace(',', ''))
+                        us_margin = round(val_millions / 1000000, 3)
+                        print(f"      ✅ [3순위/Playwright] FINRA 미국 신용잔고 발견: {us_margin} 조 달러")
+                    else:
+                        print("      ⚠️ FINRA 표에서 데이터를 파싱하지 못했습니다.")
+                    browser.close()
+            except Exception as e:
+                print(f"      ⚠️ 3순위 에러: {e}")
+
+        # ==========================================
+        # 💡 [4순위] YCharts (Playwright 순수 텍스트 스캔 - 안정성 대폭 상향)
+        # ==========================================
+        if us_margin is None:
+            print("      ▶️ 4순위: Playwright를 이용한 YCharts 강제 렌더링...")
+            try:
+                from playwright.sync_api import sync_playwright
+                with sync_playwright() as p:
+                    browser = p.chromium.launch(headless=True, args=["--disable-blink-features=AutomationControlled"])
+                    context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    page = context.new_page()
+                    page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                    
                     page.goto("https://ycharts.com/indicators/finra_margin_debt", timeout=30000)
-                    
-                    # 💡 특정 요소를 기다리지 않고, 페이지 뼈대가 뜨면 3초 대기 후 전체 코드를 스캔합니다. (무한 로딩/Timeout 방지)
                     page.wait_for_load_state("domcontentloaded", timeout=15000)
-                    page.wait_for_timeout(3000) 
+                    page.wait_for_timeout(3000)
                     
-                    html = page.content()
-                    m = re.search(r"([\d\.]+)([TBM])\s*for\s+[A-Za-z]+\s+\d{4}", html, re.IGNORECASE)
+                    # 💡 핵심: 복잡한 HTML 대신 '화면에 보이는 글자(순수 텍스트)'만 긁어옵니다.
+                    raw_text = page.locator("body").inner_text()
+                    
+                    # 화면 텍스트에서 'Last Value' 혹은 'current level of' 바로 뒤의 숫자를 스캔
+                    m = re.search(r"current level of\s+([\d\.]+)([TBM])", raw_text, re.IGNORECASE)
                     if not m:
-                        m = re.search(r"Last\s+Value[\s\S]{1,150}?([\d\.]+)([TBM])", html, re.IGNORECASE)
+                        m = re.search(r"Last Value\s+([\d\.]+)([TBM])", raw_text, re.IGNORECASE)
                         
                     if m:
                         val = float(m.group(1))
@@ -354,12 +380,13 @@ def get_us_margin_debt():
                         if unit == 'T': us_margin = val
                         elif unit == 'B': us_margin = round(val / 1000, 3)
                         elif unit == 'M': us_margin = round(val / 1000000, 3)
-                        print(f"      ✅ [3순위/Playwright] YCharts 미국 신용잔고 발견: {us_margin} 조 달러")
+                        print(f"      ✅ [4순위/Playwright] YCharts 미국 신용잔고 발견: {us_margin} 조 달러")
                     else:
-                        print("      ⚠️ 화면 렌더링 완료 후에도 수치 패턴을 찾지 못했습니다.")
+                        snippet = raw_text[:100].replace('\n', ' ')
+                        print(f"      ⚠️ 텍스트에서 수치를 찾지 못했습니다. (원인파악용 텍스트 일부: {snippet}...)")
                     browser.close()
             except Exception as e:
-                print(f"      ⚠️ 3순위 수집 실패: {e}")
+                print(f"      ⚠️ 4순위 에러: {e}")
 
     except Exception as e:
         print(f"      ⚠️ 미국 신용잔고 수집 환경 오류: {e}")
