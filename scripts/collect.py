@@ -124,7 +124,7 @@ def get_cape_pe():
     return None
 
 # ──────────────────────────────────────────────
-# 5. 버핏 지수 (미국 & 글로벌) - GuruFocus 전용 (우회 삭제)
+# 5. 버핏 지수 (미국 & 글로벌) - 3중 다중 엔진 (GuruFocus + Longtermtrends)
 # ──────────────────────────────────────────────
 def get_buffett_indicators():
     us_val = None
@@ -138,10 +138,9 @@ def get_buffett_indicators():
         "Referer": "https://www.google.com/"
     }
 
-    # 💡 1순위 타격: Requests
+    # 💡 1순위 타격: Requests (GuruFocus)
     try:
         resp_us = requests.get("https://www.gurufocus.com/stock-market-valuations.php", headers=headers, timeout=15)
-        # 상태 코드 확인으로 Cloudflare 차단 여부 로그 출력
         if resp_us.status_code != 200:
             print(f"   ⚠️ [1순위] GuruFocus 미국 접속 차단 (상태코드: {resp_us.status_code})")
         else:
@@ -149,8 +148,6 @@ def get_buffett_indicators():
             if m_us:
                 us_val = float(m_us.group(1))
                 print(f"   ✅ [1순위/Requests] GuruFocus 미국 수치 발견: {us_val}%")
-            else:
-                print("   ⚠️ [1순위] 미국 페이지 접속은 성공했으나 수치를 찾지 못했습니다. (로봇 방지 페이지로 추정)")
 
         resp_gl = requests.get("https://www.gurufocus.com/global-market-valuation.php", headers=headers, timeout=15)
         if resp_gl.status_code == 200:
@@ -162,7 +159,7 @@ def get_buffett_indicators():
     except Exception as e:
         print(f"   ⚠️ [1순위] 통신 에러: {e}")
 
-    # 💡 2순위 타격: Playwright (우회 경로 삭제됨)
+    # 💡 2순위 타격: Playwright (GuruFocus)
     if us_val is None or global_val is None:
         try:
             print("   ▶️ 2순위(Playwright) 엔진을 가동합니다...")
@@ -193,9 +190,43 @@ def get_buffett_indicators():
         except Exception as e:
             print(f"   ⚠️ [2순위] Playwright 수집 실패: {e}")
 
-    # 부적절한 3순위(Fallback) 코드는 완전히 제거되었습니다.
+    # 💡 3순위 타격: Longtermtrends (사용자 요청 신규 우회 경로)
     if us_val is None:
-        print("   ❌ 버핏 지수를 가져오지 못했습니다. N/A로 기록됩니다.")
+        print("   ⚠️ GuruFocus 1, 2순위 모두 실패. 대안 사이트(Longtermtrends)로 우회합니다...")
+        try:
+            url_alt = "https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/"
+            
+            # 먼저 빠르고 가벼운 Requests로 스캔
+            resp_alt = requests.get(url_alt, headers=headers, timeout=15)
+            
+            # 사용자가 발견한 <span id="buffett-ratio"> 껍데기 타겟팅
+            m_alt = re.search(r"id=[\"']buffett-ratio[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)", resp_alt.text, re.IGNORECASE)
+            
+            if m_alt:
+                us_val = float(m_alt.group(1))
+                print(f"   ✅ [3순위/Requests] Longtermtrends 미국 수치 발견: {us_val}%")
+            else:
+                # Requests가 차단되었다면 Playwright로 다시 시도
+                print("   ▶️ Longtermtrends Requests 실패. Playwright로 재시도합니다...")
+                from playwright.sync_api import sync_playwright
+                with sync_playwright() as p:
+                    browser = p.chromium.launch(headless=True)
+                    context = browser.new_context(user_agent=headers["User-Agent"])
+                    page = context.new_page()
+                    page.goto(url_alt, timeout=30000)
+                    page.wait_for_load_state("domcontentloaded", timeout=15000)
+                    
+                    m_alt_pw = re.search(r"id=[\"']buffett-ratio[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)", page.content(), re.IGNORECASE)
+                    if m_alt_pw:
+                        us_val = float(m_alt_pw.group(1))
+                        print(f"   ✅ [3순위/Playwright] Longtermtrends 미국 수치 발견: {us_val}%")
+                    
+                    browser.close()
+        except Exception as e:
+            print(f"   ⚠️ [3순위] Longtermtrends 수집 실패: {e}")
+
+    if us_val is None:
+        print("   ❌ 모든 버핏 지수 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
             
     return us_val, global_val
     
