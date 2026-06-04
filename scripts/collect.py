@@ -129,6 +129,8 @@ def get_cape_pe():
 def get_buffett_indicators():
     us_val = None
     global_val = None
+    
+    # 여기서 열린 최상단 try 구문에 대한 짝(except)이 맨 아래에 있어야 합니다.
     try:
         from playwright.sync_api import sync_playwright
         import re
@@ -139,19 +141,16 @@ def get_buffett_indicators():
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             )
             
-            # 💡 핵심 1: 광고 및 불필요한 미디어 트래픽 원천 차단 함수
+            # 광고 및 불필요한 미디어 트래픽 원천 차단 함수
             def cancel_ads(route):
                 url = route.request.url
-                # 이미지, 영상, 폰트 및 구글/크리테오 등 주요 광고 네트워크 도메인 접속 쳐내기
                 if route.request.resource_type in ["image", "media", "font"] or \
                    any(ad in url for ad in ["googlesyndication", "doubleclick", "googleads", "criteo"]):
                     route.abort()
                 else:
                     route.continue_()
             
-            # 브라우저 컨텍스트에 통신 차단 규칙 적용
             context.route("**/*", cancel_ads)
-            
             page = context.new_page()
 
             # 5-1. 미국 버핏 지수
@@ -160,7 +159,7 @@ def get_buffett_indicators():
                 page.wait_for_load_state("networkidle", timeout=30000)
                 page.wait_for_timeout(2000)
                 
-                # 💡 핵심 2: 만약 자체 팝업이 떴을 경우를 대비해 ESC 키를 누르고, HTML 구조에서 iframe(광고틀) 강제 삭제
+                # 팝업 무력화
                 page.keyboard.press("Escape")
                 page.evaluate("document.querySelectorAll('iframe, .popup, .modal, ins').forEach(el => el.remove());")
                 page.wait_for_timeout(1000)
@@ -188,7 +187,7 @@ def get_buffett_indicators():
                 page.wait_for_load_state("networkidle", timeout=30000)
                 page.wait_for_timeout(2000)
                 
-                # 동일한 팝업 클리닝 적용
+                # 팝업 무력화
                 page.keyboard.press("Escape")
                 page.evaluate("document.querySelectorAll('iframe, .popup, .modal, ins').forEach(el => el.remove());")
                 page.wait_for_timeout(1000)
@@ -203,7 +202,18 @@ def get_buffett_indicators():
                 for pat in patterns_gl:
                     m_gl = re.search(pat, html_source_gl, re.IGNORECASE)
                     if m_gl: 
-                        global_val = float
+                        global_val = float(m_gl.group(1))
+                        break
+            except Exception as e:
+                print(f"   ⚠️ 글로벌 버핏 지수 파싱 오류: {e}")
+
+            browser.close()
+            
+    # 👇 누락되었던 except 블록입니다. 이 부분이 반드시 return 위에 있어야 합니다!
+    except Exception as e:
+        print(f"   ⚠️ 버핏 지수 Playwright 환경 오류: {e}")
+        
+    return us_val, global_val
 
 # ──────────────────────────────────────────────
 # 6. 월간/특수 데이터 (Mockup or Placeholder)
