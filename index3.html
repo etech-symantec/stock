@@ -412,10 +412,13 @@ function renderHistory(rows) {
     const total = parseFloat(r.Total_Score) || 0;
     const sig = getValuationSignal(total);
     
-    // 포맷팅 헬퍼
+    // 💡 핵심 수정: 숫자(Number)와 문자열(String)을 완벽히 구분하고, 0점도 정상 출력하도록 수정
     const fmt = (val, isLocale=false, digits=1) => {
-      if (!val || val === 'N/A') return '-';
-      if (val.includes('(')) return val; // 괄호 문자열 처리
+      if (val === undefined || val === null || val === 'N/A' || val === '') return '-';
+      
+      // val이 '문자열'일 때만 includes 검사를 실행하여 에러 원천 차단
+      if (typeof val === 'string' && val.includes('(')) return val; 
+      
       const n = parseFloat(val);
       if (isNaN(n)) return val;
       return isLocale ? n.toLocaleString() : n.toFixed(digits);
