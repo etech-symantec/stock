@@ -273,59 +273,54 @@ def get_kr_buffett_indicator():
 # ──────────────────────────────────────────────
 def get_us_margin_debt():
     us_margin = None
-    print("\n   ▶️ [미국 신용잔고] YCharts / FINRA 접속 중 (월간 데이터)...")
+    print("\n   ▶️ [미국 신용잔고] FINRA 공식 데이터베이스 접속 중...")
     try:
-        from playwright.sync_api import sync_playwright
+        import requests
         import re
+        import cloudscraper
         
-        with sync_playwright() as p:
-            browser = p.chromium.launch(
-                headless=True, 
-                args=["--disable-blink-features=AutomationControlled"]
-            )
-            context = browser.new_context(user_agent="Mozilla/5.0")
-            context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
-            page = context.new_page()
-            
-            # 1순위: YCharts (가장 최신 수치를 보기 좋게 제공)
-            try:
-                page.goto("https://ycharts.com/indicators/finra_margin_debt", timeout=30000)
-                page.wait_for_selector("text=Last Value", state="attached", timeout=15000)
-                html = page.content()
-                
-                # "Last Value 1.304T" 형태의 텍스트에서 숫자와 단위 추출
-                m = re.search(r"Last\s+Value[\s\S]{1,50}?([\d\.]+)([TBM])", html, re.IGNORECASE)
+        # 가상 브라우저(Playwright) 대신 가볍고 봇 차단을 잘 뚫는 Cloudscraper 가동
+        scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
+        
+        # ==========================================
+        # 💡 [1순위] FINRA 공식 홈페이지 (안정성 가장 높음)
+        # ==========================================
+        try:
+            resp = scraper.get("https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics", timeout=15)
+            if resp.status_code == 200:
+                # <td>Jan-24</td> <td>700,000</td> 형태의 HTML 구조 타겟팅
+                m = re.search(r"<td>\s*(?:[A-Za-z]+\s*-\s*\d{2}|\d{4}-\d{2})\s*</td>\s*<td>\s*\$?\s*([\d,]+)\s*</td>", resp.text, re.IGNORECASE)
                 if m:
-                    val = float(m.group(1))
-                    unit = m.group(2).upper()
+                    val_millions = float(m.group(1).replace(',', ''))
+                    us_margin = round(val_millions / 1000000, 3) # 조 달러(Trillion USD)로 환산
+                    print(f"      ✅ [1순위/FINRA] 미국 신용잔고 발견: {us_margin} 조 달러")
+                else:
+                    print("      ⚠️ FINRA 접속은 성공했으나 최신 데이터 패턴을 찾지 못했습니다.")
+            else:
+                print(f"      ⚠️ FINRA 접속 차단 (상태코드: {resp.status_code})")
+        except Exception as e:
+            print(f"      ⚠️ FINRA 수집 실패: {e}")
+
+        # ==========================================
+        # 💡 [2순위] YCharts (FINRA 서버에 문제가 있을 경우 우회)
+        # ==========================================
+        if us_margin is None:
+            print("      ▶️ 2순위: YCharts 우회 접속 중...")
+            try:
+                resp_y = scraper.get("https://ycharts.com/indicators/finra_margin_debt", timeout=15)
+                # "Last Value 1.304T" 형태의 텍스트에서 숫자와 단위 추출
+                m_y = re.search(r"Last\s+Value[\s\S]{1,50}?([\d\.]+)([TBM])", resp_y.text, re.IGNORECASE)
+                if m_y:
+                    val = float(m_y.group(1))
+                    unit = m_y.group(2).upper()
                     
-                    # 조 달러(Trillion) 단위로 통일
                     if unit == 'T': us_margin = val
                     elif unit == 'B': us_margin = round(val / 1000, 3)
                     elif unit == 'M': us_margin = round(val / 1000000, 3)
-                    
-                    print(f"      ✅ [1순위/YCharts] 미국 신용잔고: {us_margin} 조 달러 (Trillion USD)")
+                    print(f"      ✅ [2순위/YCharts] 미국 신용잔고 발견: {us_margin} 조 달러")
             except Exception as e:
                 print(f"      ⚠️ YCharts 수집 실패: {e}")
 
-            # 2순위: FINRA 공식 페이지 (YCharts 차단 시 우회)
-            if us_margin is None:
-                try:
-                    print("      ▶️ 2순위: FINRA 공식 페이지 접속...")
-                    page.goto("https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics", timeout=30000)
-                    page.wait_for_selector("table", state="attached", timeout=15000)
-                    html = page.content()
-                    
-                    # 표의 첫 번째 데이터 행 추출 (Month-Year, 십만 단위 숫자)
-                    m = re.search(r"<td>\s*(?:20\d{2}-\d{2}|[A-Za-z]+\s*-\s*20\d{2})\s*</td>\s*<td>\s*([\d,]+)\s*</td>", html, re.IGNORECASE)
-                    if m:
-                        val_millions = float(m.group(1).replace(',', ''))
-                        us_margin = round(val_millions / 1000000, 3) # 조 달러로 환산
-                        print(f"      ✅ [2순위/FINRA] 미국 신용잔고: {us_margin} 조 달러")
-                except Exception as e:
-                    print(f"      ⚠️ FINRA 공식 수집 실패: {e}")
-
-            browser.close()
     except Exception as e:
         print(f"      ⚠️ 미국 신용잔고 수집 환경 오류: {e}")
         
@@ -333,7 +328,7 @@ def get_us_margin_debt():
 
 def get_kr_margin_debt():
     kr_margin = None
-    print("\n   ▶️ [한국 신용잔고] 네이버 금융(증시자금동향) 수집 중 (일간 데이터)...")
+    print("\n   ▶️ [한국 신용잔고] 네이버 금융(증시자금동향) 수집 중...")
     try:
         import re
         import requests
@@ -342,31 +337,44 @@ def get_kr_margin_debt():
         url = "https://finance.naver.com/sise/sise_deposit.naver"
         headers = {"User-Agent": "Mozilla/5.0"}
         resp = requests.get(url, headers=headers, timeout=10)
+        
+        # 💡 핵심 문제 해결: 네이버 금융의 구형 인코딩(EUC-KR) 강제 변환 (한글 깨짐 방지)
+        resp.encoding = 'euc-kr' 
+        
         soup = BeautifulSoup(resp.text, 'html.parser')
         
         table = soup.find('table', class_='type_1')
         if table:
             headers_th = table.find_all('th')
             margin_idx = -1
+            
+            # 한글이 정상적으로 디코딩되었으므로 이제 '신용융자' 단어를 찾을 수 있습니다.
             for i, th in enumerate(headers_th):
                 if '신용융자' in th.text:
                     margin_idx = i
                     break
+            
+            # 만약 네이버 금융 표 헤더가 이미지로 바뀌거나 탐색에 실패할 경우 3번째 칸으로 강제 고정 (대비책)
+            if margin_idx == -1:
+                margin_idx = 3 
                     
-            if margin_idx != -1:
-                rows = table.find_all('tr')
-                for row in rows:
-                    cols = row.find_all('td')
-                    if len(cols) > margin_idx and re.match(r"\d{4}\.\d{2}\.\d{2}", cols[0].text.strip()):
-                        date_str = cols[0].text.strip()
-                        margin_str = cols[margin_idx].text.strip().replace(',', '')
-                        
+            rows = table.find_all('tr')
+            for row in rows:
+                cols = row.find_all('td')
+                # 첫 칸이 날짜 형식(202X.XX.XX)인 데이터 추출
+                if len(cols) > margin_idx and re.match(r"\d{4}\.\d{2}\.\d{2}", cols[0].text.strip()):
+                    date_str = cols[0].text.strip()
+                    margin_str = cols[margin_idx].text.strip().replace(',', '')
+                    
+                    try:
                         # 백만 원 -> 조 원 단위 환산
                         kr_margin = round(float(margin_str) / 1000000, 2)
                         print(f"      ✅ [수집 완료] 한국 신용잔고 ({date_str} 기준): {kr_margin} 조 원")
-                        break
-            else:
-                print("      ⚠️ 표에서 '신용융자' 항목을 찾을 수 없습니다.")
+                        break # 첫 번째(가장 최신) 정상 데이터를 찾으면 스캔 종료
+                    except ValueError:
+                        continue
+        else:
+            print("      ⚠️ 네이버 금융에서 'class=type_1' 테이블을 찾을 수 없습니다.")
     except Exception as e:
         print(f"      ⚠️ 한국 신용잔고 수집 실패: {e}")
         
