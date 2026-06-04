@@ -432,7 +432,7 @@ def get_kr_margin_debt():
                     margin_str = cols[margin_idx].text.strip().replace(',', '')
                     
                     try:
-                        kr_margin = round(float(margin_str) / 1000000, 2)
+                        kr_margin = round(float(margin_str) / 10000, 2)
                         print(f"      ✅ [수집 완료] 한국 신용잔고 ({date_str} 기준): {kr_margin} 조 원")
                         break 
                     except ValueError:
