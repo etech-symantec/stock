@@ -139,59 +139,70 @@ def get_us_buffett_indicator():
     return us_val
 
 # ──────────────────────────────────────────────
-# 6. 한국 버핏 지수 (IndexerGo 크롤링)
+# 6. 한국 버핏 지수 (IndexerGo 크롤링 + 우회/자체계산 방어막)
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
     print("\n   ▶️ [한국 버핏지수] IndexerGo 사이트 접속 중...")
     try:
         import re
-        import requests
         
         url = "https://www.indexergo.com/series/?frq=D&idxDetail=20104"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
 
         # ==========================================
-        # 💡 [1순위] 빠르고 가벼운 Requests 스캔
+        # 💡 [1순위] Cloudscraper 스텔스 접속 (봇 차단 우회)
         # ==========================================
+        print("      ▶️ 1순위: Cloudscraper 스텔스 엔진 가동...")
         try:
-            resp = requests.get(url, headers=headers, timeout=15)
+            import cloudscraper
+            scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
+            resp = scraper.get(url, timeout=15)
+            
             if resp.status_code == 200:
-                # 사용자가 짚어준 `<span class="ms-1 text-lg"> 숫자%</span>` 껍데기 타겟팅
+                # 렌더링된 HTML 껍데기 타겟팅
                 m = re.search(r"class=[\"'][^>]*ms-1\s+text-lg[^>]*[\"'][^>]*>\s*([\d,]+(?:\.\d+)?)\s*%", resp.text, re.IGNORECASE)
+                # 만약 JS 프레임워크 뒷단(JSON)에 데이터가 숨어있을 경우 대비
+                m_json = re.search(r"\"lastValue\"?\s*:\s*([\d,]+(?:\.\d+)?)", resp.text, re.IGNORECASE)
+
                 if m:
-                    # 천 단위 콤마(,)가 있을 경우 제거 후 float 변환
                     kr_val = float(m.group(1).replace(',', ''))
-                    print(f"      ✅ [1순위/Requests] 한국 버핏 지수 발견: {kr_val}%")
+                    print(f"      ✅ [1순위/Cloudscraper] 한국 버핏 지수 발견 (HTML): {kr_val}%")
+                elif m_json:
+                    kr_val = float(m_json.group(1).replace(',', ''))
+                    print(f"      ✅ [1순위/Cloudscraper] 한국 버핏 지수 발견 (JSON): {kr_val}%")
                 else:
-                    print("      ⚠️ Requests 접속은 성공했으나, 화면에 숫자가 바로 뜨지 않습니다. (동적 렌더링 의심)")
+                    print("      ⚠️ Cloudscraper 접속은 성공했으나 화면에서 숫자를 찾지 못했습니다.")
             else:
-                print(f"      ⚠️ Requests 접속 차단 (상태코드: {resp.status_code})")
+                print(f"      ⚠️ Cloudscraper 접속 차단 (상태코드: {resp.status_code})")
         except Exception as e:
             print(f"      ⚠️ 1순위 통신 에러: {e}")
 
         # ==========================================
-        # 💡 [2순위] 자바스크립트 동적 렌더링 대기 (Playwright)
+        # 💡 [2순위] 로봇 탐지 회피형 Playwright
         # ==========================================
         if kr_val is None:
-            print("      ▶️ 1순위 실패. Playwright를 이용해 JS 렌더링을 기다립니다...")
+            print("      ▶️ 2순위: 봇 탐지 회피형 Playwright 브라우저 렌더링 대기...")
             try:
                 from playwright.sync_api import sync_playwright
                 with sync_playwright() as p:
-                    browser = p.chromium.launch(headless=True)
-                    context = browser.new_context(user_agent=headers["User-Agent"])
-                    
-                    # 속도 향상: 불필요한 이미지/폰트 로딩 차단
+                    # 봇 차단 회피를 위한 특수 인자 추가
+                    browser = p.chromium.launch(
+                        headless=True,
+                        args=["--disable-blink-features=AutomationControlled"]
+                    )
+                    context = browser.new_context(
+                        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                        viewport={"width": 1920, "height": 1080}
+                    )
                     context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
                     page = context.new_page()
 
-                    page.goto(url, timeout=30000)
-                    
-                    # 짚어주신 클래스 이름(.ms-1.text-lg)이 화면에 붙을 때까지 최대 15초 대기
-                    page.wait_for_selector(".ms-1.text-lg", state="attached", timeout=15000)
-                    page.wait_for_timeout(2000) # 숫자 업데이트 안정화 2초 대기
+                    # 웹드라이버(로봇) 흔적 지우기
+                    page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+                    page.goto(url, timeout=40000)
+                    page.wait_for_selector(".ms-1.text-lg", state="attached", timeout=20000)
+                    page.wait_for_timeout(2000)
                     
                     html_content = page.content()
                     m2 = re.search(r"class=[\"'][^>]*ms-1\s+text-lg[^>]*[\"'][^>]*>\s*([\d,]+(?:\.\d+)?)\s*%", html_content, re.IGNORECASE)
@@ -199,10 +210,49 @@ def get_kr_buffett_indicator():
                     if m2:
                         kr_val = float(m2.group(1).replace(',', ''))
                         print(f"      ✅ [2순위/Playwright] 한국 버핏 지수 발견: {kr_val}%")
+                    else:
+                        print("      ⚠️ 화면 렌더링 완료 후에도 요소를 찾지 못했습니다.")
                     
                     browser.close()
             except Exception as e:
                 print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
+
+        # ==========================================
+        # 💡 [3순위] 최후의 보루: 자체 계산 (Naver + FRED)
+        # ==========================================
+        if kr_val is None:
+            print("      ▶️ 3순위: 모든 접속이 차단되었습니다. 네이버/FRED 데이터로 자체 계산합니다...")
+            try:
+                import requests
+                headers_alt = {"User-Agent": "Mozilla/5.0"}
+                
+                # 1. KOSPI & KOSDAQ 시가총액 구하기
+                def get_market_cap(code):
+                    res = requests.get(f"https://finance.naver.com/sise/sise_index.naver?code={code}", headers=headers_alt, timeout=10)
+                    m_cap = re.search(r"시가총액.*?<td[^>]*>([\d,]+)조\s*([\d,]*)", res.text, re.IGNORECASE | re.DOTALL)
+                    if m_cap:
+                        jo = float(m_cap.group(1).replace(',', ''))
+                        eok_str = m_cap.group(2).replace(',', '')
+                        eok = float(eok_str) if eok_str else 0
+                        return jo + (eok / 10000)
+                    return 0
+
+                total_cap_trillion = get_market_cap("KOSPI") + get_market_cap("KOSDAQ")
+                
+                # 2. FRED 명목 GDP 구하기
+                resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=KORNGDP", headers=headers_alt, timeout=10)
+                lines_gdp = [line for line in resp_gdp.text.split('\n') if ',' in line and line[0].isdigit()]
+                
+                if lines_gdp and total_cap_trillion > 0:
+                    gdp_date, gdp_val = lines_gdp[-1].split(',')
+                    if gdp_val.strip() == '.': gdp_date, gdp_val = lines_gdp[-2].split(',')
+                    gdp_trillion = float(gdp_val) / 1000
+                    
+                    # 수식: (시가총액 / GDP) * 100
+                    kr_val = round((total_cap_trillion / gdp_trillion) * 100, 1)
+                    print(f"      ✅ [3순위/자체계산] 한국 버핏 지수 산출 완료: {kr_val}% (KOSPI+KOSDAQ / 명목GDP)")
+            except Exception as e:
+                print(f"      ⚠️ 3순위 자체 계산 실패: {e}")
 
     except Exception as e:
         print(f"      ⚠️ 한국 버핏 지수 환경 오류: {e}")
