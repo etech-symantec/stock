@@ -139,84 +139,87 @@ def get_us_buffett_indicator():
     return us_val
 
 # ──────────────────────────────────────────────
-# 6. 한국 버핏 지수 (KRX 한국거래소 + FRED 공식 데이터 직접 계산)
+# 6. 한국 버핏 지수 (한국은행 ECOS + KRX 하이브리드 엔진)
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] KRX(한국거래소) + FRED 계산 엔진 가동...")
+    print("\n   ▶️ [한국 버핏지수] 한국은행 ECOS(GDP) + KRX(시가총액) 하이브리드 엔진 가동...")
     try:
         import re
-        import requests
+        from playwright.sync_api import sync_playwright
         
         total_cap_billion = 0
+        gdp_billion = 0
         
-        # ==========================================
-        # 1. KRX 한국거래소 시가총액 수집 (Playwright)
-        # ==========================================
-        print("      ▶️ KRX 공식 데이터 포털 접속 중...")
-        try:
-            from playwright.sync_api import sync_playwright
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                context = browser.new_context(
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-                )
-                
-                # 불필요한 미디어 차단 (속도 향상)
-                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
-                page = context.new_page()
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            )
+            context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+            page = context.new_page()
 
-                # KRX 메인 페이지 접속
+            # ==========================================
+            # 1. 한국은행 ECOS - 명목 GDP 수집
+            # ==========================================
+            print("      ▶️ 한국은행 ECOS 100대 통계 접속 중...")
+            try:
+                page.goto("https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100", timeout=40000)
+                
+                # 'GDP(명목, 계절조정)' 텍스트가 화면에 나타날 때까지 대기
+                page.wait_for_selector("text=GDP(명목, 계절조정)", state="attached", timeout=20000)
+                page.wait_for_timeout(2000) 
+                
+                html_ecos = page.content()
+                
+                # 💡 사용자 제공 HTML 기반 초정밀 정규식
+                # <span class="listTit">GDP(명목, 계절조정)</span><span class="result">690,599.9 십억원</span>
+                m_gdp = re.search(r"GDP\(명목,\s*계절조정\)</span>\s*<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)", html_ecos, re.IGNORECASE)
+                
+                if m_gdp:
+                    quarterly_gdp = float(m_gdp.group(1).replace(',', ''))
+                    # ECOS 100대 통계의 GDP는 '분기' 기준이므로, 연간 버핏지수 산출을 위해 4를 곱해 연환산(Annualized) 수행
+                    gdp_billion = quarterly_gdp * 4
+                    print(f"      - [ECOS] 분기 명목 GDP: {quarterly_gdp:,.1f} 십억원")
+                    print(f"      - [ECOS] 연환산(추정) 명목 GDP: {gdp_billion:,.1f} 십억원")
+                else:
+                    print("      ⚠️ ECOS 접속은 성공했으나 GDP 데이터를 찾지 못했습니다.")
+            except Exception as e:
+                print(f"      ⚠️ ECOS GDP 수집 실패: {e}")
+
+            # ==========================================
+            # 2. KRX 한국거래소 - 시가총액 수집
+            # ==========================================
+            print("      ▶️ KRX 공식 데이터 포털 접속 중...")
+            try:
                 page.goto("https://data.krx.co.kr/contents/MDC/MAIN/main/index.cmd", timeout=40000)
-                
-                # '시가총액(십억원)' 텍스트가 화면에 렌더링될 때까지 대기
                 page.wait_for_selector("text=시가총액(십억원)", state="attached", timeout=20000)
-                page.wait_for_timeout(2000) # 테이블 데이터가 완전히 그려질 시간 부여
+                page.wait_for_timeout(2000)
                 
-                html_content = page.content()
+                html_krx = page.content()
+                m_cap = re.search(r"시가총액\(십억원\)[^<]*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>", html_krx, re.IGNORECASE)
                 
-                # 💡 사용자가 제시한 HTML 구조 기반 초정밀 정규식 타겟팅
-                # "시가총액(십억원)" 텍스트 뒤에 오는 첫 번째 td(코스피)와 두 번째 td(코스닥)의 숫자를 그룹화
-                m = re.search(r"시가총액\(십억원\)[^<]*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>", html_content, re.IGNORECASE)
-                
-                if m:
-                    kospi_val = float(m.group(1).replace(',', ''))
-                    kosdaq_val = float(m.group(2).replace(',', ''))
+                if m_cap:
+                    kospi_val = float(m_cap.group(1).replace(',', ''))
+                    kosdaq_val = float(m_cap.group(2).replace(',', ''))
                     total_cap_billion = kospi_val + kosdaq_val
                     
-                    print(f"      - [KRX] 코스피 시총: {kospi_val:,.0f} 십억원")
-                    print(f"      - [KRX] 코스닥 시총: {kosdaq_val:,.0f} 십억원")
-                    print(f"      - [합산] 한국 전체 시가총액: {total_cap_billion:,.0f} 십억원 ({total_cap_billion/1000:,.1f} 조원)")
+                    print(f"      - [KRX] 한국 전체 시가총액 (코스피+코스닥): {total_cap_billion:,.0f} 십억원")
                 else:
                     print("      ⚠️ KRX 접속은 성공했으나 시가총액 데이터를 찾지 못했습니다.")
-                    
-                browser.close()
-        except Exception as e:
-            print(f"      ⚠️ KRX 시가총액 수집 실패: {e}")
+            except Exception as e:
+                print(f"      ⚠️ KRX 시가총액 수집 실패: {e}")
+
+            browser.close()
 
         # ==========================================
-        # 2. FRED 명목 GDP 수집 및 버핏 지수 계산
+        # 3. 한국 버핏 지수 공식 계산
         # ==========================================
-        if total_cap_billion > 0:
-            print("      ▶️ FRED 공공 데이터(한국 명목 GDP) 접속 중...")
-            resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=KORNGDP", timeout=10)
-            
-            # CSV 유효성 검증
-            lines_gdp = [line for line in resp_gdp.text.split('\n') if ',' in line and line[0].isdigit()]
-            
-            if lines_gdp:
-                gdp_date, gdp_val = lines_gdp[-1].split(',')
-                if gdp_val.strip() == '.': gdp_date, gdp_val = lines_gdp[-2].split(',')
-                
-                # FRED의 단위 역시 '10억 원(십억원, Billion KRW)'이므로 단위가 완벽히 일치합니다.
-                gdp_billion = float(gdp_val)
-                print(f"      - [FRED] 한국 명목 GDP ({gdp_date}): {gdp_billion:,.0f} 십억원 ({gdp_billion/1000:,.1f} 조원)")
-                
-                # 수식 산출: (시가총액 / GDP) * 100
-                kr_val = round((total_cap_billion / gdp_billion) * 100, 1)
-                print(f"      ✅ [계산 완료] 한국 버핏 지수: ({total_cap_billion:,.0f} / {gdp_billion:,.0f}) * 100 = {kr_val}%")
-            else:
-                print("      ⚠️ FRED에서 GDP 데이터를 가져오지 못했습니다.")
+        if total_cap_billion > 0 and gdp_billion > 0:
+            kr_val = round((total_cap_billion / gdp_billion) * 100, 1)
+            print(f"      ✅ [계산 완료] 한국 버핏 지수: ({total_cap_billion:,.0f} / {gdp_billion:,.0f}) * 100 = {kr_val}%")
+        else:
+            print("      ⚠️ 수집된 데이터가 부족하여 연산을 수행할 수 없습니다.")
 
     except Exception as e:
         print(f"      ⚠️ 한국 버핏 지수 전체 연산 실패: {e}")
