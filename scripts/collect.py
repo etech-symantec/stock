@@ -146,11 +146,12 @@ def get_kr_buffett_indicator():
     print("\n   ▶️ [한국 버핏지수] IndexerGo 사이트 접속 중...")
     try:
         import re
+        from bs4 import BeautifulSoup
         
         url = "https://www.indexergo.com/series/?frq=D&idxDetail=20104"
 
         # ==========================================
-        # 💡 [1순위] Cloudscraper 스텔스 접속 (봇 차단 우회)
+        # 💡 [1순위] Cloudscraper + BeautifulSoup (가장 우아한 방법)
         # ==========================================
         print("      ▶️ 1순위: Cloudscraper 스텔스 엔진 가동...")
         try:
@@ -159,19 +160,19 @@ def get_kr_buffett_indicator():
             resp = scraper.get(url, timeout=15)
             
             if resp.status_code == 200:
-                # 렌더링된 HTML 껍데기 타겟팅
-                m = re.search(r"class=[\"'][^>]*ms-1\s+text-lg[^>]*[\"'][^>]*>\s*([\d,]+(?:\.\d+)?)\s*%", resp.text, re.IGNORECASE)
-                # 만약 JS 프레임워크 뒷단(JSON)에 데이터가 숨어있을 경우 대비
-                m_json = re.search(r"\"lastValue\"?\s*:\s*([\d,]+(?:\.\d+)?)", resp.text, re.IGNORECASE)
-
-                if m:
-                    kr_val = float(m.group(1).replace(',', ''))
-                    print(f"      ✅ [1순위/Cloudscraper] 한국 버핏 지수 발견 (HTML): {kr_val}%")
-                elif m_json:
-                    kr_val = float(m_json.group(1).replace(',', ''))
-                    print(f"      ✅ [1순위/Cloudscraper] 한국 버핏 지수 발견 (JSON): {kr_val}%")
+                # 정규식 대신 HTML DOM 트리 파서를 이용해 정확히 태그를 찾아냅니다.
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                
+                # CSS 선택자로 class="ms-1 text-lg" 인 span 태그를 정확히 탐색
+                target_span = soup.select_one('span.ms-1.text-lg')
+                
+                if target_span:
+                    # 빈칸과 '%' 기호, ',' 기호를 말끔히 지우고 숫자로 변환 (예: " 292.09%" -> 292.09)
+                    clean_text = target_span.get_text(strip=True).replace('%', '').replace(',', '')
+                    kr_val = float(clean_text)
+                    print(f"      ✅ [1순위/BS4] 한국 버핏 지수 발견: {kr_val}%")
                 else:
-                    print("      ⚠️ Cloudscraper 접속은 성공했으나 화면에서 숫자를 찾지 못했습니다.")
+                    print("      ⚠️ 접속은 성공했으나 <span class='ms-1 text-lg'> 태그를 찾지 못했습니다.")
             else:
                 print(f"      ⚠️ Cloudscraper 접속 차단 (상태코드: {resp.status_code})")
         except Exception as e:
@@ -181,11 +182,10 @@ def get_kr_buffett_indicator():
         # 💡 [2순위] 로봇 탐지 회피형 Playwright
         # ==========================================
         if kr_val is None:
-            print("      ▶️ 2순위: 봇 탐지 회피형 Playwright 브라우저 렌더링 대기...")
+            print("      ▶️ 2순위: Playwright 브라우저 렌더링 대기...")
             try:
                 from playwright.sync_api import sync_playwright
                 with sync_playwright() as p:
-                    # 봇 차단 회피를 위한 특수 인자 추가
                     browser = p.chromium.launch(
                         headless=True,
                         args=["--disable-blink-features=AutomationControlled"]
@@ -197,18 +197,20 @@ def get_kr_buffett_indicator():
                     context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
                     page = context.new_page()
 
-                    # 웹드라이버(로봇) 흔적 지우기
                     page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
                     page.goto(url, timeout=40000)
-                    page.wait_for_selector(".ms-1.text-lg", state="attached", timeout=20000)
+                    
+                    # 알려주신 클래스 이름이 화면에 나타날 때까지 대기
+                    page.wait_for_selector("span.ms-1.text-lg", state="attached", timeout=20000)
                     page.wait_for_timeout(2000)
                     
-                    html_content = page.content()
-                    m2 = re.search(r"class=[\"'][^>]*ms-1\s+text-lg[^>]*[\"'][^>]*>\s*([\d,]+(?:\.\d+)?)\s*%", html_content, re.IGNORECASE)
+                    # Playwright의 로케이터를 사용해 해당 태그의 텍스트만 콕 집어옴
+                    raw_text = page.locator("span.ms-1.text-lg").first.inner_text()
                     
-                    if m2:
-                        kr_val = float(m2.group(1).replace(',', ''))
+                    if raw_text:
+                        clean_text = raw_text.replace('%', '').replace(',', '').strip()
+                        kr_val = float(clean_text)
                         print(f"      ✅ [2순위/Playwright] 한국 버핏 지수 발견: {kr_val}%")
                     else:
                         print("      ⚠️ 화면 렌더링 완료 후에도 요소를 찾지 못했습니다.")
@@ -221,12 +223,11 @@ def get_kr_buffett_indicator():
         # 💡 [3순위] 최후의 보루: 자체 계산 (Naver + FRED)
         # ==========================================
         if kr_val is None:
-            print("      ▶️ 3순위: 모든 접속이 차단되었습니다. 네이버/FRED 데이터로 자체 계산합니다...")
+            print("      ▶️ 3순위: 자체 계산(네이버/FRED 데이터) 엔진 가동...")
             try:
                 import requests
                 headers_alt = {"User-Agent": "Mozilla/5.0"}
                 
-                # 1. KOSPI & KOSDAQ 시가총액 구하기
                 def get_market_cap(code):
                     res = requests.get(f"https://finance.naver.com/sise/sise_index.naver?code={code}", headers=headers_alt, timeout=10)
                     m_cap = re.search(r"시가총액.*?<td[^>]*>([\d,]+)조\s*([\d,]*)", res.text, re.IGNORECASE | re.DOTALL)
@@ -237,20 +238,18 @@ def get_kr_buffett_indicator():
                         return jo + (eok / 10000)
                     return 0
 
-                total_cap_trillion = get_market_cap("KOSPI") + get_market_cap("KOSDAQ")
+                total_cap = get_market_cap("KOSPI") + get_market_cap("KOSDAQ")
                 
-                # 2. FRED 명목 GDP 구하기
                 resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=KORNGDP", headers=headers_alt, timeout=10)
                 lines_gdp = [line for line in resp_gdp.text.split('\n') if ',' in line and line[0].isdigit()]
                 
-                if lines_gdp and total_cap_trillion > 0:
+                if lines_gdp and total_cap > 0:
                     gdp_date, gdp_val = lines_gdp[-1].split(',')
                     if gdp_val.strip() == '.': gdp_date, gdp_val = lines_gdp[-2].split(',')
-                    gdp_trillion = float(gdp_val) / 1000
+                    gdp_tril = float(gdp_val) / 1000
                     
-                    # 수식: (시가총액 / GDP) * 100
-                    kr_val = round((total_cap_trillion / gdp_trillion) * 100, 1)
-                    print(f"      ✅ [3순위/자체계산] 한국 버핏 지수 산출 완료: {kr_val}% (KOSPI+KOSDAQ / 명목GDP)")
+                    kr_val = round((total_cap / gdp_tril) * 100, 1)
+                    print(f"      ✅ [3순위/자체계산] 한국 버핏 지수 산출 완료: {kr_val}%")
             except Exception as e:
                 print(f"      ⚠️ 3순위 자체 계산 실패: {e}")
 
