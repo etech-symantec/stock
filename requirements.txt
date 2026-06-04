@@ -6,3 +6,4 @@ finance-datareader>=0.9.50
 lxml
 tqdm
 beautifulsoup4
+cloudscraper
