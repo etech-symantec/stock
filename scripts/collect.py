@@ -536,8 +536,6 @@ def get_kr_export():
     try:
         import re
 
-        # 관세청 사이트는 접속 후 자바스크립트(API)로 데이터를 뒤늦게 불러오는 구조입니다.
-        # 따라서 requests로는 껍데기만 가져오게 되므로, Playwright 단일 엔진으로 강력하게 대기합니다.
         print("      ▶️ Playwright 브라우저 가동 및 동적 데이터 렌더링 대기...")
         try:
             from playwright.sync_api import sync_playwright
@@ -548,31 +546,32 @@ def get_kr_export():
                 )
                 context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                 
-                # 불필요한 이미지 차단으로 속도 최적화
-                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+                # 이미지, 미디어에 추가로 'stylesheet(CSS)'까지 차단하여 로딩 속도 극한으로 끌어올림
+                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font", "stylesheet"] else route.continue_())
                 page = context.new_page()
 
                 page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-                page.goto("https://tradedata.go.kr/cts/index.do", timeout=30000)
+                
+                # 💡 핵심 수정 1: 타임아웃 60초(60000ms)로 연장
+                # 💡 핵심 수정 2: wait_until="domcontentloaded" -> 모든 이미지가 안 떠도 HTML 뼈대만 잡히면 바로 다음 코드로 넘어감
+                print("      - 메인 페이지 로딩을 시도합니다 (최대 60초 대기)...")
+                page.goto("https://tradedata.go.kr/cts/index.do", timeout=60000, wait_until="domcontentloaded")
                 
                 target_selector = "div#pprcOvrlExp strong"
-                page.wait_for_selector(target_selector, state="attached", timeout=15000)
+                page.wait_for_selector(target_selector, state="attached", timeout=20000)
                 
-                # 💡 핵심 해결책: 화면 뼈대('수출 억 달러')가 떴다고 바로 넘어가면 안 됩니다!
-                # 타겟 요소 안에 숫자(\d)가 하나라도 찍힐 때까지 브라우저를 감시하며 명시적으로 대기합니다.
                 print("      - 화면 뼈대 로딩 완료. 백그라운드 데이터 수신(숫자 렌더링)을 기다립니다...")
                 try:
                     page.wait_for_function(
                         f"() => {{ const el = document.querySelector('{target_selector}'); return el && /\\d/.test(el.innerText); }}",
-                        timeout=15000
+                        timeout=20000
                     )
-                    page.wait_for_timeout(1000) # 애니메이션 등을 대비해 숫자가 완전히 그려질 1초 여유 부여
+                    page.wait_for_timeout(1000)
                 except Exception:
-                    print("      ⚠️ 15초 대기했으나 관세청 서버에서 숫자를 내려주지 않았습니다.")
+                    print("      ⚠️ 데이터 수신 대기 시간 초과. (관세청 서버 지연)")
 
                 raw_text = page.locator(target_selector).first.inner_text()
                 
-                # "수출              877.5억 달러" 형태에서 숫자만 추출
                 m = re.search(r"([\d,\.]+)\s*억", raw_text)
                 if m:
                     export_val = float(m.group(1).replace(',', ''))
