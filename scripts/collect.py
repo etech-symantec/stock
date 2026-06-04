@@ -528,63 +528,53 @@ def get_bdi_index():
     return bdi_val
 
 # ──────────────────────────────────────────────
-# (추가) 한국 수출액 (관세청 TRASS 무역통계)
+# (추가) 한국 수출액 (한국은행 ECOS 우회 수집)
 # ──────────────────────────────────────────────
 def get_kr_export():
     export_val = None
-    print("\n   ▶️ [한국 수출액] 관세청(TRASS) 접속 중...")
+    print("\n   ▶️ [한국 수출액] 관세청 차단 우회 -> 한국은행 ECOS 접속 중...")
     try:
         import re
+        from playwright.sync_api import sync_playwright
 
-        print("      ▶️ Playwright 브라우저 가동 및 동적 데이터 렌더링 대기...")
-        try:
-            from playwright.sync_api import sync_playwright
-            with sync_playwright() as p:
-                browser = p.chromium.launch(
-                    headless=True,
-                    args=["--disable-blink-features=AutomationControlled"]
-                )
-                context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                
-                # 이미지, 미디어에 추가로 'stylesheet(CSS)'까지 차단하여 로딩 속도 극한으로 끌어올림
-                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font", "stylesheet"] else route.continue_())
-                page = context.new_page()
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=True,
+                args=["--disable-blink-features=AutomationControlled"]
+            )
+            context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            
+            # 불필요한 미디어 차단 (속도 최적화)
+            context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+            page = context.new_page()
 
-                page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-                
-                # 💡 핵심 수정 1: 타임아웃 60초(60000ms)로 연장
-                # 💡 핵심 수정 2: wait_until="domcontentloaded" -> 모든 이미지가 안 떠도 HTML 뼈대만 잡히면 바로 다음 코드로 넘어감
-                print("      - 메인 페이지 로딩을 시도합니다 (최대 60초 대기)...")
-                page.goto("https://tradedata.go.kr/cts/index.do", timeout=60000, wait_until="domcontentloaded")
-                
-                target_selector = "div#pprcOvrlExp strong"
-                page.wait_for_selector(target_selector, state="attached", timeout=20000)
-                
-                print("      - 화면 뼈대 로딩 완료. 백그라운드 데이터 수신(숫자 렌더링)을 기다립니다...")
-                try:
-                    page.wait_for_function(
-                        f"() => {{ const el = document.querySelector('{target_selector}'); return el && /\\d/.test(el.innerText); }}",
-                        timeout=20000
-                    )
-                    page.wait_for_timeout(1000)
-                except Exception:
-                    print("      ⚠️ 데이터 수신 대기 시간 초과. (관세청 서버 지연)")
+            # 💡 앞서 GDP 수집에서 100% 성공했던 ECOS 100대 통계 페이지로 접속합니다.
+            page.goto("https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100", timeout=40000)
+            
+            # '수출'이라는 단어가 화면에 뜰 때까지 대기
+            page.wait_for_selector("text=수출", state="attached", timeout=20000)
+            page.wait_for_timeout(2000) # 데이터가 표에 완전히 채워질 시간 부여
 
-                raw_text = page.locator(target_selector).first.inner_text()
-                
-                m = re.search(r"([\d,\.]+)\s*억", raw_text)
-                if m:
-                    export_val = float(m.group(1).replace(',', ''))
-                    print(f"      ✅ [수집 완료] 한국 수출액 발견: {export_val} 억 달러")
-                else:
-                    print(f"      ⚠️ 데이터 추출 실패 (현재 화면의 텍스트: '{raw_text}')")
-                    
-                browser.close()
-        except Exception as e:
-            print(f"      ⚠️ Playwright 수집 실패: {e}")
+            html_ecos = page.content()
 
+            # 💡 ECOS의 "수출(통관기준)" 데이터를 타겟팅
+            # HTML 예시: <span class="listTit">수출(통관기준)</span><span class="result">58,145 백만달러</span>
+            m = re.search(r"수출(?:\(통관기준\))?[^<]*</span>\s*<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)", html_ecos, re.IGNORECASE)
+
+            if m:
+                # 1. '백만 달러' 단위로 숫자 추출 (예: 58,145)
+                val_millions = float(m.group(1).replace(',', ''))
+                
+                # 2. 대시보드 표기에 맞게 '억 달러' 단위로 자동 환산 (백만 달러 / 100)
+                export_val = round(val_millions / 100, 1)
+                
+                print(f"      ✅ [수집 완료] 한국 수출액(ECOS): {export_val} 억 달러 (원문: {val_millions:,.0f} 백만달러)")
+            else:
+                print("      ⚠️ ECOS 접속은 성공했으나 '수출' 데이터를 찾지 못했습니다.")
+
+            browser.close()
     except Exception as e:
-        print(f"      ⚠️ 한국 수출액 환경 오류: {e}")
+        print(f"      ⚠️ 한국 수출액 수집 실패: {e}")
 
     if export_val is None:
          print("      ❌ 한국 수출액을 수집하지 못했습니다. N/A로 기록됩니다.")
