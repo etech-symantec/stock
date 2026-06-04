@@ -6,6 +6,7 @@
 <title>Macro & Market Signal Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   /* ── Reset & Base ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,7 +41,7 @@
     background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
     background-size: 40px 40px;
   }
-  .wrapper { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+  .wrapper { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 80px; }
   header {
     display: flex; align-items: flex-end; justify-content: space-between; padding: 48px 0 36px; border-bottom: 1px solid var(--border);
   }
@@ -52,14 +53,7 @@
   .logo-area p { margin-top: 8px; font-family: var(--font-num); font-size: 11px; letter-spacing: 2px; color: var(--txt2); text-transform: uppercase; }
   .meta { text-align: right; font-family: var(--font-num); font-size: 12px; color: var(--txt2); }
   .meta .date-val { display: block; font-size: 22px; font-weight: 500; color: var(--txt3); letter-spacing: 1px; }
-  .live-dot {
-    display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--buy); margin-right: 6px; vertical-align: middle;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(5,150,105,.5); }
-    50%       { opacity: .7; box-shadow: 0 0 0 6px rgba(5,150,105,0); }
-  }
+  
   .hero {
     margin: 40px 0 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 40px 48px;
     display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; position: relative; overflow: hidden;
@@ -84,7 +78,7 @@
   .gauge-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--buy), var(--warn), var(--sell)); transition: width 1.2s cubic-bezier(.22,1,.36,1); }
   .gauge-labels { display: flex; justify-content: space-between; margin-top: 8px; font-family: var(--font-num); font-size: 10px; color: var(--txt2); letter-spacing: 1px; }
   
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 32px; }
   .card {
     background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px;
     transition: border-color .2s, transform .2s, box-shadow .2s; position: relative; overflow: hidden;
@@ -92,19 +86,32 @@
   .card:hover { border-color: rgba(0,0,0,.15); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,.06); }
   .card-tag { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
   .tag-dot { width: 5px; height: 5px; border-radius: 50%; }
-  .card-value { font-family: var(--font-hd); font-size: clamp(32px, 4vw, 44px); line-height: 1.1; letter-spacing: 1px; margin-bottom: 4px; }
+  .card-value { font-family: var(--font-hd); font-size: clamp(28px, 3.5vw, 38px); line-height: 1.1; letter-spacing: 1px; margin-bottom: 4px; }
   .card-unit { font-family: var(--font-num); font-size: 12px; color: var(--txt2); margin-bottom: 14px; }
   .card-desc { font-size: 12px; color: var(--txt2); line-height: 1.5; }
+  
   .section-title { font-family: var(--font-num); font-size: 11px; font-weight: 600; letter-spacing: 2px; color: var(--txt3); margin: 56px 0 20px; display: flex; align-items: center; gap: 12px; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   
+  /* 💡 차트 컨테이너 스타일 추가 */
+  .chart-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    height: 500px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.03);
+  }
+
   .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; background: var(--card); min-width: 900px; }
-  thead th { font-family: var(--font-num); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); min-width: 1500px; }
+  thead th { font-family: var(--font-num); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--txt2); padding: 14px 16px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th:first-child { text-align: left; }
   tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
   tbody tr:hover { background: rgba(0,0,0,.02); }
-  tbody td { padding: 14px 20px; font-family: var(--font-num); font-size: 13px; color: var(--txt3); }
-  tbody td:first-child { color: var(--txt2); font-size: 12px; }
+  tbody td { padding: 12px 16px; font-family: var(--font-num); font-size: 12px; color: var(--txt3); text-align: right; white-space: nowrap; }
+  tbody td:first-child { color: var(--txt2); text-align: left; }
   .cpill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; border: 1px solid; background: white; }
   footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); font-family: var(--font-num); font-size: 11px; color: var(--txt2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
   
@@ -117,7 +124,7 @@
   <header class="fade-up">
     <div class="logo-area">
       <h1>Global Macro Signal</h1>
-      <p><span class="live-dot"></span>Auto-updated Every Morning · KST 08:00</p>
+      <p><span class="live-dot" style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--buy); margin-right:6px; animation:pulse 2s infinite;"></span>Auto-updated Every Morning</p>
     </div>
     <div class="meta">
       <span class="date-val" id="latest-date">—</span>
@@ -152,30 +159,46 @@
     </div>
   </div>
 
+  <p class="section-title fade-up">매크로 종합 트렌드 차트 (하단의 이름을 클릭하여 지표를 켜고 끌 수 있습니다)</p>
+  <div class="chart-container fade-up">
+    <canvas id="macroChart"></canvas>
+  </div>
+
   <p class="section-title fade-up">일간 지표 (단기 심리 및 수급)</p>
   <div class="cards" id="cards-grid-daily"></div>
 
   <p class="section-title fade-up">월간 지표 (거시 경제 및 펀더멘털)</p>
   <div class="cards" id="cards-grid-monthly"></div>
 
-  <p class="section-title fade-up">역사적 매크로 타임라인 기록</p>
+  <p class="section-title fade-up">역사적 매크로 타임라인 기록 (전체 지표)</p>
   <div class="table-wrap fade-up">
     <table>
       <thead>
         <tr>
           <th>날짜</th>
           <th>통합 점수</th>
-          <th>일간(심리)</th>
-          <th>월간(펀더멘털)</th>
-          <th>Fear & Greed</th>
-          <th>VIX 지수</th>
-          <th>하이일드 스프레드</th>
+          <th>일간 점수</th>
+          <th>월간 점수</th>
+          <th>F&G</th>
+          <th>VIX</th>
+          <th>MOVE</th>
+          <th>US10Y</th>
+          <th>DXY</th>
+          <th>USDKRW</th>
+          <th>Russell2000</th>
+          <th>Copper</th>
+          <th>하이일드</th>
           <th>CAPE PE</th>
-          <th>버핏지수 (美)</th>
+          <th>버핏(美)</th>
+          <th>버핏(韓)</th>
+          <th>신용(美)</th>
+          <th>신용(韓)</th>
+          <th>수출(韓)</th>
+          <th>BDI</th>
         </tr>
       </thead>
       <tbody id="history-body">
-        <tr><td colspan="9" style="text-align:center;padding:32px;color:var(--txt2)">데이터 로딩 중...</td></tr>
+        <tr><td colspan="20" style="text-align:center;padding:32px;color:var(--txt2)">데이터 로딩 중...</td></tr>
       </tbody>
     </table>
   </div>
@@ -192,7 +215,6 @@ function parseCSV(text) {
   const lines = text.trim().split('\n');
   const headers = lines[0].split(',').map(h => h.trim());
   return lines.slice(1).map(line => {
-    // 콤마가 포함된 문자열(예: "877.5 (53.2%)") 파싱 로직 추가
     const vals = [];
     let insideQuote = false;
     let currWord = '';
@@ -218,6 +240,7 @@ function getValuationSignal(score) {
   return           { label: '비중 축소', color: 'var(--sell)', border: 'rgba(225,29,72,.3)' };
 }
 
+/* ── 상단 히어로 렌더링 ── */
 function renderHero(latest) {
   const score = parseFloat(latest.Total_Score) || 0;
   const sig = getValuationSignal(score);
@@ -244,12 +267,11 @@ function renderHero(latest) {
   badge.style.borderColor = sig.border;
   badge.style.background = sig.border.replace('0.4', '0.08').replace('0.3', '0.06');
 
-  // 게이지는 0~100 스케일
   const pct = Math.min(Math.max(score, 0), 100);
   setTimeout(() => { document.getElementById('hero-gauge').style.width = pct + '%'; }, 300);
 }
 
-/* ── 16가지 카드를 Daily / Monthly로 분류 ── */
+/* ── 16가지 카드 렌더링 ── */
 const CARDS_META = [
   // Daily
   { key: 'Fear_Greed', type: 'daily', label: 'CNN Fear & Greed', unit: '시장 심리 지수', color: 'var(--sell)', desc: 'CNN이 산출한 투심 지표. 낮을수록 공포(매수 기회), 높을수록 탐욕(과열)을 뜻합니다.' },
@@ -283,7 +305,6 @@ function renderCards(latest) {
     
     let displayVal = 'N/A';
     if (rawVal && rawVal !== 'N/A') {
-        // 단위 포맷팅 보정 (한국수출액 등 문자열이 섞인 경우 방어)
         if(isNaN(parseFloat(rawVal))) {
             displayVal = rawVal;
         } else {
@@ -292,9 +313,7 @@ function renderCards(latest) {
             else if (meta.key === 'US10Y' || meta.key === 'High_Yield' || meta.key.includes('Buffett') || meta.key.includes('Margin')) displayVal = num.toFixed(2);
             else displayVal = num.toFixed(1);
             
-            if(rawVal.includes('(')) {
-               displayVal = rawVal; // "877.5 (53.2%)" 형태일 경우 원본 유지
-            }
+            if(rawVal.includes('(')) displayVal = rawVal; 
         }
     }
 
@@ -305,7 +324,7 @@ function renderCards(latest) {
         <span class="tag-dot" style="background:${meta.color}"></span>
         ${meta.label}
       </p>
-      <div class="card-value" style="color:var(--txt3); font-size: clamp(24px, 3.5vw, 36px);">${displayVal}</div>
+      <div class="card-value" style="color:var(--txt3); font-size: clamp(24px, 3vw, 36px);">${displayVal}</div>
       <p class="card-unit">${meta.unit}</p>
       <p class="card-desc">${meta.desc}</p>
     `;
@@ -315,37 +334,114 @@ function renderCards(latest) {
   });
 }
 
+/* ── 💡 차트 생성 렌더링 로직 (Chart.js) ── */
+function renderChart(rows) {
+  const ctx = document.getElementById('macroChart').getContext('2d');
+  
+  // 날짜순(오름차순) 정렬 보장
+  const chartData = [...rows].sort((a, b) => new Date(a.Date) - new Date(b.Date));
+  const labels = chartData.map(r => r.Date);
+  
+  // 데이터를 실수로 변환해주는 헬퍼 함수
+  const getD = (key) => chartData.map(r => {
+    if (!r[key] || r[key] === 'N/A') return null;
+    return parseFloat(r[key].toString().replace(/,/g, '').split('(')[0]); // 수출액의 괄호 등 제거
+  });
+
+  // 점수는 굵고 메인 컬러로, 나머지 지표는 얇게 처리하여 사용자가 범례 클릭시 볼 수 있게 hidden 처리
+  const datasets = [
+    // 1. 핵심 점수 지표 (기본 노출)
+    { label: '통합 밸류에이션 점수', data: getD('Total_Score'), borderColor: '#2563eb', backgroundColor: '#2563eb', borderWidth: 3, tension: 0.2, yAxisID: 'y' },
+    { label: '일간 점수', data: getD('Daily_Score'), borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2, borderDash: [4, 4], hidden: true, tension: 0.2, yAxisID: 'y' },
+    { label: '월간 점수', data: getD('Monthly_Score'), borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', borderWidth: 2, borderDash: [4, 4], hidden: true, tension: 0.2, yAxisID: 'y' },
+    
+    // 2. 개별 지표 (기본 숨김, 클릭시 노출)
+    { label: 'Fear & Greed', data: getD('Fear_Greed'), borderColor: '#e11d48', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: 'VIX 지수', data: getD('VIX'), borderColor: '#d97706', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: 'MOVE 지수', data: getD('MOVE'), borderColor: '#b45309', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '하이일드 스프레드', data: getD('High_Yield'), borderColor: '#9f1239', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '미 10년물 국채금리', data: getD('US10Y'), borderColor: '#0284c7', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '달러인덱스', data: getD('DXY'), borderColor: '#0369a1', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '구리 (Copper)', data: getD('Copper'), borderColor: '#b45309', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: 'CAPE PE', data: getD('CAPE_PE'), borderColor: '#059669', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '버핏지수 (美)', data: getD('Buffett_US'), borderColor: '#047857', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '버핏지수 (韓)', data: getD('Buffett_KR'), borderColor: '#065f46', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '신용잔고 (美)', data: getD('Margin_Debt_US'), borderColor: '#ea580c', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '신용잔고 (韓)', data: getD('Margin_Debt_KR'), borderColor: '#c2410c', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '한국 수출액', data: getD('KR_Export'), borderColor: '#475569', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    
+    // 3. 우측 Y축(단위가 매우 큰 지표들)
+    { label: '원/달러 환율 (우측축)', data: getD('USDKRW'), borderColor: '#dc2626', borderWidth: 1.5, hidden: true, yAxisID: 'y1' },
+    { label: '러셀 2000 (우측축)', data: getD('Russell2000'), borderColor: '#4f46e5', borderWidth: 1.5, hidden: true, yAxisID: 'y1' },
+    { label: 'BDI 지수 (우측축)', data: getD('BDI_Index'), borderColor: '#334155', borderWidth: 1.5, hidden: true, yAxisID: 'y1' }
+  ];
+
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { family: "'DM Sans', sans-serif", size: 11 } } },
+        tooltip: { titleFont: { size: 13 }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 8 }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        // 좌측 Y축: 점수, 퍼센트, 소규모 지수
+        y: { type: 'linear', display: true, position: 'left', grid: { color: '#f1f5f9' } },
+        // 우측 Y축: 환율, BDI 등 단위가 수백~수천 대인 지수
+        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } }
+      }
+    }
+  });
+}
+
+/* ── 💡 20개 모든 지표를 표시하는 타임라인 렌더링 ── */
 function renderHistory(rows) {
   const tbody = document.getElementById('history-body');
   const recent = [...rows].reverse().slice(0, 30);
 
   if (!recent.length) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--txt2)">데이터가 비어있습니다.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="20" style="text-align:center;padding:32px;color:var(--txt2)">데이터가 비어있습니다.</td></tr>';
     return;
   }
 
   tbody.innerHTML = recent.map((r, idx) => {
     const total = parseFloat(r.Total_Score) || 0;
-    const daily = parseFloat(r.Daily_Score) || 0;
-    const monthly = parseFloat(r.Monthly_Score) || 0;
     const sig = getValuationSignal(total);
     
-    const fmtStr = (val, isLocale=false, digits=1) => {
+    // 포맷팅 헬퍼
+    const fmt = (val, isLocale=false, digits=1) => {
+      if (!val || val === 'N/A') return '-';
+      if (val.includes('(')) return val; // 괄호 문자열 처리
       const n = parseFloat(val);
-      if (!val || val === 'N/A' || isNaN(n)) return 'N/A';
+      if (isNaN(n)) return val;
       return isLocale ? n.toLocaleString() : n.toFixed(digits);
     };
 
     return `<tr style="opacity:${1 - idx * 0.025}">
       <td>${r.Date}</td>
-      <td><span class="cpill" style="color:${sig.color}; border-color:${sig.border}">${fmtStr(total, false, 1)} · ${sig.label}</span></td>
-      <td>${fmtStr(daily, false, 1)}</td>
-      <td>${fmtStr(monthly, false, 1)}</td>
-      <td>${fmtStr(r.Fear_Greed, false, 1)}</td>
-      <td>${fmtStr(r.VIX, false, 1)}</td>
-      <td>${fmtStr(r.High_Yield, false, 2)}%</td>
-      <td>${fmtStr(r.CAPE_PE, false, 1)}</td>
-      <td>${fmtStr(r.Buffett_US, false, 1)}%</td>
+      <td style="text-align:left"><span class="cpill" style="color:${sig.color}; border-color:${sig.border}">${fmt(total, false, 1)} · ${sig.label}</span></td>
+      <td>${fmt(r.Daily_Score, false, 1)}</td>
+      <td>${fmt(r.Monthly_Score, false, 1)}</td>
+      <td>${fmt(r.Fear_Greed, false, 0)}</td>
+      <td>${fmt(r.VIX, false, 1)}</td>
+      <td>${fmt(r.MOVE, false, 1)}</td>
+      <td>${fmt(r.US10Y, false, 2)}</td>
+      <td>${fmt(r.DXY, false, 1)}</td>
+      <td>${fmt(r.USDKRW, true, 0)}</td>
+      <td>${fmt(r.Russell2000, true, 0)}</td>
+      <td>${fmt(r.Copper, false, 2)}</td>
+      <td>${fmt(r.High_Yield, false, 2)}</td>
+      <td>${fmt(r.CAPE_PE, false, 1)}</td>
+      <td>${fmt(r.Buffett_US, false, 1)}</td>
+      <td>${fmt(r.Buffett_KR, false, 1)}</td>
+      <td>${fmt(r.Margin_Debt_US, false, 2)}</td>
+      <td>${fmt(r.Margin_Debt_KR, false, 2)}</td>
+      <td>${fmt(r.KR_Export, false, 1)}</td>
+      <td>${fmt(r.BDI_Index, true, 0)}</td>
     </tr>`;
   }).join('');
 }
@@ -353,7 +449,7 @@ function renderHistory(rows) {
 async function init() {
   try {
     const res = await fetch(`data/indicators.csv?t=${new Date().getTime()}`);
-    if (!res.ok) throw new Error('data/indicators.csv 리소스를 찾을 수 없습니다.');
+    if (!res.ok) throw new Error('CSV 파일을 찾을 수 없습니다.');
     const text = await res.text();
     const rows = parseCSV(text);
 
@@ -364,6 +460,7 @@ async function init() {
 
     renderHero(latest);
     renderCards(latest);
+    renderChart(rows); // 차트 렌더링 호출
     renderHistory(rows);
 
   } catch (e) {
