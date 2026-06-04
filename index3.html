@@ -294,7 +294,7 @@ const CARDS_META = [
   { key: 'MOVE', type: 'daily', label: 'MOVE 지수', unit: '미 국채 변동성지수', color: 'var(--warn)', inverse: true, range: [50, 160], desc: '국채 옵션 변동성. 금리 발작 및 통화정책 불확실성을 측정하는 핵심 단기 지표입니다.' },
   { key: 'US10Y', type: 'daily', label: '미국 국채 10년물', unit: '글로벌 기준 금리 (%)', color: 'var(--info)', inverse: false, range: [1.5, 6.0], desc: '주식 등 위험자산의 밸류에이션 하방 압력(할인율)으로 작용하는 가장 중요한 금리입니다.' },
   { key: 'DXY', type: 'daily', label: '달러 인덱스', unit: '6개국 통화 대비 가치', color: 'var(--info)', inverse: false, range: [90, 115], desc: '강달러 시 신흥국 자본 이탈 및 다국적 기업의 실적 악화 우려가 커집니다.' },
-  { key: 'USDKRW', type: 'daily', label: '원/달러 환율', unit: 'KRW/USD 종가', color: 'var(--info)', inverse: true, range: [1100, 1600], desc: '국내 증시의 외국인 수급을 좌우하며, 환율 급등 시 강력한 하방 압력이 발생합니다.' },
+  { key: 'USDKRW', type: 'daily', label: '원/달러 환율', unit: 'KRW/USD 종가', color: 'var(--sell)', inverse: false, range: [1000, 1600], desc: '국내 증시의 외국인 수급을 좌우하며, 환율 급등 시 강력한 하방 압력이 발생합니다.' },
   { key: 'High_Yield', type: 'daily', label: '하이일드 스프레드', unit: '신용 리스크 (%p)', color: 'var(--sell)', inverse: true, range: [2.0, 9.0], desc: '부실 회사채와 국채의 금리차. 급등 시 기업의 자금 경색 및 연쇄 파산 우려를 예고합니다.' },
   { key: 'Copper', type: 'daily', label: '구리 선물 가격', unit: '닥터 코퍼 (USD/lb)', color: 'var(--buy)', inverse: false, range: [2.5, 5.5], desc: '실물 산업 전반에 기초 소재로 사용되어 제조업 경기를 정밀하게 선행 타겟팅합니다.' },
   { key: 'Margin_Debt_KR', type: 'daily', label: '신용잔고 (한국)', unit: '개인 빚투 규모 (조 원)', color: '#ff9800', inverse: false, range: [10, 45], desc: '한국 증시의 빚투 규모(일간 업데이트)로 단기 과열 양상을 체크합니다.' },
