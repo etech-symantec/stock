@@ -528,7 +528,7 @@ def get_bdi_index():
     return bdi_val
 
 # ──────────────────────────────────────────────
-# (추가) 한국 수출액 (한국은행 ECOS 우회 수집)
+# (추가) 한국 수출액 (한국은행 ECOS 우회 수집 - 정밀 타겟팅)
 # ──────────────────────────────────────────────
 def get_kr_export():
     export_val = None
@@ -548,18 +548,16 @@ def get_kr_export():
             context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
             page = context.new_page()
 
-            # 💡 앞서 GDP 수집에서 100% 성공했던 ECOS 100대 통계 페이지로 접속합니다.
             page.goto("https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100", timeout=40000)
             
-            # '수출'이라는 단어가 화면에 뜰 때까지 대기
-            page.wait_for_selector("text=수출", state="attached", timeout=20000)
+            # 💡 수정 1: 그냥 '수출'이 아니라 정확히 '수출(통관기준)' 텍스트가 렌더링될 때까지 대기
+            page.wait_for_selector("text=\"수출(통관기준)\"", state="attached", timeout=20000)
             page.wait_for_timeout(2000) # 데이터가 표에 완전히 채워질 시간 부여
 
             html_ecos = page.content()
 
-            # 💡 ECOS의 "수출(통관기준)" 데이터를 타겟팅
-            # HTML 예시: <span class="listTit">수출(통관기준)</span><span class="result">58,145 백만달러</span>
-            m = re.search(r"수출(?:\(통관기준\))?[^<]*</span>\s*<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)", html_ecos, re.IGNORECASE)
+            # 💡 수정 2: 정규식 강제 고정. (?:...)? 같은 옵션을 빼고 반드시 '수출(통관기준)' 뒤에 오는 숫자만 추출
+            m = re.search(r"수출\(통관기준\)[^<]*</span>\s*<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)", html_ecos)
 
             if m:
                 # 1. '백만 달러' 단위로 숫자 추출 (예: 58,145)
@@ -570,7 +568,7 @@ def get_kr_export():
                 
                 print(f"      ✅ [수집 완료] 한국 수출액(ECOS): {export_val} 억 달러 (원문: {val_millions:,.0f} 백만달러)")
             else:
-                print("      ⚠️ ECOS 접속은 성공했으나 '수출' 데이터를 찾지 못했습니다.")
+                print("      ⚠️ ECOS 접속은 성공했으나 '수출(통관기준)' 데이터를 찾지 못했습니다.")
 
             browser.close()
     except Exception as e:
