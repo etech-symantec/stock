@@ -124,129 +124,97 @@ def get_cape_pe():
     return None
 
 # ──────────────────────────────────────────────
-# 5. 버핏 지수 (미국 & 글로벌) - 상세 로깅 및 동적 JS 렌더링 우회 엔진
+# 5. 버핏 지수 (1순위: Longtermtrends / 2순위: FRED 공공데이터 자체 계산)
 # ──────────────────────────────────────────────
 def get_buffett_indicators():
     us_val = None
     global_val = None
     import re
+    import requests
     
+    # ==========================================
+    # 💡 [1순위] Longtermtrends (Playwright)
+    # ==========================================
+    print("\n   ▶️ [1순위] Longtermtrends Playwright 접속 중...")
     try:
-        import cloudscraper
-        scraper = cloudscraper.create_scraper(
-            browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
-        )
-        
-        # ==========================================
-        # 💡 [1순위] GuruFocus (미국) - 상세 로깅 적용
-        # ==========================================
-        print("\n   ▶️ [1순위/상세로그] GuruFocus(미국) Cloudscraper 우회 접속 시도...")
-        url_us = "https://www.gurufocus.com/stock-market-valuations.php"
-        print(f"      - 대상 URL: {url_us}")
-        
-        try:
-            resp_us = scraper.get(url_us, timeout=20)
-            print(f"      - 응답 코드: {resp_us.status_code}")
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080}
+            )
             
-            if resp_us.status_code == 200:
-                print("      - 응답 성공(200). 'currently at' 텍스트 탐색을 시작합니다.")
-                m_us = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
-                
-                if m_us:
-                    us_val = float(m_us.group(1))
-                    print(f"      ✅ [1순위] 미국 수치 1차 탐색 성공: {us_val}%")
-                else:
-                    print("      ⚠️ [실패] 1차 텍스트 패턴 탐색 실패. 2차(HTML 껍데기) 탐색을 시도합니다.")
-                    
-                    # 2차 탐색: 텍스트가 바뀌었을 경우 HTML 태그 껍데기로 찾기
-                    m_us_alt = re.search(r"US\s+Market\s+Valuation[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
-                    
-                    if m_us_alt:
-                        us_val = float(m_us_alt.group(1))
-                        print(f"      ✅ [1순위] 미국 수치 2차 태그 탐색 성공: {us_val}%")
-                    else:
-                        print("      ⚠️ [치명적 실패] 상태코드는 200이지만 모든 패턴 탐색에 실패했습니다.")
-                        print("      - 원인 추정 1: Cloudflare의 '사람 확인(캡챠)' 페이지가 200 코드로 반환됨.")
-                        print("      - 원인 추정 2: GuruFocus 사이트의 HTML 구조가 완전히 변경됨.")
-                        # 수신된 텍스트의 앞 150글자만 잘라서 출력해 실제 원인 파악
-                        snippet = resp_us.text[:150].replace('\n', ' ')
-                        print(f"      - 수신된 HTML 일부: {snippet} ...")
-                        
-            elif resp_us.status_code in [403, 429, 503]:
-                print(f"      ⚠️ [실패] Cloudflare 방어막에 의해 접속이 완벽히 차단되었습니다. (상태코드: {resp_us.status_code})")
-            else:
-                print(f"      ⚠️ [실패] 예상치 못한 오류 코드 발생 (상태코드: {resp_us.status_code})")
-                
-        except Exception as req_e:
-            print(f"      ⚠️ [에러] 미국 HTTP 요청 중 예외 발생: {req_e}")
+            context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+            page = context.new_page()
 
-        # ==========================================
-        # 💡 [1순위] GuruFocus (글로벌) - 상세 로깅 적용
-        # ==========================================
-        print("\n   ▶️ [1순위/상세로그] GuruFocus(글로벌) Cloudscraper 우회 접속 시도...")
-        url_gl = "https://www.gurufocus.com/global-market-valuation.php"
-        
-        try:
-            resp_gl = scraper.get(url_gl, timeout=20)
-            print(f"      - 응답 코드: {resp_gl.status_code}")
+            page.goto("https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/", timeout=40000)
+            page.wait_for_selector("#buffett-ratio", state="attached", timeout=20000)
+            page.wait_for_timeout(3000)
             
+            raw_text = page.locator("#buffett-ratio").inner_text()
+            m_alt = re.search(r"(\d{2,4}(?:\.\d+)?)", raw_text)
+            if m_alt:
+                us_val = float(m_alt.group(1))
+                print(f"      ✅ [1순위] Longtermtrends 미국 수치 발견: {us_val}%")
+            else:
+                print(f"      ⚠️ 1순위 실패: 껍데기는 찾았으나 숫자가 비어있습니다.")
+                
+            resp_gl = requests.get("https://www.gurufocus.com/global-market-valuation.php", headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
             if resp_gl.status_code == 200:
                 m_gl = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
-                if m_gl:
-                    global_val = float(m_gl.group(1))
-                    print(f"      ✅ [1순위] 글로벌 수치 1차 탐색 성공: {global_val}%")
-                else:
-                    m_gl_alt = re.search(r"Ratio\s+of\s+Total\s+Market\s+Cap[\s\S]{1,400}?<span[^>]*class=[\"'][^>]*fw-bold[^>]*[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
-                    if m_gl_alt:
-                        global_val = float(m_gl_alt.group(1))
-                        print(f"      ✅ [1순위] 글로벌 수치 2차 태그 탐색 성공: {global_val}%")
-                    else:
-                        print("      ⚠️ [실패] 글로벌 수치 패턴 탐색 실패.")
-            else:
-                print(f"      ⚠️ [실패] 글로벌 접속 차단됨 (상태코드: {resp_gl.status_code})")
-                
-        except Exception as req_e_gl:
-            print(f"      ⚠️ [에러] 글로벌 HTTP 요청 중 예외 발생: {req_e_gl}")
+                if m_gl: global_val = float(m_gl.group(1))
 
+            browser.close()
     except Exception as e:
-        print(f"   ⚠️ Cloudscraper 구동 예외 발생: {e}")
+        print(f"      ⚠️ Playwright 1순위 수집 중 오류: {e}")
 
     # ==========================================
-    # 💡 [2순위] Longtermtrends (Playwright 대기 로직 유지)
+    # 💡 [2순위] 자체 계산 (FRED 공공데이터: Wilshire 5000 시총 / GDP)
     # ==========================================
     if us_val is None:
-        print("\n   ▶️ [2순위] GuruFocus 수집 실패. Longtermtrends Playwright 접속 중...")
+        print("\n   ▶️ [2순위] 1순위 실패. FRED 공공 데이터를 활용해 버핏 지수를 직접 계산합니다...")
         try:
-            from playwright.sync_api import sync_playwright
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                context = browser.new_context(
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                    viewport={"width": 1920, "height": 1080}
-                )
+            # 1. FRED 최신 미국 GDP 가져오기
+            resp_gdp = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDP", timeout=10)
+            lines_gdp = [line for line in resp_gdp.text.split('\n') if line.strip() and not line.startswith('DATE')]
+            
+            # 날짜와 수치 분리 (예: "2024-01-01,27938.831")
+            gdp_date, gdp_val = lines_gdp[-1].split(',')
+            latest_gdp = float(gdp_val)
+            print(f"      - [FRED API] 미국 명목 GDP ({gdp_date} 기준): ${latest_gdp:,.1f} Billion")
+            
+            # 2. FRED 최신 Wilshire 5000 지수 가져오기
+            resp_wil = requests.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=WILL5000PRFC", timeout=10)
+            lines_wil = [line for line in resp_wil.text.split('\n') if line.strip() and not line.startswith('DATE')]
+            
+            latest_wilshire = None
+            wil_date = None
+            for line in reversed(lines_wil):
+                parts = line.split(',')
+                if parts[-1] != '.':  # 주말/휴일 결측치 무시
+                    wil_date = parts[0]
+                    latest_wilshire = float(parts[-1])
+                    break
+            
+            if latest_wilshire:
+                print(f"      - [FRED API] Wilshire 5000 지수 ({wil_date} 기준): {latest_wilshire:,.2f} pt")
+            
+            if latest_gdp and latest_wilshire:
+                # Wilshire 5000 지수 1포인트는 약 1.35 Billion 달러의 시총 (Longtermtrends 스케일 보정치)
+                market_cap_billions = latest_wilshire * 1.35 
+                print(f"      - [계산식] 추산된 미국 시가총액 (지수 * 1.35): ${market_cap_billions:,.1f} Billion")
                 
-                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
-                page = context.new_page()
-
-                page.goto("https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/", timeout=40000)
+                # 수식 산출: (시가총액 / GDP) * 100
+                calculated_val = (market_cap_billions / latest_gdp) * 100
+                us_val = round(calculated_val, 1)
                 
-                page.wait_for_selector("#buffett-ratio", state="attached", timeout=20000)
-                page.wait_for_timeout(3000)
-                
-                raw_text = page.locator("#buffett-ratio").inner_text()
-                m_alt = re.search(r"(\d{2,4}(?:\.\d+)?)", raw_text)
-                if m_alt:
-                    us_val = float(m_alt.group(1))
-                    print(f"      ✅ [2순위] Longtermtrends 미국 수치 발견: {us_val}%")
-                else:
-                    print(f"      ⚠️ 껍데기는 찾았으나 숫자가 비어있습니다. (현재 텍스트: '{raw_text}')")
-                
-                browser.close()
+                print(f"      ✅ [2순위] FRED 자체 산출 완료: ({market_cap_billions:,.1f} / {latest_gdp:,.1f}) * 100 = {us_val}%")
         except Exception as e:
-            print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
+            print(f"      ⚠️ FRED 직접 계산 실패: {e}")
 
     if us_val is None:
-        print("\n   ❌ 모든 우회 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
+        print("\n   ❌ 모든 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
 
     return us_val, global_val
     
