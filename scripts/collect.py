@@ -269,11 +269,205 @@ def get_kr_buffett_indicator():
     return kr_val
 
 # ──────────────────────────────────────────────
-# 7. 월간/특수 데이터
+# 7. 신용융자 잔고 (미국 FINRA / 한국 KOFIA)
 # ──────────────────────────────────────────────
-def get_monthly_and_special():
-    return {"Margin_Debt": None, "KR_Export": None, "BDI_Index": None}
+def get_us_margin_debt():
+    us_margin = None
+    print("\n   ▶️ [미국 신용잔고] YCharts / FINRA 접속 중 (월간 데이터)...")
+    try:
+        from playwright.sync_api import sync_playwright
+        import re
+        
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=True, 
+                args=["--disable-blink-features=AutomationControlled"]
+            )
+            context = browser.new_context(user_agent="Mozilla/5.0")
+            context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+            page = context.new_page()
+            
+            # 1순위: YCharts (가장 최신 수치를 보기 좋게 제공)
+            try:
+                page.goto("https://ycharts.com/indicators/finra_margin_debt", timeout=30000)
+                page.wait_for_selector("text=Last Value", state="attached", timeout=15000)
+                html = page.content()
+                
+                # "Last Value 1.304T" 형태의 텍스트에서 숫자와 단위 추출
+                m = re.search(r"Last\s+Value[\s\S]{1,50}?([\d\.]+)([TBM])", html, re.IGNORECASE)
+                if m:
+                    val = float(m.group(1))
+                    unit = m.group(2).upper()
+                    
+                    # 조 달러(Trillion) 단위로 통일
+                    if unit == 'T': us_margin = val
+                    elif unit == 'B': us_margin = round(val / 1000, 3)
+                    elif unit == 'M': us_margin = round(val / 1000000, 3)
+                    
+                    print(f"      ✅ [1순위/YCharts] 미국 신용잔고: {us_margin} 조 달러 (Trillion USD)")
+            except Exception as e:
+                print(f"      ⚠️ YCharts 수집 실패: {e}")
 
+            # 2순위: FINRA 공식 페이지 (YCharts 차단 시 우회)
+            if us_margin is None:
+                try:
+                    print("      ▶️ 2순위: FINRA 공식 페이지 접속...")
+                    page.goto("https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics", timeout=30000)
+                    page.wait_for_selector("table", state="attached", timeout=15000)
+                    html = page.content()
+                    
+                    # 표의 첫 번째 데이터 행 추출 (Month-Year, 십만 단위 숫자)
+                    m = re.search(r"<td>\s*(?:20\d{2}-\d{2}|[A-Za-z]+\s*-\s*20\d{2})\s*</td>\s*<td>\s*([\d,]+)\s*</td>", html, re.IGNORECASE)
+                    if m:
+                        val_millions = float(m.group(1).replace(',', ''))
+                        us_margin = round(val_millions / 1000000, 3) # 조 달러로 환산
+                        print(f"      ✅ [2순위/FINRA] 미국 신용잔고: {us_margin} 조 달러")
+                except Exception as e:
+                    print(f"      ⚠️ FINRA 공식 수집 실패: {e}")
+
+            browser.close()
+    except Exception as e:
+        print(f"      ⚠️ 미국 신용잔고 수집 환경 오류: {e}")
+        
+    return us_margin
+
+def get_kr_margin_debt():
+    kr_margin = None
+    print("\n   ▶️ [한국 신용잔고] 네이버 금융(증시자금동향) 수집 중 (일간 데이터)...")
+    try:
+        import re
+        import requests
+        from bs4 import BeautifulSoup
+        
+        url = "https://finance.naver.com/sise/sise_deposit.naver"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        resp = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        
+        table = soup.find('table', class_='type_1')
+        if table:
+            headers_th = table.find_all('th')
+            margin_idx = -1
+            for i, th in enumerate(headers_th):
+                if '신용융자' in th.text:
+                    margin_idx = i
+                    break
+                    
+            if margin_idx != -1:
+                rows = table.find_all('tr')
+                for row in rows:
+                    cols = row.find_all('td')
+                    if len(cols) > margin_idx and re.match(r"\d{4}\.\d{2}\.\d{2}", cols[0].text.strip()):
+                        date_str = cols[0].text.strip()
+                        margin_str = cols[margin_idx].text.strip().replace(',', '')
+                        
+                        # 백만 원 -> 조 원 단위 환산
+                        kr_margin = round(float(margin_str) / 1000000, 2)
+                        print(f"      ✅ [수집 완료] 한국 신용잔고 ({date_str} 기준): {kr_margin} 조 원")
+                        break
+            else:
+                print("      ⚠️ 표에서 '신용융자' 항목을 찾을 수 없습니다.")
+    except Exception as e:
+        print(f"      ⚠️ 한국 신용잔고 수집 실패: {e}")
+        
+    return kr_margin
+
+def get_monthly_and_special():
+    return {
+        "Margin_Debt_US": get_us_margin_debt(), 
+        "Margin_Debt_KR": get_kr_margin_debt(), 
+        "KR_Export": None, 
+        "BDI_Index": None
+    }
+
+# ──────────────────────────────────────────────
+# 8. CSV 저장 로직
+# ──────────────────────────────────────────────
+# 💡 Margin_Debt 필드가 삭제되고 _US 와 _KR 두 개로 분리되었습니다.
+FIELDNAMES = [
+    "Date", "VIX", "MOVE", "US10Y", "DXY", "USDKRW", "Russell2000", "Copper",
+    "High_Yield", "Fear_Greed", "CAPE_PE", "Buffett_US", "Buffett_KR",
+    "Margin_Debt_US", "Margin_Debt_KR", "KR_Export", "BDI_Index", "Integrated_Valuation"
+]
+
+def save_to_csv(row: dict):
+    from pathlib import Path
+    import csv
+    
+    csv_path = Path("data/indicators.csv")
+    csv_path.parent.mkdir(exist_ok=True)
+    rows = []
+    
+    if csv_path.exists():
+        with open(csv_path, "r", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for existing in reader:
+                if existing.get("Date") != row["Date"]:
+                    rows.append(existing)
+                    
+    rows.append(row)
+
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        writer.writeheader()
+        for r in rows:
+            clean_row = {k: r.get(k, "N/A") for k in FIELDNAMES}
+            writer.writerow(clean_row)
+    print(f"\n✅ 저장 완료 → {csv_path}")
+
+# ──────────────────────────────────────────────
+# Main
+# ──────────────────────────────────────────────
+def main():
+    today = date.today().strftime("%Y-%m-%d")
+    print(f"📊 대규모 시장 지표 수집 시작: {today}\n")
+
+    yf_data = get_yfinance_indicators()
+    high_yield = get_high_yield_spread()
+    fg = get_fear_greed()
+    cape_pe = get_cape_pe()
+    
+    buff_us = get_us_buffett_indicator()
+    buff_kr = get_kr_buffett_indicator()
+    
+    special = get_monthly_and_special()
+
+    # 통합 밸류에이션 (기존 로직)
+    integrated_val = None
+    if buff_us and cape_pe:
+        integrated_val = round(((buff_us / 150) * 50) + ((cape_pe / 35) * 50), 1)
+
+    row = {
+        "Date": today,
+        "VIX": yf_data.get("VIX"),
+        "MOVE": yf_data.get("MOVE"),
+        "US10Y": yf_data.get("US10Y"),
+        "DXY": yf_data.get("DXY"),
+        "USDKRW": yf_data.get("USDKRW"),
+        "Russell2000": yf_data.get("Russell2000"),
+        "Copper": yf_data.get("Copper"),
+        "High_Yield": high_yield,
+        "Fear_Greed": fg,
+        "CAPE_PE": cape_pe,
+        "Buffett_US": buff_us,
+        "Buffett_KR": buff_kr,
+        "Margin_Debt_US": special.get("Margin_Debt_US"),
+        "Margin_Debt_KR": special.get("Margin_Debt_KR"),
+        "KR_Export": special.get("KR_Export"),
+        "BDI_Index": special.get("BDI_Index"),
+        "Integrated_Valuation": integrated_val
+    }
+
+    for k, v in row.items():
+        if v is None: row[k] = "N/A"
+
+    for k, v in row.items():
+        print(f"   {k.ljust(20)} : {v}")
+
+    save_to_csv(row)
+
+if __name__ == "__main__":
+    main()
 # ──────────────────────────────────────────────
 # 8. CSV 저장 로직
 # ──────────────────────────────────────────────
