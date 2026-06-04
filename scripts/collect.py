@@ -124,7 +124,7 @@ def get_cape_pe():
     return None
 
 # ──────────────────────────────────────────────
-# 5. 버핏 지수 (미국 & 글로벌) - 3중 크롤링 엔진
+# 5. 버핏 지수 (미국 & 글로벌) - GuruFocus 전용 (우회 삭제)
 # ──────────────────────────────────────────────
 def get_buffett_indicators():
     us_val = None
@@ -134,26 +134,35 @@ def get_buffett_indicators():
     
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9"
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.google.com/"
     }
 
-    # 💡 1순위 타격: Requests를 이용한 초고속/스텔스 수집 (봇 탐지 회피 확률 높음)
+    # 💡 1순위 타격: Requests
     try:
-        resp_us = requests.get("https://www.gurufocus.com/stock-market-valuations.php", headers=headers, timeout=10)
-        m_us = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
-        if m_us:
-            us_val = float(m_us.group(1))
-            print(f"   ✅ [1순위/Requests] GuruFocus 미국 수치 발견: {us_val}%")
-            
-        resp_gl = requests.get("https://www.gurufocus.com/global-market-valuation.php", headers=headers, timeout=10)
-        m_gl = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
-        if m_gl:
-            global_val = float(m_gl.group(1))
-            print(f"   ✅ [1순위/Requests] GuruFocus 글로벌 수치 발견: {global_val}%")
-    except Exception as e:
-        print(f"   ⚠️ 1순위 수집 실패: {e}")
+        resp_us = requests.get("https://www.gurufocus.com/stock-market-valuations.php", headers=headers, timeout=15)
+        # 상태 코드 확인으로 Cloudflare 차단 여부 로그 출력
+        if resp_us.status_code != 200:
+            print(f"   ⚠️ [1순위] GuruFocus 미국 접속 차단 (상태코드: {resp_us.status_code})")
+        else:
+            m_us = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
+            if m_us:
+                us_val = float(m_us.group(1))
+                print(f"   ✅ [1순위/Requests] GuruFocus 미국 수치 발견: {us_val}%")
+            else:
+                print("   ⚠️ [1순위] 미국 페이지 접속은 성공했으나 수치를 찾지 못했습니다. (로봇 방지 페이지로 추정)")
 
-    # 💡 2순위 타격: 만약 Requests가 차단당했다면 Playwright (가상 브라우저) 출동
+        resp_gl = requests.get("https://www.gurufocus.com/global-market-valuation.php", headers=headers, timeout=15)
+        if resp_gl.status_code == 200:
+            m_gl = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
+            if m_gl:
+                global_val = float(m_gl.group(1))
+                print(f"   ✅ [1순위/Requests] GuruFocus 글로벌 수치 발견: {global_val}%")
+                
+    except Exception as e:
+        print(f"   ⚠️ [1순위] 통신 에러: {e}")
+
+    # 💡 2순위 타격: Playwright (우회 경로 삭제됨)
     if us_val is None or global_val is None:
         try:
             print("   ▶️ 2순위(Playwright) 엔진을 가동합니다...")
@@ -161,8 +170,6 @@ def get_buffett_indicators():
             with sync_playwright() as p:
                 browser = p.chromium.launch(headless=True)
                 context = browser.new_context(user_agent=headers["User-Agent"])
-                
-                # 광고/미디어 차단
                 context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
                 page = context.new_page()
 
@@ -170,32 +177,28 @@ def get_buffett_indicators():
                     page.goto("https://www.gurufocus.com/stock-market-valuations.php", timeout=30000)
                     page.wait_for_load_state("domcontentloaded", timeout=15000)
                     m = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", page.content(), re.IGNORECASE)
-                    if m: us_val = float(m.group(1))
+                    if m: 
+                        us_val = float(m.group(1))
+                        print(f"   ✅ [2순위/Playwright] GuruFocus 미국 수치 발견: {us_val}%")
 
                 if global_val is None:
                     page.goto("https://www.gurufocus.com/global-market-valuation.php", timeout=30000)
                     page.wait_for_load_state("domcontentloaded", timeout=15000)
                     m2 = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", page.content(), re.IGNORECASE)
-                    if m2: global_val = float(m2.group(1))
-                    
+                    if m2: 
+                        global_val = float(m2.group(1))
+                        print(f"   ✅ [2순위/Playwright] GuruFocus 글로벌 수치 발견: {global_val}%")
+                        
                 browser.close()
         except Exception as e:
-            print(f"   ⚠️ 2순위(Playwright) 수집 실패: {e}")
+            print(f"   ⚠️ [2순위] Playwright 수집 실패: {e}")
 
-    # 💡 3순위 타격(최후의 보루): 모든 방법이 막혔을 때만 대안 사이트(219%) 우회
+    # 부적절한 3순위(Fallback) 코드는 완전히 제거되었습니다.
     if us_val is None:
-        try:
-            print("   ⚠️ GuruFocus 완전 차단됨. 우회 경로(CurrentMarketValuation) 접근 중...")
-            resp_alt = requests.get("https://www.currentmarketvaluation.com/models/buffett-indicator.php", headers=headers, timeout=10)
-            m_alt = re.search(r"current\s+ratio\s+of\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_alt.text, re.IGNORECASE)
-            if m_alt:
-                us_val = float(m_alt.group(1))
-                print(f"   ✅ [3순위/Fallback] 대안 사이트 수치 발견: {us_val}%")
-        except Exception as e:
-            print(f"   ⚠️ 최후의 보루마저 실패: {e}")
+        print("   ❌ 버핏 지수를 가져오지 못했습니다. N/A로 기록됩니다.")
             
     return us_val, global_val
-
+    
 # ──────────────────────────────────────────────
 # 6. 월간/특수 데이터 (Mockup or Placeholder)
 # ──────────────────────────────────────────────
