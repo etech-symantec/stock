@@ -86,12 +86,6 @@
   .card:hover { border-color: rgba(0,0,0,.15); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,.06); }
   .card-tag { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); display: flex; align-items: center; gap: 6px; margin: 0;}
   .tag-dot { width: 5px; height: 5px; border-radius: 50%; }
-  
-  /* 💡 카드 타이틀 텍스트 줄바꿈 방지 */
-  .card-title-wrap { display:flex; align-items:center; gap:8px; white-space:nowrap; }
-  .source-link { color:var(--txt2); text-decoration:none; opacity:0.5; font-size:12px; transition:opacity 0.2s; }
-  .source-link:hover { opacity:1; }
-
   .card-value { font-family: var(--font-hd); font-size: clamp(28px, 3.5vw, 38px); line-height: 1.1; letter-spacing: 1px; margin-bottom: 4px; }
   .card-unit { font-family: var(--font-num); font-size: 12px; color: var(--txt2); margin-bottom: 14px; }
   .card-desc { font-size: 12px; color: var(--txt2); line-height: 1.5; }
@@ -104,7 +98,7 @@
     padding: 24px; height: 500px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,.03);
   }
 
-  /* 테이블 스타일 및 틀 고정 */
+  /* 💡 가로 스크롤 및 틀 고정(Sticky) 최적화 테이블 */
   .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); background: var(--card); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
   table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1500px; }
   
@@ -122,14 +116,18 @@
   }
   tbody tr:last-child td { border-bottom: none; }
   
+  /* 💡 1~4열을 왼쪽으로 고정 (스크롤 시 기둥 역할) */
   th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 2; width: 90px; min-width: 90px; text-align: left; }
   th:nth-child(2), td:nth-child(2) { position: sticky; left: 90px; z-index: 2; width: 140px; min-width: 140px; text-align: left; }
   th:nth-child(3), td:nth-child(3) { position: sticky; left: 230px; z-index: 2; width: 80px; min-width: 80px; }
   th:nth-child(4), td:nth-child(4) { position: sticky; left: 310px; z-index: 2; width: 80px; min-width: 80px; border-right: 2px solid var(--border); }
   
-  thead th:nth-child(1), thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) { z-index: 3; background: var(--panel); }
+  /* 💡 헤더(thead)는 바디(tbody)보다 위에 표시되도록 z-index 상향 */
+  thead th:nth-child(1), thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) {
+    z-index: 3; background: var(--panel);
+  }
+
   .cpill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; border: 1px solid; background: white; }
-  
   footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); font-family: var(--font-num); font-size: 11px; color: var(--txt2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
   
   .fade-up { opacity: 0; transform: translateY(16px); animation: fadeUp .6s ease forwards; }
@@ -141,7 +139,7 @@
   <header class="fade-up">
     <div class="logo-area">
       <h1>Global Macro Signal</h1>
-      <p><span class="live-dot" style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--buy); margin-right:6px; animation:pulse 2s infinite;"></span>Auto-updated Every Morning</p>
+      <p><span class="live-dot"></span>Auto-updated Every Morning</p>
     </div>
     <div class="meta">
       <span class="date-val" id="latest-date">—</span>
@@ -181,17 +179,11 @@
     <canvas id="macroChart"></canvas>
   </div>
 
-  <p class="section-title fade-up">1. 시장 심리 및 변동성 (Sentiment & Volatility)</p>
-  <div class="cards fade-up" id="grid-sentiment"></div>
+  <p class="section-title fade-up">일간 지표 (단기 심리 및 수급)</p>
+  <div class="cards" id="cards-grid-daily"></div>
 
-  <p class="section-title fade-up">2. 거시 유동성 및 자금 동향 (Macro & Liquidity)</p>
-  <div class="cards fade-up" id="grid-macro"></div>
-
-  <p class="section-title fade-up">3. 실물 경기 및 선행 지표 (Real Economy)</p>
-  <div class="cards fade-up" id="grid-economy"></div>
-
-  <p class="section-title fade-up">4. 자산 밸류에이션 및 신용 (Valuation & Credit)</p>
-  <div class="cards fade-up" id="grid-valuation"></div>
+  <p class="section-title fade-up">월간 지표 (거시 경제 및 펀더멘털)</p>
+  <div class="cards" id="cards-grid-monthly"></div>
 
   <p class="section-title fade-up">역사적 매크로 타임라인 기록 (좌우로 스크롤하세요)</p>
   <div class="table-wrap fade-up">
@@ -294,47 +286,39 @@ function renderHero(latest) {
   setTimeout(() => { document.getElementById('hero-gauge').style.width = pct + '%'; }, 300);
 }
 
-/* ── 💡 카드 메타데이터 (group과 link 필드 추가) ── */
+/* ── 💡 카드 메타데이터 (개별 지표의 심각도 계산을 위해 range와 inverse 역산 로직 추가) ── */
 const CARDS_META = [
-  // 1. 시장 심리 및 변동성 (group: sentiment)
-  { key: 'Fear_Greed', group: 'sentiment', label: 'CNN Fear & Greed', unit: '시장 심리 지수', color: 'var(--sell)', inverse: false, range: [0, 100], link: 'https://edition.cnn.com/markets/fear-and-greed', desc: 'CNN이 산출한 투심 지표. 낮을수록 공포(매수 기회), 높을수록 탐욕(과열)을 뜻합니다.' },
-  { key: 'VIX', group: 'sentiment', label: 'VIX 지수 (변동성)', unit: 'S&P500 내재변동성', color: 'var(--warn)', inverse: true, range: [10, 40], link: 'https://finance.yahoo.com/quote/%5EVIX/', desc: '공포 지수로 불리며 30 이상 급등 시 패닉셀에 의한 단기 바닥권 형성을 암시합니다.' },
-  { key: 'MOVE', group: 'sentiment', label: 'MOVE 지수', unit: '미 국채 변동성지수', color: 'var(--warn)', inverse: true, range: [50, 160], link: 'https://finance.yahoo.com/quote/%5EMOVE/', desc: '국채 옵션 변동성. 금리 발작 및 통화정책 불확실성을 측정하는 핵심 단기 지표입니다.' },
+  // Daily
+  { key: 'Fear_Greed', type: 'daily', label: 'CNN Fear & Greed', unit: '시장 심리 지수', color: 'var(--sell)', inverse: false, range: [0, 100], desc: 'CNN이 산출한 투심 지표. 낮을수록 공포(매수 기회), 높을수록 탐욕(과열)을 뜻합니다.' },
+  { key: 'VIX', type: 'daily', label: 'VIX 지수 (변동성)', unit: 'S&P500 내재변동성', color: 'var(--warn)', inverse: true, range: [10, 40], desc: '공포 지수로 불리며 30 이상 급등 시 패닉셀에 의한 단기 바닥권 형성을 암시합니다.' },
+  { key: 'MOVE', type: 'daily', label: 'MOVE 지수', unit: '미 국채 변동성지수', color: 'var(--warn)', inverse: true, range: [50, 160], desc: '국채 옵션 변동성. 금리 발작 및 통화정책 불확실성을 측정하는 핵심 단기 지표입니다.' },
+  { key: 'US10Y', type: 'daily', label: '미국 국채 10년물', unit: '글로벌 기준 금리 (%)', color: 'var(--info)', inverse: false, range: [1.5, 6.0], desc: '주식 등 위험자산의 밸류에이션 하방 압력(할인율)으로 작용하는 가장 중요한 금리입니다.' },
+  { key: 'DXY', type: 'daily', label: '달러 인덱스', unit: '6개국 통화 대비 가치', color: 'var(--info)', inverse: false, range: [90, 115], desc: '강달러 시 신흥국 자본 이탈 및 다국적 기업의 실적 악화 우려가 커집니다.' },
+  { key: 'USDKRW', type: 'daily', label: '원/달러 환율', unit: 'KRW/USD 종가', color: 'var(--sell)', inverse: false, range: [1000, 1600], desc: '국내 증시의 외국인 수급을 좌우하며, 환율 급등 시 강력한 하방 압력이 발생합니다.' },
+  { key: 'High_Yield', type: 'daily', label: '하이일드 스프레드', unit: '신용 리스크 (%p)', color: 'var(--sell)', inverse: true, range: [2.0, 9.0], desc: '부실 회사채와 국채의 금리차. 급등 시 기업의 자금 경색 및 연쇄 파산 우려를 예고합니다.' },
+  { key: 'Copper', type: 'daily', label: '구리 선물 가격', unit: '닥터 코퍼 (USD/lb)', color: 'var(--buy)', inverse: false, range: [2.5, 5.5], desc: '실물 산업 전반에 기초 소재로 사용되어 제조업 경기를 정밀하게 선행 타겟팅합니다.' },
+  { key: 'Margin_Debt_KR', type: 'daily', label: '신용잔고 (한국)', unit: '개인 빚투 규모 (조 원)', color: '#ff9800', inverse: false, range: [10, 45], desc: '한국 증시의 빚투 규모(일간 업데이트)로 단기 과열 양상을 체크합니다.' },
+  { key: 'BDI_Index', type: 'daily', label: '발틱 운임 지수 (BDI)', unit: '해상 벌크선 운임', color: 'var(--txt2)', inverse: false, range: [500, 4500], desc: '원자재 물동량과 속도를 대변하여 글로벌 단기 경기 흐름을 선행적으로 보여줍니다.' },
 
-  // 2. 거시 유동성 및 자금 동향 (group: macro)
-  { key: 'US10Y', group: 'macro', label: '미국 국채 10년물', unit: '글로벌 기준 금리 (%)', color: 'var(--info)', inverse: false, range: [1.5, 6.0], link: 'https://finance.yahoo.com/quote/%5ETNX/', desc: '주식 등 위험자산의 밸류에이션 하방 압력(할인율)으로 작용하는 가장 중요한 금리입니다.' },
-  { key: 'DXY', group: 'macro', label: '달러 인덱스', unit: '6개국 통화 대비 가치', color: 'var(--info)', inverse: false, range: [90, 115], link: 'https://finance.yahoo.com/quote/DX-Y.NYB/', desc: '강달러 시 신흥국 자본 이탈 및 다국적 기업의 실적 악화 우려가 커집니다.' },
-  { key: 'USDKRW', group: 'macro', label: '원/달러 환율', unit: 'KRW/USD 종가', color: 'var(--info)', inverse: true, range: [1000, 1600], link: 'https://finance.yahoo.com/quote/KRW=X/', desc: '국내 증시의 외국인 수급을 좌우하며, 환율 급등 시 강력한 하방 압력이 발생합니다.' },
-  { key: 'Margin_Debt_US', group: 'macro', label: '신용잔고 (미국)', unit: '구조적 레버리지 (조 달러)', color: '#ff9800', inverse: false, range: [0, 2], link: 'https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics', desc: '미국 증시의 신용융자 규모(FINRA 월간 발표). 기관/개인의 총 레버리지 임계치를 뜻합니다.' },
-  { key: 'Margin_Debt_KR', group: 'macro', label: '신용잔고 (한국)', unit: '개인 빚투 규모 (조 원)', color: '#ff9800', inverse: false, range: [10, 45], link: 'https://finance.naver.com/sise/sise_deposit.naver', desc: '한국 증시의 빚투 규모(일간 업데이트)로 단기 과열 양상을 체크합니다.' },
-
-  // 3. 실물 경기 및 선행 지표 (group: economy)
-  { key: 'Copper', group: 'economy', label: '구리 선물 가격', unit: '닥터 코퍼 (USD/lb)', color: 'var(--buy)', inverse: false, range: [2.5, 5.5], link: 'https://finance.yahoo.com/quote/HG=F/', desc: '실물 산업 전반에 기초 소재로 사용되어 제조업 경기를 정밀하게 선행 타겟팅합니다.' },
-  { key: 'BDI_Index', group: 'economy', label: '발틱 운임 지수 (BDI)', unit: '해상 벌크선 운임', color: 'var(--txt2)', inverse: false, range: [500, 4500], link: 'https://ko.tradingeconomics.com/commodity/baltic', desc: '원자재 물동량과 속도를 대변하여 글로벌 단기 경기 흐름을 선행적으로 보여줍니다.' },
-  { key: 'KR_Export', group: 'economy', label: '한국 수출액 추이', unit: '월간 무역 수출액 (억 달러)', color: 'var(--txt2)', inverse: false, range: [40, 70], link: 'https://ko.tradingeconomics.com/south-korea/exports', desc: '글로벌 무역 사이클의 선행 지표이자 세계 경제의 탄광 속 카나리아 역할을 수행합니다.' },
-  { key: 'Russell2000', group: 'economy', label: '러셀 2000 지수', unit: '소형주 벤치마크 (pt)', color: 'var(--txt)', inverse: false, range: [1400, 2600], link: 'https://finance.yahoo.com/quote/%5ERUT/', desc: '미국 중소형 기업 주가 흐름으로 내수 경기 회복 여부를 파악합니다.' },
-
-  // 4. 자산 밸류에이션 및 신용 (group: valuation)
-  { key: 'CAPE_PE', group: 'valuation', label: 'CAPE PE (Shiller)', unit: '경기조정 10년 평균 PE (배)', color: 'var(--buy)', inverse: false, range: [15, 45], link: 'https://www.multpl.com/shiller-pe', desc: '인플레이션을 조정한 S&P500 벨류에이션으로 장기 사이클의 고평가 여부를 진단합니다.' },
-  { key: 'Buffett_US', group: 'valuation', label: '미국 버핏 지수', unit: '미 시총 / GDP (%)', color: 'var(--buy)', inverse: false, range: [70, 240], link: 'https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/', desc: '국가 경제 규모 대비 주식자산 비중으로 워런 버핏이 신뢰하는 구조적 과열 지표입니다.' },
-  { key: 'Buffett_KR', group: 'valuation', label: '한국 버핏 지수', unit: '한국 시총 / GDP (%)', color: 'var(--buy)', inverse: false, range: [50, 150], link: 'https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100', desc: '한국 주식시장 시가총액을 명목 GDP로 나눈 장기 밸류에이션입니다.' },
-  { key: 'High_Yield', group: 'valuation', label: '하이일드 스프레드', unit: '신용 리스크 (%p)', color: 'var(--sell)', inverse: true, range: [2.0, 9.0], link: 'https://fred.stlouisfed.org/series/BAMLH0A0HYM2', desc: '부실 회사채와 국채의 금리차. 급등 시 기업의 자금 경색 및 연쇄 파산 우려를 예고합니다.' }
+  // Monthly
+  { key: 'CAPE_PE', type: 'monthly', label: 'CAPE PE (Shiller)', unit: '경기조정 10년 평균 PE (배)', color: 'var(--buy)', inverse: false, range: [15, 45], desc: '인플레이션을 조정한 S&P500 벨류에이션으로 장기 사이클의 고평가 여부를 진단합니다.' },
+  { key: 'Buffett_US', type: 'monthly', label: '미국 버핏 지수', unit: '미 시총 / GDP (%)', color: 'var(--buy)', inverse: false, range: [70, 240], desc: '국가 경제 규모 대비 주식자산 비중으로 워런 버핏이 신뢰하는 구조적 과열 지표입니다.' },
+  { key: 'Buffett_KR', type: 'monthly', label: '한국 버핏 지수', unit: '한국 시총 / GDP (%)', color: 'var(--buy)', inverse: false, range: [50, 150], desc: '한국 주식시장(코스피+코스닥) 시가총액을 명목 GDP로 나눈 장기 밸류에이션입니다.' },
+  { key: 'Margin_Debt_US', type: 'monthly', label: '신용잔고 (미국)', unit: '구조적 레버리지 (조 달러)', color: '#ff9800', inverse: false, range: [0, 2], desc: '미국 증시의 신용융자 규모(FINRA 월간 발표). 기관/개인의 총 레버리지 임계치를 뜻합니다.' },
+  { key: 'Russell2000', type: 'monthly', label: '러셀 2000 지수', unit: '소형주 벤치마크 (pt)', color: 'var(--txt)', inverse: false, range: [1400, 2600], desc: '미국 중소형 기업 주가 흐름으로 내수 경기 회복 여부를 파악합니다.' },
+  { key: 'KR_Export', type: 'monthly', label: '한국 수출액 추이', unit: '월간 무역 수출액 (억 달러)', color: 'var(--txt2)', inverse: false, range: [40, 70], desc: '글로벌 무역 사이클의 선행 지표이자 세계 경제의 탄광 속 카나리아 역할을 수행합니다.' }
 ];
 
-/* ── 💡 16가지 카드 렌더링 (4대 카테고리 분배 및 출처 링크 포함) ── */
+/* ── 💡 16가지 카드 렌더링 (각 지표별 상태 뱃지 추가) ── */
 function renderCards(latest) {
-  const grids = {
-    sentiment: document.getElementById('grid-sentiment'),
-    macro: document.getElementById('grid-macro'),
-    economy: document.getElementById('grid-economy'),
-    valuation: document.getElementById('grid-valuation')
-  };
-
-  // 초기화
-  Object.values(grids).forEach(grid => grid.innerHTML = '');
+  const dailyGrid = document.getElementById('cards-grid-daily');
+  const monthlyGrid = document.getElementById('cards-grid-monthly');
+  dailyGrid.innerHTML = '';
+  monthlyGrid.innerHTML = '';
 
   CARDS_META.forEach((meta) => {
     const rawVal = latest[meta.key];
+    
     let displayVal = 'N/A';
     let pct = 50;
     let sig = { label: '-', color: 'var(--txt2)', border: 'var(--border)' };
@@ -342,15 +326,17 @@ function renderCards(latest) {
     if (rawVal && rawVal !== 'N/A') {
         const num = parseFloat(rawVal.toString().split('(')[0]); 
         if(!isNaN(num)) {
+            // 숫자 형식 변환
             if (meta.key === 'USDKRW' || meta.key === 'Russell2000' || meta.key === 'BDI_Index') displayVal = num.toLocaleString();
             else if (meta.key === 'US10Y' || meta.key === 'High_Yield' || meta.key.includes('Buffett') || meta.key.includes('Margin')) displayVal = num.toFixed(2);
             else displayVal = num.toFixed(1);
             
             if(rawVal.includes('(')) displayVal = rawVal; 
             
+            // 지표별 점수(0~100) 및 상태 뱃지 산출
             const [min, max] = meta.range;
             pct = Math.min(Math.max((num - min) / (max - min) * 100, 0), 100);
-            if (meta.inverse) pct = 100 - pct;
+            if (meta.inverse) pct = 100 - pct; // 역방향 지표(예: 환율 급등 = 공포) 보정
             sig = getValuationSignal(pct);
         }
     }
@@ -358,11 +344,11 @@ function renderCards(latest) {
     const card = document.createElement('div');
     card.className = 'card fade-up';
     card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <div class="card-title-wrap">
-          <p class="card-tag"><span class="tag-dot" style="background:${meta.color}"></span>${meta.label}</p>
-          <a href="${meta.link}" target="_blank" class="source-link" title="데이터 원본 출처로 이동">🔗</a>
-        </div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+        <p class="card-tag">
+          <span class="tag-dot" style="background:${meta.color}"></span>
+          ${meta.label}
+        </p>
         <span class="cpill" style="color:${sig.color}; border-color:${sig.border}; font-size:10px; padding:2px 8px; margin:0;">${sig.label}</span>
       </div>
       <div class="card-value" style="color:var(--txt3); font-size: clamp(24px, 3vw, 36px);">${displayVal}</div>
@@ -375,11 +361,11 @@ function renderCards(latest) {
       <p class="card-desc">${meta.desc}</p>
     `;
 
-    if (grids[meta.group]) {
-      grids[meta.group].appendChild(card);
-    }
+    if (meta.type === 'daily') dailyGrid.appendChild(card);
+    else monthlyGrid.appendChild(card);
   });
 
+  // 애니메이션 트리거
   setTimeout(() => {
     document.querySelectorAll('.mini-fill').forEach(el => {
       el.style.width = el.getAttribute('data-pct') + '%';
@@ -442,7 +428,7 @@ function renderChart(rows) {
   });
 }
 
-/* ── 20개 모든 지표를 표시하는 타임라인 렌더링 ── */
+/* ── 20개 모든 지표를 표시하는 타임라인 렌더링 (에러 및 0점 완벽 처리) ── */
 function renderHistory(rows) {
   const tbody = document.getElementById('history-body');
   const recent = [...rows].reverse().slice(0, 30);
@@ -509,7 +495,7 @@ async function init() {
 
   } catch (e) {
     console.error(e);
-    document.getElementById('grid-sentiment').innerHTML = `<div style="grid-column:1/-1; color:red;">에러: ${e.message}</div>`;
+    document.getElementById('cards-grid-daily').innerHTML = `<div style="grid-column:1/-1; color:red;">에러: ${e.message}</div>`;
   }
 }
 
