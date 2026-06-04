@@ -535,76 +535,54 @@ def get_kr_export():
     print("\n   ▶️ [한국 수출액] 관세청(TRASS) 접속 중...")
     try:
         import re
-        from bs4 import BeautifulSoup
 
-        url = "https://tradedata.go.kr/cts/index.do"
-
-        # ==========================================
-        # 💡 [1순위] Cloudscraper + BeautifulSoup
-        # ==========================================
-        print("      ▶️ 1순위: Cloudscraper 스텔스 엔진 가동...")
+        # 관세청 사이트는 접속 후 자바스크립트(API)로 데이터를 뒤늦게 불러오는 구조입니다.
+        # 따라서 requests로는 껍데기만 가져오게 되므로, Playwright 단일 엔진으로 강력하게 대기합니다.
+        print("      ▶️ Playwright 브라우저 가동 및 동적 데이터 렌더링 대기...")
         try:
-            import cloudscraper
-            scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
-            resp = scraper.get(url, timeout=15)
-            
-            if resp.status_code == 200:
-                soup = BeautifulSoup(resp.text, 'html.parser')
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as p:
+                browser = p.chromium.launch(
+                    headless=True,
+                    args=["--disable-blink-features=AutomationControlled"]
+                )
+                context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                 
-                # 짚어주신 id="pprcOvrlExp" 인 div 태그 탐색
-                target_div = soup.find('div', id='pprcOvrlExp')
-                if target_div:
-                    target_strong = target_div.find('strong')
-                    if target_strong:
-                        # "수출              877억 달러" 텍스트에서 숫자만 정교하게 추출
-                        m = re.search(r"([\d,\.]+)\s*억", target_strong.text)
-                        if m:
-                            export_val = float(m.group(1).replace(',', ''))
-                            print(f"      ✅ [1순위/BS4] 한국 수출액 발견: {export_val} 억 달러")
-                
-                if export_val is None:
-                    print("      ⚠️ 접속은 성공했으나 id='pprcOvrlExp' 데이터를 찾지 못했습니다.")
-            else:
-                print(f"      ⚠️ Cloudscraper 접속 차단 (상태코드: {resp.status_code})")
-        except Exception as e:
-            print(f"      ⚠️ 1순위 통신 에러: {e}")
+                # 불필요한 이미지 차단으로 속도 최적화
+                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+                page = context.new_page()
 
-        # ==========================================
-        # 💡 [2순위] 로봇 탐지 회피형 Playwright
-        # ==========================================
-        if export_val is None:
-            print("      ▶️ 2순위: Playwright 브라우저 렌더링 대기...")
-            try:
-                from playwright.sync_api import sync_playwright
-                with sync_playwright() as p:
-                    browser = p.chromium.launch(
-                        headless=True,
-                        args=["--disable-blink-features=AutomationControlled"]
+                page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                page.goto("https://tradedata.go.kr/cts/index.do", timeout=30000)
+                
+                target_selector = "div#pprcOvrlExp strong"
+                page.wait_for_selector(target_selector, state="attached", timeout=15000)
+                
+                # 💡 핵심 해결책: 화면 뼈대('수출 억 달러')가 떴다고 바로 넘어가면 안 됩니다!
+                # 타겟 요소 안에 숫자(\d)가 하나라도 찍힐 때까지 브라우저를 감시하며 명시적으로 대기합니다.
+                print("      - 화면 뼈대 로딩 완료. 백그라운드 데이터 수신(숫자 렌더링)을 기다립니다...")
+                try:
+                    page.wait_for_function(
+                        f"() => {{ const el = document.querySelector('{target_selector}'); return el && /\\d/.test(el.innerText); }}",
+                        timeout=15000
                     )
-                    context = browser.new_context(user_agent="Mozilla/5.0")
-                    # 이미지/미디어 차단으로 렌더링 속도 최적화
-                    context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
-                    page = context.new_page()
+                    page.wait_for_timeout(1000) # 애니메이션 등을 대비해 숫자가 완전히 그려질 1초 여유 부여
+                except Exception:
+                    print("      ⚠️ 15초 대기했으나 관세청 서버에서 숫자를 내려주지 않았습니다.")
 
-                    page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-                    page.goto(url, timeout=30000)
+                raw_text = page.locator(target_selector).first.inner_text()
+                
+                # "수출              877.5억 달러" 형태에서 숫자만 추출
+                m = re.search(r"([\d,\.]+)\s*억", raw_text)
+                if m:
+                    export_val = float(m.group(1).replace(',', ''))
+                    print(f"      ✅ [수집 완료] 한국 수출액 발견: {export_val} 억 달러")
+                else:
+                    print(f"      ⚠️ 데이터 추출 실패 (현재 화면의 텍스트: '{raw_text}')")
                     
-                    # css selector를 이용해 짚어주신 구조 직격 타겟팅
-                    target_selector = "div#pprcOvrlExp strong"
-                    page.wait_for_selector(target_selector, state="attached", timeout=15000)
-                    
-                    raw_text = page.locator(target_selector).first.inner_text()
-                    
-                    m = re.search(r"([\d,\.]+)\s*억", raw_text)
-                    if m:
-                        export_val = float(m.group(1).replace(',', ''))
-                        print(f"      ✅ [2순위/Playwright] 한국 수출액 발견: {export_val} 억 달러")
-                    else:
-                        print(f"      ⚠️ 렌더링 완료 후에도 숫자 패턴을 찾지 못했습니다. (추출 텍스트: '{raw_text}')")
-                        
-                    browser.close()
-            except Exception as e:
-                print(f"      ⚠️ Playwright 2순위 수집 실패: {e}")
+                browser.close()
+        except Exception as e:
+            print(f"      ⚠️ Playwright 수집 실패: {e}")
 
     except Exception as e:
         print(f"      ⚠️ 한국 수출액 환경 오류: {e}")
@@ -615,13 +593,13 @@ def get_kr_export():
     return export_val
 
 # ──────────────────────────────────────────────
-# 기존 7번 구역 하단 get_monthly_and_special() 덮어쓰기
+# 기존 7번 구역 하단 get_monthly_and_special() 확인용
 # ──────────────────────────────────────────────
 def get_monthly_and_special():
     return {
         "Margin_Debt_US": get_us_margin_debt(), 
         "Margin_Debt_KR": get_kr_margin_debt(), 
-        "KR_Export": get_kr_export(),   # <- 💡 새로 만든 수출액 함수 연결
+        "KR_Export": get_kr_export(),   # 정상적으로 연결되어 있는지 확인
         "BDI_Index": get_bdi_index()
     }
 
