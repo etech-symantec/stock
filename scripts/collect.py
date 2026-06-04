@@ -124,7 +124,7 @@ def get_cape_pe():
     return None
 
 # ──────────────────────────────────────────────
-# 5. 버핏 지수 (미국 & 글로벌) - Cloudflare 우회 엔진 (cloudscraper)
+# 5. 버핏 지수 (미국 & 글로벌) - 동적 JS 렌더링 우회 엔진
 # ──────────────────────────────────────────────
 def get_buffett_indicators():
     us_val = None
@@ -132,60 +132,71 @@ def get_buffett_indicators():
     import re
     
     try:
-        # 💡 일반 requests 대신 Cloudflare 방어막을 뚫는 전문 스크래퍼 가동
         import cloudscraper
         scraper = cloudscraper.create_scraper(
-            browser={
-                'browser': 'chrome',
-                'platform': 'windows',
-                'desktop': True
-            }
+            browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
         )
-
-        # 💡 1순위: GuruFocus 스텔스 접속
-        print("   ▶️ [1순위] Cloudscraper 엔진으로 GuruFocus(미국) 우회 접속 중...")
-        resp_us = scraper.get("https://www.gurufocus.com/stock-market-valuations.php", timeout=20)
         
+        # 💡 [1순위] GuruFocus (cloudscraper) - 서버 환경에 따라 막힐 확률 높음
+        print("   ▶️ [1순위] GuruFocus(미국) 우회 접속 중...")
+        resp_us = scraper.get("https://www.gurufocus.com/stock-market-valuations.php", timeout=15)
         if resp_us.status_code == 200:
             m_us = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_us.text, re.IGNORECASE)
-            if m_us:
-                us_val = float(m_us.group(1))
-                print(f"   ✅ [1순위] GuruFocus 미국 수치 발견: {us_val}%")
-            else:
-                print("   ⚠️ GuruFocus 미국 페이지 우회는 성공했으나 수치를 찾지 못했습니다.")
-        else:
-            print(f"   ⚠️ GuruFocus 미국 여전히 차단됨 (상태코드: {resp_us.status_code})")
-
-        print("   ▶️ [1순위] Cloudscraper 엔진으로 GuruFocus(글로벌) 우회 접속 중...")
-        resp_gl = scraper.get("https://www.gurufocus.com/global-market-valuation.php", timeout=20)
+            if m_us: us_val = float(m_us.group(1))
+        
+        resp_gl = scraper.get("https://www.gurufocus.com/global-market-valuation.php", timeout=15)
         if resp_gl.status_code == 200:
             m_gl = re.search(r"currently\s+at\s+(\d{2,4}(?:\.\d+)?)\s*%", resp_gl.text, re.IGNORECASE)
-            if m_gl:
-                global_val = float(m_gl.group(1))
-                print(f"   ✅ [1순위] GuruFocus 글로벌 수치 발견: {global_val}%")
-
-        # 💡 2순위: GuruFocus가 막혔을 경우 Longtermtrends로 즉시 우회
-        if us_val is None:
-            print("   ▶️ [2순위] GuruFocus 실패. 대안 사이트(Longtermtrends) 우회 접속 중...")
-            resp_alt = scraper.get("https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/", timeout=20)
+            if m_gl: global_val = float(m_gl.group(1))
             
-            if resp_alt.status_code == 200:
-                # 사용자가 지정한 <span id="buffett-ratio"> 껍데기 타겟팅
-                m_alt = re.search(r"id=[\"']buffett-ratio[\"'][^>]*>\s*(\d{2,4}(?:\.\d+)?)", resp_alt.text, re.IGNORECASE)
+        if us_val: print(f"   ✅ [1순위] GuruFocus 미국 수치 발견: {us_val}%")
+        if global_val: print(f"   ✅ [1순위] GuruFocus 글로벌 수치 발견: {global_val}%")
+
+    except Exception as e:
+        print(f"   ⚠️ Cloudscraper 구동 예외 발생: {e}")
+
+    # 💡 [2순위] Longtermtrends (Playwright) - JS가 숫자를 그릴 때까지 대기
+    if us_val is None:
+        print("   ▶️ [2순위] GuruFocus 차단됨. Longtermtrends(대안) Playwright 접속 중...")
+        try:
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                context = browser.new_context(
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    viewport={"width": 1920, "height": 1080}
+                )
+                
+                # 이미지, 미디어는 차단하되 자바스크립트는 허용 (숫자를 그려야 하므로)
+                context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+                page = context.new_page()
+
+                # Longtermtrends 미국 지수 페이지 이동
+                page.goto("https://www.longtermtrends.net/market-cap-to-gdp-the-buffett-indicator/", timeout=40000)
+                
+                # 🔥 핵심: id="buffett-ratio" 요소가 화면에 나타날 때까지 기다림
+                page.wait_for_selector("#buffett-ratio", state="attached", timeout=20000)
+                # 🔥 핵심: 자바스크립트가 데이터를 연산해서 요소 안에 숫자를 꽂아넣을 시간(3초)을 명시적으로 부여
+                page.wait_for_timeout(3000)
+                
+                # HTML 전체를 뒤지는 대신, 해당 요소의 순수 텍스트만 콕 집어서 가져옴
+                raw_text = page.locator("#buffett-ratio").inner_text()
+                
+                # 가져온 텍스트에서 숫자만 추출
+                m_alt = re.search(r"(\d{2,4}(?:\.\d+)?)", raw_text)
                 if m_alt:
                     us_val = float(m_alt.group(1))
                     print(f"   ✅ [2순위] Longtermtrends 미국 수치 발견: {us_val}%")
                 else:
-                    print("   ⚠️ Longtermtrends 페이지 우회는 성공했으나 수치를 찾지 못했습니다.")
-            else:
-                print(f"   ⚠️ Longtermtrends마저 차단됨 (상태코드: {resp_alt.status_code})")
-
-    except Exception as e:
-        print(f"   ⚠️ 버핏 지수 Cloudscraper 실행 환경 오류: {e}")
+                    print(f"   ⚠️ 껍데기는 찾았으나 숫자가 비어있습니다. (현재 텍스트: '{raw_text}')")
+                
+                browser.close()
+        except Exception as e:
+            print(f"   ⚠️ Playwright 2순위 수집 실패: {e}")
 
     if us_val is None:
         print("   ❌ 모든 우회 수집 엔진이 실패했습니다. N/A로 기록됩니다.")
-            
+
     return us_val, global_val
     
 # ──────────────────────────────────────────────
