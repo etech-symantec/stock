@@ -35,15 +35,41 @@ def get_yfinance_indicators():
 # 2. 하이일드 스프레드 (FRED)
 # ──────────────────────────────────────────────
 def get_high_yield_spread():
+    hy_spread = None
+    print("\n   ▶️ [High Yield] FRED 접속 중...")
     try:
-        url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2"
-        resp = requests.get(url, timeout=10)
-        lines = [line for line in resp.text.split('\n') if line.strip()]
-        val = lines[-1].split(',')[-1]
-        if val != '.': return float(val)
+        import requests
+        from bs4 import BeautifulSoup
+        import time
+        
+        url = "https://fred.stlouisfed.org/series/BAMLH0A0HYM2"
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        
+        # 💡 핵심 수정: 타임아웃을 30초로 늘리고, 서버 지연 시 최대 3번까지 재시도하는 강력한 로직 추가
+        for attempt in range(3):
+            try:
+                resp = requests.get(url, headers=headers, timeout=30)
+                if resp.status_code == 200:
+                    soup = BeautifulSoup(resp.text, 'html.parser')
+                    val_span = soup.find('span', class_='series-meta-observation-value')
+                    if val_span:
+                        hy_spread = float(val_span.text.strip())
+                        print(f"      ✅ [수집 완료] 하이일드 스프레드: {hy_spread}%")
+                        break # 성공 시 반복문 즉시 탈출
+            except requests.exceptions.ReadTimeout:
+                print(f"      ⚠️ FRED 응답 지연 (재시도 {attempt+1}/3)...")
+                time.sleep(2)
+            except Exception as e:
+                print(f"      ⚠️ FRED 통신 에러: {e}")
+                break
+                
     except Exception as e:
-        print(f"   ⚠️ 하이일드 수집 오류: {e}")
-    return None
+        print(f"      ⚠️ 하이일드 수집 오류: {e}")
+        
+    if hy_spread is None:
+        print("      ❌ 하이일드 스프레드를 수집하지 못했습니다. N/A로 기록됩니다.")
+        
+    return hy_spread
 
 # ──────────────────────────────────────────────
 # 3. Fear & Greed Index (CNN 공포탐욕지수)
@@ -185,6 +211,7 @@ def get_kr_buffett_indicator():
     print("\n   ▶️ [한국 버핏지수] 한국은행 ECOS(GDP) + KRX(시가총액) 하이브리드 엔진 가동...")
     try:
         import re
+        import time
         from playwright.sync_api import sync_playwright
         
         total_cap_billion = 0
@@ -236,7 +263,7 @@ def get_kr_buffett_indicator():
                 page.wait_for_timeout(2000)
                 
                 html_krx = page.content()
-                m_cap = re.search(r"시가총액\(십억원\)[^<]*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>", html_krx, re.IGNORECASE)
+                m_cap = re.search(r"시가총액\(십억원\)[^<]*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*<\/td>", html_krx, re.IGNORECASE)
                 
                 if m_cap:
                     kospi_val = float(m_cap.group(1).replace(',', ''))
