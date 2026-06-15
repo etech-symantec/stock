@@ -9372,6 +9372,16 @@
       "qty": -20,
       "price": 217000,
       "txType": "trade"
+    },
+    {
+      "id": 1781531896147,
+      "date": "2026-06-11",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "MSFT",
+      "qty": 0,
+      "price": 3.8674999999999997,
+      "txType": "dividend"
     }
   ],
   "range": "1y",
