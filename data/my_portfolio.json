@@ -9382,6 +9382,16 @@
       "qty": 0,
       "price": 3.8674999999999997,
       "txType": "dividend"
+    },
+    {
+      "id": 1781531953685,
+      "date": "2026-06-08",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "005935.KS",
+      "qty": -20,
+      "price": 203500,
+      "txType": "trade"
     }
   ],
   "range": "1y",
