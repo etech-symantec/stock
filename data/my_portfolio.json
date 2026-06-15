@@ -9592,6 +9592,16 @@
       "qty": -4,
       "price": 429,
       "txType": "trade"
+    },
+    {
+      "id": 1781533423401,
+      "date": "2026-05-11",
+      "owner": "끄니",
+      "broker": "KB (RIA)",
+      "symbol": "TSLA",
+      "qty": -6,
+      "price": 425,
+      "txType": "trade"
     }
   ],
   "range": "3m",
