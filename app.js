@@ -3756,6 +3756,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     let krwPieConfigs = [];
     let krwAccHtml = Object.keys(krwSummary.accounts).map(b => {
       let d = krwSummary.accounts[b];
+      // [추가] 파이 차트와 포트맵 색상이 일치하도록 평가금액 순 정렬
+      d.items.sort((a,b) => b.evalAmt - a.evalAmt);
       let pnl = d.eval - d.cost;
       let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
       let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
@@ -3769,27 +3771,44 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? '#00C578' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
+      // [추가] 포트맵 막대(Segment) 동적 생성
+      let portmapSegments = d.items.map((item, idx) => {
+          let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
+          if(ratio <= 0) return '';
+          let color = pieColors[idx % pieColors.length];
+          return `<div class="portmap-segment" style="width:${ratio}%; background:${color};" title="${item.name}: ${ratio.toFixed(1)}%">${ratio > 7 ? item.name : ''}</div>`;
+      }).join('');
+
+      let portmapHtml = `
+        <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
+            <div class="portmap-bar">${portmapSegments}</div>
+        </div>
+      `;
+
       return `
-        <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')">
-          <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
-          <div class="acc-content">
-              <div class="acc-header">
-                  <div class="acc-name" title="${b}">${b}<span class="acc-count">(${count}종목)</span></div>
-                  <div class="acc-pnl ${cls}">${sign}₩${Math.round(Math.abs(pnl)).toLocaleString()} <span class="acc-roi">(${sign}${roi.toFixed(2)}%)</span></div>
-              </div>
-              <div class="acc-bars">
-                  <div class="acc-bar-row">
-                      <span class="acc-bar-label">투자</span>
-                      <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:${costPct}%; background:rgba(136,144,164,0.4);"></div></div>
-                      <span class="acc-bar-val">₩${Math.round(d.cost).toLocaleString()}</span>
+        <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')" style="flex-wrap: wrap;">
+          <div style="display:flex; width:100%; align-items:center;">
+              <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
+              <div class="acc-content">
+                  <div class="acc-header">
+                      <div class="acc-name" title="${b}">${b}<span class="acc-count">(${count}종목)</span></div>
+                      <div class="acc-pnl ${cls}">${sign}₩${Math.round(Math.abs(pnl)).toLocaleString()} <span class="acc-roi">(${sign}${roi.toFixed(2)}%)</span></div>
                   </div>
-                  <div class="acc-bar-row">
-                      <span class="acc-bar-label">평가</span>
-                      <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:${evalPct}%; background:${evalColor};"></div></div>
-                      <span class="acc-bar-val">₩${Math.round(d.eval).toLocaleString()}</span>
+                  <div class="acc-bars">
+                      <div class="acc-bar-row">
+                          <span class="acc-bar-label">투자</span>
+                          <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:${costPct}%; background:rgba(136,144,164,0.4);"></div></div>
+                          <span class="acc-bar-val">₩${Math.round(d.cost).toLocaleString()}</span>
+                      </div>
+                      <div class="acc-bar-row">
+                          <span class="acc-bar-label">평가</span>
+                          <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:${evalPct}%; background:${evalColor};"></div></div>
+                          <span class="acc-bar-val">₩${Math.round(d.eval).toLocaleString()}</span>
+                      </div>
                   </div>
               </div>
           </div>
+          ${portmapHtml}
         </div>
       `;
     }).join('');
@@ -3813,6 +3832,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     let usdPieConfigs = [];
     let usdAccHtml = Object.keys(usdSummary.accounts).map(b => {
       let d = usdSummary.accounts[b];
+      // [추가] 정렬
+      d.items.sort((a,b) => b.evalAmt - a.evalAmt);
       let pnl = d.eval - d.cost;
       let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
       let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
@@ -3826,27 +3847,44 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
+      // [추가] 포트맵 막대(Segment) 동적 생성
+      let portmapSegments = d.items.map((item, idx) => {
+          let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
+          if(ratio <= 0) return '';
+          let color = pieColors[idx % pieColors.length];
+          return `<div class="portmap-segment" style="width:${ratio}%; background:${color};" title="${item.name}: ${ratio.toFixed(1)}%">${ratio > 7 ? item.name : ''}</div>`;
+      }).join('');
+
+      let portmapHtml = `
+        <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
+            <div class="portmap-bar">${portmapSegments}</div>
+        </div>
+      `;
+
       return `
-        <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')">
-          <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
-          <div class="acc-content">
-              <div class="acc-header">
-                  <div class="acc-name" title="${b}">${b}<span class="acc-count">(${count}종목)</span></div>
-                  <div class="acc-pnl ${cls}">${sign}$${Math.abs(pnl).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="acc-roi">(${sign}${roi.toFixed(2)}%)</span></div>
-              </div>
-              <div class="acc-bars">
-                  <div class="acc-bar-row">
-                      <span class="acc-bar-label">투자</span>
-                      <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:${costPct}%; background:rgba(136,144,164,0.4);"></div></div>
-                      <span class="acc-bar-val">$${d.cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+        <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')" style="flex-wrap: wrap;">
+          <div style="display:flex; width:100%; align-items:center;">
+              <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
+              <div class="acc-content">
+                  <div class="acc-header">
+                      <div class="acc-name" title="${b}">${b}<span class="acc-count">(${count}종목)</span></div>
+                      <div class="acc-pnl ${cls}">${sign}$${Math.abs(pnl).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="acc-roi">(${sign}${roi.toFixed(2)}%)</span></div>
                   </div>
-                  <div class="acc-bar-row">
-                      <span class="acc-bar-label">평가</span>
-                      <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:${evalPct}%; background:${evalColor};"></div></div>
-                      <span class="acc-bar-val">$${d.eval.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                  <div class="acc-bars">
+                      <div class="acc-bar-row">
+                          <span class="acc-bar-label">투자</span>
+                          <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:${costPct}%; background:rgba(136,144,164,0.4);"></div></div>
+                          <span class="acc-bar-val">$${d.cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                      </div>
+                      <div class="acc-bar-row">
+                          <span class="acc-bar-label">평가</span>
+                          <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:${evalPct}%; background:${evalColor};"></div></div>
+                          <span class="acc-bar-val">$${d.eval.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                      </div>
                   </div>
               </div>
           </div>
+          ${portmapHtml}
         </div>
       `;
     }).join('');
@@ -3925,6 +3963,13 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       });
       accountPieChartInsts.push(c);
     });
+    setTimeout(() => {
+        // 방금 화면에 그려진 포트맵 중 'should-open(열려야 할 대상)' 클래스를 가진 것을 모두 찾습니다.
+        document.querySelectorAll('.mini-portmap-wrapper.should-open').forEach(el => {
+            el.classList.remove('should-open'); // 대기표를 떼어내고
+            el.classList.add('open');           // 진짜 'open' 클래스를 붙여 애니메이션을 발동시킵니다.
+        });
+    }, 30);
 }
 
 function renderDividendDashboard() {
