@@ -1284,7 +1284,8 @@ function editTransaction(id) {
   _editSymInput.value = _editDisplayName;
   _editSymInput.dataset.symbol = tx.symbol;
   document.getElementById('txQty').value = Math.abs(tx.qty);
-  document.getElementById('txPrice').value = tx.price;
+  document.getElementById('txPrice').value = Number(tx.price).toLocaleString('ko-KR');
+  if (txPriceKorean) txPriceKorean.innerText = numberToKorean(String(tx.price));
   document.getElementById('txBroker').value = tx.broker || '';
   
   const isUser1 = tx.owner === state.owners.user1.name;
@@ -1316,6 +1317,7 @@ function cancelEdit() {
   document.getElementById('txSymbol').value = '';
   document.getElementById('txQty').value = '';
   document.getElementById('txPrice').value = '';
+  if (txPriceKorean) txPriceKorean.innerText = '';
   toggleTxType();
 }
 
@@ -1351,7 +1353,7 @@ function addOrUpdateTransaction() {
   }
 
   let qty   = parseFloat(document.getElementById('txQty').value)   || 0;
-  let price = parseFloat(document.getElementById('txPrice').value) || 0;
+  let price = parseFloat(document.getElementById('txPrice').value.replace(/,/g, '')) || 0;
 
   // ✅ 아래 유효성 검사 추가
   if (!date) {
@@ -8509,3 +8511,63 @@ loadFontSize();
         }
     }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
 })();
+
+/* =========================================================
+   app.js 추가 코드: 3자리 콤마 및 한글 표기 기능
+========================================================= */
+const txPriceInput = document.getElementById('txPrice');
+const txPriceKorean = document.getElementById('txPriceKorean');
+
+function numberToKorean(numberStr) {
+    const numStr = numberStr.replace(/,/g, '').split('.')[0]; // 소수점 아래는 한글 표기에서 제외
+    if (isNaN(numStr) || numStr === '' || numStr === '0') return '';
+
+    const units = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+    const tens = ['', '십', '백', '천'];
+    const thousands = ['', '만', '억', '조', '경'];
+
+    let result = '';
+    let thousandIndex = 0;
+
+    for (let i = numStr.length; i > 0; i -= 4) {
+        const chunk = numStr.substring(Math.max(0, i - 4), i);
+        let chunkResult = '';
+
+        for (let j = 0; j < chunk.length; j++) {
+            const digit = parseInt(chunk[chunk.length - 1 - j], 10);
+            if (digit > 0) {
+                // 1일 경우에도 '일'을 붙임 (일십만 등)
+                chunkResult = units[digit] + tens[j] + chunkResult;
+            }
+        }
+        if (chunkResult !== '') {
+            result = chunkResult + thousands[thousandIndex] + result;
+        }
+        thousandIndex++;
+    }
+    return result;
+}
+
+// 입력할 때 콤마 찍기 및 한글 출력
+if (txPriceInput) {
+    txPriceInput.addEventListener('input', function(e) {
+        // 숫자와 소수점만 허용
+        let value = e.target.value.replace(/[^0-9.]/g, ''); 
+        
+        // 소수점 처리 (소수점은 하나만 허용)
+        const parts = value.split('.');
+        let integerPart = parts[0];
+        let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+
+        // 정수 부분에 3자리 콤마 적용
+        if (integerPart) {
+            integerPart = Number(integerPart).toLocaleString('ko-KR');
+        }
+
+        // 인풋 창 업데이트
+        e.target.value = integerPart + decimalPart;
+        
+        // 하단 한글 텍스트 업데이트
+        txPriceKorean.innerText = numberToKorean(integerPart);
+    });
+}
