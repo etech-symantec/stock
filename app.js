@@ -3503,6 +3503,7 @@ function resetPortfolioChartZoom() {
 }
 
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
+    const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
     if(allocationChartInst && typeof allocationChartInst.destroy === 'function') { allocationChartInst.destroy(); allocationChartInst = null; }
@@ -3890,7 +3891,6 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     }).join('');
     document.getElementById('usdAccountList').innerHTML = usdAccHtml || '<div style="color:var(--text3); font-size:11px; text-align:center; padding:10px;">등록된 계좌가 없습니다.</div>';
 
-    const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
     [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
       const ctx = document.getElementById(cfg.id);
       if(!ctx) return;
