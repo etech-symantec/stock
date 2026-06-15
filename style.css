@@ -281,7 +281,7 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 .cp-summary { display: flex; gap: 15px; }
 .cp-sum-box { flex: 1; }
 .cp-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
-.cp-sum-val { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
+.cp-sum-val { font-family: var(--font-mono); font-size: 200px; font-weight: 700; color: var(--text); }
 .cp-sum-val.up { color: var(--profit); } .cp-sum-val.down { color: var(--loss); }
 
 .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
