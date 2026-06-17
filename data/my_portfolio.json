@@ -9612,6 +9612,16 @@
       "qty": 0,
       "price": 5752.8,
       "txType": "dividend"
+    },
+    {
+      "id": 1781684421177,
+      "date": "2026-06-16",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "GOOGL",
+      "qty": 0,
+      "price": 1.496,
+      "txType": "dividend"
     }
   ],
   "range": "3m",
