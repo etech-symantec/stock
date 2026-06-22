@@ -3795,27 +3795,32 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? '#00C578' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 포트맵 막대(Segment) 동적 생성
+      // [추가] 포트맵 막대(Segment) 동적 생성 (스크린샷 2번: 블록형 디자인)
       let portmapSegments = d.items.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return '';
           let color = pieColors[idx % pieColors.length];
+          
+          // 비율이 7% 이상일 때만 종목명 텍스트 표시 (공간이 좁으면 글자 숨김)
+          let textHtml = ratio > 7 
+              ? `<span style="padding: 0 4px; opacity: 0.95; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 700; color: #ffffff; text-shadow: 0px 1px 2px rgba(0,0,0,0.3); font-family: var(--font-sans);">${item.name}</span>` 
+              : '';
+
           return `
-            <div class="portmap-item" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg); padding: 6px 10px; border-radius: 6px; border-left: 4px solid ${color}; min-width: 0;">
-                <span style="font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.name}">${item.name}</span>
-                <span style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: ${color}; flex-shrink: 0;">${ratio.toFixed(1)}%</span>
+            <div class="mini-portmap-item" style="width: ${ratio}%; background-color: ${color}; border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
+                ${textHtml}
             </div>
           `;
       }).join('');
 
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
-            <div class="portmap-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 10px; width: 100%; max-height: 130px; overflow-y: auto; padding: 2px 2px;" class="custom-scrollbar">
+            <div class="mini-portmap" style="display: flex; width: 100%; height: 24px; gap: 4px; align-items: stretch; margin-top: 6px;">
                 ${portmapSegments}
             </div>
         </div>
       `;
-
+      
       return `
         <div class="acc-row ${activeCls}" onclick="toggleAccountFilter('${b}')" style="flex-wrap: wrap;">
           <div style="display:flex; width:100%; align-items:center;">
@@ -3878,22 +3883,27 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 포트맵 막대(Segment) 동적 생성
+      // [추가] 포트맵 막대(Segment) 동적 생성 (스크린샷 2번: 블록형 디자인)
       let portmapSegments = d.items.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return '';
           let color = pieColors[idx % pieColors.length];
+          
+          // 비율이 7% 이상일 때만 종목명 텍스트 표시 (공간이 좁으면 글자 숨김)
+          let textHtml = ratio > 7 
+              ? `<span style="padding: 0 4px; opacity: 0.95; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 700; color: #ffffff; text-shadow: 0px 1px 2px rgba(0,0,0,0.3); font-family: var(--font-sans);">${item.name}</span>` 
+              : '';
+
           return `
-            <div class="portmap-item" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg); padding: 6px 10px; border-radius: 6px; border-left: 4px solid ${color}; min-width: 0;">
-                <span style="font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.name}">${item.name}</span>
-                <span style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: ${color}; flex-shrink: 0;">${ratio.toFixed(1)}%</span>
+            <div class="mini-portmap-item" style="width: ${ratio}%; background-color: ${color}; border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
+                ${textHtml}
             </div>
           `;
       }).join('');
 
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
-            <div class="portmap-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 10px; width: 100%; max-height: 130px; overflow-y: auto; padding: 2px 2px;" class="custom-scrollbar">
+            <div class="mini-portmap" style="display: flex; width: 100%; height: 24px; gap: 4px; align-items: stretch; margin-top: 6px;">
                 ${portmapSegments}
             </div>
         </div>
