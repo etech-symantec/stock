@@ -3795,14 +3795,14 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? '#00C578' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬)
-      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬 (가장 큰 비중이 위로)
+      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬 & 금액 우선)
+      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬
       let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
 
       let portmapSegments = sortedItems.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return ''; 
-          let color = pieColors[idx % pieColors.length]; // 비중 높은 순서대로 색상 배정
+          let color = pieColors[idx % pieColors.length];
           
           let amtStr = Math.round(item.evalAmt).toLocaleString();
 
@@ -3810,7 +3810,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
             <div class="hbar-item">
                 <div class="hbar-info">
                     <span class="hbar-name">${item.name}</span>
-                    <span class="hbar-ratio-text">${ratio.toFixed(1)}% (${amtStr}원)</span>
+                    <span class="hbar-ratio-text">${amtStr}원 (${ratio.toFixed(1)}%)</span>
                 </div>
                 <div class="hbar-track">
                     <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
@@ -3821,7 +3821,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
-            <div class="hbar-container custom-scrollbar">
+            <div class="hbar-container">
                 ${portmapSegments}
             </div>
         </div>
@@ -3889,14 +3889,14 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬)
-      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬 (가장 큰 비중이 위로)
+      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬 & 금액 우선)
+      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬
       let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
 
       let portmapSegments = sortedItems.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return ''; 
-          let color = pieColors[idx % pieColors.length]; // 비중 높은 순서대로 색상 배정
+          let color = pieColors[idx % pieColors.length];
           
           let amtStr = Math.round(item.evalAmt).toLocaleString();
 
@@ -3904,7 +3904,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
             <div class="hbar-item">
                 <div class="hbar-info">
                     <span class="hbar-name">${item.name}</span>
-                    <span class="hbar-ratio-text">${ratio.toFixed(1)}% (${amtStr}원)</span>
+                    <span class="hbar-ratio-text">${amtStr}원 (${ratio.toFixed(1)}%)</span>
                 </div>
                 <div class="hbar-track">
                     <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
@@ -3915,7 +3915,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
 
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
-            <div class="hbar-container custom-scrollbar">
+            <div class="hbar-container">
                 ${portmapSegments}
             </div>
         </div>
