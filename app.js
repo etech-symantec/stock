@@ -1138,7 +1138,30 @@ function updateOwnerLabels() {
 function toggleAccountFilter(broker) {
   if (activeAccountFilter === broker) activeAccountFilter = null;
   else activeAccountFilter = broker;
-  render();
+  
+  // 전체 다시 그리기(render)를 하지 않고, DOM 클래스 조작으로 부드러운 전환 구현
+  document.querySelectorAll('.acc-row').forEach(row => {
+      const nameEl = row.querySelector('.acc-name');
+      const rowBroker = nameEl ? nameEl.getAttribute('title') : null;
+      
+      const portmap = row.querySelector('.mini-portmap-wrapper');
+      if (rowBroker === activeAccountFilter) {
+          row.classList.add('active-filter');
+          if (portmap) {
+              portmap.classList.add('should-open');
+              setTimeout(() => {
+                  portmap.classList.remove('should-open');
+                  portmap.classList.add('open');
+              }, 30);
+          }
+      } else {
+          row.classList.remove('active-filter');
+          if (portmap) {
+              portmap.classList.remove('open');
+              portmap.classList.remove('should-open');
+          }
+      }
+  });
 }
 
 function toggleTxType() {
