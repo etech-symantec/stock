@@ -3525,6 +3525,34 @@ function resetPortfolioChartZoom() {
     _buildPortfolioChart(portfolioZoomData, null);
 }
 
+// [추가] 증권사 이름을 기반으로 구글 서버에서 공식 로고를 불러오는 함수
+function getBrokerLogo(brokerName) {
+    if (!brokerName) return '';
+    let domain = '';
+    const name = brokerName.toLowerCase();
+    
+    // 주요 증권사 도메인 매핑
+    if (name.includes('키움')) domain = 'kiwoom.com';
+    else if (name.includes('미래에셋')) domain = 'securities.miraeasset.com';
+    else if (name.includes('kb') || name.includes('국민')) domain = 'kbsec.com';
+    else if (name.includes('삼성')) domain = 'samsungpop.com';
+    else if (name.includes('nh') || name.includes('나무')) domain = 'm.nhqv.com';
+    else if (name.includes('한국투자') || name.includes('한투')) domain = 'truefriend.com';
+    else if (name.includes('토스')) domain = 'tossinvest.com';
+    else if (name.includes('신한')) domain = 'shinhansec.com';
+    else if (name.includes('대신')) domain = 'daishin.com';
+    else if (name.includes('유안타')) domain = 'myasset.com';
+    else if (name.includes('카카오')) domain = 'kakaopaysec.com';
+    
+    // 도메인을 찾았다면 구글 Favicon API를 사용해 64px 고화질 로고 호출
+    if (domain) {
+        return `<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=64" class="broker-logo" alt="로고">`;
+    }
+    
+    // 매칭되는 증권사가 없다면 기본 은행 아이콘 반환
+    return `<div class="broker-logo default-logo">🏦</div>`;
+}
+
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
@@ -3833,7 +3861,11 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
               <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
               <div class="acc-content">
                   <div class="acc-header">
-                      <div class="acc-name" title="${b}">${b}<span class="acc-count">(${count}종목)</span></div>
+                      <div class="acc-name" title="${b}" style="display: flex; align-items: center;">
+                          ${getBrokerLogo(b)}
+                          ${b}
+                          <span class="acc-count" style="margin-left: 4px;">(${count}종목)</span>
+                      </div>
                       <div class="acc-pnl ${cls}">${sign}₩${Math.round(Math.abs(pnl)).toLocaleString()} <span class="acc-roi">(${sign}${roi.toFixed(2)}%)</span></div>
                   </div>
                   <div class="acc-bars">
@@ -3927,7 +3959,11 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
               <div class="acc-pie-wrap"><canvas id="${pieId}"></canvas></div>
               <div class="acc-content">
                   <div class="acc-header">
-                      <div class="acc-name" title="${b}">${b}<span class="acc-count">(${count}종목)</span></div>
+                      <div class="acc-name" title="${b}" style="display: flex; align-items: center;">
+                          ${getBrokerLogo(b)}
+                          ${b}
+                          <span class="acc-count" style="margin-left: 4px;">(${count}종목)</span>
+                      </div>
                       <div class="acc-pnl ${cls}">${sign}$${Math.abs(pnl).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="acc-roi">(${sign}${roi.toFixed(2)}%)</span></div>
                   </div>
                   <div class="acc-bars">
