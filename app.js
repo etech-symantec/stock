@@ -3795,33 +3795,33 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? '#00C578' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 포트맵 막대(Segment) 동적 생성 (금액 포함 & 모든 항목 표시)
-      let portmapSegments = d.items.map((item, idx) => {
+      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬)
+      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬 (가장 큰 비중이 위로)
+      let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
+
+      let portmapSegments = sortedItems.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return ''; 
-          let color = pieColors[idx % pieColors.length];
+          let color = pieColors[idx % pieColors.length]; // 비중 높은 순서대로 색상 배정
           
-          // 🌟 평가금액 포맷팅 (정수로 반올림 후 콤마 찍기)
           let amtStr = Math.round(item.evalAmt).toLocaleString();
 
-          // 숨김 조건(ratio > 6)을 없애고 모든 블록에 텍스트를 출력합니다.
-          let nameHtml = `<span class="portmap-name">${item.name}</span>`;
-          
-          // 🌟 퍼센트와 평가금액을 함께 출력합니다. ex: "25.0% (1,234,567)"
-          let ratioHtml = `<span class="portmap-ratio">${ratio.toFixed(1)}% (${amtStr})</span>`;
-
-          // 금액이 추가되어 글자가 길어졌으므로 min-width를 75px로 늘려 레이아웃이 깨지지 않게 방어합니다.
           return `
-            <div class="mini-portmap-item" style="background-color: ${color}; flex: ${ratio} ${ratio} calc(${ratio}% - 4px); min-width: 75px;">
-                ${nameHtml}
-                ${ratioHtml}
+            <div class="hbar-item">
+                <div class="hbar-info">
+                    <span class="hbar-name">${item.name}</span>
+                    <span class="hbar-ratio-text">${ratio.toFixed(1)}% (${amtStr}원)</span>
+                </div>
+                <div class="hbar-track">
+                    <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
+                </div>
             </div>
           `;
       }).join('');
 
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
-            <div class="mini-portmap custom-scrollbar">
+            <div class="hbar-container custom-scrollbar">
                 ${portmapSegments}
             </div>
         </div>
@@ -3889,33 +3889,33 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 포트맵 막대(Segment) 동적 생성 (금액 포함 & 모든 항목 표시)
-      let portmapSegments = d.items.map((item, idx) => {
+      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬)
+      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬 (가장 큰 비중이 위로)
+      let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
+
+      let portmapSegments = sortedItems.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return ''; 
-          let color = pieColors[idx % pieColors.length];
+          let color = pieColors[idx % pieColors.length]; // 비중 높은 순서대로 색상 배정
           
-          // 🌟 평가금액 포맷팅 (정수로 반올림 후 콤마 찍기)
           let amtStr = Math.round(item.evalAmt).toLocaleString();
 
-          // 숨김 조건(ratio > 6)을 없애고 모든 블록에 텍스트를 출력합니다.
-          let nameHtml = `<span class="portmap-name">${item.name}</span>`;
-          
-          // 🌟 퍼센트와 평가금액을 함께 출력합니다. ex: "25.0% (1,234,567)"
-          let ratioHtml = `<span class="portmap-ratio">${ratio.toFixed(1)}% (${amtStr})</span>`;
-
-          // 금액이 추가되어 글자가 길어졌으므로 min-width를 75px로 늘려 레이아웃이 깨지지 않게 방어합니다.
           return `
-            <div class="mini-portmap-item" style="background-color: ${color}; flex: ${ratio} ${ratio} calc(${ratio}% - 4px); min-width: 75px;">
-                ${nameHtml}
-                ${ratioHtml}
+            <div class="hbar-item">
+                <div class="hbar-info">
+                    <span class="hbar-name">${item.name}</span>
+                    <span class="hbar-ratio-text">${ratio.toFixed(1)}% (${amtStr}원)</span>
+                </div>
+                <div class="hbar-track">
+                    <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
+                </div>
             </div>
           `;
       }).join('');
 
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
-            <div class="mini-portmap custom-scrollbar">
+            <div class="hbar-container custom-scrollbar">
                 ${portmapSegments}
             </div>
         </div>
