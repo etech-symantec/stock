@@ -2427,7 +2427,9 @@ nav {
     transform: scale(1.5);
 }
 
-/* 3. 미니 포트맵이 흘러내리듯 나타나는 타이밍 조절 */
+/* =========================================================
+   미니 포트맵 (알약 형태의 칩 디자인 - 최대 3줄 래핑)
+========================================================= */
 .mini-portmap-wrapper {
     width: 100%;
     max-height: 0;
@@ -2439,38 +2441,59 @@ nav {
 }
 
 .mini-portmap-wrapper.open {
-    /* 블록 두께와 텍스트를 고려해 높이를 살짝 여유 있게 확보합니다 */
-    max-height: 50px; 
+    /* 3줄을 충분히 담을 수 있도록 높이를 넉넉히 설정 (약 120px) */
+    max-height: 120px; 
     opacity: 1;
     margin-top: 12px;
     margin-bottom: 4px;
     transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in, margin 0.4s ease-in;
 }
-/* 전체 막대 컨테이너: gap을 추가해 항목 사이를 띄웁니다 */
+
+/* 전체 컨테이너: flex-wrap으로 여러 줄 넘김 처리 */
 .mini-portmap {
     display: flex;
+    flex-wrap: wrap; /* 자리가 없으면 자동으로 다음 줄로 넘어감 */
     width: 100%;
-    height: 24px; /* 스크린샷 2처럼 도톰한 두께 (원하는 대로 조절 가능) */
-    gap: 4px;     /* 🌟 이 간격이 스크린샷 2 디자인의 핵심입니다 */
-    align-items: stretch;
+    gap: 6px;        /* 칩 상하좌우 간격 */
+    align-items: center;
+    max-height: 90px; /* 대략 3줄 정도가 보이는 높이 */
+    overflow-y: auto; /* 3줄(90px)이 넘어가면 내부 스크롤 생성 */
+    padding-bottom: 4px;
 }
 
-/* 개별 자산 블록 */
+/* 개별 알약(Chip) 디자인 */
 .mini-portmap-item {
-    border-radius: 4px; /* 🌟 개별 블록마다 둥근 모서리 적용 */
+    border-radius: 12px; /* 완전히 둥근 캡슐 모양 */
     display: flex;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;       /* 영역이 좁을 때 텍스트가 삐져나오지 않게 숨김 */
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* 텍스트(종목명/비율)를 넣을 경우를 대비한 폰트 설정 */
+    padding: 4px 10px; /* 글자 주변 여백 */
+    gap: 6px; /* 종목명과 퍼센트 사이 간격 */
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.15); /* 입체감을 위한 살짝 그림자 */
+    transition: transform 0.2s ease;
+}
+
+/* (선택) 마우스 오버 시 살짝 뜨는 귀여운 효과 */
+.mini-portmap-item:hover {
+    transform: translateY(-1px); 
+}
+
+/* 종목명 텍스트 */
+.mini-portmap-item .portmap-name {
     color: #ffffff;
     font-size: 11px;
     font-weight: 700;
     font-family: var(--font-sans);
-    white-space: nowrap;
-    text-shadow: 0px 1px 2px rgba(0,0,0,0.3); /* 배경색 대비 가독성 향상 */
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* 퍼센트 텍스트 */
+.mini-portmap-item .portmap-ratio {
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500; /* 종목명과 구분되게 굵기를 살짝 뺌 */
+    font-family: var(--font-mono); /* 숫자가 예쁘게 나오는 폰트 */
+    opacity: 0.9;
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
 }
 
 /* 블록 안의 텍스트 여백 */
