@@ -3795,16 +3795,22 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? '#00C578' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 포트맵 막대(Segment) 동적 생성 (알약 형태의 칩 디자인, 퍼센트 포함)
+      // [추가] 포트맵 막대(Segment) 동적 생성 (포트폴리오 트리맵 블록 디자인)
       let portmapSegments = d.items.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
-          if(ratio <= 0) return ''; // 0% 이하는 숨김
+          if(ratio <= 0) return ''; // 0% 이하는 제외
           let color = pieColors[idx % pieColors.length];
           
+          // 💡 금융 앱 디테일: 비중 크기에 따라 텍스트 노출 조건을 다르게 하여 가독성 확보
+          let nameHtml = ratio > 6 ? `<span class="portmap-name">${item.name}</span>` : '';
+          let ratioHtml = ratio > 3 ? `<span class="portmap-ratio">${ratio.toFixed(1)}%</span>` : '';
+
+          // flex-grow와 flex-basis에 ratio를 주어 비중에 비례해 크기가 커지도록 설정합니다.
+          // min-width를 통해 종목이 아주 많아지면 자연스럽게 최대 3줄까지 아랫줄로 래핑됩니다.
           return `
-            <div class="mini-portmap-item" style="background-color: ${color};">
-                <span class="portmap-name">${item.name}</span>
-                <span class="portmap-ratio">${ratio.toFixed(1)}%</span>
+            <div class="mini-portmap-item" style="background-color: ${color}; flex: ${ratio} ${ratio} calc(${ratio}% - 4px); min-width: 48px;">
+                ${nameHtml}
+                ${ratioHtml}
             </div>
           `;
       }).join('');
@@ -3879,16 +3885,22 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 포트맵 막대(Segment) 동적 생성 (알약 형태의 칩 디자인, 퍼센트 포함)
+      // [추가] 포트맵 막대(Segment) 동적 생성 (포트폴리오 트리맵 블록 디자인)
       let portmapSegments = d.items.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
-          if(ratio <= 0) return ''; // 0% 이하는 숨김
+          if(ratio <= 0) return ''; // 0% 이하는 제외
           let color = pieColors[idx % pieColors.length];
           
+          // 💡 금융 앱 디테일: 비중 크기에 따라 텍스트 노출 조건을 다르게 하여 가독성 확보
+          let nameHtml = ratio > 6 ? `<span class="portmap-name">${item.name}</span>` : '';
+          let ratioHtml = ratio > 3 ? `<span class="portmap-ratio">${ratio.toFixed(1)}%</span>` : '';
+
+          // flex-grow와 flex-basis에 ratio를 주어 비중에 비례해 크기가 커지도록 설정합니다.
+          // min-width를 통해 종목이 아주 많아지면 자연스럽게 최대 3줄까지 아랫줄로 래핑됩니다.
           return `
-            <div class="mini-portmap-item" style="background-color: ${color};">
-                <span class="portmap-name">${item.name}</span>
-                <span class="portmap-ratio">${ratio.toFixed(1)}%</span>
+            <div class="mini-portmap-item" style="background-color: ${color}; flex: ${ratio} ${ratio} calc(${ratio}% - 4px); min-width: 48px;">
+                ${nameHtml}
+                ${ratioHtml}
             </div>
           `;
       }).join('');
