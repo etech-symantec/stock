@@ -2350,13 +2350,13 @@ nav {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    /* 스르륵 흐르는 듯한 애니메이션 */
     transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease-out, margin 0.3s ease-out;
     margin-top: 0;
     flex-shrink: 0;
 }
+
 .mini-portmap-wrapper.open {
-    max-height: 50px; /* 포트맵이 들어갈 충분한 높이 */
+    max-height: 200px; /* 💡 기존 50px에서 200px로 상향하여 최대 4줄까지 안전하게 수용 */
     opacity: 1;
     margin-top: 12px;
     margin-bottom: 4px;
