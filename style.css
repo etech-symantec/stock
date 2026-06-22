@@ -2345,22 +2345,53 @@ nav {
 /* =========================================================
    미니 포트맵 (계좌 하단 펼침 효과)
 ========================================================= */
+/* 1. 파이 그래프 컨테이너 기본 상태 및 애니메이션 */
+.chart-wrapper {
+    max-height: 260px; /* 기존 기본 높이 (본인 코드에 맞게 조절 가능) */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.4s ease-out,
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* 🌟 계좌 박스가 선택되었을 때 파이 그래프가 밑으로 흐르며 사라지는 효과 */
+.account-selected-mode .chart-wrapper {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(30px) scale(0.85); /* 밑으로 떨어지며 작아짐 */
+    margin-bottom: 0;
+    pointer-events: none; /* 클릭 방지 */
+}
+
+/* 2. 대형화할 텍스트(예: 총자산 금액 등) 애니메이션 */
+.zoom-text-target {
+    display: inline-block;
+    transform-origin: left center; /* 왼쪽 기준으로 정렬 유지하며 확대 */
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* 살짝 튕기는 부드러운 효과 */
+}
+
+/* 🌟 계좌 박스가 선택되었을 때 폰트 1.5배 확대 */
+.account-selected-mode .zoom-text-target {
+    transform: scale(1.5);
+}
+
+/* 3. 미니 포트맵이 흘러내리듯 나타나는 타이밍 조절 */
 .mini-portmap-wrapper {
     width: 100%;
     max-height: 0;
     opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease-out, margin 0.3s ease-out;
-    margin-top: 0;
-    flex-shrink: 0;
+    transform: translateY(-10px); /* 위에서 내려오는 느낌 추가 */
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.4s ease-in-out,
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mini-portmap-wrapper.open {
-    max-height: 200px; /* 💡 기존 50px에서 200px로 상향하여 최대 4줄까지 안전하게 수용 */
+    max-height: 200px;
     opacity: 1;
-    margin-top: 12px;
-    margin-bottom: 4px;
-    transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in, margin 0.4s ease-in;
+    transform: translateY(0);
 }
 .portmap-bar {
     display: flex;
