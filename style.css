@@ -2428,7 +2428,7 @@ nav {
 }
 
 /* =========================================================
-   미니 포트맵 (알약 형태의 칩 디자인 - 최대 3줄 래핑)
+   미니 포트맵 (각진 사각형 포트폴리오 맵/트리맵 스타일)
 ========================================================= */
 .mini-portmap-wrapper {
     width: 100%;
@@ -2441,59 +2441,70 @@ nav {
 }
 
 .mini-portmap-wrapper.open {
-    /* 3줄을 충분히 담을 수 있도록 높이를 넉넉히 설정 (약 120px) */
-    max-height: 120px; 
+    /* 사각형 블록들이 다단으로 쌓일 수 있도록 최대 높이 확보 */
+    max-height: 140px; 
     opacity: 1;
     margin-top: 12px;
     margin-bottom: 4px;
     transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in, margin 0.4s ease-in;
 }
 
-/* 전체 컨테이너: flex-wrap으로 여러 줄 넘김 처리 */
+/* 포트맵 전체 컨테이너 */
 .mini-portmap {
     display: flex;
-    flex-wrap: wrap; /* 자리가 없으면 자동으로 다음 줄로 넘어감 */
+    flex-wrap: wrap;   /* 자리가 부족하면 아래 레이어로 격자 생성 */
     width: 100%;
-    gap: 6px;        /* 칩 상하좌우 간격 */
-    align-items: center;
-    max-height: 90px; /* 대략 3줄 정도가 보이는 높이 */
-    overflow-y: auto; /* 3줄(90px)이 넘어가면 내부 스크롤 생성 */
+    gap: 4px;          /* 블록 간격 (포트맵 구분선 역할) */
+    align-items: stretch;
+    max-height: 114px; /* 대략 도톰한 블록 3줄 분량의 높이 제한 */
+    overflow-y: auto;  /* 3줄이 넘어가면 깔끔하게 스크롤 처리 */
     padding-bottom: 4px;
 }
 
-/* 개별 알약(Chip) 디자인 */
+/* 개별 사각형 자산 블록 */
 .mini-portmap-item {
-    border-radius: 12px; /* 완전히 둥근 캡슐 모양 */
+    border-radius: 4px; /* 각진 직사각형 구조의 자산 지도 디자인 */
     display: flex;
+    flex-direction: column; /* 종목명과 퍼센트를 위아래(수직)로 배치 */
+    justify-content: center;
     align-items: center;
-    padding: 4px 10px; /* 글자 주변 여백 */
-    gap: 6px; /* 종목명과 퍼센트 사이 간격 */
-    box-shadow: 0px 2px 4px rgba(0,0,0,0.15); /* 입체감을 위한 살짝 그림자 */
-    transition: transform 0.2s ease;
+    padding: 4px;
+    box-sizing: border-box;
+    overflow: hidden;
+    min-height: 35px;  /* 블록의 두께감 확보 */
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* (선택) 마우스 오버 시 살짝 뜨는 귀여운 효과 */
+/* 마우스 올렸을 때 타일이 살짝 강조되는 연출 */
 .mini-portmap-item:hover {
-    transform: translateY(-1px); 
+    transform: scale(1.02);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+    z-index: 2;
 }
 
-/* 종목명 텍스트 */
+/* 블록 내부 종목명 */
 .mini-portmap-item .portmap-name {
     color: #ffffff;
     font-size: 11px;
     font-weight: 700;
     font-family: var(--font-sans);
-    text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+    line-height: 1.2;
 }
 
-/* 퍼센트 텍스트 */
+/* 블록 내부 비중 퍼센트 */
 .mini-portmap-item .portmap-ratio {
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 500; /* 종목명과 구분되게 굵기를 살짝 뺌 */
-    font-family: var(--font-mono); /* 숫자가 예쁘게 나오는 폰트 */
-    opacity: 0.9;
-    text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    margin-top: 1px;
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* 블록 안의 텍스트 여백 */
