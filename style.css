@@ -289,7 +289,23 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 .acc-row:hover { border-color: var(--border2); }
 .acc-row.active-filter { border-color: var(--accent); background: rgba(124,106,247,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
-.acc-pie-wrap { width: 85px; height: 85px; position: relative; flex-shrink: 0; }
+/* 1. 파이 그래프 애니메이션 (기존 .acc-pie-wrap 속성을 이걸로 교체/덮어쓰기) */
+.acc-pie-wrap {
+    width: 85px; 
+    height: 85px; 
+    position: relative; 
+    flex-shrink: 0;
+    margin-right: 16px; /* 텍스트 영역과의 간격 분리 */
+    overflow: hidden;   /* 크기가 0이 될 때 캔버스가 삐져나오지 않게 숨김 처리 */
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                margin 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top center;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
 .acc-content { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .acc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px; }
 .acc-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -303,7 +319,41 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 .acc-bar-label { font-size: 14px; color: var(--text2); width: 32px; flex-shrink: 0; }
 .acc-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
 .acc-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
-.acc-bar-val { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); width: 100px; text-align: right; flex-shrink: 0; }
+
+/* 활성화 시 밑으로 빨려 들어가며 사라지는 효과 */
+.acc-row.active-filter .acc-pie-wrap {
+    width: 0px;
+    height: 0px;
+    margin-right: 0px;
+    opacity: 0;
+    transform: translateY(40px) scale(0.2); 
+}
+/* 2. 평가금액 / 투자금액 폰트 1.5배 확대 애니메이션 */
+.acc-bar-val { 
+    font-family: var(--font-mono); 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: var(--text); 
+    width: 100px; 
+    text-align: right; 
+    flex-shrink: 0;
+    transition: font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* 선택 시 14px -> 21px로 커짐 */
+.acc-row.active-filter .acc-bar-val {
+    font-size: 21px; 
+    width: 150px; /* 폰트가 커지면서 줄바꿈이 일어나지 않도록 공간 추가 확보 */
+}
+
+/* (선택) 시각적 밸런스를 위해 위쪽 총 수익금 및 계좌명 폰트도 비율에 맞게 살짝 키워줍니다 */
+.acc-pnl, .acc-roi, .acc-name, .acc-bar-label { 
+    transition: font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+.acc-row.active-filter .acc-pnl { font-size: 18px; }
+.acc-row.active-filter .acc-roi { font-size: 13px; }
+.acc-row.active-filter .acc-name { font-size: 16px; }
+.acc-row.active-filter .acc-bar-label { font-size: 16px; }
 
 .list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; flex-shrink: 0; position: sticky; top: 0; z-index: 30; background: var(--bg); margin-left: -2rem; margin-right: -2rem; padding-left: 2rem; padding-right: 2rem; padding-top: 10px; }
 .list-title-wrap { display: flex; align-items: center; gap: 12px; }
