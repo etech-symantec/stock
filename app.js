@@ -3777,12 +3777,19 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return '';
           let color = pieColors[idx % pieColors.length];
-          return `<div class="portmap-segment" style="width:${ratio}%; background:${color};" title="${item.name}: ${ratio.toFixed(1)}%">${ratio > 7 ? item.name : ''}</div>`;
+          return `
+            <div class="portmap-item" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg); padding: 6px 10px; border-radius: 6px; border-left: 4px solid ${color}; min-width: 0;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.name}">${item.name}</span>
+                <span style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: ${color}; flex-shrink: 0;">${ratio.toFixed(1)}%</span>
+            </div>
+          `;
       }).join('');
 
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
-            <div class="portmap-bar">${portmapSegments}</div>
+            <div class="portmap-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 10px; width: 100%; max-height: 130px; overflow-y: auto; padding: 2px 2px;" class="custom-scrollbar">
+                ${portmapSegments}
+            </div>
         </div>
       `;
 
@@ -3853,12 +3860,19 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return '';
           let color = pieColors[idx % pieColors.length];
-          return `<div class="portmap-segment" style="width:${ratio}%; background:${color};" title="${item.name}: ${ratio.toFixed(1)}%">${ratio > 7 ? item.name : ''}</div>`;
+          return `
+            <div class="portmap-item" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg); padding: 6px 10px; border-radius: 6px; border-left: 4px solid ${color}; min-width: 0;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.name}">${item.name}</span>
+                <span style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: ${color}; flex-shrink: 0;">${ratio.toFixed(1)}%</span>
+            </div>
+          `;
       }).join('');
 
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
-            <div class="portmap-bar">${portmapSegments}</div>
+            <div class="portmap-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 10px; width: 100%; max-height: 130px; overflow-y: auto; padding: 2px 2px;" class="custom-scrollbar">
+                ${portmapSegments}
+            </div>
         </div>
       `;
 
