@@ -3795,20 +3795,24 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? '#00C578' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 포트맵 막대(Segment) 동적 생성 (포트폴리오 트리맵 블록 디자인)
+      // [추가] 포트맵 막대(Segment) 동적 생성 (금액 포함 & 모든 항목 표시)
       let portmapSegments = d.items.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
-          if(ratio <= 0) return ''; // 0% 이하는 제외
+          if(ratio <= 0) return ''; 
           let color = pieColors[idx % pieColors.length];
           
-          // 💡 금융 앱 디테일: 비중 크기에 따라 텍스트 노출 조건을 다르게 하여 가독성 확보
-          let nameHtml = ratio > 6 ? `<span class="portmap-name">${item.name}</span>` : '';
-          let ratioHtml = ratio > 3 ? `<span class="portmap-ratio">${ratio.toFixed(1)}%</span>` : '';
+          // 🌟 평가금액 포맷팅 (정수로 반올림 후 콤마 찍기)
+          let amtStr = Math.round(item.evalAmt).toLocaleString();
 
-          // flex-grow와 flex-basis에 ratio를 주어 비중에 비례해 크기가 커지도록 설정합니다.
-          // min-width를 통해 종목이 아주 많아지면 자연스럽게 최대 3줄까지 아랫줄로 래핑됩니다.
+          // 숨김 조건(ratio > 6)을 없애고 모든 블록에 텍스트를 출력합니다.
+          let nameHtml = `<span class="portmap-name">${item.name}</span>`;
+          
+          // 🌟 퍼센트와 평가금액을 함께 출력합니다. ex: "25.0% (1,234,567)"
+          let ratioHtml = `<span class="portmap-ratio">${ratio.toFixed(1)}% (${amtStr})</span>`;
+
+          // 금액이 추가되어 글자가 길어졌으므로 min-width를 75px로 늘려 레이아웃이 깨지지 않게 방어합니다.
           return `
-            <div class="mini-portmap-item" style="background-color: ${color}; flex: ${ratio} ${ratio} calc(${ratio}% - 4px); min-width: 48px;">
+            <div class="mini-portmap-item" style="background-color: ${color}; flex: ${ratio} ${ratio} calc(${ratio}% - 4px); min-width: 75px;">
                 ${nameHtml}
                 ${ratioHtml}
             </div>
@@ -3885,20 +3889,24 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 포트맵 막대(Segment) 동적 생성 (포트폴리오 트리맵 블록 디자인)
+      // [추가] 포트맵 막대(Segment) 동적 생성 (금액 포함 & 모든 항목 표시)
       let portmapSegments = d.items.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
-          if(ratio <= 0) return ''; // 0% 이하는 제외
+          if(ratio <= 0) return ''; 
           let color = pieColors[idx % pieColors.length];
           
-          // 💡 금융 앱 디테일: 비중 크기에 따라 텍스트 노출 조건을 다르게 하여 가독성 확보
-          let nameHtml = ratio > 6 ? `<span class="portmap-name">${item.name}</span>` : '';
-          let ratioHtml = ratio > 3 ? `<span class="portmap-ratio">${ratio.toFixed(1)}%</span>` : '';
+          // 🌟 평가금액 포맷팅 (정수로 반올림 후 콤마 찍기)
+          let amtStr = Math.round(item.evalAmt).toLocaleString();
 
-          // flex-grow와 flex-basis에 ratio를 주어 비중에 비례해 크기가 커지도록 설정합니다.
-          // min-width를 통해 종목이 아주 많아지면 자연스럽게 최대 3줄까지 아랫줄로 래핑됩니다.
+          // 숨김 조건(ratio > 6)을 없애고 모든 블록에 텍스트를 출력합니다.
+          let nameHtml = `<span class="portmap-name">${item.name}</span>`;
+          
+          // 🌟 퍼센트와 평가금액을 함께 출력합니다. ex: "25.0% (1,234,567)"
+          let ratioHtml = `<span class="portmap-ratio">${ratio.toFixed(1)}% (${amtStr})</span>`;
+
+          // 금액이 추가되어 글자가 길어졌으므로 min-width를 75px로 늘려 레이아웃이 깨지지 않게 방어합니다.
           return `
-            <div class="mini-portmap-item" style="background-color: ${color}; flex: ${ratio} ${ratio} calc(${ratio}% - 4px); min-width: 48px;">
+            <div class="mini-portmap-item" style="background-color: ${color}; flex: ${ratio} ${ratio} calc(${ratio}% - 4px); min-width: 75px;">
                 ${nameHtml}
                 ${ratioHtml}
             </div>
