@@ -2428,7 +2428,7 @@ nav {
 }
 
 /* =========================================================
-   미니 포트맵 (각진 사각형 포트폴리오 맵/트리맵 스타일)
+   미니 포트맵 (4줄 확장 및 금액 표시 대응)
 ========================================================= */
 .mini-portmap-wrapper {
     width: 100%;
@@ -2441,8 +2441,8 @@ nav {
 }
 
 .mini-portmap-wrapper.open {
-    /* 사각형 블록들이 다단으로 쌓일 수 있도록 최대 높이 확보 */
-    max-height: 140px; 
+    /* 🌟 4줄까지 담을 수 있도록 높이를 180px로 넉넉히 확보 */
+    max-height: 180px; 
     opacity: 1;
     margin-top: 12px;
     margin-bottom: 4px;
@@ -2452,31 +2452,31 @@ nav {
 /* 포트맵 전체 컨테이너 */
 .mini-portmap {
     display: flex;
-    flex-wrap: wrap;   /* 자리가 부족하면 아래 레이어로 격자 생성 */
+    flex-wrap: wrap;
     width: 100%;
-    gap: 4px;          /* 블록 간격 (포트맵 구분선 역할) */
+    gap: 4px;
     align-items: stretch;
-    max-height: 114px; /* 대략 도톰한 블록 3줄 분량의 높이 제한 */
-    overflow-y: auto;  /* 3줄이 넘어가면 깔끔하게 스크롤 처리 */
+    /* 🌟 4줄 분량의 높이 (이 높이를 넘어가면 스크롤이 생깁니다) */
+    max-height: 160px; 
+    overflow-y: auto;
     padding-bottom: 4px;
 }
 
 /* 개별 사각형 자산 블록 */
 .mini-portmap-item {
-    border-radius: 4px; /* 각진 직사각형 구조의 자산 지도 디자인 */
+    border-radius: 4px; 
     display: flex;
-    flex-direction: column; /* 종목명과 퍼센트를 위아래(수직)로 배치 */
+    flex-direction: column; 
     justify-content: center;
     align-items: center;
-    padding: 4px;
+    padding: 6px 4px; 
     box-sizing: border-box;
     overflow: hidden;
-    min-height: 35px;  /* 블록의 두께감 확보 */
+    min-height: 38px; /* 텍스트가 늘어났으므로 블록 높이를 약간 늘려줍니다 */
     text-align: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* 마우스 올렸을 때 타일이 살짝 강조되는 연출 */
 .mini-portmap-item:hover {
     transform: scale(1.02);
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
@@ -2491,20 +2491,24 @@ nav {
     font-family: var(--font-sans);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* 글자가 블록 너비를 넘으면 '...' 처리 */
     width: 100%;
     text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
     line-height: 1.2;
 }
 
-/* 블록 내부 비중 퍼센트 */
+/* 블록 내부 비중 퍼센트 + 금액 */
 .mini-portmap-item .portmap-ratio {
     color: rgba(255, 255, 255, 0.85);
     font-size: 10px;
     font-weight: 700;
     font-family: var(--font-mono);
-    margin-top: 1px;
+    margin-top: 2px;
     text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 퍼센트+금액도 너비를 넘으면 '...' 처리 */
+    width: 100%;
 }
 
 /* 블록 안의 텍스트 여백 */
