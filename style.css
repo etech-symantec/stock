@@ -2428,7 +2428,7 @@ nav {
 }
 
 /* =========================================================
-   미니 포트맵 (4줄 확장 및 금액 표시 대응)
+   미니 포트맵 (비중순 가로 막대그래프 리스트)
 ========================================================= */
 .mini-portmap-wrapper {
     width: 100%;
@@ -2441,74 +2441,72 @@ nav {
 }
 
 .mini-portmap-wrapper.open {
-    /* 🌟 4줄까지 담을 수 있도록 높이를 180px로 넉넉히 확보 */
-    max-height: 180px; 
+    /* 리스트가 길어질 것을 대비해 넉넉히 최대 높이 설정 */
+    max-height: 250px; 
     opacity: 1;
     margin-top: 12px;
     margin-bottom: 4px;
     transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in, margin 0.4s ease-in;
 }
 
-/* 포트맵 전체 컨테이너 */
-.mini-portmap {
+/* 가로 막대 리스트 컨테이너 */
+.hbar-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 12px; /* 각 종목 사이의 간격 */
     width: 100%;
-    gap: 4px;
-    align-items: stretch;
-    /* 🌟 4줄 분량의 높이 (이 높이를 넘어가면 스크롤이 생깁니다) */
-    max-height: 160px; 
+    max-height: 230px;
     overflow-y: auto;
-    padding-bottom: 4px;
+    padding: 4px 8px 8px 4px;
 }
 
-/* 개별 사각형 자산 블록 */
-.mini-portmap-item {
-    border-radius: 4px; 
+/* 개별 종목 래퍼 */
+.hbar-item {
     display: flex;
-    flex-direction: column; 
-    justify-content: center;
-    align-items: center;
-    padding: 6px 4px; 
-    box-sizing: border-box;
-    overflow: hidden;
-    min-height: 38px; /* 텍스트가 늘어났으므로 블록 높이를 약간 늘려줍니다 */
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-direction: column;
+    gap: 6px; /* 텍스트와 막대바 사이의 간격 */
 }
 
-.mini-portmap-item:hover {
-    transform: scale(1.02);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
-    z-index: 2;
+/* 종목명 및 퍼센트 텍스트 영역 */
+.hbar-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 }
 
-/* 블록 내부 종목명 */
-.mini-portmap-item .portmap-name {
-    color: #ffffff;
-    font-size: 11px;
+.hbar-name {
+    color: var(--text); /* 밝은 텍스트 색상 */
+    font-size: 13px;
     font-weight: 700;
     font-family: var(--font-sans);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* 글자가 블록 너비를 넘으면 '...' 처리 */
-    width: 100%;
-    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
-    line-height: 1.2;
+    text-overflow: ellipsis;
+    max-width: 50%;
 }
 
-/* 블록 내부 비중 퍼센트 + 금액 */
-.mini-portmap-item .portmap-ratio {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 10px;
-    font-weight: 700;
+.hbar-ratio-text {
+    color: var(--text2); /* 서브 텍스트 색상 */
+    font-size: 12px;
+    font-weight: 500;
     font-family: var(--font-mono);
-    margin-top: 2px;
-    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* 퍼센트+금액도 너비를 넘으면 '...' 처리 */
+}
+
+/* 빈 배경 막대 (트랙) */
+.hbar-track {
     width: 100%;
+    height: 6px; /* 막대그래프 두께 */
+    background-color: var(--bg3); /* 어두운 트랙 배경 (기존 변수 활용) */
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* 비중만큼 채워지는 색상 막대 */
+.hbar-fill {
+    height: 100%;
+    border-radius: 4px;
+    /* 스르륵 차오르는 애니메이션 */
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
 }
 
 /* 블록 안의 텍스트 여백 */
