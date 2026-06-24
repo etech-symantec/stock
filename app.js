@@ -8645,18 +8645,57 @@ const FONT_SIZE_LEVELS = { xs: 0.8, sm: 0.9, md: 1.0, lg: 1.1, xl: 1.2 };
 
 function applyFontSize(level) {
   const zoom = FONT_SIZE_LEVELS[level] || 1.0;
-    document.body.style.fontSize = (zoom * 100) + '%';
-    document.body.style.zoom = zoom;
+    // 1. 기존 화면 전체 확대(zoom) 방식 초기화
+    document.body.style.zoom = '';
+    document.body.style.fontSize = '';
+
+    // 2. 글자 크기만 변경할 동적 스타일 태그 생성
+    let styleTag = document.getElementById('dynamic-font-scale');
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'dynamic-font-scale';
+        document.head.appendChild(styleTag);
+    }
+
+    // 3. '기본' 크기일 때는 스타일 비우기, 아닐 때는 배율을 곱해서 강제 덮어쓰기
+    if (level === 'md') {
+        styleTag.innerHTML = '';
+    } else {
+        styleTag.innerHTML = `
+            /* 16px ~ 26px (타이틀 및 강조 텍스트) */
+            .vtab { font-size: ${16 * scale}px !important; }
+            .cp-title { font-size: ${15 * scale}px !important; }
+            .cp-sum-val { font-size: ${16 * scale}px !important; }
+            .ms-ind-val { font-size: ${18 * scale}px !important; }
+            .card-price { font-size: ${24 * scale}px !important; }
+            .stat-banner-val { font-size: ${26 * scale}px !important; }
+            
+            /* 13px ~ 14px (서브 타이틀 및 주요 값) */
+            .acc-pnl, .list-item-right { font-size: ${14 * scale}px !important; }
+            .form-input, .btn-submit, .acc-name, .tx-sym, .search-dropdown .search-item div span { font-size: ${13 * scale}px !important; }
+            
+            /* 12px (본문 및 표) */
+            .btn-sm, .f-btn, .f-input, .toggle-btn, .search-input { font-size: ${12 * scale}px !important; }
+            .history-table th, .history-table td { font-size: ${12 * scale}px !important; }
+            .tx-card, .list-item, .acc-content { font-size: ${12 * scale}px !important; }
+
+            /* 10px ~ 11px (라벨 및 부가 정보) */
+            .rtab, .filter-label, .form-group label, .tx-meta-label span, .stat-market-label { font-size: ${11 * scale}px !important; }
+            .sync-status, .card-badge, .ms-ind-hint { font-size: ${10 * scale}px !important; }
+        `;
+    }
+
+    // 4. 로컬 스토리지에 설정 저장
     localStorage.setItem(FONT_SIZE_KEY, level);
 
-    // 버튼 active 상태 동기화
+    // 5. 폰트 크기 설정 버튼 하이라이트 동기화
     document.querySelectorAll('.font-size-btn').forEach(btn => {
-      const isActive = btn.getAttribute('data-level') === level;
-      btn.style.background    = isActive ? 'var(--accent)'    : 'transparent';
-      btn.style.color         = isActive ? '#fff'             : 'var(--text2)';
-      btn.style.borderColor   = isActive ? 'var(--accent)'    : 'var(--border2)';
-      btn.style.fontWeight    = isActive ? '700'              : '500';
-  });
+        const isActive = btn.getAttribute('data-level') === level;
+        btn.style.background    = isActive ? 'var(--accent)'    : 'transparent';
+        btn.style.color         = isActive ? '#fff'             : 'var(--text2)';
+        btn.style.borderColor   = isActive ? 'var(--accent)'    : 'var(--border2)';
+        btn.style.fontWeight    = isActive ? '700'              : '500';
+    });
 }
 
 function loadFontSize() {
