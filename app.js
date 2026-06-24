@@ -506,13 +506,39 @@ function openMasterSettingsModal() {
   // RIA 계좌 값 복원
   const riaEl = document.getElementById('inputRiaAccounts');
   if (riaEl) riaEl.value = (state.riaAccounts || []).join(', ');
-  // 🌟 [추가] 모달 열 때 수동 해외자산 목록 불러오기
+  
   const customOverseasEl = document.getElementById('inputCustomOverseas');
   if (customOverseasEl) customOverseasEl.value = (state.customOverseasAssets || []).join(', ');
 
   document.getElementById('masterSettingsOverlay').classList.add('open');
+  switchSettingsTab('data');
 }
 
+// 설정 모달 탭 전환 함수
+function switchSettingsTab(tabName) {
+  const tabData = document.getElementById('settingsTabData');
+  const tabDisplay = document.getElementById('settingsTabDisplay');
+  const btnData = document.getElementById('tabBtnData');
+  const btnDisplay = document.getElementById('tabBtnDisplay');
+
+  if (tabName === 'data') {
+      tabData.style.display = 'block';
+      tabDisplay.style.display = 'none';
+      
+      btnData.style.borderBottomColor = 'var(--accent)';
+      btnData.style.color = 'var(--text)';
+      btnDisplay.style.borderBottomColor = 'transparent';
+      btnDisplay.style.color = 'var(--text2)';
+  } else {
+      tabData.style.display = 'none';
+      tabDisplay.style.display = 'block';
+      
+      btnData.style.borderBottomColor = 'transparent';
+      btnData.style.color = 'var(--text2)';
+      btnDisplay.style.borderBottomColor = 'var(--accent)';
+      btnDisplay.style.color = 'var(--text)';
+  }
+}
 // 🌟 [추가] 수동 해외자산 목록 저장 함수
 function saveCustomOverseas() {
     const val = document.getElementById('inputCustomOverseas').value;
@@ -8615,21 +8641,22 @@ document.addEventListener('DOMContentLoaded', initMarketSignalBar);
 // 🔤 전체 폰트 크기 설정
 // ==========================================
 const FONT_SIZE_KEY = 'ttm_font_size';
-const FONT_SIZE_LEVELS = { xs: 0.82, sm: 0.91, md: 1.0, lg: 1.1, xl: 1.22 };
+const FONT_SIZE_LEVELS = { xs: 0.6, sm: 0.8, md: 1.0, lg: 1.2, xl: 1.4 };
 
 function applyFontSize(level) {
-    const zoom = FONT_SIZE_LEVELS[level] || 1.0;
+  const zoom = FONT_SIZE_LEVELS[level] || 1.0;
     document.body.style.fontSize = (zoom * 100) + '%';
+    document.body.style.zoom = zoom;
     localStorage.setItem(FONT_SIZE_KEY, level);
 
     // 버튼 active 상태 동기화
     document.querySelectorAll('.font-size-btn').forEach(btn => {
-        const isActive = btn.getAttribute('data-level') === level;
-        btn.style.background    = isActive ? 'var(--accent)'    : 'transparent';
-        btn.style.color         = isActive ? '#fff'             : 'var(--text2)';
-        btn.style.borderColor   = isActive ? 'var(--accent)'    : 'var(--border2)';
-        btn.style.fontWeight    = isActive ? '700'              : '500';
-    });
+      const isActive = btn.getAttribute('data-level') === level;
+      btn.style.background    = isActive ? 'var(--accent)'    : 'transparent';
+      btn.style.color         = isActive ? '#fff'             : 'var(--text2)';
+      btn.style.borderColor   = isActive ? 'var(--accent)'    : 'var(--border2)';
+      btn.style.fontWeight    = isActive ? '700'              : '500';
+  });
 }
 
 function loadFontSize() {
@@ -8710,38 +8737,4 @@ if (txPriceInput) {
         // 하단 한글 텍스트 업데이트
         txPriceKorean.innerText = numberToKorean(integerPart);
     });
-}
-// 설정 모달 탭 전환 함수
-function switchSettingsTab(tabName) {
-    const tabData = document.getElementById('settingsTabData');
-    const tabDisplay = document.getElementById('settingsTabDisplay');
-    const btnData = document.getElementById('tabBtnData');
-    const btnDisplay = document.getElementById('tabBtnDisplay');
-
-    if (tabName === 'data') {
-        tabData.style.display = 'block';
-        tabDisplay.style.display = 'none';
-        
-        btnData.style.borderBottomColor = 'var(--accent)';
-        btnData.style.color = 'var(--text)';
-        btnDisplay.style.borderBottomColor = 'transparent';
-        btnDisplay.style.color = 'var(--text2)';
-    } else {
-        tabData.style.display = 'none';
-        tabDisplay.style.display = 'block';
-        
-        btnData.style.borderBottomColor = 'transparent';
-        btnData.style.color = 'var(--text2)';
-        btnDisplay.style.borderBottomColor = 'var(--accent)';
-        btnDisplay.style.color = 'var(--text)';
-    }
-}
-
-// 모달이 열릴 때 항상 '데이터 관리' 탭이 먼저 보이도록 설정(선택 사항)
-function openMasterSettingsModal() {
-    // 기존에 있던 열기 로직 유지
-    document.getElementById('masterSettingsOverlay').style.display = 'flex';
-    
-    // 모달을 열 때 탭을 초기화
-    switchSettingsTab('data');
 }
