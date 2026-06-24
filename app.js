@@ -8644,7 +8644,7 @@ const FONT_SIZE_KEY = 'ttm_font_size';
 const FONT_SIZE_LEVELS = { xs: 0.8, sm: 0.9, md: 1.0, lg: 1.1, xl: 1.2 };
 
 function applyFontSize(level) {
-  const zoom = FONT_SIZE_LEVELS[level] || 1.0;
+  const scale = FONT_SIZE_LEVELS[level] || 1.0;
     // 1. 기존 화면 전체 확대(zoom) 방식 초기화
     document.body.style.zoom = '';
     document.body.style.fontSize = '';
