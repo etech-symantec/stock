@@ -8641,7 +8641,7 @@ document.addEventListener('DOMContentLoaded', initMarketSignalBar);
 // 🔤 전체 폰트 크기 설정
 // ==========================================
 const FONT_SIZE_KEY = 'ttm_font_size';
-const FONT_SIZE_LEVELS = { xs: 0.6, sm: 0.8, md: 1.0, lg: 1.2, xl: 1.4 };
+const FONT_SIZE_LEVELS = { xs: 0.8, sm: 0.9, md: 1.0, lg: 1.1, xl: 1.2 };
 
 function applyFontSize(level) {
   const zoom = FONT_SIZE_LEVELS[level] || 1.0;
