@@ -8711,3 +8711,37 @@ if (txPriceInput) {
         txPriceKorean.innerText = numberToKorean(integerPart);
     });
 }
+// 설정 모달 탭 전환 함수
+function switchSettingsTab(tabName) {
+    const tabData = document.getElementById('settingsTabData');
+    const tabDisplay = document.getElementById('settingsTabDisplay');
+    const btnData = document.getElementById('tabBtnData');
+    const btnDisplay = document.getElementById('tabBtnDisplay');
+
+    if (tabName === 'data') {
+        tabData.style.display = 'block';
+        tabDisplay.style.display = 'none';
+        
+        btnData.style.borderBottomColor = 'var(--accent)';
+        btnData.style.color = 'var(--text)';
+        btnDisplay.style.borderBottomColor = 'transparent';
+        btnDisplay.style.color = 'var(--text2)';
+    } else {
+        tabData.style.display = 'none';
+        tabDisplay.style.display = 'block';
+        
+        btnData.style.borderBottomColor = 'transparent';
+        btnData.style.color = 'var(--text2)';
+        btnDisplay.style.borderBottomColor = 'var(--accent)';
+        btnDisplay.style.color = 'var(--text)';
+    }
+}
+
+// 모달이 열릴 때 항상 '데이터 관리' 탭이 먼저 보이도록 설정(선택 사항)
+function openMasterSettingsModal() {
+    // 기존에 있던 열기 로직 유지
+    document.getElementById('masterSettingsOverlay').style.display = 'flex';
+    
+    // 모달을 열 때 탭을 초기화
+    switchSettingsTab('data');
+}
