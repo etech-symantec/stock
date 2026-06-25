@@ -258,11 +258,11 @@ def get_us_buffett_indicator():
     return us_val
 
 # ──────────────────────────────────────────────
-# 6. 한국 버핏 지수 (한국은행 ECOS + KRX 하이브리드 엔진)
+# 6. 한국 버핏 지수 (한국은행 ECOS + 네이버 금융 하이브리드 엔진 v2)
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] 한국은행 ECOS(GDP) + 네이버 금융(시가총액) 하이브리드 엔진 가동...")
+    print("\n   ▶️ [한국 버핏지수] ECOS(GDP) + 네이버 금융(시가총액) 엔진 가동...")
     try:
         import re
         from bs4 import BeautifulSoup
@@ -270,9 +270,9 @@ def get_kr_buffett_indicator():
         
         total_cap_billion = 0
         gdp_billion = 0
-
+        
         # ==========================================
-        # 1. 시가총액 (네이버 금융 차단 우회 엔진)
+        # 1. 시가총액 (네이버 금융 이중 레이어 파싱 엔진)
         # ==========================================
         print("      ▶️ [시가총액] 네이버 금융에서 코스피/코스닥 시총 수집 중...")
         try:
@@ -282,26 +282,43 @@ def get_kr_buffett_indicator():
             for m_name, m_code in markets.items():
                 url = f"https://finance.naver.com/sise/sise_index.naver?code={m_code}"
                 res = requests.get(url, headers=headers)
+                html_text = res.content.decode('euc-kr', errors='ignore')
                 
-                # 네이버 금융은 EUC-KR 인코딩을 사용하므로 변환 처리
-                soup = BeautifulSoup(res.content.decode('euc-kr', errors='ignore'), 'html.parser')
+                cap_text = ""
                 
-                # '시가총액' 텍스트를 포함하는 <th> 태그 탐색 후 옆의 <td> 값 추출
-                th_element = soup.find('th', string=re.compile('시가총액'))
-                if th_element:
-                    td_element = th_element.find_next('td')
-                    cap_text = td_element.get_text(strip=True).replace(',', '').replace(' ', '')
+                # [레이어 1] BeautifulSoup 전역 문자열 탐색 및 트리 역추적
+                soup = BeautifulSoup(html_text, 'html.parser')
+                text_node = soup.find(string=re.compile('시가총액'))
+                if text_node:
+                    parent_tr = text_node.find_parent('tr')
+                    if parent_tr:
+                        td_element = parent_tr.find('td')
+                        if td_element:
+                            cap_text = td_element.get_text(strip=True)
+                
+                # [레이어 2] 태그 구조가 완전히 바뀌었을 때를 대비한 백업 정규식 파싱
+                if not cap_text:
+                    raw_match = re.search(r'시가총액.*?<\s*td[^>]*>(.*?)<\s*/td>', html_text, re.DOTALL | re.IGNORECASE)
+                    if raw_match:
+                        cap_text = raw_match.group(1).strip()
+                
+                # 데이터 정제 및 조/억 단위 결합 연산
+                if cap_text:
+                    cap_text = cap_text.replace(',', '') # 쉼표 제거
                     
-                    # "X조Y억원" 형태에서 숫자 추출 (예: 2145조7800억원)
-                    match = re.search(r'(?:(\d+)조)?(?:(\d+)억원)?', cap_text)
-                    if match:
-                        jo = int(match.group(1)) if match.group(1) else 0
-                        uk = int(match.group(2)) if match.group(2) else 0
-                        
-                        # 1조원 = 1,000십억원 / 1억원 = 0.1십억원 계산 후 합산
-                        market_cap_billion = (jo * 1000) + (uk / 10)
-                        total_cap_billion += market_cap_billion
-                        print(f"      - [네이버] {m_name} 시가총액: {market_cap_billion:,.1f} 십억원")
+                    # '조'와 '억' 뒤의 숫자를 독립적으로 안전하게 추출
+                    jo_match = re.search(r'(\d+)\s*조', cap_text)
+                    uk_match = re.search(r'(\d+)\s*억', cap_text)
+                    
+                    jo = int(jo_match.group(1)) if jo_match else 0
+                    uk = int(uk_match.group(1)) if uk_match else 0
+                    
+                    # 1조원 = 1,000십억원 / 1억원 = 0.1십억원 단위 환산
+                    market_cap_billion = (jo * 1000) + (uk / 10)
+                    total_cap_billion += market_cap_billion
+                    print(f"      - [네이버] {m_name} 시가총액: {market_cap_billion:,.1f} 십억원")
+                else:
+                    print(f"      ⚠️ [네이버] {m_name} 시가총액 파싱 요소를 찾지 못했습니다.")
             
             print(f"      - [합산 완료] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
                         
