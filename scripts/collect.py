@@ -36,44 +36,78 @@ def get_yfinance_indicators():
 # ──────────────────────────────────────────────
 def get_high_yield_spread():
     hy_spread = None
+    series_id = "BAMLH0A0HYM2"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    import time
+
     print("\n   ▶️ [High Yield] FRED 접속 중...")
 
-    # 💡 핵심 수정: HTML 페이지(series/...) 직접 크롤링은 클라우드(GitHub Actions) IP에서
-    # 응답 지연/차단이 잦아 불안정함. FRED가 공식 제공하는 fredgraph.csv
-    # 엔드포인트(이 파일의 버핏지수 계산 로직에서도 이미 사용 중)는
-    # 순수 텍스트 응답이라 훨씬 빠르고 안정적이라 1순위로 사용.
-    series_id = "BAMLH0A0HYM2"
-    csv_url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-
-    import time
-    for attempt in range(3):
+    # ==========================================
+    # 💡 [1순위] FRED 공식 API (api.stlouisfed.org)
+    # fred.stlouisfed.org(웹페이지/그래프 도메인)와는 별개의 서브도메인이라
+    # 해당 도메인이 클라우드 IP에서 지연/차단되더라도 영향받지 않을 가능성이 높음.
+    # API 키는 무료 발급, GitHub Secrets에 FRED_API_KEY로 등록해서 사용.
+    # ==========================================
+    api_key = os.environ.get("FRED_API_KEY")
+    if api_key:
         try:
-            resp = requests.get(csv_url, headers=headers, timeout=15)
+            api_url = "https://api.stlouisfed.org/fred/series/observations"
+            params = {
+                "series_id": series_id,
+                "api_key": api_key,
+                "file_type": "json",
+                "sort_order": "desc",
+                "limit": 5,  # 최근 결측치(.)가 있을 수도 있으니 여유롭게 5개 조회
+            }
+            resp = requests.get(api_url, params=params, headers=headers, timeout=15)
             if resp.status_code == 200:
-                lines = [line.strip() for line in resp.text.splitlines() if line.strip()]
-                # 헤더(DATE,...) 제외, 끝에서부터 결측치(".")가 아닌 최신값 탐색
-                for line in reversed(lines):
-                    if line.startswith("DATE"):
-                        continue
-                    parts = line.split(",")
-                    if len(parts) == 2 and parts[1] != ".":
-                        hy_spread = round(float(parts[1]), 2)
-                        print(f"      ✅ [1순위/CSV] 하이일드 스프레드: {hy_spread}% (기준일: {parts[0]})")
+                data = resp.json()
+                for obs in data.get("observations", []):
+                    if obs.get("value") not in (None, ".", ""):
+                        hy_spread = round(float(obs["value"]), 2)
+                        print(f"      ✅ [1순위/공식API] 하이일드 스프레드: {hy_spread}% (기준일: {obs['date']})")
                         break
-                if hy_spread is not None:
-                    break
             else:
-                print(f"      ⚠️ FRED CSV 응답코드 {resp.status_code} (재시도 {attempt+1}/3)...")
-        except requests.exceptions.ReadTimeout:
-            print(f"      ⚠️ FRED 응답 지연 (재시도 {attempt+1}/3)...")
+                print(f"      ⚠️ FRED 공식 API 응답코드 {resp.status_code}: {resp.text[:200]}")
         except Exception as e:
-            print(f"      ⚠️ FRED CSV 통신 에러: {e}")
-        time.sleep(2)
+            print(f"      ⚠️ FRED 공식 API 호출 실패: {e}")
+    else:
+        print("      ⚠️ FRED_API_KEY 환경변수가 없어 공식 API를 건너뜁니다.")
 
-    # 💡 2순위: CSV 엔드포인트마저 실패할 경우를 대비한 폴백 (HTML 페이지 1회만 시도, 짧은 타임아웃)
+    # ==========================================
+    # 💡 [2순위] fredgraph.csv (API 키 불필요, 그래프 도메인 접속)
+    # ==========================================
     if hy_spread is None:
-        print("      ▶️ [2순위] FRED 시리즈 페이지(HTML) 폴백 시도...")
+        print("      ▶️ [2순위] fredgraph.csv 시도...")
+        csv_url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+        for attempt in range(3):
+            try:
+                resp = requests.get(csv_url, headers=headers, timeout=15)
+                if resp.status_code == 200:
+                    lines = [line.strip() for line in resp.text.splitlines() if line.strip()]
+                    for line in reversed(lines):
+                        if line.startswith("DATE"):
+                            continue
+                        parts = line.split(",")
+                        if len(parts) == 2 and parts[1] != ".":
+                            hy_spread = round(float(parts[1]), 2)
+                            print(f"      ✅ [2순위/CSV] 하이일드 스프레드: {hy_spread}% (기준일: {parts[0]})")
+                            break
+                    if hy_spread is not None:
+                        break
+                else:
+                    print(f"      ⚠️ FRED CSV 응답코드 {resp.status_code} (재시도 {attempt+1}/3)...")
+            except requests.exceptions.ReadTimeout:
+                print(f"      ⚠️ FRED 응답 지연 (재시도 {attempt+1}/3)...")
+            except Exception as e:
+                print(f"      ⚠️ FRED CSV 통신 에러: {e}")
+            time.sleep(2)
+
+    # ==========================================
+    # 💡 [3순위] HTML 시리즈 페이지 폴백 (1회, 짧은 타임아웃)
+    # ==========================================
+    if hy_spread is None:
+        print("      ▶️ [3순위] FRED 시리즈 페이지(HTML) 폴백 시도...")
         try:
             html_url = f"https://fred.stlouisfed.org/series/{series_id}"
             resp = requests.get(html_url, headers=headers, timeout=10)
@@ -82,7 +116,7 @@ def get_high_yield_spread():
                 val_span = soup.find('span', class_='series-meta-observation-value')
                 if val_span:
                     hy_spread = float(val_span.text.strip())
-                    print(f"      ✅ [2순위/HTML] 하이일드 스프레드: {hy_spread}%")
+                    print(f"      ✅ [3순위/HTML] 하이일드 스프레드: {hy_spread}%")
         except Exception as e:
             print(f"      ⚠️ HTML 폴백 실패: {e}")
 
