@@ -7,3 +7,4 @@ lxml
 tqdm
 beautifulsoup4
 cloudscraper
+pykrx
