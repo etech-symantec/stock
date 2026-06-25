@@ -262,50 +262,51 @@ def get_us_buffett_indicator():
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] 한국은행 ECOS(GDP) + PyKrx API(시가총액) 하이브리드 엔진 가동...")
+    print("\n   ▶️ [한국 버핏지수] 한국은행 ECOS(GDP) + 네이버 금융(시가총액) 하이브리드 엔진 가동...")
     try:
         import re
-        import time
+        from bs4 import BeautifulSoup
         from playwright.sync_api import sync_playwright
         
         total_cap_billion = 0
         gdp_billion = 0
 
         # ==========================================
-        # 1. 시가총액 (KRX) - PyKrx 라이브러리 (API 통신)
+        # 1. 시가총액 (네이버 금융 차단 우회 엔진)
         # ==========================================
-        print("      ▶️ [1순위/API] PyKrx 라이브러리를 통해 시가총액 데이터 호출 중...")
+        print("      ▶️ [시가총액] 네이버 금융에서 코스피/코스닥 시총 수집 중...")
         try:
-            from pykrx import stock
-            from datetime import datetime, timedelta
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+            markets = {"KOSPI": "KOSPI", "KOSDAQ": "KOSDAQ"}
             
-            target_date = datetime.today()
-            df_kospi = stock.get_market_cap(target_date.strftime("%Y%m%d"), market="KOSPI")
+            for m_name, m_code in markets.items():
+                url = f"https://finance.naver.com/sise/sise_index.naver?code={m_code}"
+                res = requests.get(url, headers=headers)
+                
+                # 네이버 금융은 EUC-KR 인코딩을 사용하므로 변환 처리
+                soup = BeautifulSoup(res.content.decode('euc-kr', errors='ignore'), 'html.parser')
+                
+                # '시가총액' 텍스트를 포함하는 <th> 태그 탐색 후 옆의 <td> 값 추출
+                th_element = soup.find('th', string=re.compile('시가총액'))
+                if th_element:
+                    td_element = th_element.find_next('td')
+                    cap_text = td_element.get_text(strip=True).replace(',', '').replace(' ', '')
+                    
+                    # "X조Y억원" 형태에서 숫자 추출 (예: 2145조7800억원)
+                    match = re.search(r'(?:(\d+)조)?(?:(\d+)억원)?', cap_text)
+                    if match:
+                        jo = int(match.group(1)) if match.group(1) else 0
+                        uk = int(match.group(2)) if match.group(2) else 0
+                        
+                        # 1조원 = 1,000십억원 / 1억원 = 0.1십억원 계산 후 합산
+                        market_cap_billion = (jo * 1000) + (uk / 10)
+                        total_cap_billion += market_cap_billion
+                        print(f"      - [네이버] {m_name} 시가총액: {market_cap_billion:,.1f} 십억원")
             
-            # 주말/공휴일 또는 장 시작 전이라 데이터가 비어있다면 최근 7일 내 최신 영업일 탐색
-            days_subtracted = 0
-            while df_kospi.empty and days_subtracted < 7:
-                days_subtracted += 1
-                target_date -= timedelta(days=1)
-                df_kospi = stock.get_market_cap(target_date.strftime("%Y%m%d"), market="KOSPI")
-                
-            if not df_kospi.empty:
-                df_kosdaq = stock.get_market_cap(target_date.strftime("%Y%m%d"), market="KOSDAQ")
-                
-                # 코스피 + 코스닥 전체 시총 합산 후 십억원 단위로 변환
-                kospi_cap = df_kospi['시가총액'].sum()
-                kosdaq_cap = df_kosdaq['시가총액'].sum()
-                total_cap_billion = (kospi_cap + kosdaq_cap) / 1_000_000_000
-                
-                biz_date_str = target_date.strftime("%Y-%m-%d")
-                print(f"      - [PyKrx] 한국 전체 시가총액 (코스피+코스닥): {total_cap_billion:,.0f} 십억원 ({biz_date_str} 기준)")
-            else:
-                print("      ⚠️ PyKrx 시가총액 데이터를 찾을 수 없습니다. (최근 영업일 탐색 실패)")
-                
-        except ImportError:
-            print("      ⚠️ pykrx 패키지가 설치되어 있지 않습니다. (pip install pykrx 실행 필요)")
+            print(f"      - [합산 완료] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
+                        
         except Exception as e:
-            print(f"      ⚠️ PyKrx API 호출 실패: {e}")
+            print(f"      ⚠️ 네이버 금융 시가총액 수집 실패: {e}")
         
         # ==========================================
         # 2. 명목 GDP - 한국은행 ECOS (기존 Playwright 유지)
@@ -344,7 +345,7 @@ def get_kr_buffett_indicator():
         # ==========================================
         if total_cap_billion > 0 and gdp_billion > 0:
             kr_val = round((total_cap_billion / gdp_billion) * 100, 1)
-            print(f"      ✅ [계산 완료] 한국 버핏 지수: ({total_cap_billion:,.0f} / {gdp_billion:,.0f}) * 100 = {kr_val}%")
+            print(f"      ✅ [계산 완료] 한국 버핏 지수: ({total_cap_billion:,.1f} / {gdp_billion:,.1f}) * 100 = {kr_val}%")
         else:
             print("      ⚠️ 수집된 데이터가 부족하여 연산을 수행할 수 없습니다.")
 
