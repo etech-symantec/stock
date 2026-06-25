@@ -37,38 +37,58 @@ def get_yfinance_indicators():
 def get_high_yield_spread():
     hy_spread = None
     print("\n   ▶️ [High Yield] FRED 접속 중...")
-    try:
-        import requests
-        from bs4 import BeautifulSoup
-        import time
-        
-        url = "https://fred.stlouisfed.org/series/BAMLH0A0HYM2"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        
-        # 💡 핵심 수정: 타임아웃을 30초로 늘리고, 서버 지연 시 최대 3번까지 재시도하는 강력한 로직 추가
-        for attempt in range(3):
-            try:
-                resp = requests.get(url, headers=headers, timeout=30)
-                if resp.status_code == 200:
-                    soup = BeautifulSoup(resp.text, 'html.parser')
-                    val_span = soup.find('span', class_='series-meta-observation-value')
-                    if val_span:
-                        hy_spread = float(val_span.text.strip())
-                        print(f"      ✅ [수집 완료] 하이일드 스프레드: {hy_spread}%")
-                        break # 성공 시 반복문 즉시 탈출
-            except requests.exceptions.ReadTimeout:
-                print(f"      ⚠️ FRED 응답 지연 (재시도 {attempt+1}/3)...")
-                time.sleep(2)
-            except Exception as e:
-                print(f"      ⚠️ FRED 통신 에러: {e}")
-                break
-                
-    except Exception as e:
-        print(f"      ⚠️ 하이일드 수집 오류: {e}")
-        
+
+    # 💡 핵심 수정: HTML 페이지(series/...) 직접 크롤링은 클라우드(GitHub Actions) IP에서
+    # 응답 지연/차단이 잦아 불안정함. FRED가 공식 제공하는 fredgraph.csv
+    # 엔드포인트(이 파일의 버핏지수 계산 로직에서도 이미 사용 중)는
+    # 순수 텍스트 응답이라 훨씬 빠르고 안정적이라 1순위로 사용.
+    series_id = "BAMLH0A0HYM2"
+    csv_url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
+    import time
+    for attempt in range(3):
+        try:
+            resp = requests.get(csv_url, headers=headers, timeout=15)
+            if resp.status_code == 200:
+                lines = [line.strip() for line in resp.text.splitlines() if line.strip()]
+                # 헤더(DATE,...) 제외, 끝에서부터 결측치(".")가 아닌 최신값 탐색
+                for line in reversed(lines):
+                    if line.startswith("DATE"):
+                        continue
+                    parts = line.split(",")
+                    if len(parts) == 2 and parts[1] != ".":
+                        hy_spread = round(float(parts[1]), 2)
+                        print(f"      ✅ [1순위/CSV] 하이일드 스프레드: {hy_spread}% (기준일: {parts[0]})")
+                        break
+                if hy_spread is not None:
+                    break
+            else:
+                print(f"      ⚠️ FRED CSV 응답코드 {resp.status_code} (재시도 {attempt+1}/3)...")
+        except requests.exceptions.ReadTimeout:
+            print(f"      ⚠️ FRED 응답 지연 (재시도 {attempt+1}/3)...")
+        except Exception as e:
+            print(f"      ⚠️ FRED CSV 통신 에러: {e}")
+        time.sleep(2)
+
+    # 💡 2순위: CSV 엔드포인트마저 실패할 경우를 대비한 폴백 (HTML 페이지 1회만 시도, 짧은 타임아웃)
+    if hy_spread is None:
+        print("      ▶️ [2순위] FRED 시리즈 페이지(HTML) 폴백 시도...")
+        try:
+            html_url = f"https://fred.stlouisfed.org/series/{series_id}"
+            resp = requests.get(html_url, headers=headers, timeout=10)
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                val_span = soup.find('span', class_='series-meta-observation-value')
+                if val_span:
+                    hy_spread = float(val_span.text.strip())
+                    print(f"      ✅ [2순위/HTML] 하이일드 스프레드: {hy_spread}%")
+        except Exception as e:
+            print(f"      ⚠️ HTML 폴백 실패: {e}")
+
     if hy_spread is None:
         print("      ❌ 하이일드 스프레드를 수집하지 못했습니다. N/A로 기록됩니다.")
-        
+
     return hy_spread
 
 # ──────────────────────────────────────────────
