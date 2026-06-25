@@ -262,7 +262,7 @@ def get_us_buffett_indicator():
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] 한국은행 ECOS(GDP) + KRX(시가총액) 하이브리드 엔진 가동...")
+    print("\n   ▶️ [한국 버핏지수] 한국은행 ECOS(GDP) + PyKrx API(시가총액) 하이브리드 엔진 가동...")
     try:
         import re
         import time
@@ -270,35 +270,65 @@ def get_kr_buffett_indicator():
         
         total_cap_billion = 0
         gdp_billion = 0
+
+        # ==========================================
+        # 1. 시가총액 (KRX) - PyKrx 라이브러리 (API 통신)
+        # ==========================================
+        print("      ▶️ [1순위/API] PyKrx 라이브러리를 통해 시가총액 데이터 호출 중...")
+        try:
+            from pykrx import stock
+            from datetime import datetime, timedelta
+            
+            target_date = datetime.today()
+            df_kospi = stock.get_market_cap(target_date.strftime("%Y%m%d"), market="KOSPI")
+            
+            # 주말/공휴일 또는 장 시작 전이라 데이터가 비어있다면 최근 7일 내 최신 영업일 탐색
+            days_subtracted = 0
+            while df_kospi.empty and days_subtracted < 7:
+                days_subtracted += 1
+                target_date -= timedelta(days=1)
+                df_kospi = stock.get_market_cap(target_date.strftime("%Y%m%d"), market="KOSPI")
+                
+            if not df_kospi.empty:
+                df_kosdaq = stock.get_market_cap(target_date.strftime("%Y%m%d"), market="KOSDAQ")
+                
+                # 코스피 + 코스닥 전체 시총 합산 후 십억원 단위로 변환
+                kospi_cap = df_kospi['시가총액'].sum()
+                kosdaq_cap = df_kosdaq['시가총액'].sum()
+                total_cap_billion = (kospi_cap + kosdaq_cap) / 1_000_000_000
+                
+                biz_date_str = target_date.strftime("%Y-%m-%d")
+                print(f"      - [PyKrx] 한국 전체 시가총액 (코스피+코스닥): {total_cap_billion:,.0f} 십억원 ({biz_date_str} 기준)")
+            else:
+                print("      ⚠️ PyKrx 시가총액 데이터를 찾을 수 없습니다. (최근 영업일 탐색 실패)")
+                
+        except ImportError:
+            print("      ⚠️ pykrx 패키지가 설치되어 있지 않습니다. (pip install pykrx 실행 필요)")
+        except Exception as e:
+            print(f"      ⚠️ PyKrx API 호출 실패: {e}")
         
+        # ==========================================
+        # 2. 명목 GDP - 한국은행 ECOS (기존 Playwright 유지)
+        # ==========================================
+        print("      ▶️ 한국은행 ECOS 100대 통계 접속 중...")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             )
             context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
             page = context.new_page()
 
-            # ==========================================
-            # 1. 한국은행 ECOS - 명목 GDP 수집
-            # ==========================================
-            print("      ▶️ 한국은행 ECOS 100대 통계 접속 중...")
             try:
                 page.goto("https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100", timeout=40000)
-                
-                # 'GDP(명목, 계절조정)' 텍스트가 화면에 나타날 때까지 대기
                 page.wait_for_selector("text=GDP(명목, 계절조정)", state="attached", timeout=20000)
                 page.wait_for_timeout(2000) 
                 
                 html_ecos = page.content()
-                
-                # 💡 사용자 제공 HTML 기반 초정밀 정규식
-                # <span class="listTit">GDP(명목, 계절조정)</span><span class="result">690,599.9 십억원</span>
                 m_gdp = re.search(r"GDP\(명목,\s*계절조정\)</span>\s*<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)", html_ecos, re.IGNORECASE)
                 
                 if m_gdp:
                     quarterly_gdp = float(m_gdp.group(1).replace(',', ''))
-                    # ECOS 100대 통계의 GDP는 '분기' 기준이므로, 연간 버핏지수 산출을 위해 4를 곱해 연환산(Annualized) 수행
                     gdp_billion = quarterly_gdp * 4
                     print(f"      - [ECOS] 분기 명목 GDP: {quarterly_gdp:,.1f} 십억원")
                     print(f"      - [ECOS] 연환산(추정) 명목 GDP: {gdp_billion:,.1f} 십억원")
@@ -306,31 +336,8 @@ def get_kr_buffett_indicator():
                     print("      ⚠️ ECOS 접속은 성공했으나 GDP 데이터를 찾지 못했습니다.")
             except Exception as e:
                 print(f"      ⚠️ ECOS GDP 수집 실패: {e}")
-
-            # ==========================================
-            # 2. KRX 한국거래소 - 시가총액 수집
-            # ==========================================
-            print("      ▶️ KRX 공식 데이터 포털 접속 중...")
-            try:
-                page.goto("https://data.krx.co.kr/contents/MDC/MAIN/main/index.cmd", timeout=40000)
-                page.wait_for_selector("text=시가총액(십억원)", state="attached", timeout=20000)
-                page.wait_for_timeout(2000)
-                
-                html_krx = page.content()
-                m_cap = re.search(r"시가총액\(십억원\)[^<]*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*<\/td>", html_krx, re.IGNORECASE)
-                
-                if m_cap:
-                    kospi_val = float(m_cap.group(1).replace(',', ''))
-                    kosdaq_val = float(m_cap.group(2).replace(',', ''))
-                    total_cap_billion = kospi_val + kosdaq_val
-                    
-                    print(f"      - [KRX] 한국 전체 시가총액 (코스피+코스닥): {total_cap_billion:,.0f} 십억원")
-                else:
-                    print("      ⚠️ KRX 접속은 성공했으나 시가총액 데이터를 찾지 못했습니다.")
-            except Exception as e:
-                print(f"      ⚠️ KRX 시가총액 수집 실패: {e}")
-
-            browser.close()
+            finally:
+                browser.close()
 
         # ==========================================
         # 3. 한국 버핏 지수 공식 계산
