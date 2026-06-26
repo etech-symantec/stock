@@ -118,12 +118,27 @@
   .ind-pill { font-size: 10px; padding: 2px 8px; border-radius: 12px; border: 1px solid; font-weight: 500; letter-spacing: 0.5px; }
   .ind-desc { font-size: 13px; color: var(--txt2); line-height: 1.5; }
 
-  .ind-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 130px; }
+  .ind-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 160px; }
   .ind-val-wrap { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
   .ind-val { font-family: var(--font-hd); font-size: 26px; color: var(--txt3); line-height: 1; letter-spacing: 0.5px;}
   .ind-unit { font-size: 12px; color: var(--txt2); font-family: var(--font-num); }
   .ind-source { font-size: 11px; text-decoration: none; display: flex; align-items: center; gap: 2px; font-weight: 500; opacity: 0.8; transition: opacity 0.2s; }
   .ind-source:hover { opacity: 1; }
+
+  /* 💡 지표별 위치(낮음~높음) 게이지 바 - 더 눈에 띄게 재설계 */
+  .ind-gauge-wrap { width: 140px; margin-bottom: 8px; }
+  .ind-gauge-track {
+    position: relative; height: 10px; border-radius: 5px;
+    background: linear-gradient(90deg, #d1fae5 0%, #fef3c7 50%, #fee2e2 100%);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .ind-gauge-marker {
+    position: absolute; top: -3px; width: 4px; height: 16px; border-radius: 2px;
+    background: var(--txt3); transform: translateX(-50%);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: left .8s cubic-bezier(.22,1,.36,1);
+  }
+  .ind-gauge-labels { display: flex; justify-content: space-between; margin-top: 5px; font-size: 9px; color: var(--txt2); font-family: var(--font-num); letter-spacing: 0.3px; }
 
   /* 💡 4가지 테마 색상 (Red, Blue, Orange, Green) */
   .theme-red { border-top: 4px solid #f43f5e; }
@@ -373,6 +388,7 @@ function renderCards(latest) {
       const rawVal = latest[meta.key];
       let displayVal = 'N/A';
       let sig = { label: '-', color: 'var(--txt2)', border: 'var(--border)' };
+      let gaugePct = 50; // 데이터 없을 때 기본값(중앙)
 
       if (rawVal && rawVal !== 'N/A') {
           const num = parseFloat(rawVal.toString().split('(')[0]); 
@@ -384,9 +400,12 @@ function renderCards(latest) {
               if(rawVal.includes('(')) displayVal = rawVal; 
               
               const [min, max] = meta.range;
-              let pct = Math.min(Math.max((num - min) / (max - min) * 100, 0), 100);
-              if (meta.inverse) pct = 100 - pct;
-              sig = getValuationSignal(pct);
+              // 💡 위치(%) = 역사적 range 안에서 실제 값이 차지하는 위치 (왼쪽=낮음, 오른쪽=높음)
+              gaugePct = Math.min(Math.max((num - min) / (max - min) * 100, 0), 100);
+              // 💡 시그널 판단도 동일한 위치값을 그대로 사용합니다.
+              //    inverse 지표(VIX, MOVE, 하이일드, 환율 등)는 이미 range 자체가
+              //    "낮을수록 안정적" 방향으로 설정되어 있으므로 별도 반전이 필요 없습니다.
+              sig = getValuationSignal(gaugePct);
           } else {
               displayVal = rawVal;
           }
@@ -406,6 +425,16 @@ function renderCards(latest) {
             <div class="ind-val-wrap">
               <span class="ind-val">${displayVal}</span>
               <span class="ind-unit">${meta.unit} <span style="opacity:0.45; font-size:10px; margin-left:4px; letter-spacing:0px;">(${meta.freq})</span></span>
+            </div>
+            <div class="ind-gauge-wrap">
+              <div class="ind-gauge-track">
+                <div class="ind-gauge-marker" style="left:${gaugePct}%;"></div>
+              </div>
+              <div class="ind-gauge-labels">
+                <span>낮음</span>
+                <span style="color:${sig.color}; font-weight:600;">${rawVal && rawVal !== 'N/A' ? Math.round(gaugePct) + '%' : '—'}</span>
+                <span>높음</span>
+              </div>
             </div>
             <a href="${meta.link}" target="_blank" class="ind-source">${meta.sourceName} ↗</a>
           </div>
@@ -530,10 +559,12 @@ async function init() {
     const latest = rows[rows.length - 1];
     document.getElementById('latest-date').textContent = latest.Date ?? '—';
 
-    renderHero(latest);
-    renderCards(latest);
-    renderChart(rows); 
-    renderHistory(rows);
+    // 💡 각 렌더 함수를 독립적으로 실행하여, 하나가 실패해도(예: 차트 라이브러리 로드 실패)
+    //    나머지 영역(특히 4대 지표 카드)은 정상적으로 표시되도록 분리합니다.
+    try { renderHero(latest); } catch (e) { console.error('renderHero 실패:', e); }
+    try { renderCards(latest); } catch (e) { console.error('renderCards 실패:', e); }
+    try { renderChart(rows); } catch (e) { console.error('renderChart 실패:', e); }
+    try { renderHistory(rows); } catch (e) { console.error('renderHistory 실패:', e); }
 
   } catch (e) {
     console.error(e);
