@@ -553,7 +553,7 @@ def get_kr_buffett_indicator(ecos_api_key=None, include_konex=True):
         print("      ▶️ [시가총액] KRX 메인 HTML 수집 시도 중...")
 
         try:
-            total_cap_billion = _fetch_cap_krx_main_html()
+            total_cap_billion = _fetch_cap_krx_main_playwright()
         except Exception as e:
             print(f"      ❌ KRX 시가총액 수집 실패: {e}")
 
