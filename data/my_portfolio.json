@@ -9622,9 +9622,19 @@
       "qty": 0,
       "price": 1.496,
       "txType": "dividend"
+    },
+    {
+      "id": 1782457030438,
+      "date": "2026-06-26",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "NVDA",
+      "qty": 0,
+      "price": 2.5245,
+      "txType": "dividend"
     }
   ],
-  "range": "3m",
+  "range": "1m",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
