@@ -43,48 +43,56 @@
   }
   .wrapper { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 80px; }
   header {
-    display: flex; align-items: flex-end; justify-content: space-between; padding: 48px 0 36px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-end; justify-content: space-between; padding: 24px 0 18px; border-bottom: 1px solid var(--border);
   }
   .logo-area h1 {
-    font-family: var(--font-hd); font-size: clamp(36px, 6vw, 64px); letter-spacing: 3px; line-height: 1;
+    font-family: var(--font-hd); font-size: clamp(22px, 3vw, 32px); letter-spacing: 2px; line-height: 1;
     background: linear-gradient(135deg, #1e293b 30%, var(--buy) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
-  .logo-area p { margin-top: 8px; font-family: var(--font-num); font-size: 11px; letter-spacing: 2px; color: var(--txt2); text-transform: uppercase; }
-  .meta { text-align: right; font-family: var(--font-num); font-size: 12px; color: var(--txt2); }
-  .meta .date-val { display: block; font-size: 22px; font-weight: 500; color: var(--txt3); letter-spacing: 1px; }
-  
+  .logo-area p { margin-top: 4px; font-family: var(--font-num); font-size: 10px; letter-spacing: 1.5px; color: var(--txt2); text-transform: uppercase; }
+  .meta { text-align: right; font-family: var(--font-num); font-size: 11px; color: var(--txt2); }
+  .meta .date-val { display: block; font-size: 16px; font-weight: 500; color: var(--txt3); letter-spacing: 0.5px; }
+
+  /* ── 💡 통합 점수(좌) + 차트(우) 한 행 배치 ── */
+  .top-section {
+    margin: 20px 0 28px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: stretch; height: 320px;
+  }
+  @media (max-width: 900px) { .top-section { grid-template-columns: 1fr; height: auto; } .chart-container { height: 280px; } }
+
   .hero {
-    margin: 40px 0 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 40px 48px;
-    display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; position: relative; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px;
+    display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;
   }
   .hero::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, transparent, var(--buy), transparent);
   }
-  .hero-label { font-family: var(--font-num); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--txt2); margin-bottom: 12px; }
-  .hero-score { font-family: var(--font-hd); font-size: clamp(72px, 10vw, 120px); line-height: 1; letter-spacing: -1px; transition: color .5s; }
-  .sub-scores { display: flex; gap: 16px; margin-top: 16px; font-family: var(--font-num); font-size: 12px; color: var(--txt2); }
-  .sub-scores div { background: var(--card); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-  .sub-scores strong { color: var(--txt3); font-size: 14px; margin-left: 6px; }
-  .hero-sub { margin-top: 16px; font-size: 14px; color: var(--txt2); max-width: 480px; line-height: 1.7; }
+  .hero-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .hero-label { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); margin-bottom: 4px; }
+  .hero-score { font-family: var(--font-hd); font-size: 52px; line-height: 1; letter-spacing: -1px; transition: color .5s; }
+  .sub-scores { display: flex; gap: 8px; margin-top: 10px; font-family: var(--font-num); font-size: 10px; color: var(--txt2); }
+  .sub-scores div { background: var(--card); border: 1px solid var(--border); padding: 5px 9px; border-radius: 7px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+  .sub-scores strong { color: var(--txt3); font-size: 12px; margin-left: 4px; }
+  .hero-sub { margin-top: 10px; font-size: 12px; color: var(--txt2); line-height: 1.5; }
   .hero-sub strong { color: var(--txt3); }
   .signal-badge {
-    padding: 8px 20px; border-radius: 40px; font-family: var(--font-num); font-size: 13px; font-weight: 500;
-    letter-spacing: 2px; text-transform: uppercase; border: 1px solid; white-space: nowrap; align-self: flex-start;
+    padding: 5px 14px; border-radius: 30px; font-family: var(--font-num); font-size: 11px; font-weight: 500;
+    letter-spacing: 1.5px; text-transform: uppercase; border: 1px solid; white-space: nowrap;
   }
-  .gauge-wrap { margin-top: 28px; }
-  .gauge-track { height: 6px; border-radius: 3px; background: var(--border); position: relative; overflow: hidden; }
+  .gauge-wrap { margin-top: 16px; max-width: none !important; }
+  .gauge-track { height: 5px; border-radius: 3px; background: var(--border); position: relative; overflow: hidden; }
   .gauge-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--buy), var(--warn), var(--sell)); transition: width 1.2s cubic-bezier(.22,1,.36,1); }
-  .gauge-labels { display: flex; justify-content: space-between; margin-top: 8px; font-family: var(--font-num); font-size: 10px; color: var(--txt2); letter-spacing: 1px; }
+  .gauge-labels { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--font-num); font-size: 9px; color: var(--txt2); letter-spacing: 0.5px; }
   
   .section-title { font-family: var(--font-num); font-size: 11px; font-weight: 600; letter-spacing: 2px; color: var(--txt3); margin: 56px 0 24px; display: flex; align-items: center; gap: 12px; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   
   .chart-container {
-    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-    padding: 24px; height: 500px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,.03);
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.03); display: flex; flex-direction: column; min-height: 0;
   }
+  .chart-container canvas { flex: 1; min-height: 0; }
 
   /* ── 💡 4대 지표 패널 레이아웃 (스크린샷 기반) ── */
   .category-grid {
@@ -201,36 +209,38 @@
     </div>
   </header>
 
-  <div class="hero fade-up" style="animation-delay: 0.1s">
-    <div>
-      <p class="hero-label">// 통합 밸류에이션 점수 (0~100)</p>
-      <div class="hero-score" id="hero-score">—</div>
-      
+  <div class="top-section">
+    <div class="hero fade-up" style="animation-delay: 0.1s">
+      <div class="hero-top-row">
+        <div>
+          <p class="hero-label">// 통합 밸류에이션 점수 (0~100)</p>
+          <div class="hero-score" id="hero-score">—</div>
+        </div>
+        <div class="signal-badge" id="signal-badge" style="color:var(--txt2); border-color:var(--border)">LOADING</div>
+      </div>
+
       <div class="sub-scores">
-        <div>일간 심리/수급 (30%) <strong id="daily-score">—</strong></div>
-        <div>월간 펀더멘털 (70%) <strong id="monthly-score">—</strong></div>
+        <div>일간 (30%) <strong id="daily-score">—</strong></div>
+        <div>월간 (70%) <strong id="monthly-score">—</strong></div>
       </div>
 
       <p class="hero-sub" id="hero-desc">데이터를 불러오는 중...</p>
-      <div class="gauge-wrap" style="max-width:480px">
+      <div class="gauge-wrap">
         <div class="gauge-track">
           <div class="gauge-fill" id="hero-gauge" style="width:0%"></div>
         </div>
         <div class="gauge-labels">
-          <span>0 · 적극 매수 (Undervalued)</span>
-          <span>50 · 중립 (Neutral)</span>
-          <span>100 · 적극 매도 (Overheated)</span>
+          <span>0 · 적극 매수</span>
+          <span>50 · 중립</span>
+          <span>100 · 적극 매도</span>
         </div>
       </div>
     </div>
-    <div>
-      <div class="signal-badge" id="signal-badge" style="color:var(--txt2); border-color:var(--border)">LOADING</div>
-    </div>
-  </div>
 
-  <p class="section-title fade-up">매크로 종합 트렌드 차트 (하단의 이름을 클릭하여 지표를 켜고 끌 수 있습니다)</p>
-  <div class="chart-container fade-up">
-    <canvas id="macroChart"></canvas>
+    <div class="chart-container fade-up">
+      <p style="font-family:var(--font-num); font-size:10px; letter-spacing:1px; color:var(--txt2); margin-bottom:8px;">매크로 종합 트렌드 (클릭하여 지표 켜고 끄기)</p>
+      <canvas id="macroChart"></canvas>
+    </div>
   </div>
 
   <p class="section-title fade-up">4대 지표 카테고리</p>
@@ -497,7 +507,7 @@ function renderChart(rows) {
     options: {
       responsive: true, maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { family: "'DM Sans', sans-serif", size: 11 } } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, padding: 6, font: { family: "'DM Sans', sans-serif", size: 9.5 } } } },
       scales: {
         x: { grid: { display: false } },
         y: { type: 'linear', display: true, position: 'left', grid: { color: '#f1f5f9' } },
