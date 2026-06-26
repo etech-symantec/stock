@@ -258,7 +258,7 @@ def get_us_buffett_indicator():
     return us_val
 
 # ──────────────────────────────────────────────
-# 6. 한국 버핏 지수 (KRX 직접 API + Playwright 폴백 + 한국은행 ECOS 하이브리드 엔진 v4)
+# 6. 한국 버핏 지수 (KRX HTTPS API + 네이버 직접 info 페이지 + ECOS 하이브리드 엔진 v5)
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
@@ -273,10 +273,14 @@ def get_kr_buffett_indicator():
         gdp_billion = 0
 
         # ==========================================
-        # 1-A. 시가총액 — KRX 직접 POST API (인증 불필요)
+        # 1-A. 시가총액 — KRX HTTPS API (AJAX 헤더 포함)
         # ==========================================
         def _fetch_cap_krx():
-            """KRX 데이터포털 POST API로 KOSPI/KOSDAQ 시가총액 합산 (단위: 십억원)"""
+            """
+            KRX 데이터포털 HTTPS POST API.
+            X-Requested-With 헤더 추가 및 HTTPS 엔드포인트 사용.
+            응답 단위: 백만원 → 십억원으로 환산.
+            """
             session = requests.Session()
             session.headers.update({
                 "User-Agent": (
@@ -284,63 +288,80 @@ def get_kr_buffett_indicator():
                     "AppleWebKit/537.36 (KHTML, like Gecko) "
                     "Chrome/120.0.0.0 Safari/537.36"
                 ),
-                "Referer": "http://data.krx.co.kr/",
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "Referer":          "https://data.krx.co.kr/",
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept":           "application/json, text/javascript, */*; q=0.01",
+                "Accept-Language":  "ko-KR,ko;q=0.9",
+                "Content-Type":     "application/x-www-form-urlencoded; charset=UTF-8",
             })
+
             # 세션 쿠키 사전 획득
             try:
                 session.get(
-                    "http://data.krx.co.kr/contents/MDC/STAT/standard/MDCSTAT03901",
+                    "https://data.krx.co.kr/contents/MDC/STAT/standard/MDCSTAT03901",
                     timeout=10,
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"      ⚠️ [KRX] 세션 쿠키 획득 실패(무시): {e}")
 
             markets = {"KOSPI": "STK", "KOSDAQ": "KSQ"}
-            date = datetime.today()
+            date    = datetime.today()
 
-            for _ in range(10):          # 최대 10 영업일 역순 탐색
+            for attempt in range(10):
                 date_str = date.strftime("%Y%m%d")
-                total = 0.0
-                hit = 0
+                total, hit = 0.0, 0
 
                 for name, mkt_id in markets.items():
                     payload = {
-                        "bld":          "dbms/MDC/STAT/standard/MDCSTAT03901",
-                        "locale":       "ko_KR",
-                        "mktId":        mkt_id,
-                        "trdDd":        date_str,
-                        "money":        "1",          # 응답 단위: 백만원
-                        "csvxls_isNo":  "false",
+                        "bld":         "dbms/MDC/STAT/standard/MDCSTAT03901",
+                        "locale":      "ko_KR",
+                        "mktId":       mkt_id,
+                        "trdDd":       date_str,
+                        "money":       "1",            # 응답 단위: 백만원
+                        "csvxls_isNo": "false",
                     }
                     try:
-                        res  = session.post(
-                            "http://data.krx.co.kr/comm/bldAttendant/getJsonData.cmd",
+                        res = session.post(
+                            "https://data.krx.co.kr/comm/bldAttendant/getJsonData.cmd",
                             data=payload, timeout=10,
                         )
+                        # ── 첫 번째 시도에서 응답 미리보기 출력 (디버그용) ──
+                        if attempt == 0 and name == "KOSPI":
+                            print(
+                                f"      🔍 [KRX 디버그] "
+                                f"status={res.status_code}, "
+                                f"content-type={res.headers.get('content-type','?')!r}, "
+                                f"body={res.text[:150]!r}"
+                            )
                         rows = res.json().get("OutBlock_1", [])
                         if rows:
                             cap_million = float(str(rows[0]["MKTCAP"]).replace(",", ""))
-                            cap_billion = cap_million / 1_000   # 백만원 → 십억원
-                            total += cap_billion
+                            cap_billion  = cap_million / 1_000
+                            total       += cap_billion
                             print(f"      - [KRX] {name} ({date_str}): {cap_billion:,.1f} 십억원")
                             hit += 1
                     except Exception as e:
-                        print(f"      ⚠️ [KRX] {name} 파싱 실패: {e}")
+                        if attempt == 0:
+                            print(f"      ⚠️ [KRX] {name} 파싱 실패: {e}")
 
                 if hit > 0 and total > 0:
                     return total
+
                 date -= timedelta(days=1)
 
             raise ValueError("KRX API: 10 영업일 내 유효 데이터 없음")
 
         # ==========================================
-        # 1-B. 시가총액 — Playwright + 네이버 금융 폴백
+        # 1-B. 시가총액 — Playwright + 네이버 금융 (iframe 우회)
         # ==========================================
-        def _fetch_cap_playwright():
-            """Playwright로 네이버 금융 렌더링 후 시가총액 추출 (단위: 십억원)"""
+        def _fetch_cap_playwright_naver():
+            """
+            네이버 금융 sise_index_info 페이지에 직접 접근.
+            sise_index.naver 는 iframe 구조라 탐색 실패하므로
+            iframe 내부 실제 콘텐츠 URL 을 직접 요청한다.
+            """
             markets = {"KOSPI": "KOSPI", "KOSDAQ": "KOSDAQ"}
-            total = 0.0
+            total   = 0.0
 
             with sync_playwright() as p:
                 browser = p.chromium.launch(headless=True)
@@ -351,7 +372,6 @@ def get_kr_buffett_indicator():
                         "Chrome/120.0.0.0 Safari/537.36"
                     )
                 )
-                # 이미지·폰트 차단으로 속도 향상
                 context.route(
                     "**/*",
                     lambda route: route.abort()
@@ -362,31 +382,53 @@ def get_kr_buffett_indicator():
 
                 try:
                     for name, code in markets.items():
-                        url = f"https://finance.naver.com/sise/sise_index.naver?code={code}"
-                        page.goto(url, timeout=30_000)
+                        # ★ iframe 안의 실제 통계 페이지를 직접 요청
+                        info_url = (
+                            f"https://finance.naver.com/sise/sise_index_info.naver"
+                            f"?code={code}"
+                        )
+                        page.goto(info_url, timeout=30_000, wait_until="domcontentloaded")
 
-                        # '시가총액' 텍스트가 포함된 행의 다음 <td> 대기
-                        page.wait_for_selector("text=시가총액", timeout=10_000)
-                        cap_text = page.evaluate("""() => {
-                            const rows = document.querySelectorAll('tr');
-                            for (const tr of rows) {
-                                if (tr.innerText.includes('시가총액')) {
-                                    const td = tr.querySelector('td');
-                                    if (td) return td.innerText.trim();
+                        cap_text = ""
+
+                        # ── 방법 1: DOM 탐색으로 시가총액 행 직접 추출 ──
+                        try:
+                            cap_text = page.evaluate("""() => {
+                                const rows = document.querySelectorAll('tr');
+                                for (const tr of rows) {
+                                    const th = tr.querySelector('th');
+                                    if (th && th.innerText.trim().includes('시가총액')) {
+                                        const td = tr.querySelector('td');
+                                        return td ? td.innerText.trim() : '';
+                                    }
                                 }
-                            }
-                            return '';
-                        }""")
+                                return '';
+                            }""")
+                        except Exception as e:
+                            print(f"      ⚠️ [네이버/PW] DOM 탐색 실패: {e}")
 
-                        if cap_text:
+                        # ── 방법 2: 렌더링된 전체 HTML 정규식 백업 ──
+                        if not cap_text or ('조' not in cap_text and '억' not in cap_text):
+                            try:
+                                html = page.content()
+                                m = re.search(
+                                    r'시가총액[^<]*</th>\s*<td[^>]*>(.*?)</td>',
+                                    html, re.DOTALL,
+                                )
+                                if m:
+                                    cap_text = re.sub(r'<[^>]+>', '', m.group(1)).strip()
+                            except Exception as e:
+                                print(f"      ⚠️ [네이버/PW] HTML 정규식 백업 실패: {e}")
+
+                        if cap_text and ('조' in cap_text or '억' in cap_text):
                             cap_text = cap_text.replace(",", "")
-                            jo  = int(m.group(1)) if (m := re.search(r"(\d+)\s*조",  cap_text)) else 0
-                            uk  = int(m.group(1)) if (m := re.search(r"(\d+)\s*억",  cap_text)) else 0
-                            cap = jo * 1_000 + uk / 10      # 조 → 십억원, 억 → 십억원
+                            jo  = int(g.group(1)) if (g := re.search(r"(\d+)\s*조",  cap_text)) else 0
+                            uk  = int(g.group(1)) if (g := re.search(r"(\d+)\s*억",  cap_text)) else 0
+                            cap = jo * 1_000 + uk / 10
                             total += cap
-                            print(f"      - [네이버/PW] {name}: {cap:,.1f} 십억원")
+                            print(f"      - [네이버/PW] {name}: {cap:,.1f} 십억원  (원문: {cap_text!r})")
                         else:
-                            print(f"      ⚠️ [네이버/PW] {name} 시가총액 요소 없음")
+                            print(f"      ⚠️ [네이버/PW] {name} 시가총액 없음  (cap_text={cap_text!r})")
                 finally:
                     browser.close()
 
@@ -397,14 +439,14 @@ def get_kr_buffett_indicator():
         # ==========================================
         # 1. 시가총액 수집 (KRX API → Playwright 폴백)
         # ==========================================
-        print("      ▶️ [시가총액] KRX 직접 API 시도 중...")
+        print("      ▶️ [시가총액] KRX HTTPS API 시도 중...")
         try:
             total_cap_billion = _fetch_cap_krx()
             print(f"      ✅ [KRX API] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
         except Exception as e:
             print(f"      ⚠️ KRX API 실패 ({e}), 네이버 금융 Playwright 폴백 시도...")
             try:
-                total_cap_billion = _fetch_cap_playwright()
+                total_cap_billion = _fetch_cap_playwright_naver()
                 print(f"      ✅ [네이버/PW] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
             except Exception as e2:
                 print(f"      ❌ 폴백도 실패: {e2}")
