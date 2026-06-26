@@ -258,75 +258,56 @@ def get_us_buffett_indicator():
     return us_val
 
 # ──────────────────────────────────────────────
-# 6. 한국 버핏 지수 (한국은행 ECOS + 네이버 금융 하이브리드 엔진 v2)
+# 6. 한국 버핏 지수 (pykrx + 한국은행 ECOS 하이브리드 엔진 v3)
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] ECOS(GDP) + 네이버 금융(시가총액) 엔진 가동...")
+    print("\n   ▶️ [한국 버핏지수] pykrx(시가총액) + ECOS(GDP) 엔진 가동...")
     try:
         import re
-        from bs4 import BeautifulSoup
+        from datetime import datetime, timedelta
+        from pykrx import stock
         from playwright.sync_api import sync_playwright
-        
+
         total_cap_billion = 0
         gdp_billion = 0
-        
+
         # ==========================================
-        # 1. 시가총액 (네이버 금융 이중 레이어 파싱 엔진)
+        # 1. 시가총액 (pykrx — KRX 공식 데이터 직접 수집)
         # ==========================================
-        print("      ▶️ [시가총액] 네이버 금융에서 코스피/코스닥 시총 수집 중...")
+        print("      ▶️ [시가총액] pykrx로 KOSPI/KOSDAQ 시총 수집 중...")
         try:
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
-            markets = {"KOSPI": "KOSPI", "KOSDAQ": "KOSDAQ"}
-            
-            for m_name, m_code in markets.items():
-                url = f"https://finance.naver.com/sise/sise_index.naver?code={m_code}"
-                res = requests.get(url, headers=headers)
-                html_text = res.content.decode('euc-kr', errors='ignore')
-                
-                cap_text = ""
-                
-                # [레이어 1] BeautifulSoup 전역 문자열 탐색 및 트리 역추적
-                soup = BeautifulSoup(html_text, 'html.parser')
-                text_node = soup.find(string=re.compile('시가총액'))
-                if text_node:
-                    parent_tr = text_node.find_parent('tr')
-                    if parent_tr:
-                        td_element = parent_tr.find('td')
-                        if td_element:
-                            cap_text = td_element.get_text(strip=True)
-                
-                # [레이어 2] 태그 구조가 완전히 바뀌었을 때를 대비한 백업 정규식 파싱
-                if not cap_text:
-                    raw_match = re.search(r'시가총액.*?<\s*td[^>]*>(.*?)<\s*/td>', html_text, re.DOTALL | re.IGNORECASE)
-                    if raw_match:
-                        cap_text = raw_match.group(1).strip()
-                
-                # 데이터 정제 및 조/억 단위 결합 연산
-                if cap_text:
-                    cap_text = cap_text.replace(',', '') # 쉼표 제거
-                    
-                    # '조'와 '억' 뒤의 숫자를 독립적으로 안전하게 추출
-                    jo_match = re.search(r'(\d+)\s*조', cap_text)
-                    uk_match = re.search(r'(\d+)\s*억', cap_text)
-                    
-                    jo = int(jo_match.group(1)) if jo_match else 0
-                    uk = int(uk_match.group(1)) if uk_match else 0
-                    
-                    # 1조원 = 1,000십억원 / 1억원 = 0.1십억원 단위 환산
-                    market_cap_billion = (jo * 1000) + (uk / 10)
-                    total_cap_billion += market_cap_billion
-                    print(f"      - [네이버] {m_name} 시가총액: {market_cap_billion:,.1f} 십억원")
-                else:
-                    print(f"      ⚠️ [네이버] {m_name} 시가총액 파싱 요소를 찾지 못했습니다.")
-            
-            print(f"      - [합산 완료] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
-                        
+            # 오늘부터 최대 10 영업일 전까지 역순 탐색 (공휴일·장 마감 전 대응)
+            date = datetime.today()
+            for _ in range(10):
+                date_str = date.strftime("%Y%m%d")
+                try:
+                    kospi_cap  = stock.get_market_cap(date_str, market="KOSPI")["시가총액"].sum()
+                    kosdaq_cap = stock.get_market_cap(date_str, market="KOSDAQ")["시가총액"].sum()
+
+                    if kospi_cap > 0:
+                        # 단위: 원 → 십억원
+                        total_cap_billion = (kospi_cap + kosdaq_cap) / 1e9
+                        print(f"      - [pykrx] 기준일: {date_str}")
+                        print(f"      - [pykrx] KOSPI  시가총액: {kospi_cap  / 1e12:,.2f} 조원")
+                        print(f"      - [pykrx] KOSDAQ 시가총액: {kosdaq_cap / 1e12:,.2f} 조원")
+                        print(f"      - [합산 완료] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
+                        break
+                except Exception:
+                    pass  # 해당 날짜 데이터 없음 → 하루 전으로 이동
+
+                date -= timedelta(days=1)
+
+            if total_cap_billion == 0:
+                print("      ⚠️ pykrx: 유효한 시가총액 데이터를 찾지 못했습니다.")
+
+        except ImportError:
+            print("      ⚠️ pykrx 미설치. 'pip install pykrx' 후 재실행하세요.")
         except Exception as e:
-            print(f"      ⚠️ 네이버 금융 시가총액 수집 실패: {e}")
-        
+            print(f"      ⚠️ pykrx 시가총액 수집 실패: {e}")
+
         # ==========================================
-        # 2. 명목 GDP - 한국은행 ECOS (기존 Playwright 유지)
+        # 2. 명목 GDP — 한국은행 ECOS (기존 Playwright 유지)
         # ==========================================
         print("      ▶️ 한국은행 ECOS 100대 통계 접속 중...")
         with sync_playwright() as p:
@@ -334,24 +315,34 @@ def get_kr_buffett_indicator():
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             )
-            context.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+            context.route(
+                "**/*",
+                lambda route: route.abort()
+                if route.request.resource_type in ["image", "media", "font"]
+                else route.continue_()
+            )
             page = context.new_page()
 
             try:
                 page.goto("https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100", timeout=40000)
                 page.wait_for_selector("text=GDP(명목, 계절조정)", state="attached", timeout=20000)
-                page.wait_for_timeout(2000) 
-                
+                page.wait_for_timeout(2000)
+
                 html_ecos = page.content()
-                m_gdp = re.search(r"GDP\(명목,\s*계절조정\)</span>\s*<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)", html_ecos, re.IGNORECASE)
-                
+                m_gdp = re.search(
+                    r"GDP\(명목,\s*계절조정\)</span>\s*<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)",
+                    html_ecos,
+                    re.IGNORECASE,
+                )
+
                 if m_gdp:
-                    quarterly_gdp = float(m_gdp.group(1).replace(',', ''))
-                    gdp_billion = quarterly_gdp * 4
-                    print(f"      - [ECOS] 분기 명목 GDP: {quarterly_gdp:,.1f} 십억원")
+                    quarterly_gdp = float(m_gdp.group(1).replace(",", ""))
+                    gdp_billion   = quarterly_gdp * 4
+                    print(f"      - [ECOS] 분기 명목 GDP:        {quarterly_gdp:,.1f} 십억원")
                     print(f"      - [ECOS] 연환산(추정) 명목 GDP: {gdp_billion:,.1f} 십억원")
                 else:
                     print("      ⚠️ ECOS 접속은 성공했으나 GDP 데이터를 찾지 못했습니다.")
+
             except Exception as e:
                 print(f"      ⚠️ ECOS GDP 수집 실패: {e}")
             finally:
@@ -362,7 +353,10 @@ def get_kr_buffett_indicator():
         # ==========================================
         if total_cap_billion > 0 and gdp_billion > 0:
             kr_val = round((total_cap_billion / gdp_billion) * 100, 1)
-            print(f"      ✅ [계산 완료] 한국 버핏 지수: ({total_cap_billion:,.1f} / {gdp_billion:,.1f}) * 100 = {kr_val}%")
+            print(
+                f"      ✅ [계산 완료] 한국 버핏 지수: "
+                f"({total_cap_billion:,.1f} / {gdp_billion:,.1f}) * 100 = {kr_val}%"
+            )
         else:
             print("      ⚠️ 수집된 데이터가 부족하여 연산을 수행할 수 없습니다.")
 
@@ -370,7 +364,7 @@ def get_kr_buffett_indicator():
         print(f"      ⚠️ 한국 버핏 지수 전체 연산 실패: {e}")
 
     if kr_val is None:
-         print("      ❌ 한국 버핏 지수를 수집하지 못했습니다. N/A로 기록됩니다.")
+        print("      ❌ 한국 버핏 지수를 수집하지 못했습니다. N/A로 기록됩니다.")
 
     return kr_val
 
