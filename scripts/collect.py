@@ -258,56 +258,159 @@ def get_us_buffett_indicator():
     return us_val
 
 # ──────────────────────────────────────────────
-# 6. 한국 버핏 지수 (pykrx + 한국은행 ECOS 하이브리드 엔진 v3)
+# 6. 한국 버핏 지수 (KRX 직접 API + Playwright 폴백 + 한국은행 ECOS 하이브리드 엔진 v4)
 # ──────────────────────────────────────────────
 def get_kr_buffett_indicator():
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] pykrx(시가총액) + ECOS(GDP) 엔진 가동...")
+    print("\n   ▶️ [한국 버핏지수] KRX API(시가총액) + ECOS(GDP) 엔진 가동...")
     try:
         import re
+        import requests
         from datetime import datetime, timedelta
-        from pykrx import stock
         from playwright.sync_api import sync_playwright
 
         total_cap_billion = 0
         gdp_billion = 0
 
         # ==========================================
-        # 1. 시가총액 (pykrx — KRX 공식 데이터 직접 수집)
+        # 1-A. 시가총액 — KRX 직접 POST API (인증 불필요)
         # ==========================================
-        print("      ▶️ [시가총액] pykrx로 KOSPI/KOSDAQ 시총 수집 중...")
-        try:
-            # 오늘부터 최대 10 영업일 전까지 역순 탐색 (공휴일·장 마감 전 대응)
+        def _fetch_cap_krx():
+            """KRX 데이터포털 POST API로 KOSPI/KOSDAQ 시가총액 합산 (단위: 십억원)"""
+            session = requests.Session()
+            session.headers.update({
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                ),
+                "Referer": "http://data.krx.co.kr/",
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            })
+            # 세션 쿠키 사전 획득
+            try:
+                session.get(
+                    "http://data.krx.co.kr/contents/MDC/STAT/standard/MDCSTAT03901",
+                    timeout=10,
+                )
+            except Exception:
+                pass
+
+            markets = {"KOSPI": "STK", "KOSDAQ": "KSQ"}
             date = datetime.today()
-            for _ in range(10):
+
+            for _ in range(10):          # 최대 10 영업일 역순 탐색
                 date_str = date.strftime("%Y%m%d")
-                try:
-                    kospi_cap  = stock.get_market_cap(date_str, market="KOSPI")["시가총액"].sum()
-                    kosdaq_cap = stock.get_market_cap(date_str, market="KOSDAQ")["시가총액"].sum()
+                total = 0.0
+                hit = 0
 
-                    if kospi_cap > 0:
-                        # 단위: 원 → 십억원
-                        total_cap_billion = (kospi_cap + kosdaq_cap) / 1e9
-                        print(f"      - [pykrx] 기준일: {date_str}")
-                        print(f"      - [pykrx] KOSPI  시가총액: {kospi_cap  / 1e12:,.2f} 조원")
-                        print(f"      - [pykrx] KOSDAQ 시가총액: {kosdaq_cap / 1e12:,.2f} 조원")
-                        print(f"      - [합산 완료] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
-                        break
-                except Exception:
-                    pass  # 해당 날짜 데이터 없음 → 하루 전으로 이동
+                for name, mkt_id in markets.items():
+                    payload = {
+                        "bld":          "dbms/MDC/STAT/standard/MDCSTAT03901",
+                        "locale":       "ko_KR",
+                        "mktId":        mkt_id,
+                        "trdDd":        date_str,
+                        "money":        "1",          # 응답 단위: 백만원
+                        "csvxls_isNo":  "false",
+                    }
+                    try:
+                        res  = session.post(
+                            "http://data.krx.co.kr/comm/bldAttendant/getJsonData.cmd",
+                            data=payload, timeout=10,
+                        )
+                        rows = res.json().get("OutBlock_1", [])
+                        if rows:
+                            cap_million = float(str(rows[0]["MKTCAP"]).replace(",", ""))
+                            cap_billion = cap_million / 1_000   # 백만원 → 십억원
+                            total += cap_billion
+                            print(f"      - [KRX] {name} ({date_str}): {cap_billion:,.1f} 십억원")
+                            hit += 1
+                    except Exception as e:
+                        print(f"      ⚠️ [KRX] {name} 파싱 실패: {e}")
 
+                if hit > 0 and total > 0:
+                    return total
                 date -= timedelta(days=1)
 
-            if total_cap_billion == 0:
-                print("      ⚠️ pykrx: 유효한 시가총액 데이터를 찾지 못했습니다.")
-
-        except ImportError:
-            print("      ⚠️ pykrx 미설치. 'pip install pykrx' 후 재실행하세요.")
-        except Exception as e:
-            print(f"      ⚠️ pykrx 시가총액 수집 실패: {e}")
+            raise ValueError("KRX API: 10 영업일 내 유효 데이터 없음")
 
         # ==========================================
-        # 2. 명목 GDP — 한국은행 ECOS (기존 Playwright 유지)
+        # 1-B. 시가총액 — Playwright + 네이버 금융 폴백
+        # ==========================================
+        def _fetch_cap_playwright():
+            """Playwright로 네이버 금융 렌더링 후 시가총액 추출 (단위: 십억원)"""
+            markets = {"KOSPI": "KOSPI", "KOSDAQ": "KOSDAQ"}
+            total = 0.0
+
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                context = browser.new_context(
+                    user_agent=(
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/120.0.0.0 Safari/537.36"
+                    )
+                )
+                # 이미지·폰트 차단으로 속도 향상
+                context.route(
+                    "**/*",
+                    lambda route: route.abort()
+                    if route.request.resource_type in ["image", "media", "font"]
+                    else route.continue_(),
+                )
+                page = context.new_page()
+
+                try:
+                    for name, code in markets.items():
+                        url = f"https://finance.naver.com/sise/sise_index.naver?code={code}"
+                        page.goto(url, timeout=30_000)
+
+                        # '시가총액' 텍스트가 포함된 행의 다음 <td> 대기
+                        page.wait_for_selector("text=시가총액", timeout=10_000)
+                        cap_text = page.evaluate("""() => {
+                            const rows = document.querySelectorAll('tr');
+                            for (const tr of rows) {
+                                if (tr.innerText.includes('시가총액')) {
+                                    const td = tr.querySelector('td');
+                                    if (td) return td.innerText.trim();
+                                }
+                            }
+                            return '';
+                        }""")
+
+                        if cap_text:
+                            cap_text = cap_text.replace(",", "")
+                            jo  = int(m.group(1)) if (m := re.search(r"(\d+)\s*조",  cap_text)) else 0
+                            uk  = int(m.group(1)) if (m := re.search(r"(\d+)\s*억",  cap_text)) else 0
+                            cap = jo * 1_000 + uk / 10      # 조 → 십억원, 억 → 십억원
+                            total += cap
+                            print(f"      - [네이버/PW] {name}: {cap:,.1f} 십억원")
+                        else:
+                            print(f"      ⚠️ [네이버/PW] {name} 시가총액 요소 없음")
+                finally:
+                    browser.close()
+
+            if total == 0:
+                raise ValueError("네이버 금융 Playwright: 유효 데이터 없음")
+            return total
+
+        # ==========================================
+        # 1. 시가총액 수집 (KRX API → Playwright 폴백)
+        # ==========================================
+        print("      ▶️ [시가총액] KRX 직접 API 시도 중...")
+        try:
+            total_cap_billion = _fetch_cap_krx()
+            print(f"      ✅ [KRX API] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
+        except Exception as e:
+            print(f"      ⚠️ KRX API 실패 ({e}), 네이버 금융 Playwright 폴백 시도...")
+            try:
+                total_cap_billion = _fetch_cap_playwright()
+                print(f"      ✅ [네이버/PW] 한국 전체 시가총액: {total_cap_billion:,.1f} 십억원")
+            except Exception as e2:
+                print(f"      ❌ 폴백도 실패: {e2}")
+
+        # ==========================================
+        # 2. 명목 GDP — 한국은행 ECOS (Playwright, 기존 유지)
         # ==========================================
         print("      ▶️ 한국은행 ECOS 100대 통계 접속 중...")
         with sync_playwright() as p:
@@ -319,14 +422,17 @@ def get_kr_buffett_indicator():
                 "**/*",
                 lambda route: route.abort()
                 if route.request.resource_type in ["image", "media", "font"]
-                else route.continue_()
+                else route.continue_(),
             )
             page = context.new_page()
 
             try:
-                page.goto("https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100", timeout=40000)
-                page.wait_for_selector("text=GDP(명목, 계절조정)", state="attached", timeout=20000)
-                page.wait_for_timeout(2000)
+                page.goto(
+                    "https://ecos.bok.or.kr/#/StatisticsByTheme/KoreanStat100",
+                    timeout=40_000,
+                )
+                page.wait_for_selector("text=GDP(명목, 계절조정)", state="attached", timeout=20_000)
+                page.wait_for_timeout(2_000)
 
                 html_ecos = page.content()
                 m_gdp = re.search(
@@ -334,7 +440,6 @@ def get_kr_buffett_indicator():
                     html_ecos,
                     re.IGNORECASE,
                 )
-
                 if m_gdp:
                     quarterly_gdp = float(m_gdp.group(1).replace(",", ""))
                     gdp_billion   = quarterly_gdp * 4
@@ -342,7 +447,6 @@ def get_kr_buffett_indicator():
                     print(f"      - [ECOS] 연환산(추정) 명목 GDP: {gdp_billion:,.1f} 십억원")
                 else:
                     print("      ⚠️ ECOS 접속은 성공했으나 GDP 데이터를 찾지 못했습니다.")
-
             except Exception as e:
                 print(f"      ⚠️ ECOS GDP 수집 실패: {e}")
             finally:
