@@ -258,12 +258,15 @@
     <div id="marketSignalBar" style="display:none; margin-top:0.6rem; margin-bottom:0.6rem;">
       <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:stretch;">
     
-        <!-- 종합 신호 (1줄 콤팩트) -->
-        <div style="display:flex; align-items:center; gap:8px; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:6px 12px; flex-shrink:0;">
-          <div style="font-size:14px; line-height:1;">📡</div>
-          <div style="font-size:10px; font-weight:700; color:var(--text3); letter-spacing:0.05em; white-space:nowrap;">종합 신호</div>
-          <span id="ms-score" style="font-family:var(--font-mono); font-size:16px; font-weight:800; line-height:1;">—</span>
-          <span id="ms-badge" style="padding:2px 9px; border-radius:20px; font-size:10px; font-weight:800; border:1px solid transparent; white-space:nowrap;">—</span>
+        <!-- 종합 신호 (좌: 라벨+배지 / 우: 큰 숫자) -->
+        <div style="display:flex; align-items:center; gap:10px; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:6px 10px; flex-shrink:0;">
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+            <div style="display:flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:var(--text3); letter-spacing:0.05em; white-space:nowrap; line-height:1;">
+              <span style="font-size:12px; line-height:1;">📡</span>종합 신호
+            </div>
+            <span id="ms-badge" style="padding:2px 9px; border-radius:20px; font-size:10px; font-weight:800; border:1px solid transparent; white-space:nowrap; line-height:1.3;">—</span>
+          </div>
+          <span id="ms-score" style="font-family:var(--font-mono); font-size:30px; font-weight:800; line-height:1;">—</span>
         </div>
     
         <!-- 구분선 -->
