@@ -8595,11 +8595,11 @@ async function initMarketSignalBar() {
     if (!isNaN(fg)) {
       fgEl.textContent = fg.toFixed(1);
       fgDot.style.left = clamp(fg, 2, 98) + '%';
-      let fColor = '#ff4d6a', fHint = '극단적 탐욕 🔴';
-      if (fg < 25)      { fColor = '#3A9AFF'; fHint = '극단적 공포 🟢'; }
-      else if (fg < 45) { fColor = '#4d9fff'; fHint = '공포 구간'; }
-      else if (fg < 55) { fColor = '#ffb703'; fHint = '중립'; }
-      else if (fg < 75) { fColor = '#ff9f43'; fHint = '탐욕 구간'; }
+      let fColor = 'var(--loss)', fHint = '극단적 탐욕 🔴';
+      if (fg < 25)      { fColor = 'var(--profit)'; fHint = '극단적 공포 🟢'; }
+      else if (fg < 45) { fColor = '#00c87a';        fHint = '공포 구간'; }
+      else if (fg < 55) { fColor = '#ffb703';        fHint = '중립'; }
+      else if (fg < 75) { fColor = '#ff9f43';        fHint = '탐욕 구간'; }
       fgEl.style.color = fColor;
       fgHint.textContent = fHint; fgHint.style.color = fColor;
     } else { fgEl.textContent = 'N/A'; fgHint.textContent = '데이터 없음'; }
