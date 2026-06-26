@@ -272,120 +272,131 @@
     
         <!-- 구분선 -->
         <div style="width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin:4px 0;"></div>
-    
-        <!-- ▸ 심리/리스크 -->
-        <div class="ms-indicator-card" id="ms-card-vix">
-          <div class="ms-ind-label">VIX</div>
-          <div id="ms-vix" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-vix-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-vix-hint" class="ms-ind-hint">—</div>
+
+        <!-- ▸ GROUP 1: 심리 / 리스크 -->
+        <div class="ms-group" style="display:flex; flex-direction:column; gap:6px; background:rgba(255,77,106,0.05); border:1px solid rgba(255,77,106,0.25); border-radius:12px; padding:8px 10px; flex-shrink:0;">
+          <div class="ms-group-label" style="font-size:9px; font-weight:800; letter-spacing:0.06em; color:#ff4d6a; text-transform:uppercase;">🔥 심리 · 리스크</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:stretch;">
+            <div class="ms-indicator-card" id="ms-card-vix">
+              <div class="ms-ind-label">VIX</div>
+              <div id="ms-vix" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-vix-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-vix-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-move">
+              <div class="ms-ind-label">MOVE</div>
+              <div id="ms-move" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-move-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-move-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-hy">
+              <div class="ms-ind-label">하이일드</div>
+              <div id="ms-hy" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-hy-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-hy-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-fg">
+              <div class="ms-ind-label">공포 & 탐욕</div>
+              <div id="ms-fg" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track ms-ind-gauge-rainbow"><div id="ms-fg-dot" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(0,0,0,0.5);transition:left 0.5s;left:50%;"></div></div></div>
+              <div id="ms-fg-hint" class="ms-ind-hint">—</div>
+            </div>
+          </div>
         </div>
-        <div class="ms-indicator-card" id="ms-card-move">
-          <div class="ms-ind-label">MOVE</div>
-          <div id="ms-move" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-move-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-move-hint" class="ms-ind-hint">—</div>
+
+        <!-- ▸ GROUP 2: 자금 환경 -->
+        <div class="ms-group" style="display:flex; flex-direction:column; gap:6px; background:rgba(58,154,255,0.05); border:1px solid rgba(58,154,255,0.25); border-radius:12px; padding:8px 10px; flex-shrink:0;">
+          <div class="ms-group-label" style="font-size:9px; font-weight:800; letter-spacing:0.06em; color:#3A9AFF; text-transform:uppercase;">💧 자금 환경</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:stretch;">
+            <div class="ms-indicator-card" id="ms-card-us10y">
+              <div class="ms-ind-label">미국 10Y</div>
+              <div id="ms-us10y" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-us10y-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-us10y-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-dxy">
+              <div class="ms-ind-label">DXY</div>
+              <div id="ms-dxy" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-dxy-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-dxy-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-usdkrw">
+              <div class="ms-ind-label">USD/KRW</div>
+              <div id="ms-usdkrw" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-usdkrw-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-usdkrw-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-margin-us">
+              <div class="ms-ind-label">신용잔고(미)</div>
+              <div id="ms-margin-us" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-margin-us-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-margin-us-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-margin-kr">
+              <div class="ms-ind-label">신용잔고(한)</div>
+              <div id="ms-margin-kr" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-margin-kr-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-margin-kr-hint" class="ms-ind-hint">—</div>
+            </div>
+          </div>
         </div>
-        <div class="ms-indicator-card" id="ms-card-hy">
-          <div class="ms-ind-label">하이일드</div>
-          <div id="ms-hy" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-hy-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-hy-hint" class="ms-ind-hint">—</div>
+
+        <!-- ▸ GROUP 3: 경기 선행 -->
+        <div class="ms-group" style="display:flex; flex-direction:column; gap:6px; background:rgba(255,183,3,0.05); border:1px solid rgba(255,183,3,0.25); border-radius:12px; padding:8px 10px; flex-shrink:0;">
+          <div class="ms-group-label" style="font-size:9px; font-weight:800; letter-spacing:0.06em; color:#ffb703; text-transform:uppercase;">📦 경기 선행</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:stretch;">
+            <div class="ms-indicator-card" id="ms-card-russell">
+              <div class="ms-ind-label">Russell 2000</div>
+              <div id="ms-russell" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-russell-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-russell-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-copper">
+              <div class="ms-ind-label">구리 가격</div>
+              <div id="ms-copper" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-copper-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-copper-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-bdi">
+              <div class="ms-ind-label">BDI</div>
+              <div id="ms-bdi" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-bdi-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-bdi-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-krexport">
+              <div class="ms-ind-label">한국 수출</div>
+              <div id="ms-krexport" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-krexport-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-krexport-hint" class="ms-ind-hint">—</div>
+            </div>
+          </div>
         </div>
-        <div class="ms-indicator-card" id="ms-card-fg">
-          <div class="ms-ind-label">공포 & 탐욕</div>
-          <div id="ms-fg" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track ms-ind-gauge-rainbow"><div id="ms-fg-dot" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(0,0,0,0.5);transition:left 0.5s;left:50%;"></div></div></div>
-          <div id="ms-fg-hint" class="ms-ind-hint">—</div>
+
+        <!-- ▸ GROUP 4: 밸류에이션 -->
+        <div class="ms-group" style="display:flex; flex-direction:column; gap:6px; background:rgba(0,200,122,0.05); border:1px solid rgba(0,200,122,0.25); border-radius:12px; padding:8px 10px; flex-shrink:0;">
+          <div class="ms-group-label" style="font-size:9px; font-weight:800; letter-spacing:0.06em; color:#00c87a; text-transform:uppercase;">📐 밸류에이션</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:stretch;">
+            <div class="ms-indicator-card" id="ms-card-buffett">
+              <div class="ms-ind-label">버핏 지수(미)</div>
+              <div id="ms-buffett" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-buffett-gauge" class="ms-ind-gauge-fill" style="width:50%;"><div style="position:absolute;left:60%;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,0.25);"></div></div></div></div>
+              <div id="ms-buffett-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-buffett-kr">
+              <div class="ms-ind-label">버핏 지수(한)</div>
+              <div id="ms-buffett-kr" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-buffett-kr-gauge" class="ms-ind-gauge-fill" style="width:50%;"><div style="position:absolute;left:60%;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,0.25);"></div></div></div></div>
+              <div id="ms-buffett-kr-hint" class="ms-ind-hint">—</div>
+            </div>
+            <div class="ms-indicator-card" id="ms-card-cape">
+              <div class="ms-ind-label">CAPE PE</div>
+              <div id="ms-cape" class="ms-ind-val">—</div>
+              <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-cape-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
+              <div id="ms-cape-hint" class="ms-ind-hint">—</div>
+            </div>
+          </div>
         </div>
-    
-        <!-- 그룹 구분선 -->
-        <div style="width:1px;background:var(--border);flex-shrink:0;align-self:stretch;margin:4px 0;"></div>
-    
-        <!-- ▸ 자금 환경 -->
-        <div class="ms-indicator-card" id="ms-card-us10y">
-          <div class="ms-ind-label">미국 10Y</div>
-          <div id="ms-us10y" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-us10y-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-us10y-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-dxy">
-          <div class="ms-ind-label">DXY</div>
-          <div id="ms-dxy" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-dxy-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-dxy-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-usdkrw">
-          <div class="ms-ind-label">USD/KRW</div>
-          <div id="ms-usdkrw" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-usdkrw-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-usdkrw-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-margin-us">
-          <div class="ms-ind-label">신용잔고(미)</div>
-          <div id="ms-margin-us" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-margin-us-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-margin-us-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-margin-kr">
-          <div class="ms-ind-label">신용잔고(한)</div>
-          <div id="ms-margin-kr" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-margin-kr-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-margin-kr-hint" class="ms-ind-hint">—</div>
-        </div>
-    
-        <!-- 그룹 구분선 -->
-        <div style="width:1px;background:var(--border);flex-shrink:0;align-self:stretch;margin:4px 0;"></div>
-    
-        <!-- ▸ 경기 선행 -->
-        <div class="ms-indicator-card" id="ms-card-russell">
-          <div class="ms-ind-label">Russell 2000</div>
-          <div id="ms-russell" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-russell-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-russell-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-copper">
-          <div class="ms-ind-label">구리 가격</div>
-          <div id="ms-copper" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-copper-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-copper-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-bdi">
-          <div class="ms-ind-label">BDI</div>
-          <div id="ms-bdi" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-bdi-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-bdi-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-krexport">
-          <div class="ms-ind-label">한국 수출</div>
-          <div id="ms-krexport" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-krexport-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-krexport-hint" class="ms-ind-hint">—</div>
-        </div>
-    
-        <!-- 그룹 구분선 -->
-        <div style="width:1px;background:var(--border);flex-shrink:0;align-self:stretch;margin:4px 0;"></div>
-    
-        <!-- ▸ 밸류에이션 -->
-        <div class="ms-indicator-card" id="ms-card-buffett">
-          <div class="ms-ind-label">버핏 지수(미)</div>
-          <div id="ms-buffett" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-buffett-gauge" class="ms-ind-gauge-fill" style="width:50%;"><div style="position:absolute;left:60%;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,0.25);"></div></div></div></div>
-          <div id="ms-buffett-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-buffett-kr">
-          <div class="ms-ind-label">버핏 지수(한)</div>
-          <div id="ms-buffett-kr" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-buffett-kr-gauge" class="ms-ind-gauge-fill" style="width:50%;"><div style="position:absolute;left:60%;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,0.25);"></div></div></div></div>
-          <div id="ms-buffett-kr-hint" class="ms-ind-hint">—</div>
-        </div>
-        <div class="ms-indicator-card" id="ms-card-cape">
-          <div class="ms-ind-label">CAPE PE</div>
-          <div id="ms-cape" class="ms-ind-val">—</div>
-          <div class="ms-ind-gauge-wrap"><div class="ms-ind-gauge-track"><div id="ms-cape-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
-          <div id="ms-cape-hint" class="ms-ind-hint">—</div>
-        </div>
-    
+
       </div>
     </div>
     <div id="viewHeader" class="view-header"></div>
