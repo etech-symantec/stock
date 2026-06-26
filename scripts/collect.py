@@ -259,20 +259,16 @@ def get_us_buffett_indicator():
 
 # ──────────────────────────────────────────────
 # 6. 한국 버핏 지수
-#    KRX JSON → KRX CSV OTP → 네이버 Playwright
-#    ECOS API → ECOS Playwright 하이브리드 엔진 v5
+#    KRX 메인 HTML 시가총액(십억원) + ECOS GDP
 # ──────────────────────────────────────────────
-def get_kr_buffett_indicator(ecos_api_key=None):
+def get_kr_buffett_indicator(ecos_api_key=None, include_konex=True):
     kr_val = None
-    print("\n   ▶️ [한국 버핏지수] KRX(시가총액) + ECOS(GDP) 엔진 가동...")
+    print("\n   ▶️ [한국 버핏지수] KRX 시가총액 + ECOS GDP 엔진 가동...")
 
     try:
         import os
         import re
         import requests
-        import pandas as pd
-        from io import BytesIO
-        from datetime import datetime, timedelta
 
         total_cap_billion = 0.0
         gdp_billion = 0.0
@@ -306,33 +302,7 @@ def get_kr_buffett_indicator(ecos_api_key=None):
             except Exception:
                 return 0.0
 
-        def _normalize_mktcap_to_billion(raw_sum):
-            """
-            KRX 응답 단위가 상황에 따라 달라질 수 있어 자동 보정.
-            반환 단위: 십억원
-
-            예)
-            - 원 단위 총합:     6,800,000,000,000,000  → / 1e9
-            - 백만원 단위 총합: 6,800,000,000          → / 1e3
-            - 십억원 단위 총합: 6,800,000              → 그대로
-            """
-            raw_sum = float(raw_sum or 0)
-
-            if raw_sum <= 0:
-                return 0.0
-
-            # 원 단위로 들어온 경우
-            if raw_sum > 1e11:
-                return raw_sum / 1_000_000_000
-
-            # 백만원 단위로 들어온 경우
-            if raw_sum > 1e8:
-                return raw_sum / 1_000
-
-            # 이미 십억원 단위로 들어온 경우
-            return raw_sum
-
-        def _make_krx_session():
+        def _make_session():
             session = requests.Session()
             session.headers.update({
                 "User-Agent": (
@@ -341,306 +311,89 @@ def get_kr_buffett_indicator(ecos_api_key=None):
                     "Chrome/120.0.0.0 Safari/537.36"
                 ),
                 "Referer": "https://data.krx.co.kr/",
-                "Origin": "https://data.krx.co.kr",
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
             })
-
-            try:
-                session.get(
-                    "https://data.krx.co.kr/contents/MDC/MAIN/main/index.cmd",
-                    timeout=10,
-                )
-            except Exception:
-                pass
-
             return session
 
-        def _date_candidates(days=15):
-            base = datetime.today()
-            for i in range(days):
-                yield (base - timedelta(days=i)).strftime("%Y%m%d")
-
         # ==========================================
-        # 1-A. 시가총액 — KRX JSON 직접 호출
+        # 1. 시가총액 — KRX 메인 HTML row 파싱
         # ==========================================
-        def _fetch_cap_krx_json():
+        def _fetch_cap_krx_main_html():
             """
-            KRX Data Marketplace 내부 JSON 호출.
-            KOSPI/STK + KOSDAQ/KSQ 종목별 시가총액 합산.
+            KRX 메인 페이지의 아래 row를 찾아 시가총액을 수집한다.
+
+            <td>시가총액(십억원)</td>
+            <td>KOSPI</td>
+            <td>KOSDAQ</td>
+            <td>KONEX</td>
+
             반환 단위: 십억원
             """
-            session = _make_krx_session()
-            markets = {
-                "KOSPI": "STK",
-                "KOSDAQ": "KSQ",
-            }
+            url = "https://data.krx.co.kr/contents/MDC/MAIN/main/index.cmd"
+            session = _make_session()
 
-            for date_str in _date_candidates(days=15):
-                market_caps = {}
+            res = session.get(url, timeout=15)
+            res.raise_for_status()
 
-                for name, mkt_id in markets.items():
-                    payload = {
-                        "bld": "dbms/MDC/STAT/standard/MDCSTAT01501",
-                        "locale": "ko_KR",
-                        "mktId": mkt_id,
-                        "trdDd": date_str,
-                        "share": "1",
-                        "money": "1",
-                        "csvxls_isNo": "false",
-                    }
+            html = res.text
 
-                    try:
-                        res = session.post(
-                            "https://data.krx.co.kr/comm/bldAttendant/getJsonData.cmd",
-                            data=payload,
-                            timeout=15,
-                        )
-                        res.raise_for_status()
+            pattern = re.compile(
+                r"<tr[^>]*>\s*"
+                r"<td[^>]*>\s*시가총액\s*\(십억원\)\s*</td>\s*"
+                r"<td[^>]*>\s*([\d,]+(?:\.\d+)?)\s*</td>\s*"
+                r"<td[^>]*>\s*([\d,]+(?:\.\d+)?)\s*</td>\s*"
+                r"<td[^>]*>\s*([\d,]+(?:\.\d+)?)\s*</td>\s*"
+                r"</tr>",
+                re.IGNORECASE | re.DOTALL,
+            )
 
-                        data = res.json()
-                        rows = data.get("OutBlock_1", [])
+            match = pattern.search(html)
 
-                        if not rows:
-                            continue
+            if not match:
+                raise ValueError("KRX 메인 HTML에서 '시가총액(십억원)' row를 찾지 못했습니다.")
 
-                        raw_sum = 0.0
-                        for row in rows:
-                            raw_sum += _num(row.get("MKTCAP"))
+            kospi = _num(match.group(1))
+            kosdaq = _num(match.group(2))
+            konex = _num(match.group(3))
 
-                        cap_billion = _normalize_mktcap_to_billion(raw_sum)
-
-                        if cap_billion > 0:
-                            market_caps[name] = cap_billion
-                            print(
-                                f"      - [KRX/JSON] {name} ({date_str}): "
-                                f"{cap_billion:,.1f} 십억원"
-                            )
-
-                    except Exception as e:
-                        print(f"      ⚠️ [KRX/JSON] {name} ({date_str}) 실패: {e}")
-
-                # KOSPI/KOSDAQ 둘 다 있어야 전체 시총으로 인정
-                if len(market_caps) == len(markets):
-                    total = sum(market_caps.values())
-                    print(f"      ✅ [KRX/JSON] 기준일 {date_str} 전체 시총: {total:,.1f} 십억원")
-                    return total
-
-            raise ValueError("KRX JSON: 15일 내 KOSPI/KOSDAQ 유효 데이터 없음")
-
-        # ==========================================
-        # 1-B. 시가총액 — KRX CSV OTP 폴백
-        # ==========================================
-        def _fetch_cap_krx_csv():
-            """
-            KRX CSV 다운로드 방식.
-            GenerateOTP → download_csv 흐름.
-            반환 단위: 십억원
-            """
-            session = _make_krx_session()
-            markets = {
-                "KOSPI": "STK",
-                "KOSDAQ": "KSQ",
-            }
-
-            gen_url = "https://data.krx.co.kr/comm/fileDn/GenerateOTP/generate.cmd"
-            down_url = "https://data.krx.co.kr/comm/fileDn/download_csv/download.cmd"
-
-            for date_str in _date_candidates(days=15):
-                market_caps = {}
-
-                for name, mkt_id in markets.items():
-                    payload = {
-                        "locale": "ko_KR",
-                        "mktId": mkt_id,
-                        "trdDd": date_str,
-                        "share": "1",
-                        "money": "1",
-                        "csvxls_isNo": "false",
-                        "name": "fileDown",
-                        "url": "dbms/MDC/STAT/standard/MDCSTAT01501",
-                    }
-
-                    try:
-                        otp_res = session.post(gen_url, data=payload, timeout=15)
-                        otp_res.raise_for_status()
-                        otp = otp_res.text.strip()
-
-                        if not otp or "<html" in otp.lower():
-                            raise ValueError("OTP 발급 실패")
-
-                        csv_res = session.post(
-                            down_url,
-                            data={"code": otp},
-                            timeout=20,
-                        )
-                        csv_res.raise_for_status()
-
-                        df = pd.read_csv(BytesIO(csv_res.content), encoding="EUC-KR")
-
-                        cap_col = None
-                        for col in df.columns:
-                            col_str = str(col).strip()
-                            if "시가총액" in col_str or col_str.upper() == "MKTCAP":
-                                cap_col = col
-                                break
-
-                        if cap_col is None:
-                            raise ValueError(f"시가총액 컬럼 없음: {list(df.columns)}")
-
-                        raw_sum = df[cap_col].apply(_num).sum()
-                        cap_billion = _normalize_mktcap_to_billion(raw_sum)
-
-                        if cap_billion > 0:
-                            market_caps[name] = cap_billion
-                            print(
-                                f"      - [KRX/CSV] {name} ({date_str}): "
-                                f"{cap_billion:,.1f} 십억원"
-                            )
-
-                    except Exception as e:
-                        print(f"      ⚠️ [KRX/CSV] {name} ({date_str}) 실패: {e}")
-
-                if len(market_caps) == len(markets):
-                    total = sum(market_caps.values())
-                    print(f"      ✅ [KRX/CSV] 기준일 {date_str} 전체 시총: {total:,.1f} 십억원")
-                    return total
-
-            raise ValueError("KRX CSV: 15일 내 KOSPI/KOSDAQ 유효 데이터 없음")
-
-        # ==========================================
-        # 1-C. 시가총액 — 네이버 금융 Playwright 폴백
-        # ==========================================
-        def _fetch_cap_playwright():
-            """
-            네이버 금융 지수 페이지에서 KOSPI/KOSDAQ 시가총액 추출.
-            반환 단위: 십억원
-            """
-            from playwright.sync_api import sync_playwright
-
-            def _parse_korean_amount_to_billion(text):
-                """
-                예: '2,923조 5,120억' → 십억원
-                1조 = 1,000 십억원
-                1억 = 0.1 십억원
-                """
-                s = str(text or "").replace(",", "")
-                jo = 0.0
-                eok = 0.0
-
-                m = re.search(r"([\d.]+)\s*조", s)
-                if m:
-                    jo = float(m.group(1))
-
-                m = re.search(r"([\d.]+)\s*억", s)
-                if m:
-                    eok = float(m.group(1))
-
-                return jo * 1_000 + eok / 10
-
-            markets = {
-                "KOSPI": "KOSPI",
-                "KOSDAQ": "KOSDAQ",
-            }
-
-            market_caps = {}
-
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                context = browser.new_context(
-                    user_agent=(
-                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                        "AppleWebKit/537.36 (KHTML, like Gecko) "
-                        "Chrome/120.0.0.0 Safari/537.36"
-                    )
+            if kospi <= 0 or kosdaq <= 0:
+                raise ValueError(
+                    f"KRX 시가총액 값 이상: KOSPI={kospi}, KOSDAQ={kosdaq}, KONEX={konex}"
                 )
 
-                context.route(
-                    "**/*",
-                    lambda route: route.abort()
-                    if route.request.resource_type in ["image", "media", "font"]
-                    else route.continue_(),
+            total = kospi + kosdaq + konex if include_konex else kospi + kosdaq
+
+            print(f"      - [KRX/MAIN] KOSPI:  {kospi:,.1f} 십억원")
+            print(f"      - [KRX/MAIN] KOSDAQ: {kosdaq:,.1f} 십억원")
+            print(f"      - [KRX/MAIN] KONEX:  {konex:,.1f} 십억원")
+
+            if include_konex:
+                print(
+                    f"      ✅ [KRX/MAIN] 전체 시가총액"
+                    f"(KOSPI+KOSDAQ+KONEX): {total:,.1f} 십억원"
+                )
+            else:
+                print(
+                    f"      ✅ [KRX/MAIN] 전체 시가총액"
+                    f"(KOSPI+KOSDAQ): {total:,.1f} 십억원"
                 )
 
-                page = context.new_page()
-
-                try:
-                    for name, code in markets.items():
-                        url = f"https://finance.naver.com/sise/sise_index.naver?code={code}"
-                        page.goto(url, timeout=30_000)
-                        page.wait_for_selector("text=시가총액", timeout=10_000)
-
-                        cap_text = page.evaluate(
-                            """() => {
-                                const rows = document.querySelectorAll('tr');
-                                for (const tr of rows) {
-                                    if (tr.innerText.includes('시가총액')) {
-                                        const tds = tr.querySelectorAll('td');
-                                        for (const td of tds) {
-                                            const txt = td.innerText.trim();
-                                            if (txt.includes('조') || txt.includes('억')) {
-                                                return txt;
-                                            }
-                                        }
-                                    }
-                                }
-                                return '';
-                            }"""
-                        )
-
-                        cap_billion = _parse_korean_amount_to_billion(cap_text)
-
-                        if cap_billion > 0:
-                            market_caps[name] = cap_billion
-                            print(
-                                f"      - [네이버/PW] {name}: "
-                                f"{cap_billion:,.1f} 십억원"
-                            )
-                        else:
-                            print(f"      ⚠️ [네이버/PW] {name} 시가총액 파싱 실패: {cap_text}")
-
-                finally:
-                    browser.close()
-
-            if len(market_caps) != len(markets):
-                raise ValueError("네이버 금융 Playwright: KOSPI/KOSDAQ 중 일부 데이터 누락")
-
-            total = sum(market_caps.values())
-            print(f"      ✅ [네이버/PW] 한국 전체 시가총액: {total:,.1f} 십억원")
             return total
 
         # ==========================================
-        # 1. 시가총액 수집
-        # ==========================================
-        print("      ▶️ [시가총액] KRX JSON 직접 호출 시도 중...")
-
-        try:
-            total_cap_billion = _fetch_cap_krx_json()
-        except Exception as e:
-            print(f"      ⚠️ KRX JSON 실패 ({e}), KRX CSV OTP 폴백 시도...")
-
-            try:
-                total_cap_billion = _fetch_cap_krx_csv()
-            except Exception as e2:
-                print(f"      ⚠️ KRX CSV 실패 ({e2}), 네이버 금융 Playwright 폴백 시도...")
-
-                try:
-                    total_cap_billion = _fetch_cap_playwright()
-                except Exception as e3:
-                    print(f"      ❌ 시가총액 전체 수집 실패: {e3}")
-
-        # ==========================================
-        # 2-A. 명목 GDP — ECOS 공식 API 우선
+        # 2-A. GDP — ECOS 공식 API
         # ==========================================
         def _fetch_gdp_ecos_api():
             """
             한국은행 ECOS 100대 통계지표 API 사용.
-            GDP(명목, 계절조정)의 최근 분기 값을 가져와 연환산.
+            GDP(명목, 계절조정)의 최근 분기 값을 가져와 연환산한다.
+
             반환 단위: 십억원
             """
             if not ecos_api_key:
                 raise ValueError("ECOS API KEY 없음")
 
             url = f"https://ecos.bok.or.kr/api/KeyStatisticList/{ecos_api_key}/json/kr/1/100"
+
             res = requests.get(url, timeout=15)
             res.raise_for_status()
 
@@ -657,14 +410,12 @@ def get_kr_buffett_indicator(ecos_api_key=None):
 
             target = None
 
-            # 1차: 정확히 GDP(명목, 계절조정)
             for row in rows:
                 name = str(row.get("KEYSTAT_NAME", ""))
                 if "GDP" in name and "명목" in name and "계절조정" in name:
                     target = row
                     break
 
-            # 2차: 완화 조건
             if target is None:
                 for row in rows:
                     name = str(row.get("KEYSTAT_NAME", ""))
@@ -673,8 +424,7 @@ def get_kr_buffett_indicator(ecos_api_key=None):
                         break
 
             if target is None:
-                names = [row.get("KEYSTAT_NAME") for row in rows]
-                raise ValueError(f"ECOS API에서 GDP 명목 항목을 찾지 못함: {names}")
+                raise ValueError("ECOS API에서 명목 GDP 항목을 찾지 못했습니다.")
 
             value = _num(target.get("DATA_VALUE"))
             unit = str(target.get("UNIT_NAME", "") or "")
@@ -702,12 +452,13 @@ def get_kr_buffett_indicator(ecos_api_key=None):
             return annualized_gdp_billion
 
         # ==========================================
-        # 2-B. 명목 GDP — ECOS Playwright 폴백
+        # 2-B. GDP — ECOS Playwright 폴백
         # ==========================================
         def _fetch_gdp_ecos_playwright():
             """
-            기존 방식 유지.
-            ECOS 100대 통계 페이지 렌더링 후 GDP(명목, 계절조정) 추출.
+            ECOS API 키가 없거나 API 조회에 실패한 경우만 사용.
+            ECOS 100대 통계 페이지에서 GDP(명목, 계절조정)를 추출한다.
+
             반환 단위: 십억원
             """
             from playwright.sync_api import sync_playwright
@@ -742,40 +493,49 @@ def get_kr_buffett_indicator(ecos_api_key=None):
                     )
                     page.wait_for_timeout(2_000)
 
-                    html_ecos = page.content()
+                    html = page.content()
 
-                    m_gdp = re.search(
+                    match = re.search(
                         r"GDP\(명목,\s*계절조정\)</span>\s*"
                         r"<span[^>]*result[^>]*>\s*([\d,]+(?:\.\d+)?)",
-                        html_ecos,
+                        html,
                         re.IGNORECASE,
                     )
 
-                    if not m_gdp:
-                        # HTML 구조 변경 대비: body text 기반 보조 파싱
+                    if not match:
                         body_text = page.evaluate("() => document.body.innerText")
-                        m_gdp = re.search(
+                        match = re.search(
                             r"GDP\(명목,\s*계절조정\)[^\d]+([\d,]+(?:\.\d+)?)",
                             body_text,
                             re.IGNORECASE,
                         )
 
-                    if not m_gdp:
-                        raise ValueError("ECOS 페이지에서 GDP 값을 찾지 못함")
+                    if not match:
+                        raise ValueError("ECOS 페이지에서 GDP 값을 찾지 못했습니다.")
 
-                    quarterly_gdp = float(m_gdp.group(1).replace(",", ""))
-                    annualized_gdp = quarterly_gdp * 4
+                    quarterly_gdp_billion = _num(match.group(1))
+                    annualized_gdp_billion = quarterly_gdp_billion * 4
 
-                    print(f"      - [ECOS/PW] 분기 명목 GDP: {quarterly_gdp:,.1f} 십억원")
-                    print(f"      - [ECOS/PW] 연환산 명목 GDP: {annualized_gdp:,.1f} 십억원")
+                    print(f"      - [ECOS/PW] 분기 명목 GDP: {quarterly_gdp_billion:,.1f} 십억원")
+                    print(f"      - [ECOS/PW] 연환산 명목 GDP: {annualized_gdp_billion:,.1f} 십억원")
 
-                    return annualized_gdp
+                    return annualized_gdp_billion
 
                 finally:
                     browser.close()
 
         # ==========================================
-        # 2. 명목 GDP 수집
+        # 3. 시가총액 수집
+        # ==========================================
+        print("      ▶️ [시가총액] KRX 메인 HTML 수집 시도 중...")
+
+        try:
+            total_cap_billion = _fetch_cap_krx_main_html()
+        except Exception as e:
+            print(f"      ❌ KRX 시가총액 수집 실패: {e}")
+
+        # ==========================================
+        # 4. GDP 수집
         # ==========================================
         print("      ▶️ [GDP] 한국은행 ECOS 수집 시도 중...")
 
@@ -790,10 +550,11 @@ def get_kr_buffett_indicator(ecos_api_key=None):
                 print(f"      ❌ ECOS GDP 수집 실패: {e2}")
 
         # ==========================================
-        # 3. 한국 버핏 지수 계산
+        # 5. 한국 버핏 지수 계산
         # ==========================================
         if total_cap_billion > 0 and gdp_billion > 0:
             kr_val = round((total_cap_billion / gdp_billion) * 100, 1)
+
             print(
                 f"      ✅ [계산 완료] 한국 버핏 지수: "
                 f"({total_cap_billion:,.1f} / {gdp_billion:,.1f}) * 100 = {kr_val}%"
