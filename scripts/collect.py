@@ -318,42 +318,58 @@ def get_kr_buffett_indicator(ecos_api_key=None, include_konex=True):
         # 1. 시가총액 — KRX 메인 HTML row 파싱
         # ==========================================
         def _fetch_cap_krx_main_html():
-            """
-            KRX 메인 페이지의 아래 row를 찾아 시가총액을 수집한다.
+    """
+    KRX 메인 페이지를 Playwright로 렌더링한 뒤,
+    DOM에 생성된 '시가총액(십억원)' row를 찾아 수집한다.
 
-            <td>시가총액(십억원)</td>
-            <td>KOSPI</td>
-            <td>KOSDAQ</td>
-            <td>KONEX</td>
+    반환 단위: 십억원
+    """
+    from playwright.sync_api import sync_playwright
 
-            반환 단위: 십억원
-            """
-            url = "https://data.krx.co.kr/contents/MDC/MAIN/main/index.cmd"
-            session = _make_session()
+    url = "https://data.krx.co.kr/contents/MDC/MAIN/main/index.cmd"
 
-            res = session.get(url, timeout=15)
-            res.raise_for_status()
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
 
-            html = res.text
-
-            pattern = re.compile(
-                r"<tr[^>]*>\s*"
-                r"<td[^>]*>\s*시가총액\s*\(십억원\)\s*</td>\s*"
-                r"<td[^>]*>\s*([\d,]+(?:\.\d+)?)\s*</td>\s*"
-                r"<td[^>]*>\s*([\d,]+(?:\.\d+)?)\s*</td>\s*"
-                r"<td[^>]*>\s*([\d,]+(?:\.\d+)?)\s*</td>\s*"
-                r"</tr>",
-                re.IGNORECASE | re.DOTALL,
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
             )
+        )
 
-            match = pattern.search(html)
+        context.route(
+            "**/*",
+            lambda route: route.abort()
+            if route.request.resource_type in ["image", "media", "font"]
+            else route.continue_(),
+        )
 
-            if not match:
-                raise ValueError("KRX 메인 HTML에서 '시가총액(십억원)' row를 찾지 못했습니다.")
+        page = context.new_page()
 
-            kospi = _num(match.group(1))
-            kosdaq = _num(match.group(2))
-            konex = _num(match.group(3))
+        try:
+            page.goto(url, wait_until="domcontentloaded", timeout=40_000)
+
+            # JS 데이터 로딩 대기
+            page.wait_for_selector("text=상장종목 현황", timeout=20_000)
+            page.wait_for_selector("text=시가총액(십억원)", timeout=20_000)
+
+            row_text = page.locator(
+                "tr",
+                has_text=re.compile(r"시가총액\s*\(십억원\)")
+            ).first.inner_text(timeout=10_000)
+
+            # 예:
+            # 시가총액(십억원) 7,080,808 492,337 3,378
+            nums = re.findall(r"[\d,]+(?:\.\d+)?", row_text)
+
+            if len(nums) < 3:
+                raise ValueError(f"시가총액 row 숫자 파싱 실패: {row_text}")
+
+            kospi = _num(nums[0])
+            kosdaq = _num(nums[1])
+            konex = _num(nums[2])
 
             if kospi <= 0 or kosdaq <= 0:
                 raise ValueError(
@@ -362,22 +378,25 @@ def get_kr_buffett_indicator(ecos_api_key=None, include_konex=True):
 
             total = kospi + kosdaq + konex if include_konex else kospi + kosdaq
 
-            print(f"      - [KRX/MAIN] KOSPI:  {kospi:,.1f} 십억원")
-            print(f"      - [KRX/MAIN] KOSDAQ: {kosdaq:,.1f} 십억원")
-            print(f"      - [KRX/MAIN] KONEX:  {konex:,.1f} 십억원")
+            print(f"      - [KRX/MAIN/PW] KOSPI:  {kospi:,.1f} 십억원")
+            print(f"      - [KRX/MAIN/PW] KOSDAQ: {kosdaq:,.1f} 십억원")
+            print(f"      - [KRX/MAIN/PW] KONEX:  {konex:,.1f} 십억원")
 
             if include_konex:
                 print(
-                    f"      ✅ [KRX/MAIN] 전체 시가총액"
+                    f"      ✅ [KRX/MAIN/PW] 전체 시가총액"
                     f"(KOSPI+KOSDAQ+KONEX): {total:,.1f} 십억원"
                 )
             else:
                 print(
-                    f"      ✅ [KRX/MAIN] 전체 시가총액"
+                    f"      ✅ [KRX/MAIN/PW] 전체 시가총액"
                     f"(KOSPI+KOSDAQ): {total:,.1f} 십억원"
                 )
 
             return total
+
+        finally:
+            browser.close()
 
         # ==========================================
         # 2-A. GDP — ECOS 공식 API
