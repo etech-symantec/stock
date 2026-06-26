@@ -258,8 +258,8 @@
     <div id="marketSignalBar" style="display:none; margin-top:0.6rem; margin-bottom:0.6rem;">
       <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:stretch;">
     
-        <!-- 종합 신호 (좌: 라벨+배지 / 우: 큰 숫자) -->
-        <div style="display:flex; align-items:center; gap:10px; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:6px 10px; flex-shrink:0;">
+        <!-- 종합 신호 (좌: 라벨+배지 / 우: 큰 숫자) — 클릭 시 index.html 새 탭 -->
+        <div id="ms-total-card" onclick="window.open('index.html', '_blank')" title="클릭하면 종합 지표 대시보드(index.html)가 새 탭에서 열립니다." style="display:flex; align-items:center; gap:10px; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:6px 10px; flex-shrink:0; cursor:pointer; transition:border-color .15s, transform .1s;" onmouseover="this.style.borderColor='var(--accent, #3A9AFF)'" onmouseout="this.style.borderColor='var(--border)'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
           <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
             <div style="display:flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:var(--text3); letter-spacing:0.05em; white-space:nowrap; line-height:1;">
               <span style="font-size:12px; line-height:1;">📡</span>종합 신호
@@ -276,25 +276,25 @@
         <div class="ms-group" style="display:flex; flex-direction:column; gap:4px; background:rgba(255,77,106,0.05); border:1px solid rgba(255,77,106,0.25); border-radius:10px; padding:5px 8px; flex-shrink:0;">
           <div class="ms-group-label" style="font-size:8px; font-weight:800; letter-spacing:0.05em; color:#ff4d6a; text-transform:uppercase; line-height:1;">🔥 심리 · 리스크</div>
           <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:stretch;">
-            <div class="ms-indicator-card" id="ms-card-vix" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-vix" title="S&P 500 옵션 내재변동성(공포 지수). 20 미만은 안정, 30 이상은 경계, 40 이상 급등 시 패닉셀에 의한 단기 바닥권 형성(역발상 매수 기회)을 암시합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">VIX</div>
               <div id="ms-vix" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-vix-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-vix-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-move" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-move" title="미국 국채 옵션 변동성. 주식 시장의 VIX보다 선행하여 위기 신호를 감지하며, 금리 발작 및 통화정책 불확실성을 측정하는 핵심 지표입니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">MOVE</div>
               <div id="ms-move" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-move-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-move-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-hy" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-hy" title="부실 회사채와 안전한 국채 간의 금리 차이. 스프레드 확대(급등) 시 기업의 자금 경색 및 연쇄 파산(부도) 위험이 커짐을 예고하는 신용 위기 경보기입니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">하이일드</div>
               <div id="ms-hy" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-hy-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-hy-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-fg" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-fg" title="CNN이 산출한 7가지 지표 종합 투심 지표. 25 미만은 극단적 공포(역발상 매수 기회), 75 이상은 극단적 탐욕(과열/매도 경고)을 의미합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">공포 & 탐욕</div>
               <div id="ms-fg" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track ms-ind-gauge-rainbow" style="height:3px;"><div id="ms-fg-dot" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(0,0,0,0.5);transition:left 0.5s;left:50%;"></div></div></div>
@@ -307,31 +307,31 @@
         <div class="ms-group" style="display:flex; flex-direction:column; gap:4px; background:rgba(58,154,255,0.05); border:1px solid rgba(58,154,255,0.25); border-radius:10px; padding:5px 8px; flex-shrink:0;">
           <div class="ms-group-label" style="font-size:8px; font-weight:800; letter-spacing:0.05em; color:#3A9AFF; text-transform:uppercase; line-height:1;">💧 자금 환경</div>
           <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:stretch;">
-            <div class="ms-indicator-card" id="ms-card-us10y" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-us10y" title="전 세계 모든 자산 가격의 기준점(할인율)이 되는 핵심 금리. 국채 금리 하락 시 미래 수익의 현재 가치가 높아져 기술주·성장주에 유리한 환경이 조성됩니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">미국 10Y</div>
               <div id="ms-us10y" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-us10y-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-us10y-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-dxy" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-dxy" title="주요 6개국 통화 대비 달러화의 가치. 100을 기준으로 강세/약세를 판단하며, 강달러 시 신흥국 자본 이탈 및 미국 다국적 기업의 수출 실적 악화 우려가 커집니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">DXY</div>
               <div id="ms-dxy" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-dxy-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-dxy-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-usdkrw" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-usdkrw" title="국내 증시의 외국인 수급을 좌우하는 달러 강세 체감 지표. 환율 상승(원화 약세) 시 환차손 우려로 외국인 자본 이탈 및 강력한 하방 압력이 발생합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">USD/KRW</div>
               <div id="ms-usdkrw" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-usdkrw-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-usdkrw-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-margin-us" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-margin-us" title="FINRA가 발표하는 기관과 개인의 총 빚투 잔고. 빚으로 쌓아 올린 주식 규모가 급증한 후 꺾일 때 연쇄 강제 청산(Deleveraging) 위험이 발생합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">신용잔고(미)</div>
               <div id="ms-margin-us" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-margin-us-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-margin-us-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-margin-kr" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-margin-kr" title="국내 주식 시장의 신용융자 잔고. 시장의 단기 과열 양상 및 개인 투자자의 레버리지 투기 수준을 보여주며, 급락 시 반대매매 위험을 암시합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">신용잔고(한)</div>
               <div id="ms-margin-kr" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-margin-kr-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
@@ -344,25 +344,25 @@
         <div class="ms-group" style="display:flex; flex-direction:column; gap:4px; background:rgba(255,183,3,0.05); border:1px solid rgba(255,183,3,0.25); border-radius:10px; padding:5px 8px; flex-shrink:0;">
           <div class="ms-group-label" style="font-size:8px; font-weight:800; letter-spacing:0.05em; color:#ffb703; text-transform:uppercase; line-height:1;">📦 경기 선행</div>
           <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:stretch;">
-            <div class="ms-indicator-card" id="ms-card-russell" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-russell" title="미국 중소형주 2,000개 벤치마크 지수. 대형주보다 미국 내수 경기와 금리 변화에 훨씬 민감하게 반응하여, 실물 경기 방향성을 미리 감지하는 지표입니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">Russell 2000</div>
               <div id="ms-russell" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-russell-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-russell-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-copper" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-copper" title="전선·건설·전자 등 실물 산업 전반에 기초 소재로 사용되는 닥터 코퍼. 가격 상승은 글로벌 산업 수요 증가 및 제조업 경기 회복 신호로 해석됩니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">구리 가격</div>
               <div id="ms-copper" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-copper-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-copper-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-bdi" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-bdi" title="철광석, 석탄 등 원자재를 싣고 나르는 벌크선 해상 운임 지수. 지수 상승은 글로벌 물동량 증가 및 실물 경기 활성화를 의미하는 선행 지표입니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">BDI</div>
               <div id="ms-bdi" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-bdi-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
               <div id="ms-bdi-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-krexport" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-krexport" title="한국의 월간 무역 수출액 추이. 세계 경제의 탄광 속 카나리아 역할을 수행하며, 수출액 증가는 코스피 상장사들의 실적 상승을 강력하게 선행합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">한국 수출</div>
               <div id="ms-krexport" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-krexport-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
@@ -375,19 +375,19 @@
         <div class="ms-group" style="display:flex; flex-direction:column; gap:4px; background:rgba(0,200,122,0.05); border:1px solid rgba(0,200,122,0.25); border-radius:10px; padding:5px 8px; flex-shrink:0;">
           <div class="ms-group-label" style="font-size:8px; font-weight:800; letter-spacing:0.05em; color:#00c87a; text-transform:uppercase; line-height:1;">📐 밸류에이션</div>
           <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:stretch;">
-            <div class="ms-indicator-card" id="ms-card-buffett" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-buffett" title="미국 시가총액을 명목 GDP로 나눈 값. 워런 버핏이 가장 신뢰하는 구조적 과열 지표로, 100% 미만 저평가 · 120~130% 고평가 · 200% 이상 극단적 버블 경고를 의미합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">버핏 지수(미)</div>
               <div id="ms-buffett" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-buffett-gauge" class="ms-ind-gauge-fill" style="width:50%;"><div style="position:absolute;left:60%;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,0.25);"></div></div></div></div>
               <div id="ms-buffett-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-buffett-kr" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-buffett-kr" title="한국 주식시장(코스피+코스닥) 전체 시가총액을 명목 GDP로 나눈 국가별 밸류에이션 지표. 한국 증시의 전반적인 고평가/저평가 상태를 장기적으로 판단합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">버핏 지수(한)</div>
               <div id="ms-buffett-kr" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-buffett-kr-gauge" class="ms-ind-gauge-fill" style="width:50%;"><div style="position:absolute;left:60%;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,0.25);"></div></div></div></div>
               <div id="ms-buffett-kr-hint" class="ms-ind-hint" style="font-size:9px; line-height:1.1; margin-top:0;">—</div>
             </div>
-            <div class="ms-indicator-card" id="ms-card-cape" style="padding:5px 8px; min-width:84px; gap:2px;">
+            <div class="ms-indicator-card" id="ms-card-cape" title="물가상승률을 조정한 S&P 500의 10년 평균 PER. 단기 이익 변동 노이즈를 제거한 장기 가치를 보여주며, 30 이상은 역사적 고평가(닷컴 버블 수준)로 진단합니다." style="padding:5px 8px; min-width:84px; gap:2px; cursor:help;">
               <div class="ms-ind-label" style="font-size:9px; line-height:1.1; margin-bottom:1px;">CAPE PE</div>
               <div id="ms-cape" class="ms-ind-val" style="font-size:13px; line-height:1.1;">—</div>
               <div class="ms-ind-gauge-wrap" style="margin:2px 0;"><div class="ms-ind-gauge-track" style="height:3px;"><div id="ms-cape-gauge" class="ms-ind-gauge-fill" style="width:50%;"></div></div></div>
