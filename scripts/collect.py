@@ -977,14 +977,13 @@ def get_monthly_and_special():
     }
 
 # ──────────────────────────────────────────────
-# 8. CSV 저장 로직 및 점수 산출
+# 8. CSV 저장 로직
 # ──────────────────────────────────────────────
-# 💡 Integrated_Valuation 대신 Daily_Score, Monthly_Score, Total_Score 3개 필드로 개편
+# 💡 점수 산출(Daily_Score, Monthly_Score, Total_Score)은 index.html에서 처리
 FIELDNAMES = [
     "Date", "VIX", "MOVE", "US10Y", "DXY", "USDKRW", "Russell2000", "Copper",
     "High_Yield", "Fear_Greed", "CAPE_PE", "Buffett_US", "Buffett_KR",
-    "Margin_Debt_US", "Margin_Debt_KR", "KR_Export", "BDI_Index", 
-    "Daily_Score", "Monthly_Score", "Total_Score"
+    "Margin_Debt_US", "Margin_Debt_KR", "KR_Export", "BDI_Index"
 ]
 
 def save_to_csv(row: dict):
@@ -1013,22 +1012,6 @@ def save_to_csv(row: dict):
     print(f"\n✅ 저장 완료 → {csv_path}")
 
 # ──────────────────────────────────────────────
-# 9. 통합 밸류에이션 산출 로직 (0 ~ 100 정규화)
-# ──────────────────────────────────────────────
-def normalize(val, min_v, max_v, inverse=False):
-    if val is None or val == "N/A": return 50 # 결측치는 중립(50) 처리
-    try:
-        v = float(val)
-        # 역방향(inverse): 낮을수록 위험(100점), 높을수록 안전(0점)
-        if inverse:
-            pct = (max_v - v) / (max_v - min_v) * 100
-        else:
-            pct = (v - min_v) / (max_v - min_v) * 100
-        return max(0, min(100, pct))
-    except:
-        return 50
-
-# ──────────────────────────────────────────────
 # Main
 # ──────────────────────────────────────────────
 def main():
@@ -1044,29 +1027,6 @@ def main():
     buff_kr = get_kr_buffett_indicator()
     
     special = get_monthly_and_special()
-
-    # ========================================================
-    # 💡 1. 단기 일일 점수 (심리 & 수급) 0~100점
-    # ========================================================
-    score_fg = normalize(fg, 0, 100)
-    score_vix = normalize(yf_data.get("VIX"), 12, 40, inverse=True)
-    score_hy = normalize(high_yield, 3, 8, inverse=True)
-    
-    daily_score = round((score_fg * 0.4) + (score_vix * 0.3) + (score_hy * 0.3), 1)
-
-    # ========================================================
-    # 💡 2. 장기 월간 점수 (펀더멘털 & 밸류에이션) 0~100점
-    # ========================================================
-    score_buff = normalize(buff_us, 100, 200)
-    score_cape = normalize(cape_pe, 15, 45)
-    score_margin = normalize(special.get("Margin_Debt_US"), 0.5, 1.2)
-    
-    monthly_score = round((score_buff * 0.5) + (score_cape * 0.3) + (score_margin * 0.2), 1)
-
-    # ========================================================
-    # 💡 3. 최종 통합 점수 (단기 30% + 장기 70%)
-    # ========================================================
-    total_score = round((daily_score * 0.3) + (monthly_score * 0.7), 1)
 
     row = {
         "Date": today,
@@ -1086,9 +1046,6 @@ def main():
         "Margin_Debt_KR": special.get("Margin_Debt_KR"),
         "KR_Export": special.get("KR_Export"),
         "BDI_Index": special.get("BDI_Index"),
-        "Daily_Score": daily_score,
-        "Monthly_Score": monthly_score,
-        "Total_Score": total_score
     }
 
     for k, v in row.items():
