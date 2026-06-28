@@ -8521,15 +8521,67 @@ async function initMarketSignalBar() {
     // ── 헬퍼 ──────────────────────────────────────────
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
+    // ── 0. 종합 점수(Total_Score) 계산 로직 ──────────────
+    //    index.html의 calculateTotalScore()와 동일한 가중치/range/inverse를 사용합니다.
+    //    (4대 카테고리 각 25% 균등 + 카테고리 내부는 지표 중요도 가중, 0~100 스케일)
+    const SCORE_META = [
+      // 1. 심리·리스크 (합계 25)
+      { key: 'VIX',           group: 'risk',      weight: 8, inverse: false, range: [10, 40] },
+      { key: 'MOVE',          group: 'risk',      weight: 4, inverse: false, range: [50, 160] },
+      { key: 'High_Yield',    group: 'risk',      weight: 6, inverse: false, range: [2.0, 9.0] },
+      { key: 'Fear_Greed',    group: 'risk',      weight: 7, inverse: false, range: [0, 100] },
+      // 2. 자금환경 (합계 25)
+      { key: 'US10Y',         group: 'liquidity', weight: 8, inverse: false, range: [1.5, 6.0] },
+      { key: 'DXY',           group: 'liquidity', weight: 6, inverse: false, range: [90, 115] },
+      { key: 'USDKRW',        group: 'liquidity', weight: 5, inverse: false, range: [1000, 1600] },
+      { key: 'Margin_Debt_US',group: 'liquidity', weight: 3, inverse: false, range: [0, 2] },
+      { key: 'Margin_Debt_KR',group: 'liquidity', weight: 3, inverse: false, range: [10, 45] },
+      // 3. 경기선행 (합계 25)
+      { key: 'Russell2000',   group: 'economy',   weight: 6, inverse: true,  range: [1800, 3200] },
+      { key: 'Copper',        group: 'economy',   weight: 6, inverse: true,  range: [4.0, 7.0] },
+      { key: 'BDI_Index',     group: 'economy',   weight: 5, inverse: true,  range: [1000, 3000] },
+      { key: 'KR_Export',     group: 'economy',   weight: 8, inverse: true,  range: [500, 950] },
+      // 4. 밸류에이션 (합계 25)
+      { key: 'Buffett_US',    group: 'valuation', weight: 8, inverse: false, range: [70, 240] },
+      { key: 'Buffett_KR',    group: 'valuation', weight: 8, inverse: false, range: [50, 150] },
+      { key: 'CAPE_PE',       group: 'valuation', weight: 9, inverse: false, range: [15, 45] },
+    ];
+
+    function calculateTotalScore(row) {
+      const groups = {};
+      SCORE_META.forEach(m => {
+        const raw = row[m.key];
+        if (raw === undefined || raw === null || raw === '' || raw === 'N/A') return;
+        const num = parseFloat(raw.toString().split('(')[0]);
+        if (isNaN(num)) return;
+        const [min, max] = m.range;
+        let pct = clamp((num - min) / (max - min) * 100, 0, 100);
+        const riskPct = m.inverse ? (100 - pct) : pct;
+        if (!groups[m.group]) groups[m.group] = { sw: 0, w: 0 };
+        groups[m.group].sw += riskPct * m.weight;
+        groups[m.group].w += m.weight;
+      });
+      const names = ['risk', 'liquidity', 'economy', 'valuation'];
+      let total = 0, validCount = 0;
+      names.forEach(g => {
+        if (groups[g] && groups[g].w > 0) { total += groups[g].sw / groups[g].w; validCount++; }
+      });
+      return validCount === 0 ? NaN : total / validCount;
+    }
+
     // ── 1. 종합 신호 ──────────────────────────────────
-    const score = parseFloat(latest.Total_Score);
+    //    0~100 스케일: 0~30 강한매수, 30~50 분할매수, 50~70 관망, 70~100 매수자제
+    //    (index.html의 getValuationSignal()과 동일한 구간 기준으로 통일)
+    const score = calculateTotalScore(latest);
     let signalLabel = '매수 자제', signalColor = 'var(--loss)', signalBg = 'rgba(58,154,255,0.12)';
-    if (score >= 400)      { signalLabel = '강한 매수';  signalColor = 'var(--profit)'; signalBg = 'rgba(0,200,122,0.15)'; }
-    else if (score >= 200) { signalLabel = '분할 매수';  signalColor = '#00c87a';        signalBg = 'rgba(0,200,122,0.1)'; }
-    else if (score >= 100) { signalLabel = '관 망';      signalColor = '#ffb703';        signalBg = 'rgba(255,183,3,0.12)'; }
+    if (!isNaN(score)) {
+      if (score <= 30)      { signalLabel = '적극 매수';  signalColor = 'var(--profit)'; signalBg = 'rgba(0,200,122,0.15)'; }
+      else if (score <= 50) { signalLabel = '분할 매수';  signalColor = '#00c87a';        signalBg = 'rgba(0,200,122,0.1)'; }
+      else if (score <= 70) { signalLabel = '관 망';      signalColor = '#ffb703';        signalBg = 'rgba(255,183,3,0.12)'; }
+    }
 
     const scoreEl = document.getElementById('ms-score');
-    scoreEl.textContent = isNaN(score) ? '—' : Math.round(score);
+    scoreEl.textContent = isNaN(score) ? '—' : score.toFixed(1);
     scoreEl.style.color = signalColor;
 
     const badge = document.getElementById('ms-badge');
