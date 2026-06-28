@@ -8087,15 +8087,20 @@ async function initMarketSignalBar() {
     // ── 헬퍼 ──────────────────────────────────────────
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
-    // ── 1. 종합 신호 ──────────────────────────────────
+    // ── 1. 종합 신호 (index.html의 통합 밸류에이션 점수 기준과 동일하게 산출) ──
+    // index.html getValuationSignal()과 동일한 0~100 스케일 기준:
+    // [0~30] 적극 매수 · (30~50] 분할 매수 · (50~70] 관망 유지 · (70~100] 비중 축소
     const score = parseFloat(latest.Total_Score);
-    let signalLabel = '매수 자제', signalColor = 'var(--loss)', signalBg = 'rgba(58,154,255,0.12)';
-    if (score >= 400)      { signalLabel = '강한 매수';  signalColor = 'var(--profit)'; signalBg = 'rgba(0,200,122,0.15)'; }
-    else if (score >= 200) { signalLabel = '분할 매수';  signalColor = '#00c87a';        signalBg = 'rgba(0,200,122,0.1)'; }
-    else if (score >= 100) { signalLabel = '관 망';      signalColor = '#ffb703';        signalBg = 'rgba(255,183,3,0.12)'; }
+    let signalLabel = 'N/A', signalColor = 'var(--text3)', signalBg = 'rgba(150,150,150,0.12)';
+    if (!isNaN(score) && score !== 0) {
+      if (score <= 30)      { signalLabel = '적극 매수'; signalColor = '#059669'; signalBg = 'rgba(5,150,105,0.12)'; }
+      else if (score <= 50) { signalLabel = '분할 매수'; signalColor = '#10b981'; signalBg = 'rgba(16,185,129,0.1)'; }
+      else if (score <= 70) { signalLabel = '관망 유지'; signalColor = '#d97706'; signalBg = 'rgba(217,119,6,0.12)'; }
+      else                  { signalLabel = '비중 축소'; signalColor = '#e11d48'; signalBg = 'rgba(225,29,72,0.12)'; }
+    }
 
     const scoreEl = document.getElementById('ms-score');
-    scoreEl.textContent = isNaN(score) ? '—' : Math.round(score);
+    scoreEl.textContent = (isNaN(score) || score === 0) ? '—' : score.toFixed(1);
     scoreEl.style.color = signalColor;
 
     const badge = document.getElementById('ms-badge');
