@@ -8063,16 +8063,87 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+/* ── 💡 index.html의 calculateTotalScore()와 완전히 동일한 로직 (16개 지표 가중평균) ──
+   CSV의 Total_Score 컬럼(구식 일간30%/월간70% 방식)은 더 이상 사용하지 않고,
+   index.html과 동일하게 매번 latest row로부터 직접 재계산합니다. */
+const MS_CARDS_META = [
+  // 1. 심리 / 리스크 (카테고리 합계 25)
+  { key: 'VIX', group: 'risk', weight: 8, inverse: false, range: [10, 40] },
+  { key: 'MOVE', group: 'risk', weight: 4, inverse: false, range: [50, 160] },
+  { key: 'High_Yield', group: 'risk', weight: 6, inverse: false, range: [2.0, 9.0] },
+  { key: 'Fear_Greed', group: 'risk', weight: 7, inverse: false, range: [0, 100] },
+
+  // 2. 자금 환경 (카테고리 합계 25)
+  { key: 'US10Y', group: 'liquidity', weight: 8, inverse: false, range: [1.5, 6.0] },
+  { key: 'DXY', group: 'liquidity', weight: 6, inverse: false, range: [90, 115] },
+  { key: 'USDKRW', group: 'liquidity', weight: 5, inverse: false, range: [1000, 1600] },
+  { key: 'Margin_Debt_US', group: 'liquidity', weight: 3, inverse: false, range: [0, 2] },
+  { key: 'Margin_Debt_KR', group: 'liquidity', weight: 3, inverse: false, range: [10, 45] },
+
+  // 3. 경기 선행 (카테고리 합계 25)
+  { key: 'Russell2000', group: 'economy', weight: 6, inverse: true, range: [1800, 3200] },
+  { key: 'Copper', group: 'economy', weight: 6, inverse: true, range: [4.0, 7.0] },
+  { key: 'BDI_Index', group: 'economy', weight: 5, inverse: true, range: [1000, 3000] },
+  { key: 'KR_Export', group: 'economy', weight: 8, inverse: true, range: [500, 950] },
+
+  // 4. 밸류에이션 (카테고리 합계 25)
+  { key: 'Buffett_US', group: 'valuation', weight: 8, inverse: false, range: [70, 240] },
+  { key: 'Buffett_KR', group: 'valuation', weight: 8, inverse: false, range: [50, 150] },
+  { key: 'CAPE_PE', group: 'valuation', weight: 9, inverse: false, range: [15, 45] }
+];
+
+function msCalculateTotalScore(row) {
+  const groups = {};
+
+  MS_CARDS_META.forEach(meta => {
+    const raw = row[meta.key];
+    if (raw === undefined || raw === null || raw === '' || raw === 'N/A') return;
+    const num = parseFloat(raw.toString().split('(')[0]);
+    if (isNaN(num)) return;
+
+    const [min, max] = meta.range;
+    let pct = Math.min(Math.max((num - min) / (max - min) * 100, 0), 100);
+    const riskPct = meta.inverse ? (100 - pct) : pct;
+
+    if (!groups[meta.group]) groups[meta.group] = { sumScoreWeight: 0, sumWeight: 0 };
+    groups[meta.group].sumScoreWeight += riskPct * meta.weight;
+    groups[meta.group].sumWeight += meta.weight;
+  });
+
+  const groupNames = ['risk', 'liquidity', 'economy', 'valuation'];
+  let validGroupCount = 0;
+  let totalScore = 0;
+
+  groupNames.forEach(g => {
+    if (groups[g] && groups[g].sumWeight > 0) {
+      totalScore += groups[g].sumScoreWeight / groups[g].sumWeight;
+      validGroupCount++;
+    }
+  });
+
+  if (validGroupCount === 0) return NaN;
+  return totalScore / validGroupCount;
+}
+
 async function initMarketSignalBar() {
   try {
     const res = await fetch(`data/indicators.csv?t=${new Date().getTime()}`);
     if (!res.ok) throw new Error('CSV not found');
     const text = await res.text();
-    
+
+    // 💡 index.html의 parseCSV()와 동일한 quote-aware 파서 (값 내부 콤마/괄호 안전 처리)
     const lines = text.trim().split('\n');
     const headers = lines[0].split(',').map(h => h.trim());
     const rows = lines.slice(1).map(line => {
-      const vals = line.split(',').map(v => v.trim());
+      const vals = [];
+      let insideQuote = false;
+      let currWord = '';
+      for (const char of line) {
+        if (char === '"') insideQuote = !insideQuote;
+        else if (char === ',' && !insideQuote) { vals.push(currWord.trim()); currWord = ''; }
+        else currWord += char;
+      }
+      vals.push(currWord.trim());
       const obj = {};
       headers.forEach((h, i) => obj[h] = vals[i] ?? '');
       return obj;
@@ -8087,10 +8158,10 @@ async function initMarketSignalBar() {
     // ── 헬퍼 ──────────────────────────────────────────
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
-    // ── 1. 종합 신호 (index.html의 통합 밸류에이션 점수 기준과 동일하게 산출) ──
+    // ── 1. 종합 신호 (index.html의 calculateTotalScore() 재계산 로직과 완전히 동일하게 산출) ──
     // index.html getValuationSignal()과 동일한 0~100 스케일 기준:
     // [0~30] 적극 매수 · (30~50] 분할 매수 · (50~70] 관망 유지 · (70~100] 비중 축소
-    const score = parseFloat(latest.Total_Score);
+    const score = msCalculateTotalScore(latest);
     let signalLabel = 'N/A', signalColor = 'var(--text3)', signalBg = 'rgba(150,150,150,0.12)';
     if (!isNaN(score) && score !== 0) {
       if (score <= 30)      { signalLabel = '적극 매수'; signalColor = '#059669'; signalBg = 'rgba(5,150,105,0.12)'; }
