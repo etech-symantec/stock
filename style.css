@@ -1136,6 +1136,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   transition: 0.15s;
 }
 .btn-restart-tutorial:hover { background: rgba(124,106,247,0.2); }
+.btn-restart-tutorial + .btn-restart-tutorial { margin-top: 8px; }
 
 /* 모바일 튜토리얼 조정 */
 @media (max-width: 600px) {
