@@ -8151,12 +8151,52 @@ async function initMarketSignalBar() {
 
     if (!rows.length) return;
     const latest = rows[rows.length - 1];
+    const prev = rows.length > 1 ? rows[rows.length - 2] : null;
 
     document.getElementById('marketSignalBar').style.display = 'block';
     document.getElementById('marketSignalBar').setAttribute('data-loaded', '1');
 
     // ── 헬퍼 ──────────────────────────────────────────
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+    // ── 0. 오늘 날짜 (연/월/일 세로 3줄) ──────────────
+    if (latest.Date) {
+      const d = new Date(latest.Date);
+      if (!isNaN(d.getTime())) {
+        document.getElementById('ms-date-year').textContent = d.getFullYear() + '년';
+        document.getElementById('ms-date-month').textContent = (d.getMonth() + 1) + '월';
+        document.getElementById('ms-date-day').textContent = d.getDate() + '일';
+      } else {
+        // "YYYY-MM-DD" 형식이 아닐 경우 문자열 자체를 분해 시도
+        const parts = latest.Date.split(/[-./]/);
+        document.getElementById('ms-date-year').textContent = parts[0] ? parts[0] + '년' : '—';
+        document.getElementById('ms-date-month').textContent = parts[1] ? parseInt(parts[1], 10) + '월' : '—';
+        document.getElementById('ms-date-day').textContent = parts[2] ? parseInt(parts[2], 10) + '일' : '—';
+      }
+    }
+
+    // ── 어제 대비 등락 표시 헬퍼 ──────────────────────
+    // up이 true면 "값이 클수록 긍정적"(녹색 ▲ / 빨강 ▼), false면 "값이 클수록 부정적"(반대)
+    // decimals: 비교에 사용할 소수점 자릿수, suffix: 표시 접미사(%, pt 등)
+    function msSetDiff(diffEl, currVal, prevVal, { decimals = 1, suffix = '', goodDirection = 'up' } = {}) {
+      if (!diffEl) return;
+      if (isNaN(currVal) || prevVal === undefined || prevVal === null || prevVal === '' || prevVal === 'N/A') {
+        diffEl.textContent = ''; return;
+      }
+      const prevNum = parseFloat(prevVal.toString().split('(')[0]);
+      if (isNaN(prevNum)) { diffEl.textContent = ''; return; }
+      const diff = currVal - prevNum;
+      const absStr = Math.abs(diff).toFixed(decimals) + suffix;
+      if (Math.abs(diff) < Math.pow(10, -decimals) / 2) {
+        diffEl.textContent = '─ 0' + suffix;
+        diffEl.style.color = 'var(--text3)';
+        return;
+      }
+      const isUp = diff > 0;
+      const isGood = goodDirection === 'up' ? isUp : !isUp;
+      diffEl.textContent = (isUp ? '▲ ' : '▼ ') + absStr;
+      diffEl.style.color = isGood ? 'var(--profit)' : 'var(--loss)';
+    }
 
     // ── 1. 종합 신호 (index.html의 calculateTotalScore() 재계산 로직과 완전히 동일하게 산출) ──
     // index.html getValuationSignal()과 동일한 0~100 스케일 기준:
@@ -8180,225 +8220,284 @@ async function initMarketSignalBar() {
     badge.style.backgroundColor = signalBg;
     badge.style.borderColor = signalColor;
 
+    // 종합 신호: 점수가 낮을수록 긍정적(저평가)이므로 goodDirection은 'down'
+    const scoreDiffEl = document.getElementById('ms-score-diff');
+    if (prev) {
+      const prevScore = msCalculateTotalScore(prev);
+      msSetDiff(scoreDiffEl, score, isNaN(prevScore) ? null : prevScore, { decimals: 1, goodDirection: 'down' });
+    } else if (scoreDiffEl) { scoreDiffEl.textContent = ''; }
+
     // ── 2. VIX ──────────────────────────────────────
     const vix = parseFloat(latest.VIX);
     const vixEl = document.getElementById('ms-vix');
+    const vixValSpan = vixEl ? vixEl.querySelector('span:first-child') : null;
+    const vixDiffEl = document.getElementById('ms-vix-diff');
     const vixGauge = document.getElementById('ms-vix-gauge');
     const vixHint = document.getElementById('ms-vix-hint');
     if (!isNaN(vix)) {
-      vixEl.textContent = vix.toFixed(2);
+      vixValSpan.textContent = vix.toFixed(2);
       const pct = clamp((vix / 60) * 100, 2, 98);
       vixGauge.style.width = pct + '%';
       let vColor = 'var(--loss)', vHint = '공포 구간 🔴';
       if (vix < 15)      { vColor = 'var(--profit)'; vHint = '저변동 안정 🟢'; }
       else if (vix < 20) { vColor = '#00c87a';        vHint = '보통 수준'; }
       else if (vix < 30) { vColor = '#ffb703';        vHint = '변동성 주의'; }
-      vixEl.style.color = vColor; vixGauge.style.background = vColor;
+      vixValSpan.style.color = vColor; vixGauge.style.background = vColor;
       vixHint.textContent = vHint; vixHint.style.color = vColor;
-    } else { vixEl.textContent = 'N/A'; vixHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(vixDiffEl, vix, prev.VIX, { decimals: 2, goodDirection: 'down' });
+    } else { vixValSpan.textContent = 'N/A'; vixHint.textContent = '데이터 없음'; }
 
     // ── 3. MOVE ─────────────────────────────────────
     const move = parseFloat(latest.MOVE);
     const moveEl = document.getElementById('ms-move');
+    const moveValSpan = moveEl ? moveEl.querySelector('span:first-child') : null;
+    const moveDiffEl = document.getElementById('ms-move-diff');
     const moveGauge = document.getElementById('ms-move-gauge');
     const moveHint = document.getElementById('ms-move-hint');
     if (!isNaN(move)) {
-      moveEl.textContent = move.toFixed(1);
+      moveValSpan.textContent = move.toFixed(1);
       const pct = clamp(((move - 50) / 110) * 100, 2, 98);
       moveGauge.style.width = pct + '%';
       let mColor = 'var(--loss)', mHint = '채권 발작 경고 🔴';
       if (move < 80)       { mColor = 'var(--profit)'; mHint = '안정 구간 🟢'; }
       else if (move < 110) { mColor = '#ffb703';        mHint = '주의 구간'; }
-      moveEl.style.color = mColor; moveGauge.style.background = mColor;
+      moveValSpan.style.color = mColor; moveGauge.style.background = mColor;
       moveHint.textContent = mHint; moveHint.style.color = mColor;
-    } else { moveEl.textContent = 'N/A'; moveHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(moveDiffEl, move, prev.MOVE, { decimals: 1, goodDirection: 'down' });
+    } else { moveValSpan.textContent = 'N/A'; moveHint.textContent = '데이터 없음'; }
 
     // ── 4. 하이일드 스프레드 ─────────────────────────
     const hy = parseFloat(latest.High_Yield);
     const hyEl = document.getElementById('ms-hy');
+    const hyValSpan = hyEl ? hyEl.querySelector('span:first-child') : null;
+    const hyDiffEl = document.getElementById('ms-hy-diff');
     const hyGauge = document.getElementById('ms-hy-gauge');
     const hyHint = document.getElementById('ms-hy-hint');
     if (!isNaN(hy)) {
-      hyEl.textContent = hy.toFixed(2) + '%p';
+      hyValSpan.textContent = hy.toFixed(2) + '%p';
       const pct = clamp(((hy - 2) / 7) * 100, 2, 98);
       hyGauge.style.width = pct + '%';
       let hColor = 'var(--loss)', hHint = '신용 위기 경보 🔴';
       if (hy < 3.5)      { hColor = 'var(--profit)'; hHint = '안정 구간 🟢'; }
       else if (hy < 5.5) { hColor = '#ffb703';        hHint = '신용 주의'; }
-      hyEl.style.color = hColor; hyGauge.style.background = hColor;
+      hyValSpan.style.color = hColor; hyGauge.style.background = hColor;
       hyHint.textContent = hHint; hyHint.style.color = hColor;
-    } else { hyEl.textContent = 'N/A'; hyHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(hyDiffEl, hy, prev.High_Yield, { decimals: 2, goodDirection: 'down' });
+    } else { hyValSpan.textContent = 'N/A'; hyHint.textContent = '데이터 없음'; }
 
     // ── 5. 공포탐욕 ──────────────────────────────────
     const fg = parseFloat(latest.Fear_Greed);
     const fgEl = document.getElementById('ms-fg');
+    const fgValSpan = fgEl ? fgEl.querySelector('span:first-child') : null;
+    const fgDiffEl = document.getElementById('ms-fg-diff');
     const fgDot = document.getElementById('ms-fg-dot');
     const fgHint = document.getElementById('ms-fg-hint');
     if (!isNaN(fg)) {
-      fgEl.textContent = fg.toFixed(1);
+      fgValSpan.textContent = fg.toFixed(1);
       fgDot.style.left = clamp(fg, 2, 98) + '%';
       let fColor = '#ff4d6a', fHint = '극단적 탐욕 🔴';
       if (fg < 25)      { fColor = '#3A9AFF'; fHint = '극단적 공포 🟢'; }
       else if (fg < 45) { fColor = '#4d9fff'; fHint = '공포 구간'; }
       else if (fg < 55) { fColor = '#ffb703'; fHint = '중립'; }
       else if (fg < 75) { fColor = '#ff9f43'; fHint = '탐욕 구간'; }
-      fgEl.style.color = fColor;
+      fgValSpan.style.color = fColor;
       fgHint.textContent = fHint; fgHint.style.color = fColor;
-    } else { fgEl.textContent = 'N/A'; fgHint.textContent = '데이터 없음'; }
+      // 공포&탐욕은 중립(50)이 기준이라 방향성 좋다/나쁘다 판단 없이 변화량만 중립색으로 표시
+      if (prev && fgDiffEl) {
+        const prevFg = parseFloat((prev.Fear_Greed ?? '').toString().split('(')[0]);
+        if (!isNaN(prevFg)) {
+          const diff = fg - prevFg;
+          if (Math.abs(diff) < 0.05) { fgDiffEl.textContent = '─ 0'; fgDiffEl.style.color = 'var(--text3)'; }
+          else { fgDiffEl.textContent = (diff > 0 ? '▲ ' : '▼ ') + Math.abs(diff).toFixed(1); fgDiffEl.style.color = 'var(--text3)'; }
+        } else { fgDiffEl.textContent = ''; }
+      }
+    } else { fgValSpan.textContent = 'N/A'; fgHint.textContent = '데이터 없음'; }
 
     // ── 6. 미국 10년물 금리 ──────────────────────────
     const us10y = parseFloat(latest.US10Y);
     const us10yEl = document.getElementById('ms-us10y');
+    const us10yValSpan = us10yEl ? us10yEl.querySelector('span:first-child') : null;
+    const us10yDiffEl = document.getElementById('ms-us10y-diff');
     const us10yGauge = document.getElementById('ms-us10y-gauge');
     const us10yHint = document.getElementById('ms-us10y-hint');
     if (!isNaN(us10y)) {
-      us10yEl.textContent = us10y.toFixed(2) + '%';
+      us10yValSpan.textContent = us10y.toFixed(2) + '%';
       const pct = clamp(((us10y - 1.5) / 4.5) * 100, 2, 98);
       us10yGauge.style.width = pct + '%';
       let yColor = 'var(--loss)', yHint = '고금리 부담 🔴';
       if (us10y < 3)      { yColor = 'var(--profit)'; yHint = '저금리 구간'; }
       else if (us10y < 4) { yColor = '#00c87a';        yHint = '안정 수준'; }
       else if (us10y < 5) { yColor = '#ffb703';        yHint = '고금리 주의'; }
-      us10yEl.style.color = yColor; us10yGauge.style.background = yColor;
+      us10yValSpan.style.color = yColor; us10yGauge.style.background = yColor;
       us10yHint.textContent = yHint; us10yHint.style.color = yColor;
-    } else { us10yEl.textContent = 'N/A'; us10yHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(us10yDiffEl, us10y, prev.US10Y, { decimals: 2, suffix: '%p', goodDirection: 'down' });
+    } else { us10yValSpan.textContent = 'N/A'; us10yHint.textContent = '데이터 없음'; }
 
     // ── 7. DXY ───────────────────────────────────────
     const dxy = parseFloat(latest.DXY);
     const dxyEl = document.getElementById('ms-dxy');
+    const dxyValSpan = dxyEl ? dxyEl.querySelector('span:first-child') : null;
+    const dxyDiffEl = document.getElementById('ms-dxy-diff');
     const dxyGauge = document.getElementById('ms-dxy-gauge');
     const dxyHint = document.getElementById('ms-dxy-hint');
     if (!isNaN(dxy)) {
-      dxyEl.textContent = dxy.toFixed(2);
+      dxyValSpan.textContent = dxy.toFixed(2);
       const pct = clamp(((dxy - 90) / 25) * 100, 2, 98);
       dxyGauge.style.width = pct + '%';
       let dColor = 'var(--loss)', dHint = '달러 강세 🔴';
       if (dxy < 95)       { dColor = 'var(--profit)'; dHint = '달러 약세 🟢'; }
       else if (dxy < 103) { dColor = '#ffb703';        dHint = '중립 구간'; }
-      dxyEl.style.color = dColor; dxyGauge.style.background = dColor;
+      dxyValSpan.style.color = dColor; dxyGauge.style.background = dColor;
       dxyHint.textContent = dHint; dxyHint.style.color = dColor;
-    } else { dxyEl.textContent = 'N/A'; dxyHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(dxyDiffEl, dxy, prev.DXY, { decimals: 2, goodDirection: 'down' });
+    } else { dxyValSpan.textContent = 'N/A'; dxyHint.textContent = '데이터 없음'; }
 
     // ── 8. USD/KRW ───────────────────────────────────
     const usdkrw = parseFloat(latest.USDKRW);
     const usdkrwEl = document.getElementById('ms-usdkrw');
+    const usdkrwValSpan = usdkrwEl ? usdkrwEl.querySelector('span:first-child') : null;
+    const usdkrwDiffEl = document.getElementById('ms-usdkrw-diff');
     const usdkrwGauge = document.getElementById('ms-usdkrw-gauge');
     const usdkrwHint = document.getElementById('ms-usdkrw-hint');
     if (!isNaN(usdkrw)) {
-      usdkrwEl.textContent = usdkrw.toFixed(0) + '₩';
+      usdkrwValSpan.textContent = usdkrw.toFixed(0) + '₩';
       const pct = clamp(((usdkrw - 1000) / 600) * 100, 2, 98);
       usdkrwGauge.style.width = pct + '%';
       let kColor = 'var(--loss)', kHint = '원화 약세 🔴';
       if (usdkrw < 1300)      { kColor = 'var(--profit)'; kHint = '원화 강세 🟢'; }
       else if (usdkrw < 1400) { kColor = '#ffb703';        kHint = '보통 수준'; }
-      usdkrwEl.style.color = kColor; usdkrwGauge.style.background = kColor;
+      usdkrwValSpan.style.color = kColor; usdkrwGauge.style.background = kColor;
       usdkrwHint.textContent = kHint; usdkrwHint.style.color = kColor;
-    } else { usdkrwEl.textContent = 'N/A'; usdkrwHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(usdkrwDiffEl, usdkrw, prev.USDKRW, { decimals: 0, suffix: '₩', goodDirection: 'down' });
+    } else { usdkrwValSpan.textContent = 'N/A'; usdkrwHint.textContent = '데이터 없음'; }
 
     // ── 9. 미국 신용잔고 ─────────────────────────────
     const marginUs = parseFloat(latest.Margin_Debt_US);
     const marginUsEl = document.getElementById('ms-margin-us');
+    const marginUsValSpan = marginUsEl ? marginUsEl.querySelector('span:first-child') : null;
+    const marginUsDiffEl = document.getElementById('ms-margin-us-diff');
     const marginUsGauge = document.getElementById('ms-margin-us-gauge');
     const marginUsHint = document.getElementById('ms-margin-us-hint');
     if (!isNaN(marginUs)) {
-      marginUsEl.textContent = marginUs.toFixed(3) + 'T';
+      marginUsValSpan.textContent = marginUs.toFixed(3) + 'T';
       const pct = clamp((marginUs / 2) * 100, 2, 98);
       marginUsGauge.style.width = pct + '%';
       let muColor = '#ffb703', muHint = '레버리지 과열';
       if (marginUs < 0.8)      { muColor = 'var(--profit)'; muHint = '레버리지 안정 🟢'; }
       else if (marginUs < 1.4) { muColor = '#00c87a';        muHint = '보통 수준'; }
       else if (marginUs > 1.7) { muColor = 'var(--loss)';    muHint = '강제청산 위험 🔴'; }
-      marginUsEl.style.color = muColor; marginUsGauge.style.background = muColor;
+      marginUsValSpan.style.color = muColor; marginUsGauge.style.background = muColor;
       marginUsHint.textContent = muHint; marginUsHint.style.color = muColor;
-    } else { marginUsEl.textContent = 'N/A'; marginUsHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(marginUsDiffEl, marginUs, prev.Margin_Debt_US, { decimals: 3, suffix: 'T', goodDirection: 'down' });
+    } else { marginUsValSpan.textContent = 'N/A'; marginUsHint.textContent = '데이터 없음'; }
 
     // ── 10. 한국 신용잔고 ────────────────────────────
     const marginKr = parseFloat(latest.Margin_Debt_KR);
     const marginKrEl = document.getElementById('ms-margin-kr');
+    const marginKrValSpan = marginKrEl ? marginKrEl.querySelector('span:first-child') : null;
+    const marginKrDiffEl = document.getElementById('ms-margin-kr-diff');
     const marginKrGauge = document.getElementById('ms-margin-kr-gauge');
     const marginKrHint = document.getElementById('ms-margin-kr-hint');
     if (!isNaN(marginKr)) {
-      marginKrEl.textContent = marginKr.toFixed(1) + '조';
+      marginKrValSpan.textContent = marginKr.toFixed(1) + '조';
       const pct = clamp(((marginKr - 10) / 35) * 100, 2, 98);
       marginKrGauge.style.width = pct + '%';
       let mkColor = 'var(--loss)', mkHint = '반대매매 위험 🔴';
       if (marginKr < 20)      { mkColor = 'var(--profit)'; mkHint = '안정 구간 🟢'; }
       else if (marginKr < 30) { mkColor = '#ffb703';        mkHint = '레버리지 주의'; }
-      marginKrEl.style.color = mkColor; marginKrGauge.style.background = mkColor;
+      marginKrValSpan.style.color = mkColor; marginKrGauge.style.background = mkColor;
       marginKrHint.textContent = mkHint; marginKrHint.style.color = mkColor;
-    } else { marginKrEl.textContent = 'N/A'; marginKrHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(marginKrDiffEl, marginKr, prev.Margin_Debt_KR, { decimals: 1, suffix: '조', goodDirection: 'down' });
+    } else { marginKrValSpan.textContent = 'N/A'; marginKrHint.textContent = '데이터 없음'; }
 
     // ── 11. Russell 2000 ─────────────────────────────
     const russell = parseFloat(latest.Russell2000);
     const russellEl = document.getElementById('ms-russell');
+    const russellValSpan = russellEl ? russellEl.querySelector('span:first-child') : null;
+    const russellDiffEl = document.getElementById('ms-russell-diff');
     const russellGauge = document.getElementById('ms-russell-gauge');
     const russellHint = document.getElementById('ms-russell-hint');
     if (!isNaN(russell)) {
-      russellEl.textContent = russell.toFixed(0);
+      russellValSpan.textContent = russell.toFixed(0);
       const pct = clamp(((russell - 1400) / 1200) * 100, 2, 98);
       russellGauge.style.width = pct + '%';
       let rColor = 'var(--loss)', rHint = '약세 구간 🔴';
       if (russell > 2200)      { rColor = 'var(--profit)'; rHint = '강세 구간 🟢'; }
       else if (russell > 1800) { rColor = '#ffb703';        rHint = '중립 구간'; }
-      russellEl.style.color = rColor; russellGauge.style.background = rColor;
+      russellValSpan.style.color = rColor; russellGauge.style.background = rColor;
       russellHint.textContent = rHint; russellHint.style.color = rColor;
-    } else { russellEl.textContent = 'N/A'; russellHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(russellDiffEl, russell, prev.Russell2000, { decimals: 0, goodDirection: 'up' });
+    } else { russellValSpan.textContent = 'N/A'; russellHint.textContent = '데이터 없음'; }
 
     // ── 12. 구리 가격 ────────────────────────────────
     const copper = parseFloat(latest.Copper);
     const copperEl = document.getElementById('ms-copper');
+    const copperValSpan = copperEl ? copperEl.querySelector('span:first-child') : null;
+    const copperDiffEl = document.getElementById('ms-copper-diff');
     const copperGauge = document.getElementById('ms-copper-gauge');
     const copperHint = document.getElementById('ms-copper-hint');
     if (!isNaN(copper)) {
-      copperEl.textContent = '$' + copper.toFixed(2);
+      copperValSpan.textContent = '$' + copper.toFixed(2);
       const pct = clamp(((copper - 2.5) / 3) * 100, 2, 98);
       copperGauge.style.width = pct + '%';
       let cColor = 'var(--loss)', cHint = '경기 침체 신호 🔴';
       if (copper > 4.0)      { cColor = 'var(--profit)'; cHint = '경기 호황 🟢'; }
       else if (copper > 3.2) { cColor = '#ffb703';        cHint = '회복 구간'; }
-      copperEl.style.color = cColor; copperGauge.style.background = cColor;
+      copperValSpan.style.color = cColor; copperGauge.style.background = cColor;
       copperHint.textContent = cHint; copperHint.style.color = cColor;
-    } else { copperEl.textContent = 'N/A'; copperHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(copperDiffEl, copper, prev.Copper, { decimals: 2, suffix: '$', goodDirection: 'up' });
+    } else { copperValSpan.textContent = 'N/A'; copperHint.textContent = '데이터 없음'; }
 
     // ── 13. BDI ──────────────────────────────────────
     const bdi = parseFloat(latest.BDI_Index);
     const bdiEl = document.getElementById('ms-bdi');
+    const bdiValSpan = bdiEl ? bdiEl.querySelector('span:first-child') : null;
+    const bdiDiffEl = document.getElementById('ms-bdi-diff');
     const bdiGauge = document.getElementById('ms-bdi-gauge');
     const bdiHint = document.getElementById('ms-bdi-hint');
     if (!isNaN(bdi)) {
-      bdiEl.textContent = bdi.toFixed(0);
+      bdiValSpan.textContent = bdi.toFixed(0);
       const pct = clamp(((bdi - 500) / 4000) * 100, 2, 98);
       bdiGauge.style.width = pct + '%';
       let bdColor = 'var(--loss)', bdHint = '물동량 침체 🔴';
       if (bdi > 2000)      { bdColor = 'var(--profit)'; bdHint = '물동량 호황 🟢'; }
       else if (bdi > 1000) { bdColor = '#ffb703';        bdHint = '보통 수준'; }
-      bdiEl.style.color = bdColor; bdiGauge.style.background = bdColor;
+      bdiValSpan.style.color = bdColor; bdiGauge.style.background = bdColor;
       bdiHint.textContent = bdHint; bdiHint.style.color = bdColor;
-    } else { bdiEl.textContent = 'N/A'; bdiHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(bdiDiffEl, bdi, prev.BDI_Index, { decimals: 0, goodDirection: 'up' });
+    } else { bdiValSpan.textContent = 'N/A'; bdiHint.textContent = '데이터 없음'; }
 
     // ── 14. 한국 수출 ─────────────────────────────────
     const krRaw = latest.KR_Export ?? '';
     const krexport = parseFloat(krRaw);
     const krexportEl = document.getElementById('ms-krexport');
+    const krexportValSpan = krexportEl ? krexportEl.querySelector('span:first-child') : null;
+    const krexportDiffEl = document.getElementById('ms-krexport-diff');
     const krexportGauge = document.getElementById('ms-krexport-gauge');
     const krexportHint = document.getElementById('ms-krexport-hint');
     if (!isNaN(krexport)) {
-      krexportEl.textContent = krexport.toFixed(0) + '억$';
+      krexportValSpan.textContent = krexport.toFixed(0) + '억$';
       const pct = clamp(((krexport - 40) / 30) * 100, 2, 98);
       krexportGauge.style.width = pct + '%';
       let keColor = 'var(--loss)', keHint = '수출 부진 🔴';
       if (krexport > 580)      { keColor = 'var(--profit)'; keHint = '수출 호조 🟢'; }
       else if (krexport > 500) { keColor = '#ffb703';        keHint = '보통 수준'; }
-      krexportEl.style.color = keColor; krexportGauge.style.background = keColor;
+      krexportValSpan.style.color = keColor; krexportGauge.style.background = keColor;
       krexportHint.textContent = keHint; krexportHint.style.color = keColor;
+      if (prev) msSetDiff(krexportDiffEl, krexport, prev.KR_Export, { decimals: 0, suffix: '억$', goodDirection: 'up' });
     } else {
       // "877.5 (53.2%)" 같은 형식도 처리
       const match = krRaw.match(/[\d.]+/);
       if (match) {
-        krexportEl.textContent = parseFloat(match[0]).toFixed(0) + '억$';
+        krexportValSpan.textContent = parseFloat(match[0]).toFixed(0) + '억$';
         krexportHint.textContent = krRaw.includes('(') ? krRaw.match(/\(([^)]+)\)/)?.[1] ?? '' : '';
+        if (prev && krexportDiffEl) {
+          const prevRaw = (prev.KR_Export ?? '').toString();
+          const prevMatch = prevRaw.match(/[\d.]+/);
+          if (prevMatch) msSetDiff(krexportDiffEl, parseFloat(match[0]), prevMatch[0], { decimals: 0, suffix: '억$', goodDirection: 'up' });
+        }
       } else {
-        krexportEl.textContent = 'N/A';
+        krexportValSpan.textContent = 'N/A';
         krexportHint.textContent = '데이터 없음';
       }
     }
@@ -8406,53 +8505,62 @@ async function initMarketSignalBar() {
     // ── 15. 버핏 지수 (미국) ─────────────────────────
     const buff = parseFloat(latest.Buffett_US);
     const buffEl = document.getElementById('ms-buffett');
+    const buffValSpan = buffEl ? buffEl.querySelector('span:first-child') : null;
+    const buffDiffEl = document.getElementById('ms-buffett-diff');
     const buffGauge = document.getElementById('ms-buffett-gauge');
     const buffHint = document.getElementById('ms-buffett-hint');
     if (!isNaN(buff)) {
-      buffEl.textContent = buff.toFixed(1) + '%';
+      buffValSpan.textContent = buff.toFixed(1) + '%';
       const pct = clamp(((buff - 70) / 170) * 100, 2, 98);
       buffGauge.style.width = pct + '%';
       let bColor = 'var(--loss)', bHint = '극단적 버블 🔴';
       if (buff < 100)      { bColor = 'var(--profit)'; bHint = '저평가 구간 🟢'; }
       else if (buff < 130) { bColor = '#00c87a';        bHint = '적정~약간 고평가'; }
       else if (buff < 180) { bColor = '#ffb703';        bHint = '고평가 주의'; }
-      buffEl.style.color = bColor; buffGauge.style.background = bColor;
+      buffValSpan.style.color = bColor; buffGauge.style.background = bColor;
       buffHint.textContent = bHint; buffHint.style.color = bColor;
-    } else { buffEl.textContent = 'N/A'; buffHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(buffDiffEl, buff, prev.Buffett_US, { decimals: 1, suffix: '%p', goodDirection: 'down' });
+    } else { buffValSpan.textContent = 'N/A'; buffHint.textContent = '데이터 없음'; }
 
     // ── 16. 버핏 지수 (한국) ─────────────────────────
     const buffKr = parseFloat(latest.Buffett_KR);
     const buffKrEl = document.getElementById('ms-buffett-kr');
+    const buffKrValSpan = buffKrEl ? buffKrEl.querySelector('span:first-child') : null;
+    const buffKrDiffEl = document.getElementById('ms-buffett-kr-diff');
     const buffKrGauge = document.getElementById('ms-buffett-kr-gauge');
     const buffKrHint = document.getElementById('ms-buffett-kr-hint');
     if (!isNaN(buffKr)) {
-      buffKrEl.textContent = buffKr.toFixed(1) + '%';
+      buffKrValSpan.textContent = buffKr.toFixed(1) + '%';
       const pct = clamp(((buffKr - 50) / 100) * 100, 2, 98);
       buffKrGauge.style.width = pct + '%';
       let bkColor = 'var(--loss)', bkHint = '고평가 경계 🔴';
       if (buffKr < 80)       { bkColor = 'var(--profit)'; bkHint = '저평가 구간 🟢'; }
       else if (buffKr < 110) { bkColor = '#00c87a';        bkHint = '적정 수준'; }
       else if (buffKr < 130) { bkColor = '#ffb703';        bkHint = '다소 고평가'; }
-      buffKrEl.style.color = bkColor; buffKrGauge.style.background = bkColor;
+      buffKrValSpan.style.color = bkColor; buffKrGauge.style.background = bkColor;
       buffKrHint.textContent = bkHint; buffKrHint.style.color = bkColor;
-    } else { buffKrEl.textContent = 'N/A'; buffKrHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(buffKrDiffEl, buffKr, prev.Buffett_KR, { decimals: 1, suffix: '%p', goodDirection: 'down' });
+    } else { buffKrValSpan.textContent = 'N/A'; buffKrHint.textContent = '데이터 없음'; }
 
     // ── 17. CAPE PE ──────────────────────────────────
     const cape = parseFloat(latest.CAPE_PE);
     const capeEl = document.getElementById('ms-cape');
+    const capeValSpan = capeEl ? capeEl.querySelector('span:first-child') : null;
+    const capeDiffEl = document.getElementById('ms-cape-diff');
     const capeGauge = document.getElementById('ms-cape-gauge');
     const capeHint = document.getElementById('ms-cape-hint');
     if (!isNaN(cape)) {
-      capeEl.textContent = cape.toFixed(1) + '배';
+      capeValSpan.textContent = cape.toFixed(1) + '배';
       const pct = clamp(((cape - 15) / 30) * 100, 2, 98);
       capeGauge.style.width = pct + '%';
       let caColor = 'var(--loss)', caHint = '역사적 고평가 🔴';
       if (cape < 20)      { caColor = 'var(--profit)'; caHint = '저평가 구간 🟢'; }
       else if (cape < 28) { caColor = '#ffb703';        caHint = '역사적 평균'; }
       else if (cape < 38) { caColor = '#ff9f43';        caHint = '과열 주의'; }
-      capeEl.style.color = caColor; capeGauge.style.background = caColor;
+      capeValSpan.style.color = caColor; capeGauge.style.background = caColor;
       capeHint.textContent = caHint; capeHint.style.color = caColor;
-    } else { capeEl.textContent = 'N/A'; capeHint.textContent = '데이터 없음'; }
+      if (prev) msSetDiff(capeDiffEl, cape, prev.CAPE_PE, { decimals: 1, suffix: '배', goodDirection: 'down' });
+    } else { capeValSpan.textContent = 'N/A'; capeHint.textContent = '데이터 없음'; }
 
   } catch (e) {
     console.warn('Market Signal Bar 로드 실패:', e);
