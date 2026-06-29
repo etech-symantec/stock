@@ -3057,3 +3057,134 @@ nav {
   .signal-settings-grid { grid-template-columns: 1fr; }
   .signal-indicator-grid { grid-template-columns: 1fr; }
 }
+
+/* =====================================================
+   📡 Market Signal 자동 컴팩트 레이아웃
+   - 지표를 많이 숨겨 공간이 남을 때 날짜 + 종합 신호를 1줄 배치
+   ===================================================== */
+
+/* 상단/하단 여백 동일 */
+#marketSignalBar.market-signal-bar {
+  margin: 12px 0 !important;
+}
+
+/* 테두리 그림자 제거 */
+.market-signal-shell,
+[data-theme="light"] .market-signal-shell {
+  box-shadow: none !important;
+}
+
+/* 컴팩트 모드: 날짜 + 종합 신호를 좌우 배치 */
+#marketSignalBar.ms-compact .market-signal-shell {
+  grid-template-columns: max-content minmax(0, 1fr) !important;
+  align-items: stretch;
+  gap: 10px;
+}
+
+/* 왼쪽 패널을 세로 2단이 아니라 가로 2칸으로 변경 */
+#marketSignalBar.ms-compact .ms-overview-panel {
+  display: grid;
+  grid-template-columns: 86px 190px;
+  grid-template-rows: 1fr;
+  gap: 10px;
+  align-self: stretch;
+}
+
+/* 날짜 카드 축소 */
+#marketSignalBar.ms-compact .ms-date-card {
+  min-height: 82px;
+  padding: 8px 10px;
+  border-radius: 16px;
+}
+
+#marketSignalBar.ms-compact .ms-date-stack span:first-child {
+  font-size: 10px;
+}
+
+#marketSignalBar.ms-compact .ms-date-stack span:nth-child(2) {
+  font-size: 13px;
+}
+
+#marketSignalBar.ms-compact .ms-date-stack span:last-child {
+  font-size: 17px;
+}
+
+/* 종합 신호 카드 축소 */
+#marketSignalBar.ms-compact .ms-total-card {
+  min-height: 82px;
+  padding: 10px 12px;
+  gap: 5px;
+  border-radius: 16px;
+}
+
+#marketSignalBar.ms-compact .ms-total-kicker {
+  font-size: 9px;
+}
+
+#marketSignalBar.ms-compact .ms-score {
+  font-size: 30px;
+}
+
+#marketSignalBar.ms-compact .ms-score-row {
+  gap: 6px;
+}
+
+#marketSignalBar.ms-compact .ms-badge {
+  padding: 4px 9px;
+  font-size: 10px;
+}
+
+#marketSignalBar.ms-compact .ms-total-note {
+  display: none;
+}
+
+/* 지표 그룹도 한 줄에 최대한 붙여서 표시 */
+#marketSignalBar.ms-compact .ms-groups-wrap {
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: stretch;
+}
+
+#marketSignalBar.ms-compact .ms-group {
+  min-width: 230px;
+  padding: 9px;
+  border-radius: 16px;
+}
+
+#marketSignalBar.ms-compact .ms-group-head {
+  margin-bottom: 7px;
+}
+
+#marketSignalBar.ms-compact .ms-group-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+#marketSignalBar.ms-compact .ms-indicator-card {
+  min-height: 60px;
+  padding: 7px 8px;
+}
+
+/* 모바일에서는 기존 세로 구조 유지 */
+@media (max-width: 760px) {
+  #marketSignalBar.ms-compact .market-signal-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  #marketSignalBar.ms-compact .ms-overview-panel {
+    grid-template-columns: 1fr;
+  }
+
+  #marketSignalBar.ms-compact .ms-groups-wrap {
+    flex-wrap: wrap;
+  }
+
+  #marketSignalBar.ms-compact .ms-group {
+    min-width: 100%;
+  }
+
+  #marketSignalBar.ms-compact .ms-total-note {
+    display: block;
+  }
+}
