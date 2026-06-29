@@ -3,6 +3,56 @@
 // ==========================================
 const STORE_KEY = 'stockwatch_real_v69'; 
 
+// ==========================================
+// Market Signal 표시 설정
+// ==========================================
+const MARKET_SIGNAL_GROUPS = {
+  risk: { label: '심리 · 리스크', className: 'ms-risk' },
+  valuation: { label: '밸류에이션', className: 'ms-valuation' },
+  cycle: { label: '경기 선행', className: 'ms-cycle' },
+  liquidity: { label: '자금 환경', className: 'ms-liquidity' }
+};
+
+const MARKET_SIGNAL_INDICATORS = {
+  vix: { label: 'VIX', group: 'risk', cardId: 'ms-card-vix' },
+  move: { label: 'MOVE', group: 'risk', cardId: 'ms-card-move' },
+  hy: { label: '하이일드', group: 'risk', cardId: 'ms-card-hy' },
+  fg: { label: '공포 & 탐욕', group: 'risk', cardId: 'ms-card-fg' },
+  buffett: { label: '버핏 지수(미)', group: 'valuation', cardId: 'ms-card-buffett' },
+  'buffett-kr': { label: '버핏 지수(한)', group: 'valuation', cardId: 'ms-card-buffett-kr' },
+  cape: { label: 'CAPE PE', group: 'valuation', cardId: 'ms-card-cape' },
+  russell: { label: 'Russell 2000', group: 'cycle', cardId: 'ms-card-russell' },
+  copper: { label: '구리 가격', group: 'cycle', cardId: 'ms-card-copper' },
+  bdi: { label: 'BDI', group: 'cycle', cardId: 'ms-card-bdi' },
+  krexport: { label: '한국 수출', group: 'cycle', cardId: 'ms-card-krexport' },
+  us10y: { label: '미국 10Y', group: 'liquidity', cardId: 'ms-card-us10y' },
+  dxy: { label: 'DXY', group: 'liquidity', cardId: 'ms-card-dxy' },
+  usdkrw: { label: 'USD/KRW', group: 'liquidity', cardId: 'ms-card-usdkrw' },
+  'margin-us': { label: '신용잔고(미)', group: 'liquidity', cardId: 'ms-card-margin-us' },
+  'margin-kr': { label: '신용잔고(한)', group: 'liquidity', cardId: 'ms-card-margin-kr' }
+};
+
+function getDefaultSignalVisibility() {
+  const groups = {};
+  const indicators = {};
+  Object.keys(MARKET_SIGNAL_GROUPS).forEach(key => groups[key] = true);
+  Object.keys(MARKET_SIGNAL_INDICATORS).forEach(key => indicators[key] = true);
+  return { groups, indicators };
+}
+
+function mergeSignalVisibility(saved) {
+  const defaults = getDefaultSignalVisibility();
+  return {
+    groups: { ...defaults.groups, ...(saved && saved.groups ? saved.groups : {}) },
+    indicators: { ...defaults.indicators, ...(saved && saved.indicators ? saved.indicators : {}) }
+  };
+}
+
+function ensureSignalVisibility() {
+  state.signalVisibility = mergeSignalVisibility(state.signalVisibility);
+  return state.signalVisibility;
+}
+
 function loadState() {
   try {
     let s = localStorage.getItem(STORE_KEY);
@@ -19,13 +69,14 @@ function loadState() {
       if(!parsed.riaAccounts) parsed.riaAccounts = [];
       if(!parsed.riaExcludeSymbols) parsed.riaExcludeSymbols = [];
       if(!parsed.customOverseasAssets) parsed.customOverseasAssets = []; // 🌟 수동 지정 해외자산 추가
+      parsed.signalVisibility = mergeSignalVisibility(parsed.signalVisibility);
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [] };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [], signalVisibility: getDefaultSignalVisibility() };
 }
 
 let state = loadState();
@@ -269,7 +320,10 @@ function setListStyle(style) {
     render(); // 스타일 변경 즉시 화면 다시 그리기
 }
 
-function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function saveState() {
+  if (state) state.signalVisibility = mergeSignalVisibility(state.signalVisibility);
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
 
 function formatDate(dateStr) {
     if (!dateStr) return '';
@@ -511,34 +565,106 @@ function openMasterSettingsModal() {
   if (customOverseasEl) customOverseasEl.value = (state.customOverseasAssets || []).join(', ');
 
   document.getElementById('masterSettingsOverlay').classList.add('open');
+  syncMarketSignalSettingsUI();
   switchSettingsTab('data');
 }
 
 // 설정 모달 탭 전환 함수
 function switchSettingsTab(tabName) {
-  const tabData = document.getElementById('settingsTabData');
-  const tabDisplay = document.getElementById('settingsTabDisplay');
-  const btnData = document.getElementById('tabBtnData');
-  const btnDisplay = document.getElementById('tabBtnDisplay');
+  const tabs = {
+    data: { panel: 'settingsTabData', button: 'tabBtnData' },
+    display: { panel: 'settingsTabDisplay', button: 'tabBtnDisplay' },
+    signal: { panel: 'settingsTabSignal', button: 'tabBtnSignal' }
+  };
 
-  if (tabName === 'data') {
-      tabData.style.display = 'block';
-      tabDisplay.style.display = 'none';
-      
-      btnData.style.borderBottomColor = 'var(--accent)';
-      btnData.style.color = 'var(--text)';
-      btnDisplay.style.borderBottomColor = 'transparent';
-      btnDisplay.style.color = 'var(--text2)';
-  } else {
-      tabData.style.display = 'none';
-      tabDisplay.style.display = 'block';
-      
-      btnData.style.borderBottomColor = 'transparent';
-      btnData.style.color = 'var(--text2)';
-      btnDisplay.style.borderBottomColor = 'var(--accent)';
-      btnDisplay.style.color = 'var(--text)';
-  }
+  Object.entries(tabs).forEach(([key, item]) => {
+    const panel = document.getElementById(item.panel);
+    const btn = document.getElementById(item.button);
+    const isActive = key === tabName;
+
+    if (panel) panel.style.display = isActive ? 'block' : 'none';
+    if (btn) {
+      btn.style.borderBottomColor = isActive ? 'var(--accent)' : 'transparent';
+      btn.style.color = isActive ? 'var(--text)' : 'var(--text2)';
+    }
+  });
+
+  if (tabName === 'signal') syncMarketSignalSettingsUI();
 }
+
+function applyMarketSignalVisibility() {
+  const bar = document.getElementById('marketSignalBar');
+  if (!bar || !state) return;
+
+  const vis = ensureSignalVisibility();
+
+  Object.entries(MARKET_SIGNAL_INDICATORS).forEach(([key, meta]) => {
+    const card = document.getElementById(meta.cardId);
+    if (card) card.style.display = vis.indicators[key] === false ? 'none' : '';
+  });
+
+  Object.entries(MARKET_SIGNAL_GROUPS).forEach(([groupKey, meta]) => {
+    const groupEl = bar.querySelector(`.${meta.className}`);
+    if (!groupEl) return;
+
+    const groupEnabled = vis.groups[groupKey] !== false;
+    const hasVisibleIndicator = Object.entries(MARKET_SIGNAL_INDICATORS)
+      .some(([indKey, indMeta]) => indMeta.group === groupKey && vis.indicators[indKey] !== false);
+
+    groupEl.style.display = groupEnabled && hasVisibleIndicator ? '' : 'none';
+  });
+}
+
+function syncMarketSignalSettingsUI() {
+  if (!state) return;
+  const vis = ensureSignalVisibility();
+
+  Object.keys(MARKET_SIGNAL_GROUPS).forEach(groupKey => {
+    const groupCheckbox = document.getElementById(`sig-group-${groupKey}`);
+    const groupEnabled = vis.groups[groupKey] !== false;
+    if (groupCheckbox) groupCheckbox.checked = groupEnabled;
+
+    Object.keys(MARKET_SIGNAL_INDICATORS)
+      .filter(indKey => MARKET_SIGNAL_INDICATORS[indKey].group === groupKey)
+      .forEach(indKey => {
+        const indicatorCheckbox = document.getElementById(`sig-ind-${indKey}`);
+        if (!indicatorCheckbox) return;
+        indicatorCheckbox.checked = vis.indicators[indKey] !== false;
+        indicatorCheckbox.disabled = !groupEnabled;
+        const row = indicatorCheckbox.closest('.signal-check');
+        if (row) row.classList.toggle('disabled', !groupEnabled);
+      });
+  });
+}
+
+function toggleSignalGroupVisibility(groupKey, checked) {
+  const vis = ensureSignalVisibility();
+  vis.groups[groupKey] = !!checked;
+  state.signalVisibility = vis;
+  saveState();
+  applyMarketSignalVisibility();
+  syncMarketSignalSettingsUI();
+  triggerAutoSync();
+}
+
+function toggleSignalIndicatorVisibility(indicatorKey, checked) {
+  const vis = ensureSignalVisibility();
+  vis.indicators[indicatorKey] = !!checked;
+  state.signalVisibility = vis;
+  saveState();
+  applyMarketSignalVisibility();
+  syncMarketSignalSettingsUI();
+  triggerAutoSync();
+}
+
+function resetMarketSignalVisibility() {
+  state.signalVisibility = getDefaultSignalVisibility();
+  saveState();
+  applyMarketSignalVisibility();
+  syncMarketSignalSettingsUI();
+  triggerAutoSync();
+}
+
 // 🌟 [추가] 수동 해외자산 목록 저장 함수
 function saveCustomOverseas() {
     const val = document.getElementById('inputCustomOverseas').value;
@@ -8561,6 +8687,8 @@ async function initMarketSignalBar() {
       capeHint.textContent = caHint; capeHint.style.color = caColor;
       if (prev) msSetDiff(capeDiffEl, cape, prev.CAPE_PE, { decimals: 1, suffix: '배', goodDirection: 'down' });
     } else { capeValSpan.textContent = 'N/A'; capeHint.textContent = '데이터 없음'; }
+
+    applyMarketSignalVisibility();
 
   } catch (e) {
     console.warn('Market Signal Bar 로드 실패:', e);
