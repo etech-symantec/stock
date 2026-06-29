@@ -9724,7 +9724,7 @@
   "signalVisibility": {
     "groups": {
       "risk": false,
-      "valuation": true,
+      "valuation": false,
       "cycle": true,
       "liquidity": true
     },
@@ -9737,7 +9737,7 @@
       "buffett-kr": true,
       "cape": true,
       "russell": true,
-      "copper": true,
+      "copper": false,
       "bdi": true,
       "krexport": true,
       "us10y": true,
