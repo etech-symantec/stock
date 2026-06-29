@@ -2571,7 +2571,7 @@ nav {
    ===================================================== */
 #marketSignalBar.market-signal-bar {
   display: none;
-  margin: 14px 0 10px;
+  margin: 14px 0 14px;
   position: relative;
   z-index: 5;
 }
@@ -2588,7 +2588,7 @@ nav {
     radial-gradient(circle at 0% 0%, rgba(124,106,247,0.18), transparent 34%),
     radial-gradient(circle at 100% 0%, rgba(58,154,255,0.12), transparent 30%),
     linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018));
-  box-shadow: 0 18px 40px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: none;
   overflow: hidden;
 }
 .market-signal-shell::before {
@@ -2622,7 +2622,7 @@ nav {
   background: rgba(13,15,20,0.46);
   backdrop-filter: blur(12px);
   border-radius: 18px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  box-shadow: none;
 }
 .ms-date-card {
   display: flex;
@@ -2717,7 +2717,7 @@ nav {
   border: 1px solid transparent;
   white-space: nowrap;
   line-height: 1.2;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+  box-shadow: none;
 }
 .ms-total-note {
   font-size: 10px;
@@ -2744,7 +2744,7 @@ nav {
   background:
     linear-gradient(180deg, rgba(var(--ms-accent-rgb),0.10), rgba(var(--ms-accent-rgb),0.035)),
     rgba(13,15,20,0.34);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  box-shadow: none;
 }
 .ms-risk { --ms-accent: #ff4d6a; --ms-accent-rgb: 255,77,106; }
 .ms-liquidity { --ms-accent: #3A9AFF; --ms-accent-rgb: 58,154,255; }
@@ -2764,7 +2764,7 @@ nav {
   border-radius: 9px;
   background: rgba(var(--ms-accent-rgb), 0.14);
   border: 1px solid rgba(var(--ms-accent-rgb), 0.20);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: none;
 }
 .ms-group-label {
   font-size: 12px;
@@ -2807,7 +2807,7 @@ nav {
   transform: translateY(-1px);
   border-color: rgba(var(--ms-accent-rgb),0.44);
   background: rgba(var(--ms-accent-rgb),0.08);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+  box-shadow: none;
 }
 .ms-ind-label {
   font-size: 9px;
@@ -2868,7 +2868,7 @@ nav {
   height: 8px;
   border-radius: 999px;
   background: rgba(255,255,255,0.45);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
+  box-shadow: none;
 }
 .ms-ind-gauge-rainbow {
   background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
@@ -2883,7 +2883,7 @@ nav {
   height: 9px;
   border-radius: 999px;
   background: #fff;
-  box-shadow: 0 0 0 2px rgba(0,0,0,0.18), 0 2px 7px rgba(0,0,0,0.35);
+  box-shadow: none;
   transition: left 0.45s ease;
 }
 .ms-ind-hint {
@@ -2902,7 +2902,7 @@ nav {
     radial-gradient(circle at 0% 0%, rgba(98,80,224,0.16), transparent 34%),
     radial-gradient(circle at 100% 0%, rgba(42,125,225,0.10), transparent 30%),
     linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.68));
-  box-shadow: 0 14px 32px rgba(20,25,40,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow: none;
 }
 [data-theme="light"] .ms-date-card,
 [data-theme="light"] .ms-total-card,
@@ -2927,7 +2927,7 @@ nav {
   .ms-score { font-size: 34px; }
 }
 @media (max-width: 760px) {
-  #marketSignalBar.market-signal-bar { margin: 10px 0 8px; }
+  #marketSignalBar.market-signal-bar { margin: 10px 0 10px; }
   .market-signal-shell { padding: 10px; border-radius: 18px; }
   .ms-overview-panel { grid-template-columns: 1fr; }
   .ms-date-caption { writing-mode: initial; transform: none; }
@@ -2935,4 +2935,125 @@ nav {
   .ms-date-stack { flex-direction: row; align-items: baseline; gap: 6px; }
   .ms-group { min-width: 100%; }
   .ms-indicator-card { max-width: none; }
+}
+
+/* Market Signal — 그림자 제거 및 상하 여백 균일화 */
+#marketSignalBar.market-signal-bar { margin-top: 14px; margin-bottom: 14px; }
+#marketSignalBar .market-signal-shell,
+#marketSignalBar .ms-date-card,
+#marketSignalBar .ms-total-card,
+#marketSignalBar .ms-group,
+#marketSignalBar .ms-group-icon,
+#marketSignalBar .ms-badge,
+#marketSignalBar .ms-indicator-card,
+#marketSignalBar .ms-gauge-marker::after,
+#marketSignalBar .ms-fg-dot { box-shadow: none !important; }
+@media (max-width: 760px) {
+  #marketSignalBar.market-signal-bar { margin-top: 10px; margin-bottom: 10px; }
+}
+
+
+/* =====================================================
+   📡 Market Signal 표시 설정 탭
+   ===================================================== */
+.signal-settings-intro {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text2);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.signal-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.signal-settings-group {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.025);
+  padding: 12px;
+}
+
+.signal-risk-box { border-color: rgba(255,77,106,0.24); }
+.signal-valuation-box { border-color: rgba(0,200,122,0.24); }
+.signal-cycle-box { border-color: rgba(255,183,3,0.24); }
+.signal-liquidity-box { border-color: rgba(58,154,255,0.24); }
+
+.signal-toggle-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  cursor: pointer;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.signal-toggle-row input,
+.signal-check input {
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.signal-toggle-row b {
+  display: block;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.signal-toggle-row small {
+  display: block;
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 3px;
+}
+
+.signal-indicator-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.signal-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.signal-check:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.signal-check.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.signal-check.disabled input,
+.signal-check.disabled span {
+  cursor: not-allowed;
+}
+
+@media (max-width: 760px) {
+  .signal-settings-grid { grid-template-columns: 1fr; }
+  .signal-indicator-grid { grid-template-columns: 1fr; }
 }
