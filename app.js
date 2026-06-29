@@ -3,56 +3,6 @@
 // ==========================================
 const STORE_KEY = 'stockwatch_real_v69'; 
 
-// ==========================================
-// Market Signal 표시 설정
-// ==========================================
-const MARKET_SIGNAL_GROUPS = {
-  risk: { label: '심리 · 리스크', className: 'ms-risk' },
-  valuation: { label: '밸류에이션', className: 'ms-valuation' },
-  cycle: { label: '경기 선행', className: 'ms-cycle' },
-  liquidity: { label: '자금 환경', className: 'ms-liquidity' }
-};
-
-const MARKET_SIGNAL_INDICATORS = {
-  vix: { label: 'VIX', group: 'risk', cardId: 'ms-card-vix' },
-  move: { label: 'MOVE', group: 'risk', cardId: 'ms-card-move' },
-  hy: { label: '하이일드', group: 'risk', cardId: 'ms-card-hy' },
-  fg: { label: '공포 & 탐욕', group: 'risk', cardId: 'ms-card-fg' },
-  buffett: { label: '버핏 지수(미)', group: 'valuation', cardId: 'ms-card-buffett' },
-  'buffett-kr': { label: '버핏 지수(한)', group: 'valuation', cardId: 'ms-card-buffett-kr' },
-  cape: { label: 'CAPE PE', group: 'valuation', cardId: 'ms-card-cape' },
-  russell: { label: 'Russell 2000', group: 'cycle', cardId: 'ms-card-russell' },
-  copper: { label: '구리 가격', group: 'cycle', cardId: 'ms-card-copper' },
-  bdi: { label: 'BDI', group: 'cycle', cardId: 'ms-card-bdi' },
-  krexport: { label: '한국 수출', group: 'cycle', cardId: 'ms-card-krexport' },
-  us10y: { label: '미국 10Y', group: 'liquidity', cardId: 'ms-card-us10y' },
-  dxy: { label: 'DXY', group: 'liquidity', cardId: 'ms-card-dxy' },
-  usdkrw: { label: 'USD/KRW', group: 'liquidity', cardId: 'ms-card-usdkrw' },
-  'margin-us': { label: '신용잔고(미)', group: 'liquidity', cardId: 'ms-card-margin-us' },
-  'margin-kr': { label: '신용잔고(한)', group: 'liquidity', cardId: 'ms-card-margin-kr' }
-};
-
-function getDefaultSignalVisibility() {
-  const groups = {};
-  const indicators = {};
-  Object.keys(MARKET_SIGNAL_GROUPS).forEach(key => groups[key] = true);
-  Object.keys(MARKET_SIGNAL_INDICATORS).forEach(key => indicators[key] = true);
-  return { groups, indicators };
-}
-
-function mergeSignalVisibility(saved) {
-  const defaults = getDefaultSignalVisibility();
-  return {
-    groups: { ...defaults.groups, ...(saved && saved.groups ? saved.groups : {}) },
-    indicators: { ...defaults.indicators, ...(saved && saved.indicators ? saved.indicators : {}) }
-  };
-}
-
-function ensureSignalVisibility() {
-  state.signalVisibility = mergeSignalVisibility(state.signalVisibility);
-  return state.signalVisibility;
-}
-
 function loadState() {
   try {
     let s = localStorage.getItem(STORE_KEY);
@@ -69,14 +19,13 @@ function loadState() {
       if(!parsed.riaAccounts) parsed.riaAccounts = [];
       if(!parsed.riaExcludeSymbols) parsed.riaExcludeSymbols = [];
       if(!parsed.customOverseasAssets) parsed.customOverseasAssets = []; // 🌟 수동 지정 해외자산 추가
-      parsed.signalVisibility = mergeSignalVisibility(parsed.signalVisibility);
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [], signalVisibility: getDefaultSignalVisibility() };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [] };
 }
 
 let state = loadState();
@@ -320,10 +269,7 @@ function setListStyle(style) {
     render(); // 스타일 변경 즉시 화면 다시 그리기
 }
 
-function saveState() {
-  if (state) state.signalVisibility = mergeSignalVisibility(state.signalVisibility);
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
-}
+function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
 function formatDate(dateStr) {
     if (!dateStr) return '';
@@ -564,107 +510,39 @@ function openMasterSettingsModal() {
   const customOverseasEl = document.getElementById('inputCustomOverseas');
   if (customOverseasEl) customOverseasEl.value = (state.customOverseasAssets || []).join(', ');
 
-  document.getElementById('masterSettingsOverlay').classList.add('open');
   syncMarketSignalSettingsUI();
+  applyMarketSignalVisibility();
+  document.getElementById('masterSettingsOverlay').classList.add('open');
   switchSettingsTab('data');
 }
 
 // 설정 모달 탭 전환 함수
 function switchSettingsTab(tabName) {
   const tabs = {
-    data: { panel: 'settingsTabData', button: 'tabBtnData' },
-    display: { panel: 'settingsTabDisplay', button: 'tabBtnDisplay' },
-    signal: { panel: 'settingsTabSignal', button: 'tabBtnSignal' }
+    data: {
+      panel: document.getElementById('settingsTabData'),
+      button: document.getElementById('tabBtnData')
+    },
+    display: {
+      panel: document.getElementById('settingsTabDisplay'),
+      button: document.getElementById('tabBtnDisplay')
+    },
+    signal: {
+      panel: document.getElementById('settingsTabSignal'),
+      button: document.getElementById('tabBtnSignal')
+    }
   };
 
   Object.entries(tabs).forEach(([key, item]) => {
-    const panel = document.getElementById(item.panel);
-    const btn = document.getElementById(item.button);
-    const isActive = key === tabName;
-
-    if (panel) panel.style.display = isActive ? 'block' : 'none';
-    if (btn) {
-      btn.style.borderBottomColor = isActive ? 'var(--accent)' : 'transparent';
-      btn.style.color = isActive ? 'var(--text)' : 'var(--text2)';
-    }
+    if (!item.panel || !item.button) return;
+    const active = key === tabName;
+    item.panel.style.display = active ? 'block' : 'none';
+    item.button.style.borderBottomColor = active ? 'var(--accent)' : 'transparent';
+    item.button.style.color = active ? 'var(--text)' : 'var(--text2)';
   });
 
   if (tabName === 'signal') syncMarketSignalSettingsUI();
 }
-
-function applyMarketSignalVisibility() {
-  const bar = document.getElementById('marketSignalBar');
-  if (!bar || !state) return;
-
-  const vis = ensureSignalVisibility();
-
-  Object.entries(MARKET_SIGNAL_INDICATORS).forEach(([key, meta]) => {
-    const card = document.getElementById(meta.cardId);
-    if (card) card.style.display = vis.indicators[key] === false ? 'none' : '';
-  });
-
-  Object.entries(MARKET_SIGNAL_GROUPS).forEach(([groupKey, meta]) => {
-    const groupEl = bar.querySelector(`.${meta.className}`);
-    if (!groupEl) return;
-
-    const groupEnabled = vis.groups[groupKey] !== false;
-    const hasVisibleIndicator = Object.entries(MARKET_SIGNAL_INDICATORS)
-      .some(([indKey, indMeta]) => indMeta.group === groupKey && vis.indicators[indKey] !== false);
-
-    groupEl.style.display = groupEnabled && hasVisibleIndicator ? '' : 'none';
-  });
-}
-
-function syncMarketSignalSettingsUI() {
-  if (!state) return;
-  const vis = ensureSignalVisibility();
-
-  Object.keys(MARKET_SIGNAL_GROUPS).forEach(groupKey => {
-    const groupCheckbox = document.getElementById(`sig-group-${groupKey}`);
-    const groupEnabled = vis.groups[groupKey] !== false;
-    if (groupCheckbox) groupCheckbox.checked = groupEnabled;
-
-    Object.keys(MARKET_SIGNAL_INDICATORS)
-      .filter(indKey => MARKET_SIGNAL_INDICATORS[indKey].group === groupKey)
-      .forEach(indKey => {
-        const indicatorCheckbox = document.getElementById(`sig-ind-${indKey}`);
-        if (!indicatorCheckbox) return;
-        indicatorCheckbox.checked = vis.indicators[indKey] !== false;
-        indicatorCheckbox.disabled = !groupEnabled;
-        const row = indicatorCheckbox.closest('.signal-check');
-        if (row) row.classList.toggle('disabled', !groupEnabled);
-      });
-  });
-}
-
-function toggleSignalGroupVisibility(groupKey, checked) {
-  const vis = ensureSignalVisibility();
-  vis.groups[groupKey] = !!checked;
-  state.signalVisibility = vis;
-  saveState();
-  applyMarketSignalVisibility();
-  syncMarketSignalSettingsUI();
-  triggerAutoSync();
-}
-
-function toggleSignalIndicatorVisibility(indicatorKey, checked) {
-  const vis = ensureSignalVisibility();
-  vis.indicators[indicatorKey] = !!checked;
-  state.signalVisibility = vis;
-  saveState();
-  applyMarketSignalVisibility();
-  syncMarketSignalSettingsUI();
-  triggerAutoSync();
-}
-
-function resetMarketSignalVisibility() {
-  state.signalVisibility = getDefaultSignalVisibility();
-  saveState();
-  applyMarketSignalVisibility();
-  syncMarketSignalSettingsUI();
-  triggerAutoSync();
-}
-
 // 🌟 [추가] 수동 해외자산 목록 저장 함수
 function saveCustomOverseas() {
     const val = document.getElementById('inputCustomOverseas').value;
@@ -8688,8 +8566,6 @@ async function initMarketSignalBar() {
       if (prev) msSetDiff(capeDiffEl, cape, prev.CAPE_PE, { decimals: 1, suffix: '배', goodDirection: 'down' });
     } else { capeValSpan.textContent = 'N/A'; capeHint.textContent = '데이터 없음'; }
 
-    applyMarketSignalVisibility();
-
   } catch (e) {
     console.warn('Market Signal Bar 로드 실패:', e);
   }
@@ -8837,3 +8713,230 @@ if (txPriceInput) {
         txPriceKorean.innerText = numberToKorean(integerPart);
     });
 }
+
+
+// =====================================================
+// 📡 Market Signal 표시 설정 + 자동 컴팩트 레이아웃
+// - 설정 모달에서 그룹/지표 숨김 상태 저장
+// - 숨긴 지표 수와 실제 가로 공간에 따라 날짜+종합 신호를 1줄로 자동 배치
+// =====================================================
+const MARKET_SIGNAL_VISIBILITY_KEY = 'ttm_market_signal_visibility_v1';
+
+const MARKET_SIGNAL_GROUPS = {
+  risk: {
+    checkboxId: 'sig-group-risk',
+    selector: '.ms-risk',
+    indicators: ['vix', 'move', 'hy', 'fg']
+  },
+  valuation: {
+    checkboxId: 'sig-group-valuation',
+    selector: '.ms-valuation',
+    indicators: ['buffett', 'buffett-kr', 'cape']
+  },
+  cycle: {
+    checkboxId: 'sig-group-cycle',
+    selector: '.ms-cycle',
+    indicators: ['russell', 'copper', 'bdi', 'krexport']
+  },
+  liquidity: {
+    checkboxId: 'sig-group-liquidity',
+    selector: '.ms-liquidity',
+    indicators: ['us10y', 'dxy', 'usdkrw', 'margin-us', 'margin-kr']
+  }
+};
+
+const MARKET_SIGNAL_INDICATORS = {
+  vix: { checkboxId: 'sig-ind-vix', cardId: 'ms-card-vix' },
+  move: { checkboxId: 'sig-ind-move', cardId: 'ms-card-move' },
+  hy: { checkboxId: 'sig-ind-hy', cardId: 'ms-card-hy' },
+  fg: { checkboxId: 'sig-ind-fg', cardId: 'ms-card-fg' },
+  buffett: { checkboxId: 'sig-ind-buffett', cardId: 'ms-card-buffett' },
+  'buffett-kr': { checkboxId: 'sig-ind-buffett-kr', cardId: 'ms-card-buffett-kr' },
+  cape: { checkboxId: 'sig-ind-cape', cardId: 'ms-card-cape' },
+  russell: { checkboxId: 'sig-ind-russell', cardId: 'ms-card-russell' },
+  copper: { checkboxId: 'sig-ind-copper', cardId: 'ms-card-copper' },
+  bdi: { checkboxId: 'sig-ind-bdi', cardId: 'ms-card-bdi' },
+  krexport: { checkboxId: 'sig-ind-krexport', cardId: 'ms-card-krexport' },
+  us10y: { checkboxId: 'sig-ind-us10y', cardId: 'ms-card-us10y' },
+  dxy: { checkboxId: 'sig-ind-dxy', cardId: 'ms-card-dxy' },
+  usdkrw: { checkboxId: 'sig-ind-usdkrw', cardId: 'ms-card-usdkrw' },
+  'margin-us': { checkboxId: 'sig-ind-margin-us', cardId: 'ms-card-margin-us' },
+  'margin-kr': { checkboxId: 'sig-ind-margin-kr', cardId: 'ms-card-margin-kr' }
+};
+
+function getDefaultMarketSignalVisibility() {
+  const groups = {};
+  const indicators = {};
+  Object.keys(MARKET_SIGNAL_GROUPS).forEach(key => groups[key] = true);
+  Object.keys(MARKET_SIGNAL_INDICATORS).forEach(key => indicators[key] = true);
+  return { groups, indicators };
+}
+
+function loadMarketSignalVisibility() {
+  const defaults = getDefaultMarketSignalVisibility();
+  try {
+    const saved = JSON.parse(localStorage.getItem(MARKET_SIGNAL_VISIBILITY_KEY) || '{}');
+    return {
+      groups: { ...defaults.groups, ...(saved.groups || {}) },
+      indicators: { ...defaults.indicators, ...(saved.indicators || {}) }
+    };
+  } catch (e) {
+    return defaults;
+  }
+}
+
+function saveMarketSignalVisibility(visibility) {
+  localStorage.setItem(MARKET_SIGNAL_VISIBILITY_KEY, JSON.stringify(visibility));
+}
+
+function isMarketSignalElementVisible(el) {
+  if (!el) return false;
+  const style = window.getComputedStyle(el);
+  return style.display !== 'none' && style.visibility !== 'hidden' && !el.hidden;
+}
+
+function syncMarketSignalSettingsUI() {
+  const visibility = loadMarketSignalVisibility();
+
+  Object.entries(MARKET_SIGNAL_GROUPS).forEach(([groupKey, group]) => {
+    const groupCheckbox = document.getElementById(group.checkboxId);
+    if (!groupCheckbox) return;
+
+    const groupVisible = visibility.groups[groupKey] !== false;
+    const visibleCount = group.indicators.filter(indKey => visibility.indicators[indKey] !== false).length;
+
+    groupCheckbox.checked = groupVisible;
+    groupCheckbox.indeterminate = groupVisible && visibleCount > 0 && visibleCount < group.indicators.length;
+
+    group.indicators.forEach(indKey => {
+      const meta = MARKET_SIGNAL_INDICATORS[indKey];
+      const indicatorCheckbox = meta ? document.getElementById(meta.checkboxId) : null;
+      if (!indicatorCheckbox) return;
+      indicatorCheckbox.checked = visibility.indicators[indKey] !== false;
+      indicatorCheckbox.disabled = !groupVisible;
+      const row = indicatorCheckbox.closest('.signal-check');
+      if (row) row.classList.toggle('is-disabled', !groupVisible);
+    });
+  });
+}
+
+function applyMarketSignalVisibility() {
+  const visibility = loadMarketSignalVisibility();
+  const bar = document.getElementById('marketSignalBar');
+  if (!bar) return;
+
+  Object.entries(MARKET_SIGNAL_INDICATORS).forEach(([indicatorKey, meta]) => {
+    const card = document.getElementById(meta.cardId);
+    if (!card) return;
+    card.style.display = visibility.indicators[indicatorKey] === false ? 'none' : '';
+  });
+
+  Object.entries(MARKET_SIGNAL_GROUPS).forEach(([groupKey, group]) => {
+    const groupEl = bar.querySelector(group.selector);
+    if (!groupEl) return;
+
+    const groupVisible = visibility.groups[groupKey] !== false;
+    const hasVisibleIndicator = group.indicators.some(indKey => visibility.indicators[indKey] !== false);
+    groupEl.style.display = groupVisible && hasVisibleIndicator ? '' : 'none';
+  });
+
+  syncMarketSignalSettingsUI();
+  requestAnimationFrame(updateMarketSignalCompactLayout);
+}
+
+function toggleSignalGroupVisibility(groupKey, checked) {
+  const visibility = loadMarketSignalVisibility();
+  if (!visibility.groups) visibility.groups = {};
+  visibility.groups[groupKey] = !!checked;
+  saveMarketSignalVisibility(visibility);
+  applyMarketSignalVisibility();
+}
+
+function toggleSignalIndicatorVisibility(indicatorKey, checked) {
+  const visibility = loadMarketSignalVisibility();
+  if (!visibility.indicators) visibility.indicators = {};
+  visibility.indicators[indicatorKey] = !!checked;
+  saveMarketSignalVisibility(visibility);
+  applyMarketSignalVisibility();
+}
+
+function resetMarketSignalVisibility() {
+  saveMarketSignalVisibility(getDefaultMarketSignalVisibility());
+  applyMarketSignalVisibility();
+}
+
+function getVisibleMarketSignalGroups() {
+  const bar = document.getElementById('marketSignalBar');
+  if (!bar) return [];
+
+  return [...bar.querySelectorAll('.ms-group')].filter(group => {
+    if (!isMarketSignalElementVisible(group)) return false;
+    return [...group.querySelectorAll('.ms-indicator-card')].some(card => isMarketSignalElementVisible(card));
+  });
+}
+
+function updateMarketSignalCompactLayout() {
+  const bar = document.getElementById('marketSignalBar');
+  if (!bar) return;
+
+  const shell = bar.querySelector('.market-signal-shell');
+  if (!shell || !isMarketSignalElementVisible(bar)) {
+    bar.classList.remove('ms-compact');
+    return;
+  }
+
+  const visibleGroups = getVisibleMarketSignalGroups();
+  const visibleCardCount = visibleGroups.reduce((sum, group) => {
+    return sum + [...group.querySelectorAll('.ms-indicator-card')].filter(card => isMarketSignalElementVisible(card)).length;
+  }, 0);
+
+  const shellWidth = shell.clientWidth || bar.clientWidth || window.innerWidth;
+
+  // 날짜+종합신호 1줄 영역(약 300px) + 그룹 예상 폭을 비교해서 충분할 때만 컴팩트 적용
+  const overviewWidth = 300;
+  const groupsRequiredWidth = visibleGroups.reduce((sum, group) => {
+    const cardCount = [...group.querySelectorAll('.ms-indicator-card')].filter(card => isMarketSignalElementVisible(card)).length;
+    return sum + Math.max(220, Math.min(cardCount, 5) * 96 + 32);
+  }, 0);
+  const gapWidth = Math.max(0, visibleGroups.length) * 10;
+  const requiredWidth = overviewWidth + groupsRequiredWidth + gapWidth;
+
+  const shouldCompact =
+    visibleGroups.length > 0 &&
+    visibleGroups.length <= 4 &&
+    visibleCardCount <= 9 &&
+    shellWidth >= requiredWidth;
+
+  bar.classList.toggle('ms-compact', shouldCompact);
+}
+
+function bindMarketSignalLayoutWatchers() {
+  const bar = document.getElementById('marketSignalBar');
+  if (!bar) return;
+
+  const scheduleUpdate = () => requestAnimationFrame(updateMarketSignalCompactLayout);
+
+  window.addEventListener('resize', scheduleUpdate);
+
+  const mutationObserver = new MutationObserver(scheduleUpdate);
+  mutationObserver.observe(bar, {
+    attributes: true,
+    subtree: true,
+    attributeFilter: ['style', 'class', 'hidden']
+  });
+
+  if ('ResizeObserver' in window) {
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
+    resizeObserver.observe(bar);
+  }
+
+  applyMarketSignalVisibility();
+  scheduleUpdate();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bindMarketSignalLayoutWatchers);
+} else {
+  bindMarketSignalLayoutWatchers();
+}
+
