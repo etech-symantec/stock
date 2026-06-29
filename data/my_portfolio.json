@@ -9634,7 +9634,7 @@
       "txType": "dividend"
     }
   ],
-  "range": "1m",
+  "range": "all",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
@@ -9720,5 +9720,31 @@
   "customOverseasAssets": [
     "TIME 글로벌우주테크&방산액티브"
   ],
-  "riaExcludeSymbols": []
+  "riaExcludeSymbols": [],
+  "signalVisibility": {
+    "groups": {
+      "risk": true,
+      "valuation": true,
+      "cycle": true,
+      "liquidity": true
+    },
+    "indicators": {
+      "vix": true,
+      "move": true,
+      "hy": true,
+      "fg": true,
+      "buffett": true,
+      "buffett-kr": true,
+      "cape": true,
+      "russell": true,
+      "copper": true,
+      "bdi": true,
+      "krexport": true,
+      "us10y": true,
+      "dxy": true,
+      "usdkrw": true,
+      "margin-us": true,
+      "margin-kr": true
+    }
+  }
 }
