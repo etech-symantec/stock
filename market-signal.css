@@ -1,0 +1,733 @@
+/* =====================================================
+   📡 market-signal.css
+   test4.html 상단 Market Signal Bar(지표 카드) 전용 스타일
+   style.css에서 분리됨. style.css 다음에 로드되어야 합니다.
+   ===================================================== */
+
+/* =====================================================
+   📡 Market Signal Bar — 지표 카드 스타일
+   ===================================================== */
+.ms-indicator-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 110px;
+  flex: 1;
+  transition: border-color 0.2s;
+}
+.ms-indicator-card:hover { border-color: var(--border2); }
+
+.ms-ind-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ms-ind-val {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.ms-ind-gauge-wrap {
+  margin: 2px 0;
+}
+
+.ms-ind-gauge-track {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--bg3);
+  position: relative;
+  overflow: visible;
+}
+
+.ms-ind-gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.4s;
+}
+
+/* 공포탐욕 레인보우 게이지 */
+.ms-ind-gauge-rainbow {
+  background: linear-gradient(
+    to right,
+    #00c87a 0%,
+    #34d399 20%,
+    #ffb703 45%,
+    #ff9f43 55%,
+    #ff4d6a 80%,
+    #ff2255 100%
+  );
+  overflow: hidden;
+}
+
+.ms-ind-hint {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.02em;
+}
+
+/* 라이트 모드 */
+[data-theme="light"] .ms-indicator-card {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.1);
+}
+[data-theme="light"] .ms-ind-gauge-track {
+  background: rgba(0,0,0,0.07);
+}
+[data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow {
+  background: linear-gradient(to right, #00c87a 0%, #34d399 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
+}
+[data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow-reverse {
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #34d399 78%, #00c87a 100%);
+}
+
+
+
+/* =====================================================
+   📡 Market Signal Bar — 리디자인 v2
+   ===================================================== */
+#marketSignalBar.market-signal-bar {
+  display: none;
+  margin: 14px 0 10px;
+  position: relative;
+  z-index: 5;
+}
+
+.market-signal-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: 178px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(124,106,247,0.22);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(124,106,247,0.18), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(58,154,255,0.12), transparent 30%),
+    linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018));
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.market-signal-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to right, rgba(0,0,0,0.8), transparent 75%);
+}
+
+.ms-overview-panel,
+.ms-groups-wrap,
+.ms-group,
+.ms-indicator-card,
+.ms-total-card,
+.ms-date-card { position: relative; z-index: 1; }
+
+.ms-overview-panel {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  min-width: 0;
+}
+.ms-date-card,
+.ms-total-card {
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(13,15,20,0.46);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.ms-date-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+}
+.ms-date-caption {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  line-height: 1;
+}
+.ms-date-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  line-height: 1.18;
+  color: var(--text2);
+}
+.ms-date-stack span:first-child { font-size: 11px; color: var(--text3); }
+.ms-date-stack span:nth-child(2) { font-size: 14px; color: var(--text2); }
+.ms-date-stack span:last-child { font-size: 18px; color: var(--text); }
+
+.ms-total-card {
+  cursor: pointer;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+.ms-total-card::before {
+  content: '';
+  position: absolute;
+  width: 128px;
+  height: 128px;
+  right: -54px;
+  top: -56px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,106,247,0.42), transparent 62%);
+  pointer-events: none;
+}
+.ms-total-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(124,106,247,0.5) !important;
+  background: rgba(124,106,247,0.08);
+}
+.ms-total-kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+.ms-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.ms-score {
+  font-family: var(--font-mono);
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+.ms-score-diff {
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ms-badge {
+  align-self: flex-start;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  line-height: 1.2;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.ms-total-note {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: -0.02em;
+}
+
+.ms-groups-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: stretch;
+  min-width: 0;
+}
+.ms-group {
+  --ms-accent: var(--accent);
+  --ms-accent-rgb: 124,106,247;
+  flex: 1 1 auto;
+  min-width: 260px;
+  padding: 10px;
+  border: 1px solid rgba(var(--ms-accent-rgb), 0.22);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(var(--ms-accent-rgb),0.10), rgba(var(--ms-accent-rgb),0.035)),
+    rgba(13,15,20,0.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.ms-risk { --ms-accent: #ff4d6a; --ms-accent-rgb: 255,77,106; }
+.ms-liquidity { --ms-accent: #3A9AFF; --ms-accent-rgb: 58,154,255; }
+.ms-cycle { --ms-accent: #ffb703; --ms-accent-rgb: 255,183,3; }
+.ms-valuation { --ms-accent: #00c87a; --ms-accent-rgb: 0,200,122; }
+.ms-group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.ms-group-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  background: rgba(var(--ms-accent-rgb), 0.14);
+  border: 1px solid rgba(var(--ms-accent-rgb), 0.20);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.ms-group-label {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--ms-accent);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.ms-group-sub {
+  margin-top: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text3);
+  line-height: 1.1;
+}
+.ms-group-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: stretch;
+}
+
+.ms-indicator-card {
+  flex: 1 1 92px;
+  min-width: 92px;
+  max-width: 124px;
+  min-height: 64px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 8px 9px;
+  background: rgba(255,255,255,0.045);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 4px;
+  cursor: help;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.ms-indicator-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(var(--ms-accent-rgb),0.44);
+  background: rgba(var(--ms-accent-rgb),0.08);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+.ms-ind-label {
+  font-size: 9px;
+  font-weight: 900;
+  color: var(--text3);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.1;
+}
+.ms-ind-val {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.ms-ind-val > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ms-ind-diff {
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: -0.04em;
+}
+.ms-ind-gauge-wrap { margin: 0; }
+.ms-ind-gauge-track {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  overflow: visible;
+}
+.ms-ind-gauge-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1), background 0.35s ease;
+}
+.ms-gauge-marker::after {
+  content: '';
+  position: absolute;
+  left: 60%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.45);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
+}
+.ms-ind-gauge-rainbow {
+  background: linear-gradient(to right, #00c87a 0%, #34d399 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
+  overflow: visible;
+}
+.ms-ind-gauge-rainbow-reverse {
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #34d399 78%, #00c87a 100%);
+  overflow: visible;
+}
+.ms-fg-dot,
+.ms-ind-gauge-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.18), 0 2px 7px rgba(0,0,0,0.35);
+  transition: left 0.45s ease;
+}
+.ms-ind-hint {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text3);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.03em;
+}
+
+[data-theme="light"] .market-signal-shell {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(98,80,224,0.16), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(42,125,225,0.10), transparent 30%),
+    linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.68));
+  box-shadow: 0 14px 32px rgba(20,25,40,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+[data-theme="light"] .ms-date-card,
+[data-theme="light"] .ms-total-card,
+[data-theme="light"] .ms-group {
+  background-color: rgba(255,255,255,0.72);
+  border-color: rgba(0,0,0,0.08);
+}
+[data-theme="light"] .ms-indicator-card {
+  background: rgba(255,255,255,0.78);
+  border-color: rgba(0,0,0,0.07);
+}
+[data-theme="light"] .ms-indicator-card:hover {
+  background: rgba(var(--ms-accent-rgb),0.08);
+  border-color: rgba(var(--ms-accent-rgb),0.38);
+}
+[data-theme="light"] .ms-ind-gauge-track { background: rgba(0,0,0,0.08); }
+[data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow {
+  background: linear-gradient(to right, #00c87a 0%, #34d399 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
+}
+[data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow-reverse {
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #34d399 78%, #00c87a 100%);
+}
+
+@media (max-width: 1240px) {
+  .market-signal-shell { grid-template-columns: 1fr; }
+  .ms-overview-panel { grid-template-columns: 150px minmax(0, 1fr); grid-template-rows: auto; }
+  .ms-total-card { min-height: 96px; }
+  .ms-score { font-size: 34px; }
+}
+@media (max-width: 760px) {
+  #marketSignalBar.market-signal-bar { margin: 10px 0 8px; }
+  .market-signal-shell { padding: 10px; border-radius: 18px; }
+  .ms-overview-panel { grid-template-columns: 1fr; }
+  .ms-date-caption { writing-mode: initial; transform: none; }
+  .ms-date-card { justify-content: space-between; }
+  .ms-date-stack { flex-direction: row; align-items: baseline; gap: 6px; }
+  .ms-group { min-width: 100%; }
+  .ms-indicator-card { max-width: none; }
+}
+
+
+/* =====================================================
+   📡 Market Signal 표시 설정 + 자동 컴팩트 레이아웃
+   ===================================================== */
+
+/* 상단/하단 여백 동일화 */
+#marketSignalBar.market-signal-bar {
+  margin: 12px 0 !important;
+}
+#dashboardTopWrapper.dashboard-top-wrapper {
+  margin-top: 0 !important;
+}
+
+/* 요청사항: 테두리 그림자 제거 */
+.market-signal-shell,
+[data-theme="light"] .market-signal-shell,
+.ms-indicator-card:hover,
+.ms-total-card:hover {
+  box-shadow: none !important;
+}
+
+/* 숨김 처리 시 빈 공간 제거 */
+.ms-group[style*="display: none"],
+.ms-indicator-card[style*="display: none"] {
+  margin: 0 !important;
+}
+
+/* 컴팩트 모드: 날짜 + 종합 신호를 한 줄로 묶고 전체를 1줄 배치 */
+#marketSignalBar.ms-compact .market-signal-shell {
+  grid-template-columns: max-content minmax(0, 1fr) !important;
+  align-items: stretch;
+  gap: 10px;
+  padding: 10px;
+}
+
+#marketSignalBar.ms-compact .ms-overview-panel {
+  display: grid;
+  grid-template-columns: 86px 198px;
+  grid-template-rows: 1fr;
+  gap: 10px;
+  align-self: stretch;
+  min-width: 294px;
+}
+
+#marketSignalBar.ms-compact .ms-date-card,
+#marketSignalBar.ms-compact .ms-total-card {
+  min-height: 80px;
+  border-radius: 16px;
+}
+
+#marketSignalBar.ms-compact .ms-date-card {
+  padding: 8px 10px;
+}
+
+#marketSignalBar.ms-compact .ms-date-caption {
+  font-size: 8px;
+}
+
+#marketSignalBar.ms-compact .ms-date-stack span:first-child { font-size: 10px; }
+#marketSignalBar.ms-compact .ms-date-stack span:nth-child(2) { font-size: 13px; }
+#marketSignalBar.ms-compact .ms-date-stack span:last-child { font-size: 17px; }
+
+#marketSignalBar.ms-compact .ms-total-card {
+  padding: 10px 12px;
+  gap: 5px;
+}
+
+#marketSignalBar.ms-compact .ms-total-kicker { font-size: 9px; }
+#marketSignalBar.ms-compact .ms-score-row { gap: 6px; }
+#marketSignalBar.ms-compact .ms-score { font-size: 30px; }
+#marketSignalBar.ms-compact .ms-score-diff { font-size: 9px; }
+#marketSignalBar.ms-compact .ms-badge { padding: 4px 9px; font-size: 10px; }
+#marketSignalBar.ms-compact .ms-total-note { display: none; }
+
+#marketSignalBar.ms-compact .ms-groups-wrap {
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: stretch;
+  overflow: visible;
+}
+
+#marketSignalBar.ms-compact .ms-group {
+  min-width: 220px;
+  padding: 9px;
+  border-radius: 16px;
+}
+
+#marketSignalBar.ms-compact .ms-group-head {
+  margin-bottom: 7px;
+}
+
+#marketSignalBar.ms-compact .ms-group-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+#marketSignalBar.ms-compact .ms-group-label { font-size: 11px; }
+#marketSignalBar.ms-compact .ms-group-sub { font-size: 8px; }
+
+#marketSignalBar.ms-compact .ms-group-body {
+  gap: 6px;
+}
+
+#marketSignalBar.ms-compact .ms-indicator-card {
+  min-width: 88px;
+  max-width: 116px;
+  min-height: 58px;
+  padding: 7px 8px;
+  border-radius: 13px;
+}
+
+#marketSignalBar.ms-compact .ms-ind-val { font-size: 13px; }
+#marketSignalBar.ms-compact .ms-ind-hint { font-size: 8px; }
+
+/* 설정 모달: 지표 설정 탭 */
+.signal-settings-intro {
+  padding: 10px 12px;
+  margin: 4px 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  color: var(--text2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.signal-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.signal-settings-group {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.025);
+}
+
+.signal-risk-box { border-color: rgba(255,77,106,0.24); }
+.signal-valuation-box { border-color: rgba(0,200,122,0.24); }
+.signal-cycle-box { border-color: rgba(255,183,3,0.24); }
+.signal-liquidity-box { border-color: rgba(58,154,255,0.24); }
+
+.signal-toggle-row {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.signal-toggle-row input,
+.signal-check input {
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.signal-toggle-row b {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.signal-toggle-row small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text3);
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.signal-indicator-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.signal-check {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: rgba(255,255,255,0.025);
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.signal-check:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.signal-check.is-disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+[data-theme="light"] .signal-settings-group,
+[data-theme="light"] .signal-settings-intro,
+[data-theme="light"] .signal-check {
+  background: rgba(0,0,0,0.025);
+}
+
+@media (max-width: 1240px) {
+  #marketSignalBar.ms-compact .market-signal-shell {
+    grid-template-columns: 1fr !important;
+  }
+  #marketSignalBar.ms-compact .ms-overview-panel {
+    grid-template-columns: 150px minmax(0, 1fr);
+    min-width: 0;
+  }
+  #marketSignalBar.ms-compact .ms-groups-wrap {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 760px) {
+  #marketSignalBar.market-signal-bar {
+    margin: 10px 0 !important;
+  }
+  #marketSignalBar.ms-compact .market-signal-shell {
+    grid-template-columns: 1fr !important;
+  }
+  #marketSignalBar.ms-compact .ms-overview-panel {
+    grid-template-columns: 1fr;
+  }
+  #marketSignalBar.ms-compact .ms-date-caption {
+    writing-mode: initial;
+    transform: none;
+  }
+  #marketSignalBar.ms-compact .ms-total-note {
+    display: block;
+  }
+  #marketSignalBar.ms-compact .ms-group {
+    min-width: 100%;
+  }
+  #marketSignalBar.ms-compact .ms-indicator-card {
+    max-width: none;
+  }
+  .signal-settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
