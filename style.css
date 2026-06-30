@@ -3016,9 +3016,15 @@ nav {
 }
 
 #marketSignalBar.ms-compact .ms-group {
+  flex: 0 0 auto;
+  width: max-content;
   min-width: 220px;
   padding: 9px;
   border-radius: 16px;
+}
+
+#marketSignalBar.ms-compact .ms-group-body {
+  flex-wrap: nowrap;
 }
 
 #marketSignalBar.ms-compact .ms-group-head {
