@@ -2366,8 +2366,8 @@ nav {
 .ms-ind-gauge-rainbow {
   background: linear-gradient(
     to right,
-    #3A9AFF 0%,
-    #4d9fff 20%,
+    #00c87a 0%,
+    #34d399 20%,
     #ffb703 45%,
     #ff9f43 55%,
     #ff4d6a 80%,
@@ -2392,10 +2392,10 @@ nav {
   background: rgba(0,0,0,0.07);
 }
 [data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow {
-  background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
+  background: linear-gradient(to right, #00c87a 0%, #34d399 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
 }
 [data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow-reverse {
-  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #4d9fff 78%, #3A9AFF 100%);
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #34d399 78%, #00c87a 100%);
 }
 
 
@@ -2877,11 +2877,11 @@ nav {
   box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
 }
 .ms-ind-gauge-rainbow {
-  background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
+  background: linear-gradient(to right, #00c87a 0%, #34d399 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
   overflow: visible;
 }
 .ms-ind-gauge-rainbow-reverse {
-  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #4d9fff 78%, #3A9AFF 100%);
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #34d399 78%, #00c87a 100%);
   overflow: visible;
 }
 .ms-fg-dot,
@@ -2931,10 +2931,10 @@ nav {
 }
 [data-theme="light"] .ms-ind-gauge-track { background: rgba(0,0,0,0.08); }
 [data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow {
-  background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
+  background: linear-gradient(to right, #00c87a 0%, #34d399 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
 }
 [data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow-reverse {
-  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #4d9fff 78%, #3A9AFF 100%);
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #34d399 78%, #00c87a 100%);
 }
 
 @media (max-width: 1240px) {
