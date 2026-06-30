@@ -8896,18 +8896,16 @@ function updateMarketSignalCompactLayout() {
   const overviewWidth = 300;
   const groupsRequiredWidth = visibleGroups.reduce((sum, group) => {
     const cardCount = [...group.querySelectorAll('.ms-indicator-card')].filter(card => isMarketSignalElementVisible(card)).length;
-    return sum + Math.max(220, Math.min(cardCount, 5) * 96 + 32);
+    return sum + Math.max(100, cardCount * 100 + 20);
   }, 0);
   const gapWidth = Math.max(0, visibleGroups.length) * 10;
   const requiredWidth = overviewWidth + groupsRequiredWidth + gapWidth;
 
-  // 지표가 모두 숨겨진 경우(visibleGroups=0)에도 컴팩트 적용
   const shouldCompact =
-    visibleGroups.length === 0
-      ? true
-      : (visibleGroups.length <= 4 &&
-         visibleCardCount <= 9 &&
-         shellWidth >= requiredWidth);
+    visibleGroups.length === 0 ||
+    (visibleGroups.length <= 4 &&
+     visibleCardCount <= 9 &&
+     shellWidth >= requiredWidth);
 
   bar.classList.toggle('ms-compact', shouldCompact);
 }
