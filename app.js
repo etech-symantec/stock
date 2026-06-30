@@ -8241,12 +8241,13 @@ async function initMarketSignalBar() {
     if (!isNaN(vix)) {
       vixValSpan.textContent = vix.toFixed(2);
       const pct = clamp((vix / 60) * 100, 2, 98);
-      vixGauge.style.width = pct + '%';
+      const vixDot = document.getElementById('ms-vix-dot');
+      if (vixDot) vixDot.style.left = pct + '%';
       let vColor = 'var(--loss)', vHint = '공포 구간 🔴';
       if (vix < 15)      { vColor = 'var(--profit)'; vHint = '저변동 안정 🟢'; }
       else if (vix < 20) { vColor = '#00c87a';        vHint = '보통 수준'; }
       else if (vix < 30) { vColor = '#ffb703';        vHint = '변동성 주의'; }
-      vixValSpan.style.color = vColor; vixGauge.style.background = vColor;
+      vixValSpan.style.color = vColor;
       vixHint.textContent = vHint; vixHint.style.color = vColor;
       if (prev) msSetDiff(vixDiffEl, vix, prev.VIX, { decimals: 2, goodDirection: 'down' });
     } else { vixValSpan.textContent = 'N/A'; vixHint.textContent = '데이터 없음'; }
