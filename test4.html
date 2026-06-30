@@ -1178,55 +1178,48 @@
       <!-- 탭 1: 데이터 관리 (기본 활성화) -->
       <!-- ========================================== -->
       <div id="settingsTabData" style="display: block;">
-        
+
         <div class="settings-section" style="margin-top: 0;">
           <div class="settings-section-title">☁️ GitHub 클라우드 동기화</div>
-          <div style="font-size:11px; color:var(--text2); margin-bottom:15px;">
-            개인 GitHub 저장소를 연결하여 모든 기기에서 장부를 안전하게 동기화합니다.
+          <div class="settings-hint">개인 GitHub 저장소를 연결하면 모든 기기에서 장부를 안전하게 동기화합니다.</div>
+
+          <div class="settings-input-row">
+            <input type="text" id="ghUser" class="form-input" placeholder="GitHub 아이디">
+            <input type="text" id="ghRepo" class="form-input" placeholder="저장소 이름">
           </div>
-          <div class="form-group" style="margin-bottom:10px; display:flex; gap:10px;">
-            <div style="flex:1;">
-              <input type="text" id="ghUser" class="form-input" placeholder="GitHub 아이디 (예: username)">
-            </div>
-            <div style="flex:1;">
-              <input type="text" id="ghRepo" class="form-input" placeholder="저장소 이름 (예: stock-data)">
-            </div>
-          </div>
-          <div class="form-group" style="margin-bottom:15px;">
-            <input type="password" id="ghToken" class="form-input" placeholder="Personal Access Token (ghp_...)">
-          </div>
-          
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; background:var(--bg); border-radius:6px; border:1px solid var(--border); margin-bottom:15px;">
-            <span style="font-size:12px; font-weight:700;">🔄 내역 수정 시 자동 저장(Sync)</span>
+          <input type="password" id="ghToken" class="form-input" placeholder="Personal Access Token (ghp_...)" style="margin-bottom:8px;">
+
+          <div class="settings-toggle-row">
+            <span>🔄 내역 수정 시 자동 저장(Sync)</span>
             <label class="toggle-switch">
               <input type="checkbox" id="ghAutoSync">
               <span class="slider"></span>
             </label>
           </div>
 
-          <div style="display:flex; gap:10px;">
-            <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="pullFromGithub(false)">⬇️ 클라우드에서 불러오기</button>
-            <button class="btn-submit" style="background:var(--accent);" onclick="pushToGithub(false)">⬆️ 클라우드에 백업</button>
+          <div class="settings-input-row" style="margin-bottom:0;">
+            <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="pullFromGithub(false)">⬇️ 불러오기</button>
+            <button class="btn-submit" style="background:var(--accent);" onclick="pushToGithub(false)">⬆️ 백업</button>
           </div>
         </div>
 
         <div class="settings-section">
-          <div class="settings-section-title">💻 기기 로컬 데이터 및 CSV 관리</div>
-          <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="exportData()">⬇️ JSON 파일로 로컬 백업</button>
-            <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="document.getElementById('importFile').click()">⬆️ JSON 파일로 불러오기</button>
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="downloadCsvSample()">⬇️ CSV 양식 파일 받기</button>
-            <button class="btn-submit" style="flex:1; background:rgba(0, 200, 122, 0.15); border:1px solid rgba(0, 200, 122, 0.4); color:var(--green);" onclick="document.getElementById('importCsvFile').click()">📄 CSV 파일 일괄 업로드</button>
+          <div class="settings-section-title">💻 로컬 데이터 · CSV 관리</div>
+          <div class="settings-action-grid">
+            <button class="settings-action-btn" onclick="exportData()"><span>⬇️</span>JSON 백업</button>
+            <button class="settings-action-btn" onclick="document.getElementById('importFile').click()"><span>⬆️</span>JSON 불러오기</button>
+            <button class="settings-action-btn" onclick="downloadCsvSample()"><span>📋</span>CSV 양식 받기</button>
+            <button class="settings-action-btn settings-action-btn-accent" onclick="document.getElementById('importCsvFile').click()"><span>📄</span>CSV 일괄 업로드</button>
           </div>
         </div>
 
-        <div class="settings-section" style="border-color:rgba(255,77,106,0.3); background:rgba(255,77,106,0.05); margin-bottom:0;">
-          <div class="settings-section-title" style="color:var(--red);">🚨 모든 데이터 영구 삭제</div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--text2);">저장된 모든 장부 내역을 완전히 비웁니다.</span>
-            <button class="btn-danger" style="background:var(--red); color:#fff; padding:6px 12px; font-weight:bold; border:none; border-radius:6px; cursor:pointer;" onclick="resetAllTransactions()">초기화 실행</button>
+        <div class="settings-section settings-section-danger" style="margin-bottom:0;">
+          <div class="settings-danger-row">
+            <div>
+              <div class="settings-section-title" style="color:var(--red);">🚨 데이터 초기화</div>
+              <span style="font-size:10.5px; color:var(--text2);">저장된 모든 장부 내역을 완전히 비웁니다.</span>
+            </div>
+            <button class="btn-danger-solid" onclick="resetAllTransactions()">초기화 실행</button>
           </div>
         </div>
       </div>
