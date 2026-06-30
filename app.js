@@ -8885,27 +8885,32 @@ function updateMarketSignalCompactLayout() {
     return;
   }
 
+  // 모바일에서는 컴팩트 미적용
+  if (window.innerWidth < 768) {
+    bar.classList.remove('ms-compact');
+    return;
+  }
+
   const visibleGroups = getVisibleMarketSignalGroups();
   const visibleCardCount = visibleGroups.reduce((sum, group) => {
     return sum + [...group.querySelectorAll('.ms-indicator-card')].filter(card => isMarketSignalElementVisible(card)).length;
   }, 0);
 
-  const shellWidth = shell.clientWidth || bar.clientWidth || window.innerWidth;
+  // getBoundingClientRect는 항상 실제 렌더링 크기를 반환 (clientWidth의 timing 문제 회피)
+  const barWidth = bar.getBoundingClientRect().width || window.innerWidth;
 
-  // 날짜+종합신호 1줄 영역(약 300px) + 그룹 예상 폭을 비교해서 충분할 때만 컴팩트 적용
-  const overviewWidth = 300;
+  const overviewWidth = 294;  // compact CSS: 86px + 198px + 10px gap
+  const perCardWidth = 96;
+  const perGroupOverhead = 28;  // 패딩 9px*2 + 여유
+  const groupGap = 10;
+
   const groupsRequiredWidth = visibleGroups.reduce((sum, group) => {
     const cardCount = [...group.querySelectorAll('.ms-indicator-card')].filter(card => isMarketSignalElementVisible(card)).length;
-    return sum + Math.max(100, cardCount * 100 + 20);
+    return sum + cardCount * perCardWidth + perGroupOverhead;
   }, 0);
-  const gapWidth = Math.max(0, visibleGroups.length) * 10;
-  const requiredWidth = overviewWidth + groupsRequiredWidth + gapWidth;
+  const requiredWidth = overviewWidth + groupsRequiredWidth + visibleGroups.length * groupGap + 20;
 
-  const shouldCompact =
-    visibleGroups.length === 0 ||
-    (visibleGroups.length <= 4 &&
-     visibleCardCount <= 9 &&
-     shellWidth >= requiredWidth);
+  const shouldCompact = visibleGroups.length === 0 || barWidth >= requiredWidth;
 
   bar.classList.toggle('ms-compact', shouldCompact);
 }
