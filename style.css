@@ -2946,7 +2946,9 @@ nav {
 #marketSignalBar.market-signal-bar {
   margin: 12px 0 !important;
 }
-
+#marketSignalBar.market-signal-bar + #dashboardTopWrapper {
+  margin-top: 0 !important;
+}
 /* 요청사항: 테두리 그림자 제거 */
 .market-signal-shell,
 [data-theme="light"] .market-signal-shell,
