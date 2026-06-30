@@ -2973,11 +2973,11 @@ nav {
 
 #marketSignalBar.ms-compact .ms-overview-panel {
   display: grid;
-  grid-template-columns: 86px 198px;
+  grid-template-columns: 104px 170px;
   grid-template-rows: 1fr;
   gap: 10px;
   align-self: stretch;
-  min-width: 294px;
+  min-width: 284px;
 }
 
 #marketSignalBar.ms-compact .ms-date-card,
@@ -2994,9 +2994,9 @@ nav {
   font-size: 8px;
 }
 
-#marketSignalBar.ms-compact .ms-date-stack span:first-child { font-size: 10px; }
-#marketSignalBar.ms-compact .ms-date-stack span:nth-child(2) { font-size: 13px; }
-#marketSignalBar.ms-compact .ms-date-stack span:last-child { font-size: 17px; }
+#marketSignalBar.ms-compact .ms-date-stack span:first-child { font-size: 12px; }
+#marketSignalBar.ms-compact .ms-date-stack span:nth-child(2) { font-size: 15px; }
+#marketSignalBar.ms-compact .ms-date-stack span:last-child { font-size: 19px; }
 
 #marketSignalBar.ms-compact .ms-total-card {
   padding: 10px 12px;
