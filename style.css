@@ -1119,24 +1119,59 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 
 /* ── 설정 메뉴 안 튜토리얼 재시작 버튼 ── */
 .btn-restart-tutorial {
-  width: 100%;
-  padding: 10px 16px;
+  padding: 6px 10px;
   background: var(--accent-bg);
   border: 1px solid rgba(124,106,247,0.3);
-  border-radius: 8px;
+  border-radius: 7px;
   color: var(--accent);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   font-family: var(--font-sans);
   text-align: left;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
   transition: 0.15s;
 }
 .btn-restart-tutorial:hover { background: rgba(124,106,247,0.2); }
-.btn-restart-tutorial + .btn-restart-tutorial { margin-top: 8px; }
+
+/* ── 설정 모달 하단 고정 영역(주가 데이터 / 튜토리얼) — 한 줄 컴팩트 레이아웃 ── */
+.tutorial-restart-section {
+  padding: 8px 14px !important;
+}
+.tutorial-restart-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tutorial-restart-row + .tutorial-restart-row { margin-top: 6px; }
+.tutorial-restart-row .settings-section-title {
+  font-size: 11px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.tutorial-restart-row .btn-restart-tutorial { flex-shrink: 0; }
+#marketDataLastUpdated {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  font-size: 11px;
+  color: var(--text2);
+}
+.tutorial-btn-group {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.tutorial-btn-group .btn-restart-tutorial { flex: 1; min-width: 0; }
 
 /* 모바일 튜토리얼 조정 */
 @media (max-width: 600px) {
