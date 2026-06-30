@@ -2392,17 +2392,11 @@ nav {
   background: rgba(0,0,0,0.07);
 }
 [data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow {
-  background: linear-gradient(
-    to right,
-    #3A9AFF 0%,
-    #4d9fff 20%,
-    #ffb703 45%,
-    #ff9f43 55%,
-    #ff4d6a 80%,
-    #ff2255 100%
-  );
+  background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 20%, #ffb703 45%, #ff9f43 55%, #ff4d6a 80%, #ff2255 100%);
 }
-
+[data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow-reverse {
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #4d9fff 78%, #3A9AFF 100%);
+}
 
 /* =========================================================
    미니 포트맵 (계좌 하단 펼침 효과)
@@ -2883,6 +2877,10 @@ nav {
 }
 .ms-ind-gauge-rainbow {
   background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
+  overflow: visible;
+}
+.ms-ind-gauge-rainbow-reverse {
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #4d9fff 78%, #3A9AFF 100%);
   overflow: visible;
 }
 .ms-fg-dot,
