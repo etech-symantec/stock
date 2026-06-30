@@ -2885,7 +2885,8 @@ nav {
   background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
   overflow: visible;
 }
-.ms-fg-dot {
+.ms-fg-dot,
+.ms-ind-gauge-dot {
   position: absolute;
   top: 50%;
   left: 50%;
