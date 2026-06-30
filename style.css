@@ -2392,11 +2392,12 @@ nav {
   background: rgba(0,0,0,0.07);
 }
 [data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow {
-  background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 20%, #ffb703 45%, #ff9f43 55%, #ff4d6a 80%, #ff2255 100%);
+  background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
 }
 [data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow-reverse {
   background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #4d9fff 78%, #3A9AFF 100%);
 }
+
 
 /* =========================================================
    미니 포트맵 (계좌 하단 펼침 효과)
@@ -2576,7 +2577,7 @@ nav {
    ===================================================== */
 #marketSignalBar.market-signal-bar {
   display: none;
-  margin: 14px 0;
+  margin: 14px 0 10px;
   position: relative;
   z-index: 5;
 }
@@ -2929,6 +2930,12 @@ nav {
   border-color: rgba(var(--ms-accent-rgb),0.38);
 }
 [data-theme="light"] .ms-ind-gauge-track { background: rgba(0,0,0,0.08); }
+[data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow {
+  background: linear-gradient(to right, #3A9AFF 0%, #4d9fff 22%, #ffb703 48%, #ff9f43 64%, #ff4d6a 84%, #ff2255 100%);
+}
+[data-theme="light"] .ms-ind-gauge-track.ms-ind-gauge-rainbow-reverse {
+  background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #4d9fff 78%, #3A9AFF 100%);
+}
 
 @media (max-width: 1240px) {
   .market-signal-shell { grid-template-columns: 1fr; }
@@ -2956,9 +2963,7 @@ nav {
 #marketSignalBar.market-signal-bar {
   margin: 12px 0 !important;
 }
-#dashboardTopWrapper.dashboard-top-wrapper {
-  margin-top: 0 !important;
-}
+
 /* 요청사항: 테두리 그림자 제거 */
 .market-signal-shell,
 [data-theme="light"] .market-signal-shell,
@@ -2983,11 +2988,11 @@ nav {
 
 #marketSignalBar.ms-compact .ms-overview-panel {
   display: grid;
-  grid-template-columns: 104px 170px;
+  grid-template-columns: 86px 198px;
   grid-template-rows: 1fr;
   gap: 10px;
   align-self: stretch;
-  min-width: 284px;
+  min-width: 294px;
 }
 
 #marketSignalBar.ms-compact .ms-date-card,
@@ -3004,9 +3009,9 @@ nav {
   font-size: 8px;
 }
 
-#marketSignalBar.ms-compact .ms-date-stack span:first-child { font-size: 12px; }
-#marketSignalBar.ms-compact .ms-date-stack span:nth-child(2) { font-size: 15px; }
-#marketSignalBar.ms-compact .ms-date-stack span:last-child { font-size: 19px; }
+#marketSignalBar.ms-compact .ms-date-stack span:first-child { font-size: 10px; }
+#marketSignalBar.ms-compact .ms-date-stack span:nth-child(2) { font-size: 13px; }
+#marketSignalBar.ms-compact .ms-date-stack span:last-child { font-size: 17px; }
 
 #marketSignalBar.ms-compact .ms-total-card {
   padding: 10px 12px;
@@ -3028,15 +3033,9 @@ nav {
 }
 
 #marketSignalBar.ms-compact .ms-group {
-  flex: 0 0 auto;
-  width: max-content;
   min-width: 220px;
   padding: 9px;
   border-radius: 16px;
-}
-
-#marketSignalBar.ms-compact .ms-group-body {
-  flex-wrap: nowrap;
 }
 
 #marketSignalBar.ms-compact .ms-group-head {
@@ -3207,4 +3206,3 @@ nav {
     grid-template-columns: 1fr;
   }
 }
-
