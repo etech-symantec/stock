@@ -689,22 +689,26 @@ function injectRestartButton() {
 
     const sec = document.createElement('div');
     sec.className = 'settings-section tutorial-restart-section';
-    sec.style.cssText = 'margin-top:16px; margin-bottom:0;';
+    sec.style.cssText = 'margin-top:10px; margin-bottom:0;';
     sec.innerHTML = `
-      <div class="settings-section-title">📡 주가 데이터</div>
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-        <span id="marketDataLastUpdated" style="font-size:12px; color:var(--text2);"></span>
-        <button class="btn-restart-tutorial" onclick="forceMarketDataUpdate()" style="margin:0;">
-          <span>🔄</span> 캐시 삭제 후 최신화
+      <div class="tutorial-restart-row">
+        <span class="settings-section-title">📡 주가</span>
+        <span id="marketDataLastUpdated"></span>
+        <button class="btn-restart-tutorial" onclick="forceMarketDataUpdate()">
+          <span>🔄</span> 최신화
         </button>
       </div>
-      <div class="settings-section-title" style="margin-top:12px;">🎓 튜토리얼</div>
-      <button class="btn-restart-tutorial" onclick="restartTutorial()" style="margin-bottom:8px;">
-        <span>🔁</span> 전체 가이드 다시 보기
-      </button>
-      <button class="btn-restart-tutorial" onclick="resetPageTutorials(); closeModal('masterSettingsOverlay');">
-        <span>📄</span> 페이지별 가이드 초기화
-      </button>
+      <div class="tutorial-restart-row">
+        <span class="settings-section-title">🎓 가이드</span>
+        <div class="tutorial-btn-group">
+          <button class="btn-restart-tutorial" onclick="restartTutorial()">
+            <span>🔁</span> 전체 다시 보기
+          </button>
+          <button class="btn-restart-tutorial" onclick="resetPageTutorials(); closeModal('masterSettingsOverlay');">
+            <span>📄</span> 페이지별 초기화
+          </button>
+        </div>
+      </div>
     `;
     settingsModal.appendChild(sec);
     if (typeof updateLastSyncTimeDisplay === 'function') updateLastSyncTimeDisplay();
