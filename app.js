@@ -3635,12 +3635,12 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
           krwSummary.totalEval += eAmt; krwSummary.totalCost += cAmt;
           if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
           krwSummary.accounts[broker].eval += eAmt; krwSummary.accounts[broker].cost += cAmt;
-          krwSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
+          krwSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt, qty: h.qty });
         } else { 
           usdSummary.totalEval += eAmt; usdSummary.totalCost += cAmt;
           if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
           usdSummary.accounts[broker].eval += eAmt; usdSummary.accounts[broker].cost += cAmt;
-          usdSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
+          usdSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt, qty: h.qty });
         }
       }
     }
@@ -3838,8 +3838,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     let krwPieConfigs = [];
     let krwAccHtml = Object.keys(krwSummary.accounts).map(b => {
       let d = krwSummary.accounts[b];
-      // [추가] 파이 차트와 포트맵 색상이 일치하도록 평가금액 순 정렬
-      d.items.sort((a,b) => b.evalAmt - a.evalAmt);
+      // [수정] 파이 차트와 포트맵을 '보유 수량' 기준으로 정렬
+      d.items.sort((a,b) => b.qty - a.qty);
       let pnl = d.eval - d.cost;
       let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
       let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
@@ -3853,22 +3853,22 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? '#00C578' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬 & 금액 우선)
-      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬
-      let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
+      // [수정] 가로 막대그래프(Bar Chart) 리스트 — '보유 수량' 기준 비중으로 계산
+      let totalQty = d.items.reduce((s, item) => s + item.qty, 0);
+      let sortedItems = [...d.items].sort((a, b) => b.qty - a.qty);
 
       let portmapSegments = sortedItems.map((item, idx) => {
-          let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
+          let ratio = totalQty > 0 ? (item.qty / totalQty) * 100 : 0;
           if(ratio <= 0) return ''; 
           let color = pieColors[idx % pieColors.length];
           
-          let amtStr = Math.round(item.evalAmt).toLocaleString();
+          let qtyStr = Math.round(item.qty).toLocaleString();
 
           return `
             <div class="hbar-item">
                 <div class="hbar-info">
                     <span class="hbar-name">${item.name}</span>
-                    <span class="hbar-ratio-text">${amtStr}원 (${ratio.toFixed(1)}%)</span>
+                    <span class="hbar-ratio-text">${qtyStr}주 (${ratio.toFixed(1)}%)</span>
                 </div>
                 <div class="hbar-track">
                     <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
@@ -3936,8 +3936,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     let usdPieConfigs = [];
     let usdAccHtml = Object.keys(usdSummary.accounts).map(b => {
       let d = usdSummary.accounts[b];
-      // [추가] 정렬
-      d.items.sort((a,b) => b.evalAmt - a.evalAmt);
+      // [수정] '보유 수량' 기준 정렬
+      d.items.sort((a,b) => b.qty - a.qty);
       let pnl = d.eval - d.cost;
       let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
       let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
@@ -3951,22 +3951,22 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬 & 금액 우선)
-      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬
-      let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
+      // [수정] 가로 막대그래프(Bar Chart) 리스트 — '보유 수량' 기준 비중으로 계산
+      let totalQty = d.items.reduce((s, item) => s + item.qty, 0);
+      let sortedItems = [...d.items].sort((a, b) => b.qty - a.qty);
 
       let portmapSegments = sortedItems.map((item, idx) => {
-          let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
+          let ratio = totalQty > 0 ? (item.qty / totalQty) * 100 : 0;
           if(ratio <= 0) return ''; 
           let color = pieColors[idx % pieColors.length];
           
-          let amtStr = Math.round(item.evalAmt).toLocaleString();
+          let qtyStr = Math.round(item.qty).toLocaleString();
 
           return `
             <div class="hbar-item">
                 <div class="hbar-info">
                     <span class="hbar-name">${item.name}</span>
-                    <span class="hbar-ratio-text">${amtStr}원 (${ratio.toFixed(1)}%)</span>
+                    <span class="hbar-ratio-text">${qtyStr}주 (${ratio.toFixed(1)}%)</span>
                 </div>
                 <div class="hbar-track">
                     <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
@@ -4019,13 +4019,13 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
       const ctx = document.getElementById(cfg.id);
       if(!ctx) return;
-      cfg.items.sort((a,b) => b.evalAmt - a.evalAmt);
+      cfg.items.sort((a,b) => b.qty - a.qty);
       const c = new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
         data: {
           labels: cfg.items.map(i => i.name),
           datasets: [{
-            data: cfg.items.map(i => i.evalAmt),
+            data: cfg.items.map(i => i.qty),
             backgroundColor: cfg.items.map((_, i) => pieColors[i % pieColors.length]),
             borderWidth: 0
           }]
@@ -4040,7 +4040,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
               callbacks: {
                 label: function(context) {
                   let v = context.raw;
-                  let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v || 0).toLocaleString();
+                  let formatVal = Math.round(v || 0).toLocaleString() + '주';
                   return context.label + ': ' + formatVal;
                 }
               },
