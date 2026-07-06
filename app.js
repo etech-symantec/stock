@@ -208,6 +208,7 @@ let portfolioChartInstUs = null;
 let portfolioZoomData = null; // 드래그 줌을 위한 차트 데이터 저장
 const chartInstances = {};
 let accountPieChartInsts = []; 
+let accountGrowthChartInsts = {}; // 🌟 계좌별 자산 성장 추이 미니 차트 인스턴스 저장
 let cachedMarketData = {}; 
 let localStockDB = []; 
 
@@ -3583,10 +3584,182 @@ function getBrokerLogo(brokerName) {
     return `<div class="broker-logo default-logo">🏦</div>`;
 }
 
+// 🌟 특정 계좌(broker)의 날짜별 투자원금/평가액 시계열을 계산 (자산 성장 추이 미니 차트용)
+function computeAccountGrowthSeries(broker, isKr) {
+    let masterData = cachedMarketData['KRW=X'];
+    if (!masterData || masterData._failed || !masterData.rawDates) {
+        const validKeys = Object.keys(cachedMarketData).filter(k => cachedMarketData[k] && !cachedMarketData[k]._failed && cachedMarketData[k].rawDates);
+        if (validKeys.length > 0) masterData = cachedMarketData[validKeys[0]];
+    }
+    if (!masterData || !masterData.rawDates) return null;
+
+    const rawDates = masterData.rawDates;
+
+    // 해당 계좌 + 해당 통화권(국내/해외)의 거래만 추출 (배당 제외)
+    const brokerTxs = state.transactions.filter(t =>
+        t.broker === broker && t.txType !== 'dividend' && isKorean(t.symbol) === isKr
+    );
+    if (brokerTxs.length === 0) return null;
+
+    // 첫 거래일 이전 구간은 계산할 필요가 없으므로 시작 인덱스 축소
+    let firstTxDate = brokerTxs.reduce((min, t) => (t.date < min ? t.date : min), brokerTxs[0].date);
+    let startIdx = rawDates.findIndex(d => d >= firstTxDate);
+    if (startIdx === -1) startIdx = 0;
+    const slicedDates = rawDates.slice(startIdx);
+    if (slicedDates.length === 0) return null;
+
+    const sortedTxs = [...brokerTxs].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const costArr = [], evalArr = [];
+
+    slicedDates.forEach(dateStr => {
+        let holdings = {};
+        sortedTxs.forEach(tx => {
+            if (tx.date > dateStr) return;
+            if (!holdings[tx.symbol]) holdings[tx.symbol] = { qty: 0, avg: 0 };
+            let h = holdings[tx.symbol];
+
+            if (tx.txType === 'transfer') {
+                if (tx.qty > 0) {
+                    let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
+                    h.qty += tx.qty;
+                    h.avg = h.qty > 0 ? totalVal / h.qty : 0;
+                } else {
+                    h.qty += tx.qty;
+                    if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+                }
+                return;
+            }
+
+            if (tx.qty > 0) {
+                let totalVal = (h.qty * h.avg) + (tx.qty * tx.price);
+                h.qty += tx.qty;
+                h.avg = totalVal / h.qty;
+            } else {
+                let sellQty = Math.abs(tx.qty);
+                h.qty -= sellQty;
+                if (h.qty <= 0) { h.qty = 0; h.avg = 0; }
+            }
+        });
+
+        let dCost = 0, dEval = 0;
+        for (let sym in holdings) {
+            if (holdings[sym].qty > 0) {
+                let h = holdings[sym];
+                dCost += h.qty * h.avg;
+
+                let priceOnDate = h.avg;
+                if (cachedMarketData[sym] && !cachedMarketData[sym]._failed) {
+                    const pIdx = cachedMarketData[sym].rawDates.indexOf(dateStr);
+                    if (pIdx !== -1 && cachedMarketData[sym].prices[pIdx] !== null) {
+                        priceOnDate = cachedMarketData[sym].prices[pIdx];
+                    } else {
+                        for (let k = cachedMarketData[sym].rawDates.length - 1; k >= 0; k--) {
+                            if (cachedMarketData[sym].rawDates[k] <= dateStr && cachedMarketData[sym].prices[k] !== null) {
+                                priceOnDate = cachedMarketData[sym].prices[k];
+                                break;
+                            }
+                        }
+                    }
+                }
+                dEval += h.qty * priceOnDate;
+            }
+        }
+        costArr.push(dCost);
+        evalArr.push(dEval);
+    });
+
+    return { dates: slicedDates, cost: costArr, eval: evalArr };
+}
+
+// 🌟 계좌별 자산 성장 추이 미니 차트 생성
+function buildAccountGrowthChart(canvasId, broker, isKr) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    if (accountGrowthChartInsts[canvasId]) {
+        accountGrowthChartInsts[canvasId].destroy();
+        delete accountGrowthChartInsts[canvasId];
+    }
+
+    const wrap = canvas.closest('.acc-growth-wrapper');
+    const series = computeAccountGrowthSeries(broker, isKr);
+    if (!series || series.dates.length < 2) {
+        if (wrap) wrap.style.display = 'none';
+        return;
+    }
+    if (wrap) wrap.style.display = '';
+
+    const labels = series.dates.map(d => {
+        if (typeof d === 'string' && d.includes('-')) {
+            const p = d.split('-');
+            return `${p[1]}.${p[2]}`;
+        }
+        return d;
+    });
+
+    const lineColor = isKr ? '#7c6af7' : '#3A9AFF';
+    const fillColor = isKr ? 'rgba(124,106,247,0.15)' : 'rgba(58,154,255,0.15)';
+    const fmtVal = v => isKr ? `₩${Math.round(v).toLocaleString()}` : `$${v.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
+    accountGrowthChartInsts[canvasId] = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: '평가액',
+                    data: series.eval,
+                    borderColor: lineColor,
+                    backgroundColor: fillColor,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 3,
+                    borderWidth: 2
+                },
+                {
+                    label: '투자원금',
+                    data: series.cost,
+                    borderColor: 'rgba(136,144,164,0.7)',
+                    borderDash: [4, 4],
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    borderWidth: 1.5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            animation: { duration: 300 },
+            scales: {
+                x: { display: false },
+                y: { display: false }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(20,20,30,0.9)',
+                    titleFont: { size: 11 },
+                    bodyFont: { size: 11 },
+                    padding: 8,
+                    callbacks: {
+                        label: (ctx) => `${ctx.dataset.label}: ${fmtVal(ctx.raw)}`
+                    }
+                }
+            }
+        }
+    });
+}
+
 function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     const pieColors = ['#7c6af7', '#4d9fff', '#00c87a', '#ff4d6a', '#f5a623', '#00b4d8', '#a259ff', '#ffb703', '#118ab2', '#06d6a0'];
     accountPieChartInsts.forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
     accountPieChartInsts = [];
+    Object.values(accountGrowthChartInsts).forEach(c => { if (c && typeof c.destroy === 'function') c.destroy(); });
+    accountGrowthChartInsts = {};
     if(allocationChartInst && typeof allocationChartInst.destroy === 'function') { allocationChartInst.destroy(); allocationChartInst = null; }
 
     let krwSummary = { totalEval: 0, totalCost: 0, accounts: {} };
@@ -3635,12 +3808,12 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
           krwSummary.totalEval += eAmt; krwSummary.totalCost += cAmt;
           if(!krwSummary.accounts[broker]) krwSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
           krwSummary.accounts[broker].eval += eAmt; krwSummary.accounts[broker].cost += cAmt;
-          krwSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt, qty: h.qty });
+          krwSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
         } else { 
           usdSummary.totalEval += eAmt; usdSummary.totalCost += cAmt;
           if(!usdSummary.accounts[broker]) usdSummary.accounts[broker] = { eval: 0, cost: 0, items: [] };
           usdSummary.accounts[broker].eval += eAmt; usdSummary.accounts[broker].cost += cAmt;
-          usdSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt, qty: h.qty });
+          usdSummary.accounts[broker].items.push({ name: stockName, costAmt: cAmt, evalAmt: eAmt });
         }
       }
     }
@@ -3836,10 +4009,11 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     });
 
     let krwPieConfigs = [];
+    let krwGrowthConfigs = [];
     let krwAccHtml = Object.keys(krwSummary.accounts).map(b => {
       let d = krwSummary.accounts[b];
-      // [수정] 파이 차트와 포트맵을 '보유 수량' 기준으로 정렬
-      d.items.sort((a,b) => b.qty - a.qty);
+      // [추가] 파이 차트와 포트맵 색상이 일치하도록 평가금액 순 정렬
+      d.items.sort((a,b) => b.evalAmt - a.evalAmt);
       let pnl = d.eval - d.cost;
       let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
       let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
@@ -3853,22 +4027,22 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? '#00C578' : '#3A9AFF';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [수정] 가로 막대그래프(Bar Chart) 리스트 — '보유 수량' 기준 비중으로 계산
-      let totalQty = d.items.reduce((s, item) => s + item.qty, 0);
-      let sortedItems = [...d.items].sort((a, b) => b.qty - a.qty);
+      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬 & 금액 우선)
+      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬
+      let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
 
       let portmapSegments = sortedItems.map((item, idx) => {
-          let ratio = totalQty > 0 ? (item.qty / totalQty) * 100 : 0;
+          let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return ''; 
           let color = pieColors[idx % pieColors.length];
           
-          let qtyStr = Math.round(item.qty).toLocaleString();
+          let amtStr = Math.round(item.evalAmt).toLocaleString();
 
           return `
             <div class="hbar-item">
                 <div class="hbar-info">
                     <span class="hbar-name">${item.name}</span>
-                    <span class="hbar-ratio-text">${qtyStr}주 (${ratio.toFixed(1)}%)</span>
+                    <span class="hbar-ratio-text">${amtStr}원 (${ratio.toFixed(1)}%)</span>
                 </div>
                 <div class="hbar-track">
                     <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
@@ -3877,10 +4051,17 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
           `;
       }).join('');
 
+      let growthId = 'krw_growth_' + Math.random().toString(36).substring(2, 9);
+      krwGrowthConfigs.push({ id: growthId, broker: b });
+
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
             <div class="hbar-container">
                 ${portmapSegments}
+            </div>
+            <div class="acc-growth-wrapper">
+                <div class="acc-growth-title">📈 자산 성장 추이</div>
+                <div class="acc-growth-canvas-wrap"><canvas id="${growthId}"></canvas></div>
             </div>
         </div>
       `;
@@ -3934,10 +4115,11 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     });
 
     let usdPieConfigs = [];
+    let usdGrowthConfigs = [];
     let usdAccHtml = Object.keys(usdSummary.accounts).map(b => {
       let d = usdSummary.accounts[b];
-      // [수정] '보유 수량' 기준 정렬
-      d.items.sort((a,b) => b.qty - a.qty);
+      // [추가] 정렬
+      d.items.sort((a,b) => b.evalAmt - a.evalAmt);
       let pnl = d.eval - d.cost;
       let roi = d.cost > 0 ? (pnl / d.cost * 100) : 0;
       let cls = pnl >= 0 ? 'up' : (d.cost > 0 ? 'down' : '');
@@ -3951,22 +4133,22 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       let evalColor = pnl >= 0 ? 'rgba(0,197,120,0.8)' : 'rgba(58,154,255,0.8)';
       let activeCls = activeAccountFilter === b ? 'active-filter' : '';
 
-      // [수정] 가로 막대그래프(Bar Chart) 리스트 — '보유 수량' 기준 비중으로 계산
-      let totalQty = d.items.reduce((s, item) => s + item.qty, 0);
-      let sortedItems = [...d.items].sort((a, b) => b.qty - a.qty);
+      // [추가] 가로 막대그래프(Bar Chart) 리스트 동적 생성 (비중순 정렬 & 금액 우선)
+      // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬
+      let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
 
       let portmapSegments = sortedItems.map((item, idx) => {
-          let ratio = totalQty > 0 ? (item.qty / totalQty) * 100 : 0;
+          let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return ''; 
           let color = pieColors[idx % pieColors.length];
           
-          let qtyStr = Math.round(item.qty).toLocaleString();
+          let amtStr = Math.round(item.evalAmt).toLocaleString();
 
           return `
             <div class="hbar-item">
                 <div class="hbar-info">
                     <span class="hbar-name">${item.name}</span>
-                    <span class="hbar-ratio-text">${qtyStr}주 (${ratio.toFixed(1)}%)</span>
+                    <span class="hbar-ratio-text">${amtStr}원 (${ratio.toFixed(1)}%)</span>
                 </div>
                 <div class="hbar-track">
                     <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
@@ -3975,10 +4157,17 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
           `;
       }).join('');
 
+      let growthId = 'usd_growth_' + Math.random().toString(36).substring(2, 9);
+      usdGrowthConfigs.push({ id: growthId, broker: b });
+
       let portmapHtml = `
         <div class="mini-portmap-wrapper ${activeAccountFilter === b ? 'should-open' : ''}">
             <div class="hbar-container">
                 ${portmapSegments}
+            </div>
+            <div class="acc-growth-wrapper">
+                <div class="acc-growth-title">📈 자산 성장 추이</div>
+                <div class="acc-growth-canvas-wrap"><canvas id="${growthId}"></canvas></div>
             </div>
         </div>
       `;
@@ -4019,13 +4208,13 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     [...krwPieConfigs, ...usdPieConfigs].forEach(cfg => {
       const ctx = document.getElementById(cfg.id);
       if(!ctx) return;
-      cfg.items.sort((a,b) => b.qty - a.qty);
+      cfg.items.sort((a,b) => b.evalAmt - a.evalAmt);
       const c = new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
         data: {
           labels: cfg.items.map(i => i.name),
           datasets: [{
-            data: cfg.items.map(i => i.qty),
+            data: cfg.items.map(i => i.evalAmt),
             backgroundColor: cfg.items.map((_, i) => pieColors[i % pieColors.length]),
             borderWidth: 0
           }]
@@ -4040,7 +4229,7 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
               callbacks: {
                 label: function(context) {
                   let v = context.raw;
-                  let formatVal = Math.round(v || 0).toLocaleString() + '주';
+                  let formatVal = cfg.isUsd ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:2}) : '₩' + Math.round(v || 0).toLocaleString();
                   return context.label + ': ' + formatVal;
                 }
               },
@@ -4088,6 +4277,11 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       });
       accountPieChartInsts.push(c);
     });
+
+    // 🌟 계좌별 자산 성장 추이 미니 차트 렌더링
+    [...krwGrowthConfigs].forEach(cfg => buildAccountGrowthChart(cfg.id, cfg.broker, true));
+    [...usdGrowthConfigs].forEach(cfg => buildAccountGrowthChart(cfg.id, cfg.broker, false));
+
     setTimeout(() => {
         // 방금 화면에 그려진 포트맵 중 'should-open(열려야 할 대상)' 클래스를 가진 것을 모두 찾습니다.
         document.querySelectorAll('.mini-portmap-wrapper.should-open').forEach(el => {
