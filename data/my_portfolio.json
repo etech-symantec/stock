@@ -9632,6 +9632,16 @@
       "qty": 0,
       "price": 2.5245,
       "txType": "dividend"
+    },
+    {
+      "id": 1783349951781,
+      "date": "2023-12-07",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "AMZN",
+      "qty": -10,
+      "price": 146.4,
+      "txType": "trade"
     }
   ],
   "range": "1y",
