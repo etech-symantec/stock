@@ -3979,9 +3979,9 @@
       "owner": "끄니",
       "broker": "키움",
       "symbol": "AMZN",
-      "qty": 5,
-      "price": 240,
-      "txType": "buy"
+      "qty": -5,
+      "price": 239.95,
+      "txType": "trade"
     },
     {
       "id": 1776937393151,
@@ -9634,7 +9634,7 @@
       "txType": "dividend"
     }
   ],
-  "range": "all",
+  "range": "1y",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
@@ -9740,10 +9740,10 @@
       "copper": false,
       "bdi": true,
       "krexport": true,
-      "us10y": true,
-      "dxy": true,
+      "us10y": false,
+      "dxy": false,
       "usdkrw": true,
-      "margin-us": true,
+      "margin-us": false,
       "margin-kr": true
     }
   }
