@@ -2735,7 +2735,7 @@ function setView(view, el) {
   if(view === 'realized') renderRealizedDashboard();
   
   const pChartRowWrap2 = document.getElementById('chartRowWrapper');
-  if (view === 'dividend' || view === 'history' || view === 'realized' || view === 'watch') {
+  if (view === 'dividend' || view === 'history' || view === 'realized' || view === 'watch' || view === 'moonlight') {
       if(pChartRowWrap2) pChartRowWrap2.style.display = 'none';
   } else {
       if(pChartRowWrap2) pChartRowWrap2.style.display = 'flex';
@@ -4919,11 +4919,13 @@ async function render() {
   const histDash = document.getElementById('historyDashboard');
   const realDash = document.getElementById('realizedDashboard');
   const msBar = document.getElementById('marketSignalBar');
+  const moonSection = document.getElementById('moonlightSection');
   
   if (currentView === 'dividend') {
     if (msBar) msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
+    if(moonSection) moonSection.style.display = 'none';
     divDash.style.display = 'flex';
     renderDividendDashboard();
     return;
@@ -4931,6 +4933,7 @@ async function render() {
     if (msBar) msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; listOptions.style.display = 'none'; divDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
+    if(moonSection) moonSection.style.display = 'none';
     histDash.style.display = 'flex';
     renderHistoryDashboard();
     return;
@@ -4938,6 +4941,7 @@ async function render() {
     if (msBar) msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none'; 
     listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
+    if(moonSection) moonSection.style.display = 'none';
     
     // 실현수익 페이지 진입 시 다른 탭의 잔여 클래스 간섭을 완전히 제거 및 청소
     if (listOptions) listOptions.classList.remove('non-sticky'); 
@@ -4945,12 +4949,23 @@ async function render() {
     if(realDash) realDash.style.display = 'flex';
     renderRealizedDashboard();
     return;
+  } else if (currentView === 'moonlight') {
+    if (msBar) msBar.style.display = 'none';
+    dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; container.style.display = 'none';
+    listOptions.style.display = 'none'; divDash.style.display = 'none'; histDash.style.display = 'none';
+    if(realDash) realDash.style.display = 'none';
+    if (listOptions) listOptions.classList.remove('non-sticky');
+    if(moonSection) moonSection.style.display = 'flex';
+    updateViewHeader('🌕', '달빛정보');
+    if (typeof renderMoonlightView === 'function') renderMoonlightView();
+    return;
   } else if (currentView === 'watch') {
     if (msBar) msBar.style.display = 'none';
     dash.style.display = 'none'; pChartRowWrap.style.display = 'none'; 
     container.style.display = 'block'; listOptions.style.display = 'flex'; 
     divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
+    if(moonSection) moonSection.style.display = 'none';
     if(watchlistSearch) watchlistSearch.style.display = 'flex';
     updateViewHeader('⭐', '관심종목');
     const _lob = document.getElementById('listOptionsBar');
@@ -4962,6 +4977,7 @@ async function render() {
     dash.style.display = 'flex';
     pChartRowWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
     if(realDash) realDash.style.display = 'none';
+    if(moonSection) moonSection.style.display = 'none';
     if(watchlistSearch) watchlistSearch.style.display = 'none';
     updateViewHeader();
     const _lob = document.getElementById('listOptionsBar');
