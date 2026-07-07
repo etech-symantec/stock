@@ -114,11 +114,13 @@
   .cat-desc { font-size: 13px; color: var(--txt2); }
 
   .ind-row { 
-    display: flex; justify-content: space-between; align-items: center; 
+    display: flex; flex-direction: column; gap: 14px;
     padding: 20px 30px; border-bottom: 1px solid var(--border); transition: background 0.15s; 
   }
   .ind-row:last-child { border-bottom: none; }
   .ind-row:hover { background: #f8fafc; }
+
+  .ind-top-row { display: flex; justify-content: space-between; align-items: center; }
 
   .ind-left { flex: 1; padding-right: 20px; }
   .ind-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
@@ -147,6 +149,15 @@
     transition: left .8s cubic-bezier(.22,1,.36,1);
   }
   .ind-gauge-labels { display: flex; justify-content: space-between; margin-top: 5px; font-size: 9px; color: var(--txt2); font-family: var(--font-num); letter-spacing: 0.3px; }
+
+  /* 💡 지표 하단 히스토리 스파크라인 (과거 대비 현재 수준 시각화) */
+  .ind-spark-wrap { width: 100%; }
+  .ind-spark-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+  .ind-spark-title { font-family: var(--font-num); font-size: 9px; letter-spacing: 1px; color: var(--txt2); text-transform: uppercase; opacity: 0.75; }
+  .ind-spark-range { font-family: var(--font-num); font-size: 9px; color: var(--txt2); }
+  .ind-spark-svg { width: 100%; height: 34px; display: block; }
+  .ind-spark-caption { display: flex; justify-content: space-between; margin-top: 3px; font-family: var(--font-num); font-size: 9px; color: var(--txt2); letter-spacing: 0.3px; }
+  .ind-spark-empty { font-family: var(--font-num); font-size: 10px; color: var(--txt2); opacity: 0.6; padding: 8px 0; }
 
   /* 💡 4가지 테마 색상 (Red, Blue, Orange, Green) */
   .theme-red { border-top: 4px solid #f43f5e; }
@@ -449,8 +460,92 @@ const CARDS_META = [
   { key: 'CAPE_PE', group: 'valuation', weight: 9, freq: '월간', label: 'CAPE Shiller PE', tag: '밸류에이션', unit: '배', inverse: false, range: [15, 45], sourceName: 'Multpl.com', link: 'https://www.multpl.com/shiller-pe', desc: '물가상승률을 조정한 S&P 500의 10년 평균 PER. 단기 이익 변동 노이즈를 제거한 장기 가치를 보여주며, 30 이상은 역사적 고평가(닷컴 버블 수준)로 진단합니다.' }
 ];
 
+/* ── 💡 지표별 과거 시계열 → 얇은 스파크라인 SVG 생성 ──
+   meta.key의 전체 히스토리 값을 0~100 위치가 아닌 "그 지표 자신의 실제 최소/최대"를 기준으로
+   정규화해서 그립니다. 현재값이 과거 대비 어느 위치(고점/저점)에 있는지 한눈에 보여주는 것이 목적입니다. */
+function buildIndicatorSparkline(meta, allRows, color) {
+  if (!allRows || !allRows.length) return '';
+
+  const sorted = [...allRows].sort((a, b) => new Date(a.Date) - new Date(b.Date));
+  const series = sorted.map(r => {
+    const raw = r[meta.key];
+    if (raw === undefined || raw === null || raw === '' || raw === 'N/A') return null;
+    const num = parseFloat(raw.toString().replace(/,/g, '').split('(')[0]);
+    return isNaN(num) ? null : num;
+  });
+
+  const validPoints = series.map((v, i) => ({ v, i })).filter(o => o.v !== null);
+  if (validPoints.length < 2) {
+    return `<div class="ind-spark-wrap"><div class="ind-spark-empty">// 추세를 그리기에 데이터가 부족합니다</div></div>`;
+  }
+
+  const w = 600, h = 34, padX = 2, padY = 4;
+  const vals = validPoints.map(o => o.v);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const range = (max - min) || Math.abs(max) || 1;
+  const n = series.length;
+  const stepX = n > 1 ? (w - padX * 2) / (n - 1) : 0;
+
+  const xy = (i, v) => {
+    const x = padX + i * stepX;
+    const y = h - padY - ((v - min) / range) * (h - padY * 2);
+    return [x, y];
+  };
+
+  // null(결측)에서 선을 끊어가며 세그먼트별로 path 생성
+  let segments = [];
+  let current = [];
+  series.forEach((v, i) => {
+    if (v === null) { if (current.length) { segments.push(current); current = []; } return; }
+    current.push(xy(i, v));
+  });
+  if (current.length) segments.push(current);
+
+  const pathsSvg = segments.map(seg => {
+    const d = seg.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    // 라인 아래 은은한 영역 채우기 (마지막 세그먼트만이 아니라 각 세그먼트에 적용)
+    const areaD = `${d} L${seg[seg.length - 1][0].toFixed(1)},${h} L${seg[0][0].toFixed(1)},${h} Z`;
+    return `<path d="${areaD}" fill="${color}" opacity="0.07"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>`;
+  }).join('');
+
+  // 현재(가장 최근 유효) 값 점 강조
+  const last = validPoints[validPoints.length - 1];
+  const [lx, ly] = xy(last.i, last.v);
+  const lastDot = `<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="3" fill="${color}" stroke="#ffffff" stroke-width="1.2"/>`;
+
+  // 역사적 최저/최고 지점도 옅게 표시(현재가 그 근처인지 가늠)
+  const minPoint = validPoints.reduce((a, b) => (b.v < a.v ? b : a));
+  const maxPoint = validPoints.reduce((a, b) => (b.v > a.v ? b : a));
+  const [minX, minY] = xy(minPoint.i, minPoint.v);
+  const [maxX, maxY] = xy(maxPoint.i, maxPoint.v);
+  const refDots = `<circle cx="${minX.toFixed(1)}" cy="${minY.toFixed(1)}" r="1.6" fill="var(--txt2)" opacity="0.5"/>
+                    <circle cx="${maxX.toFixed(1)}" cy="${maxY.toFixed(1)}" r="1.6" fill="var(--txt2)" opacity="0.5"/>`;
+
+  const startDate = sorted[0].Date;
+  const endDate = sorted[sorted.length - 1].Date;
+  const fmtNum = (v) => (Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2));
+
+  return `
+    <div class="ind-spark-wrap">
+      <div class="ind-spark-head">
+        <span class="ind-spark-title">과거 추이</span>
+        <span class="ind-spark-range">최저 ${fmtNum(min)} · 최고 ${fmtNum(max)}</span>
+      </div>
+      <svg class="ind-spark-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        ${pathsSvg}
+        ${refDots}
+        ${lastDot}
+      </svg>
+      <div class="ind-spark-caption">
+        <span>${startDate}</span>
+        <span>${endDate}</span>
+      </div>
+    </div>
+  `;
+}
+
 /* ── 💡 카테고리 패널 생성 및 리스트 렌더링 ── */
-function renderCards(latest) {
+function renderCards(latest, allRows) {
   const grid = document.getElementById('category-grid');
   grid.innerHTML = '';
 
@@ -488,33 +583,38 @@ function renderCards(latest) {
           }
       }
 
+      const sparkHtml = buildIndicatorSparkline(meta, allRows, sig.color);
+
       rowsHtml += `
         <div class="ind-row">
-          <div class="ind-left">
-            <div class="ind-title-row">
-              <span class="ind-name">${meta.label}</span>
-              <span class="ind-pill">${meta.tag}</span>
-              <span class="cpill" style="color:${sig.color}; border-color:${sig.border};">${sig.label}</span>
-            </div>
-            <p class="ind-desc">${meta.desc}</p>
-          </div>
-          <div class="ind-right">
-            <div class="ind-val-wrap">
-              <span class="ind-val">${displayVal}</span>
-              <span class="ind-unit">${meta.unit} <span style="opacity:0.45; font-size:10px; margin-left:4px; letter-spacing:0px;">(${meta.freq})</span></span>
-            </div>
-            <div class="ind-gauge-wrap">
-              <div class="ind-gauge-track">
-                <div class="ind-gauge-marker" style="left:${gaugePct}%;"></div>
+          <div class="ind-top-row">
+            <div class="ind-left">
+              <div class="ind-title-row">
+                <span class="ind-name">${meta.label}</span>
+                <span class="ind-pill">${meta.tag}</span>
+                <span class="cpill" style="color:${sig.color}; border-color:${sig.border};">${sig.label}</span>
               </div>
-              <div class="ind-gauge-labels">
-                <span>낮음</span>
-                <span style="color:${sig.color}; font-weight:600;">${rawVal && rawVal !== 'N/A' ? Math.round(gaugePct) + '%' : '—'}</span>
-                <span>높음</span>
-              </div>
+              <p class="ind-desc">${meta.desc}</p>
             </div>
-            <a href="${meta.link}" target="_blank" class="ind-source">${meta.sourceName} ↗</a>
+            <div class="ind-right">
+              <div class="ind-val-wrap">
+                <span class="ind-val">${displayVal}</span>
+                <span class="ind-unit">${meta.unit} <span style="opacity:0.45; font-size:10px; margin-left:4px; letter-spacing:0px;">(${meta.freq})</span></span>
+              </div>
+              <div class="ind-gauge-wrap">
+                <div class="ind-gauge-track">
+                  <div class="ind-gauge-marker" style="left:${gaugePct}%;"></div>
+                </div>
+                <div class="ind-gauge-labels">
+                  <span>낮음</span>
+                  <span style="color:${sig.color}; font-weight:600;">${rawVal && rawVal !== 'N/A' ? Math.round(gaugePct) + '%' : '—'}</span>
+                  <span>높음</span>
+                </div>
+              </div>
+              <a href="${meta.link}" target="_blank" class="ind-source">${meta.sourceName} ↗</a>
+            </div>
           </div>
+          ${sparkHtml}
         </div>
       `;
     });
@@ -651,7 +751,7 @@ async function init() {
     // 💡 각 렌더 함수를 독립적으로 실행하여, 하나가 실패해도(예: 차트 라이브러리 로드 실패)
     //    나머지 영역(특히 4대 지표 카드)은 정상적으로 표시되도록 분리합니다.
     try { renderHero(latest); } catch (e) { console.error('renderHero 실패:', e); }
-    try { renderCards(latest); } catch (e) { console.error('renderCards 실패:', e); }
+    try { renderCards(latest, rows); } catch (e) { console.error('renderCards 실패:', e); }
     try { renderChart(rows); } catch (e) { console.error('renderChart 실패:', e); }
     try { renderHistory(rows); } catch (e) { console.error('renderHistory 실패:', e); }
 
