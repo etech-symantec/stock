@@ -492,21 +492,13 @@ function buildIndicatorSparkline(meta, allRows, color) {
     return [x, y];
   };
 
-  // null(결측)에서 선을 끊어가며 세그먼트별로 path 생성
-  let segments = [];
-  let current = [];
-  series.forEach((v, i) => {
-    if (v === null) { if (current.length) { segments.push(current); current = []; } return; }
-    current.push(xy(i, v));
-  });
-  if (current.length) segments.push(current);
-
-  const pathsSvg = segments.map(seg => {
-    const d = seg.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
-    // 라인 아래 은은한 영역 채우기 (마지막 세그먼트만이 아니라 각 세그먼트에 적용)
-    const areaD = `${d} L${seg[seg.length - 1][0].toFixed(1)},${h} L${seg[0][0].toFixed(1)},${h} Z`;
-    return `<path d="${areaD}" fill="${color}" opacity="0.07"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>`;
-  }).join('');
+  // 💡 결측치(N/A) 구간은 건너뛰고, 유효한 값들만 순서대로 자연스럽게 이어서 하나의 선으로 그립니다.
+  //    (x좌표는 원래 시점의 인덱스를 그대로 사용하므로, 데이터가 촘촘한 구간과 성긴 구간의
+  //     시간 간격 차이는 유지되면서도 선 자체는 끊기지 않습니다.)
+  const linePoints = validPoints.map(o => xy(o.i, o.v));
+  const lineD = linePoints.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const areaD = `${lineD} L${linePoints[linePoints.length - 1][0].toFixed(1)},${h} L${linePoints[0][0].toFixed(1)},${h} Z`;
+  const pathsSvg = `<path d="${areaD}" fill="${color}" opacity="0.07"/><path d="${lineD}" fill="none" stroke="${color}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>`;
 
   // 현재(가장 최근 유효) 값 점 강조
   const last = validPoints[validPoints.length - 1];
