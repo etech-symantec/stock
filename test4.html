@@ -11,28 +11,11 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="market-signal.css">
 <style>
-  /* 🌕 달빛정보 섹션 (index.html 콘텐츠를 페이지 하단에 인라인으로 삽입) */
+  /* 🌕 달빛정보 섹션 (다른 메뉴 탭과 동일하게 setView()로 전환되는 대시보드 페이지) */
   .moonlight-section{
-    margin: 20px; border-radius: 16px; overflow: hidden;
-    border: 1px solid var(--border2, #333); background: #ffffff;
+    flex-direction: column;
+    overflow-y: auto;
   }
-  .moonlight-toolbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 12px 20px; background: var(--bg3, #1c1f26);
-    border-bottom: 1px solid var(--border2, #333);
-  }
-  .moonlight-toolbar-title{
-    font-size:14px; font-weight:700; color: var(--text, #eee);
-    display:flex; align-items:center; gap:8px;
-  }
-  .moonlight-toolbar-title small{
-    font-size:11px; font-weight:400; color:var(--text2, #888); font-family: monospace;
-  }
-  .moonlight-close-btn{
-    border:none; background:transparent; color:var(--text2, #aaa);
-    font-size:13px; cursor:pointer; padding:6px 10px; border-radius:6px; line-height:1;
-  }
-  .moonlight-close-btn:hover{ background:rgba(255,255,255,0.08); color:var(--text, #fff); }
 
   /* ── 아래는 index.html(Macro & Market Signal Dashboard) 스타일을 .moonlight-view 안으로 스코프 처리 ── */
   .moonlight-view {
@@ -226,6 +209,7 @@
     <button class="vtab" onclick="setView('history', this)"><span class="vtab-icon">📋</span><span class="vtab-text">거래내역</span></button>
     <button class="vtab" onclick="setView('realized', this)" style="color:var(--blue)"><span class="vtab-icon">💵</span><span class="vtab-text">실현수익</span></button>
     <button class="vtab" id="tabDividend" onclick="setView('dividend', this)" style="color:var(--green)"><span class="vtab-icon">🌿</span><span class="vtab-text">배당통계</span></button>
+    <button class="vtab" id="tabMoonlight" onclick="setView('moonlight', this)"><span class="vtab-icon">🌕</span><span class="vtab-text">달빛정보</span></button>
   </div>
 
   <!-- 우측: 기간 + 테마 + 설정 -->
@@ -245,7 +229,6 @@
       <div class="sync-spinner" id="syncSpinner"></div>
       <span id="syncText"></span>
     </div>
-    <button class="btn-sm" onclick="toggleMoonlightView()" title="매크로 & 마켓 시그널 대시보드">🌕 달빛정보</button>
     <button class="btn-theme-toggle" onclick="toggleTheme()" id="btnThemeToggle" title="라이트/다크 모드 전환">🌙</button>
     <button class="btn-sm" onclick="openMasterSettingsModal()" title="전체 설정 및 데이터 관리">⚙️ 설정</button>
     <button class="btn-mobile-menu" onclick="openMobileMenu()" title="메뉴">☰</button>
@@ -282,9 +265,9 @@
     <button class="vtab" id="mDrawerTabHistory" onclick="setView('history',this);closeMobileMenu()">📋 거래 내역</button>
     <button class="vtab" id="mDrawerTabRealized" onclick="setView('realized',this);closeMobileMenu()" style="color:var(--blue)">📈 실현수익</button>
     <button class="vtab" id="mDrawerTabDividend" onclick="setView('dividend',this);closeMobileMenu()" style="color:var(--green)">🌿 배당통계</button>
+    <button class="vtab" id="mDrawerTabMoonlight" onclick="setView('moonlight',this);closeMobileMenu()">🌕 달빛정보</button>
     <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:8px;">
       <button class="btn-sm" style="justify-content:center;" onclick="toggleSidebar();closeMobileMenu()">✏️ 거래 장부 열기</button>
-      <button class="btn-sm" style="justify-content:center;" onclick="toggleMoonlightView();closeMobileMenu()">🌕 달빛정보</button>
       <button class="btn-sm" style="justify-content:center;" onclick="openMasterSettingsModal();closeMobileMenu()">⚙️ 설정</button>
     </div>
   </div>
@@ -1218,109 +1201,106 @@
         </div><!-- /right -->
       </div><!-- /flex wrapper -->
       
-    </div> </main> </div>
-
-<!-- 🌕 달빛정보 섹션 (index.html: Macro & Market Signal Dashboard 내용을 그대로 삽입) -->
-<section class="moonlight-section" id="moonlightSection" style="display:none;">
-  <div class="moonlight-toolbar">
-    <span class="moonlight-toolbar-title">🌕 달빛정보 <small>MACRO &amp; MARKET SIGNAL</small></span>
-    <button class="moonlight-close-btn" onclick="closeMoonlightView()">✕ 닫기</button>
-  </div>
-
-  <div class="moonlight-view">
-    <div class="wrapper">
-      <header class="fade-up">
-        <div class="logo-area">
-          <h1>Global Macro Signal</h1>
-          <p><span class="live-dot" style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--ms-buy); margin-right:6px; animation:pulse 2s infinite;"></span>Auto-updated Every Morning</p>
-        </div>
-        <div class="meta">
-          <span class="date-val" id="ms-latest-date">—</span>
-          최신 업데이트
-        </div>
-      </header>
-
-      <div class="top-section">
-        <div class="hero fade-up" style="animation-delay: 0.1s">
-          <div class="hero-top-row">
-            <div>
-              <p class="hero-label">// 통합 밸류에이션 점수 (0~100)</p>
-              <div class="hero-score" id="ms-hero-score">—</div>
-            </div>
-            <div class="signal-badge" id="ms-signal-badge" style="color:var(--ms-txt2); border-color:var(--ms-border)">LOADING</div>
-          </div>
-
-          <div class="sub-scores" id="ms-sub-scores-row">
-            <div>심리·리스크 (25%) <strong>—</strong></div>
-            <div>자금환경 (25%) <strong>—</strong></div>
-            <div>경기선행 (25%) <strong>—</strong></div>
-            <div>밸류에이션 (25%) <strong>—</strong></div>
-          </div>
-
-          <p class="hero-sub" id="ms-hero-desc">데이터를 불러오는 중...</p>
-          <div class="gauge-wrap">
-            <div class="gauge-track">
-              <div class="gauge-fill" id="ms-hero-gauge" style="width:0%"></div>
-            </div>
-            <div class="gauge-labels">
-              <span>0 · 적극 매수</span>
-              <span>50 · 중립</span>
-              <span>100 · 적극 매도</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="chart-container fade-up">
-          <p style="font-family:var(--ms-font-num); font-size:10px; letter-spacing:1px; color:var(--ms-txt2); margin-bottom:8px;">매크로 종합 트렌드 (클릭하여 지표 켜고 끄기)</p>
-          <canvas id="ms-macroChart"></canvas>
-        </div>
-      </div>
-
-      <p class="section-title fade-up">4대 지표 카테고리</p>
-      <div class="category-grid" id="ms-category-grid"></div>
-
-      <p class="section-title fade-up">역사적 매크로 타임라인 기록 (좌우로 스크롤하세요)</p>
-      <div class="table-wrap fade-up">
-        <table>
-          <thead>
-            <tr>
-              <th>날짜</th>
-              <th>통합 점수</th>
-              <th>심리·리스크</th>
-              <th>자금환경</th>
-              <th>경기선행</th>
-              <th>밸류에이션</th>
-              <th>F&G</th>
-              <th>VIX</th>
-              <th>MOVE</th>
-              <th>US10Y</th>
-              <th>DXY</th>
-              <th>USDKRW</th>
-              <th>Russell2000</th>
-              <th>Copper</th>
-              <th>하이일드</th>
-              <th>CAPE PE</th>
-              <th>버핏(美)</th>
-              <th>버핏(韓)</th>
-              <th>신용(美)</th>
-              <th>신용(韓)</th>
-              <th>수출(韓)</th>
-              <th>BDI</th>
-            </tr>
-          </thead>
-          <tbody id="ms-history-body">
-            <tr><td colspan="20" style="text-align:center;padding:32px;color:var(--ms-txt2)">데이터 로딩 중...</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <footer class="fade-up">
-        <span>데이터 출처: Yahoo Finance · FRED (Fed) · CNN Markets · GuruFocus · KOFIA · TRASS</span>
-        <span>GitHub Actions 자동 집계 스크립트 기반</span>
-      </footer>
     </div>
-  </div>
-</section>
+
+    <!-- 🌕 달빛정보 (index.html: Macro & Market Signal Dashboard 내용을 그대로 삽입) -->
+    <div id="moonlightSection" class="dashboard-page moonlight-section" style="display:none;">
+      <div class="moonlight-view">
+        <div class="wrapper">
+          <header class="fade-up">
+            <div class="logo-area">
+              <h1>Global Macro Signal</h1>
+              <p><span class="live-dot" style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--ms-buy); margin-right:6px; animation:pulse 2s infinite;"></span>Auto-updated Every Morning</p>
+            </div>
+            <div class="meta">
+              <span class="date-val" id="ms-latest-date">—</span>
+              최신 업데이트
+            </div>
+          </header>
+
+          <div class="top-section">
+            <div class="hero fade-up" style="animation-delay: 0.1s">
+              <div class="hero-top-row">
+                <div>
+                  <p class="hero-label">// 통합 밸류에이션 점수 (0~100)</p>
+                  <div class="hero-score" id="ms-hero-score">—</div>
+                </div>
+                <div class="signal-badge" id="ms-signal-badge" style="color:var(--ms-txt2); border-color:var(--ms-border)">LOADING</div>
+              </div>
+
+              <div class="sub-scores" id="ms-sub-scores-row">
+                <div>심리·리스크 (25%) <strong>—</strong></div>
+                <div>자금환경 (25%) <strong>—</strong></div>
+                <div>경기선행 (25%) <strong>—</strong></div>
+                <div>밸류에이션 (25%) <strong>—</strong></div>
+              </div>
+
+              <p class="hero-sub" id="ms-hero-desc">데이터를 불러오는 중...</p>
+              <div class="gauge-wrap">
+                <div class="gauge-track">
+                  <div class="gauge-fill" id="ms-hero-gauge" style="width:0%"></div>
+                </div>
+                <div class="gauge-labels">
+                  <span>0 · 적극 매수</span>
+                  <span>50 · 중립</span>
+                  <span>100 · 적극 매도</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-container fade-up">
+              <p style="font-family:var(--ms-font-num); font-size:10px; letter-spacing:1px; color:var(--ms-txt2); margin-bottom:8px;">매크로 종합 트렌드 (클릭하여 지표 켜고 끄기)</p>
+              <canvas id="ms-macroChart"></canvas>
+            </div>
+          </div>
+
+          <p class="section-title fade-up">4대 지표 카테고리</p>
+          <div class="category-grid" id="ms-category-grid"></div>
+
+          <p class="section-title fade-up">역사적 매크로 타임라인 기록 (좌우로 스크롤하세요)</p>
+          <div class="table-wrap fade-up">
+            <table>
+              <thead>
+                <tr>
+                  <th>날짜</th>
+                  <th>통합 점수</th>
+                  <th>심리·리스크</th>
+                  <th>자금환경</th>
+                  <th>경기선행</th>
+                  <th>밸류에이션</th>
+                  <th>F&G</th>
+                  <th>VIX</th>
+                  <th>MOVE</th>
+                  <th>US10Y</th>
+                  <th>DXY</th>
+                  <th>USDKRW</th>
+                  <th>Russell2000</th>
+                  <th>Copper</th>
+                  <th>하이일드</th>
+                  <th>CAPE PE</th>
+                  <th>버핏(美)</th>
+                  <th>버핏(韓)</th>
+                  <th>신용(美)</th>
+                  <th>신용(韓)</th>
+                  <th>수출(韓)</th>
+                  <th>BDI</th>
+                </tr>
+              </thead>
+              <tbody id="ms-history-body">
+                <tr><td colspan="20" style="text-align:center;padding:32px;color:var(--ms-txt2)">데이터 로딩 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="fade-up">
+            <span>데이터 출처: Yahoo Finance · FRED (Fed) · CNN Markets · GuruFocus · KOFIA · TRASS</span>
+            <span>GitHub Actions 자동 집계 스크립트 기반</span>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    </main> </div>
 
 
 <!-- 🌟 개별 종목 차트 모달 -->
@@ -1777,28 +1757,21 @@
 <script>
 /* ══════════════════════════════════════════════════════
    🌕 달빛정보 (index.html: Macro & Market Signal Dashboard)
-   - 별도 페이지 로직을 test4.html 안에 그대로 병합
+   - 다른 메뉴(전체보기/관심종목/거래내역 등)와 동일하게 setView('moonlight')로 전환되는 뷰
    - 함수/변수명은 ms 접두어로 스코프 처리하여 기존 코드와 충돌 방지
-   - 최초로 열릴 때만 데이터를 불러오고 차트를 그림(지연 초기화)
+   - 최초로 탭을 열 때만 데이터를 불러오고 차트를 그림(지연 초기화); 이후에는 캔버스만 리사이즈
    ══════════════════════════════════════════════════════ */
-let msInitialized = false;
+let msLoaded = false;
+let msChartInstance = null;
 
-function toggleMoonlightView(){
-  const section = document.getElementById('moonlightSection');
-  const isHidden = section.style.display === 'none' || !section.style.display;
-  if (isHidden) {
-    section.style.display = 'block';
-    if (!msInitialized) {
-      msInitialized = true;
-      msInit();
-    }
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    section.style.display = 'none';
+// app.js의 setView()/render()가 currentView === 'moonlight'일 때 호출합니다.
+function renderMoonlightView(){
+  if (!msLoaded) {
+    msLoaded = true;
+    msInit();
+  } else if (msChartInstance) {
+    setTimeout(() => msChartInstance.resize(), 50);
   }
-}
-function closeMoonlightView(){
-  document.getElementById('moonlightSection').style.display = 'none';
 }
 
 function msParseCSV(text) {
@@ -2055,7 +2028,8 @@ function msRenderChart(rows) {
     { label: 'BDI 지수 (우측축)', data: getD('BDI_Index'), borderColor: '#334155', borderWidth: 1.5, hidden: true, yAxisID: 'y1' }
   ];
 
-  new Chart(ctx, {
+  if (msChartInstance) { msChartInstance.destroy(); msChartInstance = null; }
+  msChartInstance = new Chart(ctx, {
     type: 'line', data: { labels, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
