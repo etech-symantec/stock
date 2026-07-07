@@ -548,6 +548,82 @@ def get_kr_buffett_indicator(ecos_api_key=None, include_konex=True):
                     browser.close()
 
         # ==========================================
+        # 2-C. 버핏지수 — macromicro.me 직접 폴백
+        # (KRX 시가총액 수집이 실패했을 때, 시총/GDP를 각각
+        #  계산하지 않고 macromicro가 이미 계산해둔 값을 그대로 사용)
+        # ==========================================
+        def _fetch_buffett_macromicro():
+            """
+            https://en.macromicro.me/series/4235/kr-market-cap-gdp 페이지의
+            <span class="val">232.08</span> 형태 값을 그대로 가져온다.
+            """
+            url = "https://en.macromicro.me/series/4235/kr-market-cap-gdp"
+            headers = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                ),
+                "Referer": "https://en.macromicro.me/",
+            }
+
+            html_text = None
+
+            # 💡 [1순위] Cloudscraper (봇 탐지 우회, 가볍고 빠름)
+            try:
+                import cloudscraper
+                scraper = cloudscraper.create_scraper(
+                    browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
+                )
+                resp = scraper.get(url, headers=headers, timeout=15)
+                if resp.status_code == 200:
+                    html_text = resp.text
+                else:
+                    print(f"      ⚠️ [macromicro/1순위] 응답코드 {resp.status_code}")
+            except Exception as e:
+                print(f"      ⚠️ [macromicro/1순위] Cloudscraper 실패: {e}")
+
+            # 💡 [2순위] Playwright (JS 렌더링 필요 시 대비)
+            if not html_text:
+                try:
+                    from playwright.sync_api import sync_playwright
+                    with sync_playwright() as p:
+                        browser = p.chromium.launch(
+                            headless=True,
+                            args=["--disable-blink-features=AutomationControlled"]
+                        )
+                        context = browser.new_context(user_agent=headers["User-Agent"])
+                        context.route(
+                            "**/*",
+                            lambda route: route.abort()
+                            if route.request.resource_type in ["image", "media", "font"]
+                            else route.continue_(),
+                        )
+                        page = context.new_page()
+                        page.goto(url, timeout=30_000)
+                        page.wait_for_selector("span.val", state="attached", timeout=15_000)
+                        page.wait_for_timeout(1_000)
+                        html_text = page.content()
+                        browser.close()
+                except Exception as e:
+                    print(f"      ⚠️ [macromicro/2순위] Playwright 실패: {e}")
+
+            if not html_text:
+                raise ValueError("macromicro 페이지 접속 실패 (두 방식 모두 실패)")
+
+            soup = BeautifulSoup(html_text, "html.parser")
+            val_span = soup.find("span", class_="val")
+            if not val_span:
+                raise ValueError("macromicro 페이지에서 val 값을 찾지 못했습니다.")
+
+            value = _num(val_span.text)
+            if value <= 0:
+                raise ValueError(f"macromicro 버핏지수 값 이상: '{val_span.text}'")
+
+            print(f"      ✅ [macromicro] 한국 버핏지수(직접 수집): {value}%")
+            return round(value, 2)
+
+        # ==========================================
         # 3. 시가총액 수집
         # ==========================================
         print("      ▶️ [시가총액] KRX 메인 HTML 수집 시도 중...")
@@ -556,6 +632,16 @@ def get_kr_buffett_indicator(ecos_api_key=None, include_konex=True):
             total_cap_billion = _fetch_cap_krx_main_playwright()
         except Exception as e:
             print(f"      ❌ KRX 시가총액 수집 실패: {e}")
+            print("      ▶️ [폴백] macromicro.me에서 버핏지수 직접 수집 시도...")
+            try:
+                kr_val = _fetch_buffett_macromicro()
+            except Exception as e2:
+                print(f"      ❌ macromicro 폴백도 실패: {e2}")
+
+        # KRX 시가총액 실패 → macromicro 폴백으로 이미 kr_val을 구한 경우,
+        # GDP 수집/나눗셈 계산을 건너뛰고 바로 결과를 반환한다.
+        if kr_val is not None:
+            return kr_val
 
         # ==========================================
         # 4. GDP 수집
