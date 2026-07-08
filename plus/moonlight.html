@@ -275,7 +275,30 @@
   .history-more-btn:disabled { opacity: 0.5; cursor: default; }
 
   footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); font-family: var(--font-num); font-size: 11px; color: var(--txt2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-  
+
+  /* ── 📰 관심 종목 구글 뉴스 리스트 (test4.html에 등록된 종목 기준) ── */
+  .gnews-section { margin: 0 0 8px; }
+  .gnews-list { display: flex; flex-direction: column; gap: 8px; }
+  .gnews-item {
+    display: flex; align-items: center; gap: 12px; padding: 11px 16px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    text-decoration: none; color: inherit; transition: border-color .15s, transform .15s;
+  }
+  .gnews-item:hover { border-color: var(--info); transform: translateX(2px); }
+  .gnews-tag {
+    flex: 0 0 auto; font-family: var(--font-num); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.5px; color: var(--info); background: rgba(37,99,235,0.1);
+    border-radius: 6px; padding: 3px 8px; white-space: nowrap;
+  }
+  .gnews-title { flex: 1; min-width: 0; font-size: 13px; color: var(--txt3); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gnews-meta { flex: 0 0 auto; font-family: var(--font-num); font-size: 10px; color: var(--txt2); white-space: nowrap; }
+  .gnews-loading, .gnews-empty { padding: 18px; text-align: center; font-size: 12px; color: var(--txt2); background: var(--panel); border-radius: 10px; border: 1px dashed var(--border); }
+  .gnews-fallback .gnews-title { color: var(--info); }
+  @media (max-width: 640px) {
+    .gnews-item { flex-wrap: wrap; }
+    .gnews-title { white-space: normal; }
+  }
+
   .fade-up { opacity: 0; transform: translateY(16px); animation: fadeUp .6s ease forwards; }
   @keyframes fadeUp { to { opacity: 1; transform: none; } }
 </style>
@@ -283,6 +306,18 @@
 <body>
 <div id="spark-tooltip" class="spark-tooltip"></div>
 <div class="wrapper">
+  <!-- 📰 관심 종목 구글 뉴스 리스트 (test4.html에 등록된 종목 기준, 최대 10개) -->
+  <div class="gnews-section fade-up" id="gnews-section">
+    <p class="section-title section-title--with-date" style="margin: 24px 0 14px;">
+      📰 관심 종목 뉴스
+      <span class="section-title-line"></span>
+      <span class="section-title-date"><span class="date-val" id="gnews-updated">—</span></span>
+    </p>
+    <div class="gnews-list" id="gnews-list">
+      <div class="gnews-loading">뉴스를 불러오는 중...</div>
+    </div>
+  </div>
+
   <div class="top-section" style="margin-top: 32px;">
     <div class="hero fade-up" style="animation-delay: 0.1s">
       <div class="mode-switch" id="mode-switch">
@@ -993,6 +1028,136 @@ function renderHistory(rows) {
   }
 }
 
+/* ────────────────────────────────────────────────────────────
+   📰 관심 종목 구글 뉴스 리스트
+   - test4.html(메인 대시보드)에 등록된 종목(state.tickers)을 그대로 가져와
+     각 종목 이름으로 구글 뉴스를 검색하고, 최신순으로 최대 10개만 보여줍니다.
+   - moonlight.html은 test4.html 안에서 Shadow DOM 스크립트로 실행되기 때문에
+     app.js가 만든 전역 변수 state / localStockDB / fetchWithProxy를
+     그대로 함께 사용할 수 있습니다(같은 창, 같은 스코프에서 실행됨).
+   - 구글 뉴스 RSS는 브라우저에서 직접 fetch하면 CORS로 막히므로,
+     app.js가 이미 쓰고 있는 /api/proxy 프록시를 통해 요청합니다.
+     혹시 프록시가 news.google.com 도메인을 막아 두었거나 실패하면,
+     각 종목별로 "구글 뉴스에서 검색" 링크만 보여주는 방식으로 자동 대체됩니다.
+──────────────────────────────────────────────────────────── */
+
+// 등록된 종목 티커 목록 가져오기 (state가 없으면 localStorage에서 직접 복구 시도)
+function gnewsGetRegisteredTickers() {
+  try {
+    if (typeof state !== 'undefined' && state && Array.isArray(state.tickers)) {
+      return state.tickers.slice();
+    }
+  } catch (e) {}
+  try {
+    const raw = localStorage.getItem('stockwatch_real_v69') || localStorage.getItem('stockwatch_real_v68');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.tickers)) return parsed.tickers.slice();
+    }
+  } catch (e) {}
+  return [];
+}
+
+// 티커 -> 뉴스 검색에 쓸 이름 (localStockDB에서 회사명을 찾고, 없으면 .KS/.KQ 접미사만 제거)
+function gnewsQueryFor(symbol) {
+  try {
+    if (typeof localStockDB !== 'undefined' && Array.isArray(localStockDB) && localStockDB.length) {
+      const match = localStockDB.find(s => s.symbol === symbol);
+      if (match && match.name) return match.name;
+    }
+  } catch (e) {}
+  return symbol.replace(/\.(KS|KQ)$/i, '');
+}
+
+function gnewsEscapeHtml(str) {
+  const div = document.createElement ? document.createElement('div') : window.document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+// 구글 뉴스 RSS를 프록시를 통해 가져와 파싱 (실패 시 빈 배열 반환)
+async function gnewsFetchForSymbol(symbol, query) {
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' 주식')}&hl=ko&gl=KR&ceid=KR:ko`;
+  try {
+    const proxyUrl = `/api/proxy?url=${encodeURIComponent(rssUrl)}`;
+    const res = await fetch(proxyUrl);
+    if (!res.ok) return [];
+    const text = await res.text();
+    const xml = new DOMParser().parseFromString(text, 'text/xml');
+    if (xml.querySelector('parsererror')) return [];
+    const items = Array.from(xml.querySelectorAll('item')).slice(0, 3);
+    return items.map(it => ({
+      symbol,
+      title: it.querySelector('title') ? it.querySelector('title').textContent : '',
+      link: it.querySelector('link') ? it.querySelector('link').textContent : '#',
+      pubDate: it.querySelector('pubDate') ? it.querySelector('pubDate').textContent : '',
+      source: it.getElementsByTagName('source')[0] ? it.getElementsByTagName('source')[0].textContent : query
+    }));
+  } catch (e) {
+    return [];
+  }
+}
+
+function gnewsRenderItem(item) {
+  const d = item.pubDate ? new Date(item.pubDate) : null;
+  const dateStr = (d && !isNaN(d)) ? `${d.getMonth() + 1}/${d.getDate()}` : '';
+  return `<a class="gnews-item" href="${item.link}" target="_blank" rel="noopener noreferrer">
+    <span class="gnews-tag">${gnewsEscapeHtml(item.symbol.replace(/\.(KS|KQ)$/i,''))}</span>
+    <span class="gnews-title">${gnewsEscapeHtml(item.title)}</span>
+    <span class="gnews-meta">${gnewsEscapeHtml(item.source)}${dateStr ? ' · ' + dateStr : ''}</span>
+  </a>`;
+}
+
+function gnewsRenderFallbackLinks(pairs) {
+  return pairs.map(({ symbol, query }) => `<a class="gnews-item gnews-fallback" href="https://news.google.com/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko" target="_blank" rel="noopener noreferrer">
+    <span class="gnews-tag">${gnewsEscapeHtml(symbol.replace(/\.(KS|KQ)$/i,''))}</span>
+    <span class="gnews-title">${gnewsEscapeHtml(query)} 관련 뉴스 구글에서 보기</span>
+  </a>`).join('');
+}
+
+async function loadGoogleNewsList() {
+  const container = document.getElementById('gnews-list');
+  if (!container) return;
+
+  const tickers = gnewsGetRegisteredTickers();
+  if (tickers.length === 0) {
+    container.innerHTML = '<div class="gnews-empty">등록된 종목이 없습니다. test4.html에서 종목을 먼저 추가해주세요.</div>';
+    return;
+  }
+
+  const pairs = tickers.map(symbol => ({ symbol, query: gnewsQueryFor(symbol) }));
+
+  const settled = await Promise.allSettled(pairs.map(p => gnewsFetchForSymbol(p.symbol, p.query)));
+  let items = [];
+  settled.forEach(r => { if (r.status === 'fulfilled') items = items.concat(r.value); });
+
+  // 같은 뉴스가 중복으로 잡히는 경우 제목 기준으로 제거
+  const seen = new Set();
+  items = items.filter(it => {
+    if (!it.title || seen.has(it.title)) return false;
+    seen.add(it.title);
+    return true;
+  });
+
+  // 최신순 정렬 후 최대 10개
+  items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  items = items.slice(0, 10);
+
+  const updatedEl = document.getElementById('gnews-updated');
+  if (updatedEl) {
+    const now = new Date();
+    updatedEl.textContent = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} 기준`;
+  }
+
+  if (items.length === 0) {
+    // 프록시가 news.google.com을 못 가져온 경우 등 → 검색 링크로 대체
+    container.innerHTML = gnewsRenderFallbackLinks(pairs.slice(0, 10));
+    return;
+  }
+
+  container.innerHTML = items.map(gnewsRenderItem).join('');
+}
+
 async function init() {
   try {
     const res = await fetch(`/data/indicators.csv?t=${new Date().getTime()}`);
@@ -1020,6 +1185,7 @@ async function init() {
   }
 }
 init();
+loadGoogleNewsList();
 </script>
 </body>
 </html>
