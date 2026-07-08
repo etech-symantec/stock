@@ -971,7 +971,7 @@ function renderHistory(rows) {
 
 async function init() {
   try {
-    const res = await fetch(`data/indicators.csv?t=${new Date().getTime()}`);
+    const res = await fetch(`/data/indicators.csv?t=${new Date().getTime()}`);
     if (!res.ok) throw new Error('CSV 파일을 찾을 수 없습니다.');
     const text = await res.text();
     const rows = parseCSV(text);
