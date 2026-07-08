@@ -1058,21 +1058,10 @@ function gnewsGetRegisteredTickers() {
   return [];
 }
 
-// 티커 -> 뉴스 검색에 쓸 이름 (localStockDB에서 회사명을 찾고, 없으면 .KS/.KQ 접미사만 제거)
-function gnewsQueryFor(symbol) {
-  try {
-    if (typeof localStockDB !== 'undefined' && Array.isArray(localStockDB) && localStockDB.length) {
-      const match = localStockDB.find(s => s.symbol === symbol);
-      if (match && match.name) return match.name;
-    }
-  } catch (e) {}
-  return symbol.replace(/\.(KS|KQ)$/i, '');
-}
-
-function gnewsEscapeHtml(str) {
-  const div = document.createElement ? document.createElement('div') : window.document.createElement('div');
-  div.textContent = str == null ? '' : String(str);
-  return div.innerHTML;
+// 종목 코드의 야후파이낸스식 꼬리표(.KS, .KQ, .DLST, .KS.DLST 등)를 제거해
+// 순수 코드/이름만 남깁니다. (app.js에서 쓰는 정규화 방식과 동일)
+function gnewsNormalizeSymbol(sym) {
+  return String(sym).replace(/\.KS\.DLST|\.KQ\.DLST|\.DLST|\.KS|\.KQ/gi, '');
 }
 
 // localStockDB(종목명 데이터)가 아직 비동기로 로딩 중일 수 있으므로,
@@ -1093,36 +1082,78 @@ function gnewsWaitForStockDB(timeoutMs = 3000) {
   });
 }
 
-// 구글 뉴스 RSS를 가져와 파싱 (실패 시 빈 배열 반환)
-// ※ jooseek의 /api/proxy는 JSON 응답을 기대해서 RSS(XML)를 주면 500 에러가 나고,
-//   allorigins 같은 범용 공개 프록시는 CORS 헤더가 안정적이지 않아 자주 막힙니다.
-//   그래서 애초에 "RSS를 JSON으로 바꿔서 브라우저로 바로 내려주는" rss2json을 사용합니다.
-async function gnewsFetchForSymbol(symbol, query) {
-  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' 주식')}&hl=ko&gl=KR&ceid=KR:ko`;
+// 티커 -> 뉴스 검색에 쓸 이름 (localStockDB에서 회사명을 찾고, 없으면 꼬리표만 제거)
+// 예: "005930.KS" -> "삼성전자", 바코드가 "035900"처럼 접미사 없이 저장돼 있어도
+// 정규화(normalize) 후 비교하기 때문에 매칭됩니다.
+function gnewsQueryFor(symbol) {
   try {
+    if (typeof localStockDB !== 'undefined' && Array.isArray(localStockDB) && localStockDB.length) {
+      const target = gnewsNormalizeSymbol(symbol);
+      const match = localStockDB.find(s => gnewsNormalizeSymbol(s.symbol) === target);
+      if (match && match.name) return match.name;
+    }
+  } catch (e) {}
+  return gnewsNormalizeSymbol(symbol);
+}
+
+function gnewsEscapeHtml(str) {
+  const div = document.createElement ? document.createElement('div') : window.document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+// 구글 뉴스를 가져와 파싱 (실패 시 빈 배열 반환)
+// 1순위: 같은 도메인의 /api/news (서버리스 함수) — CORS 문제가 없어 가장 안정적입니다.
+//        ※ 이 기능을 쓰려면 프로젝트에 api/news.js 파일을 추가/배포해야 합니다.
+// 2순위: rss2json 공개 서비스 — /api/news를 아직 배포하지 않았거나 실패했을 때의 임시 대안.
+//        (무료 요청 한도가 낮아 종목이 많으면 실패할 수 있습니다)
+async function gnewsFetchForSymbol(symbol, query) {
+  const searchTerm = query + ' 주식';
+
+  // 1순위: 자체 서버 엔드포인트
+  try {
+    const res = await fetch(`/api/news?q=${encodeURIComponent(searchTerm)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.items) && data.items.length) {
+        return data.items.slice(0, 3).map(it => ({
+          symbol,
+          title: it.title || '',
+          link: it.link || '#',
+          pubDate: it.pubDate || '',
+          source: it.source || query
+        }));
+      }
+    }
+  } catch (e) {}
+
+  // 2순위: rss2json (임시 대안)
+  try {
+    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(searchTerm)}&hl=ko&gl=KR&ceid=KR:ko`;
     const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
     const res = await fetch(apiUrl);
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (!data || data.status !== 'ok' || !Array.isArray(data.items)) return [];
-    return data.items.slice(0, 3).map(it => {
-      const raw = it.title || '';
-      // 구글 뉴스 제목은 보통 "기사 제목 - 언론사" 형태라 언론사만 분리해냅니다.
-      const idx = raw.lastIndexOf(' - ');
-      const title = idx > -1 ? raw.slice(0, idx) : raw;
-      const source = idx > -1 ? raw.slice(idx + 3) : query;
-      return { symbol, title, source, link: it.link || '#', pubDate: it.pubDate || '' };
-    });
-  } catch (e) {
-    return [];
-  }
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.status === 'ok' && Array.isArray(data.items) && data.items.length) {
+        return data.items.slice(0, 3).map(it => {
+          const raw = it.title || '';
+          const idx = raw.lastIndexOf(' - ');
+          const title = idx > -1 ? raw.slice(0, idx) : raw;
+          const source = idx > -1 ? raw.slice(idx + 3) : query;
+          return { symbol, title, source, link: it.link || '#', pubDate: it.pubDate || '' };
+        });
+      }
+    }
+  } catch (e) {}
+
+  return [];
 }
 
 function gnewsRenderItem(item) {
   const d = item.pubDate ? new Date(item.pubDate) : null;
   const dateStr = (d && !isNaN(d)) ? `${d.getMonth() + 1}/${d.getDate()}` : '';
   return `<a class="gnews-item" href="${item.link}" target="_blank" rel="noopener noreferrer">
-    <span class="gnews-tag">${gnewsEscapeHtml(item.symbol.replace(/\.(KS|KQ)$/i,''))}</span>
+    <span class="gnews-tag">${gnewsEscapeHtml(gnewsNormalizeSymbol(item.symbol))}</span>
     <span class="gnews-title">${gnewsEscapeHtml(item.title)}</span>
     <span class="gnews-meta">${gnewsEscapeHtml(item.source)}${dateStr ? ' · ' + dateStr : ''}</span>
   </a>`;
@@ -1130,7 +1161,7 @@ function gnewsRenderItem(item) {
 
 function gnewsRenderFallbackLinks(pairs) {
   return pairs.map(({ symbol, query }) => `<a class="gnews-item gnews-fallback" href="https://news.google.com/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko" target="_blank" rel="noopener noreferrer">
-    <span class="gnews-tag">${gnewsEscapeHtml(symbol.replace(/\.(KS|KQ)$/i,''))}</span>
+    <span class="gnews-tag">${gnewsEscapeHtml(gnewsNormalizeSymbol(symbol))}</span>
     <span class="gnews-title">${gnewsEscapeHtml(query)} 관련 뉴스 구글에서 보기</span>
   </a>`).join('');
 }
