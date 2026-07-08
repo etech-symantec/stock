@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>달빛신호 — Macro & Market Signal Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='68' font-size='64' text-anchor='middle'%3E%F0%9F%8C%99%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:       #ffffff;
+    --panel:    #f8f9fa;
+    --card:     #ffffff;
+    --border:   #e2e8f0;
+    --buy:      #059669; 
+    --sell:     #e11d48; 
+    --warn:     #d97706; 
+    --info:     #2563eb; 
+    --txt:      #1e293b;
+    --txt2:     #64748b;
+    --txt3:     #0f172a;
+    --font-hd:  'Bebas Neue', sans-serif;
+    --font-num: 'DM Mono', monospace;
+    --font-body:'DM Sans', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--txt); font-family: var(--font-body);
+    font-size: 14px; min-height: 100vh; overflow-x: hidden;
+  }
+  .wrapper { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 80px; }
+  header {
+    display: flex; align-items: flex-end; justify-content: space-between; padding: 24px 0 18px; border-bottom: 1px solid var(--border);
+  }
+  .logo-area h1 { display: flex; align-items: center; gap: 10px; line-height: 1; }
+  .logo-icon {
+    font-size: clamp(20px, 2.6vw, 28px); line-height: 1;
+    filter: drop-shadow(0 2px 6px rgba(37,99,235,0.35));
+  }
+  .logo-text {
+    font-family: var(--font-hd); font-size: clamp(22px, 3vw, 32px); letter-spacing: 2px;
+    background: linear-gradient(135deg, #1e293b 30%, var(--buy) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .logo-area p { margin-top: 4px; font-family: var(--font-num); font-size: 10px; letter-spacing: 1.5px; color: var(--txt2); text-transform: uppercase; }
+  .meta { text-align: right; font-family: var(--font-num); font-size: 11px; color: var(--txt2); }
+  .meta .date-val { display: block; font-size: 16px; font-weight: 500; color: var(--txt3); letter-spacing: 0.5px; }
+
+  /* ── 💡 통합 점수(좌) + 차트(우) 한 행 배치 ── */
+  .top-section {
+    margin: 20px 0 28px; display: grid; grid-template-columns: 560px 1fr; gap: 20px; align-items: stretch; height: 460px;
+  }
+  @media (max-width: 900px) { .top-section { grid-template-columns: 1fr; height: auto; } .chart-container { height: 280px; } }
+
+  .hero {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px 26px;
+    display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--buy), transparent);
+  }
+
+  /* 💡 좌: 점수/최종의견/모드설명, 우: 카테고리별 비중 막대그래프 */
+  .hero-main { display: flex; align-items: flex-start; gap: 28px; margin: 22px 0 20px; }
+  .hero-left { flex: 0 0 220px; display: flex; flex-direction: column; align-items: flex-start; }
+  .hero-right { flex: 1; min-width: 0; padding-top: 2px; }
+
+  /* 💡 통합 점수 계산 방식(적극적/중립적/보수적) 선택 - 세그먼트 컨트롤(알약형 토글) */
+  .mode-switch {
+    display: flex; gap: 2px; padding: 3px; margin-bottom: 8px;
+    background: #eef1f5; border-radius: 10px;
+  }
+  .mode-btn {
+    flex: 1; padding: 6px 4px; border: none; border-radius: 8px; background: transparent;
+    font-family: var(--font-num); font-size: 11px; letter-spacing: 0.4px; font-weight: 500; color: var(--txt2);
+    cursor: pointer; text-align: center; transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .mode-btn:hover { color: var(--txt3); }
+  .mode-btn.active { background: #ffffff; color: var(--txt3); font-weight: 700; box-shadow: 0 2px 6px rgba(15,23,42,0.12); }
+  .mode-desc { margin: 6px 0 0; font-size: 11.5px; color: var(--txt2); line-height: 1.6; }
+  .hero-label {
+    display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px;
+    font-family: var(--font-num); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 500;
+    color: var(--buy); background: rgba(5,150,105,0.08); border: 1px solid rgba(5,150,105,0.2);
+    padding: 4px 10px 4px 8px; border-radius: 20px;
+  }
+  .hero-label-icon { font-size: 11px; line-height: 1; }
+  .hero-score { font-family: var(--font-hd); font-size: 52px; line-height: 1; letter-spacing: -1px; transition: color .5s; }
+
+  /* 💡 카테고리별 비중: 세로 나열 + 비중만큼 채워지는 막대그래프 */
+  .weight-label { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); margin-bottom: 14px; }
+  .weight-list { display: flex; flex-direction: column; gap: 14px; }
+  .weight-item-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .weight-name { font-size: 12.5px; font-weight: 600; color: var(--txt3); white-space: nowrap; }
+  .weight-meta { font-family: var(--font-num); font-size: 11px; color: var(--txt2); white-space: nowrap; }
+  .weight-meta strong { color: var(--txt3); font-size: 12px; margin-right: 2px; }
+  .weight-bar-track { height: 8px; border-radius: 4px; background: #eef1f5; overflow: hidden; }
+  .weight-bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.22,1,.36,1); }
+
+  .hero-sub { margin-top: 14px; font-size: 12px; color: var(--txt2); line-height: 1.6; }
+  .hero-sub strong { color: var(--txt3); }
+  .signal-badge {
+    display: inline-block; margin-top: 12px; padding: 5px 14px; border-radius: 30px; font-family: var(--font-num); font-size: 11px; font-weight: 500;
+    letter-spacing: 1.5px; text-transform: uppercase; border: 1px solid; white-space: nowrap;
+  }
+  .gauge-wrap { margin-top: 22px; max-width: none !important; }
+  .gauge-track { height: 5px; border-radius: 3px; background: var(--border); position: relative; overflow: hidden; }
+  /* 💡 0~100 전체 구간을 고정된 그래디언트(매수→중립→매도)로 항상 동일하게 표시하고,
+     오른쪽에서부터 실제 점수 이후 구간만 배경색으로 가려서(mask) 현재 점수 위치의 실제 색이
+     드러나도록 합니다. 기존에는 gauge-fill 자체가 자기 너비 기준으로 그래디언트를 다시 그려서
+     점수와 무관하게 끝부분이 항상 빨간색으로 보이는 문제가 있었습니다. */
+  .gauge-gradient-bg { position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(90deg, var(--buy), var(--warn) 50%, var(--sell)); }
+  .gauge-mask { position: absolute; top: 0; right: 0; height: 100%; background: var(--panel); transition: width 1.2s cubic-bezier(.22,1,.36,1); }
+  .gauge-labels { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--font-num); font-size: 9px; color: var(--txt2); letter-spacing: 0.5px; }
+  
+  .section-title { font-family: var(--font-num); font-size: 11px; font-weight: 600; letter-spacing: 2px; color: var(--txt3); margin: 56px 0 24px; display: flex; align-items: center; gap: 12px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-title--with-date::after { content: none; }
+  .section-title-line { flex: 1; height: 1px; background: var(--border); }
+  .section-title-date { flex: 0 0 auto; font-weight: 500; letter-spacing: 0.5px; color: var(--txt2); text-transform: none; white-space: nowrap; }
+  .section-title-date .date-val { color: var(--txt3); font-weight: 600; margin-right: 4px; }
+  
+  .chart-container {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.03); display: flex; flex-direction: column; min-height: 0;
+  }
+  .chart-container canvas { flex: 1; min-height: 0; }
+
+  /* ── 💡 4대 지표 패널 레이아웃 (스크린샷 기반) ── */
+  .category-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 48px;
+  }
+  @media (max-width: 1024px) { .category-grid { grid-template-columns: 1fr; } }
+
+  .cat-panel {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  }
+  .cat-header { padding: 24px 30px; position: relative; border-bottom: 1px solid var(--border); }
+  .cat-num {
+    position: absolute; top: 18px; left: 28px; font-family: var(--font-hd);
+    font-size: 56px; line-height: 1; opacity: 0.2; pointer-events: none;
+  }
+  .cat-title-wrap { position: relative; z-index: 1; padding-left: 52px; }
+  .cat-title { font-size: 18px; font-weight: 600; color: var(--txt3); margin-bottom: 6px; letter-spacing: -0.5px; }
+  .cat-desc { font-size: 13px; color: var(--txt2); }
+
+  .ind-row { 
+    display: grid; grid-template-columns: 5fr 1fr 4fr; align-items: center; gap: 20px;
+    padding: 20px 30px; border-bottom: 1px solid var(--border); transition: background 0.15s; 
+  }
+  .ind-row:last-child { border-bottom: none; }
+  .ind-row:hover { background: #f8fafc; }
+
+  .ind-left { min-width: 0; }
+  .ind-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .ind-name { font-size: 15px; font-weight: 600; color: var(--txt3); font-family: var(--font-body); }
+  .ind-pill { font-size: 10px; padding: 2px 8px; border-radius: 12px; border: 1px solid; font-weight: 500; letter-spacing: 0.5px; }
+  .ind-desc { font-size: 13px; color: var(--txt2); line-height: 1.5; }
+
+  /* 💡 지표값 칸 (전체 카드 가로 길이의 10%) */
+  .ind-value-col { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-width: 0; }
+  .ind-val-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 0; }
+  .ind-val { font-family: var(--font-hd); font-size: 22px; color: var(--txt3); line-height: 1; letter-spacing: 0.5px; word-break: keep-all; }
+  .ind-unit { font-size: 11px; color: var(--txt2); font-family: var(--font-num); }
+
+  /* 💡 그래프(스파크라인+게이지) 칸 (전체 카드 가로 길이의 40%) */
+  .ind-graph-col { display: flex; flex-direction: column; align-items: stretch; justify-content: center; min-width: 0; }
+  .ind-source { font-size: 11px; text-decoration: none; display: flex; align-items: center; gap: 2px; font-weight: 500; opacity: 0.8; transition: opacity 0.2s; align-self: flex-end; }
+  .ind-source:hover { opacity: 1; }
+
+  /* 💡 지표별 위치(낮음~높음) 게이지 바 - 더 눈에 띄게 재설계 */
+  .ind-gauge-wrap { width: 100%; margin-bottom: 8px; }
+  .ind-gauge-track {
+    position: relative; height: 10px; border-radius: 5px;
+    background: linear-gradient(90deg, #d1fae5 0%, #fef3c7 50%, #fee2e2 100%);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .ind-gauge-marker {
+    position: absolute; top: -3px; width: 4px; height: 16px; border-radius: 2px;
+    background: var(--txt3); transform: translateX(-50%);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: left .8s cubic-bezier(.22,1,.36,1);
+  }
+  .ind-gauge-labels { display: flex; justify-content: space-between; margin-top: 5px; font-size: 9px; color: var(--txt2); font-family: var(--font-num); letter-spacing: 0.3px; }
+
+  /* 💡 지표별 미니 스파크라인: 최근 히스토리 추이를 얇은 라인 그래프로 표시 */
+  .ind-spark-wrap { width: 100%; height: 34px; margin-bottom: 8px; position: relative; }
+  .ind-spark-wrap svg { width: 100%; height: 100%; display: block; overflow: visible; cursor: crosshair; }
+  .ind-spark-area { opacity: 0.12; }
+  .ind-spark-line { fill: none; stroke-width: 1.3; vector-effect: non-scaling-stroke; }
+  .ind-spark-last { stroke: #fff; stroke-width: 1; }
+  .ind-spark-dot { stroke-width: 1.6; }
+  .ind-spark-empty {
+    height: 100%; display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: var(--txt2); font-family: var(--font-num); letter-spacing: 0.3px;
+  }
+
+  /* 💡 좁은 화면에서는 3단 배치를 세로로 쌓아 가독성 확보 */
+  @media (max-width: 640px) {
+    .ind-row { grid-template-columns: 1fr; row-gap: 14px; }
+    .ind-value-col { flex-direction: row; align-items: baseline; justify-content: flex-start; gap: 8px; }
+    .ind-val-wrap { flex-direction: row; align-items: baseline; }
+  }
+
+  /* 💡 스파크라인 위에 마우스를 올리면 나오는 작은 툴팁 */
+  .spark-tooltip {
+    position: fixed; z-index: 9999; background: #ffffff; border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px; font-family: var(--font-num); line-height: 1.5;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08); pointer-events: none; opacity: 0;
+    transform: translate(-50%, calc(-100% - 10px)); transition: opacity .1s ease;
+    white-space: nowrap;
+  }
+  .spark-tooltip.show { opacity: 1; }
+  .spark-tooltip .st-date { font-size: 9px; color: var(--txt2); margin-bottom: 2px; letter-spacing: 0.3px; }
+  .spark-tooltip .st-val { font-size: 12px; font-weight: 600; color: var(--txt3); }
+
+  /* 💡 4가지 테마 색상 (Red, Blue, Orange, Green) */
+  .theme-red { border-top: 4px solid #f43f5e; }
+  .theme-red .cat-header { background: #fff1f2; }
+  .theme-red .cat-num { color: #e11d48; }
+  .theme-red .ind-pill { color: #e11d48; border-color: #fecdd3; background: #fff1f2; }
+  .theme-red .ind-source { color: #f43f5e; }
+
+  .theme-blue { border-top: 4px solid #3b82f6; }
+  .theme-blue .cat-header { background: #eff6ff; }
+  .theme-blue .cat-num { color: #2563eb; }
+  .theme-blue .ind-pill { color: #2563eb; border-color: #bfdbfe; background: #eff6ff; }
+  .theme-blue .ind-source { color: #3b82f6; }
+
+  .theme-orange { border-top: 4px solid #f59e0b; }
+  .theme-orange .cat-header { background: #fff7ed; }
+  .theme-orange .cat-num { color: #d97706; }
+  .theme-orange .ind-pill { color: #d97706; border-color: #fed7aa; background: #fff7ed; }
+  .theme-orange .ind-source { color: #f59e0b; }
+
+  .theme-green { border-top: 4px solid #10b981; }
+  .theme-green .cat-header { background: #f0fdf4; }
+  .theme-green .cat-num { color: #059669; }
+  .theme-green .ind-pill { color: #059669; border-color: #bbf7d0; background: #f0fdf4; }
+  .theme-green .ind-source { color: #10b981; }
+
+  /* 테이블 스타일 및 틀 고정 */
+  .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); background: var(--card); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1500px; }
+  thead th { font-family: var(--font-num); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--txt2); padding: 14px 16px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; background: var(--panel); }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover td { background: #f8fafc; }
+  tbody td { padding: 12px 16px; font-family: var(--font-num); font-size: 12px; color: var(--txt3); text-align: right; white-space: nowrap; border-bottom: 1px solid var(--border); background: var(--card); }
+  tbody tr:last-child td { border-bottom: none; }
+  
+  th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 2; width: 90px; min-width: 90px; text-align: left; }
+  th:nth-child(2), td:nth-child(2) { position: sticky; left: 90px; z-index: 2; width: 140px; min-width: 140px; text-align: left; }
+  th:nth-child(3), td:nth-child(3) { position: sticky; left: 230px; z-index: 2; width: 80px; min-width: 80px; }
+  th:nth-child(4), td:nth-child(4) { position: sticky; left: 310px; z-index: 2; width: 80px; min-width: 80px; border-right: 2px solid var(--border); }
+  thead th:nth-child(1), thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) { z-index: 3; background: var(--panel); }
+  
+  .cpill { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; border: 1px solid; background: white; font-weight: 500; }
+
+  /* 히스토리 테이블 "더 보기" 영역 */
+  .table-more-wrap { display: flex; justify-content: center; padding: 14px 0; background: var(--card); border-radius: 0 0 12px 12px; }
+  .history-more-btn {
+    font-family: var(--font-num); font-size: 11px; letter-spacing: 0.5px; font-weight: 500;
+    color: var(--info); background: var(--panel); border: 1px solid var(--border);
+    border-radius: 20px; padding: 7px 18px; cursor: pointer; transition: background .15s, border-color .15s;
+  }
+  .history-more-btn:hover { background: #eff6ff; border-color: #bfdbfe; }
+  .history-more-btn:disabled { opacity: 0.5; cursor: default; }
+
+  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); font-family: var(--font-num); font-size: 11px; color: var(--txt2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+  
+  .fade-up { opacity: 0; transform: translateY(16px); animation: fadeUp .6s ease forwards; }
+  @keyframes fadeUp { to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div id="spark-tooltip" class="spark-tooltip"></div>
+<div class="wrapper">
+  <div class="top-section" style="margin-top: 32px;">
+    <div class="hero fade-up" style="animation-delay: 0.1s">
+      <div class="mode-switch" id="mode-switch">
+        <button type="button" class="mode-btn" data-mode="aggressive" onclick="setMode('aggressive')">적극적</button>
+        <button type="button" class="mode-btn active" data-mode="neutral" onclick="setMode('neutral')">중립적</button>
+        <button type="button" class="mode-btn" data-mode="conservative" onclick="setMode('conservative')">보수적</button>
+      </div>
+      <p class="mode-desc" id="mode-desc">4대 카테고리(심리·리스크, 자금환경, 경기선행, 밸류에이션)에 동일한 가중치(25%)를 부여하는 균형잡힌 기본 방식입니다.</p>
+
+      <div class="hero-main">
+        <div class="hero-left">
+          <p class="hero-label"><span class="hero-label-icon">📊</span>통합 밸류에이션 점수 (0~100)</p>
+          <div class="hero-score" id="hero-score">—</div>
+          <div class="signal-badge" id="signal-badge" style="color:var(--txt2); border-color:var(--border)">LOADING</div>
+          <p class="hero-sub" id="hero-desc">데이터를 불러오는 중...</p>
+        </div>
+
+        <div class="hero-right">
+          <p class="weight-label">카테고리별 비중</p>
+          <div class="weight-list" id="sub-scores-row"></div>
+        </div>
+      </div>
+
+      <div class="gauge-wrap">
+        <div class="gauge-track">
+          <div class="gauge-gradient-bg"></div>
+          <div class="gauge-mask" id="hero-gauge-mask" style="width:100%"></div>
+        </div>
+        <div class="gauge-labels">
+          <span>0 · 적극 매수</span>
+          <span>50 · 중립</span>
+          <span>100 · 적극 매도</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-container fade-up">
+      <p style="font-family:var(--font-num); font-size:10px; letter-spacing:1px; color:var(--txt2); margin-bottom:8px;">매크로 종합 트렌드 (클릭하여 지표 켜고 끄기)</p>
+      <canvas id="macroChart"></canvas>
+    </div>
+  </div>
+
+  <p class="section-title section-title--with-date fade-up">
+    4대 지표 카테고리
+    <span class="section-title-line"></span>
+    <span class="section-title-date"><span class="date-val" id="latest-date">—</span> 최신 업데이트</span>
+  </p>
+  
+  <!-- 💡 스크린샷과 동일한 4대 패널 그리드 컨테이너 -->
+  <div class="category-grid" id="category-grid"></div>
+
+  <p class="section-title fade-up">지표값 히스토리</p>
+  <div class="table-wrap fade-up">
+    <table>
+      <thead>
+        <tr>
+          <th>날짜</th>
+          <th>통합 점수</th>
+          <th>심리·리스크</th>
+          <th>자금환경</th>
+          <th>경기선행</th>
+          <th>밸류에이션</th>
+          <th>F&G</th>
+          <th>VIX</th>
+          <th>MOVE</th>
+          <th>US10Y</th>
+          <th>DXY</th>
+          <th>USDKRW</th>
+          <th>Russell2000</th>
+          <th>Copper</th>
+          <th>하이일드</th>
+          <th>CAPE PE</th>
+          <th>버핏(美)</th>
+          <th>버핏(韓)</th>
+          <th>신용(美)</th>
+          <th>신용(韓)</th>
+          <th>수출(韓)</th>
+          <th>BDI</th>
+        </tr>
+      </thead>
+      <tbody id="history-body">
+        <tr><td colspan="20" style="text-align:center;padding:32px;color:var(--txt2)">데이터 로딩 중...</td></tr>
+      </tbody>
+    </table>
+    <div class="table-more-wrap">
+      <button type="button" id="history-loadmore-btn" class="history-more-btn" style="display:none;">더 보기 (최근 1개월까지)</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── CSV Parser ── */
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const vals = [];
+    let insideQuote = false;
+    let currWord = '';
+    for (let char of line) {
+      if (char === '"') insideQuote = !insideQuote;
+      else if (char === ',' && !insideQuote) { vals.push(currWord.trim()); currWord = ''; }
+      else currWord += char;
+    }
+    vals.push(currWord.trim());
+    
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = vals[i] ?? '');
+    return obj;
+  }).filter(r => r.Date);
+}
+
+/* ── 💡 통합 밸류에이션 점수 계산 모드 (적극적 / 중립적 / 보수적) ──
+   같은 원본 데이터를 두고도 "어떤 카테고리에 더 무게를 둘지"와 "얼마나 보수적으로 매수/매도
+   신호를 낼지"를 다르게 가져갈 수 있도록 3가지 프리셋을 제공합니다.
+   - groupWeights: 4대 카테고리(심리·리스크/자금환경/경기선행/밸류에이션)의 가중치(합계 1.0)
+   - thresholds: 종합 점수(0~100)를 신호로 변환할 때 사용하는 구간 경계값
+     (buy 이하=적극 매수, addBuy 이하=분할 매수, watch 이하=관망 유지, 초과=비중 축소) */
+const MODE_CONFIGS = {
+  aggressive: {
+    label: '적극적',
+    desc: '심리·리스크와 자금환경에 더 큰 가중치를 두어, 저점에서 더 빠르고 과감하게 매수 신호를 포착하는 방식입니다.',
+    groupWeights: { risk: 0.35, liquidity: 0.30, economy: 0.20, valuation: 0.15 },
+    thresholds: { buy: 40, addBuy: 55, watch: 75 }
+  },
+  neutral: {
+    label: '중립적',
+    desc: '4대 카테고리(심리·리스크, 자금환경, 경기선행, 밸류에이션)에 동일한 가중치(25%)를 부여하는 균형잡힌 기본 방식입니다.',
+    groupWeights: { risk: 0.25, liquidity: 0.25, economy: 0.25, valuation: 0.25 },
+    thresholds: { buy: 30, addBuy: 50, watch: 70 }
+  },
+  conservative: {
+    label: '보수적',
+    desc: '밸류에이션과 심리·리스크에 더 큰 비중을 두어, 확실한 저평가 근거가 확인될 때만 신중하게 접근하는 방식입니다.',
+    groupWeights: { valuation: 0.40, risk: 0.25, economy: 0.20, liquidity: 0.15 },
+    thresholds: { buy: 20, addBuy: 40, watch: 65 }
+  }
+};
+let currentMode = 'neutral';
+
+/* ── 0~100점 기반 밸류에이션 시그널 (모드별 임계값 반영) ── */
+function getValuationSignal(score, mode = currentMode) {
+  const conf = MODE_CONFIGS[mode] || MODE_CONFIGS.neutral;
+  const { buy, addBuy, watch } = conf.thresholds;
+  if (isNaN(score) || score === 0) return { label: 'N/A', color: 'var(--txt2)', border: 'var(--border)' };
+  if (score <= buy) return { label: '적극 매수', color: 'var(--buy)',  border: 'rgba(5,150,105,.4)' };
+  if (score <= addBuy) return { label: '분할 매수', color: '#10b981',    border: 'rgba(16,185,129,.3)' };
+  if (score <= watch) return { label: '관망 유지', color: 'var(--warn)', border: 'rgba(217,119,6,.3)' };
+  return           { label: '비중 축소', color: 'var(--sell)', border: 'rgba(225,29,72,.3)' };
+}
+
+/* ── 💡 종합 밸류에이션 점수(Total_Score) 신규 계산 로직 ──
+   기존 CSV의 Total_Score는 "일간 30% / 월간 70%"로, 4대 카테고리(심리·자금환경·경기선행·밸류
+   에이션)가 데이터 갱신주기에 따라 불균등하게 반영되는 구조적 문제가 있었습니다.
+   아래 calculateTotalScore()는 CARDS_META의 weight를 이용해
+     1) 16개 지표를 각자의 range로 0~100 위치(gaugePct)로 정규화
+     2) inverse 지표는 반전(100-gaugePct)해서 "값이 높을수록 위험"이라는 공통 스케일로 통일
+     3) 카테고리별로 그룹화 후, 카테고리 내부에서 weight로 가중평균 → 카테고리 점수(0~100)
+     4) 4개 카테고리 점수를 mode.groupWeights 비율로 가중평균 → 최종 종합 점수(0~100)
+   순서로 재계산합니다. 결측치(N/A) 지표는 그 카테고리 내에서 제외하고 나머지 가중치로 재정규화하며,
+   카테고리 전체가 결측인 경우 해당 카테고리를 제외한 나머지 카테고리 가중치로 재정규화합니다. */
+function calculateTotalScore(row, mode = currentMode) {
+  const groups = {}; // { groupName: { sumScoreWeight, sumWeight } }
+
+  CARDS_META.forEach(meta => {
+    const raw = row[meta.key];
+    if (raw === undefined || raw === null || raw === '' || raw === 'N/A') return;
+    const num = parseFloat(raw.toString().split('(')[0]);
+    if (isNaN(num)) return;
+
+    const [min, max] = meta.range;
+    let pct = Math.min(Math.max((num - min) / (max - min) * 100, 0), 100);
+    // 공통 스케일로 통일: "높을수록 위험(비중축소)"
+    const riskPct = meta.inverse ? (100 - pct) : pct;
+
+    if (!groups[meta.group]) groups[meta.group] = { sumScoreWeight: 0, sumWeight: 0 };
+    groups[meta.group].sumScoreWeight += riskPct * meta.weight;
+    groups[meta.group].sumWeight += meta.weight;
+  });
+
+  const conf = MODE_CONFIGS[mode] || MODE_CONFIGS.neutral;
+  const groupNames = ['risk', 'liquidity', 'economy', 'valuation'];
+  const groupScores = {};
+  let sumWeightedScore = 0;
+  let sumWeight = 0;
+
+  groupNames.forEach(g => {
+    if (groups[g] && groups[g].sumWeight > 0) {
+      const score = groups[g].sumScoreWeight / groups[g].sumWeight;
+      groupScores[g] = score;
+      const w = conf.groupWeights[g] ?? 0;
+      sumWeightedScore += score * w;
+      sumWeight += w;
+    } else {
+      groupScores[g] = null; // 해당 카테고리 데이터 전부 결측
+    }
+  });
+
+  if (sumWeight === 0) return { total: NaN, groups: groupScores };
+  return { total: sumWeightedScore / sumWeight, groups: groupScores };
+}
+
+function renderHero(latest) {
+  const result = calculateTotalScore(latest);
+  const score = isNaN(result.total) ? 0 : result.total;
+  const sig = getValuationSignal(score);
+  const conf = MODE_CONFIGS[currentMode] || MODE_CONFIGS.neutral;
+
+  const heroEl = document.getElementById('hero-score');
+  heroEl.textContent = isNaN(result.total) ? '—' : score.toFixed(1);
+  heroEl.style.color = sig.color;
+
+  // 4대 카테고리별 점수(0~100, 높을수록 비중축소 방향)와 현재 모드의 실제 가중치(%)를 세로 막대그래프로 표기
+  const groupLabel = { risk: '심리·리스크', liquidity: '자금환경', economy: '경기선행', valuation: '밸류에이션' };
+  const groupColor = { risk: '#f43f5e', liquidity: '#3b82f6', economy: '#f59e0b', valuation: '#10b981' };
+  const subScoresEl = document.getElementById('sub-scores-row');
+  if (subScoresEl) {
+    subScoresEl.innerHTML = ['risk', 'liquidity', 'economy', 'valuation'].map(g => {
+      const v = result.groups[g];
+      const wPct = Math.round((conf.groupWeights[g] ?? 0) * 100);
+      return `<div class="weight-item">
+        <div class="weight-item-top">
+          <span class="weight-name">${groupLabel[g]}</span>
+          <span class="weight-meta"><strong>${wPct}%</strong> 비중 · 점수 ${v === null ? '—' : v.toFixed(1)}</span>
+        </div>
+        <div class="weight-bar-track">
+          <div class="weight-bar-fill" style="width:0%; background:${groupColor[g]}" data-target="${wPct}"></div>
+        </div>
+      </div>`;
+    }).join('');
+    // 로드 직후 막대가 0%에서 실제 비중까지 차오르는 애니메이션
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        subScoresEl.querySelectorAll('.weight-bar-fill').forEach(el => {
+          el.style.width = el.dataset.target + '%';
+        });
+      }, 50);
+    });
+  }
+
+  const { buy, addBuy, watch } = conf.thresholds;
+  let desc = '데이터 상태를 분석하고 있습니다.';
+  if (score > 0) {
+    if (score <= buy) desc = '시장 멀티플이 역사적 저평가 상태(공포 구간)에 진입했습니다. 장기적 관점에서 <strong style="color:var(--buy)">적극적인 포지션 구축</strong>에 유리합니다.';
+    else if (score <= addBuy) desc = '단기 심리와 장기 가치가 안정적인 구간입니다. 변동성을 감안한 자산별 <strong style="color:#10b981">전략적 분할 매수</strong>를 권장합니다.';
+    else if (score <= watch) desc = '거시경제 대비 자산 가격이 다소 비싸진 상태입니다. 현금 비중을 유지하며 리스크 관리를 동반한 <strong style="color:var(--warn)">관망</strong> 포지션이 유리합니다.';
+    else desc = '지표가 극단적 자산 과열(탐욕 구간)에 포진했습니다. 단기 조정 발생 확률이 매우 높으므로 <strong style="color:var(--sell)">신규 진입을 제한</strong>하고 비중 축소로 대응하십시오.';
+  }
+  document.getElementById('hero-desc').innerHTML = desc;
+
+  const badge = document.getElementById('signal-badge');
+  badge.textContent = sig.label;
+  badge.style.color = sig.color;
+  badge.style.borderColor = sig.border;
+  badge.style.background = sig.border.replace('0.4', '0.08').replace('0.3', '0.06');
+
+  const pct = Math.min(Math.max(score, 0), 100);
+  setTimeout(() => { document.getElementById('hero-gauge-mask').style.width = (100 - pct) + '%'; }, 300);
+}
+
+/* ── 💡 계산 방식(적극적/중립적/보수적) 전환 ──
+   버튼 클릭 시 currentMode만 바꾸고, 이미 메모리에 있는 cachedRows/cachedLatest로
+   CSV를 다시 불러오지 않고 관련 영역(히어로/카드/차트/히스토리표)만 재계산·재렌더링합니다. */
+let cachedRows = [];
+let cachedLatest = null;
+
+function setMode(mode) {
+  if (!MODE_CONFIGS[mode]) return;
+  currentMode = mode;
+  updateModeUI();
+  rerenderWithCurrentMode();
+}
+
+function updateModeUI() {
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === currentMode);
+  });
+  const descEl = document.getElementById('mode-desc');
+  if (descEl) descEl.textContent = MODE_CONFIGS[currentMode].desc;
+}
+
+function rerenderWithCurrentMode() {
+  if (!cachedLatest || !cachedRows.length) return;
+  try { renderHero(cachedLatest); } catch (e) { console.error('renderHero 실패:', e); }
+  try { renderCards(cachedLatest, cachedRows); } catch (e) { console.error('renderCards 실패:', e); }
+  try { renderChart(cachedRows); } catch (e) { console.error('renderChart 실패:', e); }
+  try { renderHistoryTable(); } catch (e) { console.error('renderHistoryTable 실패:', e); }
+}
+
+/* ── 💡 4대 카테고리 정의 ── */
+const CATEGORIES = [
+  { id: 'risk', num: '01', title: '심리 / 리스크', desc: '시장 참여자의 공포·탐욕 수준을 측정', theme: 'red' },
+  { id: 'liquidity', num: '02', title: '자금 환경', desc: '주식 시장으로 돈이 들어올지 나갈지 결정', theme: 'blue' },
+  { id: 'economy', num: '03', title: '경기 선행', desc: '실물 경기 방향을 미리 감지', theme: 'orange' },
+  { id: 'valuation', num: '04', title: '밸류에이션', desc: '지금 주가가 비싼지 싼지 장기적으로 판단', theme: 'green' }
+];
+
+/* ── 💡 지표 메타데이터 (업데이트 주기 freq 및 상세 설명 desc 대폭 보강) ── */
+/* inverse: true  → 값이 높을수록 "긍정적"(매수 신호) 지표 (예: 러셀2000, 구리, BDI, 한국수출)
+   inverse: false → 값이 높을수록 "부정적"(비중축소 신호) 지표 (예: VIX, 금리, 버핏지수 등)
+   getValuationSignal() 호출 시 inverse가 true이면 gaugePct를 반전(100-gaugePct)해서 넘깁니다.
+   weight → 종합 점수(Total_Score) 계산 시 사용하는 지표별 가중치.
+   4개 카테고리(risk/liquidity/economy/valuation)가 각각 정확히 25%를 차지하도록 설계했고,
+   카테고리 내부에서는 지표의 선행성·신뢰도·시장 영향력에 따라 차등 배분했습니다. */
+const CARDS_META = [
+  // 1. 심리 / 리스크 (카테고리 합계 25)
+  { key: 'VIX', group: 'risk', weight: 8, freq: '일간', label: 'VIX', tag: '공포 지수', unit: 'pt', inverse: false, range: [10, 40], sourceName: 'Investing.com', link: 'https://kr.investing.com/indices/volatility-s-p-500', desc: 'S&P 500 옵션 내재변동성(공포 지수). 20 미만은 안정, 30 이상은 경계, 40 이상 급등 시 패닉셀에 의한 단기 바닥권 형성(역발상 매수 기회)을 암시합니다.' },
+  { key: 'MOVE', group: 'risk', weight: 4, freq: '일간', label: 'MOVE 지수', tag: '채권 VIX', unit: 'pt', inverse: false, range: [50, 160], sourceName: 'TradingView', link: 'https://kr.tradingview.com/symbols/ICE-MOVE/', desc: '미국 국채 옵션 변동성. 주식 시장의 VIX보다 선행하여 위기 신호를 감지하며, 금리 발작 및 통화정책 불확실성을 측정하는 핵심 지표입니다.' },
+  { key: 'High_Yield', group: 'risk', weight: 6, freq: '일간', label: '하이일드 스프레드', tag: '신용 위험', unit: '%p', inverse: false, range: [2.0, 9.0], sourceName: 'FRED', link: 'https://fred.stlouisfed.org/series/BAMLH0A0HYM2', desc: '부실 회사채와 안전한 국채 간의 금리 차이. 스프레드 확대(급등) 시 기업의 자금 경색 및 연쇄 파산(부도) 위험이 커짐을 예고하는 신용 위기 경보기입니다.' },
+  { key: 'Fear_Greed', group: 'risk', weight: 7, freq: '일간', label: 'CNN Fear & Greed', tag: '투자 심리', unit: 'Score', inverse: false, range: [0, 100], sourceName: 'CNN Markets', link: 'https://edition.cnn.com/markets/fear-and-greed', desc: 'CNN이 산출한 7가지 지표 종합 투심 지표. 25 미만은 극단적 공포(역발상 매수 기회), 75 이상은 극단적 탐욕(과열/매도 경고)을 의미합니다.' },
+
+  // 2. 자금 환경 (카테고리 합계 25)
+  { key: 'US10Y', group: 'liquidity', weight: 8, freq: '일간', label: '미국 10년물 금리', tag: '금리의 닻', unit: '%', inverse: false, range: [1.5, 6.0], sourceName: 'Investing.com', link: 'https://kr.investing.com/rates-bonds/u.s.-10-year-bond-yield', desc: '전 세계 모든 자산 가격의 기준점(할인율)이 되는 핵심 금리. 국채 금리 하락 시 미래 수익의 현재 가치가 높아져 기술주·성장주에 유리한 환경이 조성됩니다.' },
+  { key: 'DXY', group: 'liquidity', weight: 6, freq: '일간', label: '달러 인덱스 DXY', tag: '통화 방향', unit: 'pt', inverse: false, range: [90, 115], sourceName: 'Investing.com', link: 'https://kr.investing.com/indices/usdollar', desc: '주요 6개국 통화 대비 달러화의 가치. 100을 기준으로 강세/약세를 판단하며, 강달러 시 신흥국 자본 이탈 및 미국 다국적 기업의 수출 실적 악화 우려가 커집니다.' },
+  { key: 'USDKRW', group: 'liquidity', weight: 5, freq: '일간', label: '원/달러 환율', tag: '외국인 수급', unit: '원', inverse: false, range: [1000, 1600], sourceName: '네이버 증권', link: 'https://finance.naver.com/marketindex/exchangeDetail.naver?marketindexCd=FX_USDKRW', desc: '국내 증시의 외국인 수급을 좌우하는 달러 강세 체감 지표. 환율 상승(원화 약세) 시 환차손 우려로 외국인 자본 이탈 및 강력한 하방 압력이 발생합니다.' },
+  { key: 'Margin_Debt_US', group: 'liquidity', weight: 3, freq: '월간', label: '미국 신용잔고', tag: '레버리지', unit: '조 달러', inverse: false, range: [0, 2], sourceName: 'FINRA', link: 'https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics', desc: 'FINRA가 발표하는 기관과 개인의 총 빚투 잔고. 빚으로 쌓아 올린 주식 규모가 급증한 후 꺾일 때 연쇄 강제 청산(Deleveraging) 위험이 발생합니다.' },
+  { key: 'Margin_Debt_KR', group: 'liquidity', weight: 3, freq: '일간', label: '한국 신용잔고', tag: '레버리지', unit: '조 원', inverse: false, range: [10, 45], sourceName: 'KOFIA', link: 'https://finance.naver.com/sise/sise_deposit.naver', desc: '국내 주식 시장의 신용융자 잔고. 시장의 단기 과열 양상 및 개인 투자자의 레버리지 투기 수준을 보여주며, 급락 시 반대매매 위험을 암시합니다.' },
+
+  // 3. 경기 선행 (카테고리 합계 25)
+  { key: 'Russell2000', group: 'economy', weight: 6, freq: '일간', label: '러셀 2000', tag: '중소형주', unit: 'pt', inverse: true, range: [1800, 3200], sourceName: 'Investing.com', link: 'https://kr.investing.com/indices/smallcap-2000', desc: '미국 중소형주 2,000개 벤치마크 지수. 대형주보다 미국 내수 경기와 금리 변화에 훨씬 민감하게 반응하여, 실물 경기 방향성을 미리 감지하는 지표입니다.' },
+  { key: 'Copper', group: 'economy', weight: 6, freq: '일간', label: '구리 가격 Dr. Copper', tag: '산업 수요', unit: 'USD', inverse: true, range: [4.0, 7.0], sourceName: 'Investing.com', link: 'https://kr.investing.com/commodities/copper', desc: '전선·건설·전자 등 실물 산업 전반에 기초 소재로 사용되는 닥터 코퍼. 가격 상승은 글로벌 산업 수요 증가 및 제조업 경기 회복 신호로 해석됩니다.' },
+  { key: 'BDI_Index', group: 'economy', weight: 5, freq: '일간', label: 'BDI 발틱 운임 지수', tag: '물동량', unit: 'pt', inverse: true, range: [1000, 3000], sourceName: 'TradingEconomics', link: 'https://ko.tradingeconomics.com/commodity/baltic', desc: '철광석, 석탄 등 원자재를 싣고 나르는 벌크선 해상 운임 지수. 지수 상승은 글로벌 물동량 증가 및 실물 경기 활성화를 의미하는 선행 지표입니다.' },
+  { key: 'KR_Export', group: 'economy', weight: 8, freq: '월간', label: '한국 수출 데이터', tag: '코스피 선행', unit: '억 달러', inverse: true, range: [500, 950], sourceName: '관세청', link: 'https://tradedata.go.kr/cts/index.do', desc: '한국의 월간 무역 수출액 추이. 세계 경제의 탄광 속 카나리아 역할을 수행하며, 수출액 증가는 코스피 상장사들의 실적 상승을 강력하게 선행합니다.' },
+
+  // 4. 밸류에이션 (카테고리 합계 25)
+  { key: 'Buffett_US', group: 'valuation', weight: 8, freq: '월간', label: '버핏 지수', tag: '시총/GDP', unit: '%', inverse: false, range: [70, 240], sourceName: 'Current MV', link: 'https://www.currentmarketvaluation.com/models/buffett-indicator.php', desc: '미국 시가총액을 명목 GDP로 나눈 값. 워런 버핏이 가장 신뢰하는 구조적 과열 지표로, <100% 저평가 · 120~130% 고평가 · >200% 극단적 버블 경고를 의미합니다.' },
+  { key: 'Buffett_KR', group: 'valuation', weight: 8, freq: '월간', label: '버핏 지수 한국', tag: '국가별', unit: '%', inverse: false, range: [50, 150], sourceName: 'Gurufocus', link: 'https://www.gurufocus.com/global-market-valuation.php?country=KOR', desc: '한국 주식시장(코스피+코스닥) 전체 시가총액을 명목 GDP로 나눈 국가별 밸류에이션 지표. 한국 증시의 전반적인 고평가/저평가 상태를 장기적으로 판단합니다.' },
+  { key: 'CAPE_PE', group: 'valuation', weight: 9, freq: '월간', label: 'CAPE Shiller PE', tag: '밸류에이션', unit: '배', inverse: false, range: [15, 45], sourceName: 'Multpl.com', link: 'https://www.multpl.com/shiller-pe', desc: '물가상승률을 조정한 S&P 500의 10년 평균 PER. 단기 이익 변동 노이즈를 제거한 장기 가치를 보여주며, 30 이상은 역사적 고평가(닷컴 버블 수준)로 진단합니다.' }
+];
+
+/* ── 💡 카테고리별 스파크라인 색상 (테마 색상과 통일) ── */
+const THEME_SPARK_COLOR = { red: '#f43f5e', blue: '#3b82f6', orange: '#f59e0b', green: '#10b981' };
+
+/* 💡 지표 한 개의 최근 히스토리를 스파크라인 좌표(0~140 x, 0~32 y)로 변환합니다.
+   너무 오래된 데이터까지 전부 넣으면 최근 추세가 희석되므로 최근 SPARK_MAX개까지만 사용합니다. */
+const SPARK_MAX_POINTS = 90;
+const SPARK_W = 140, SPARK_H = 32, SPARK_PAD = 3;
+
+function buildSparkPoints(meta, sortedRows) {
+  const raw = sortedRows.map(r => {
+    const v = r[meta.key];
+    if (v === undefined || v === null || v === '' || v === 'N/A') return null;
+    const num = parseFloat(v.toString().replace(/,/g, '').split('(')[0]);
+    return isNaN(num) ? null : { date: r.Date, value: num };
+  }).filter(Boolean);
+
+  const series = raw.slice(-SPARK_MAX_POINTS);
+  if (series.length < 2) return null;
+
+  const values = series.map(p => p.value);
+  const min = Math.min(...values), max = Math.max(...values);
+
+  const points = series.map((p, i) => {
+    const x = (i / (series.length - 1)) * SPARK_W;
+    const y = (max === min) ? (SPARK_H / 2) : (SPARK_H - SPARK_PAD - ((p.value - min) / (max - min)) * (SPARK_H - SPARK_PAD * 2));
+    return { x, y, date: p.date, value: p.value };
+  });
+  return points;
+}
+
+/* 💡 스파크라인 SVG 마크업 생성. sparkId로 나중에 hover 이벤트를 연결할 좌표 데이터를 찾습니다. */
+let sparkRegistry = [];
+function renderSparkMarkup(meta, sortedRows, color) {
+  const points = buildSparkPoints(meta, sortedRows);
+  if (!points) {
+    return `<div class="ind-spark-wrap"><div class="ind-spark-empty">히스토리 데이터 부족</div></div>`;
+  }
+  const sparkId = sparkRegistry.length;
+  sparkRegistry.push(points);
+
+  const linePts = points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const areaPts = `0,${SPARK_H} ${linePts} ${SPARK_W},${SPARK_H}`;
+  const last = points[points.length - 1];
+
+  return `
+    <div class="ind-spark-wrap" data-spark-id="${sparkId}">
+      <svg viewBox="0 0 ${SPARK_W} ${SPARK_H}" preserveAspectRatio="none">
+        <polygon class="ind-spark-area" points="${areaPts}" fill="${color}"></polygon>
+        <polyline class="ind-spark-line" points="${linePts}" stroke="${color}"></polyline>
+        <circle class="ind-spark-last" cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="2.2" fill="${color}"></circle>
+        <circle class="ind-spark-dot" r="3" fill="#fff" stroke="${color}" style="display:none"></circle>
+      </svg>
+    </div>
+  `;
+}
+
+/* 💡 스파크라인에 마우스를 올리면 날짜/값을 보여주는 작은 툴팁 연결 */
+function getSparkTooltipEl() {
+  return document.getElementById('spark-tooltip');
+}
+
+function attachSparkTooltipEvents(container) {
+  const tooltip = getSparkTooltipEl();
+  container.querySelectorAll('.ind-spark-wrap[data-spark-id]').forEach(wrap => {
+    const points = sparkRegistry[wrap.dataset.sparkId];
+    if (!points) return;
+    const svg = wrap.querySelector('svg');
+    const dot = wrap.querySelector('.ind-spark-dot');
+    const n = points.length;
+
+    wrap.addEventListener('mousemove', (e) => {
+      const rect = wrap.getBoundingClientRect();
+      const xFrac = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+      const idx = Math.round(xFrac * (n - 1));
+      const pt = points[idx];
+      if (!pt || !svg) return;
+
+      const scaleX = rect.width / SPARK_W;
+      const scaleY = rect.height / SPARK_H;
+      dot.setAttribute('cx', pt.x.toFixed(1));
+      dot.setAttribute('cy', pt.y.toFixed(1));
+      dot.style.display = 'block';
+
+      tooltip.innerHTML = `<div class="st-date">📅 ${pt.date}</div><div class="st-val">${pt.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>`;
+      tooltip.style.left = (rect.left + pt.x * scaleX) + 'px';
+      tooltip.style.top = (rect.top + pt.y * scaleY) + 'px';
+      tooltip.classList.add('show');
+    });
+
+    wrap.addEventListener('mouseleave', () => {
+      dot.style.display = 'none';
+      tooltip.classList.remove('show');
+    });
+  });
+}
+
+/* ── 💡 카테고리 패널 생성 및 리스트 렌더링 ── */
+function renderCards(latest, rows) {
+  const grid = document.getElementById('category-grid');
+  grid.innerHTML = '';
+  sparkRegistry = [];
+  const sortedRows = [...rows].sort((a, b) => new Date(a.Date) - new Date(b.Date));
+
+  CATEGORIES.forEach(cat => {
+    const catItems = CARDS_META.filter(m => m.group === cat.id);
+    const panel = document.createElement('div');
+    panel.className = `cat-panel theme-${cat.theme} fade-up`;
+    
+    let rowsHtml = '';
+    catItems.forEach(meta => {
+      const rawVal = latest[meta.key];
+      let displayVal = 'N/A';
+      let sig = { label: '-', color: 'var(--txt2)', border: 'var(--border)' };
+      let gaugePct = 50; // 데이터 없을 때 기본값(중앙)
+
+      if (rawVal && rawVal !== 'N/A') {
+          const num = parseFloat(rawVal.toString().split('(')[0]); 
+          if(!isNaN(num)) {
+              if (meta.key === 'USDKRW' || meta.key === 'Russell2000' || meta.key === 'BDI_Index') displayVal = num.toLocaleString();
+              else if (meta.key === 'US10Y' || meta.key === 'High_Yield' || meta.key.includes('Buffett') || meta.key.includes('Margin')) displayVal = num.toFixed(2);
+              else displayVal = num.toFixed(1);
+              
+              if(rawVal.includes('(')) displayVal = rawVal; 
+              
+              const [min, max] = meta.range;
+              // 💡 위치(%) = 역사적 range 안에서 실제 값이 차지하는 위치 (왼쪽=낮음, 오른쪽=높음)
+              gaugePct = Math.min(Math.max((num - min) / (max - min) * 100, 0), 100);
+              // 💡 시그널 판단: getValuationSignal()은 "값이 높을수록 위험(비중축소)"을 가정합니다.
+              //    inverse: true 지표(러셀2000·구리·BDI·한국수출처럼 "값↑=긍정"인 지표)는
+              //    위치값을 반전(100-gaugePct)해서 넘겨야 설명(desc)과 배지 색상이 일치합니다.
+              const sigPct = meta.inverse ? (100 - gaugePct) : gaugePct;
+              sig = getValuationSignal(sigPct);
+          } else {
+              displayVal = rawVal;
+          }
+      }
+
+      rowsHtml += `
+        <div class="ind-row">
+          <div class="ind-left">
+            <div class="ind-title-row">
+              <span class="ind-name">${meta.label}</span>
+              <span class="ind-pill">${meta.tag}</span>
+              <span class="cpill" style="color:${sig.color}; border-color:${sig.border};">${sig.label}</span>
+            </div>
+            <p class="ind-desc">${meta.desc}</p>
+          </div>
+          <div class="ind-value-col">
+            <div class="ind-val-wrap">
+              <span class="ind-val">${displayVal}</span>
+              <span class="ind-unit">${meta.unit} <span style="opacity:0.45; font-size:10px; margin-left:4px; letter-spacing:0px;">(${meta.freq})</span></span>
+            </div>
+          </div>
+          <div class="ind-graph-col">
+            ${renderSparkMarkup(meta, sortedRows, THEME_SPARK_COLOR[cat.theme])}
+            <div class="ind-gauge-wrap">
+              <div class="ind-gauge-track">
+                <div class="ind-gauge-marker" style="left:${gaugePct}%;"></div>
+              </div>
+              <div class="ind-gauge-labels">
+                <span>낮음</span>
+                <span style="color:${sig.color}; font-weight:600;">${rawVal && rawVal !== 'N/A' ? Math.round(gaugePct) + '%' : '—'}</span>
+                <span>높음</span>
+              </div>
+            </div>
+            <a href="${meta.link}" target="_blank" class="ind-source">${meta.sourceName} ↗</a>
+          </div>
+        </div>
+      `;
+    });
+
+    panel.innerHTML = `
+      <div class="cat-header">
+        <div class="cat-num">${cat.num}</div>
+        <div class="cat-title-wrap">
+          <div class="cat-title">${cat.title}</div>
+          <div class="cat-desc">${cat.desc}</div>
+        </div>
+      </div>
+      <div class="cat-body">
+        ${rowsHtml}
+      </div>
+    `;
+    
+    grid.appendChild(panel);
+  });
+
+  attachSparkTooltipEvents(grid);
+}
+
+let macroChartInstance = null;
+function renderChart(rows) {
+  const ctx = document.getElementById('macroChart').getContext('2d');
+  const chartData = [...rows].sort((a, b) => new Date(a.Date) - new Date(b.Date));
+  const labels = chartData.map(r => r.Date);
+  const getD = (key) => chartData.map(r => {
+    if (!r[key] || r[key] === 'N/A') return null;
+    return parseFloat(r[key].toString().replace(/,/g, '').split('(')[0]);
+  });
+  // 💡 통합 점수 및 4대 카테고리 점수는 매 시점마다 calculateTotalScore()로 재계산합니다.
+  const scoreSeries = chartData.map(r => calculateTotalScore(r));
+  const getScore = (field) => scoreSeries.map(s => {
+    const v = field === 'total' ? s.total : s.groups[field];
+    return (v === null || isNaN(v)) ? null : v;
+  });
+
+  const datasets = [
+    { label: '통합 밸류에이션 점수', data: getScore('total'), borderColor: '#2563eb', backgroundColor: '#2563eb', borderWidth: 3, tension: 0.2, yAxisID: 'y' },
+    { label: '심리·리스크 (25%)', data: getScore('risk'), borderColor: '#e11d48', borderWidth: 2, borderDash: [4, 4], hidden: true, tension: 0.2, yAxisID: 'y' },
+    { label: '자금환경 (25%)', data: getScore('liquidity'), borderColor: '#0284c7', borderWidth: 2, borderDash: [4, 4], hidden: true, tension: 0.2, yAxisID: 'y' },
+    { label: '경기선행 (25%)', data: getScore('economy'), borderColor: '#d97706', borderWidth: 2, borderDash: [4, 4], hidden: true, tension: 0.2, yAxisID: 'y' },
+    { label: '밸류에이션 (25%)', data: getScore('valuation'), borderColor: '#059669', borderWidth: 2, borderDash: [4, 4], hidden: true, tension: 0.2, yAxisID: 'y' },
+
+    { label: 'Fear & Greed', data: getD('Fear_Greed'), borderColor: '#e11d48', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: 'VIX 지수', data: getD('VIX'), borderColor: '#d97706', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: 'MOVE 지수', data: getD('MOVE'), borderColor: '#b45309', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '하이일드 스프레드', data: getD('High_Yield'), borderColor: '#9f1239', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '미 10년물 국채금리', data: getD('US10Y'), borderColor: '#0284c7', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '달러인덱스', data: getD('DXY'), borderColor: '#0369a1', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '구리 (Copper)', data: getD('Copper'), borderColor: '#b45309', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: 'CAPE PE', data: getD('CAPE_PE'), borderColor: '#059669', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '버핏지수 (美)', data: getD('Buffett_US'), borderColor: '#047857', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '버핏지수 (韓)', data: getD('Buffett_KR'), borderColor: '#065f46', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '신용잔고 (美)', data: getD('Margin_Debt_US'), borderColor: '#ea580c', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '신용잔고 (韓)', data: getD('Margin_Debt_KR'), borderColor: '#c2410c', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+    { label: '한국 수출액', data: getD('KR_Export'), borderColor: '#475569', borderWidth: 1.5, hidden: true, yAxisID: 'y' },
+
+    { label: '원/달러 환율 (우측축)', data: getD('USDKRW'), borderColor: '#dc2626', borderWidth: 1.5, hidden: true, yAxisID: 'y1' },
+    { label: '러셀 2000 (우측축)', data: getD('Russell2000'), borderColor: '#4f46e5', borderWidth: 1.5, hidden: true, yAxisID: 'y1' },
+    { label: 'BDI 지수 (우측축)', data: getD('BDI_Index'), borderColor: '#334155', borderWidth: 1.5, hidden: true, yAxisID: 'y1' }
+  ];
+
+  if (macroChartInstance) { macroChartInstance.destroy(); }
+  macroChartInstance = new Chart(ctx, {
+    type: 'line', data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 8, padding: 6, font: { family: "'DM Sans', sans-serif", size: 9.5 } } },
+        /* 💡 각 지표 라인에 마우스를 올리면 날짜와 해당 날짜의 값을 보여주는 작은 툴팁 */
+        tooltip: {
+          enabled: true,
+          backgroundColor: '#ffffff',
+          titleColor: '#0f172a',
+          bodyColor: '#1e293b',
+          borderColor: '#e2e8f0',
+          borderWidth: 1,
+          cornerRadius: 8,
+          padding: 8,
+          boxPadding: 4,
+          displayColors: true,
+          titleFont: { family: "'DM Mono', monospace", size: 11, weight: '600' },
+          bodyFont: { family: "'DM Mono', monospace", size: 11 },
+          callbacks: {
+            title: (items) => items.length ? `📅 ${items[0].label}` : '',
+            label: (item) => {
+              const v = item.parsed.y;
+              if (v === null || v === undefined || isNaN(v)) return null;
+              return ` ${item.dataset.label}: ${v.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { type: 'linear', display: true, position: 'left', grid: { color: '#f1f5f9' } },
+        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } }
+      }
+    }
+  });
+}
+
+/* ── 히스토리 테이블 페이지네이션: 기본 7일(1주일) → "더 보기" 클릭 시 최대 30일(1개월) ── */
+const HISTORY_STEP = 7;
+const HISTORY_MAX = 30;
+let historyAllRowsDesc = [];   // 최신순 정렬된 전체 행
+let historyShownCount = HISTORY_STEP;
+
+function renderHistoryRow(r, idx) {
+  const result = calculateTotalScore(r);
+  const total = isNaN(result.total) ? 0 : result.total;
+  const sig = getValuationSignal(total);
+  const fmt = (val, isLocale=false, digits=1) => {
+    if (val === undefined || val === null || val === 'N/A' || val === '') return '-';
+    if (typeof val === 'string' && val.includes('(')) return val;
+    const n = parseFloat(val);
+    if (isNaN(n)) return val;
+    return isLocale ? n.toLocaleString() : n.toFixed(digits);
+  };
+  const fmtGroup = (g) => result.groups[g] === null ? '-' : result.groups[g].toFixed(1);
+
+  return `<tr style="opacity:${1 - idx * 0.025}">
+    <td>${r.Date}</td>
+    <td style="text-align:left"><span class="cpill" style="color:${sig.color}; border-color:${sig.border}">${fmt(total, false, 1)} · ${sig.label}</span></td>
+    <td>${fmtGroup('risk')}</td>
+    <td>${fmtGroup('liquidity')}</td>
+    <td>${fmtGroup('economy')}</td>
+    <td>${fmtGroup('valuation')}</td>
+    <td>${fmt(r.Fear_Greed, false, 0)}</td>
+    <td>${fmt(r.VIX, false, 1)}</td>
+    <td>${fmt(r.MOVE, false, 1)}</td>
+    <td>${fmt(r.US10Y, false, 2)}</td>
+    <td>${fmt(r.DXY, false, 1)}</td>
+    <td>${fmt(r.USDKRW, true, 0)}</td>
+    <td>${fmt(r.Russell2000, true, 0)}</td>
+    <td>${fmt(r.Copper, false, 2)}</td>
+    <td>${fmt(r.High_Yield, false, 2)}</td>
+    <td>${fmt(r.CAPE_PE, false, 1)}</td>
+    <td>${fmt(r.Buffett_US, false, 1)}</td>
+    <td>${fmt(r.Buffett_KR, false, 1)}</td>
+    <td>${fmt(r.Margin_Debt_US, false, 2)}</td>
+    <td>${fmt(r.Margin_Debt_KR, false, 2)}</td>
+    <td>${fmt(r.KR_Export, false, 1)}</td>
+    <td>${fmt(r.BDI_Index, true, 0)}</td>
+  </tr>`;
+}
+
+function renderHistoryTable() {
+  const tbody = document.getElementById('history-body');
+  if (!tbody) return;
+  const visibleRows = historyAllRowsDesc.slice(0, historyShownCount);
+  tbody.innerHTML = visibleRows.map((r, idx) => renderHistoryRow(r, idx)).join('');
+  updateHistoryLoadMoreButton();
+}
+
+function updateHistoryLoadMoreButton() {
+  const btn = document.getElementById('history-loadmore-btn');
+  if (!btn) return;
+  const maxAvailable = Math.min(HISTORY_MAX, historyAllRowsDesc.length);
+  if (historyShownCount >= maxAvailable) {
+    btn.style.display = 'none';
+  } else {
+    btn.style.display = 'inline-flex';
+    btn.textContent = `더 보기 (최근 1개월까지)`;
+  }
+}
+
+function renderHistory(rows) {
+  historyAllRowsDesc = [...rows].reverse().slice(0, HISTORY_MAX); // 최신순, 최대 1개월치만 보관
+  historyShownCount = Math.min(HISTORY_STEP, historyAllRowsDesc.length);
+  if (!historyAllRowsDesc.length) return;
+
+  renderHistoryTable();
+
+  const btn = document.getElementById('history-loadmore-btn');
+  if (btn && !btn.dataset.bound) {
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      historyShownCount = Math.min(historyShownCount + HISTORY_STEP, HISTORY_MAX, historyAllRowsDesc.length);
+      renderHistoryTable();
+    });
+  }
+}
+
+async function init() {
+  try {
+    const res = await fetch(`data/indicators.csv?t=${new Date().getTime()}`);
+    if (!res.ok) throw new Error('CSV 파일을 찾을 수 없습니다.');
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if (!rows.length) throw new Error('데이터셋이 존재하지 않습니다.');
+
+    const latest = rows[rows.length - 1];
+    document.getElementById('latest-date').textContent = latest.Date ?? '—';
+    cachedRows = rows;
+    cachedLatest = latest;
+    updateModeUI();
+
+    // 💡 각 렌더 함수를 독립적으로 실행하여, 하나가 실패해도(예: 차트 라이브러리 로드 실패)
+    //    나머지 영역(특히 4대 지표 카드)은 정상적으로 표시되도록 분리합니다.
+    try { renderHero(latest); } catch (e) { console.error('renderHero 실패:', e); }
+    try { renderCards(latest, rows); } catch (e) { console.error('renderCards 실패:', e); }
+    try { renderChart(rows); } catch (e) { console.error('renderChart 실패:', e); }
+    try { renderHistory(rows); } catch (e) { console.error('renderHistory 실패:', e); }
+
+  } catch (e) {
+    console.error(e);
+    document.getElementById('category-grid').innerHTML = `<div style="color:red;">에러: ${e.message}</div>`;
+  }
+}
+init();
+</script>
+</body>
+</html>
