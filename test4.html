@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="market-signal.css">
 <style>
-  /* 🌕 달빛정보 섹션 컨테이너 (내부 콘텐츠는 index.html을 Shadow DOM으로 그대로 불러와 채웁니다) */
+  /* 🌕 달빛정보 섹션 컨테이너 (내부 콘텐츠는 moonlight.html을 Shadow DOM으로 그대로 불러와 채웁니다) */
   .moonlight-section{
     flex-direction: column;
     overflow-y: auto;
@@ -277,7 +277,7 @@
             </div>
           </div>
 
-          <div id="ms-total-card" class="ms-total-card" onclick="window.open('index.html', '_blank')" title="통합 밸류에이션 점수(0~100) = 4대 카테고리(심리·리스크 / 자금환경 / 경기선행 / 밸류에이션) 각 25% 균등 가중 평균. 카테고리 내부는 지표별 중요도(VIX·CAPE PE·한국수출 등 가중치 높음)로 차등 계산합니다. 점수가 낮을수록 저평가(매수 유리), 높을수록 고평가(비중축소 경고)를 의미합니다. [0~30] 적극 매수 · [30~50] 분할 매수 · [50~70] 관망 유지 · [70~100] 비중 축소. 클릭하면 산출 근거(index.html)가 새 탭에서 열립니다.">
+          <div id="ms-total-card" class="ms-total-card" onclick="window.open('/plus/moonlight.html', '_blank')" title="통합 밸류에이션 점수(0~100) = 4대 카테고리(심리·리스크 / 자금환경 / 경기선행 / 밸류에이션) 각 25% 균등 가중 평균. 카테고리 내부는 지표별 중요도(VIX·CAPE PE·한국수출 등 가중치 높음)로 차등 계산합니다. 점수가 낮을수록 저평가(매수 유리), 높을수록 고평가(비중축소 경고)를 의미합니다. [0~30] 적극 매수 · [30~50] 분할 매수 · [50~70] 관망 유지 · [70~100] 비중 축소. 클릭하면 산출 근거가 새 탭에서 열립니다.">
             <div class="ms-total-kicker"><span>📡</span> 종합 신호</div>
             <div class="ms-score-row">
               <span id="ms-score" class="ms-score">—</span>
@@ -1034,7 +1034,7 @@
       
     </div>
 
-    <!-- 🌕 달빛정보 (하드코딩 제거: index.html을 Shadow DOM으로 그대로 불러와 렌더링) -->
+    <!-- 🌕 달빛정보 (하드코딩 제거: Shadow DOM으로 그대로 불러와 렌더링) -->
     <div id="moonlightSection" class="dashboard-page moonlight-section" style="display:none;">
       <div id="moonlightShadowHost"></div>
     </div>
@@ -1496,11 +1496,11 @@
 <script>
 /* ══════════════════════════════════════════════════════
    🌕 달빛정보
-   - 하드코딩된 대시보드 마크업/로직을 제거하고, index.html을
+   - 하드코딩된 대시보드 마크업/로직을 제거하고, moonlight.html을
      fetch로 그대로 불러와 Shadow DOM에 렌더링합니다.
-   - index.html의 <style>은 shadow root 안에서만 적용되어
+   - moonlight.html의 <style>은 shadow root 안에서만 적용되어
      기존 페이지 스타일과 충돌하지 않습니다.
-   - index.html의 인라인 <script>는 내부에서 document.getElementById(...)
+   - moonlight.html의 인라인 <script>는 내부에서 document.getElementById(...)
      를 사용하므로, shadow root를 가리키는 document 프록시를 주입해
      실행합니다(Chart.js 등 외부 <script src>는 이미 로드되어 있으므로 생략).
    - 최초로 탭을 열 때만 불러오고(지연 초기화), 이후에는 다시 불러오지 않습니다.
@@ -1525,14 +1525,14 @@ async function loadMoonlightDashboard(){
   const shadowRoot = host.attachShadow({ mode: 'open' });
 
   try {
-    const res = await fetch(`index.html?t=${new Date().getTime()}`);
-    if (!res.ok) throw new Error('index.html을 불러올 수 없습니다.');
+    const res = await fetch(`/plus/moonlight.html?t=${new Date().getTime()}`);
+    if (!res.ok) throw new Error('moonlight.html을 불러올 수 없습니다.');
     const htmlText = await res.text();
 
     const parsedDoc = new DOMParser().parseFromString(htmlText, 'text/html');
 
-    // 1) index.html의 <style> 태그를 shadow root 안으로 이식(스코프 자동 격리)
-    //    ⚠️ index.html의 스타일은 CSS 변수를 `:root`에 선언하는데, `:root`는 실제 문서 루트만
+    // 1) moonlight.html의 <style> 태그를 shadow root 안으로 이식(스코프 자동 격리)
+    //    ⚠️ moonlight.html의 스타일은 CSS 변수를 `:root`에 선언하는데, `:root`는 실제 문서 루트만
     //       가리키므로 shadow root 내부에서는 절대 매칭되지 않습니다. 그 결과 --txt2/--txt3 같은
     //       변수를 쓰는 규칙(예: 지표 하단의 얇은 게이지 바 마커)이 값을 못 받아 안 보이게 됩니다.
     //       shadow DOM 안에서는 `:host`가 그 역할을 하므로 `:root` → `:host`로 치환해서 이식합니다.
@@ -1544,10 +1544,10 @@ async function loadMoonlightDashboard(){
       // html 셀렉터도 shadow root 안에는 실제 <html> 태그가 없어 매칭되지 않으므로 :host로 치환합니다.
       // (앞뒤에 단어문자/하이픈/점이 없을 때만 치환해 .html-xxx 같은 클래스명은 건드리지 않음)
       css = css.replace(/(?<![.\-\w])html(?![\w-])/g, ':host');
-      // ⚠️ index.html과 test4.html이 변수 이름을 똑같이 --bg / --border로 쓰고 있습니다.
+      // ⚠️ moonlight.html과 test4.html이 변수 이름을 똑같이 --bg / --border로 쓰고 있습니다.
       // 아래에서 이 값을 test4.html의 실제(라이트/다크 전환되는) --bg/--border로 이어주려면
       // var(--bg)처럼 자기 자신을 참조해야 하는데, 이는 순환참조라 무효 처리됩니다.
-      // 그래서 index.html 쪽 변수만 --ix-bg / --ix-border로 이름을 바꿔 충돌을 피합니다.
+      // 그래서 moonlight.html 쪽 변수만 --ix-bg / --ix-border로 이름을 바꿔 충돌을 피합니다.
       css = css.replace(/--bg\b/g, '--ix-bg');
       css = css.replace(/--border\b/g, '--ix-border');
       fixedStyle.textContent = css;
@@ -1560,7 +1560,7 @@ async function loadMoonlightDashboard(){
     });
 
     // 2.5) 폰트/배경/카드/글자색을 test4.html 기준으로 통일
-    //      - 폰트: index.html 고유 폰트(Bebas Neue 등) 대신 test4.html의 --font-sans/--font-mono를 사용
+    //      - 폰트: moonlight.html 고유 폰트(Bebas Neue 등) 대신 test4.html의 --font-sans/--font-mono를 사용
     //      - 배경(--ix-bg, 원래 --bg): 다크색으로 칠하지 않고 완전 투명 처리 → 뒤에 있는
     //        dashboard-main의 배경이 그대로 비쳐서 라이트/다크 전환과 무관하게 항상 자연스럽게 맞음
     //      - 패널/카드/테두리/글자색(--panel,--card,--ix-border,--txt,--txt2,--txt3):
@@ -1582,7 +1582,7 @@ async function loadMoonlightDashboard(){
         --txt3: var(--text3);
       }
 
-      /* ▼ 가로 폭: index.html 자체 .wrapper가 max-width:1400px + margin:0 auto로 좁게
+      /* ▼ 가로 폭: moonlight.html 자체 .wrapper가 max-width:1400px + margin:0 auto로 좁게
          중앙 정렬되어 있어서, 폭 제한 없이 꽉 차는 다른 대시보드 페이지들과 가로 길이가
          달라 보였습니다. dashboard-main이 이미 좌우 2rem 패딩을 주고 있으므로
          .wrapper 자체의 폭 제한/여백은 제거합니다. */
@@ -1595,17 +1595,17 @@ async function loadMoonlightDashboard(){
     shadowRoot.appendChild(fontOverrideStyle);
 
     // 3) <body> 마크업을 shadow root에 이식
-    //    ⚠️ 기존에는 일반 <div>로 감싸서 넣었는데, 그러면 index.html의 CSS 안에 있는
+    //    ⚠️ 기존에는 일반 <div>로 감싸서 넣었는데, 그러면 moonlight.html의 CSS 안에 있는
     //       `body { background:...; color:...; font-family:... }`, `body::before`,
     //       `body::after` (배경 노이즈/그리드 패턴 오버레이) 같은 규칙이 실제로 매칭될
-    //       대상이 shadow tree 안에 없어서 전혀 적용되지 않았습니다(=index.html과 미묘하게
+    //       대상이 shadow tree 안에 없어서 전혀 적용되지 않았습니다(=moonlight.html과 미묘하게
     //       다르게 보이는 원인). div 대신 실제 <body> 엘리먼트를 만들어 넣으면 이 규칙들이
-    //       그대로 매칭되어 index.html과 동일한 배경/폰트/오버레이가 재현됩니다.
+    //       그대로 매칭되어 moonlight.html과 동일한 배경/폰트/오버레이가 재현됩니다.
     const bodyWrapper = document.createElement('body');
     bodyWrapper.innerHTML = parsedDoc.body.innerHTML;
     shadowRoot.appendChild(bodyWrapper);
 
-    // 4) index.html 내부의 인라인 스크립트만 추출해 실행
+    // 4) moonlight.html 내부의 인라인 스크립트만 추출해 실행
     //    (Chart.js CDN <script src>는 이미 상단에서 로드했으므로 건너뜁니다)
     const inlineScripts = Array.from(parsedDoc.querySelectorAll('script:not([src])'));
 
@@ -1617,7 +1617,7 @@ async function loadMoonlightDashboard(){
       [/'DM Mono',\s*monospace/g, "'Space Mono', monospace"]
     ];
 
-    // index.html 스크립트는 document.getElementById(...)로 자기 자신의 엘리먼트를 찾으므로,
+    // moonlight.html 스크립트는 document.getElementById(...)로 자기 자신의 엘리먼트를 찾으므로,
     // 이 실행 컨텍스트에서만 document.getElementById가 shadow root를 바라보도록 프록시 처리
     const shadowDocumentProxy = new Proxy(document, {
       get(target, prop) {
