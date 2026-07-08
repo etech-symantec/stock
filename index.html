@@ -70,15 +70,18 @@
   }
   .hero-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 
-  /* 💡 통합 점수 계산 방식(적극적/중립적/보수적) 선택 버튼 */
-  .mode-switch { display: flex; gap: 6px; margin-top: 14px; }
-  .mode-btn {
-    flex: 1; padding: 7px 4px; border-radius: 8px; border: 1px solid var(--border); background: var(--card);
-    font-family: var(--font-num); font-size: 11px; letter-spacing: 0.5px; font-weight: 500; color: var(--txt2);
-    cursor: pointer; text-align: center; transition: all .15s;
+  /* 💡 통합 점수 계산 방식(적극적/중립적/보수적) 선택 - 세그먼트 컨트롤(알약형 토글) */
+  .mode-switch {
+    display: flex; gap: 2px; padding: 3px; margin-bottom: 16px;
+    background: #eef1f5; border-radius: 10px;
   }
-  .mode-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
-  .mode-btn.active { background: var(--txt3); color: #fff; border-color: var(--txt3); }
+  .mode-btn {
+    flex: 1; padding: 6px 4px; border: none; border-radius: 8px; background: transparent;
+    font-family: var(--font-num); font-size: 11px; letter-spacing: 0.4px; font-weight: 500; color: var(--txt2);
+    cursor: pointer; text-align: center; transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .mode-btn:hover { color: var(--txt3); }
+  .mode-btn.active { background: #ffffff; color: var(--txt3); font-weight: 700; box-shadow: 0 2px 6px rgba(15,23,42,0.12); }
   .mode-desc { margin-top: 8px; font-size: 11px; color: var(--txt2); line-height: 1.5; }
   .hero-label { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); margin-bottom: 4px; }
   .hero-score { font-family: var(--font-hd); font-size: 52px; line-height: 1; letter-spacing: -1px; transition: color .5s; }
@@ -273,6 +276,12 @@
 
   <div class="top-section">
     <div class="hero fade-up" style="animation-delay: 0.1s">
+      <div class="mode-switch" id="mode-switch">
+        <button type="button" class="mode-btn" data-mode="aggressive" onclick="setMode('aggressive')">적극적</button>
+        <button type="button" class="mode-btn active" data-mode="neutral" onclick="setMode('neutral')">중립적</button>
+        <button type="button" class="mode-btn" data-mode="conservative" onclick="setMode('conservative')">보수적</button>
+      </div>
+
       <div class="hero-top-row">
         <div>
           <p class="hero-label">// 통합 밸류에이션 점수 (0~100)</p>
@@ -281,11 +290,6 @@
         <div class="signal-badge" id="signal-badge" style="color:var(--txt2); border-color:var(--border)">LOADING</div>
       </div>
 
-      <div class="mode-switch" id="mode-switch">
-        <button type="button" class="mode-btn" data-mode="aggressive" onclick="setMode('aggressive')">적극적</button>
-        <button type="button" class="mode-btn active" data-mode="neutral" onclick="setMode('neutral')">중립적</button>
-        <button type="button" class="mode-btn" data-mode="conservative" onclick="setMode('conservative')">보수적</button>
-      </div>
       <p class="mode-desc" id="mode-desc">4대 카테고리(심리·리스크, 자금환경, 경기선행, 밸류에이션)에 동일한 가중치(25%)를 부여하는 균형잡힌 기본 방식입니다.</p>
 
       <div class="sub-scores" id="sub-scores-row">
