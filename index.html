@@ -130,6 +130,10 @@
   
   .section-title { font-family: var(--font-num); font-size: 11px; font-weight: 600; letter-spacing: 2px; color: var(--txt3); margin: 56px 0 24px; display: flex; align-items: center; gap: 12px; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-title--with-date::after { content: none; }
+  .section-title-line { flex: 1; height: 1px; background: var(--border); }
+  .section-title-date { flex: 0 0 auto; font-weight: 500; letter-spacing: 0.5px; color: var(--txt2); text-transform: none; white-space: nowrap; }
+  .section-title-date .date-val { color: var(--txt3); font-weight: 600; margin-right: 4px; }
   
   .chart-container {
     background: var(--card); border: 1px solid var(--border); border-radius: 14px;
@@ -287,18 +291,7 @@
 <body>
 <div id="spark-tooltip" class="spark-tooltip"></div>
 <div class="wrapper">
-  <header class="fade-up">
-    <div class="logo-area">
-      <h1><span class="logo-icon">🌙</span><span class="logo-text">달빛신호</span></h1>
-      <p><span class="live-dot" style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--buy); margin-right:6px; animation:pulse 2s infinite;"></span>Auto-updated Every Morning</p>
-    </div>
-    <div class="meta">
-      <span class="date-val" id="latest-date">—</span>
-      최신 업데이트
-    </div>
-  </header>
-
-  <div class="top-section">
+  <div class="top-section" style="margin-top: 32px;">
     <div class="hero fade-up" style="animation-delay: 0.1s">
       <div class="mode-switch" id="mode-switch">
         <button type="button" class="mode-btn" data-mode="aggressive" onclick="setMode('aggressive')">적극적</button>
@@ -340,7 +333,11 @@
     </div>
   </div>
 
-  <p class="section-title fade-up">4대 지표 카테고리</p>
+  <p class="section-title section-title--with-date fade-up">
+    4대 지표 카테고리
+    <span class="section-title-line"></span>
+    <span class="section-title-date"><span class="date-val" id="latest-date">—</span> 최신 업데이트</span>
+  </p>
   
   <!-- 💡 스크린샷과 동일한 4대 패널 그리드 컨테이너 -->
   <div class="category-grid" id="category-grid"></div>
@@ -383,10 +380,6 @@
     </div>
   </div>
 
-  <footer class="fade-up">
-    <span>데이터 출처: Yahoo Finance · FRED (Fed) · CNN Markets · GuruFocus · KOFIA · TRASS</span>
-    <span>GitHub Actions 자동 집계 스크립트 기반</span>
-  </footer>
 </div>
 
 <script>
