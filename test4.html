@@ -1531,9 +1531,15 @@ async function loadMoonlightDashboard(){
 
     const parsedDoc = new DOMParser().parseFromString(htmlText, 'text/html');
 
-    // 1) index.html의 <style> 태그를 shadow root 안으로 그대로 이식(스코프 자동 격리)
+    // 1) index.html의 <style> 태그를 shadow root 안으로 이식(스코프 자동 격리)
+    //    ⚠️ index.html의 스타일은 CSS 변수를 `:root`에 선언하는데, `:root`는 실제 문서 루트만
+    //       가리키므로 shadow root 내부에서는 절대 매칭되지 않습니다. 그 결과 --txt2/--txt3 같은
+    //       변수를 쓰는 규칙(예: 지표 하단의 얇은 게이지 바 마커)이 값을 못 받아 안 보이게 됩니다.
+    //       shadow DOM 안에서는 `:host`가 그 역할을 하므로 `:root` → `:host`로 치환해서 이식합니다.
     parsedDoc.querySelectorAll('style').forEach(styleEl => {
-      shadowRoot.appendChild(styleEl.cloneNode(true));
+      const fixedStyle = document.createElement('style');
+      fixedStyle.textContent = styleEl.textContent.replace(/:root\b/g, ':host');
+      shadowRoot.appendChild(fixedStyle);
     });
 
     // 2) 구글 폰트 등 외부 스타일시트 링크 이식
