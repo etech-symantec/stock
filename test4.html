@@ -1624,6 +1624,20 @@ async function loadMoonlightDashboard(){
         if (prop === 'getElementById') {
           return (id) => shadowRoot.getElementById(id);
         }
+        // ⚠️ querySelector/querySelectorAll도 getElementById와 마찬가지로
+        //    shadow root 기준으로 찾아야 합니다. 이게 빠져있어서
+        //    updateModeUI()의 document.querySelectorAll('.mode-btn')이
+        //    바깥(진짜) document를 뒤지는 바람에 shadow DOM 안의 버튼을
+        //    전혀 찾지 못했고, 그 결과 active 클래스가 옮겨지지 않았습니다.
+        if (prop === 'querySelector') {
+          return (sel) => shadowRoot.querySelector(sel);
+        }
+        if (prop === 'querySelectorAll') {
+          return (sel) => shadowRoot.querySelectorAll(sel);
+        }
+        if (prop === 'getElementsByClassName') {
+          return (cls) => shadowRoot.getElementsByClassName(cls);
+        }
         const val = target[prop];
         return typeof val === 'function' ? val.bind(target) : val;
       }
