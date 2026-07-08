@@ -93,7 +93,12 @@
   }
   .gauge-wrap { margin-top: 16px; max-width: none !important; }
   .gauge-track { height: 5px; border-radius: 3px; background: var(--border); position: relative; overflow: hidden; }
-  .gauge-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--buy), var(--warn), var(--sell)); transition: width 1.2s cubic-bezier(.22,1,.36,1); }
+  /* 💡 0~100 전체 구간을 고정된 그래디언트(매수→중립→매도)로 항상 동일하게 표시하고,
+     오른쪽에서부터 실제 점수 이후 구간만 배경색으로 가려서(mask) 현재 점수 위치의 실제 색이
+     드러나도록 합니다. 기존에는 gauge-fill 자체가 자기 너비 기준으로 그래디언트를 다시 그려서
+     점수와 무관하게 끝부분이 항상 빨간색으로 보이는 문제가 있었습니다. */
+  .gauge-gradient-bg { position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(90deg, var(--buy), var(--warn) 50%, var(--sell)); }
+  .gauge-mask { position: absolute; top: 0; right: 0; height: 100%; background: var(--panel); transition: width 1.2s cubic-bezier(.22,1,.36,1); }
   .gauge-labels { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--font-num); font-size: 9px; color: var(--txt2); letter-spacing: 0.5px; }
   
   .section-title { font-family: var(--font-num); font-size: 11px; font-weight: 600; letter-spacing: 2px; color: var(--txt3); margin: 56px 0 24px; display: flex; align-items: center; gap: 12px; }
@@ -293,7 +298,8 @@
       <p class="hero-sub" id="hero-desc">데이터를 불러오는 중...</p>
       <div class="gauge-wrap">
         <div class="gauge-track">
-          <div class="gauge-fill" id="hero-gauge" style="width:0%"></div>
+          <div class="gauge-gradient-bg"></div>
+          <div class="gauge-mask" id="hero-gauge-mask" style="width:100%"></div>
         </div>
         <div class="gauge-labels">
           <span>0 · 적극 매수</span>
@@ -508,7 +514,7 @@ function renderHero(latest) {
   badge.style.background = sig.border.replace('0.4', '0.08').replace('0.3', '0.06');
 
   const pct = Math.min(Math.max(score, 0), 100);
-  setTimeout(() => { document.getElementById('hero-gauge').style.width = pct + '%'; }, 300);
+  setTimeout(() => { document.getElementById('hero-gauge-mask').style.width = (100 - pct) + '%'; }, 300);
 }
 
 /* ── 💡 계산 방식(적극적/중립적/보수적) 전환 ──
