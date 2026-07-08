@@ -1075,11 +1075,14 @@ function gnewsEscapeHtml(str) {
   return div.innerHTML;
 }
 
-// 구글 뉴스 RSS를 프록시를 통해 가져와 파싱 (실패 시 빈 배열 반환)
+// 구글 뉴스 RSS를 가져와 파싱 (실패 시 빈 배열 반환)
+// ※ jooseek의 /api/proxy는 야후 파이낸스처럼 JSON 응답을 기대하도록 만들어져 있어
+//   구글 뉴스 RSS(XML)를 넘기면 서버에서 파싱이 깨져 500 에러가 납니다.
+//   그래서 이 뉴스 기능만 XML도 그대로 통과시켜주는 공개 CORS 프록시(allorigins)를 사용합니다.
 async function gnewsFetchForSymbol(symbol, query) {
   const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' 주식')}&hl=ko&gl=KR&ceid=KR:ko`;
   try {
-    const proxyUrl = `/api/proxy?url=${encodeURIComponent(rssUrl)}`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
     const res = await fetch(proxyUrl);
     if (!res.ok) return [];
     const text = await res.text();
