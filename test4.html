@@ -8,6 +8,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- 🌕 달빛정보(moonlight.html)가 Shadow DOM 안에서 쓰는 고유 폰트를 문서 레벨에서 미리 로드합니다.
+     Shadow Root 안에서 동적으로 추가된 <link>만으로는 브라우저에 따라 @font-face 로딩이
+     늦거나 fallback(sans-serif)으로 주저앉는 경우가 있어(특히 Saira Condensed 같은 조건부
+     weight 지정 폰트), 여기서 한 번 더 미리 불러와 항상 안정적으로 적용되도록 합니다. -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Saira+Condensed:wght@700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="market-signal.css">
 <style>
@@ -1559,7 +1564,8 @@ async function loadMoonlightDashboard(){
       shadowRoot.appendChild(linkEl.cloneNode(true));
     });
 
-    // 2.5) 배경/카드/글자색을 test4.html 테마 기준으로 통일 (폰트는 moonlight.html 원본 그대로 사용)
+    // 2.5) 폰트/배경/카드/글자색을 test4.html 기준으로 통일
+    //      - 폰트: moonlight.html 고유 폰트(Bebas Neue 등) 대신 test4.html의 --font-sans/--font-mono를 사용
     //      - 배경(--ix-bg, 원래 --bg): 다크색으로 칠하지 않고 완전 투명 처리 → 뒤에 있는
     //        dashboard-main의 배경이 그대로 비쳐서 라이트/다크 전환과 무관하게 항상 자연스럽게 맞음
     //      - 패널/카드/테두리/글자색(--panel,--card,--ix-border,--txt,--txt2,--txt3):
