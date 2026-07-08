@@ -1565,6 +1565,20 @@ async function loadMoonlightDashboard(){
         --font-hd: var(--font-sans);
         --font-num: var(--font-mono);
         --font-body: var(--font-sans);
+
+        /* ▼ 배경/카드/글자색: index.html 자체 --bg(#fff) 등 라이트테마 색상 변수를
+           test4.html의 다크테마 색상으로 덮어씁니다. body { background: var(--bg) }
+           가 그대로 흰색을 쓰고 있어서 배경이 하얗게 보였던 원인입니다.
+           ⚠️ test4.html과 index.html이 변수명이 똑같아서(--bg, --border 등)
+           var(--bg)처럼 참조하면 자기 자신을 가리키는 순환참조가 되어 무효 처리됩니다.
+           그래서 test4.html의 실제 다크테마 색상값을 직접 넣습니다. */
+        --bg: #0d0f14;
+        --panel: #141720;
+        --card: #141720;
+        --border: rgba(255,255,255,0.07);
+        --txt: #e8eaf0;
+        --txt2: #8890a4;
+        --txt3: #555e72;
       }
 
       /* ▼ 가로 폭: index.html 자체 .wrapper가 max-width:1400px + margin:0 auto로 좁게
