@@ -1569,10 +1569,6 @@ async function loadMoonlightDashboard(){
     const fontOverrideStyle = document.createElement('style');
     fontOverrideStyle.textContent = `
       :host {
-        --font-hd: var(--font-sans);
-        --font-num: var(--font-mono);
-        --font-body: var(--font-sans);
-
         --ix-bg: transparent;
         --panel: var(--bg2);
         --card: var(--bg2);
@@ -1609,13 +1605,8 @@ async function loadMoonlightDashboard(){
     //    (Chart.js CDN <script src>는 이미 상단에서 로드했으므로 건너뜁니다)
     const inlineScripts = Array.from(parsedDoc.querySelectorAll('script:not([src])'));
 
-    // ⚠️ Chart.js 옵션에는 CSS 변수를 못 쓰고 'DM Sans'/'DM Mono' 같은 폰트명이 문자열로
-    //    하드코딩되어 있어서, 위의 CSS 변수 오버라이드(2.5)만으로는 차트 범례/툴팁 폰트가
-    //    바뀌지 않습니다. 실행 전에 소스 텍스트 상에서 폰트명을 test4.html 폰트로 치환합니다.
-    const FONT_REPLACEMENTS = [
-      [/'DM Sans',\s*sans-serif/g, "'Noto Sans KR', sans-serif"],
-      [/'DM Mono',\s*monospace/g, "'Space Mono', monospace"]
-    ];
+    // moonlight.html 원본 폰트(DM Sans/DM Mono)를 그대로 유지하므로 치환하지 않습니다.
+    const FONT_REPLACEMENTS = [];
 
     // moonlight.html 스크립트는 document.getElementById(...)로 자기 자신의 엘리먼트를 찾으므로,
     // 이 실행 컨텍스트에서만 document.getElementById가 shadow root를 바라보도록 프록시 처리
