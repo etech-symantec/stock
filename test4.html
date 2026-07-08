@@ -1544,6 +1544,12 @@ async function loadMoonlightDashboard(){
       // html 셀렉터도 shadow root 안에는 실제 <html> 태그가 없어 매칭되지 않으므로 :host로 치환합니다.
       // (앞뒤에 단어문자/하이픈/점이 없을 때만 치환해 .html-xxx 같은 클래스명은 건드리지 않음)
       css = css.replace(/(?<![.\-\w])html(?![\w-])/g, ':host');
+      // ⚠️ index.html과 test4.html이 변수 이름을 똑같이 --bg / --border로 쓰고 있습니다.
+      // 아래에서 이 값을 test4.html의 실제(라이트/다크 전환되는) --bg/--border로 이어주려면
+      // var(--bg)처럼 자기 자신을 참조해야 하는데, 이는 순환참조라 무효 처리됩니다.
+      // 그래서 index.html 쪽 변수만 --ix-bg / --ix-border로 이름을 바꿔 충돌을 피합니다.
+      css = css.replace(/--bg\b/g, '--ix-bg');
+      css = css.replace(/--border\b/g, '--ix-border');
       fixedStyle.textContent = css;
       shadowRoot.appendChild(fixedStyle);
     });
@@ -1553,12 +1559,13 @@ async function loadMoonlightDashboard(){
       shadowRoot.appendChild(linkEl.cloneNode(true));
     });
 
-    // 2.5) 폰트를 test4.html에서 쓰는 폰트로 강제 통일
-    //      index.html은 자체 폰트 변수(--font-hd/--font-num/--font-body: Bebas Neue·DM Mono·DM Sans)를
-    //      쓰지만, 여기서는 index.html 고유 폰트 대신 test4.html의 --font-sans(Noto Sans KR)·
-    //      --font-mono(Space Mono)를 그대로 물려받도록 덮어씁니다. --font-sans/--font-mono는
-    //      shadow host의 조상(문서 :root, style.css)에서 상속되어 내려오므로 별도 폰트 로드 없이
-    //      바로 사용할 수 있습니다. 위에서 주입한 index.html 스타일보다 뒤에 추가해 우선 적용시킵니다.
+    // 2.5) 폰트/배경/카드/글자색을 test4.html 기준으로 통일
+    //      - 폰트: index.html 고유 폰트(Bebas Neue 등) 대신 test4.html의 --font-sans/--font-mono를 사용
+    //      - 배경(--ix-bg, 원래 --bg): 다크색으로 칠하지 않고 완전 투명 처리 → 뒤에 있는
+    //        dashboard-main의 배경이 그대로 비쳐서 라이트/다크 전환과 무관하게 항상 자연스럽게 맞음
+    //      - 패널/카드/테두리/글자색(--panel,--card,--ix-border,--txt,--txt2,--txt3):
+    //        test4.html의 실제 테마 변수(--bg2,--border,--text 등)를 그대로 물려받도록 연결
+    //        → test4.html에서 라이트모드/다크모드를 토글하면 이 값들도 실시간으로 같이 바뀝니다.
     const fontOverrideStyle = document.createElement('style');
     fontOverrideStyle.textContent = `
       :host {
@@ -1566,19 +1573,13 @@ async function loadMoonlightDashboard(){
         --font-num: var(--font-mono);
         --font-body: var(--font-sans);
 
-        /* ▼ 배경/카드/글자색: index.html 자체 --bg(#fff) 등 라이트테마 색상 변수를
-           test4.html의 다크테마 색상으로 덮어씁니다. body { background: var(--bg) }
-           가 그대로 흰색을 쓰고 있어서 배경이 하얗게 보였던 원인입니다.
-           ⚠️ test4.html과 index.html이 변수명이 똑같아서(--bg, --border 등)
-           var(--bg)처럼 참조하면 자기 자신을 가리키는 순환참조가 되어 무효 처리됩니다.
-           그래서 test4.html의 실제 다크테마 색상값을 직접 넣습니다. */
-        --bg: #0d0f14;
-        --panel: #141720;
-        --card: #141720;
-        --border: rgba(255,255,255,0.07);
-        --txt: #e8eaf0;
-        --txt2: #8890a4;
-        --txt3: #555e72;
+        --ix-bg: transparent;
+        --panel: var(--bg2);
+        --card: var(--bg2);
+        --ix-border: var(--border);
+        --txt: var(--text);
+        --txt2: var(--text2);
+        --txt3: var(--text3);
       }
 
       /* ▼ 가로 폭: index.html 자체 .wrapper가 max-width:1400px + margin:0 auto로 좁게
