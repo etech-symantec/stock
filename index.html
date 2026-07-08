@@ -148,6 +148,30 @@
   }
   .ind-gauge-labels { display: flex; justify-content: space-between; margin-top: 5px; font-size: 9px; color: var(--txt2); font-family: var(--font-num); letter-spacing: 0.3px; }
 
+  /* 💡 지표별 미니 스파크라인: 최근 히스토리 추이를 얇은 라인 그래프로 표시 */
+  .ind-spark-wrap { width: 140px; height: 34px; margin-bottom: 8px; position: relative; }
+  .ind-spark-wrap svg { width: 100%; height: 100%; display: block; overflow: visible; cursor: crosshair; }
+  .ind-spark-area { opacity: 0.12; }
+  .ind-spark-line { fill: none; stroke-width: 1.3; vector-effect: non-scaling-stroke; }
+  .ind-spark-last { stroke: #fff; stroke-width: 1; }
+  .ind-spark-dot { stroke-width: 1.6; }
+  .ind-spark-empty {
+    height: 100%; display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: var(--txt2); font-family: var(--font-num); letter-spacing: 0.3px;
+  }
+
+  /* 💡 스파크라인 위에 마우스를 올리면 나오는 작은 툴팁 */
+  .spark-tooltip {
+    position: fixed; z-index: 9999; background: #ffffff; border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px; font-family: var(--font-num); line-height: 1.5;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08); pointer-events: none; opacity: 0;
+    transform: translate(-50%, calc(-100% - 10px)); transition: opacity .1s ease;
+    white-space: nowrap;
+  }
+  .spark-tooltip.show { opacity: 1; }
+  .spark-tooltip .st-date { font-size: 9px; color: var(--txt2); margin-bottom: 2px; letter-spacing: 0.3px; }
+  .spark-tooltip .st-val { font-size: 12px; font-weight: 600; color: var(--txt3); }
+
   /* 💡 4가지 테마 색상 (Red, Blue, Orange, Green) */
   .theme-red { border-top: 4px solid #f43f5e; }
   .theme-red .cat-header { background: #fff1f2; }
@@ -207,6 +231,7 @@
 </style>
 </head>
 <body>
+<div id="spark-tooltip" class="spark-tooltip"></div>
 <div class="wrapper">
   <header class="fade-up">
     <div class="logo-area">
@@ -462,10 +487,108 @@ const CARDS_META = [
   { key: 'CAPE_PE', group: 'valuation', weight: 9, freq: '월간', label: 'CAPE Shiller PE', tag: '밸류에이션', unit: '배', inverse: false, range: [15, 45], sourceName: 'Multpl.com', link: 'https://www.multpl.com/shiller-pe', desc: '물가상승률을 조정한 S&P 500의 10년 평균 PER. 단기 이익 변동 노이즈를 제거한 장기 가치를 보여주며, 30 이상은 역사적 고평가(닷컴 버블 수준)로 진단합니다.' }
 ];
 
+/* ── 💡 카테고리별 스파크라인 색상 (테마 색상과 통일) ── */
+const THEME_SPARK_COLOR = { red: '#f43f5e', blue: '#3b82f6', orange: '#f59e0b', green: '#10b981' };
+
+/* 💡 지표 한 개의 최근 히스토리를 스파크라인 좌표(0~140 x, 0~32 y)로 변환합니다.
+   너무 오래된 데이터까지 전부 넣으면 최근 추세가 희석되므로 최근 SPARK_MAX개까지만 사용합니다. */
+const SPARK_MAX_POINTS = 90;
+const SPARK_W = 140, SPARK_H = 32, SPARK_PAD = 3;
+
+function buildSparkPoints(meta, sortedRows) {
+  const raw = sortedRows.map(r => {
+    const v = r[meta.key];
+    if (v === undefined || v === null || v === '' || v === 'N/A') return null;
+    const num = parseFloat(v.toString().replace(/,/g, '').split('(')[0]);
+    return isNaN(num) ? null : { date: r.Date, value: num };
+  }).filter(Boolean);
+
+  const series = raw.slice(-SPARK_MAX_POINTS);
+  if (series.length < 2) return null;
+
+  const values = series.map(p => p.value);
+  const min = Math.min(...values), max = Math.max(...values);
+
+  const points = series.map((p, i) => {
+    const x = (i / (series.length - 1)) * SPARK_W;
+    const y = (max === min) ? (SPARK_H / 2) : (SPARK_H - SPARK_PAD - ((p.value - min) / (max - min)) * (SPARK_H - SPARK_PAD * 2));
+    return { x, y, date: p.date, value: p.value };
+  });
+  return points;
+}
+
+/* 💡 스파크라인 SVG 마크업 생성. sparkId로 나중에 hover 이벤트를 연결할 좌표 데이터를 찾습니다. */
+let sparkRegistry = [];
+function renderSparkMarkup(meta, sortedRows, color) {
+  const points = buildSparkPoints(meta, sortedRows);
+  if (!points) {
+    return `<div class="ind-spark-wrap"><div class="ind-spark-empty">히스토리 데이터 부족</div></div>`;
+  }
+  const sparkId = sparkRegistry.length;
+  sparkRegistry.push(points);
+
+  const linePts = points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const areaPts = `0,${SPARK_H} ${linePts} ${SPARK_W},${SPARK_H}`;
+  const last = points[points.length - 1];
+
+  return `
+    <div class="ind-spark-wrap" data-spark-id="${sparkId}">
+      <svg viewBox="0 0 ${SPARK_W} ${SPARK_H}" preserveAspectRatio="none">
+        <polygon class="ind-spark-area" points="${areaPts}" fill="${color}"></polygon>
+        <polyline class="ind-spark-line" points="${linePts}" stroke="${color}"></polyline>
+        <circle class="ind-spark-last" cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="2.2" fill="${color}"></circle>
+        <circle class="ind-spark-dot" r="3" fill="#fff" stroke="${color}" style="display:none"></circle>
+      </svg>
+    </div>
+  `;
+}
+
+/* 💡 스파크라인에 마우스를 올리면 날짜/값을 보여주는 작은 툴팁 연결 */
+function getSparkTooltipEl() {
+  return document.getElementById('spark-tooltip');
+}
+
+function attachSparkTooltipEvents(container) {
+  const tooltip = getSparkTooltipEl();
+  container.querySelectorAll('.ind-spark-wrap[data-spark-id]').forEach(wrap => {
+    const points = sparkRegistry[wrap.dataset.sparkId];
+    if (!points) return;
+    const svg = wrap.querySelector('svg');
+    const dot = wrap.querySelector('.ind-spark-dot');
+    const n = points.length;
+
+    wrap.addEventListener('mousemove', (e) => {
+      const rect = wrap.getBoundingClientRect();
+      const xFrac = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+      const idx = Math.round(xFrac * (n - 1));
+      const pt = points[idx];
+      if (!pt || !svg) return;
+
+      const scaleX = rect.width / SPARK_W;
+      const scaleY = rect.height / SPARK_H;
+      dot.setAttribute('cx', pt.x.toFixed(1));
+      dot.setAttribute('cy', pt.y.toFixed(1));
+      dot.style.display = 'block';
+
+      tooltip.innerHTML = `<div class="st-date">📅 ${pt.date}</div><div class="st-val">${pt.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>`;
+      tooltip.style.left = (rect.left + pt.x * scaleX) + 'px';
+      tooltip.style.top = (rect.top + pt.y * scaleY) + 'px';
+      tooltip.classList.add('show');
+    });
+
+    wrap.addEventListener('mouseleave', () => {
+      dot.style.display = 'none';
+      tooltip.classList.remove('show');
+    });
+  });
+}
+
 /* ── 💡 카테고리 패널 생성 및 리스트 렌더링 ── */
-function renderCards(latest) {
+function renderCards(latest, rows) {
   const grid = document.getElementById('category-grid');
   grid.innerHTML = '';
+  sparkRegistry = [];
+  const sortedRows = [...rows].sort((a, b) => new Date(a.Date) - new Date(b.Date));
 
   CATEGORIES.forEach(cat => {
     const catItems = CARDS_META.filter(m => m.group === cat.id);
@@ -516,6 +639,7 @@ function renderCards(latest) {
               <span class="ind-val">${displayVal}</span>
               <span class="ind-unit">${meta.unit} <span style="opacity:0.45; font-size:10px; margin-left:4px; letter-spacing:0px;">(${meta.freq})</span></span>
             </div>
+            ${renderSparkMarkup(meta, sortedRows, THEME_SPARK_COLOR[cat.theme])}
             <div class="ind-gauge-wrap">
               <div class="ind-gauge-track">
                 <div class="ind-gauge-marker" style="left:${gaugePct}%;"></div>
@@ -547,6 +671,8 @@ function renderCards(latest) {
     
     grid.appendChild(panel);
   });
+
+  attachSparkTooltipEvents(grid);
 }
 
 function renderChart(rows) {
@@ -726,7 +852,7 @@ async function init() {
     // 💡 각 렌더 함수를 독립적으로 실행하여, 하나가 실패해도(예: 차트 라이브러리 로드 실패)
     //    나머지 영역(특히 4대 지표 카드)은 정상적으로 표시되도록 분리합니다.
     try { renderHero(latest); } catch (e) { console.error('renderHero 실패:', e); }
-    try { renderCards(latest); } catch (e) { console.error('renderCards 실패:', e); }
+    try { renderCards(latest, rows); } catch (e) { console.error('renderCards 실패:', e); }
     try { renderChart(rows); } catch (e) { console.error('renderChart 실패:', e); }
     try { renderHistory(rows); } catch (e) { console.error('renderHistory 실패:', e); }
 
