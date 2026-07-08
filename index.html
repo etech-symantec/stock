@@ -32,16 +32,6 @@
     background: var(--bg); color: var(--txt); font-family: var(--font-body);
     font-size: 14px; min-height: 100vh; overflow-x: hidden;
   }
-  body::before {
-    content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    background-size: 256px; opacity: 0.2;
-  }
-  body::after {
-    content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
   .wrapper { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 80px; }
   header {
     display: flex; align-items: flex-end; justify-content: space-between; padding: 24px 0 18px; border-bottom: 1px solid var(--border);
@@ -342,7 +332,7 @@
   <!-- 💡 스크린샷과 동일한 4대 패널 그리드 컨테이너 -->
   <div class="category-grid" id="category-grid"></div>
 
-  <p class="section-title fade-up">역사적 매크로 타임라인 기록 (좌우로 스크롤하세요)</p>
+  <p class="section-title fade-up">지표값 히스토리</p>
   <div class="table-wrap fade-up">
     <table>
       <thead>
