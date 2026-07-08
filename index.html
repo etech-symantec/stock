@@ -114,27 +114,31 @@
   .cat-desc { font-size: 13px; color: var(--txt2); }
 
   .ind-row { 
-    display: flex; justify-content: space-between; align-items: center; 
+    display: grid; grid-template-columns: 5fr 1fr 4fr; align-items: center; gap: 20px;
     padding: 20px 30px; border-bottom: 1px solid var(--border); transition: background 0.15s; 
   }
   .ind-row:last-child { border-bottom: none; }
   .ind-row:hover { background: #f8fafc; }
 
-  .ind-left { flex: 1; padding-right: 20px; }
+  .ind-left { min-width: 0; }
   .ind-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
   .ind-name { font-size: 15px; font-weight: 600; color: var(--txt3); font-family: var(--font-body); }
   .ind-pill { font-size: 10px; padding: 2px 8px; border-radius: 12px; border: 1px solid; font-weight: 500; letter-spacing: 0.5px; }
   .ind-desc { font-size: 13px; color: var(--txt2); line-height: 1.5; }
 
-  .ind-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 160px; }
-  .ind-val-wrap { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
-  .ind-val { font-family: var(--font-hd); font-size: 26px; color: var(--txt3); line-height: 1; letter-spacing: 0.5px;}
-  .ind-unit { font-size: 12px; color: var(--txt2); font-family: var(--font-num); }
-  .ind-source { font-size: 11px; text-decoration: none; display: flex; align-items: center; gap: 2px; font-weight: 500; opacity: 0.8; transition: opacity 0.2s; }
+  /* 💡 지표값 칸 (전체 카드 가로 길이의 10%) */
+  .ind-value-col { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-width: 0; }
+  .ind-val-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 0; }
+  .ind-val { font-family: var(--font-hd); font-size: 22px; color: var(--txt3); line-height: 1; letter-spacing: 0.5px; word-break: keep-all; }
+  .ind-unit { font-size: 11px; color: var(--txt2); font-family: var(--font-num); }
+
+  /* 💡 그래프(스파크라인+게이지) 칸 (전체 카드 가로 길이의 40%) */
+  .ind-graph-col { display: flex; flex-direction: column; align-items: stretch; justify-content: center; min-width: 0; }
+  .ind-source { font-size: 11px; text-decoration: none; display: flex; align-items: center; gap: 2px; font-weight: 500; opacity: 0.8; transition: opacity 0.2s; align-self: flex-end; }
   .ind-source:hover { opacity: 1; }
 
   /* 💡 지표별 위치(낮음~높음) 게이지 바 - 더 눈에 띄게 재설계 */
-  .ind-gauge-wrap { width: 140px; margin-bottom: 8px; }
+  .ind-gauge-wrap { width: 100%; margin-bottom: 8px; }
   .ind-gauge-track {
     position: relative; height: 10px; border-radius: 5px;
     background: linear-gradient(90deg, #d1fae5 0%, #fef3c7 50%, #fee2e2 100%);
@@ -149,7 +153,7 @@
   .ind-gauge-labels { display: flex; justify-content: space-between; margin-top: 5px; font-size: 9px; color: var(--txt2); font-family: var(--font-num); letter-spacing: 0.3px; }
 
   /* 💡 지표별 미니 스파크라인: 최근 히스토리 추이를 얇은 라인 그래프로 표시 */
-  .ind-spark-wrap { width: 140px; height: 34px; margin-bottom: 8px; position: relative; }
+  .ind-spark-wrap { width: 100%; height: 34px; margin-bottom: 8px; position: relative; }
   .ind-spark-wrap svg { width: 100%; height: 100%; display: block; overflow: visible; cursor: crosshair; }
   .ind-spark-area { opacity: 0.12; }
   .ind-spark-line { fill: none; stroke-width: 1.3; vector-effect: non-scaling-stroke; }
@@ -158,6 +162,13 @@
   .ind-spark-empty {
     height: 100%; display: flex; align-items: center; justify-content: center;
     font-size: 9px; color: var(--txt2); font-family: var(--font-num); letter-spacing: 0.3px;
+  }
+
+  /* 💡 좁은 화면에서는 3단 배치를 세로로 쌓아 가독성 확보 */
+  @media (max-width: 640px) {
+    .ind-row { grid-template-columns: 1fr; row-gap: 14px; }
+    .ind-value-col { flex-direction: row; align-items: baseline; justify-content: flex-start; gap: 8px; }
+    .ind-val-wrap { flex-direction: row; align-items: baseline; }
   }
 
   /* 💡 스파크라인 위에 마우스를 올리면 나오는 작은 툴팁 */
@@ -634,11 +645,13 @@ function renderCards(latest, rows) {
             </div>
             <p class="ind-desc">${meta.desc}</p>
           </div>
-          <div class="ind-right">
+          <div class="ind-value-col">
             <div class="ind-val-wrap">
               <span class="ind-val">${displayVal}</span>
               <span class="ind-unit">${meta.unit} <span style="opacity:0.45; font-size:10px; margin-left:4px; letter-spacing:0px;">(${meta.freq})</span></span>
             </div>
+          </div>
+          <div class="ind-graph-col">
             ${renderSparkMarkup(meta, sortedRows, THEME_SPARK_COLOR[cat.theme])}
             <div class="ind-gauge-wrap">
               <div class="ind-gauge-track">
