@@ -1538,7 +1538,13 @@ async function loadMoonlightDashboard(){
     //       shadow DOM 안에서는 `:host`가 그 역할을 하므로 `:root` → `:host`로 치환해서 이식합니다.
     parsedDoc.querySelectorAll('style').forEach(styleEl => {
       const fixedStyle = document.createElement('style');
-      fixedStyle.textContent = styleEl.textContent.replace(/:root\b/g, ':host');
+      let css = styleEl.textContent;
+      // :root → :host (CSS 변수가 shadow root 안에서도 선언되도록)
+      css = css.replace(/:root\b/g, ':host');
+      // html 셀렉터도 shadow root 안에는 실제 <html> 태그가 없어 매칭되지 않으므로 :host로 치환합니다.
+      // (앞뒤에 단어문자/하이픈/점이 없을 때만 치환해 .html-xxx 같은 클래스명은 건드리지 않음)
+      css = css.replace(/(?<![.\-\w])html(?![\w-])/g, ':host');
+      fixedStyle.textContent = css;
       shadowRoot.appendChild(fixedStyle);
     });
 
@@ -1547,8 +1553,14 @@ async function loadMoonlightDashboard(){
       shadowRoot.appendChild(linkEl.cloneNode(true));
     });
 
-    // 3) <body> 마크업을 shadow root에 그대로 이식
-    const bodyWrapper = document.createElement('div');
+    // 3) <body> 마크업을 shadow root에 이식
+    //    ⚠️ 기존에는 일반 <div>로 감싸서 넣었는데, 그러면 index.html의 CSS 안에 있는
+    //       `body { background:...; color:...; font-family:... }`, `body::before`,
+    //       `body::after` (배경 노이즈/그리드 패턴 오버레이) 같은 규칙이 실제로 매칭될
+    //       대상이 shadow tree 안에 없어서 전혀 적용되지 않았습니다(=index.html과 미묘하게
+    //       다르게 보이는 원인). div 대신 실제 <body> 엘리먼트를 만들어 넣으면 이 규칙들이
+    //       그대로 매칭되어 index.html과 동일한 배경/폰트/오버레이가 재현됩니다.
+    const bodyWrapper = document.createElement('body');
     bodyWrapper.innerHTML = parsedDoc.body.innerHTML;
     shadowRoot.appendChild(bodyWrapper);
 
