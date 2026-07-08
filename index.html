@@ -56,9 +56,9 @@
 
   /* ── 💡 통합 점수(좌) + 차트(우) 한 행 배치 ── */
   .top-section {
-    margin: 20px 0 28px; display: grid; grid-template-columns: 460px 1fr; gap: 20px; align-items: stretch;
+    margin: 20px 0 28px; display: grid; grid-template-columns: 460px 1fr; gap: 20px; align-items: stretch; height: 460px;
   }
-  @media (max-width: 900px) { .top-section { grid-template-columns: 1fr; } .chart-container { height: 280px; } }
+  @media (max-width: 900px) { .top-section { grid-template-columns: 1fr; height: auto; } .chart-container { height: 280px; } }
 
   .hero {
     background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px 26px;
