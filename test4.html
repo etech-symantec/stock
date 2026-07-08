@@ -1566,6 +1566,16 @@ async function loadMoonlightDashboard(){
         --font-num: var(--font-mono);
         --font-body: var(--font-sans);
       }
+
+      /* ▼ 가로 폭: index.html 자체 .wrapper가 max-width:1400px + margin:0 auto로 좁게
+         중앙 정렬되어 있어서, 폭 제한 없이 꽉 차는 다른 대시보드 페이지들과 가로 길이가
+         달라 보였습니다. dashboard-main이 이미 좌우 2rem 패딩을 주고 있으므로
+         .wrapper 자체의 폭 제한/여백은 제거합니다. */
+      .wrapper {
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
     `;
     shadowRoot.appendChild(fontOverrideStyle);
 
