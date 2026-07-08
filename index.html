@@ -56,19 +56,23 @@
 
   /* ── 💡 통합 점수(좌) + 차트(우) 한 행 배치 ── */
   .top-section {
-    margin: 20px 0 28px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: stretch; height: 320px;
+    margin: 20px 0 28px; display: grid; grid-template-columns: 460px 1fr; gap: 20px; align-items: stretch;
   }
-  @media (max-width: 900px) { .top-section { grid-template-columns: 1fr; height: auto; } .chart-container { height: 280px; } }
+  @media (max-width: 900px) { .top-section { grid-template-columns: 1fr; } .chart-container { height: 280px; } }
 
   .hero {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px 26px;
     display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;
   }
   .hero::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, transparent, var(--buy), transparent);
   }
-  .hero-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+
+  /* 💡 좌: 점수/최종의견/모드설명, 우: 카테고리별 비중 막대그래프 */
+  .hero-main { display: flex; align-items: flex-start; gap: 28px; margin: 22px 0 20px; }
+  .hero-left { flex: 0 0 168px; display: flex; flex-direction: column; align-items: flex-start; }
+  .hero-right { flex: 1; min-width: 0; padding-top: 2px; }
 
   /* 💡 통합 점수 계산 방식(적극적/중립적/보수적) 선택 - 세그먼트 컨트롤(알약형 토글) */
   .mode-switch {
@@ -82,19 +86,27 @@
   }
   .mode-btn:hover { color: var(--txt3); }
   .mode-btn.active { background: #ffffff; color: var(--txt3); font-weight: 700; box-shadow: 0 2px 6px rgba(15,23,42,0.12); }
-  .mode-desc { margin-top: 8px; font-size: 11px; color: var(--txt2); line-height: 1.5; }
-  .hero-label { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); margin-bottom: 4px; }
+  .mode-desc { margin-top: 12px; font-size: 11px; color: var(--txt2); line-height: 1.6; }
+  .hero-label { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); margin-bottom: 6px; }
   .hero-score { font-family: var(--font-hd); font-size: 52px; line-height: 1; letter-spacing: -1px; transition: color .5s; }
-  .sub-scores { display: flex; gap: 8px; margin-top: 10px; font-family: var(--font-num); font-size: 10px; color: var(--txt2); flex-wrap: wrap; }
-  .sub-scores div { background: var(--card); border: 1px solid var(--border); padding: 5px 9px; border-radius: 7px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-  .sub-scores strong { color: var(--txt3); font-size: 12px; margin-left: 4px; }
-  .hero-sub { margin-top: 10px; font-size: 12px; color: var(--txt2); line-height: 1.5; }
+
+  /* 💡 카테고리별 비중: 세로 나열 + 비중만큼 채워지는 막대그래프 */
+  .weight-label { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); margin-bottom: 14px; }
+  .weight-list { display: flex; flex-direction: column; gap: 14px; }
+  .weight-item-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .weight-name { font-size: 12.5px; font-weight: 600; color: var(--txt3); }
+  .weight-meta { font-family: var(--font-num); font-size: 11px; color: var(--txt2); white-space: nowrap; }
+  .weight-meta strong { color: var(--txt3); font-size: 12px; margin-right: 2px; }
+  .weight-bar-track { height: 8px; border-radius: 4px; background: #eef1f5; overflow: hidden; }
+  .weight-bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.22,1,.36,1); }
+
+  .hero-sub { margin-top: 22px; font-size: 12px; color: var(--txt2); line-height: 1.6; }
   .hero-sub strong { color: var(--txt3); }
   .signal-badge {
-    padding: 5px 14px; border-radius: 30px; font-family: var(--font-num); font-size: 11px; font-weight: 500;
+    display: inline-block; margin-top: 12px; padding: 5px 14px; border-radius: 30px; font-family: var(--font-num); font-size: 11px; font-weight: 500;
     letter-spacing: 1.5px; text-transform: uppercase; border: 1px solid; white-space: nowrap;
   }
-  .gauge-wrap { margin-top: 16px; max-width: none !important; }
+  .gauge-wrap { margin-top: 22px; max-width: none !important; }
   .gauge-track { height: 5px; border-radius: 3px; background: var(--border); position: relative; overflow: hidden; }
   /* 💡 0~100 전체 구간을 고정된 그래디언트(매수→중립→매도)로 항상 동일하게 표시하고,
      오른쪽에서부터 실제 점수 이후 구간만 배경색으로 가려서(mask) 현재 점수 위치의 실제 색이
@@ -282,21 +294,18 @@
         <button type="button" class="mode-btn" data-mode="conservative" onclick="setMode('conservative')">보수적</button>
       </div>
 
-      <div class="hero-top-row">
-        <div>
+      <div class="hero-main">
+        <div class="hero-left">
           <p class="hero-label">// 통합 밸류에이션 점수 (0~100)</p>
           <div class="hero-score" id="hero-score">—</div>
+          <div class="signal-badge" id="signal-badge" style="color:var(--txt2); border-color:var(--border)">LOADING</div>
+          <p class="mode-desc" id="mode-desc">4대 카테고리(심리·리스크, 자금환경, 경기선행, 밸류에이션)에 동일한 가중치(25%)를 부여하는 균형잡힌 기본 방식입니다.</p>
         </div>
-        <div class="signal-badge" id="signal-badge" style="color:var(--txt2); border-color:var(--border)">LOADING</div>
-      </div>
 
-      <p class="mode-desc" id="mode-desc">4대 카테고리(심리·리스크, 자금환경, 경기선행, 밸류에이션)에 동일한 가중치(25%)를 부여하는 균형잡힌 기본 방식입니다.</p>
-
-      <div class="sub-scores" id="sub-scores-row">
-        <div>심리·리스크 (25%) <strong>—</strong></div>
-        <div>자금환경 (25%) <strong>—</strong></div>
-        <div>경기선행 (25%) <strong>—</strong></div>
-        <div>밸류에이션 (25%) <strong>—</strong></div>
+        <div class="hero-right">
+          <p class="weight-label">카테고리별 비중</p>
+          <div class="weight-list" id="sub-scores-row"></div>
+        </div>
       </div>
 
       <p class="hero-sub" id="hero-desc">데이터를 불러오는 중...</p>
@@ -490,15 +499,32 @@ function renderHero(latest) {
   heroEl.textContent = isNaN(result.total) ? '—' : score.toFixed(1);
   heroEl.style.color = sig.color;
 
-  // 4대 카테고리별 점수(0~100, 높을수록 비중축소 방향)와 현재 모드의 실제 가중치(%)를 함께 표기
+  // 4대 카테고리별 점수(0~100, 높을수록 비중축소 방향)와 현재 모드의 실제 가중치(%)를 세로 막대그래프로 표기
   const groupLabel = { risk: '심리·리스크', liquidity: '자금환경', economy: '경기선행', valuation: '밸류에이션' };
+  const groupColor = { risk: '#f43f5e', liquidity: '#3b82f6', economy: '#f59e0b', valuation: '#10b981' };
   const subScoresEl = document.getElementById('sub-scores-row');
   if (subScoresEl) {
     subScoresEl.innerHTML = ['risk', 'liquidity', 'economy', 'valuation'].map(g => {
       const v = result.groups[g];
       const wPct = Math.round((conf.groupWeights[g] ?? 0) * 100);
-      return `<div>${groupLabel[g]} (${wPct}%) <strong>${v === null ? '—' : v.toFixed(1)}</strong></div>`;
+      return `<div class="weight-item">
+        <div class="weight-item-top">
+          <span class="weight-name">${groupLabel[g]}</span>
+          <span class="weight-meta"><strong>${wPct}%</strong> 비중 · 점수 ${v === null ? '—' : v.toFixed(1)}</span>
+        </div>
+        <div class="weight-bar-track">
+          <div class="weight-bar-fill" style="width:0%; background:${groupColor[g]}" data-target="${wPct}"></div>
+        </div>
+      </div>`;
     }).join('');
+    // 로드 직후 막대가 0%에서 실제 비중까지 차오르는 애니메이션
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        subScoresEl.querySelectorAll('.weight-bar-fill').forEach(el => {
+          el.style.width = el.dataset.target + '%';
+        });
+      }, 50);
+    });
   }
 
   const { buy, addBuy, watch } = conf.thresholds;
