@@ -1565,22 +1565,6 @@ async function loadMoonlightDashboard(){
         --font-hd: var(--font-sans);
         --font-num: var(--font-mono);
         --font-body: var(--font-sans);
-        /* ▼ 여기 추가: index.html 고유 라이트테마 색상 → test4.html 다크테마 색상으로 치환 */
-        --bg: var(--bg);
-        --panel: var(--bg2);
-        --card: var(--bg2);
-        --border: var(--border);
-        --txt: var(--text);
-        --txt2: var(--text2);
-        --txt3: var(--text3);
-      }
-      /* ▼ 상단 여백: index.html 자체 header가 padding-top:24px를 또 가지고 있어서
-         바깥 .dashboard-page의 padding-top:1.5rem과 합쳐져 다른 페이지보다 여백이 큽니다 */
-      header { padding-top: 0 !important; }
-    
-      /* ▼ 카드 라운드: 14px/10px 등 제각각인 값을 다른 페이지와 동일한 --radius-lg(12px)로 통일 */
-      .hero, .chart-container, .cat-panel, .table-wrap {
-        border-radius: var(--radius-lg) !important;
       }
     `;
     shadowRoot.appendChild(fontOverrideStyle);
@@ -1625,6 +1609,22 @@ async function loadMoonlightDashboard(){
       FONT_REPLACEMENTS.forEach(([pattern, replacement]) => {
         scriptText = scriptText.replace(pattern, replacement);
       });
+
+      // ⚠️ new Function(...)으로 실행하면 그 함수만의 독립된 스코프가 생겨서,
+      //    스크립트 안에서 선언한 function setMode(){...}, setView(){...} 등은
+      //    그 스코프 안의 지역 변수로만 존재합니다. 반면 HTML의 onclick="setMode(...)"
+      //    같은 인라인 이벤트 핸들러는 전역(window)에서 이름을 찾기 때문에
+      //    "setMode is not defined" 에러가 발생했습니다.
+      //    스크립트 실행 직후, 최상위에서 선언된 함수들을 window에 등록해 전역에서도
+      //    호출 가능하게 만듭니다.
+      const topLevelFnNames = Array.from(
+        scriptText.matchAll(/^\s*function\s+([A-Za-z0-9_$]+)\s*\(/gm)
+      ).map(m => m[1]);
+      const exportCode = topLevelFnNames
+        .map(name => `window.${name} = ${name};`)
+        .join('\n');
+      scriptText += '\n' + exportCode;
+
       const run = new Function('document', scriptText);
       run(shadowDocumentProxy);
     });
