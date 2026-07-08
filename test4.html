@@ -1565,6 +1565,22 @@ async function loadMoonlightDashboard(){
         --font-hd: var(--font-sans);
         --font-num: var(--font-mono);
         --font-body: var(--font-sans);
+        /* ▼ 여기 추가: index.html 고유 라이트테마 색상 → test4.html 다크테마 색상으로 치환 */
+        --bg: var(--bg);
+        --panel: var(--bg2);
+        --card: var(--bg2);
+        --border: var(--border);
+        --txt: var(--text);
+        --txt2: var(--text2);
+        --txt3: var(--text3);
+      }
+      /* ▼ 상단 여백: index.html 자체 header가 padding-top:24px를 또 가지고 있어서
+         바깥 .dashboard-page의 padding-top:1.5rem과 합쳐져 다른 페이지보다 여백이 큽니다 */
+      header { padding-top: 0 !important; }
+    
+      /* ▼ 카드 라운드: 14px/10px 등 제각각인 값을 다른 페이지와 동일한 --radius-lg(12px)로 통일 */
+      .hero, .chart-container, .cat-panel, .table-wrap {
+        border-radius: var(--radius-lg) !important;
       }
     `;
     shadowRoot.appendChild(fontOverrideStyle);
