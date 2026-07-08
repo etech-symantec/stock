@@ -6,7 +6,7 @@
 <title>달빛신호 — Macro & Market Signal Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='68' font-size='64' text-anchor='middle'%3E%F0%9F%8C%99%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   /* ── Reset & Base ── */
@@ -25,6 +25,8 @@
     --txt3:     #0f172a;
     --font-hd:  'Bebas Neue', sans-serif;
     --font-num: 'DM Mono', monospace;
+    /* 💡 통합점수 / 지표값 / 카테고리 번호 전용 강조 숫자 폰트 (굵고 강렬한 임팩트) */
+    --font-num-display: 'Archivo Black', sans-serif;
     --font-body:'DM Sans', sans-serif;
   }
   html { scroll-behavior: smooth; }
@@ -90,7 +92,7 @@
     padding: 4px 10px 4px 8px; border-radius: 20px;
   }
   .hero-label-icon { font-size: 11px; line-height: 1; }
-  .hero-score { font-family: var(--font-hd); font-size: 52px; line-height: 1; letter-spacing: -1px; transition: color .5s; }
+  .hero-score { font-family: var(--font-num-display); font-size: 52px; line-height: 1; letter-spacing: -1px; transition: color .5s; }
 
   /* 💡 카테고리별 비중: 세로 나열 + 비중만큼 채워지는 막대그래프 */
   .weight-label { font-family: var(--font-num); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--txt2); margin-bottom: 14px; }
@@ -143,7 +145,7 @@
   }
   .cat-header { padding: 24px 30px; position: relative; border-bottom: 1px solid var(--border); }
   .cat-num {
-    position: absolute; top: 18px; left: 28px; font-family: var(--font-hd);
+    position: absolute; top: 18px; left: 28px; font-family: var(--font-num-display);
     font-size: 56px; line-height: 1; opacity: 0.2; pointer-events: none;
   }
   .cat-title-wrap { position: relative; z-index: 1; padding-left: 52px; }
@@ -166,7 +168,7 @@
   /* 💡 지표값 칸 (전체 카드 가로 길이의 10%) */
   .ind-value-col { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-width: 0; }
   .ind-val-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 0; }
-  .ind-val { font-family: var(--font-hd); font-size: 22px; color: var(--txt3); line-height: 1; letter-spacing: 0.5px; word-break: keep-all; }
+  .ind-val { font-family: var(--font-num-display); font-size: 22px; color: var(--txt3); line-height: 1; letter-spacing: 0.5px; word-break: keep-all; }
   .ind-unit { font-size: 11px; color: var(--txt2); font-family: var(--font-num); }
 
   /* 💡 그래프(스파크라인+게이지) 칸 (전체 카드 가로 길이의 40%) */
