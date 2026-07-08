@@ -29,6 +29,29 @@
   .ms-ind-diff{
     font-family: 'Saira Condensed', sans-serif;
   }
+  /* 🌗 종합 신호 카드에 표시되는 "현재 계산 모드(적극적/중립적/보수적)" 배지.
+     달빛정보의 mode-btn.active 톤과 어울리도록 은은한 알약형 배경을 사용합니다. */
+  .ms-total-kicker{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .ms-mode-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 2px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    background: var(--bg3, rgba(148,163,184,0.16));
+    color: var(--text2, #64748b);
+    border: 1px solid var(--border2, rgba(148,163,184,0.35));
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -291,7 +314,12 @@
           </div>
 
           <div id="ms-total-card" class="ms-total-card" onclick="window.open('/plus/moonlight.html', '_blank')" title="통합 밸류에이션 점수(0~100) = 4대 카테고리(심리·리스크 / 자금환경 / 경기선행 / 밸류에이션) 각 25% 균등 가중 평균. 카테고리 내부는 지표별 중요도(VIX·CAPE PE·한국수출 등 가중치 높음)로 차등 계산합니다. 점수가 낮을수록 저평가(매수 유리), 높을수록 고평가(비중축소 경고)를 의미합니다. [0~30] 적극 매수 · [30~50] 분할 매수 · [50~70] 관망 유지 · [70~100] 비중 축소. 클릭하면 산출 근거가 새 탭에서 열립니다.">
-            <div class="ms-total-kicker"><span>📡</span> 종합 신호</div>
+            <div class="ms-total-kicker">
+              <span>📡</span> 종합 신호
+              <!-- 🌗 달빛정보에서 선택한 계산 모드(적극적/중립적/보수적)를 localStorage로 기억해두었다가
+                   여기서도 동일하게 표시합니다. 값은 ms-mode-sync.js(하단 스크립트)가 채워 넣습니다. -->
+              <span id="ms-mode-badge" class="ms-mode-badge" title="달빛정보에서 선택한 통합 점수 계산 모드입니다. 달빛정보 탭에서 변경하면 여기도 함께 바뀝니다.">🌗 중립적</span>
+            </div>
             <div class="ms-score-row">
               <span id="ms-score" class="ms-score">—</span>
               <span id="ms-score-diff" class="ms-score-diff">—</span>
@@ -1679,6 +1707,63 @@ async function loadMoonlightDashboard(){
 }
 </script>
 
+<script>
+/* ══════════════════════════════════════════════════════
+   🌗 종합 신호 카드 ↔ 달빛정보 "계산 모드" 동기화
+   - 달빛정보(moonlight.html, Shadow DOM 내부 스크립트)가 setMode()를 호출할 때마다
+     localStorage(ttm-valuation-mode)에 저장하고 window에 'ttm-valuation-mode-change'
+     커스텀 이벤트를 쏩니다. 여기서는 그 값을 읽어 전체보기 종합 신호 카드의
+     배지(#ms-mode-badge)에 현재 선택된 모드를 표시합니다.
+   - ⚠️ 실제 종합 신호 점수(#ms-score) 자체의 가중치/임계값 계산 로직은
+     market-signal.js 안에 있습니다. 그 파일이 이 모드(적극적/중립적/보수적)에 맞춰
+     그룹 가중치와 매수/관망/비중축소 임계값을 다르게 계산하도록 반영하려면
+     market-signal.js 원본 코드가 필요합니다.
+   ══════════════════════════════════════════════════════ */
+(function () {
+  const VALUATION_MODE_STORAGE_KEY = 'ttm-valuation-mode';
+  const MODE_META = {
+    aggressive:   { icon: '🌕', label: '적극적' },
+    neutral:      { icon: '🌗', label: '중립적' },
+    conservative: { icon: '🌒', label: '보수적' }
+  };
+
+  function currentSavedMode() {
+    try {
+      const saved = localStorage.getItem(VALUATION_MODE_STORAGE_KEY);
+      if (saved && MODE_META[saved]) return saved;
+    } catch (e) { /* localStorage 접근 불가 시 기본값 */ }
+    return 'neutral';
+  }
+
+  function renderModeBadge() {
+    const badge = document.getElementById('ms-mode-badge');
+    if (!badge) return;
+    const mode = currentSavedMode();
+    const meta = MODE_META[mode];
+    badge.textContent = `${meta.icon} ${meta.label}`;
+  }
+
+  // 배지를 클릭하면 달빛정보 탭으로 이동해 바로 모드를 바꿀 수 있도록 연결
+  document.addEventListener('DOMContentLoaded', () => {
+    renderModeBadge();
+    const badge = document.getElementById('ms-mode-badge');
+    if (badge) {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation(); // ms-total-card 자체의 onclick(새 탭으로 산출근거 열기)과 분리
+        const moonlightTab = document.getElementById('tabMoonlight');
+        if (moonlightTab) moonlightTab.click();
+      });
+    }
+  });
+
+  // 같은 창(같은 document)의 달빛정보 Shadow DOM에서 setMode() 호출 시 발생하는 이벤트
+  window.addEventListener('ttm-valuation-mode-change', renderModeBadge);
+  // 다른 탭/창에서 모드를 바꾼 경우(localStorage 변경)에도 동기화
+  window.addEventListener('storage', (e) => {
+    if (e.key === VALUATION_MODE_STORAGE_KEY) renderModeBadge();
+  });
+})();
+</script>
 <script src="app.js"></script>
 <script src="market-signal.js"></script>
 <script src="tutorial.js"></script>
