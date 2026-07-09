@@ -801,3 +801,52 @@
     min-width: 0;
   }
 }
+/* =====================================================
+   카테고리가 실제로 2줄 이상이 된 경우
+   날짜와 종합 신호 카드도 위아래 2줄로 배치
+   ===================================================== */
+
+#marketSignalBar.ms-compact.ms-two-rows .ms-overview-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 294px) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  align-self: stretch;
+  min-width: 220px;
+  gap: 10px;
+}
+
+/* 첫 번째 줄: 데이터 날짜 */
+#marketSignalBar.ms-compact.ms-two-rows .ms-date-card {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+
+/* 두 번째 줄: 종합 신호 */
+#marketSignalBar.ms-compact.ms-two-rows .ms-total-card {
+  grid-column: 1;
+  grid-row: 2;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 날짜 카드는 가로 형태로 변경 */
+#marketSignalBar.ms-compact.ms-two-rows .ms-date-caption {
+  writing-mode: initial !important;
+  transform: none !important;
+}
+
+#marketSignalBar.ms-compact.ms-two-rows .ms-date-stack {
+  flex-direction: row !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+}
+
+/* 두 줄일 때 설명 문구 다시 표시 */
+#marketSignalBar.ms-compact.ms-two-rows .ms-total-note {
+  display: block;
+}
