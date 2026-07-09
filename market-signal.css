@@ -111,6 +111,8 @@
   align-items: start;
   gap: 12px;
   padding: 12px;
+  container-type: inline-size;
+  container-name: ms-shell;
   border: 1px solid rgba(124,106,247,0.22);
   border-radius: 22px;
   background:
@@ -141,7 +143,7 @@
 
 .ms-overview-panel {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: stretch;
   gap: 10px;
   min-width: 0;
@@ -168,15 +170,15 @@
   font-weight: 900;
   letter-spacing: 0.12em;
   color: var(--text3);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
+  writing-mode: initial;
+  transform: none;
   line-height: 1;
 }
 .ms-date-stack {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
   font-family: var(--font-mono);
   font-weight: 800;
   line-height: 1.18;
@@ -465,6 +467,12 @@
   background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #34d399 78%, #00c87a 100%);
 }
 
+@container ms-shell (min-width: 560px) {
+  .ms-overview-panel { flex-direction: row; align-items: stretch; }
+  .ms-date-caption { writing-mode: vertical-rl; transform: rotate(180deg); }
+  .ms-date-stack { flex-direction: column; align-items: flex-end; gap: 1px; }
+}
+
 @media (max-width: 1240px) {
   .market-signal-shell { grid-template-columns: 1fr; }
   .ms-total-card { min-height: 96px; }
@@ -473,10 +481,6 @@
 @media (max-width: 760px) {
   #marketSignalBar.market-signal-bar { margin: 10px 0 8px; }
   .market-signal-shell { padding: 10px; border-radius: 18px; }
-  .ms-overview-panel { flex-direction: column; }
-  .ms-date-caption { writing-mode: initial; transform: none; }
-  .ms-date-card { justify-content: space-between; }
-  .ms-date-stack { flex-direction: row; align-items: baseline; gap: 6px; }
   .ms-group { min-width: 100%; }
   .ms-indicator-card { max-width: none; }
 }
@@ -734,35 +738,5 @@
   }
   .signal-settings-grid {
     grid-template-columns: 1fr;
-  }
-}
-/* =====================================================
-   날짜 / 종합 신호 카드 반응형 배치
-   넓을 때: 좌우
-   좁을 때: 위아래
-   ===================================================== */
-
-/* 화면 전체가 아니라 Market Signal의 실제 사용 가능 너비를 기준으로 판단 */
-.market-signal-shell {
-  container-type: inline-size;
-  container-name: market-signal;
-}
-
-/* 사이드바가 열리거나 콘텐츠 영역이 좁아진 경우 */
-@container market-signal (max-width: 1450px) {
-  .ms-overview-panel {
-    flex-direction: column;
-  }
-
-  .ms-date-card,
-  .ms-total-card {
-    width: 100%;
-  }
-
-  /* ms-compact 상태에서는 display:grid가 적용되어 있으므로 별도 처리 */
-  #marketSignalBar.ms-compact .ms-overview-panel {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto;
-    min-width: 0;
   }
 }
