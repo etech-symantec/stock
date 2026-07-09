@@ -1315,7 +1315,7 @@ function gnewsRenderItem(item) {
   const d = item.pubDate ? new Date(item.pubDate) : null;
   const dateStr = (d && !isNaN(d)) ? `${d.getMonth() + 1}/${d.getDate()}` : '';
   return `<a class="gnews-item" href="${item.link}" target="_blank" rel="noopener noreferrer">
-    <span class="gnews-tag">${gnewsEscapeHtml(gnewsNormalizeSymbol(item.symbol))}</span>
+    <span class="gnews-tag">${gnewsEscapeHtml(gnewsLabelFor(item.symbol, gnewsIsDomestic(item.symbol)))}</span>
     <span class="gnews-title">${gnewsEscapeHtml(item.title)}</span>
     <span class="gnews-meta">${gnewsEscapeHtml(item.source)}${dateStr ? ' · ' + dateStr : ''}</span>
   </a>`;
@@ -1323,7 +1323,7 @@ function gnewsRenderItem(item) {
 
 function gnewsRenderFallbackLinks(pairs) {
   return pairs.map(({ symbol, query }) => `<a class="gnews-item gnews-fallback" href="https://news.google.com/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko" target="_blank" rel="noopener noreferrer">
-    <span class="gnews-tag">${gnewsEscapeHtml(gnewsNormalizeSymbol(symbol))}</span>
+    <span class="gnews-tag">${gnewsEscapeHtml(gnewsLabelFor(symbol, gnewsIsDomestic(symbol)))}</span>
     <span class="gnews-title">${gnewsEscapeHtml(query)} 관련 뉴스 구글에서 보기</span>
   </a>`).join('');
 }
