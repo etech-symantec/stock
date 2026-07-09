@@ -280,6 +280,11 @@
   .gnews-section { margin: 0 0 8px; }
   .gnews-section-header { display: flex; align-items: center; gap: 12px; }
   .gnews-section-header .section-title { flex: 1; margin: 24px 0 14px; }
+  .gnews-range-badge {
+    font-family: var(--font-num); font-size: 10px; font-weight: 600; letter-spacing: 0.3px;
+    color: var(--info); background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2);
+    padding: 3px 9px; border-radius: 20px; text-transform: none; white-space: nowrap;
+  }
   .gnews-settings-btn {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
     width: 30px; height: 30px; margin: 20px 0 10px; border-radius: 8px;
@@ -309,7 +314,13 @@
     background: var(--card); border: 1px solid var(--border); border-radius: 8px;
     padding: 4px 6px; cursor: pointer;
   }
-  .gnews-settings-group-block { display: flex; flex-direction: column; gap: 16px; }
+  .gnews-settings-group-block {
+    display: flex; flex-direction: column; gap: 16px;
+    background: var(--panel); border: 1px solid var(--border); border-top: 3px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .gnews-settings-group-block[data-block="kr"] { border-top-color: #ef4444; }
+  .gnews-settings-group-block[data-block="us"] { border-top-color: #3b82f6; }
   .gnews-settings-block-title { font-family: var(--font-num); font-size: 12px; font-weight: 800; letter-spacing: 1px; color: var(--txt2); }
   .gnews-settings-group-title {
     display: flex; align-items: center; justify-content: space-between;
@@ -376,6 +387,7 @@
     <div class="gnews-section-header">
       <p class="section-title section-title--with-date">
         📰 관심 종목 뉴스
+        <span class="gnews-range-badge" id="gnews-range-badge">—</span>
         <span class="section-title-line"></span>
         <span class="section-title-date"><span class="date-val" id="gnews-updated">—</span></span>
       </p>
@@ -1580,6 +1592,8 @@ async function loadGoogleNewsList() {
     const now = new Date();
     updatedEl.textContent = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} 기준`;
   }
+  const rangeBadgeEl = document.getElementById('gnews-range-badge');
+  if (rangeBadgeEl) rangeBadgeEl.textContent = `최근 ${gnewsLoadMaxAgeHours()}시간 기준`;
 
   if (items.length === 0) {
     if (hadAnyResults) {
