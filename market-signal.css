@@ -736,3 +736,33 @@
     grid-template-columns: 1fr;
   }
 }
+/* =====================================================
+   날짜 / 종합 신호 카드 반응형 배치
+   넓을 때: 좌우
+   좁을 때: 위아래
+   ===================================================== */
+
+/* 화면 전체가 아니라 Market Signal의 실제 사용 가능 너비를 기준으로 판단 */
+.market-signal-shell {
+  container-type: inline-size;
+  container-name: market-signal;
+}
+
+/* 사이드바가 열리거나 콘텐츠 영역이 좁아진 경우 */
+@container market-signal (max-width: 1450px) {
+  .ms-overview-panel {
+    flex-direction: column;
+  }
+
+  .ms-date-card,
+  .ms-total-card {
+    width: 100%;
+  }
+
+  /* ms-compact 상태에서는 display:grid가 적용되어 있으므로 별도 처리 */
+  #marketSignalBar.ms-compact .ms-overview-panel {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto;
+    min-width: 0;
+  }
+}
