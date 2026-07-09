@@ -278,11 +278,50 @@
 
   /* ── 📰 관심 종목 구글 뉴스 리스트 (test4.html에 등록된 종목 기준) ── */
   .gnews-section { margin: 0 0 8px; }
-  .gnews-list { display: flex; flex-direction: column; gap: 8px; }
+  .gnews-section-header { display: flex; align-items: center; gap: 12px; }
+  .gnews-section-header .section-title { flex: 1; margin: 24px 0 14px; }
+  .gnews-settings-btn {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; margin: 20px 0 10px; border-radius: 8px;
+    background: var(--panel); border: 1px solid var(--border); color: var(--txt2);
+    font-size: 15px; cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+  }
+  .gnews-settings-btn:hover { color: var(--info); border-color: var(--info); background: rgba(37,99,235,0.08); }
+  .gnews-settings-panel {
+    display: none; margin: 0 0 16px; padding: 16px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 12px;
+  }
+  .gnews-settings-panel.open { display: block; }
+  .gnews-settings-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .gnews-settings-groups { grid-template-columns: 1fr; } }
+  .gnews-settings-group-title {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-num); font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    color: var(--txt3); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .gnews-settings-group-title button {
+    font-family: var(--font-num); font-size: 10px; font-weight: 600; color: var(--info);
+    background: none; border: none; cursor: pointer; padding: 2px 4px;
+  }
+  .gnews-settings-checkbox-row {
+    display: flex; align-items: center; gap: 8px; padding: 6px 2px; font-size: 12.5px; color: var(--txt3);
+  }
+  .gnews-settings-checkbox-row input { accent-color: var(--info); width: 14px; height: 14px; cursor: pointer; }
+  .gnews-settings-checkbox-row label { cursor: pointer; user-select: none; }
+  .gnews-settings-empty { font-size: 12px; color: var(--txt2); padding: 4px 2px; }
+  .gnews-settings-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .gnews-settings-actions button {
+    font-family: var(--font-num); font-size: 12px; font-weight: 600; padding: 7px 16px;
+    border-radius: 8px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--txt3);
+  }
+  .gnews-settings-actions .gnews-apply-btn { background: var(--info); border-color: var(--info); color: #fff; }
+  .gnews-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+  @media (max-width: 640px) { .gnews-list { grid-template-columns: 1fr; } }
   .gnews-item {
     display: flex; align-items: center; gap: 12px; padding: 11px 16px;
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     text-decoration: none; color: inherit; transition: border-color .15s, transform .15s;
+    min-width: 0;
   }
   .gnews-item:hover { border-color: var(--info); transform: translateX(2px); }
   .gnews-tag {
@@ -292,7 +331,7 @@
   }
   .gnews-title { flex: 1; min-width: 0; font-size: 13px; color: var(--txt3); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .gnews-meta { flex: 0 0 auto; font-family: var(--font-num); font-size: 10px; color: var(--txt2); white-space: nowrap; }
-  .gnews-loading, .gnews-empty { padding: 18px; text-align: center; font-size: 12px; color: var(--txt2); background: var(--panel); border-radius: 10px; border: 1px dashed var(--border); }
+  .gnews-loading, .gnews-empty { grid-column: 1 / -1; padding: 18px; text-align: center; font-size: 12px; color: var(--txt2); background: var(--panel); border-radius: 10px; border: 1px dashed var(--border); }
   .gnews-fallback .gnews-title { color: var(--info); }
   @media (max-width: 640px) {
     .gnews-item { flex-wrap: wrap; }
@@ -306,13 +345,23 @@
 <body>
 <div id="spark-tooltip" class="spark-tooltip"></div>
 <div class="wrapper">
-  <!-- 📰 관심 종목 구글 뉴스 리스트 (test4.html에 등록된 종목 기준, 최대 10개) -->
+  <!-- 📰 관심 종목 구글 뉴스 리스트 (test4.html에 등록된 종목 기준, 최대 20개 · 2열) -->
   <div class="gnews-section fade-up" id="gnews-section">
-    <p class="section-title section-title--with-date" style="margin: 24px 0 14px;">
-      📰 관심 종목 뉴스
-      <span class="section-title-line"></span>
-      <span class="section-title-date"><span class="date-val" id="gnews-updated">—</span></span>
-    </p>
+    <div class="gnews-section-header">
+      <p class="section-title section-title--with-date">
+        📰 관심 종목 뉴스
+        <span class="section-title-line"></span>
+        <span class="section-title-date"><span class="date-val" id="gnews-updated">—</span></span>
+      </p>
+      <button type="button" class="gnews-settings-btn" id="gnews-settings-btn" title="뉴스 종목 설정" aria-label="뉴스 종목 설정">⚙️</button>
+    </div>
+    <div class="gnews-settings-panel" id="gnews-settings-panel">
+      <div class="gnews-settings-groups" id="gnews-settings-groups"></div>
+      <div class="gnews-settings-actions">
+        <button type="button" id="gnews-settings-cancel">취소</button>
+        <button type="button" class="gnews-apply-btn" id="gnews-settings-apply">적용</button>
+      </div>
+    </div>
     <div class="gnews-list" id="gnews-list">
       <div class="gnews-loading">뉴스를 불러오는 중...</div>
     </div>
@@ -1031,15 +1080,21 @@ function renderHistory(rows) {
 /* ────────────────────────────────────────────────────────────
    📰 관심 종목 구글 뉴스 리스트
    - test4.html(메인 대시보드)에 등록된 종목(state.tickers)을 그대로 가져와
-     각 종목 이름으로 구글 뉴스를 검색하고, 최신순으로 최대 10개만 보여줍니다.
+     각 종목 이름으로 구글 뉴스를 검색하고, 최신순으로 최대 20개(2열)로 보여줍니다.
+   - 우측 상단 ⚙️ 버튼으로 국장/미장 종목 중 보고 싶은 것만 선택할 수 있고,
+     선택 결과는 localStorage에 저장되어 다음에 열어도 그대로 유지됩니다.
    - moonlight.html은 test4.html 안에서 Shadow DOM 스크립트로 실행되기 때문에
-     app.js가 만든 전역 변수 state / localStockDB / fetchWithProxy를
+     app.js가 만든 전역 변수 state / localStockDB / isKorean을
      그대로 함께 사용할 수 있습니다(같은 창, 같은 스코프에서 실행됨).
-   - 구글 뉴스 RSS는 브라우저에서 직접 fetch하면 CORS로 막히므로,
-     app.js가 이미 쓰고 있는 /api/proxy 프록시를 통해 요청합니다.
-     혹시 프록시가 news.google.com 도메인을 막아 두었거나 실패하면,
-     각 종목별로 "구글 뉴스에서 검색" 링크만 보여주는 방식으로 자동 대체됩니다.
+   - 구글 뉴스는 같은 도메인의 /api/news(서버리스 함수)를 통해 가져옵니다.
+     (브라우저에서 news.google.com을 직접 fetch하면 CORS로 막히기 때문)
+     혹시 /api/news가 아직 배포되지 않았거나 실패하면, 콘솔에 불필요한 에러를
+     남기지 않고 조용히 "구글 뉴스에서 검색" 링크로 자동 대체됩니다.
 ──────────────────────────────────────────────────────────── */
+
+const GNEWS_MAX_TOTAL = 20;
+const GNEWS_MAX_PER_SYMBOL = 4;
+const GNEWS_DESELECT_KEY = 'gnews_deselected_symbols_v1';
 
 // 등록된 종목 티커 목록 가져오기 (state가 없으면 localStorage에서 직접 복구 시도)
 function gnewsGetRegisteredTickers() {
@@ -1064,6 +1119,16 @@ function gnewsNormalizeSymbol(sym) {
   return String(sym).replace(/\.KS\.DLST|\.KQ\.DLST|\.DLST|\.KS|\.KQ/gi, '');
 }
 
+// 국장(국내)/미장(해외) 구분. app.js의 isKorean()이 있으면 그대로 재사용하고,
+// 없으면(예: 단독 실행) 유사한 규칙으로 대체 판별합니다.
+function gnewsIsDomestic(symbol) {
+  try {
+    if (typeof isKorean === 'function') return isKorean(symbol);
+  } catch (e) {}
+  const s = String(symbol).replace('.KS.DLST', '.KS').replace('.DLST', '');
+  return s.endsWith('.KS') || s.endsWith('.KQ') || /^[0-9]{4,6}[0-9A-Za-z]{0,2}$/.test(gnewsNormalizeSymbol(s));
+}
+
 // localStockDB(종목명 데이터)가 아직 비동기로 로딩 중일 수 있으므로,
 // 최대 3초까지 로딩을 기다렸다가 뉴스 검색어를 만듭니다.
 // (이걸 안 하면 "삼성전자" 대신 "005930" 같은 코드로 검색되어 결과가 부실해집니다)
@@ -1083,7 +1148,7 @@ function gnewsWaitForStockDB(timeoutMs = 3000) {
 }
 
 // 티커 -> 뉴스 검색에 쓸 이름 (localStockDB에서 회사명을 찾고, 없으면 꼬리표만 제거)
-// 예: "005930.KS" -> "삼성전자", 바코드가 "035900"처럼 접미사 없이 저장돼 있어도
+// 예: "005930.KS" -> "삼성전자", 코드가 "035900"처럼 접미사 없이 저장돼 있어도
 // 정규화(normalize) 후 비교하기 때문에 매칭됩니다.
 function gnewsQueryFor(symbol) {
   try {
@@ -1102,51 +1167,132 @@ function gnewsEscapeHtml(str) {
   return div.innerHTML;
 }
 
-// 구글 뉴스를 가져와 파싱 (실패 시 빈 배열 반환)
-// 1순위: 같은 도메인의 /api/news (서버리스 함수) — CORS 문제가 없어 가장 안정적입니다.
-//        ※ 이 기능을 쓰려면 프로젝트에 api/news.js 파일을 추가/배포해야 합니다.
-// 2순위: rss2json 공개 서비스 — /api/news를 아직 배포하지 않았거나 실패했을 때의 임시 대안.
-//        (무료 요청 한도가 낮아 종목이 많으면 실패할 수 있습니다)
+// ── 뉴스에서 보고 싶은 종목만 선택하는 기능 (설정은 "제외 목록" 방식으로 저장) ──
+// 저장된 적 없는 새 종목은 기본적으로 "선택됨"으로 취급되어, 종목을 새로 등록해도
+// 자동으로 뉴스 목록에 포함됩니다.
+function gnewsLoadDeselected() {
+  try {
+    const raw = localStorage.getItem(GNEWS_DESELECT_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch (e) {}
+  return new Set();
+}
+
+function gnewsSaveDeselected(set) {
+  try { localStorage.setItem(GNEWS_DESELECT_KEY, JSON.stringify(Array.from(set))); } catch (e) {}
+}
+
+function gnewsBuildSettingsPanel() {
+  const wrap = document.getElementById('gnews-settings-groups');
+  if (!wrap) return;
+
+  const tickers = gnewsGetRegisteredTickers();
+  const deselected = gnewsLoadDeselected();
+
+  const domestic = tickers.filter(t => gnewsIsDomestic(t));
+  const overseas = tickers.filter(t => !gnewsIsDomestic(t));
+
+  const renderGroup = (title, groupId, list) => {
+    const rows = list.length
+      ? list.map(sym => {
+          const checked = !deselected.has(sym) ? 'checked' : '';
+          const label = gnewsQueryFor(sym);
+          const safeId = `gnews-chk-${groupId}-${gnewsEscapeHtml(sym).replace(/[^a-zA-Z0-9]/g, '_')}`;
+          return `<div class="gnews-settings-checkbox-row">
+            <input type="checkbox" id="${safeId}" data-symbol="${gnewsEscapeHtml(sym)}" data-group="${groupId}" ${checked}>
+            <label for="${safeId}">${gnewsEscapeHtml(label)}</label>
+          </div>`;
+        }).join('')
+      : '<div class="gnews-settings-empty">등록된 종목이 없습니다.</div>';
+
+    return `<div class="gnews-settings-group" data-group-block="${groupId}">
+      <div class="gnews-settings-group-title">
+        <span>${title}</span>
+        <button type="button" data-select-all="${groupId}">전체선택</button>
+      </div>
+      ${rows}
+    </div>`;
+  };
+
+  wrap.innerHTML = renderGroup('🇰🇷 국장', 'kr', domestic) + renderGroup('🇺🇸 미장', 'us', overseas);
+
+  // 그룹별 "전체선택" 버튼: 이미 전부 체크돼 있으면 전체 해제, 아니면 전체 체크(토글)
+  wrap.querySelectorAll('[data-select-all]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const groupId = btn.getAttribute('data-select-all');
+      const boxes = wrap.querySelectorAll(`input[data-group="${groupId}"]`);
+      const allChecked = Array.from(boxes).every(b => b.checked);
+      boxes.forEach(b => { b.checked = !allChecked; });
+    });
+  });
+}
+
+function gnewsOpenSettingsPanel() {
+  gnewsBuildSettingsPanel();
+  const panel = document.getElementById('gnews-settings-panel');
+  if (panel) panel.classList.add('open');
+}
+
+function gnewsCloseSettingsPanel() {
+  const panel = document.getElementById('gnews-settings-panel');
+  if (panel) panel.classList.remove('open');
+}
+
+function gnewsApplySettingsPanel() {
+  const wrap = document.getElementById('gnews-settings-groups');
+  if (!wrap) return;
+  const deselected = new Set();
+  wrap.querySelectorAll('input[data-symbol]').forEach(box => {
+    if (!box.checked) deselected.add(box.getAttribute('data-symbol'));
+  });
+  gnewsSaveDeselected(deselected);
+  gnewsCloseSettingsPanel();
+  loadGoogleNewsList();
+}
+
+function gnewsBindSettingsHandlers() {
+  const settingsBtn = document.getElementById('gnews-settings-btn');
+  const cancelBtn = document.getElementById('gnews-settings-cancel');
+  const applyBtn = document.getElementById('gnews-settings-apply');
+
+  if (settingsBtn && !settingsBtn.dataset.bound) {
+    settingsBtn.dataset.bound = '1';
+    settingsBtn.addEventListener('click', () => {
+      const panel = document.getElementById('gnews-settings-panel');
+      if (panel && panel.classList.contains('open')) gnewsCloseSettingsPanel();
+      else gnewsOpenSettingsPanel();
+    });
+  }
+  if (cancelBtn && !cancelBtn.dataset.bound) {
+    cancelBtn.dataset.bound = '1';
+    cancelBtn.addEventListener('click', gnewsCloseSettingsPanel);
+  }
+  if (applyBtn && !applyBtn.dataset.bound) {
+    applyBtn.dataset.bound = '1';
+    applyBtn.addEventListener('click', gnewsApplySettingsPanel);
+  }
+}
+
+// 구글 뉴스를 /api/news(서버리스 함수)로 가져와 파싱합니다.
+// 실패하거나 결과가 없으면 조용히 빈 배열만 반환하고(콘솔에 별도 로그를 남기지 않음),
+// 호출 쪽(loadGoogleNewsList)에서 "구글 뉴스에서 검색" 링크로 자동 대체합니다.
 async function gnewsFetchForSymbol(symbol, query) {
   const searchTerm = query + ' 주식';
-
-  // 1순위: 자체 서버 엔드포인트
   try {
     const res = await fetch(`/api/news?q=${encodeURIComponent(searchTerm)}`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data && Array.isArray(data.items) && data.items.length) {
-        return data.items.slice(0, 3).map(it => ({
-          symbol,
-          title: it.title || '',
-          link: it.link || '#',
-          pubDate: it.pubDate || '',
-          source: it.source || query
-        }));
-      }
-    }
-  } catch (e) {}
-
-  // 2순위: rss2json (임시 대안)
-  try {
-    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(searchTerm)}&hl=ko&gl=KR&ceid=KR:ko`;
-    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-    const res = await fetch(apiUrl);
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.status === 'ok' && Array.isArray(data.items) && data.items.length) {
-        return data.items.slice(0, 3).map(it => {
-          const raw = it.title || '';
-          const idx = raw.lastIndexOf(' - ');
-          const title = idx > -1 ? raw.slice(0, idx) : raw;
-          const source = idx > -1 ? raw.slice(idx + 3) : query;
-          return { symbol, title, source, link: it.link || '#', pubDate: it.pubDate || '' };
-        });
-      }
-    }
-  } catch (e) {}
-
-  return [];
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!data || !Array.isArray(data.items) || !data.items.length) return [];
+    return data.items.slice(0, GNEWS_MAX_PER_SYMBOL).map(it => ({
+      symbol,
+      title: it.title || '',
+      link: it.link || '#',
+      pubDate: it.pubDate || '',
+      source: it.source || query
+    }));
+  } catch (e) {
+    return [];
+  }
 }
 
 function gnewsRenderItem(item) {
@@ -1170,9 +1316,18 @@ async function loadGoogleNewsList() {
   const container = document.getElementById('gnews-list');
   if (!container) return;
 
-  const tickers = gnewsGetRegisteredTickers();
-  if (tickers.length === 0) {
+  gnewsBindSettingsHandlers();
+
+  const allTickers = gnewsGetRegisteredTickers();
+  if (allTickers.length === 0) {
     container.innerHTML = '<div class="gnews-empty">등록된 종목이 없습니다. test4.html에서 종목을 먼저 추가해주세요.</div>';
+    return;
+  }
+
+  const deselected = gnewsLoadDeselected();
+  const tickers = allTickers.filter(sym => !deselected.has(sym));
+  if (tickers.length === 0) {
+    container.innerHTML = '<div class="gnews-empty">⚙️ 설정에서 뉴스를 보고 싶은 종목을 선택해주세요.</div>';
     return;
   }
 
@@ -1191,9 +1346,9 @@ async function loadGoogleNewsList() {
     return true;
   });
 
-  // 최신순 정렬 후 최대 10개
+  // 최신순 정렬 후 최대 20개(2열로 표시)
   items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-  items = items.slice(0, 10);
+  items = items.slice(0, GNEWS_MAX_TOTAL);
 
   const updatedEl = document.getElementById('gnews-updated');
   if (updatedEl) {
@@ -1202,8 +1357,8 @@ async function loadGoogleNewsList() {
   }
 
   if (items.length === 0) {
-    // 프록시가 news.google.com을 못 가져온 경우 등 → 검색 링크로 대체
-    container.innerHTML = gnewsRenderFallbackLinks(pairs.slice(0, 10));
+    // /api/news가 아직 배포되지 않았거나 결과가 없는 경우 → 검색 링크로 대체
+    container.innerHTML = gnewsRenderFallbackLinks(pairs.slice(0, GNEWS_MAX_TOTAL));
     return;
   }
 
