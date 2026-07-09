@@ -8419,3 +8419,61 @@ if (txPriceInput) {
         txPriceKorean.innerText = numberToKorean(integerPart);
     });
 }
+/* 종합 신호 카테고리의 실제 줄바꿈 상태 감지 */
+function updateMarketSignalRowLayout() {
+  const bar = document.getElementById('marketSignalBar');
+  const groupsWrap = bar?.querySelector('.ms-groups-wrap');
+
+  if (!bar || !groupsWrap || bar.offsetParent === null) return;
+
+  const visibleGroups = [...groupsWrap.querySelectorAll('.ms-group')]
+    .filter(group => getComputedStyle(group).display !== 'none');
+
+  if (visibleGroups.length < 2) {
+    bar.classList.remove('ms-two-rows');
+    return;
+  }
+
+  const firstTop = visibleGroups[0].getBoundingClientRect().top;
+
+  const isWrapped = visibleGroups.some(group =>
+    Math.abs(group.getBoundingClientRect().top - firstTop) > 3
+  );
+
+  bar.classList.toggle('ms-two-rows', isWrapped);
+}
+
+let marketSignalLayoutFrame = null;
+
+function scheduleMarketSignalRowLayout() {
+  cancelAnimationFrame(marketSignalLayoutFrame);
+
+  marketSignalLayoutFrame = requestAnimationFrame(() => {
+    updateMarketSignalRowLayout();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const groupsWrap = document.querySelector(
+    '#marketSignalBar .ms-groups-wrap'
+  );
+
+  if (!groupsWrap) return;
+
+  new ResizeObserver(scheduleMarketSignalRowLayout)
+    .observe(groupsWrap);
+
+  new MutationObserver(scheduleMarketSignalRowLayout)
+    .observe(groupsWrap, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+
+  window.addEventListener(
+    'resize',
+    scheduleMarketSignalRowLayout
+  );
+
+  scheduleMarketSignalRowLayout();
+});
