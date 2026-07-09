@@ -4972,7 +4972,7 @@ async function render() {
     if (_lob) _lob.classList.add('non-sticky');
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
-    if(msBar && msBar.getAttribute('data-loaded') && currentView === 'all') msBar.style.display = 'flex';
+    if(msBar && msBar.getAttribute('data-loaded') && currentView === 'all') msBar.style.display = 'block';
     else if(msBar) msBar.style.display = 'none';
     dash.style.display = 'flex';
     pChartRowWrap.style.display = 'flex'; container.style.display = 'block'; listOptions.style.display = 'flex'; divDash.style.display = 'none'; histDash.style.display = 'none'; 
