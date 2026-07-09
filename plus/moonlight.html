@@ -303,11 +303,12 @@
     font-family: var(--font-num); font-size: 10px; font-weight: 600; color: var(--info);
     background: none; border: none; cursor: pointer; padding: 2px 4px;
   }
+  .gnews-settings-checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 2px 10px; }
   .gnews-settings-checkbox-row {
-    display: flex; align-items: center; gap: 8px; padding: 6px 2px; font-size: 12.5px; color: var(--txt3);
+    display: flex; align-items: center; gap: 8px; padding: 6px 2px; font-size: 12.5px; color: var(--txt3); min-width: 0;
   }
-  .gnews-settings-checkbox-row input { accent-color: var(--info); width: 14px; height: 14px; cursor: pointer; }
-  .gnews-settings-checkbox-row label { cursor: pointer; user-select: none; }
+  .gnews-settings-checkbox-row input { accent-color: var(--info); width: 14px; height: 14px; cursor: pointer; flex: 0 0 auto; }
+  .gnews-settings-checkbox-row label { cursor: pointer; user-select: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
   .gnews-settings-empty { font-size: 12px; color: var(--txt2); padding: 4px 2px; }
   .gnews-settings-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
   .gnews-settings-actions button {
@@ -1182,6 +1183,18 @@ function gnewsSaveDeselected(set) {
   try { localStorage.setItem(GNEWS_DESELECT_KEY, JSON.stringify(Array.from(set))); } catch (e) {}
 }
 
+function gnewsLabelFor(symbol, isDomestic) {
+  const bare = gnewsNormalizeSymbol(symbol);
+  const name = gnewsQueryFor(symbol); // localStockDB에 있으면 회사명, 없으면 정규화된 코드 그대로
+
+  if (isDomestic) {
+    // 국장은 종목명만 표시 (이름을 못 찾으면 코드라도 표시)
+    return name;
+  }
+  // 미장은 "티커 · 종목명"으로 함께 표시 (이름을 못 찾으면 티커만)
+  return (name && name !== bare) ? `${bare} · ${name}` : bare;
+}
+
 function gnewsBuildSettingsPanel() {
   const wrap = document.getElementById('gnews-settings-groups');
   if (!wrap) return;
@@ -1192,13 +1205,13 @@ function gnewsBuildSettingsPanel() {
   const domestic = tickers.filter(t => gnewsIsDomestic(t));
   const overseas = tickers.filter(t => !gnewsIsDomestic(t));
 
-  const renderGroup = (title, groupId, list) => {
+  const renderGroup = (title, groupId, list, isDomestic) => {
     const rows = list.length
       ? list.map(sym => {
           const checked = !deselected.has(sym) ? 'checked' : '';
-          const label = gnewsQueryFor(sym);
+          const label = gnewsLabelFor(sym, isDomestic);
           const safeId = `gnews-chk-${groupId}-${gnewsEscapeHtml(sym).replace(/[^a-zA-Z0-9]/g, '_')}`;
-          return `<div class="gnews-settings-checkbox-row">
+          return `<div class="gnews-settings-checkbox-row" title="${gnewsEscapeHtml(label)}">
             <input type="checkbox" id="${safeId}" data-symbol="${gnewsEscapeHtml(sym)}" data-group="${groupId}" ${checked}>
             <label for="${safeId}">${gnewsEscapeHtml(label)}</label>
           </div>`;
@@ -1210,11 +1223,11 @@ function gnewsBuildSettingsPanel() {
         <span>${title}</span>
         <button type="button" data-select-all="${groupId}">전체선택</button>
       </div>
-      ${rows}
+      <div class="gnews-settings-checkbox-grid">${rows}</div>
     </div>`;
   };
 
-  wrap.innerHTML = renderGroup('🇰🇷 국장', 'kr', domestic) + renderGroup('🇺🇸 미장', 'us', overseas);
+  wrap.innerHTML = renderGroup('🇰🇷 국장', 'kr', domestic, true) + renderGroup('🇺🇸 미장', 'us', overseas, false);
 
   // 그룹별 "전체선택" 버튼: 이미 전부 체크돼 있으면 전체 해제, 아니면 전체 체크(토글)
   wrap.querySelectorAll('[data-select-all]').forEach(btn => {
@@ -1227,7 +1240,10 @@ function gnewsBuildSettingsPanel() {
   });
 }
 
-function gnewsOpenSettingsPanel() {
+async function gnewsOpenSettingsPanel() {
+  // 종목명 DB가 아직 로딩 중일 수 있으므로 먼저 기다렸다가 패널을 그립니다.
+  // (이걸 안 하면 국장 종목이 이름 대신 코드로 잠깐/계속 보일 수 있습니다)
+  await gnewsWaitForStockDB();
   gnewsBuildSettingsPanel();
   const panel = document.getElementById('gnews-settings-panel');
   if (panel) panel.classList.add('open');
