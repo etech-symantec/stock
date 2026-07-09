@@ -1127,9 +1127,24 @@ function gnewsIsDomestic(symbol) {
     if (typeof isKorean === 'function') return isKorean(symbol);
   } catch (e) {}
   const s = String(symbol).replace('.KS.DLST', '.KS').replace('.DLST', '');
+  if (/[가-힣]/.test(s)) return true; // 한글 이름으로 등록된 종목은 국장으로 간주
   return s.endsWith('.KS') || s.endsWith('.KQ') || /^[0-9]{4,6}[0-9A-Za-z]{0,2}$/.test(gnewsNormalizeSymbol(s));
 }
 
+// 📦 종목명 DB(/data/stocks.json)를 불러와 전역 localStockDB에 채웁니다.
+// symbol(예: "005930.KS"), name(예: "삼성전자"), exch 필드를 그대로 사용합니다.
+let localStockDB = [];
+async function loadLocalStockDB() {
+  try {
+    const res = await fetch(`/data/stocks.json?t=${new Date().getTime()}`);
+    if (!res.ok) throw new Error('stocks.json 로드 실패');
+    const data = await res.json();
+    if (Array.isArray(data)) localStockDB = data;
+  } catch (e) {
+    console.error('localStockDB 로드 실패:', e);
+  }
+}
+  
 // localStockDB(종목명 데이터)가 아직 비동기로 로딩 중일 수 있으므로,
 // 최대 3초까지 로딩을 기다렸다가 뉴스 검색어를 만듭니다.
 // (이걸 안 하면 "삼성전자" 대신 "005930" 같은 코드로 검색되어 결과가 부실해집니다)
@@ -1408,7 +1423,7 @@ async function init() {
   }
 }
 init();
-loadGoogleNewsList();
+loadLocalStockDB().then(loadGoogleNewsList);
 </script>
 </body>
 </html>
