@@ -294,6 +294,17 @@
   .gnews-settings-panel.open { display: block; }
   .gnews-settings-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
   @media (max-width: 640px) { .gnews-settings-groups { grid-template-columns: 1fr; } }
+  .gnews-settings-maxage {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 12px; margin-bottom: 16px; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .gnews-settings-maxage-label { font-size: 12px; font-weight: 700; color: var(--txt2); }
+  .gnews-settings-maxage select {
+    font-family: var(--font-num); font-size: 12px; font-weight: 700; color: var(--txt3);
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 5px 8px; cursor: pointer;
+  }
   .gnews-settings-group-block { display: flex; flex-direction: column; gap: 16px; }
   .gnews-settings-block-title { font-family: var(--font-num); font-size: 12px; font-weight: 800; letter-spacing: 1px; color: var(--txt2); }
   .gnews-settings-group-title {
@@ -360,6 +371,15 @@
       <button type="button" class="gnews-settings-btn" id="gnews-settings-btn" title="뉴스 종목 설정" aria-label="뉴스 종목 설정">⚙️</button>
     </div>
     <div class="gnews-settings-panel" id="gnews-settings-panel">
+      <div class="gnews-settings-maxage">
+        <span class="gnews-settings-maxage-label">뉴스 표시 기간</span>
+        <select id="gnews-settings-maxage-select">
+          <option value="1">1시간 이내</option>
+          <option value="6">6시간 이내</option>
+          <option value="12">12시간 이내</option>
+          <option value="24">24시간 이내</option>
+        </select>
+      </div>
       <div class="gnews-settings-groups" id="gnews-settings-groups"></div>
       <div class="gnews-settings-actions">
         <button type="button" id="gnews-settings-cancel">취소</button>
@@ -1098,7 +1118,22 @@ function renderHistory(rows) {
 
 const GNEWS_MAX_TOTAL = 20;
 const GNEWS_MAX_PER_SYMBOL = 4;
-const GNEWS_MAX_AGE_MS = 12 * 60 * 60 * 1000; // 12시간 이내 뉴스만 표시
+const GNEWS_MAXAGE_KEY = 'gnews_max_age_hours_v1';
+const GNEWS_MAXAGE_DEFAULT_HOURS = 12;
+
+// 사용자가 설정에서 고른 "뉴스 표시 기간"(시간 단위)을 읽고 저장합니다.
+function gnewsLoadMaxAgeHours() {
+  try {
+    const raw = localStorage.getItem(GNEWS_MAXAGE_KEY);
+    const n = parseInt(raw, 10);
+    if ([1, 6, 12, 24].includes(n)) return n;
+  } catch (e) {}
+  return GNEWS_MAXAGE_DEFAULT_HOURS;
+}
+
+function gnewsSaveMaxAgeHours(hours) {
+  try { localStorage.setItem(GNEWS_MAXAGE_KEY, String(hours)); } catch (e) {}
+}
 const GNEWS_DESELECT_KEY = 'gnews_deselected_symbols_v1';
 const GNEWS_INCLUDE_UNASSIGNED_KEY = 'gnews_include_unassigned_symbols_v1';
 
@@ -1360,6 +1395,8 @@ async function gnewsOpenSettingsPanel() {
   await gnewsLoadLocalStockDB();
   await gnewsWaitForStockDB();
   gnewsBuildSettingsPanel();
+  const maxAgeSelect = document.getElementById('gnews-settings-maxage-select');
+  if (maxAgeSelect) maxAgeSelect.value = String(gnewsLoadMaxAgeHours());
   const panel = document.getElementById('gnews-settings-panel');
   if (panel) panel.classList.add('open');
 }
@@ -1383,6 +1420,8 @@ function gnewsApplySettingsPanel() {
   });
   gnewsSaveDeselected(deselected);
   gnewsSaveIncludeUnassigned(includeUnassigned);
+  const maxAgeSelect = document.getElementById('gnews-settings-maxage-select');
+  if (maxAgeSelect) gnewsSaveMaxAgeHours(parseInt(maxAgeSelect.value, 10) || GNEWS_MAXAGE_DEFAULT_HOURS);
   gnewsCloseSettingsPanel();
   loadGoogleNewsList();
 }
@@ -1494,13 +1533,14 @@ async function loadGoogleNewsList() {
     return true;
   });
 
-  // 최대 12시간 이내에 발행된 뉴스만 표시 (발행 시각을 알 수 없는 뉴스는 제외)
+  // 사용자가 설정에서 고른 기간(기본 12시간) 이내에 발행된 뉴스만 표시 (발행 시각을 알 수 없는 뉴스는 제외)
   const nowTs = Date.now();
+  const maxAgeMs = gnewsLoadMaxAgeHours() * 60 * 60 * 1000;
   const hadAnyResults = items.length > 0;
   items = items.filter(it => {
     const t = it.pubDate ? new Date(it.pubDate).getTime() : NaN;
     if (isNaN(t)) return false;
-    return (nowTs - t) <= GNEWS_MAX_AGE_MS;
+    return (nowTs - t) <= maxAgeMs;
   });
 
   // 최신순 정렬 후 최대 20개(2열로 표시)
@@ -1515,8 +1555,8 @@ async function loadGoogleNewsList() {
 
   if (items.length === 0) {
     if (hadAnyResults) {
-      // 뉴스는 찾았지만 전부 12시간보다 오래된 경우 → 검색 링크 대신 안내 메시지만 표시
-      container.innerHTML = '<div class="gnews-empty">최근 12시간 이내에 등록된 뉴스가 없습니다.</div>';
+      // 뉴스는 찾았지만 전부 설정한 기간보다 오래된 경우 → 검색 링크 대신 안내 메시지만 표시
+      container.innerHTML = `<div class="gnews-empty">최근 ${gnewsLoadMaxAgeHours()}시간 이내에 등록된 뉴스가 없습니다.</div>`;
     } else {
       // /api/news가 아직 배포되지 않았거나 결과가 아예 없는 경우 → 검색 링크로 대체
       container.innerHTML = gnewsRenderFallbackLinks(pairs.slice(0, GNEWS_MAX_TOTAL));
