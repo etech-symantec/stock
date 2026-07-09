@@ -751,31 +751,6 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
     flex-wrap: nowrap;
     align-items: center;
   }
-  .nav-left {
-    gap: 10px;
-    flex: 1;
-    min-width: 0;
-  }
-  .logo img { width: 160px !important; }
-
-  /* 헤더 검색바 - 모바일에서 숨김 (메인 영역으로 이동) */
-  .header-search { display: none !important; }
-
-  /* 탭 메뉴 - 데스크탑 탭 숨김 */
-  .view-tabs { display: none !important; }
-
-  /* 우측 네비 - 테마 버튼만 */
-  .nav-right .sync-status { display: none; }
-
-  /* 햄버거 버튼 표시 */
-  .btn-mobile-menu { display: flex; }
-
-  /* 하단 탭바 표시 */
-  .mobile-bottom-bar { display: flex; }
-
-  /* 바디 하단 패딩 (탭바 높이만큼) */
-  body { padding-bottom: 64px; }
-
   /* 레이아웃 */
   .layout-wrapper { overflow: visible; }
   .dashboard-main { padding: 0 12px 0; overflow-y: auto; }
@@ -826,15 +801,6 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   /* 모달 */
   .modal { margin: 12px; max-width: calc(100% - 24px) !important; max-height: 85vh; overflow-y: auto; }
 
-  /* 모바일 검색바 (nav 아래 별도 영역) */
-  .mobile-search-bar {
-    display: flex !important;
-    gap: 6px;
-    padding: 8px 12px;
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-  }
-
   /* 계좌 파이 차트 축소 */
   .acc-pie-wrap { width: 60px; height: 60px; }
   .acc-bars { display: none; }
@@ -846,7 +812,19 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   align-items: center;
 }
 
-
+/* 네비바 전용 모바일 전환 — 더 넓은 화면에서 미리 전환 */
+@media (max-width: 1850px) {
+  nav { padding: 8px 12px; gap: 8px; flex-wrap: nowrap; align-items: center; }
+  .nav-left { gap: 10px; flex: 1; min-width: 0; }
+  .logo img { width: 160px !important; }
+  .header-search { display: none !important; }
+  .view-tabs { display: none !important; }
+  .nav-right .sync-status { display: none; }
+  .btn-mobile-menu { display: flex; }
+  .mobile-bottom-bar { display: flex; }
+  body { padding-bottom: 64px; }
+  .mobile-search-bar { display: flex !important; gap: 6px; padding: 8px 12px; background: var(--bg2); border-bottom: 1px solid var(--border); }
+}
 
 /* =====================================================
    🎓 튜토리얼 시스템 CSS
@@ -1659,7 +1637,7 @@ nav {
 }
 
 /* ── 모바일 (768px 이하) ── */
-@media (max-width: 768px) {
+@media (max-width: 1850px) {
   nav {
     padding: 0 12px !important;
     height: 52px !important;
