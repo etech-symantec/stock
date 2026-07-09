@@ -99,6 +99,11 @@
    ===================================================== */
 #marketSignalBar.market-signal-bar {
   display: none;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 0 auto;
+  align-self: stretch;
   margin: 14px 0 10px;
   position: relative;
   z-index: 5;
@@ -107,6 +112,10 @@
 .market-signal-shell {
   position: relative;
   display: grid;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   grid-template-columns: minmax(300px, max-content) minmax(0, 1fr);
   align-items: start;
   gap: 12px;
@@ -738,4 +747,12 @@
   .signal-settings-grid {
     grid-template-columns: 1fr;
   }
+}
+#marketSignalBar.market-signal-bar > .market-signal-shell {
+  flex: 1 1 auto;
+}
+
+#marketSignalBar .ms-groups-wrap {
+  width: 100%;
+  min-width: 0;
 }
