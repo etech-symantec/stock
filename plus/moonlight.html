@@ -1098,6 +1098,7 @@ function renderHistory(rows) {
 const GNEWS_MAX_TOTAL = 20;
 const GNEWS_MAX_PER_SYMBOL = 4;
 const GNEWS_DESELECT_KEY = 'gnews_deselected_symbols_v1';
+const GNEWS_INCLUDE_UNASSIGNED_KEY = 'gnews_include_unassigned_symbols_v1';
 
 // app.js가 만든 전역 state가 있으면 그대로, 없으면(단독 실행) localStorage에 저장된
 // 전체 state(JSON)를 직접 복구합니다. tickers뿐 아니라 transactions/owners까지
@@ -1231,7 +1232,9 @@ function gnewsEscapeHtml(str) {
 
 // ── 뉴스에서 보고 싶은 종목만 선택하는 기능 (설정은 "제외 목록" 방식으로 저장) ──
 // 저장된 적 없는 새 종목은 기본적으로 "선택됨"으로 취급되어, 종목을 새로 등록해도
-// 자동으로 뉴스 목록에 포함됩니다.
+// 자동으로 뉴스 목록에 포함됩니다. 단, "미분류"(소유자를 특정할 수 없는 종목)는
+// 예외적으로 기본값이 "미선택"이며, 사용자가 설정 패널에서 직접 체크해 적용해야
+// 뉴스 목록에 포함됩니다 (GNEWS_INCLUDE_UNASSIGNED_KEY로 opt-in 여부를 별도 기억).
 function gnewsLoadDeselected() {
   try {
     const raw = localStorage.getItem(GNEWS_DESELECT_KEY);
@@ -1242,6 +1245,23 @@ function gnewsLoadDeselected() {
 
 function gnewsSaveDeselected(set) {
   try { localStorage.setItem(GNEWS_DESELECT_KEY, JSON.stringify(Array.from(set))); } catch (e) {}
+}
+
+function gnewsLoadIncludeUnassigned() {
+  try {
+    const raw = localStorage.getItem(GNEWS_INCLUDE_UNASSIGNED_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch (e) {}
+  return new Set();
+}
+
+function gnewsSaveIncludeUnassigned(set) {
+  try { localStorage.setItem(GNEWS_INCLUDE_UNASSIGNED_KEY, JSON.stringify(Array.from(set))); } catch (e) {}
+}
+
+// 종목이 "미분류"(국장/미장 어느 소유자에게도 매칭되지 않는 종목)인지 여부
+function gnewsIsUnassigned(symbol) {
+  return gnewsOwnerGroupFor(symbol) === null;
 }
 
 function gnewsLabelFor(symbol, isDomestic) {
@@ -1283,14 +1303,21 @@ function gnewsBuildSettingsPanel() {
   const domesticByOwner = groupByOwner(domestic);
   const overseasByOwner = groupByOwner(overseas);
 
-  const renderGroup = (title, groupId, list, isDomestic) => {
+  const includeUnassigned = gnewsLoadIncludeUnassigned();
+
+  const renderGroup = (title, groupId, list, isDomestic, isUnassignedGroup) => {
     const rows = list.length
       ? list.map(sym => {
-          const checked = !deselected.has(sym) ? 'checked' : '';
+          // 미분류 종목은 기본값이 "미선택"이며, 사용자가 예전에 직접 포함시킨 적이
+          // 있어야(includeUnassigned) 체크된 상태로 보여줍니다.
+          const checked = isUnassignedGroup
+            ? (includeUnassigned.has(sym) && !deselected.has(sym) ? 'checked' : '')
+            : (!deselected.has(sym) ? 'checked' : '');
           const label = gnewsLabelFor(sym, isDomestic);
           const safeId = `gnews-chk-${groupId}-${gnewsEscapeHtml(sym).replace(/[^a-zA-Z0-9]/g, '_')}`;
+          const unassignedAttr = isUnassignedGroup ? 'data-unassigned="1"' : '';
           return `<div class="gnews-settings-checkbox-row" title="${gnewsEscapeHtml(label)}">
-            <input type="checkbox" id="${safeId}" data-symbol="${gnewsEscapeHtml(sym)}" data-group="${groupId}" ${checked}>
+            <input type="checkbox" id="${safeId}" data-symbol="${gnewsEscapeHtml(sym)}" data-group="${groupId}" ${unassignedAttr} ${checked}>
             <label for="${safeId}">${gnewsEscapeHtml(label)}</label>
           </div>`;
         }).join('')
@@ -1309,11 +1336,11 @@ function gnewsBuildSettingsPanel() {
   const renderMarketBlock = (blockTitle, blockId, isDomestic, byOwner) => {
     let html = `<div class="gnews-settings-group-block" data-block="${blockId}">`
       + `<div class="gnews-settings-block-title">${blockTitle}</div>`
-      + renderGroup(`${ownerMeta.user1.icon} ${ownerMeta.user1.name}`, `${blockId}-user1`, byOwner.user1, isDomestic)
-      + renderGroup(`${ownerMeta.user2.icon} ${ownerMeta.user2.name}`, `${blockId}-user2`, byOwner.user2, isDomestic)
-      + renderGroup('🤝 공통', `${blockId}-common`, byOwner.common, isDomestic);
+      + renderGroup(`${ownerMeta.user1.icon} ${ownerMeta.user1.name}`, `${blockId}-user1`, byOwner.user1, isDomestic, false)
+      + renderGroup(`${ownerMeta.user2.icon} ${ownerMeta.user2.name}`, `${blockId}-user2`, byOwner.user2, isDomestic, false)
+      + renderGroup('🤝 공통', `${blockId}-common`, byOwner.common, isDomestic, false);
     if (byOwner.unassigned.length) {
-      html += renderGroup('🗂️ 미분류', `${blockId}-unassigned`, byOwner.unassigned, isDomestic);
+      html += renderGroup('🗂️ 미분류', `${blockId}-unassigned`, byOwner.unassigned, isDomestic, true);
     }
     return html + '</div>';
   };
@@ -1351,10 +1378,16 @@ function gnewsApplySettingsPanel() {
   const wrap = document.getElementById('gnews-settings-groups');
   if (!wrap) return;
   const deselected = new Set();
+  const includeUnassigned = new Set();
   wrap.querySelectorAll('input[data-symbol]').forEach(box => {
-    if (!box.checked) deselected.add(box.getAttribute('data-symbol'));
+    const sym = box.getAttribute('data-symbol');
+    if (!box.checked) deselected.add(sym);
+    // 미분류 종목은 체크된 것만 "직접 포함시킨 종목"으로 별도 기억해둡니다.
+    // (다음에 설정 패널을 다시 열었을 때도 기본 미선택 규칙에 밀리지 않도록)
+    if (box.hasAttribute('data-unassigned') && box.checked) includeUnassigned.add(sym);
   });
   gnewsSaveDeselected(deselected);
+  gnewsSaveIncludeUnassigned(includeUnassigned);
   gnewsCloseSettingsPanel();
   loadGoogleNewsList();
 }
@@ -1434,7 +1467,14 @@ async function loadGoogleNewsList() {
   }
 
   const deselected = gnewsLoadDeselected();
-  const tickers = allTickers.filter(sym => !deselected.has(sym));
+  const includeUnassigned = gnewsLoadIncludeUnassigned();
+  const tickers = allTickers.filter(sym => {
+    if (deselected.has(sym)) return false;
+    // 미분류(소유자를 특정할 수 없는) 종목은 사용자가 설정에서 직접 포함시키지
+    // 않는 한 기본적으로 뉴스 목록에서 제외합니다.
+    if (gnewsIsUnassigned(sym) && !includeUnassigned.has(sym)) return false;
+    return true;
+  });
   if (tickers.length === 0) {
     container.innerHTML = '<div class="gnews-empty">⚙️ 설정에서 뉴스를 보고 싶은 종목을 선택해주세요.</div>';
     return;
