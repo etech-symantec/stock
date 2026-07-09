@@ -324,6 +324,7 @@
   .gnews-settings-checkbox-row label { cursor: pointer; user-select: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
   .gnews-settings-empty { font-size: 12px; color: var(--txt2); padding: 4px 2px; }
   .gnews-settings-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .gnews-settings-actions--top { margin-top: 0; margin-bottom: 16px; }
   .gnews-settings-actions button {
     font-family: var(--font-num); font-size: 12px; font-weight: 600; padding: 7px 16px;
     border-radius: 8px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--txt3);
@@ -371,6 +372,10 @@
       <button type="button" class="gnews-settings-btn" id="gnews-settings-btn" title="뉴스 종목 설정" aria-label="뉴스 종목 설정">⚙️</button>
     </div>
     <div class="gnews-settings-panel" id="gnews-settings-panel">
+      <div class="gnews-settings-actions gnews-settings-actions--top">
+        <button type="button" id="gnews-settings-cancel">취소</button>
+        <button type="button" class="gnews-apply-btn" id="gnews-settings-apply">적용</button>
+      </div>
       <div class="gnews-settings-maxage">
         <span class="gnews-settings-maxage-label">뉴스 표시 기간</span>
         <select id="gnews-settings-maxage-select">
@@ -381,10 +386,6 @@
         </select>
       </div>
       <div class="gnews-settings-groups" id="gnews-settings-groups"></div>
-      <div class="gnews-settings-actions">
-        <button type="button" id="gnews-settings-cancel">취소</button>
-        <button type="button" class="gnews-apply-btn" id="gnews-settings-apply">적용</button>
-      </div>
     </div>
     <div class="gnews-list" id="gnews-list">
       <div class="gnews-loading">뉴스를 불러오는 중...</div>
@@ -1447,6 +1448,14 @@ function gnewsBindSettingsHandlers() {
     applyBtn.dataset.bound = '1';
     applyBtn.addEventListener('click', gnewsApplySettingsPanel);
   }
+  const maxAgeSelect = document.getElementById('gnews-settings-maxage-select');
+  if (maxAgeSelect && !maxAgeSelect.dataset.bound) {
+    maxAgeSelect.dataset.bound = '1';
+    maxAgeSelect.addEventListener('change', () => {
+      gnewsSaveMaxAgeHours(parseInt(maxAgeSelect.value, 10) || GNEWS_MAXAGE_DEFAULT_HOURS);
+      loadGoogleNewsList();
+    });
+  }
 }
 
 // 구글 뉴스를 /api/news(서버리스 함수)로 가져와 파싱합니다.
@@ -1464,7 +1473,7 @@ async function gnewsFetchForSymbol(symbol, query) {
       title: it.title || '',
       link: it.link || '#',
       pubDate: it.pubDate || '',
-      source: it.source || query
+      source: it.source || ''
     }));
   } catch (e) {
     return [];
@@ -1475,10 +1484,14 @@ function gnewsRenderItem(item) {
   const d = item.pubDate ? new Date(item.pubDate) : null;
   const dateStr = (d && !isNaN(d)) ? `${d.getMonth() + 1}/${d.getDate()}` : '';
   const isDomestic = gnewsIsDomestic(item.symbol);
+  // 오른쪽 메타 영역에는 매체명만 표시합니다 (종목명은 이미 왼쪽 태그에 있으므로 중복 방지).
+  const metaParts = [];
+  if (item.source) metaParts.push(gnewsEscapeHtml(item.source));
+  if (dateStr) metaParts.push(dateStr);
   return `<a class="gnews-item" href="${item.link}" target="_blank" rel="noopener noreferrer">
     <span class="gnews-tag ${isDomestic ? 'gnews-tag-kr' : 'gnews-tag-us'}">${gnewsEscapeHtml(gnewsLabelFor(item.symbol, isDomestic))}</span>
     <span class="gnews-title">${gnewsEscapeHtml(item.title)}</span>
-    <span class="gnews-meta">${gnewsEscapeHtml(item.source)}${dateStr ? ' · ' + dateStr : ''}</span>
+    <span class="gnews-meta">${metaParts.join(' · ')}</span>
   </a>`;
 }
 
