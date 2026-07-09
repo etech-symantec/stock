@@ -467,12 +467,6 @@
   background: linear-gradient(to right, #ff2255 0%, #ff4d6a 16%, #ff9f43 36%, #ffb703 52%, #34d399 78%, #00c87a 100%);
 }
 
-@container ms-shell (min-width: 560px) {
-  .ms-overview-panel { flex-direction: row; align-items: stretch; }
-  .ms-date-caption { writing-mode: vertical-rl; transform: rotate(180deg); }
-  .ms-date-stack { flex-direction: column; align-items: flex-end; gap: 1px; }
-}
-
 @media (max-width: 1240px) {
   .market-signal-shell { grid-template-columns: 1fr; }
   .ms-total-card { min-height: 96px; }
@@ -485,6 +479,11 @@
   .ms-indicator-card { max-width: none; }
 }
 
+@container ms-shell (min-width: 560px) {
+  .ms-overview-panel { flex-direction: row; align-items: stretch; }
+  .ms-date-caption { writing-mode: vertical-rl; transform: rotate(180deg); }
+  .ms-date-stack { flex-direction: column; align-items: flex-end; gap: 1px; }
+}
 
 /* =====================================================
    📡 Market Signal 표시 설정 + 자동 컴팩트 레이아웃
