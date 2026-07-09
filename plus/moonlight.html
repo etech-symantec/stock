@@ -294,16 +294,20 @@
   .gnews-settings-panel.open { display: block; }
   .gnews-settings-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
   @media (max-width: 640px) { .gnews-settings-groups { grid-template-columns: 1fr; } }
-  .gnews-settings-maxage {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 10px 12px; margin-bottom: 16px; background: var(--panel); border: 1px solid var(--border);
-    border-radius: 10px;
+  .gnews-settings-top-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 16px; flex-wrap: wrap;
   }
-  .gnews-settings-maxage-label { font-size: 12px; font-weight: 700; color: var(--txt2); }
+  .gnews-settings-maxage {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; flex: 0 0 auto;
+  }
+  .gnews-settings-maxage-label { font-size: 11.5px; font-weight: 700; color: var(--txt2); white-space: nowrap; }
   .gnews-settings-maxage select {
-    font-family: var(--font-num); font-size: 12px; font-weight: 700; color: var(--txt3);
+    font-family: var(--font-num); font-size: 11.5px; font-weight: 700; color: var(--txt3);
     background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-    padding: 5px 8px; cursor: pointer;
+    padding: 4px 6px; cursor: pointer;
   }
   .gnews-settings-group-block { display: flex; flex-direction: column; gap: 16px; }
   .gnews-settings-block-title { font-family: var(--font-num); font-size: 12px; font-weight: 800; letter-spacing: 1px; color: var(--txt2); }
@@ -324,7 +328,7 @@
   .gnews-settings-checkbox-row label { cursor: pointer; user-select: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
   .gnews-settings-empty { font-size: 12px; color: var(--txt2); padding: 4px 2px; }
   .gnews-settings-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-  .gnews-settings-actions--top { margin-top: 0; margin-bottom: 16px; }
+  .gnews-settings-actions--top { margin: 0; flex: 0 0 auto; }
   .gnews-settings-actions button {
     font-family: var(--font-num); font-size: 12px; font-weight: 600; padding: 7px 16px;
     border-radius: 8px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--txt3);
@@ -333,7 +337,8 @@
   .gnews-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
   @media (max-width: 640px) { .gnews-list { grid-template-columns: 1fr; } }
   .gnews-item {
-    display: flex; align-items: center; gap: 12px; padding: 11px 16px;
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: 12px;
+    padding: 11px 16px;
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     text-decoration: none; color: inherit; transition: border-color .15s, transform .15s;
     min-width: 0;
@@ -345,13 +350,18 @@
   }
   .gnews-tag-kr { color: #ef4444; background: rgba(239,68,68,0.12); }
   .gnews-tag-us { color: #3b82f6; background: rgba(59,130,246,0.12); }
-  .gnews-title { flex: 1; min-width: 0; font-size: 13px; color: var(--txt3); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .gnews-meta { flex: 0 0 auto; font-family: var(--font-num); font-size: 10px; color: var(--txt2); white-space: nowrap; }
+  .gnews-title { min-width: 0; font-size: 13px; color: var(--txt3); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gnews-meta {
+    flex: 0 0 auto; font-family: var(--font-num); font-size: 10px; color: var(--txt2); white-space: nowrap;
+    text-align: right; padding-left: 12px; border-left: 1px solid var(--border);
+  }
+  .gnews-meta-source { color: var(--txt3); font-weight: 600; margin-right: 6px; }
   .gnews-loading, .gnews-empty { grid-column: 1 / -1; padding: 18px; text-align: center; font-size: 12px; color: var(--txt2); background: var(--panel); border-radius: 10px; border: 1px dashed var(--border); }
   .gnews-fallback .gnews-title { color: var(--info); }
   @media (max-width: 640px) {
-    .gnews-item { flex-wrap: wrap; }
+    .gnews-item { grid-template-columns: auto 1fr; row-gap: 6px; }
     .gnews-title { white-space: normal; }
+    .gnews-meta { grid-column: 1 / -1; border-left: none; padding-left: 0; text-align: right; }
   }
 
   .fade-up { opacity: 0; transform: translateY(16px); animation: fadeUp .6s ease forwards; }
@@ -372,18 +382,20 @@
       <button type="button" class="gnews-settings-btn" id="gnews-settings-btn" title="뉴스 종목 설정" aria-label="뉴스 종목 설정">⚙️</button>
     </div>
     <div class="gnews-settings-panel" id="gnews-settings-panel">
-      <div class="gnews-settings-actions gnews-settings-actions--top">
-        <button type="button" id="gnews-settings-cancel">취소</button>
-        <button type="button" class="gnews-apply-btn" id="gnews-settings-apply">적용</button>
-      </div>
-      <div class="gnews-settings-maxage">
-        <span class="gnews-settings-maxage-label">뉴스 표시 기간</span>
-        <select id="gnews-settings-maxage-select">
-          <option value="1">1시간 이내</option>
-          <option value="6">6시간 이내</option>
-          <option value="12">12시간 이내</option>
-          <option value="24">24시간 이내</option>
-        </select>
+      <div class="gnews-settings-top-row">
+        <div class="gnews-settings-maxage">
+          <span class="gnews-settings-maxage-label">뉴스 표시 기간</span>
+          <select id="gnews-settings-maxage-select">
+            <option value="1">1시간 이내</option>
+            <option value="6">6시간 이내</option>
+            <option value="12">12시간 이내</option>
+            <option value="24">24시간 이내</option>
+          </select>
+        </div>
+        <div class="gnews-settings-actions gnews-settings-actions--top">
+          <button type="button" id="gnews-settings-cancel">취소</button>
+          <button type="button" class="gnews-apply-btn" id="gnews-settings-apply">적용</button>
+        </div>
       </div>
       <div class="gnews-settings-groups" id="gnews-settings-groups"></div>
     </div>
@@ -1482,16 +1494,19 @@ async function gnewsFetchForSymbol(symbol, query) {
 
 function gnewsRenderItem(item) {
   const d = item.pubDate ? new Date(item.pubDate) : null;
-  const dateStr = (d && !isNaN(d)) ? `${d.getMonth() + 1}/${d.getDate()}` : '';
+  const dateTimeStr = (d && !isNaN(d))
+    ? `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+    : '';
   const isDomestic = gnewsIsDomestic(item.symbol);
-  // 오른쪽 메타 영역에는 매체명만 표시합니다 (종목명은 이미 왼쪽 태그에 있으므로 중복 방지).
-  const metaParts = [];
-  if (item.source) metaParts.push(gnewsEscapeHtml(item.source));
-  if (dateStr) metaParts.push(dateStr);
+  // 매체명은 제목 옆이 아니라 별도 컬럼으로 완전히 분리해 우측 끝에 표시하고, 날짜와 시간도 함께 보여줍니다.
+  const metaHtml = [
+    item.source ? `<span class="gnews-meta-source">${gnewsEscapeHtml(item.source)}</span>` : '',
+    dateTimeStr
+  ].filter(Boolean).join('');
   return `<a class="gnews-item" href="${item.link}" target="_blank" rel="noopener noreferrer">
     <span class="gnews-tag ${isDomestic ? 'gnews-tag-kr' : 'gnews-tag-us'}">${gnewsEscapeHtml(gnewsLabelFor(item.symbol, isDomestic))}</span>
     <span class="gnews-title">${gnewsEscapeHtml(item.title)}</span>
-    <span class="gnews-meta">${metaParts.join(' · ')}</span>
+    <span class="gnews-meta">${metaHtml}</span>
   </a>`;
 }
 
