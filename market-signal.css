@@ -107,7 +107,8 @@
 .market-signal-shell {
   position: relative;
   display: grid;
-  grid-template-columns: 178px minmax(0, 1fr);
+  grid-template-columns: minmax(300px, max-content) minmax(0, 1fr);
+  align-items: start;
   gap: 12px;
   padding: 12px;
   border: 1px solid rgba(124,106,247,0.22);
@@ -139,8 +140,9 @@
 .ms-date-card { position: relative; z-index: 1; }
 
 .ms-overview-panel {
-  display: grid;
-  grid-template-rows: auto 1fr;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   gap: 10px;
   min-width: 0;
 }
@@ -153,11 +155,13 @@
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 .ms-date-card {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 10px 12px;
+  white-space: nowrap;
 }
 .ms-date-caption {
   font-size: 9px;
@@ -183,6 +187,8 @@
 .ms-date-stack span:last-child { font-size: 18px; color: var(--text); }
 
 .ms-total-card {
+  flex: 1 1 auto;
+  min-width: 180px;
   cursor: pointer;
   padding: 14px;
   display: flex;
@@ -461,14 +467,13 @@
 
 @media (max-width: 1240px) {
   .market-signal-shell { grid-template-columns: 1fr; }
-  .ms-overview-panel { grid-template-columns: 150px minmax(0, 1fr); grid-template-rows: auto; }
   .ms-total-card { min-height: 96px; }
   .ms-score { font-size: 34px; }
 }
 @media (max-width: 760px) {
   #marketSignalBar.market-signal-bar { margin: 10px 0 8px; }
   .market-signal-shell { padding: 10px; border-radius: 18px; }
-  .ms-overview-panel { grid-template-columns: 1fr; }
+  .ms-overview-panel { flex-direction: column; }
   .ms-date-caption { writing-mode: initial; transform: none; }
   .ms-date-card { justify-content: space-between; }
   .ms-date-stack { flex-direction: row; align-items: baseline; gap: 6px; }
