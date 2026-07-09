@@ -99,31 +99,17 @@
    ===================================================== */
 #marketSignalBar.market-signal-bar {
   display: none;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  flex: 0 0 auto;
-  align-self: stretch;
   margin: 14px 0 10px;
   position: relative;
   z-index: 5;
-  container-type: inline-size;
-  container-name: market-signal;
 }
 
 .market-signal-shell {
   position: relative;
   display: grid;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-  grid-template-columns: minmax(300px, max-content) minmax(0, 1fr);
-  align-items: start;
+  grid-template-columns: 178px minmax(0, 1fr);
   gap: 12px;
   padding: 12px;
-  container-type: inline-size;
-  container-name: ms-shell;
   border: 1px solid rgba(124,106,247,0.22);
   border-radius: 22px;
   background:
@@ -153,9 +139,8 @@
 .ms-date-card { position: relative; z-index: 1; }
 
 .ms-overview-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  display: grid;
+  grid-template-rows: auto 1fr;
   gap: 10px;
   min-width: 0;
 }
@@ -168,28 +153,26 @@
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 .ms-date-card {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 10px 12px;
-  white-space: nowrap;
 }
 .ms-date-caption {
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.12em;
   color: var(--text3);
-  writing-mode: initial;
-  transform: none;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
   line-height: 1;
 }
 .ms-date-stack {
   display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 6px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
   font-family: var(--font-mono);
   font-weight: 800;
   line-height: 1.18;
@@ -200,8 +183,6 @@
 .ms-date-stack span:last-child { font-size: 18px; color: var(--text); }
 
 .ms-total-card {
-  flex: 1 1 auto;
-  min-width: 180px;
   cursor: pointer;
   padding: 14px;
   display: flex;
@@ -480,21 +461,21 @@
 
 @media (max-width: 1240px) {
   .market-signal-shell { grid-template-columns: 1fr; }
+  .ms-overview-panel { grid-template-columns: 150px minmax(0, 1fr); grid-template-rows: auto; }
   .ms-total-card { min-height: 96px; }
   .ms-score { font-size: 34px; }
 }
 @media (max-width: 760px) {
   #marketSignalBar.market-signal-bar { margin: 10px 0 8px; }
   .market-signal-shell { padding: 10px; border-radius: 18px; }
+  .ms-overview-panel { grid-template-columns: 1fr; }
+  .ms-date-caption { writing-mode: initial; transform: none; }
+  .ms-date-card { justify-content: space-between; }
+  .ms-date-stack { flex-direction: row; align-items: baseline; gap: 6px; }
   .ms-group { min-width: 100%; }
   .ms-indicator-card { max-width: none; }
 }
 
-@container ms-shell (min-width: 560px) {
-  .ms-overview-panel { flex-direction: row; align-items: stretch; }
-  .ms-date-caption { writing-mode: vertical-rl; transform: rotate(180deg); }
-  .ms-date-stack { flex-direction: column; align-items: flex-end; gap: 1px; }
-}
 
 /* =====================================================
    📡 Market Signal 표시 설정 + 자동 컴팩트 레이아웃
@@ -749,104 +730,4 @@
   .signal-settings-grid {
     grid-template-columns: 1fr;
   }
-}
-#marketSignalBar.market-signal-bar > .market-signal-shell {
-  flex: 1 1 auto;
-}
-
-#marketSignalBar .ms-groups-wrap {
-  width: 100%;
-  min-width: 0;
-}
-/* 카테고리가 2줄이 되는 중간 화면 */
-@container market-signal (min-width: 761px) and (max-width: 1250px) {
-  #marketSignalBar.ms-compact .market-signal-shell {
-    grid-template-columns: 198px minmax(0, 1fr) !important;
-    grid-template-rows: repeat(2, minmax(0, 1fr));
-    align-items: stretch;
-  }
-
-  /* 날짜와 종합 신호 카드를 shell의 개별 Grid 항목으로 사용 */
-  #marketSignalBar.ms-compact .ms-overview-panel {
-    display: contents;
-  }
-
-  /* 첫 번째 줄 왼쪽 */
-  #marketSignalBar.ms-compact .ms-date-card {
-    grid-column: 1;
-    grid-row: 1;
-    min-height: 0;
-  }
-
-  /* 두 번째 줄 왼쪽 */
-  #marketSignalBar.ms-compact .ms-total-card {
-    grid-column: 1;
-    grid-row: 2;
-    min-height: 0;
-  }
-
-  /* 카테고리는 오른쪽에서 2열 × 2줄 */
-  #marketSignalBar.ms-compact .ms-groups-wrap {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  #marketSignalBar.ms-compact .ms-group {
-    width: 100%;
-    min-width: 0;
-  }
-}
-/* =====================================================
-   카테고리가 실제로 2줄 이상이 된 경우
-   날짜와 종합 신호 카드도 위아래 2줄로 배치
-   ===================================================== */
-
-#marketSignalBar.ms-compact.ms-two-rows .ms-overview-panel {
-  display: grid;
-  grid-template-columns: minmax(220px, 294px) !important;
-  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
-  align-self: stretch;
-  min-width: 220px;
-  gap: 10px;
-}
-
-/* 첫 번째 줄: 데이터 날짜 */
-#marketSignalBar.ms-compact.ms-two-rows .ms-date-card {
-  grid-column: 1;
-  grid-row: 1;
-  min-height: 0;
-  width: 100%;
-  box-sizing: border-box;
-  justify-content: space-between;
-}
-
-/* 두 번째 줄: 종합 신호 */
-#marketSignalBar.ms-compact.ms-two-rows .ms-total-card {
-  grid-column: 1;
-  grid-row: 2;
-  min-height: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* 날짜 카드는 가로 형태로 변경 */
-#marketSignalBar.ms-compact.ms-two-rows .ms-date-caption {
-  writing-mode: initial !important;
-  transform: none !important;
-}
-
-#marketSignalBar.ms-compact.ms-two-rows .ms-date-stack {
-  flex-direction: row !important;
-  align-items: baseline !important;
-  gap: 6px !important;
-}
-
-/* 두 줄일 때 설명 문구 다시 표시 */
-#marketSignalBar.ms-compact.ms-two-rows .ms-total-note {
-  display: block;
 }
