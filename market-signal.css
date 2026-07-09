@@ -107,6 +107,8 @@
   margin: 14px 0 10px;
   position: relative;
   z-index: 5;
+  container-type: inline-size;
+  container-name: market-signal;
 }
 
 .market-signal-shell {
@@ -755,4 +757,47 @@
 #marketSignalBar .ms-groups-wrap {
   width: 100%;
   min-width: 0;
+}
+/* 카테고리가 2줄이 되는 중간 화면 */
+@container market-signal (min-width: 761px) and (max-width: 1250px) {
+  #marketSignalBar.ms-compact .market-signal-shell {
+    grid-template-columns: 198px minmax(0, 1fr) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  /* 날짜와 종합 신호 카드를 shell의 개별 Grid 항목으로 사용 */
+  #marketSignalBar.ms-compact .ms-overview-panel {
+    display: contents;
+  }
+
+  /* 첫 번째 줄 왼쪽 */
+  #marketSignalBar.ms-compact .ms-date-card {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 0;
+  }
+
+  /* 두 번째 줄 왼쪽 */
+  #marketSignalBar.ms-compact .ms-total-card {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 0;
+  }
+
+  /* 카테고리는 오른쪽에서 2열 × 2줄 */
+  #marketSignalBar.ms-compact .ms-groups-wrap {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  #marketSignalBar.ms-compact .ms-group {
+    width: 100%;
+    min-width: 0;
+  }
 }
