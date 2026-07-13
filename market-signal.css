@@ -173,14 +173,14 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 1px;
-  font-family: var(--font-mono);
+  font-family: 'Saira Condensed', var(--font-mono);
   font-weight: 800;
   line-height: 1.18;
   color: var(--text2);
 }
-.ms-date-stack span:first-child { font-size: 11px; color: var(--text3); }
-.ms-date-stack span:nth-child(2) { font-size: 14px; color: var(--text2); }
-.ms-date-stack span:last-child { font-size: 18px; color: var(--text); }
+.ms-date-stack span:first-child { font-size: 15px; color: var(--text3); }
+.ms-date-stack span:nth-child(2) { font-size: 19px; color: var(--text2); }
+.ms-date-stack span:last-child { font-size: 25px; color: var(--text); }
 
 .ms-total-card {
   cursor: pointer;
@@ -534,9 +534,9 @@
   font-size: 8px;
 }
 
-#marketSignalBar.ms-compact .ms-date-stack span:first-child { font-size: 10px; }
-#marketSignalBar.ms-compact .ms-date-stack span:nth-child(2) { font-size: 13px; }
-#marketSignalBar.ms-compact .ms-date-stack span:last-child { font-size: 17px; }
+#marketSignalBar.ms-compact .ms-date-stack span:first-child { font-size: 13px; }
+#marketSignalBar.ms-compact .ms-date-stack span:nth-child(2) { font-size: 17px; }
+#marketSignalBar.ms-compact .ms-date-stack span:last-child { font-size: 22px; }
 
 #marketSignalBar.ms-compact .ms-total-card {
   padding: 10px 12px;
