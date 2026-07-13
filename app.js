@@ -4031,21 +4031,43 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬
       let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
 
+      // [추가] 종목별 투자금/평가금 막대 높이 스케일 기준값 (계좌 내 종목 중 최대 투자금/평가금)
+      let maxKrwItemVal = 0;
+      sortedItems.forEach(it => { maxKrwItemVal = Math.max(maxKrwItemVal, it.costAmt, it.evalAmt); });
+
       let portmapSegments = sortedItems.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return ''; 
-          let color = pieColors[idx % pieColors.length];
-          
-          let amtStr = Math.round(item.evalAmt).toLocaleString();
+
+          // 종목별 손익 및 수익률
+          let itemPnl = item.evalAmt - item.costAmt;
+          let itemRoi = item.costAmt > 0 ? (itemPnl / item.costAmt * 100) : 0;
+          let itemPnlColor = itemPnl >= 0 ? 'var(--profit)' : 'var(--loss)';
+          let itemRoiSign = itemPnl >= 0 ? '+' : '';
+
+          // 하나의 막대(hbar-track) 안에 투자금(옅은 배경)과 평가금(손익 색상)을 겹쳐서 표현
+          let costBarRatio = maxKrwItemVal > 0 ? (item.costAmt / maxKrwItemVal) * 100 : 0;
+          let evalBarRatio = maxKrwItemVal > 0 ? (item.evalAmt / maxKrwItemVal) * 100 : 0;
+
+          let costStr = Math.round(item.costAmt).toLocaleString();
+          let evalStr = Math.round(item.evalAmt).toLocaleString();
 
           return `
             <div class="hbar-item">
                 <div class="hbar-info">
                     <span class="hbar-name">${item.name}</span>
-                    <span class="hbar-ratio-text">${amtStr}원 (${ratio.toFixed(1)}%)</span>
+                    <span class="hbar-ratio-text">${ratio.toFixed(1)}%</span>
                 </div>
                 <div class="hbar-track">
-                    <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
+                    <div class="hbar-cost-fill" style="width: ${costBarRatio}%;"></div>
+                    <div class="hbar-eval-fill" style="width: ${evalBarRatio}%; background: ${itemPnlColor};"></div>
+                </div>
+                <div class="hbar-amt-row">
+                    <div class="hbar-amt-group">
+                        <span class="hbar-amt-item"><i class="hbar-dot"></i>투자 ₩${costStr}</span>
+                        <span class="hbar-amt-item"><i class="hbar-dot" style="background:${itemPnlColor};"></i>평가 ₩${evalStr}</span>
+                    </div>
+                    <span class="hbar-amt-roi" style="color:${itemPnlColor};">${itemRoiSign}${itemRoi.toFixed(1)}%</span>
                 </div>
             </div>
           `;
@@ -4137,21 +4159,43 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
       // 1. 평가금액(evalAmt) 기준으로 내림차순 정렬
       let sortedItems = [...d.items].sort((a, b) => b.evalAmt - a.evalAmt);
 
+      // [추가] 종목별 투자금/평가금 막대 높이 스케일 기준값 (계좌 내 종목 중 최대 투자금/평가금)
+      let maxUsdItemVal = 0;
+      sortedItems.forEach(it => { maxUsdItemVal = Math.max(maxUsdItemVal, it.costAmt, it.evalAmt); });
+
       let portmapSegments = sortedItems.map((item, idx) => {
           let ratio = d.eval > 0 ? (item.evalAmt / d.eval) * 100 : 0;
           if(ratio <= 0) return ''; 
-          let color = pieColors[idx % pieColors.length];
-          
-          let amtStr = Math.round(item.evalAmt).toLocaleString();
+
+          // 종목별 손익 및 수익률
+          let itemPnl = item.evalAmt - item.costAmt;
+          let itemRoi = item.costAmt > 0 ? (itemPnl / item.costAmt * 100) : 0;
+          let itemPnlColor = itemPnl >= 0 ? 'var(--profit)' : 'var(--loss)';
+          let itemRoiSign = itemPnl >= 0 ? '+' : '';
+
+          // 하나의 막대(hbar-track) 안에 투자금(옅은 배경)과 평가금(손익 색상)을 겹쳐서 표현
+          let costBarRatio = maxUsdItemVal > 0 ? (item.costAmt / maxUsdItemVal) * 100 : 0;
+          let evalBarRatio = maxUsdItemVal > 0 ? (item.evalAmt / maxUsdItemVal) * 100 : 0;
+
+          let costStr = item.costAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          let evalStr = item.evalAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
           return `
             <div class="hbar-item">
                 <div class="hbar-info">
                     <span class="hbar-name">${item.name}</span>
-                    <span class="hbar-ratio-text">${amtStr}원 (${ratio.toFixed(1)}%)</span>
+                    <span class="hbar-ratio-text">${ratio.toFixed(1)}%</span>
                 </div>
                 <div class="hbar-track">
-                    <div class="hbar-fill" style="width: ${ratio}%; background-color: ${color};"></div>
+                    <div class="hbar-cost-fill" style="width: ${costBarRatio}%;"></div>
+                    <div class="hbar-eval-fill" style="width: ${evalBarRatio}%; background: ${itemPnlColor};"></div>
+                </div>
+                <div class="hbar-amt-row">
+                    <div class="hbar-amt-group">
+                        <span class="hbar-amt-item"><i class="hbar-dot"></i>투자 $${costStr}</span>
+                        <span class="hbar-amt-item"><i class="hbar-dot" style="background:${itemPnlColor};"></i>평가 $${evalStr}</span>
+                    </div>
+                    <span class="hbar-amt-roi" style="color:${itemPnlColor};">${itemRoiSign}${itemRoi.toFixed(1)}%</span>
                 </div>
             </div>
           `;
