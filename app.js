@@ -4045,7 +4045,10 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
           let itemPnlColor = itemPnl >= 0 ? 'var(--profit)' : 'var(--loss)';
           let itemRoiSign = itemPnl >= 0 ? '+' : '';
 
-          // 하나의 막대(hbar-track) 안에 투자금(옅은 배경)과 평가금(손익 색상)을 겹쳐서 표현
+          // 평가금 막대는 파이차트/포트맵과 동일한 종목별 고유 색상을 유지
+          let itemColor = pieColors[idx % pieColors.length];
+
+          // 하나의 막대(hbar-track) 안에 투자금(옅은 배경)과 평가금(종목 고유 색상)을 겹쳐서 표현
           let costBarRatio = maxKrwItemVal > 0 ? (item.costAmt / maxKrwItemVal) * 100 : 0;
           let evalBarRatio = maxKrwItemVal > 0 ? (item.evalAmt / maxKrwItemVal) * 100 : 0;
 
@@ -4060,12 +4063,12 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                 </div>
                 <div class="hbar-track">
                     <div class="hbar-cost-fill" style="width: ${costBarRatio}%;"></div>
-                    <div class="hbar-eval-fill" style="width: ${evalBarRatio}%; background: ${itemPnlColor};"></div>
+                    <div class="hbar-eval-fill" style="width: ${evalBarRatio}%; background: ${itemColor};"></div>
                 </div>
                 <div class="hbar-amt-row">
                     <div class="hbar-amt-group">
                         <span class="hbar-amt-item"><i class="hbar-dot"></i>투자 ₩${costStr}</span>
-                        <span class="hbar-amt-item"><i class="hbar-dot" style="background:${itemPnlColor};"></i>평가 ₩${evalStr}</span>
+                        <span class="hbar-amt-item"><i class="hbar-dot" style="background:${itemColor};"></i>평가 ₩${evalStr}</span>
                     </div>
                     <span class="hbar-amt-roi" style="color:${itemPnlColor};">${itemRoiSign}${itemRoi.toFixed(1)}%</span>
                 </div>
@@ -4173,7 +4176,10 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
           let itemPnlColor = itemPnl >= 0 ? 'var(--profit)' : 'var(--loss)';
           let itemRoiSign = itemPnl >= 0 ? '+' : '';
 
-          // 하나의 막대(hbar-track) 안에 투자금(옅은 배경)과 평가금(손익 색상)을 겹쳐서 표현
+          // 평가금 막대는 파이차트/포트맵과 동일한 종목별 고유 색상을 유지
+          let itemColor = pieColors[idx % pieColors.length];
+
+          // 하나의 막대(hbar-track) 안에 투자금(옅은 배경)과 평가금(종목 고유 색상)을 겹쳐서 표현
           let costBarRatio = maxUsdItemVal > 0 ? (item.costAmt / maxUsdItemVal) * 100 : 0;
           let evalBarRatio = maxUsdItemVal > 0 ? (item.evalAmt / maxUsdItemVal) * 100 : 0;
 
@@ -4188,12 +4194,12 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
                 </div>
                 <div class="hbar-track">
                     <div class="hbar-cost-fill" style="width: ${costBarRatio}%;"></div>
-                    <div class="hbar-eval-fill" style="width: ${evalBarRatio}%; background: ${itemPnlColor};"></div>
+                    <div class="hbar-eval-fill" style="width: ${evalBarRatio}%; background: ${itemColor};"></div>
                 </div>
                 <div class="hbar-amt-row">
                     <div class="hbar-amt-group">
                         <span class="hbar-amt-item"><i class="hbar-dot"></i>투자 $${costStr}</span>
-                        <span class="hbar-amt-item"><i class="hbar-dot" style="background:${itemPnlColor};"></i>평가 $${evalStr}</span>
+                        <span class="hbar-amt-item"><i class="hbar-dot" style="background:${itemColor};"></i>평가 $${evalStr}</span>
                     </div>
                     <span class="hbar-amt-roi" style="color:${itemPnlColor};">${itemRoiSign}${itemRoi.toFixed(1)}%</span>
                 </div>
