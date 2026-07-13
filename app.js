@@ -4969,7 +4969,7 @@ async function render() {
     if(watchlistSearch) watchlistSearch.style.display = 'flex';
     updateViewHeader('⭐', '관심종목');
     const _lob = document.getElementById('listOptionsBar');
-    if (_lob) _lob.classList.add('non-sticky');
+    if (_lob) _lob.classList.remove('non-sticky');
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
     if(msBar && msBar.getAttribute('data-loaded') && currentView === 'all') msBar.style.display = 'block';
@@ -4982,6 +4982,11 @@ async function render() {
     updateViewHeader();
     const _lob = document.getElementById('listOptionsBar');
     if (_lob) _lob.classList.remove('non-sticky');
+    if (currentView === 'user1' || currentView === 'user2') {
+      dash.style.marginTop = '2.5rem';
+    } else {
+      dash.style.marginTop = '';
+    }
   }
 
   let ownerFilter = 'all';
