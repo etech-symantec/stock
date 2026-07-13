@@ -400,6 +400,10 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 #dividendDashboard, #historyDashboard, #realizedDashboard { 
     display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem;
     flex: 1; min-height: 0; overflow-y: auto;
+    /* 🌟 .dashboard-main의 좌우 2rem 패딩 안쪽에 스크롤바가 갇혀 창 끝과 여백이 생기는 문제 수정:
+       오른쪽으로 패딩만큼 밀어(bleed) 스크롤바를 창 끝에 붙이고, 안쪽 내용 여백은 padding-right로 복원 */
+    margin-right: -2rem;
+    padding-right: 2rem;
 }
 #dividendDashboard > .page-controls-box,
 #historyDashboard > .page-controls-box,
@@ -1416,7 +1420,7 @@ nav {
   z-index: 1;
   margin: 0 !important;
   /* 좌우 nav 영역과 겹치지 않도록 최대폭 제한 */
-  max-width: calc(100% - 440px);
+  max-width: calc(100% - 600px);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -1520,8 +1524,8 @@ nav {
   #rtab-1y  { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
 }
 
-/* ── 1900px 이하: 네비탭 아이콘 전용 전환 ── */
-@media (max-width: 1900px) and (min-width: 769px) {
+/* ── 1740px 이하: 네비탭 아이콘 전용 전환 ── */
+@media (max-width: 1740px) and (min-width: 769px) {
   .vtab-text { display: none; }
   .vtab { padding: 9px 11px; gap: 0; }
   .vtab-icon { font-size: 20px; }
@@ -2095,6 +2099,10 @@ nav {
   #historyDashboard,
   #realizedDashboard {
     padding-top: 1rem;
+  }
+  #dividendDashboard, #historyDashboard, #realizedDashboard {
+    margin-right: -12px;
+    padding-right: 12px;
   }
 }
 
