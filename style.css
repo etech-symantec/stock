@@ -270,6 +270,9 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 .dashboard-main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 2rem 0; background: var(--bg); position: relative; }
 
 .dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; margin-top: 1.5rem; flex-shrink: 0; }
+#marketSignalBar[style*="display: none"] ~ #dashboardTopWrapper {
+  margin-top: 2.5rem;
+}
 .dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
 @media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 900px) { .dashboard-top { grid-template-columns: 1fr; } }
