@@ -1416,7 +1416,7 @@ nav {
   z-index: 1;
   margin: 0 !important;
   /* 좌우 nav 영역과 겹치지 않도록 최대폭 제한 */
-  max-width: calc(100% - 600px);
+  max-width: calc(100% - 440px);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -1520,8 +1520,8 @@ nav {
   #rtab-1y  { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
 }
 
-/* ── 1740px 이하: 네비탭 아이콘 전용 전환 ── */
-@media (max-width: 1740px) and (min-width: 769px) {
+/* ── 1860px 이하: 네비탭 아이콘 전용 전환 ── */
+@media (max-width: 1860px) and (min-width: 769px) {
   .vtab-text { display: none; }
   .vtab { padding: 9px 11px; gap: 0; }
   .vtab-icon { font-size: 20px; }
