@@ -2018,7 +2018,9 @@ nav {
 
 /* ── 관심종목: listOptionsBar 비스티키 모드 ── */
 .list-options-bar.non-sticky {
-  position: static !important;
+  position: sticky !important;
+  top: 0;
+  z-index: 30;
   margin-left: 0 !important;
   margin-right: 0 !important;
   padding-left: 0 !important;
@@ -2082,7 +2084,9 @@ nav {
   margin-right: 0 !important;
   border-bottom: none !important;
   box-shadow: none !important;
-  position: static !important;
+  position: sticky !important;
+  top: 0;
+  z-index: 30;
   margin-bottom: 16px !important;
 }
 
