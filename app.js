@@ -18,14 +18,15 @@ function loadState() {
       if(!parsed.oldNames) parsed.oldNames = {}; 
       if(!parsed.riaAccounts) parsed.riaAccounts = [];
       if(!parsed.riaExcludeSymbols) parsed.riaExcludeSymbols = [];
-      if(!parsed.customOverseasAssets) parsed.customOverseasAssets = []; // 🌟 수동 지정 해외자산 추가
+      if(!parsed.customOverseasAssets) parsed.customOverseasAssets = [];
+      if(!parsed.probes) parsed.probes = [];
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [] };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [], probes: [] };
 }
 
 let state = loadState();
@@ -4799,7 +4800,128 @@ function renderModalChart() {
   }
 }
 
-// 🌟 5Y/10Y 버튼 준비 상태 업데이트
+// ── 🚀 탐사선 띄우기 기능 ──
+function ensureProbeStateShape() { if (!state.probes) state.probes = []; }
+ensureProbeStateShape();
+
+function openProbePicker() {
+  ensureProbeStateShape();
+  const probedSymbols = new Set(state.probes.map(p => p.symbol));
+  const krItems = [], usItems = [];
+
+  state.tickers.forEach(sym => {
+    const data = cachedMarketData[sym];
+    if (!data || data._failed) return;
+    const last = data.last || (data.prices ? data.prices[data.prices.length - 1] : 0);
+    (isKorean(sym) ? krItems : usItems).push({ symbol: sym, name: data.name || sym, last });
+  });
+
+  const renderGroup = (title, items) => {
+    if (items.length === 0) return '';
+    const rows = items.map(it => {
+      const already = probedSymbols.has(it.symbol);
+      return `
+        <div class="probe-pick-item" style="${already ? 'opacity:0.45; cursor:not-allowed;' : ''}"
+             onclick="${already ? '' : `launchProbe('${it.symbol}')`}">
+          <div>
+            <div style="font-size:13px; font-weight:600;">${it.name}</div>
+            <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${it.symbol}</div>
+          </div>
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:700;">
+            ${already ? '이미 띄움 ✅' : formatPrice(it.last, it.symbol)}
+          </div>
+        </div>`;
+    }).join('');
+    return `<div class="probe-pick-group"><div class="probe-pick-group-title">${title}</div>${rows}</div>`;
+  };
+
+  const body = document.getElementById('probePickerBody');
+  const html = renderGroup('🇰🇷 국내', krItems) + renderGroup('🇺🇸 해외', usItems);
+  body.innerHTML = html || `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">관심종목이 없습니다. 먼저 종목을 추가해주세요.</div>`;
+  document.getElementById('probeOverlay').classList.add('open');
+}
+
+function launchProbe(symbol) {
+  ensureProbeStateShape();
+  if (state.probes.some(p => p.symbol === symbol)) { alert('이미 탐사선을 띄운 종목입니다.'); return; }
+  const data = cachedMarketData[symbol];
+  if (!data || data._failed) { alert('시세 정보를 불러올 수 없습니다.'); return; }
+  const price = data.last || data.prices[data.prices.length - 1];
+
+  const qtyInput = prompt(`${data.name} (${symbol})\n현재가 ${formatPrice(price, symbol)}\n\n몇 주를 가상으로 매수할까요? (1주 이상)`, '1');
+  if (qtyInput === null) return;
+  const qty = parseFloat(qtyInput);
+  if (!qty || qty < 1) { alert('1주 이상 입력해주세요.'); return; }
+
+  state.probes.push({
+    id: 'probe_' + Date.now(),
+    symbol, name: data.name || symbol,
+    qty, buyPrice: price,
+    buyDate: formatDate(new Date()),
+    isKr: isKorean(symbol)
+  });
+  saveState();
+  closeModal('probeOverlay');
+  closeModal('chartOverlay');
+  alert(`🚀 ${data.name} 탐사선을 띄웠습니다! (${qty}주 · ${formatPrice(price, symbol)})`);
+  render();
+}
+
+// 카드 상세창(chartOverlay)에서 바로 띄우기
+function launchProbeFromModal() {
+  if (!currentModalTicker) return;
+  launchProbe(currentModalTicker);
+}
+
+function deleteProbe(id) {
+  if (!confirm('이 탐사선을 회수하시겠습니까?')) return;
+  state.probes = state.probes.filter(p => p.id !== id);
+  saveState();
+  render();
+}
+
+function renderProbeCollectionPanel() {
+  ensureProbeStateShape();
+  const panel = document.getElementById('probeCollectionPanel');
+  if (!panel) return;
+  if (state.probes.length === 0) { panel.style.display = 'none'; panel.innerHTML = ''; return; }
+  panel.style.display = 'block';
+
+  const cardsHtml = state.probes.map(p => {
+    const data = cachedMarketData[p.symbol];
+    const current = (data && !data._failed) ? (data.last || data.prices[data.prices.length - 1]) : p.buyPrice;
+    const invested = p.qty * p.buyPrice;
+    const evalValue = p.qty * current;
+    const pnl = evalValue - invested;
+    const roi = invested > 0 ? (pnl / invested) * 100 : 0;
+    const color = pnl >= 0 ? '#00C578' : '#3A9AFF';
+    return `
+      <div class="probe-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="font-size:13px; font-weight:700;">🚀 ${p.name}</div>
+            <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${p.symbol} · ${p.qty}주 · ${p.buyDate}</div>
+          </div>
+          <button class="btn-sm" style="height:24px; font-size:11px; padding:0 8px;" onclick="deleteProbe('${p.id}')">회수</button>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+          <div style="font-size:11px; color:var(--text3);">
+            투자금 ${formatPrice(invested, p.symbol)} → 평가금 <b style="color:var(--text);">${formatPrice(evalValue, p.symbol)}</b>
+          </div>
+          <div style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:${color};">
+            ${pnl >= 0 ? '+' : ''}${formatPrice(pnl, p.symbol)} (${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%)
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div style="font-size:14px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+      🚀 띄운 탐사선 <span style="font-size:11px; color:var(--text3); font-weight:400;">(${state.probes.length}개)</span>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:8px;">${cardsHtml}</div>`;
+}
+
 function updateRangeButtonReadiness() {
     const allSymbols = Object.keys(cachedMarketData).filter(s => cachedMarketData[s] && !cachedMarketData[s]._failed);
     if (allSymbols.length === 0) return;
@@ -4970,6 +5092,10 @@ async function render() {
   const realDash = document.getElementById('realizedDashboard');
   const msBar = document.getElementById('marketSignalBar');
   const moonSection = document.getElementById('moonlightSection');
+  const probeFab = document.getElementById('probeFabBtn');
+  const probePanel = document.getElementById('probeCollectionPanel');
+  if (probeFab) probeFab.style.display = 'none';
+  if (probePanel) probePanel.style.display = 'none';
   
   if (currentView === 'dividend') {
     if (msBar) msBar.style.display = 'none';
@@ -5020,6 +5146,8 @@ async function render() {
     updateViewHeader('⭐', '관심종목');
     const _lob = document.getElementById('listOptionsBar');
     if (_lob) _lob.classList.add('non-sticky');
+    if (probeFab) probeFab.style.display = 'block';
+    renderProbeCollectionPanel();
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
     if(msBar && msBar.getAttribute('data-loaded') && currentView === 'all') msBar.style.display = 'block';
