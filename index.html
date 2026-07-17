@@ -676,6 +676,12 @@
   </div>
     
     <div class="grid-container" id="gridContainer"></div>
+     
+     <!-- 🚀 탐사선 모음 패널 (관심종목 탭에서만 표시) -->
+     <div id="probeCollectionPanel" style="display:none; margin-top:24px;"></div>
+     
+     <!-- 🚀 탐사선 띄우기 플로팅 버튼 -->
+     <button id="probeFabBtn" class="probe-fab" style="display:none;" onclick="openProbePicker()">🚀 탐사선 띄우기</button>
 
     <div id="dividendDashboard" class="dashboard-page" style="display:none;">
       <div class="page-controls-box" style="flex-wrap:wrap; gap:10px; align-items:center;">
@@ -1101,6 +1107,7 @@
         <div id="mTicker" style="font-size:18px; font-weight:700;"></div>
         <div id="mBroker" style="font-family:var(--font-mono); font-size:12px; color:var(--text3); margin-top:2px;"></div>
       </div>
+      <button class="btn-sm" style="background:var(--accent-bg); color:var(--accent); border-color:var(--accent);" onclick="launchProbeFromModal()">🚀 탐사선</button>
       <button class="btn-sm" onclick="closeModal('chartOverlay')">닫기</button>
     </div>
     <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
@@ -1176,6 +1183,16 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<div class="overlay" id="probeOverlay" onclick="closeModal('probeOverlay')">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <div style="font-size:16px; font-weight:700;">🚀 탐사선 띄울 종목 선택</div>
+      <button class="btn-sm" onclick="closeModal('probeOverlay')">닫기</button>
+    </div>
+    <div id="probePickerBody"></div>
   </div>
 </div>
 
