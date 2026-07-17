@@ -9642,9 +9642,19 @@
       "qty": -10,
       "price": 146.4,
       "txType": "trade"
+    },
+    {
+      "id": 1784266107344,
+      "date": "2026-07-16",
+      "owner": "끄니",
+      "broker": "KB",
+      "symbol": "490490.KS",
+      "qty": 0,
+      "price": 4568.4,
+      "txType": "dividend"
     }
   ],
-  "range": "1y",
+  "range": "5y",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
