@@ -4861,7 +4861,7 @@ function launchProbe(symbol) {
     id: 'probe_' + Date.now(),
     symbol, name: data.name || symbol,
     qty, buyPrice: price,
-    buyDate: formatDate(new Date()),
+    buyDate: new Date().toISOString().split('T')[0],
     isKr: isKorean(symbol)
   });
   saveState();
