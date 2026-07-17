@@ -1106,7 +1106,6 @@
         <div id="mTicker" style="font-size:18px; font-weight:700;"></div>
         <div id="mBroker" style="font-family:var(--font-mono); font-size:12px; color:var(--text3); margin-top:2px;"></div>
       </div>
-      <button class="btn-sm" style="background:var(--accent-bg); color:var(--accent); border-color:var(--accent);" onclick="launchProbeFromModal()">🚀 탐사선</button>
       <button class="btn-sm" onclick="closeModal('chartOverlay')">닫기</button>
     </div>
     <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
@@ -1181,7 +1180,8 @@
         </div>
       </div>
     </div>
-
+     <!-- 🚀 상세창 전용 플로팅 버튼 (모달 우측 하단) -->
+    <button id="probeModalFab" class="probe-fab probe-fab-modal" onclick="launchProbeFromModal()">🚀 탐사선</button>
   </div>
 </div>
 
