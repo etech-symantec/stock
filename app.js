@@ -4901,29 +4901,27 @@ function renderProbeCollectionPanel() {
     const color = pnl >= 0 ? '#00C578' : '#3A9AFF';
     return `
       <div class="probe-card">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div>
-            <div style="font-size:13px; font-weight:700;">🚀 ${p.name}</div>
-            <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${p.symbol} · ${p.qty}주 · ${p.buyDate}</div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
+          <div style="min-width:0;">
+            <div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🚀 ${p.name}</div>
+            <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono);">${p.symbol} · ${p.qty}주</div>
           </div>
-          <button class="btn-sm" style="height:24px; font-size:11px; padding:0 8px;" onclick="deleteProbe('${p.id}')">회수</button>
+          <button class="btn-sm" style="height:20px; font-size:10px; padding:0 6px; flex-shrink:0;" onclick="deleteProbe('${p.id}')">✕</button>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-          <div style="font-size:11px; color:var(--text3);">
-            투자금 ${formatPrice(invested, p.symbol)} → 평가금 <b style="color:var(--text);">${formatPrice(evalValue, p.symbol)}</b>
-          </div>
-          <div style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:${color};">
-            ${pnl >= 0 ? '+' : ''}${formatPrice(pnl, p.symbol)} (${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%)
-          </div>
+        <div style="font-size:10px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          ${formatPrice(invested, p.symbol)} → ${formatPrice(evalValue, p.symbol)}
+        </div>
+        <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:${color};">
+          ${pnl >= 0 ? '+' : ''}${formatPrice(pnl, p.symbol)} (${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%)
         </div>
       </div>`;
   }).join('');
 
   panel.innerHTML = `
-    <div style="font-size:14px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+    <div style="font-size:13px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
       🚀 띄운 탐사선 <span style="font-size:11px; color:var(--text3); font-weight:400;">(${state.probes.length}개)</span>
     </div>
-    <div style="display:flex; flex-direction:column; gap:8px;">${cardsHtml}</div>`;
+    <div class="probe-cards-grid">${cardsHtml}</div>`;
 }
 
 function updateRangeButtonReadiness() {
