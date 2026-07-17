@@ -2739,7 +2739,11 @@ nav {
   50%      { transform: translateY(-8px); }
 }
 
-.probe-pick-group { margin-bottom: 14px; }
+.probe-pick-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.probe-pick-group { display: flex; flex-direction: column; min-width: 0; }
+.probe-pick-group-list { overflow-y: auto; max-height: 50vh; padding-right: 4px; }
+.probe-pick-group-list::-webkit-scrollbar { width: 4px; }
+.probe-pick-group-list::-webkit-scrollbar-thumb { background: rgba(124,106,247,0.35); border-radius: 10px; }
 .probe-pick-group-title { font-size: 11px; font-weight: 700; color: var(--text3); margin-bottom: 6px; padding-left: 2px; }
 .probe-pick-item {
   display: flex; align-items: center; justify-content: space-between;
