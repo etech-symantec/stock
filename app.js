@@ -4642,11 +4642,13 @@ function renderDividendDashboard() {
 
 // 🌟 종목 카드 모달 관련 로직 (개별 기간 조정 기능 추가)
 let currentModalTicker = '';
-let currentModalRange = state.range; // 처음 켤 때는 메인 대시보드 설정을 따라감
+let currentModalRange = state.range;
+let currentProbeId = null;
 
-function openChartModal(ticker) {
+function openChartModal(ticker, probeId = null) {
   currentModalTicker = ticker;
-  currentModalRange = state.range; // 모달을 새로 열 때마다 메인 설정으로 초기화
+  currentProbeId = probeId;
+  currentModalRange = state.range;
   
   // 버튼 UI 초기화
   document.querySelectorAll('.m-rtab').forEach(b => {
@@ -4679,10 +4681,23 @@ function renderModalChart() {
     if (range === 'all') return 99999;
     return 252;
   };
-  let sliceLen = getSliceLen(currentModalRange);
+  const probe = currentProbeId ? state.probes.find(p => p.id === currentProbeId) : null;
+  const modalRangeGroupEl = document.getElementById('modalRangeGroup');
   
-  const displayPrices = data.prices.slice(-sliceLen);
-  const displayDates = data.dates.slice(-sliceLen); 
+  let displayPrices, displayDates;
+  if (probe) {
+    // 🚀 탐사선을 띄운 날짜부터의 데이터만 표시 (기간 탭 무시)
+    const startIdx = data.dates.findIndex(d => d >= probe.buyDate);
+    const sliceFrom = startIdx >= 0 ? startIdx : 0;
+    displayPrices = data.prices.slice(sliceFrom);
+    displayDates  = data.dates.slice(sliceFrom);
+    if (modalRangeGroupEl) modalRangeGroupEl.style.display = 'none';
+  } else {
+    let sliceLen = getSliceLen(currentModalRange);
+    displayPrices = data.prices.slice(-sliceLen);
+    displayDates  = data.dates.slice(-sliceLen);
+    if (modalRangeGroupEl) modalRangeGroupEl.style.display = 'flex';
+  }
   if(displayPrices.length === 0) return;
   
   const hi = Math.max(...displayPrices), lo = Math.min(...displayPrices);
@@ -4698,7 +4713,9 @@ function renderModalChart() {
   chgEl.textContent = `${chgPct > 0 ? '+':''}${formatPrice(last-prev, currentModalTicker)} (${chgPct > 0 ? '+':''}${chgPct}%)`;
   chgEl.style.backgroundColor = chgPct > 0 ? 'var(--profit-bg)' : 'var(--loss-bg)';
   chgEl.style.color = chgPct > 0 ? '#00C578' : '#3A9AFF';
-  document.getElementById('mMeta').textContent = `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
+  document.getElementById('mMeta').textContent = probe
+    ? `🚀 ${probe.buyDate} 탐사선 발사 이후 · 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`
+    : `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
   
   if (modalChartInst) { modalChartInst.destroy(); modalChartInst = null; }
   const _modalOwnerFilter = currentView === 'user1' ? state.owners.user1.name
@@ -4877,6 +4894,13 @@ function launchProbeFromModal() {
   launchProbe(currentModalTicker);
 }
 
+// 탐사선 카드 클릭 시 상세창 열기
+function openProbeDetail(id) {
+  const probe = state.probes.find(p => p.id === id);
+  if (!probe) return;
+  openChartModal(probe.symbol, probe.id);
+}
+
 function deleteProbe(id) {
   if (!confirm('이 탐사선을 회수하시겠습니까?')) return;
   state.probes = state.probes.filter(p => p.id !== id);
@@ -4900,13 +4924,13 @@ function renderProbeCollectionPanel() {
     const roi = invested > 0 ? (pnl / invested) * 100 : 0;
     const color = pnl >= 0 ? '#00C578' : '#3A9AFF';
     return `
-      <div class="probe-card">
+      <div class="probe-card" onclick="openProbeDetail('${p.id}')">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
           <div style="min-width:0;">
             <div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🚀 ${p.name}</div>
             <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono);">${p.symbol} · ${p.qty}주</div>
           </div>
-          <button class="btn-sm" style="height:20px; font-size:10px; padding:0 6px; flex-shrink:0;" onclick="deleteProbe('${p.id}')">✕</button>
+          <button class="btn-sm" style="height:20px; font-size:10px; padding:0 6px; flex-shrink:0;" onclick="event.stopPropagation(); deleteProbe('${p.id}')">✕</button>
         </div>
         <div style="font-size:10px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
           ${formatPrice(invested, p.symbol)} → ${formatPrice(evalValue, p.symbol)}
