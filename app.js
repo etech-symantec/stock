@@ -4817,27 +4817,31 @@ function openProbePicker() {
   });
 
   const renderGroup = (title, items) => {
-    if (items.length === 0) return '';
-    const rows = items.map(it => {
-      const already = probedSymbols.has(it.symbol);
-      return `
-        <div class="probe-pick-item" style="${already ? 'opacity:0.45; cursor:not-allowed;' : ''}"
-             onclick="${already ? '' : `launchProbe('${it.symbol}')`}">
-          <div>
-            <div style="font-size:13px; font-weight:600;">${it.name}</div>
-            <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${it.symbol}</div>
-          </div>
-          <div style="font-family:var(--font-mono); font-size:12px; font-weight:700;">
-            ${already ? '이미 띄움 ✅' : formatPrice(it.last, it.symbol)}
-          </div>
-        </div>`;
-    }).join('');
-    return `<div class="probe-pick-group"><div class="probe-pick-group-title">${title}</div>${rows}</div>`;
+    const rows = items.length > 0
+      ? items.map(it => {
+          const already = probedSymbols.has(it.symbol);
+          return `
+            <div class="probe-pick-item" style="${already ? 'opacity:0.45; cursor:not-allowed;' : ''}"
+                 onclick="${already ? '' : `launchProbe('${it.symbol}')`}">
+              <div>
+                <div style="font-size:13px; font-weight:600;">${it.name}</div>
+                <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${it.symbol}</div>
+              </div>
+              <div style="font-family:var(--font-mono); font-size:12px; font-weight:700;">
+                ${already ? '이미 띄움 ✅' : formatPrice(it.last, it.symbol)}
+              </div>
+            </div>`;
+        }).join('')
+      : `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">종목 없음</div>`;
+    return `
+      <div class="probe-pick-group">
+        <div class="probe-pick-group-title">${title} (${items.length})</div>
+        <div class="probe-pick-group-list">${rows}</div>
+      </div>`;
   };
-
+  
   const body = document.getElementById('probePickerBody');
-  const html = renderGroup('🇰🇷 국내', krItems) + renderGroup('🇺🇸 해외', usItems);
-  body.innerHTML = html || `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">관심종목이 없습니다. 먼저 종목을 추가해주세요.</div>`;
+  body.innerHTML = renderGroup('🇰🇷 국내', krItems) + renderGroup('🇺🇸 해외', usItems);
   document.getElementById('probeOverlay').classList.add('open');
 }
 
