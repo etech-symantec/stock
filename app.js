@@ -5874,7 +5874,7 @@ function renderRealizedDashboard() {
         const holdDays = Math.max(1, Math.round((new Date(s.lastSellDate) - new Date(firstBuyDate)) / 86400000));
         s.firstBuyDate = firstBuyDate;
         s.holdDays     = holdDays;
-        s.speedScore   = s.pnlKrw / holdDays;
+        s.speedScore   = s.costKrw > 0 ? ((s.pnlKrw / s.costKrw) * 100) / holdDays : 0;
     });
  
     const symList = Object.values(symStats).map(s => ({
@@ -5904,11 +5904,8 @@ function renderRealizedDashboard() {
     };
 
     const fmtSpeed = (v) => {
-        const abs  = Math.abs(v);
         const sign = v >= 0 ? '+' : '-';
-        if (abs >= 100000000) return sign + '₩' + (abs / 100000000).toFixed(2) + '억/일';
-        if (abs >= 10000)     return sign + '₩' + (abs / 10000).toFixed(2) + '만/일';
-        return sign + '₩' + Math.round(abs).toLocaleString() + '/일';
+        return sign + Math.abs(v).toFixed(2) + '%/일';
     };
  
     const rankRowHtml = (item, rank, valueStr, barPct, isPos) => {
