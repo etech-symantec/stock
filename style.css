@@ -2713,3 +2713,42 @@ nav {
     font-size: 12px;
     box-shadow: none;
 }
+
+/* 🚀 탐사선 띄우기 기능 */
+.probe-fab {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 500;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7c6af7, #4d9fff);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(124,106,247,0.45);
+  animation: probeFloat 3s ease-in-out infinite;
+  transition: transform 0.2s;
+}
+.probe-fab:hover { transform: scale(1.06); }
+@keyframes probeFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+.probe-pick-group { margin-bottom: 14px; }
+.probe-pick-group-title { font-size: 11px; font-weight: 700; color: var(--text3); margin-bottom: 6px; padding-left: 2px; }
+.probe-pick-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 10px; border-radius: 8px; cursor: pointer; margin-bottom: 4px;
+  border: 1px solid var(--border); transition: 0.15s;
+}
+.probe-pick-item:hover { background: var(--bg3); border-color: var(--border2); }
+
+.probe-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;
+}
