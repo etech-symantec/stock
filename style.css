@@ -2774,26 +2774,36 @@ nav {
   font-size: 12px;
   box-shadow: 0 6px 18px rgba(124,106,247,0.4);
 }
-
-/* 🚀 탐사선 카드 — 은은하게 한바퀴 도는 테두리 */
 .probe-card {
   position: relative;
-  border: 1px solid transparent;
-  z-index: 0;
-}
-.probe-card::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
   border-radius: 9px;
-  padding: 1px;
-  background: conic-gradient(from 0deg, transparent 0%, rgba(124,106,247,0.85) 12%, transparent 30%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  padding: 1.5px; /* 회전 테두리 두께 */
+  background: conic-gradient(from 0deg,
+      rgba(124,106,247,0) 0%,
+      rgba(124,106,247,0.95) 12%,
+      rgba(124,106,247,0) 30%);
   animation: probeBorderSpin 3.5s linear infinite;
-  z-index: -1;
-  pointer-events: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.probe-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124,106,247,0.25);
+}
+.probe-card-inner {
+  background: var(--bg2);
+  border-radius: 7.5px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+  transition: background 0.15s ease;
+}
+.probe-card:hover .probe-card-inner {
+  background: var(--bg3);
 }
 @keyframes probeBorderSpin {
   to { transform: rotate(360deg); }
