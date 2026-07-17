@@ -5976,7 +5976,7 @@ function renderRealizedDashboard() {
                         (() => {
                             if (isSpeed) {
                                 const dailyLine = fmtSpeed(s.speedScore);
-                                const holdLine  = `<br><span style="font-size:9px;color:var(--text3);font-weight:400;">${s.holdDays}일 보유 · 총 ${fmtW(s.pnlKrw)}</span>`;
+                                const holdLine  = `<br><span style="font-size:9px;color:var(--text3);font-weight:400;">${s.holdDays}일 보유 · 총 ${(s.roi >= 0 ? '+' : '')}${s.roi.toFixed(1)}% (${fmtW(s.pnlKrw)})</span>`;
                                 return dailyLine + holdLine;
                             }
                             return isRoi
