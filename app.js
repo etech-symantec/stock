@@ -4766,7 +4766,7 @@ function renderModalChart() {
     statsEl.style.display = 'none';
   } else {
     statsEl.style.display = 'block';
-  
+    
   const probeInfoTarget = state.probes.find(pr => pr.symbol === currentModalTicker);
   const probeInfoEl = document.getElementById('mProbeInfo');
   if (probeInfoEl) {
@@ -4777,13 +4777,13 @@ function renderModalChart() {
       const pevalValue = probeInfoTarget.qty * pcurrent;
       const ppnl = pevalValue - pinvested;
       const proi = pinvested > 0 ? (ppnl / pinvested) * 100 : 0;
-      
+  
       document.getElementById('mProbeQtyDate').textContent = `${probeInfoTarget.buyDate} 발사 · ${probeInfoTarget.qty}주`;
       document.getElementById('mProbeInvestEval').textContent =
         `${formatPrice(pinvested, probeInfoTarget.symbol)} → ${formatPrice(pevalValue, probeInfoTarget.symbol)}`;
   
       const pnlEl = document.getElementById('mProbePnl');
-      pnlEl.textContent = `${ppnl >= 0 ? '+' : ''}${formatPrice(ppnl, probeForBadge.symbol)} (${proi >= 0 ? '+' : ''}${proi.toFixed(2)}%)`;
+      pnlEl.textContent = `${ppnl >= 0 ? '+' : ''}${formatPrice(ppnl, probeInfoTarget.symbol)} (${proi >= 0 ? '+' : ''}${proi.toFixed(2)}%)`;
       pnlEl.style.color = ppnl >= 0 ? '#00C578' : '#3A9AFF';
   
       probeInfoEl.style.display = 'block';
