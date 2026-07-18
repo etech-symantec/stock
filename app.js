@@ -4686,10 +4686,9 @@ function renderModalChart() {
   
   let displayPrices, displayDates;
   if (probe) {
-    const startIdx = data.rawDates.findIndex(d => d >= probe.buyDate);
-    const sliceFrom = startIdx >= 0 ? startIdx : 0;
-    displayPrices = data.prices.slice(sliceFrom);
-    displayDates  = data.dates.slice(sliceFrom);
+    const series = buildProbeSeries(probe, data);
+    displayPrices = series.sincePrices;
+    displayDates  = series.sinceDates;
     if (modalRangeGroupEl) modalRangeGroupEl.style.display = 'none';
   } else {
     let sliceLen = getSliceLen(currentModalRange);
@@ -4821,6 +4820,31 @@ function ensureProbeStateShape() { if (!state.probes) state.probes = []; }
 ensureProbeStateShape();
 
 let _probePickerItems = { kr: [], us: [] }; // 🌟 검색 필터링용 원본 목록 캐시
+
+// 🚀 탐사선 발사일 이후 시세를 안전하게 구성 (당일 매수 시 데이터 공백 방지)
+function buildProbeSeries(p, data) {
+  const rawDates = data.rawDates || [];
+  const dates = data.dates || [];
+  const prices = data.prices || [];
+  const startIdx = rawDates.findIndex(d => d >= p.buyDate);
+  const currentPrice = data.last || prices[prices.length - 1] || p.buyPrice;
+
+  let sinceDates, sincePrices;
+  if (startIdx === -1) {
+    // 매수일 이후 일봉 데이터가 아직 없음(당일 매수 등) → 매수가·현재가 2포인트로 구성
+    sinceDates  = [p.buyDate, rawDates[rawDates.length - 1] || p.buyDate];
+    sincePrices = [p.buyPrice, currentPrice];
+  } else {
+    sinceDates  = dates.slice(startIdx);
+    sincePrices = prices.slice(startIdx);
+    // 첫 데이터가 실제 매수가와 다르면 맨 앞에 매수 시점 포인트를 보정 삽입
+    if (sincePrices.length === 0 || sincePrices[0] !== p.buyPrice) {
+      sinceDates.unshift(p.buyDate);
+      sincePrices.unshift(p.buyPrice);
+    }
+  }
+  return { sinceDates, sincePrices };
+}
 
 function openProbePicker() {
   ensureProbeStateShape();
@@ -4983,12 +5007,8 @@ function renderProbeCollectionPanel() {
   // 🚀 탐사선 발사일 이후 구간만 잘라서 카드 우측에 미니 스파크라인 렌더
   state.probes.forEach(p => {
     const data = cachedMarketData[p.symbol];
-    if (!data || data._failed || !data.rawDates) return;
-    // 🌟 data.dates는 "7/18" 같은 표시용 포맷이라 buyDate(YYYY-MM-DD)와 비교 불가 → rawDates 사용
-    const startIdx = data.rawDates.findIndex(d => d >= p.buyDate);
-    const sliceFrom = startIdx >= 0 ? startIdx : 0;
-    const sincePrices = data.prices.slice(sliceFrom);
-    const sinceDates  = data.dates.slice(sliceFrom);
+    if (!data || data._failed) return;
+    const { sinceDates, sincePrices } = buildProbeSeries(p, data);
     if (sincePrices.length < 2) return;
     buildChart(`probeChart_${p.id}`, sincePrices, sinceDates, true, p.symbol);
   });
