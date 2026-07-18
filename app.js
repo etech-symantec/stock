@@ -4767,19 +4767,20 @@ function renderModalChart() {
   } else {
     statsEl.style.display = 'block';
   
+  const probeInfoTarget = state.probes.find(pr => pr.symbol === currentModalTicker);
   const probeInfoEl = document.getElementById('mProbeInfo');
   if (probeInfoEl) {
-    if (probeForBadge) {
-      const pdata = cachedMarketData[probeForBadge.symbol];
-      const pcurrent = (pdata && !pdata._failed) ? (pdata.last || pdata.prices[pdata.prices.length - 1]) : probeForBadge.buyPrice;
-      const pinvested = probeForBadge.qty * probeForBadge.buyPrice;
-      const pevalValue = probeForBadge.qty * pcurrent;
+    if (probeInfoTarget) {
+      const pdata = cachedMarketData[probeInfoTarget.symbol];
+      const pcurrent = (pdata && !pdata._failed) ? (pdata.last || pdata.prices[pdata.prices.length - 1]) : probeInfoTarget.buyPrice;
+      const pinvested = probeInfoTarget.qty * probeInfoTarget.buyPrice;
+      const pevalValue = probeInfoTarget.qty * pcurrent;
       const ppnl = pevalValue - pinvested;
       const proi = pinvested > 0 ? (ppnl / pinvested) * 100 : 0;
-  
-      document.getElementById('mProbeQtyDate').textContent = `${probeForBadge.buyDate} 발사 · ${probeForBadge.qty}주`;
+      
+      document.getElementById('mProbeQtyDate').textContent = `${probeInfoTarget.buyDate} 발사 · ${probeInfoTarget.qty}주`;
       document.getElementById('mProbeInvestEval').textContent =
-        `${formatPrice(pinvested, probeForBadge.symbol)} → ${formatPrice(pevalValue, probeForBadge.symbol)}`;
+        `${formatPrice(pinvested, probeInfoTarget.symbol)} → ${formatPrice(pevalValue, probeInfoTarget.symbol)}`;
   
       const pnlEl = document.getElementById('mProbePnl');
       pnlEl.textContent = `${ppnl >= 0 ? '+' : ''}${formatPrice(ppnl, probeForBadge.symbol)} (${proi >= 0 ? '+' : ''}${proi.toFixed(2)}%)`;
