@@ -4686,8 +4686,7 @@ function renderModalChart() {
   
   let displayPrices, displayDates;
   if (probe) {
-    // 🚀 탐사선을 띄운 날짜부터의 데이터만 표시 (기간 탭 무시)
-    const startIdx = data.dates.findIndex(d => d >= probe.buyDate);
+    const startIdx = data.rawDates.findIndex(d => d >= probe.buyDate);
     const sliceFrom = startIdx >= 0 ? startIdx : 0;
     displayPrices = data.prices.slice(sliceFrom);
     displayDates  = data.dates.slice(sliceFrom);
@@ -4959,8 +4958,9 @@ function renderProbeCollectionPanel() {
   // 🚀 탐사선 발사일 이후 구간만 잘라서 카드 우측에 미니 스파크라인 렌더
   state.probes.forEach(p => {
     const data = cachedMarketData[p.symbol];
-    if (!data || data._failed || !data.dates) return;
-    const startIdx = data.dates.findIndex(d => d >= p.buyDate);
+    if (!data || data._failed || !data.rawDates) return;
+    // 🌟 data.dates는 "7/18" 같은 표시용 포맷이라 buyDate(YYYY-MM-DD)와 비교 불가 → rawDates 사용
+    const startIdx = data.rawDates.findIndex(d => d >= p.buyDate);
     const sliceFrom = startIdx >= 0 ? startIdx : 0;
     const sincePrices = data.prices.slice(sliceFrom);
     const sinceDates  = data.dates.slice(sliceFrom);
