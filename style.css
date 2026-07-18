@@ -2845,3 +2845,31 @@ nav {
 .probe-orbit-card:hover .probe-orbit-body {
   background: var(--bg3);
 }
+/* 🚀 카드 우측 미니 스파크라인 */
+.probe-spark-wrap {
+  width: 72px;
+  height: 44px;
+  flex-shrink: 0;
+  align-self: center;
+}
+.probe-spark-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 텍스트 색상을 클래스로 분리 (인라인 style 대신) — 호버 반전 적용을 위해 */
+.probe-name { color: var(--text); }
+.probe-meta { color: var(--text3); }
+
+/* 🚀 호버 시 반대 테마 색으로 강조 */
+html[data-theme="light"] .probe-orbit-card:hover .probe-orbit-body {
+  background: #1c2030;
+}
+html[data-theme="light"] .probe-orbit-card:hover .probe-name { color: #e8eaf0; }
+html[data-theme="light"] .probe-orbit-card:hover .probe-meta { color: #8890a4; }
+
+html:not([data-theme="light"]) .probe-orbit-card:hover .probe-orbit-body {
+  background: #ffffff;
+}
+html:not([data-theme="light"]) .probe-orbit-card:hover .probe-name { color: #1a1d2e; }
+html:not([data-theme="light"]) .probe-orbit-card:hover .probe-meta { color: #9099b0; }
