@@ -2765,7 +2765,7 @@ nav {
 .probe-fab-modal {
   position: absolute;
   right: 16px;
-  top: 16px;
+  top: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
