@@ -4820,9 +4820,10 @@ function renderModalChart() {
 function ensureProbeStateShape() { if (!state.probes) state.probes = []; }
 ensureProbeStateShape();
 
+let _probePickerItems = { kr: [], us: [] }; // 🌟 검색 필터링용 원본 목록 캐시
+
 function openProbePicker() {
   ensureProbeStateShape();
-  const probedSymbols = new Set(state.probes.map(p => p.symbol));
   const krItems = [], usItems = [];
 
   state.tickers.forEach(sym => {
@@ -4831,6 +4832,17 @@ function openProbePicker() {
     const last = data.last || (data.prices ? data.prices[data.prices.length - 1] : 0);
     (isKorean(sym) ? krItems : usItems).push({ symbol: sym, name: data.name || sym, last });
   });
+
+  _probePickerItems = { kr: krItems, us: usItems };
+
+  const searchInput = document.getElementById('probePickerSearch');
+  if (searchInput) searchInput.value = '';
+  renderProbePickerList(krItems, usItems);
+  document.getElementById('probeOverlay').classList.add('open');
+}
+
+function renderProbePickerList(krItems, usItems) {
+  const probedSymbols = new Set(state.probes.map(p => p.symbol));
 
   const renderGroup = (title, items) => {
     const rows = items.length > 0
@@ -4848,17 +4860,30 @@ function openProbePicker() {
               </div>
             </div>`;
         }).join('')
-      : `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">종목 없음</div>`;
+      : `<div style="text-align:center; padding:20px; font-size:12px; color:var(--text3);">검색 결과가 없습니다</div>`;
     return `
       <div class="probe-pick-group">
         <div class="probe-pick-group-title">${title} (${items.length})</div>
         <div class="probe-pick-group-list">${rows}</div>
       </div>`;
   };
-  
+
   const body = document.getElementById('probePickerBody');
   body.innerHTML = renderGroup('🇰🇷 국내', krItems) + renderGroup('🇺🇸 해외', usItems);
-  document.getElementById('probeOverlay').classList.add('open');
+}
+
+// 🚀 검색어로 종목 필터링
+function filterProbePicker(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) {
+    renderProbePickerList(_probePickerItems.kr, _probePickerItems.us);
+    return;
+  }
+  const match = it => it.name.toLowerCase().includes(q) || it.symbol.toLowerCase().includes(q);
+  renderProbePickerList(
+    _probePickerItems.kr.filter(match),
+    _probePickerItems.us.filter(match)
+  );
 }
 
 function launchProbe(symbol) {
