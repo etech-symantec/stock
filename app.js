@@ -423,7 +423,8 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
         const probeEntry = state.probes.find(pr => pr.symbol === symbol);
         if (probeEntry) {
           let pIdx = displayRawDates.findIndex(d => d >= probeEntry.buyDate);
-          if (pIdx === -1) pIdx = 0;
+          // 🌟 buyDate가 아직 시세 데이터에 없는 최신 날짜라면(당일 발사 등) 맨 오른쪽(최신) 지점에 표시
+          if (pIdx === -1) pIdx = displayRawDates.length - 1;
           if (displayDates[pIdx] !== undefined) {
             datasets.push({
               label: '🚀 탐사선 발사',
