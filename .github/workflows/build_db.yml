@@ -1,7 +1,9 @@
 name: 🗄️ Build Stock Database
 
 on:
-  workflow_dispatch:  # GitHub 홈페이지에서 수동으로 버튼을 눌러 실행하도록 설정
+  workflow_dispatch: # 수동 실행 유지
+  schedule:
+    - cron: '0 15 * * *' # 한국 시간 기준 매일 오전 00:00 (UTC 15:00)
 
 jobs:
   build-db:
