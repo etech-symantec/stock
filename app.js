@@ -4924,19 +4924,21 @@ function renderProbeCollectionPanel() {
     const roi = invested > 0 ? (pnl / invested) * 100 : 0;
     const color = pnl >= 0 ? '#00C578' : '#3A9AFF';
     return `
-      <div class="probe-card" onclick="openProbeDetail('${p.id}')">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
-          <div style="min-width:0;">
-            <div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🚀 ${p.name}</div>
-            <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono);">${p.symbol} · ${p.qty}주</div>
+      <div class="probe-orbit-card" onclick="openProbeDetail('${p.id}')">
+        <div class="probe-orbit-body">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
+            <div style="min-width:0;">
+              <div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🚀 ${p.name}</div>
+              <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono);">${p.symbol} · ${p.qty}주</div>
+            </div>
+            <button class="btn-sm" style="height:20px; font-size:10px; padding:0 6px; flex-shrink:0;" onclick="event.stopPropagation(); deleteProbe('${p.id}')">✕</button>
           </div>
-          <button class="btn-sm" style="height:20px; font-size:10px; padding:0 6px; flex-shrink:0;" onclick="event.stopPropagation(); deleteProbe('${p.id}')">✕</button>
-        </div>
-        <div style="font-size:10px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-          ${formatPrice(invested, p.symbol)} → ${formatPrice(evalValue, p.symbol)}
-        </div>
-        <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:${color};">
-          ${pnl >= 0 ? '+' : ''}${formatPrice(pnl, p.symbol)} (${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%)
+          <div style="font-size:10px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            ${formatPrice(invested, p.symbol)} → ${formatPrice(evalValue, p.symbol)}
+          </div>
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:${color};">
+            ${pnl >= 0 ? '+' : ''}${formatPrice(pnl, p.symbol)} (${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%)
+          </div>
         </div>
       </div>`;
   }).join('');
