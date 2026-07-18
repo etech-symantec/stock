@@ -1187,10 +1187,15 @@
 
 <div class="overlay" id="probeOverlay" onclick="closeModal('probeOverlay')">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:640px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
       <div style="font-size:16px; font-weight:700;">🚀 탐사선 띄울 종목 선택</div>
       <button class="btn-sm" onclick="closeModal('probeOverlay')">닫기</button>
     </div>
+    <input type="text" id="probePickerSearch" placeholder="종목명 또는 코드 검색"
+           oninput="filterProbePicker(this.value)"
+           style="width:100%; box-sizing:border-box; padding:8px 12px; margin-bottom:12px;
+                  background:var(--bg); border:1px solid var(--border); border-radius:8px;
+                  color:var(--text); font-size:13px; font-family:var(--font-sans); outline:none;">
     <div id="probePickerBody" class="probe-pick-cols"></div>
   </div>
 </div>
