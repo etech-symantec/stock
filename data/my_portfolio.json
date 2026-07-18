@@ -140,7 +140,8 @@
     "234340.KQ",
     "089150.KQ",
     "064260.KQ",
-    "094480.KQ"
+    "094480.KQ",
+    "000660.KS"
   ],
   "transactions": [
     {
@@ -9654,7 +9655,7 @@
       "txType": "dividend"
     }
   ],
-  "range": "5y",
+  "range": "all",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
@@ -9766,5 +9767,52 @@
       "margin-us": false,
       "margin-kr": true
     }
-  }
+  },
+  "probes": [
+    {
+      "id": "probe_1784270177931",
+      "symbol": "MSFT",
+      "name": "Microsoft",
+      "qty": 1,
+      "buyPrice": 401.1000061035156,
+      "buyDate": "2026-07-17",
+      "isKr": false
+    },
+    {
+      "id": "probe_1784270253484",
+      "symbol": "449450.KS",
+      "name": "PLUS K방산",
+      "qty": 2,
+      "buyPrice": 54240,
+      "buyDate": "2026-07-17",
+      "isKr": true
+    },
+    {
+      "id": "probe_1784271702683",
+      "symbol": "AVGO",
+      "name": "Broadcom",
+      "qty": 1,
+      "buyPrice": 374.45001220703125,
+      "buyDate": "2026-07-17",
+      "isKr": false
+    },
+    {
+      "id": "probe_1784368368866",
+      "symbol": "005935.KS",
+      "name": "삼성전자우",
+      "qty": 1,
+      "buyPrice": 172000,
+      "buyDate": "2026-07-18",
+      "isKr": true
+    },
+    {
+      "id": "probe_1784368611761",
+      "symbol": "NVDA",
+      "name": "Nvidia",
+      "qty": 1,
+      "buyPrice": 202.80999755859375,
+      "buyDate": "2026-07-18",
+      "isKr": false
+    }
+  ]
 }
