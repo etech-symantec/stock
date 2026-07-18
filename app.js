@@ -4731,11 +4731,26 @@ function renderModalChart() {
   } else {
     statsEl.style.display = 'block';
 
-  // 🚀 탐사선 배지 + 정보 섹션 (currentModalTicker 기준으로 항상 체크)
   const probeForBadge = state.probes.find(pr => pr.symbol === currentModalTicker);
   
-  const badgeEl = document.getElementById('mProbeBadge');
-  if (badgeEl) badgeEl.style.display = probeForBadge ? 'inline-block' : 'none';
+  // 🌟 HTML에 span이 없어도 항상 동작하도록 없으면 직접 생성해서 mTicker 옆에 삽입
+  let badgeEl = document.getElementById('mProbeBadge');
+  if (!badgeEl) {
+    const mTickerEl = document.getElementById('mTicker');
+    if (mTickerEl) {
+      badgeEl = document.createElement('span');
+      badgeEl.id = 'mProbeBadge';
+      badgeEl.title = '탐사선 띄운 종목';
+      badgeEl.style.cssText = 'display:none; width:10px; height:10px; border-radius:50%; background:#FFD426; box-shadow:0 0 6px rgba(255,212,38,0.8); flex-shrink:0; margin-left:6px;';
+      // mTicker의 부모에 flex 레이아웃이 없을 수도 있으니 인라인으로 안전하게 처리
+      mTickerEl.parentNode.style.display = 'flex';
+      mTickerEl.parentNode.style.alignItems = 'center';
+      mTickerEl.insertAdjacentElement('afterend', badgeEl);
+    }
+  }
+  if (badgeEl) {
+    badgeEl.style.display = probeForBadge ? 'inline-block' : 'none';
+  }
   
   const probeInfoEl = document.getElementById('mProbeInfo');
   if (probeInfoEl) {
