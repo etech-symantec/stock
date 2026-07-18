@@ -141,7 +141,8 @@
     "089150.KQ",
     "064260.KQ",
     "094480.KQ",
-    "000660.KS"
+    "000660.KS",
+    "SPCX"
   ],
   "transactions": [
     {
@@ -9813,6 +9814,24 @@
       "buyPrice": 202.80999755859375,
       "buyDate": "2026-07-18",
       "isKr": false
+    },
+    {
+      "id": "probe_1784368946422",
+      "symbol": "000660.KS",
+      "name": "SK하이닉스",
+      "qty": 1,
+      "buyPrice": 1842000,
+      "buyDate": "2026-07-18",
+      "isKr": true
+    },
+    {
+      "id": "probe_1784391235874",
+      "symbol": "454910.KS",
+      "name": "두산로보틱스",
+      "qty": 1,
+      "buyPrice": 67000,
+      "buyDate": "2026-07-18",
+      "isKr": true
     }
   ]
 }
