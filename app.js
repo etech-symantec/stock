@@ -4926,18 +4926,25 @@ function renderProbeCollectionPanel() {
     return `
       <div class="probe-orbit-card" onclick="openProbeDetail('${p.id}')">
         <div class="probe-orbit-body">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
-            <div style="min-width:0;">
-              <div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🚀 ${p.name}</div>
-              <div style="font-size:9px; color:var(--text3); font-family:var(--font-mono);">${p.symbol} · ${p.qty}주</div>
+          <div style="display:flex; gap:8px;">
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
+                <div style="min-width:0;">
+                  <div class="probe-name" style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🚀 ${p.name}</div>
+                  <div class="probe-meta" style="font-size:9px; font-family:var(--font-mono);">${p.symbol} · ${p.qty}주</div>
+                </div>
+                <button class="btn-sm" style="height:20px; font-size:10px; padding:0 6px; flex-shrink:0;" onclick="event.stopPropagation(); deleteProbe('${p.id}')">✕</button>
+              </div>
+              <div class="probe-meta" style="font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:4px;">
+                ${formatPrice(invested, p.symbol)} → ${formatPrice(evalValue, p.symbol)}
+              </div>
+              <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:${color};">
+                ${pnl >= 0 ? '+' : ''}${formatPrice(pnl, p.symbol)} (${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%)
+              </div>
             </div>
-            <button class="btn-sm" style="height:20px; font-size:10px; padding:0 6px; flex-shrink:0;" onclick="event.stopPropagation(); deleteProbe('${p.id}')">✕</button>
-          </div>
-          <div style="font-size:10px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-            ${formatPrice(invested, p.symbol)} → ${formatPrice(evalValue, p.symbol)}
-          </div>
-          <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:${color};">
-            ${pnl >= 0 ? '+' : ''}${formatPrice(pnl, p.symbol)} (${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%)
+            <div class="probe-spark-wrap">
+              <canvas id="probeChart_${p.id}"></canvas>
+            </div>
           </div>
         </div>
       </div>`;
@@ -4948,6 +4955,18 @@ function renderProbeCollectionPanel() {
       🚀 띄운 탐사선 <span style="font-size:11px; color:var(--text3); font-weight:400;">(${state.probes.length}개)</span>
     </div>
     <div class="probe-cards-grid">${cardsHtml}</div>`;
+
+  // 🚀 탐사선 발사일 이후 구간만 잘라서 카드 우측에 미니 스파크라인 렌더
+  state.probes.forEach(p => {
+    const data = cachedMarketData[p.symbol];
+    if (!data || data._failed || !data.dates) return;
+    const startIdx = data.dates.findIndex(d => d >= p.buyDate);
+    const sliceFrom = startIdx >= 0 ? startIdx : 0;
+    const sincePrices = data.prices.slice(sliceFrom);
+    const sinceDates  = data.dates.slice(sliceFrom);
+    if (sincePrices.length < 2) return;
+    buildChart(`probeChart_${p.id}`, sincePrices, sinceDates, true, p.symbol);
+  });
 }
 
 function updateRangeButtonReadiness() {
