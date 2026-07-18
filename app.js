@@ -4731,6 +4731,36 @@ function renderModalChart() {
   } else {
     statsEl.style.display = 'block';
 
+  // 🚀 탐사선 배지 + 정보 섹션 (currentModalTicker 기준으로 항상 체크)
+  const probeForBadge = state.probes.find(pr => pr.symbol === currentModalTicker);
+  
+  const badgeEl = document.getElementById('mProbeBadge');
+  if (badgeEl) badgeEl.style.display = probeForBadge ? 'inline-block' : 'none';
+  
+  const probeInfoEl = document.getElementById('mProbeInfo');
+  if (probeInfoEl) {
+    if (probeForBadge) {
+      const pdata = cachedMarketData[probeForBadge.symbol];
+      const pcurrent = (pdata && !pdata._failed) ? (pdata.last || pdata.prices[pdata.prices.length - 1]) : probeForBadge.buyPrice;
+      const pinvested = probeForBadge.qty * probeForBadge.buyPrice;
+      const pevalValue = probeForBadge.qty * pcurrent;
+      const ppnl = pevalValue - pinvested;
+      const proi = pinvested > 0 ? (ppnl / pinvested) * 100 : 0;
+  
+      document.getElementById('mProbeQtyDate').textContent = `${probeForBadge.buyDate} 발사 · ${probeForBadge.qty}주`;
+      document.getElementById('mProbeInvestEval').textContent =
+        `${formatPrice(pinvested, probeForBadge.symbol)} → ${formatPrice(pevalValue, probeForBadge.symbol)}`;
+  
+      const pnlEl = document.getElementById('mProbePnl');
+      pnlEl.textContent = `${ppnl >= 0 ? '+' : ''}${formatPrice(ppnl, probeForBadge.symbol)} (${proi >= 0 ? '+' : ''}${proi.toFixed(2)}%)`;
+      pnlEl.style.color = ppnl >= 0 ? '#00C578' : '#3A9AFF';
+  
+      probeInfoEl.style.display = 'block';
+    } else {
+      probeInfoEl.style.display = 'none';
+    }
+  }
+
     // 공통 헬퍼
     const isKrStock = isKorean(sym);
     const currentPrice = data.prices[data.prices.length - 1];
