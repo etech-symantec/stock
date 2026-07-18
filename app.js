@@ -2725,10 +2725,13 @@ async function addTickerToPortfolio(symbol) {
 
   if (data && !data._failed) {
     state.tickers.push(data.symbol);
-    cachedMarketData[data.symbol] = data; // 🌟 전체 캐시를 비우지 않고 새 종목 데이터만 추가
+    cachedMarketData[data.symbol] = data;
     saveState();
-    document.getElementById('tickerInput').value = ''; render();
+    document.getElementById('tickerInput').value = '';
+    switchToWatchTab();          // 🌟 관심종목 탭으로 전환
+    await render();              // 🌟 카드가 DOM에 그려질 때까지 대기
     triggerAutoSync();
+    highlightNewlyAddedCard(data.symbol); // 🌟 새 카드로 스크롤 + 1회성 효과
   } else { alert("차트 데이터를 불러올 수 없는 종목입니다."); }
 }
 
@@ -2901,7 +2904,7 @@ function generateCardHtml(item) {
   }
 
   return `
-    <div class="card ${cls}" onclick="openChartModal('${item.symbol}')">
+    <div class="card ${cls}" data-symbol="${item.symbol}" onclick="openChartModal('${item.symbol}')">
       <div style="display:flex; align-items:center;">
         ${countryBadge}
         <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" 
@@ -2983,7 +2986,7 @@ function generateListItemHtml(item) {
   }
 
   return `
-    <div class="list-item" onclick="openChartModal('${item.symbol}')">
+    <div class="list-item" data-symbol="${item.symbol}" onclick="openChartModal('${item.symbol}')">
       <div class="list-item-left">
          <div style="font-size:20px; line-height:1; margin-right:4px;">${countryBadge}</div>
          <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:0;">
@@ -4683,6 +4686,28 @@ function renderDividendDashboard() {
 let currentModalTicker = '';
 let currentModalRange = state.range;
 let currentProbeId = null;
+
+let _newlyAddedSymbol = null; // 🌟 방금 추가한 종목 (스크롤+하이라이트용, 현재는 안 써도 되지만 참고용으로 보관)
+
+// 🌟 관심종목 탭으로 전환 + nav 활성화 표시만 갱신 (setView와 달리 이미 있는 render 흐름 재사용)
+function switchToWatchTab() {
+  currentView = 'watch';
+  activeAccountFilter = null;
+  document.querySelectorAll('.vtab, .mobile-tab-btn').forEach(b => {
+    b.classList.remove('active');
+    const onclickAttr = b.getAttribute('onclick') || '';
+    if (onclickAttr.includes("'watch'")) b.classList.add('active');
+  });
+}
+
+// 🌟 새로 추가된 카드로 스크롤 이동 + 1회성 하이라이트 효과
+function highlightNewlyAddedCard(symbol) {
+  const el = document.querySelector(`.card[data-symbol="${symbol}"], .list-item[data-symbol="${symbol}"]`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.add('card-just-added');
+  setTimeout(() => el.classList.remove('card-just-added'), 1800);
+}
 
 function openChartModal(ticker, probeId = null) {
   currentModalTicker = ticker;
