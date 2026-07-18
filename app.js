@@ -321,7 +321,7 @@ function getColors(prices) {
 }
 
 // 🌟 미니 차트 & 종목 모달 통합 차트 생성기 (연도 표시 + 매매 마커 완벽 복구!)
-function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all') {
+function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all', hideTradeMarkers = false) {
   const {line, fill} = getColors(prices);
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
@@ -354,7 +354,7 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
   ];
   
   // 🌟 거래 내역 마커 찍기
-  if (symbol && state.transactions) {
+  if (!hideTradeMarkers && symbol && state.transactions) {
       const owners = state.owners;
       const u1 = owners.user1, u2 = owners.user2;
 
@@ -5072,7 +5072,7 @@ function renderProbeCollectionPanel() {
     if (!data || data._failed) return;
     const { sinceDates, sincePrices } = buildProbeSeries(p, data);
     if (sincePrices.length < 2) return;
-    buildChart(`probeChart_${p.id}`, sincePrices, sinceDates, true, p.symbol);
+    buildChart(`probeChart_${p.id}`, sincePrices, sinceDates, true, p.symbol, 'all', true);
   });
 }
 
