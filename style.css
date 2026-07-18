@@ -2764,14 +2764,27 @@ nav {
 /* 상세창 내부용 플로팅 버튼 (메인 FAB보다 작고, absolute) */
 .probe-fab-modal {
   position: static;
-  animation: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   background: linear-gradient(135deg, #7c6af7, #4d9fff);
   color: #fff;
   border: none;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(124,106,247,0.35);
+  animation: probeFabModalFloat 3s ease-in-out infinite;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.probe-fab-modal:hover { transform: scale(1.04); }
+@keyframes probeFabModalFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+.probe-fab-modal:hover {
+  animation-play-state: paused;
+  transform: scale(1.05);
+  box-shadow: 0 8px 18px rgba(124,106,247,0.45);
+}
 @keyframes probeFloat {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-5px); }
