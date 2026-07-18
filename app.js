@@ -447,11 +447,11 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
     options: { 
         responsive: true, maintainAspectRatio: false, 
         plugins: { 
-            legend: { display: false }, 
-            tooltip: { 
-                mode: 'index', intersect: false, displayColors: false,
-                callbacks: {
-                    label: function(ctx) {
+          legend: { display: false }, 
+          tooltip: mini ? { enabled: false } : { 
+              mode: 'index', intersect: false, displayColors: false,
+              callbacks: {
+                  label: function(ctx) {
                         const sym = symbol || '';
                         const ds = ctx.dataset;
                         if (ds._isBuy !== undefined && ctx.raw) {
