@@ -2724,7 +2724,9 @@ async function addTickerToPortfolio(symbol) {
   addIcon.textContent = "＋";
 
   if (data && !data._failed) {
-    state.tickers.push(data.symbol); cachedMarketData = {}; saveState();
+    state.tickers.push(data.symbol);
+    cachedMarketData[data.symbol] = data; // 🌟 전체 캐시를 비우지 않고 새 종목 데이터만 추가
+    saveState();
     document.getElementById('tickerInput').value = ''; render();
     triggerAutoSync();
   } else { alert("차트 데이터를 불러올 수 없는 종목입니다."); }
