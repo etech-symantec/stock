@@ -2778,42 +2778,61 @@ nav {
   to { transform: rotate(360deg); }
 }
 
-/* 🚀 카드 자체: 둥실둥실 떠있고, 호버 시 확대. rotate는 절대 여기 걸지 않음 */
-.probe-card {
+/* 🚀 탐사선 카드 — 완전히 새로 작성 */
+@property --probe-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes probeFloatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+@keyframes probeRingSpin {
+  to { --probe-angle: 360deg; }
+}
+
+.probe-orbit-card {
   position: relative;
-  border-radius: 9px;
-  padding: 1.5px;              /* 테두리 두께 */
-  overflow: hidden;             /* 회전하는 빛을 카드 모양대로 잘라냄 */
+  isolation: isolate;           /* 내부 z-index가 바깥에 영향 안 주도록 격리 */
+  border-radius: 12px;
   cursor: pointer;
-  animation: probeFloat 3.5s ease-in-out infinite;
+  animation: probeFloatY 3.5s ease-in-out infinite;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.probe-card:hover { animation-play-state: paused; }  /* 호버 중엔 둥실거림 잠깐 정지 */
-.probe-card:hover {
+.probe-orbit-card:hover {
+  animation-play-state: paused;
   transform: scale(1.05) translateY(-4px);
   box-shadow: 0 14px 30px rgba(124,106,247,0.3);
   z-index: 2;
 }
 
-/* 🚀 테두리를 따라 도는 빛: 가상요소에만 rotate 적용 → 내용물엔 영향 없음 */
-.probe-card::before {
+/* 테두리 링: DOM은 절대 회전하지 않고, 그라데이션 각도만 애니메이션 */
+.probe-orbit-card::before {
   content: "";
   position: absolute;
-  inset: -60%;                  /* 카드보다 훨씬 크게 만들어 회전해도 빈틈 없이 커버 */
-  background: conic-gradient(from 0deg,
-      transparent 0%,
-      rgba(124,106,247,0.95) 6%,
-      transparent 16%);
-  animation: probeBorderSpin 3.5s linear infinite;
+  inset: 0;
   z-index: 0;
+  border-radius: inherit;
+  padding: 1.5px;                /* 테두리 두께 */
+  background: conic-gradient(from var(--probe-angle),
+      transparent 0deg,
+      rgba(124,106,247,0.95) 40deg,
+      transparent 100deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: probeRingSpin 3s linear infinite;
+  pointer-events: none;
 }
 
-/* 🚀 실제 카드 내용: ::before 위를 덮어서 얇은 테두리만 남김. 여긴 회전/이동 없음 */
-.probe-card-inner {
+/* 실제 카드 내용 (테두리 안쪽) */
+.probe-orbit-body {
   position: relative;
   z-index: 1;
   background: var(--bg2);
-  border-radius: 7.5px;
+  border-radius: 10.5px;
   padding: 8px 10px;
   display: flex;
   flex-direction: column;
@@ -2823,6 +2842,6 @@ nav {
   box-sizing: border-box;
   transition: background 0.15s ease;
 }
-.probe-card:hover .probe-card-inner {
+.probe-orbit-card:hover .probe-orbit-body {
   background: var(--bg3);
 }
