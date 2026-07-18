@@ -74,6 +74,21 @@ let _histSelectedIds = new Set(); // 거래내역 체크된 항목 ID
 let historyRankingTab = 'bigbuy'; // 'bigbuy' | 'hold' | 'freq' | 'total'
 let historyRankingSortDir = 'desc'; // 'desc' 내림차순 | 'asc' 오름차순
 
+// 🚀 탐사선 발사 지점 마커용 아이콘 이미지 (1회만 생성해서 재사용)
+const _rocketMarkerImg = (() => {
+  const size = 32;
+  const c = document.createElement('canvas');
+  c.width = size; c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.font = `${size - 6}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🚀', size / 2, size / 2 + 1);
+  const img = new Image();
+  img.src = c.toDataURL();
+  return img;
+})();
+
 function setHistoryRankingTab(tab) {
     historyRankingTab = tab;
     renderHistoryDashboard();
@@ -402,6 +417,27 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
       });
 
       Object.values(datasetMap).forEach(ds => datasets.push(ds));
+    
+      // 🚀 탐사선 발사 지점 마커
+      if (symbol && state.probes) {
+        const probeEntry = state.probes.find(pr => pr.symbol === symbol);
+        if (probeEntry) {
+          let pIdx = displayRawDates.findIndex(d => d >= probeEntry.buyDate);
+          if (pIdx === -1) pIdx = 0;
+          if (displayDates[pIdx] !== undefined) {
+            datasets.push({
+              label: '🚀 탐사선 발사',
+              data: [{ x: displayDates[pIdx], y: probeEntry.buyPrice }],
+              type: 'line',
+              showLine: false,
+              pointStyle: _rocketMarkerImg,
+              pointRadius: mini ? 8 : 14,
+              pointHoverRadius: mini ? 10 : 16,
+              order: 0
+            });
+          }
+        }
+      }
   }
 
   return new Chart(canvas, {
