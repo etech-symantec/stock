@@ -2776,6 +2776,47 @@ nav {
   gap: 8px;
 }
 
+/* 🚀 띄운 탐사선 — 총 가상 투자액 / 총 가상 평가액 요약 바 */
+.probe-summary-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.probe-summary-stat {
+  flex: 1;
+  min-width: 140px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.probe-summary-label {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+.probe-summary-value {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* 🚀 전체 탐사선 합산 가상 그래프 */
+.probe-total-chart-wrap {
+  height: 160px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+@media (max-width: 640px) {
+  .probe-total-chart-wrap { height: 130px; }
+}
+
 /* .modal에 position 기준점 추가 */
 .modal { position: relative; }
 
