@@ -373,21 +373,25 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .rtab.active { background: var(--accent); color: #fff; }
 .rtab:hover:not(.active) { background: var(--bg3); color: var(--text); }
 
-.grid-container { padding-bottom: 40px; }
+.grid-container { padding-bottom: 40px; container-type: inline-size; container-name: cardregion; }
+/* 좌우(KR/US) 분할 배치 시 각 영역(region-col)도 별도의 컨테이너 쿼리 기준이 됩니다 */
+.region-col { container-type: inline-size; container-name: cardregion; }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   align-content: start;
-  container-type: inline-size;
 }
 /* 🌟 카드 그리드 반응형: 컨테이너(영역) 너비 기준으로 3열 → 2열 → 1열 순으로 줄어듭니다.
    좌우(KR/US) 분할 배치처럼 그리드의 실제 폭이 화면 전체 폭과 다른 경우에도
-   정확히 동작하도록 뷰포트가 아닌 컨테이너 쿼리를 사용합니다. */
-@container (max-width: 899px) {
+   정확히 동작하도록 뷰포트가 아닌 컨테이너 쿼리를 사용합니다.
+   (container-type은 .grid 자신이 아니라 가장 가까운 상위 요소에 지정해야
+   grid 레이아웃과 컨테이너 크기 계산이 서로 얽히지 않고 안정적으로 동작합니다) */
+@container cardregion (max-width: 760px) {
   .grid { grid-template-columns: repeat(2, 1fr); }
 }
-@container (max-width: 599px) {
+@container cardregion (max-width: 420px) {
   .grid { grid-template-columns: 1fr; }
 }
 
