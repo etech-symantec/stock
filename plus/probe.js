@@ -1,12 +1,6 @@
 // ══════════════════════════════════════════════════════
 // 🚀 탐사선(Probe) 기능 — Plus(프리미엄) 전용 스크립트
 // - 관심종목에서 관심 있는 종목을 "가상 매수"해보고 가상 손익/그래프를 확인하는 기능입니다.
-// - app.js(핵심 상태 state, cachedMarketData, buildChart, formatPrice, isKorean,
-//   currentUsdKrw, closeModal, currentModalTicker 등)가 먼저 로드된 뒤에 실행되어야 하므로
-//   index.html에서 <script src="app.js">보다 뒤에 <script src="probe.js">로 불러옵니다.
-// - openChartModal()과 상세 모달의 탐사선 정보 영역(#mProbeInfo)처럼 다른 화면과 깊게
-//   얽혀 있는 부분은 app.js에 남겨두고, 탐사선 자체의 추가/삭제/목록/그래프 로직만
-//   이 파일로 분리했습니다.
 // ══════════════════════════════════════════════════════
 
 // ── 🚀 탐사선 띄우기 기능 ──
