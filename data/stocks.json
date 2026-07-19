@@ -42060,13 +42060,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "IDU",
-    "name": "iShares US Utilities ETF",
+    "symbol": "HYGH",
+    "name": "iShares Interest Rate Hedged High Yield Bond ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "HYGH",
-    "name": "iShares Interest Rate Hedged High Yield Bond ETF",
+    "symbol": "IDU",
+    "name": "iShares US Utilities ETF",
     "exch": "US_ETF"
   },
   {
@@ -47910,13 +47910,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "FFEB",
-    "name": "FT Vest US Equity Buffer ETF - February",
+    "symbol": "FAUG",
+    "name": "FT Vest US Equity Buffer ETF - August",
     "exch": "US_ETF"
   },
   {
-    "symbol": "FAUG",
-    "name": "FT Vest US Equity Buffer ETF - August",
+    "symbol": "FFEB",
+    "name": "FT Vest US Equity Buffer ETF - February",
     "exch": "US_ETF"
   },
   {
@@ -48355,13 +48355,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "XSHQ",
-    "name": "Invesco S&P SmallCap Quality ETF",
+    "symbol": "XMLV",
+    "name": "Invesco S&P MidCap Low Volatility ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "XMLV",
-    "name": "Invesco S&P MidCap Low Volatility ETF",
+    "symbol": "XSHQ",
+    "name": "Invesco S&P SmallCap Quality ETF",
     "exch": "US_ETF"
   },
   {
@@ -50685,13 +50685,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "UMAY",
-    "name": "Innovator US Equity Ultra Buffer ETF - May",
+    "symbol": "UOCT",
+    "name": "Innovator US Equity Ultra Buffer ETF - October",
     "exch": "US_ETF"
   },
   {
-    "symbol": "UOCT",
-    "name": "Innovator US Equity Ultra Buffer ETF - October",
+    "symbol": "UMAY",
+    "name": "Innovator US Equity Ultra Buffer ETF - May",
     "exch": "US_ETF"
   },
   {
@@ -50735,13 +50735,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "IDLV",
-    "name": "Invesco S&P Intl Developed Low Volatility ETF",
+    "symbol": "IJAN",
+    "name": "Innovator Intl Developed Power Buffer ETF - Jan",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IJAN",
-    "name": "Innovator Intl Developed Power Buffer ETF - Jan",
+    "symbol": "IDLV",
+    "name": "Invesco S&P Intl Developed Low Volatility ETF",
     "exch": "US_ETF"
   },
   {
@@ -55555,13 +55555,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "SHDG",
-    "name": "Soundwatch Hedged Equity ETF",
+    "symbol": "HAPI",
+    "name": "Harbor Human Capital Factor US Large Cap ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "HAPI",
-    "name": "Harbor Human Capital Factor US Large Cap ETF",
+    "symbol": "SHDG",
+    "name": "Soundwatch Hedged Equity ETF",
     "exch": "US_ETF"
   },
   {
@@ -58310,13 +58310,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "GXUS",
-    "name": "Goldman Sachs MarketBeta Total Internatl Eqty ETF",
+    "symbol": "BBSB",
+    "name": "JPMorgan BetaBuilders US Treasury Bond 1-3 Yr ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "BBSB",
-    "name": "JPMorgan BetaBuilders US Treasury Bond 1-3 Yr ETF",
+    "symbol": "GXUS",
+    "name": "Goldman Sachs MarketBeta Total Internatl Eqty ETF",
     "exch": "US_ETF"
   },
   {
@@ -61390,8 +61390,8 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "PSMR",
-    "name": "Pacer Swan SOS Moderate (April) ETF",
+    "symbol": "PSCW",
+    "name": "Pacer Swan SOS Conservative (April) ETF",
     "exch": "US_ETF"
   },
   {
@@ -61400,8 +61400,8 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "PSCW",
-    "name": "Pacer Swan SOS Conservative (April) ETF",
+    "symbol": "PSMR",
+    "name": "Pacer Swan SOS Moderate (April) ETF",
     "exch": "US_ETF"
   },
   {
@@ -61415,13 +61415,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "PSMO",
-    "name": "Pacer Swan SOS Moderate (October) ETF",
+    "symbol": "PSCQ",
+    "name": "Pacer Swan SOS Conservative (October) ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "PSCQ",
-    "name": "Pacer Swan SOS Conservative (October) ETF",
+    "symbol": "PSMO",
+    "name": "Pacer Swan SOS Moderate (October) ETF",
     "exch": "US_ETF"
   },
   {
@@ -61465,13 +61465,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "CMCI",
-    "name": "VanEck CMCI Commodity Strategy ETF",
+    "symbol": "AUGT",
+    "name": "AllianzIM US Equity Buffer10 Aug ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "AUGT",
-    "name": "AllianzIM US Equity Buffer10 Aug ETF",
+    "symbol": "CMCI",
+    "name": "VanEck CMCI Commodity Strategy ETF",
     "exch": "US_ETF"
   },
   {
@@ -61505,13 +61505,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "TBFC",
-    "name": "The Brinsmere Fund - Conservative ETF",
+    "symbol": "TBFG",
+    "name": "The Brinsmere Fund - Growth ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "TBFG",
-    "name": "The Brinsmere Fund - Growth ETF",
+    "symbol": "TBFC",
+    "name": "The Brinsmere Fund - Conservative ETF",
     "exch": "US_ETF"
   },
   {
