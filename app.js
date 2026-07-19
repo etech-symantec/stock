@@ -5104,25 +5104,28 @@ function renderProbeCollectionPanel() {
     <div style="font-size:13px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
       🚀 띄운 탐사선 <span style="font-size:11px; color:var(--text3); font-weight:400;">(${state.probes.length}개)</span>
     </div>
-    <div class="probe-summary-bar">
-      <div class="probe-summary-stat">
-        <div class="probe-summary-label">총 가상 투자액</div>
-        <div class="probe-summary-value">₩${Math.round(totalInvestedKrw).toLocaleString()}</div>
-      </div>
-      <div class="probe-summary-stat">
-        <div class="probe-summary-label">총 가상 평가액</div>
-        <div class="probe-summary-value">₩${Math.round(totalEvalKrw).toLocaleString()}</div>
-      </div>
-      <div class="probe-summary-stat">
-        <div class="probe-summary-label">평가 손익</div>
-        <div class="probe-summary-value" style="color:${totalColor};">
-          ${totalPnlKrw >= 0 ? '+' : ''}₩${Math.round(totalPnlKrw).toLocaleString()}
-          <span style="font-size:11px; font-weight:600;">(${totalRoi >= 0 ? '+' : ''}${totalRoi.toFixed(2)}%)</span>
+    <div class="probe-summary-row">
+      <div class="probe-summary-stats">
+        <div class="probe-summary-stat-row">
+          <div class="probe-summary-label">총 가상 투자액</div>
+          <div class="probe-summary-value">₩${Math.round(totalInvestedKrw).toLocaleString()}</div>
+        </div>
+        <div class="probe-summary-stat-row">
+          <div class="probe-summary-label">총 가상 평가액</div>
+          <div class="probe-summary-value">₩${Math.round(totalEvalKrw).toLocaleString()}</div>
+        </div>
+        <div class="probe-summary-stat-row">
+          <div class="probe-summary-label">평가 손익</div>
+          <div class="probe-summary-value" style="color:${totalColor};">
+            ${totalPnlKrw >= 0 ? '+' : ''}₩${Math.round(totalPnlKrw).toLocaleString()}
+            <span style="font-size:11px; font-weight:600;">(${totalRoi >= 0 ? '+' : ''}${totalRoi.toFixed(2)}%)</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="probe-total-chart-wrap">
-      <canvas id="probeTotalChart"></canvas>
+      <div class="probe-summary-divider"></div>
+      <div class="probe-summary-chart">
+        <canvas id="probeTotalChart"></canvas>
+      </div>
     </div>
     <div class="probe-cards-grid">${cardsHtml}</div>`;
 
@@ -5135,25 +5138,16 @@ function renderProbeCollectionPanel() {
     buildChart(`probeChart_${p.id}`, sincePrices, sinceDates, true, p.symbol, 'all', true);
   });
 
-  // 🌟 전체 탐사선을 합산한 가상 포트폴리오 그래프 렌더 (원화 환산 총 평가액 추이)
-  const { dates: totalDates, values: totalValues } = buildProbeTotalSeries();
-  if (totalValues.length >= 2) {
-    // formatPrice가 ₩ 표기를 쓰도록 실제 존재하지 않는 '한국형' 가짜 심볼을 넘김 (툴팁 표시용)
-    buildChart('probeTotalChart', totalValues, totalDates, false, '__PROBE_TOTAL__.KS', 'all', true, '총 가상 평가액');
+  // 🌟 전체 탐사선을 합산한 가상 포트폴리오 그래프 렌더 (투자금 vs 평가금 추이를 한 그래프에 함께 표시)
+  const { dates: totalDates, investedValues, evalValues } = buildProbeTotalSeries();
+  if (evalValues.length >= 2) {
+    buildProbeTotalChart('probeTotalChart', totalDates, investedValues, evalValues);
   }
 }
 
-// 🌟 모든 탐사선(관심종목 가상 매수)을 합산한 총 평가액 추이 시계열 계산
+// 🌟 모든 탐사선(관심종목 가상 매수)을 합산한 총 투자금/총 평가금 추이 시계열 계산
+// (총 가상 투자액/총 가상 평가액 요약 수치와 환율 기준을 맞추기 위해 항상 현재 환율(currentUsdKrw)로 환산합니다)
 function buildProbeTotalSeries() {
-  const fxData = cachedMarketData['KRW=X'];
-  function fxOnDate(dateStr) {
-    if (fxData && !fxData._failed && fxData.rawDates) {
-      const idx = fxData.rawDates.indexOf(dateStr);
-      if (idx !== -1 && fxData.prices[idx]) return fxData.prices[idx];
-    }
-    return currentUsdKrw || 1;
-  }
-
   // 탐사선별로 발사일 이후 (날짜 → 가격) 맵 구성
   const perProbe = state.probes.map(p => {
     const data = cachedMarketData[p.symbol];
@@ -5167,7 +5161,8 @@ function buildProbeTotalSeries() {
         }
       }
     }
-    return { probe: p, priceMap, isKr: isKorean(p.symbol) };
+    const fx = isKorean(p.symbol) ? 1 : (currentUsdKrw || 1);
+    return { probe: p, priceMap, fx };
   });
 
   // 모든 탐사선의 날짜를 합집합으로 모아 정렬
@@ -5175,24 +5170,112 @@ function buildProbeTotalSeries() {
   perProbe.forEach(pp => Object.keys(pp.priceMap).forEach(d => allDatesSet.add(d)));
   state.probes.forEach(p => allDatesSet.add(p.buyDate));
   const allDates = Array.from(allDatesSet).sort();
-  if (allDates.length === 0) return { dates: [], values: [] };
+  if (allDates.length === 0) return { dates: [], investedValues: [], evalValues: [] };
 
-  // 날짜별로 각 탐사선의 최근 가격을 이월(forward-fill)하며 총 평가액 합산
+  // 날짜별로 (1) 그 시점까지 발사된 탐사선의 투자원금 합, (2) 최근 시세를 이월(forward-fill)한 평가금 합을 계산
   const lastKnown = {};
-  const values = allDates.map(dateStr => {
-    let total = 0;
+  const investedValues = [];
+  const evalValues = [];
+  allDates.forEach(dateStr => {
+    let totalInvested = 0;
+    let totalEval = 0;
     perProbe.forEach(pp => {
       const p = pp.probe;
       if (dateStr < p.buyDate) return; // 아직 발사 전
+      totalInvested += p.qty * p.buyPrice * pp.fx;
       if (pp.priceMap[dateStr] !== undefined) lastKnown[p.id] = pp.priceMap[dateStr];
       const price = lastKnown[p.id] !== undefined ? lastKnown[p.id] : p.buyPrice;
-      const fx = pp.isKr ? 1 : fxOnDate(dateStr);
-      total += p.qty * price * fx;
+      totalEval += p.qty * price * pp.fx;
     });
-    return total;
+    investedValues.push(totalInvested);
+    evalValues.push(totalEval);
   });
 
-  return { dates: allDates, values };
+  return { dates: allDates, investedValues, evalValues };
+}
+
+// 🌟 투자금(점선) vs 평가금(채워진 실선) 두 라인을 한 그래프에 함께 그리는 전용 차트
+let _probeTotalChartInstance = null;
+function buildProbeTotalChart(canvasId, dates, investedValues, evalValues) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+
+  if (_probeTotalChartInstance && typeof _probeTotalChartInstance.destroy === 'function') {
+    _probeTotalChartInstance.destroy();
+  }
+
+  const displayDates = dates.map(d => (typeof d === 'string' && d.includes('-')) ? d.substring(2).replace(/-/g, '.') : d);
+  const lastEval = evalValues[evalValues.length - 1] || 0;
+  const lastInvested = investedValues[investedValues.length - 1] || 0;
+  const evalColor = lastEval >= lastInvested ? '#00C578' : '#3A9AFF';
+  const evalFill = lastEval >= lastInvested ? 'rgba(0,197,120,0.12)' : 'rgba(58,154,255,0.12)';
+  const formatKrw = v => '₩' + Math.round(v).toLocaleString();
+
+  _probeTotalChartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: displayDates,
+      datasets: [
+        {
+          label: '총 투자금',
+          data: investedValues,
+          borderColor: 'rgba(136,144,164,0.9)',
+          backgroundColor: 'transparent',
+          borderDash: [4, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0,
+          fill: false,
+          order: 2
+        },
+        {
+          label: '총 평가금',
+          data: evalValues,
+          borderColor: evalColor,
+          backgroundColor: evalFill,
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.1,
+          fill: true,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: { boxWidth: 10, boxHeight: 2, font: { size: 10 }, color: '#8890a4', usePointStyle: false }
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          displayColors: true,
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${formatKrw(ctx.raw)}`
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { font: { size: 9 }, color: '#555e72', maxTicksLimit: 6 }, grid: { display: false }, border: { display: false } },
+        y: {
+          ticks: {
+            font: { size: 9 }, color: '#555e72',
+            callback: v => v >= 1e8 ? (v / 1e8).toFixed(1) + '억' : v >= 1e4 ? (v / 1e4).toFixed(0) + '만' : v
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false }
+        }
+      },
+      interaction: { mode: 'index', intersect: false },
+      animation: { duration: 0 }
+    }
+  });
+
+  return _probeTotalChartInstance;
 }
 
 function updateRangeButtonReadiness() {
