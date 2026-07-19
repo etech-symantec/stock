@@ -1,12 +1,3 @@
-// =====================================================
-// 📡 market-signal.js
-// test4.html 상단 Market Signal Bar(지표 카드) 전용 스크립트
-// app.js에서 분리됨. app.js, 그리고 이 파일이 로드된 뒤에 동작합니다.
-// =====================================================
-
-/* ── 💡 index.html의 calculateTotalScore()와 완전히 동일한 로직 (16개 지표 가중평균) ──
-   CSV의 Total_Score 컬럼(구식 일간30%/월간70% 방식)은 더 이상 사용하지 않고,
-   index.html과 동일하게 매번 latest row로부터 직접 재계산합니다. */
 const MS_CARDS_META = [
   // 1. 심리 / 리스크 (카테고리 합계 25)
   { key: 'VIX', group: 'risk', weight: 8, inverse: false, range: [10, 40] },
