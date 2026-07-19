@@ -5545,7 +5545,7 @@ async function render() {
       
       // 한국 주식 구역
       if(krItems.length > 0) {
-          html += `<div style="flex:1; min-width:320px;">`;
+          html += `<div class="region-col" style="flex:1; min-width:320px;">`;
           html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇰🇷 국내 주식</h3>`;
           html += `<div class="${layoutClass}">${krItems.map(t => renderItemHtml(t)).join('')}</div>`;
           html += `</div>`;
@@ -5553,7 +5553,7 @@ async function render() {
       
       // 미국 주식 구역
       if(usItems.length > 0) {
-          html += `<div style="flex:1; min-width:320px;">`;
+          html += `<div class="region-col" style="flex:1; min-width:320px;">`;
           html += `<h3 style="margin: 10px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); color: var(--text); font-size: 15px; display:flex; align-items:center; gap:8px;">🇺🇸 미국 주식</h3>`;
           html += `<div class="${layoutClass}">${usItems.map(t => renderItemHtml(t)).join('')}</div>`;
           html += `</div>`;
