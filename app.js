@@ -5135,7 +5135,7 @@ async function render() {
     const _lob = document.getElementById('listOptionsBar');
     if (_lob) _lob.classList.add('non-sticky');
     if (probeFab) probeFab.style.display = 'block';
-    renderProbeCollectionPanel();
+    if (typeof renderProbeCollectionPanel === 'function') renderProbeCollectionPanel();
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
     if(msBar && msBar.getAttribute('data-loaded') && currentView === 'all') msBar.style.display = 'block';
