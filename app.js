@@ -321,7 +321,7 @@ function getColors(prices) {
 }
 
 // 🌟 미니 차트 & 종목 모달 통합 차트 생성기 (연도 표시 + 매매 마커 완벽 복구!)
-function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all', hideTradeMarkers = false) {
+function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all', hideTradeMarkers = false, datasetLabel = '주가') {
   const {line, fill} = getColors(prices);
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
@@ -341,7 +341,7 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
 
   const datasets = [
       { 
-          label: '주가',
+          label: datasetLabel,
           data: prices, 
           borderColor: line, 
           backgroundColor: fill, 
@@ -461,7 +461,7 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
                             return `${icon} ${action}: ${formatPrice(ctx.raw.y, sym)} (${ctx.raw.qty}주${ownerTag})`;
                         }
                         let val = typeof ctx.raw === 'object' ? ctx.raw.y : ctx.raw;
-                        return `주가: ${formatPrice(val, sym)}`;
+                        return `${datasetLabel}: ${formatPrice(val, sym)}`;
                     }
                 }
             } 
@@ -5052,6 +5052,10 @@ function renderProbeCollectionPanel() {
   if (state.probes.length === 0) { panel.style.display = 'none'; panel.innerHTML = ''; return; }
   panel.style.display = 'block';
 
+  // 🌟 전체 탐사선 합산용 (원화 환산) 총 가상 투자액 / 총 가상 평가액 계산
+  let totalInvestedKrw = 0;
+  let totalEvalKrw = 0;
+
   const cardsHtml = state.probes.map(p => {
     const data = cachedMarketData[p.symbol];
     const current = (data && !data._failed) ? (data.last || data.prices[data.prices.length - 1]) : p.buyPrice;
@@ -5060,6 +5064,11 @@ function renderProbeCollectionPanel() {
     const pnl = evalValue - invested;
     const roi = invested > 0 ? (pnl / invested) * 100 : 0;
     const color = pnl >= 0 ? '#00C578' : '#3A9AFF';
+
+    const fx = isKorean(p.symbol) ? 1 : (currentUsdKrw || 1);
+    totalInvestedKrw += invested * fx;
+    totalEvalKrw += evalValue * fx;
+
     return `
       <div class="probe-orbit-card" onclick="openProbeDetail('${p.id}')">
         <div class="probe-orbit-body">
@@ -5087,9 +5096,33 @@ function renderProbeCollectionPanel() {
       </div>`;
   }).join('');
 
+  const totalPnlKrw = totalEvalKrw - totalInvestedKrw;
+  const totalRoi = totalInvestedKrw > 0 ? (totalPnlKrw / totalInvestedKrw) * 100 : 0;
+  const totalColor = totalPnlKrw >= 0 ? '#00C578' : '#3A9AFF';
+
   panel.innerHTML = `
     <div style="font-size:13px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
       🚀 띄운 탐사선 <span style="font-size:11px; color:var(--text3); font-weight:400;">(${state.probes.length}개)</span>
+    </div>
+    <div class="probe-summary-bar">
+      <div class="probe-summary-stat">
+        <div class="probe-summary-label">총 가상 투자액</div>
+        <div class="probe-summary-value">₩${Math.round(totalInvestedKrw).toLocaleString()}</div>
+      </div>
+      <div class="probe-summary-stat">
+        <div class="probe-summary-label">총 가상 평가액</div>
+        <div class="probe-summary-value">₩${Math.round(totalEvalKrw).toLocaleString()}</div>
+      </div>
+      <div class="probe-summary-stat">
+        <div class="probe-summary-label">평가 손익</div>
+        <div class="probe-summary-value" style="color:${totalColor};">
+          ${totalPnlKrw >= 0 ? '+' : ''}₩${Math.round(totalPnlKrw).toLocaleString()}
+          <span style="font-size:11px; font-weight:600;">(${totalRoi >= 0 ? '+' : ''}${totalRoi.toFixed(2)}%)</span>
+        </div>
+      </div>
+    </div>
+    <div class="probe-total-chart-wrap">
+      <canvas id="probeTotalChart"></canvas>
     </div>
     <div class="probe-cards-grid">${cardsHtml}</div>`;
 
@@ -5101,6 +5134,65 @@ function renderProbeCollectionPanel() {
     if (sincePrices.length < 2) return;
     buildChart(`probeChart_${p.id}`, sincePrices, sinceDates, true, p.symbol, 'all', true);
   });
+
+  // 🌟 전체 탐사선을 합산한 가상 포트폴리오 그래프 렌더 (원화 환산 총 평가액 추이)
+  const { dates: totalDates, values: totalValues } = buildProbeTotalSeries();
+  if (totalValues.length >= 2) {
+    // formatPrice가 ₩ 표기를 쓰도록 실제 존재하지 않는 '한국형' 가짜 심볼을 넘김 (툴팁 표시용)
+    buildChart('probeTotalChart', totalValues, totalDates, false, '__PROBE_TOTAL__.KS', 'all', true, '총 가상 평가액');
+  }
+}
+
+// 🌟 모든 탐사선(관심종목 가상 매수)을 합산한 총 평가액 추이 시계열 계산
+function buildProbeTotalSeries() {
+  const fxData = cachedMarketData['KRW=X'];
+  function fxOnDate(dateStr) {
+    if (fxData && !fxData._failed && fxData.rawDates) {
+      const idx = fxData.rawDates.indexOf(dateStr);
+      if (idx !== -1 && fxData.prices[idx]) return fxData.prices[idx];
+    }
+    return currentUsdKrw || 1;
+  }
+
+  // 탐사선별로 발사일 이후 (날짜 → 가격) 맵 구성
+  const perProbe = state.probes.map(p => {
+    const data = cachedMarketData[p.symbol];
+    const priceMap = {};
+    if (data && !data._failed && data.rawDates && data.prices) {
+      let startIdx = data.rawDates.findIndex(d => d >= p.buyDate);
+      if (startIdx === -1) startIdx = data.rawDates.length - 1;
+      for (let i = startIdx; i < data.rawDates.length; i++) {
+        if (data.prices[i] !== null && data.prices[i] !== undefined) {
+          priceMap[data.rawDates[i]] = data.prices[i];
+        }
+      }
+    }
+    return { probe: p, priceMap, isKr: isKorean(p.symbol) };
+  });
+
+  // 모든 탐사선의 날짜를 합집합으로 모아 정렬
+  const allDatesSet = new Set();
+  perProbe.forEach(pp => Object.keys(pp.priceMap).forEach(d => allDatesSet.add(d)));
+  state.probes.forEach(p => allDatesSet.add(p.buyDate));
+  const allDates = Array.from(allDatesSet).sort();
+  if (allDates.length === 0) return { dates: [], values: [] };
+
+  // 날짜별로 각 탐사선의 최근 가격을 이월(forward-fill)하며 총 평가액 합산
+  const lastKnown = {};
+  const values = allDates.map(dateStr => {
+    let total = 0;
+    perProbe.forEach(pp => {
+      const p = pp.probe;
+      if (dateStr < p.buyDate) return; // 아직 발사 전
+      if (pp.priceMap[dateStr] !== undefined) lastKnown[p.id] = pp.priceMap[dateStr];
+      const price = lastKnown[p.id] !== undefined ? lastKnown[p.id] : p.buyPrice;
+      const fx = pp.isKr ? 1 : fxOnDate(dateStr);
+      total += p.qty * price * fx;
+    });
+    return total;
+  });
+
+  return { dates: allDates, values };
 }
 
 function updateRangeButtonReadiness() {
