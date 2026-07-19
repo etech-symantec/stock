@@ -388,10 +388,10 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
    정확히 동작하도록 뷰포트가 아닌 컨테이너 쿼리를 사용합니다.
    (container-type은 .grid 자신이 아니라 가장 가까운 상위 요소에 지정해야
    grid 레이아웃과 컨테이너 크기 계산이 서로 얽히지 않고 안정적으로 동작합니다) */
-@container cardregion (max-width: 760px) {
+@container cardregion (max-width: 560px) {
   .grid { grid-template-columns: repeat(2, 1fr); }
 }
-@container cardregion (max-width: 420px) {
+@container cardregion (max-width: 280px) {
   .grid { grid-template-columns: 1fr; }
 }
 
