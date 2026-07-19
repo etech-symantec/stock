@@ -374,7 +374,22 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .rtab:hover:not(.active) { background: var(--bg3); color: var(--text); }
 
 .grid-container { padding-bottom: 40px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-content: start; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  align-content: start;
+  container-type: inline-size;
+}
+/* 🌟 카드 그리드 반응형: 컨테이너(영역) 너비 기준으로 3열 → 2열 → 1열 순으로 줄어듭니다.
+   좌우(KR/US) 분할 배치처럼 그리드의 실제 폭이 화면 전체 폭과 다른 경우에도
+   정확히 동작하도록 뷰포트가 아닌 컨테이너 쿼리를 사용합니다. */
+@container (max-width: 899px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@container (max-width: 599px) {
+  .grid { grid-template-columns: 1fr; }
+}
 
 .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 12px; position: relative; cursor: pointer; transition: 0.15s; overflow: hidden; }
 .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
@@ -809,8 +824,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   /* 대시보드 상단 그리드 */
   .dashboard-top { grid-template-columns: 1fr !important; }
 
-  /* 카드 그리드 */
-  .grid { grid-template-columns: 1fr !important; }
+  /* 카드 그리드: 3→2→1열 전환은 위쪽 .grid 컨테이너 쿼리에서 처리합니다 */
 
   /* 옵션바 */
   .list-options-bar {
