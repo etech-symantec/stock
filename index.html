@@ -1099,6 +1099,57 @@
 
     </main> </div>
 
+<!-- 🤖 AI 투자조언 플로팅 버튼 (전체보기 / 소유자별 탭에서만 표시) -->
+<button id="aiAdviceFab" onclick="openAiAdviceModal()" style="display:none; position:fixed; right:24px; bottom:24px; z-index:900; align-items:center; gap:8px; padding:12px 18px; border:none; border-radius:30px; background:linear-gradient(135deg,#7c6af7,#4d9fff); color:#fff; font-family:var(--font-sans); font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 6px 20px rgba(124,106,247,0.45); transition:transform 0.15s ease;"
+  onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'"
+  title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
+  <span style="font-size:16px;">🤖</span><span id="aiAdviceFabLabel">AI 투자조언</span>
+</button>
+
+<!-- 🤖 AI 투자조언 모달 -->
+<div class="overlay" id="aiAdviceOverlay" onclick="closeModal('aiAdviceOverlay')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:640px; max-height:85vh; display:flex; flex-direction:column; padding:0; overflow:hidden;">
+    <!-- 헤더 -->
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 24px; border-bottom:1px solid var(--border); flex-shrink:0;">
+      <div>
+        <h3 style="font-size:16px; display:flex; align-items:center; gap:6px;">🤖 AI 투자조언 <span style="font-size:10px; font-weight:700; color:#4d9fff; background:rgba(77,159,255,0.12); border:1px solid rgba(77,159,255,0.3); padding:2px 7px; border-radius:10px;">Gemini</span></h3>
+        <div id="aiAdviceScopeLabel" style="font-size:11px; color:var(--text2); margin-top:3px;">—</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button class="btn-sm" onclick="toggleAiSettingsPanel()" title="Gemini API 키 / 모델 설정">⚙️</button>
+        <button class="btn-sm" onclick="closeModal('aiAdviceOverlay')">닫기</button>
+      </div>
+    </div>
+
+    <!-- API 키 / 모델 설정 패널 -->
+    <div id="aiSettingsPanel" style="display:none; padding:16px 24px; border-bottom:1px solid var(--border); background:var(--bg3); flex-shrink:0;">
+      <div style="font-size:11px; color:var(--text2); line-height:1.5; margin-bottom:10px;">
+        Google AI Studio에서 발급받은 <b>Gemini API 키</b>가 필요합니다. 키는 이 브라우저에만(localStorage) 저장되며 서버로 전송되지 않습니다.
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--accent);">API 키 발급받기 →</a>
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Gemini API 키</label>
+        <input type="password" id="inputGeminiApiKey" class="form-input" placeholder="AIza...">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>모델</label>
+        <input type="text" id="inputGeminiModel" class="form-input" placeholder="gemini-2.5-flash">
+      </div>
+      <button class="btn-submit" style="background:var(--accent); width:100%;" onclick="saveGeminiSettings()">저장</button>
+    </div>
+
+    <!-- 본문: 로딩 / 결과 -->
+    <div id="aiAdviceBody" style="padding:24px; overflow-y:auto; flex:1; font-size:13px; line-height:1.7; color:var(--text);">
+      <div style="text-align:center; color:var(--text3); padding:40px 0;">보유 종목을 불러오는 중입니다...</div>
+    </div>
+
+    <!-- 푸터 -->
+    <div style="display:flex; gap:8px; padding:16px 24px; border-top:1px solid var(--border); flex-shrink:0;">
+      <button class="btn-sm" style="flex:1; justify-content:center;" onclick="requestAiAdvice()">🔄 다시 물어보기</button>
+      <div style="font-size:10px; color:var(--text3); align-self:center; flex:1.4; line-height:1.4;">⚠️ AI 조언은 투자 참고용이며 투자 판단과 책임은 본인에게 있습니다.</div>
+    </div>
+  </div>
+</div>
 
 <!-- 🌟 개별 종목 차트 모달 -->
 <div class="overlay" id="chartOverlay" onclick="closeModal('chartOverlay')">
@@ -1814,5 +1865,272 @@ async function loadMoonlightDashboard(){
 <script src="/plus/probe.js"></script>
 <script src="/plus/market-signal.js"></script>
 <script src="tutorial.js"></script>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   🤖 AI 투자조언 (Gemini API 연동) — Plus 기능
+   - 전체보기 / 소유자1 / 소유자2 탭에서만 우측 하단 FAB 버튼이 노출됩니다.
+   - 버튼 클릭 시 현재 탭 기준 보유 종목(수량/평단가/현재가/평가손익 등)을
+     JSON으로 정리해 Gemini API(generateContent)에 전달하고, 받은 의견을
+     모달에 표시합니다.
+   - Gemini API 키는 브라우저 localStorage에만 저장되며 서버로 전송되지 않습니다
+     (이 앱은 백엔드가 없는 정적 페이지이므로, 브라우저 → Gemini로 직접 호출합니다).
+   ══════════════════════════════════════════════════════ */
+(function () {
+  const GEMINI_KEY_STORAGE   = 'ttm_gemini_api_key';
+  const GEMINI_MODEL_STORAGE = 'ttm_gemini_model';
+  const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+
+  // ── 설정값 read/write ──────────────────────────────
+  function getGeminiApiKey()  { try { return localStorage.getItem(GEMINI_KEY_STORAGE) || ''; } catch(e) { return ''; } }
+  function getGeminiModel()   { try { return localStorage.getItem(GEMINI_MODEL_STORAGE) || DEFAULT_GEMINI_MODEL; } catch(e) { return DEFAULT_GEMINI_MODEL; } }
+
+  window.saveGeminiSettings = function () {
+    const keyInput   = document.getElementById('inputGeminiApiKey');
+    const modelInput = document.getElementById('inputGeminiModel');
+    const key   = keyInput ? keyInput.value.trim() : '';
+    const model = (modelInput && modelInput.value.trim()) ? modelInput.value.trim() : DEFAULT_GEMINI_MODEL;
+    if (!key) { alert('Gemini API 키를 입력해주세요.'); return; }
+    try {
+      localStorage.setItem(GEMINI_KEY_STORAGE, key);
+      localStorage.setItem(GEMINI_MODEL_STORAGE, model);
+    } catch(e) { alert('이 브라우저에서는 설정을 저장할 수 없습니다.'); return; }
+    const panel = document.getElementById('aiSettingsPanel');
+    if (panel) panel.style.display = 'none';
+    requestAiAdvice();
+  };
+
+  window.toggleAiSettingsPanel = function () {
+    const panel = document.getElementById('aiSettingsPanel');
+    if (!panel) return;
+    const show = panel.style.display === 'none';
+    panel.style.display = show ? 'block' : 'none';
+    if (show) {
+      const keyInput   = document.getElementById('inputGeminiApiKey');
+      const modelInput = document.getElementById('inputGeminiModel');
+      if (keyInput)   keyInput.value   = getGeminiApiKey();
+      if (modelInput) modelInput.value = getGeminiModel();
+    }
+  };
+
+  // ── 현재 탭(전체/소유자1/소유자2) 정보 ──────────────
+  function getAiScope() {
+    if (currentView === 'user1') return { ownerFilter: state.owners.user1.name, label: `${state.owners.user1.icon || '👤'} ${state.owners.user1.name} 포트폴리오` };
+    if (currentView === 'user2') return { ownerFilter: state.owners.user2.name, label: `${state.owners.user2.icon || '👤'} ${state.owners.user2.name} 포트폴리오` };
+    if (currentView === 'all')   return { ownerFilter: 'all', label: '🌐 전체 통합 포트폴리오' };
+    return null;
+  }
+
+  // ── FAB 노출 여부: 전체보기 / 소유자1 / 소유자2 탭에서만 ──
+  function updateAiFabVisibility() {
+    const fab = document.getElementById('aiAdviceFab');
+    if (!fab) return;
+    const scope = getAiScope();
+    fab.style.display = scope ? 'inline-flex' : 'none';
+  }
+
+  // setView는 app.js에 정의된 전역 함수 → 뷰 전환 시점마다 FAB 표시 여부를 함께 갱신
+  const _origSetView = window.setView;
+  if (typeof _origSetView === 'function') {
+    window.setView = function (view, el) {
+      _origSetView(view, el);
+      updateAiFabVisibility();
+    };
+  }
+  document.addEventListener('DOMContentLoaded', () => setTimeout(updateAiFabVisibility, 300));
+
+  // ── 보유 종목 → JSON payload 구성 (calculateHoldings/cachedMarketData는 app.js 전역) ──
+  function buildPortfolioPayload(scope) {
+    const holdings = calculateHoldings(scope.ownerFilter);
+    let bySymbol = {};
+    for (const key in holdings) {
+      const h = holdings[key];
+      if (h.qty <= 0) continue;
+      if (!bySymbol[h.symbol]) bySymbol[h.symbol] = { qty: 0, totalCost: 0, brokers: new Set() };
+      bySymbol[h.symbol].qty += h.qty;
+      bySymbol[h.symbol].totalCost += h.qty * h.avg;
+      bySymbol[h.symbol].brokers.add(h.broker);
+    }
+
+    let items = [];
+    let totalEval = 0, totalCost = 0;
+    for (const sym in bySymbol) {
+      const s = bySymbol[sym];
+      const avgPrice = s.qty > 0 ? s.totalCost / s.qty : 0;
+      const market = (typeof cachedMarketData !== 'undefined') ? cachedMarketData[sym] : null;
+      const hasPrice = market && !market._failed && market.last;
+      const currentPrice = hasPrice ? market.last : avgPrice;
+      const name = hasPrice ? market.name : sym;
+      const evalAmount = s.qty * currentPrice;
+      const costAmount = s.totalCost;
+      const pnlAmount = evalAmount - costAmount;
+      const pnlPercent = costAmount > 0 ? (pnlAmount / costAmount) * 100 : 0;
+      const currency = (typeof isKorean === 'function' && isKorean(sym)) ? 'KRW' : 'USD';
+
+      totalEval += evalAmount;
+      totalCost += costAmount;
+
+      items.push({
+        symbol: sym.replace(/\.KS\.DLST|\.DLST/g, ''),
+        name: name,
+        currency: currency,
+        quantity: Number(s.qty.toFixed(4)),
+        avgBuyPrice: Number(avgPrice.toFixed(2)),
+        currentPrice: Number(currentPrice.toFixed(2)),
+        investedAmount: Math.round(costAmount),
+        evaluationAmount: Math.round(evalAmount),
+        profitLossAmount: Math.round(pnlAmount),
+        profitLossPercent: Number(pnlPercent.toFixed(2)),
+        brokers: Array.from(s.brokers)
+      });
+    }
+
+    items.sort((a, b) => b.evaluationAmount - a.evaluationAmount);
+    items.forEach(it => { it.portfolioWeightPercent = totalEval > 0 ? Number(((it.evaluationAmount / totalEval) * 100).toFixed(2)) : 0; });
+
+    const totalPnL = totalEval - totalCost;
+    return {
+      scope: scope.label,
+      generatedAt: new Date().toISOString(),
+      note: 'KRW 통화는 원화(₩), USD는 달러($) 기준 금액입니다.',
+      summary: {
+        totalInvestedAmount: Math.round(totalCost),
+        totalEvaluationAmount: Math.round(totalEval),
+        totalProfitLossAmount: Math.round(totalPnL),
+        totalProfitLossPercent: totalCost > 0 ? Number(((totalPnL / totalCost) * 100).toFixed(2)) : 0,
+        holdingCount: items.length
+      },
+      holdings: items
+    };
+  }
+
+  function buildPrompt(payload) {
+    return [
+      '당신은 신중하고 균형 잡힌 시각을 가진 투자 어시스턴트입니다.',
+      '아래 JSON은 사용자가 실제 보유 중인 종목, 수량, 평단가, 현재가, 투자금, 평가손익, 포트폴리오 비중 데이터입니다.',
+      '이 데이터를 바탕으로 다음 항목을 한국어로, 마크다운(##, -, ** ) 형식을 사용해 간결하고 실용적으로 작성해 주세요:',
+      '1. 전체 포트폴리오 총평 (수익률, 분산 정도, 눈에 띄는 특징)',
+      '2. 비중이 큰 종목 위주 코멘트 (섹터 쏠림, 리스크 요인 등)',
+      '3. 분산/리스크 관리 관점의 개선 아이디어',
+      '4. 유의사항: 이 조언은 참고용이며 투자 손익에 대한 책임은 본인에게 있다는 점을 짧게 안내',
+      '특정 종목의 즉시 매수/매도를 단정적으로 지시하지 말고, 근거와 함께 균형 잡힌 관점을 제시하세요.',
+      '',
+      '```json',
+      JSON.stringify(payload, null, 2),
+      '```'
+    ].join('\n');
+  }
+
+  async function callGeminiApi(apiKey, model, prompt) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.4 }
+      })
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      const msg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+    const candidate = data && data.candidates && data.candidates[0];
+    const parts = candidate && candidate.content && candidate.content.parts;
+    const text = parts && parts.map(p => p.text || '').join('\n');
+    if (!text) throw new Error('AI 응답에서 텍스트를 찾을 수 없습니다.');
+    return text;
+  }
+
+  // ── 아주 가벼운 마크다운 → HTML 변환 (외부 라이브러리 없이) ──
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function lightMarkdownToHtml(text) {
+    const lines = escapeHtml(text).split('\n');
+    let html = '';
+    let inList = false;
+    lines.forEach(rawLine => {
+      let line = rawLine.trim();
+      line = line.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+      if (/^#{1,3}\s+/.test(line)) {
+        if (inList) { html += '</ul>'; inList = false; }
+        const heading = line.replace(/^#{1,3}\s+/, '');
+        html += `<div style="font-weight:800; font-size:14px; margin:14px 0 6px; color:var(--text);">${heading}</div>`;
+      } else if (/^[-*]\s+/.test(line)) {
+        if (!inList) { html += '<ul style="margin:4px 0 10px; padding-left:18px;">'; inList = true; }
+        html += `<li style="margin-bottom:4px;">${line.replace(/^[-*]\s+/, '')}</li>`;
+      } else if (line === '') {
+        if (inList) { html += '</ul>'; inList = false; }
+      } else {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += `<p style="margin:0 0 8px;">${line}</p>`;
+      }
+    });
+    if (inList) html += '</ul>';
+    return html;
+  }
+
+  // ── 모달 열기 ──
+  window.openAiAdviceModal = function () {
+    const scope = getAiScope();
+    if (!scope) return;
+    document.getElementById('aiAdviceScopeLabel').textContent = scope.label + ' 기준으로 분석합니다';
+    document.getElementById('aiSettingsPanel').style.display = 'none';
+    document.getElementById('aiAdviceOverlay').classList.add('open');
+    requestAiAdvice();
+  };
+
+  // ── 실제 요청 실행 ──
+  window.requestAiAdvice = async function () {
+    const scope = getAiScope();
+    const body = document.getElementById('aiAdviceBody');
+    if (!scope || !body) return;
+
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) {
+      body.innerHTML = `<div style="text-align:center; color:var(--text2); padding:30px 10px;">
+        먼저 우측 상단 ⚙️ 버튼을 눌러 Gemini API 키를 등록해 주세요.
+      </div>`;
+      const panel = document.getElementById('aiSettingsPanel');
+      if (panel) panel.style.display = 'block';
+      const modelInput = document.getElementById('inputGeminiModel');
+      if (modelInput && !modelInput.value) modelInput.value = getGeminiModel();
+      return;
+    }
+
+    let payload;
+    try {
+      payload = buildPortfolioPayload(scope);
+    } catch (e) {
+      body.innerHTML = `<div style="text-align:center; color:#e11d48; padding:30px 10px;">보유 종목 데이터를 정리하는 중 오류가 발생했습니다: ${escapeHtml(e.message)}</div>`;
+      return;
+    }
+
+    if (!payload.holdings.length) {
+      body.innerHTML = `<div style="text-align:center; color:var(--text2); padding:30px 10px;">현재 탭에 보유 중인 종목이 없습니다. 거래 내역을 먼저 등록해 주세요.</div>`;
+      return;
+    }
+
+    body.innerHTML = `<div style="text-align:center; color:var(--text3); padding:40px 0;">
+      <div style="font-size:22px; margin-bottom:8px;">🤖</div>
+      Gemini가 ${payload.holdings.length}개 종목을 분석하고 있습니다...
+    </div>`;
+
+    try {
+      const prompt = buildPrompt(payload);
+      const resultText = await callGeminiApi(apiKey, getGeminiModel(), prompt);
+      body.innerHTML = lightMarkdownToHtml(resultText);
+    } catch (e) {
+      body.innerHTML = `<div style="text-align:center; color:#e11d48; padding:30px 10px; line-height:1.6;">
+        AI 조언을 가져오지 못했습니다.<br>
+        <span style="font-size:11px; color:var(--text3);">${escapeHtml(e.message)}</span><br><br>
+        API 키/모델이 올바른지 ⚙️ 설정에서 확인해 주세요.
+      </div>`;
+    }
+  };
+})();
+</script>
 </body>
 </html>
