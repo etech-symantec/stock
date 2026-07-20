@@ -166,17 +166,23 @@
     mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
     -webkit-mask-size: 3000% 100%;
     mask-size: 3000% 100%;
-    -webkit-animation: aiFabAni2 0.7s steps(29) forwards;
-    animation: aiFabAni2 0.7s steps(29) forwards;
+    opacity: 0;
+    -webkit-animation: aiFabAni2 0.35s steps(29) forwards;
+    animation: aiFabAni2 0.35s steps(29) forwards;
   }
   #aiAdviceFab:hover .ai-fab-mask{
-    -webkit-animation: aiFabAni 0.7s steps(29) forwards;
-    animation: aiFabAni 0.7s steps(29) forwards;
+    opacity: 1;
+    -webkit-animation: aiFabAni 0.5s steps(29) forwards;
+    animation: aiFabAni 0.5s steps(29) forwards;
   }
   #aiAdviceFab > svg,
   #aiAdviceFab > span{
     position: relative;
     z-index: 1;
+  }
+  /* 평소엔 진한 텍스트, 호버 시(색이 채워지는 동안) 하얀 글씨로 전환 */
+  #aiAdviceFab:hover{
+    color: #fff !important;
   }
   @-webkit-keyframes aiFabAni{
     from{ -webkit-mask-position: 0 0; mask-position: 0 0; }
@@ -1232,9 +1238,9 @@
 <!-- ✨ AI 투자조언 플로팅 버튼 (전체보기 / 소유자별 탭에서만 표시) — Gemini 스타일 -->
 <div id="aiAdviceFabWrap" style="display:none; position:fixed; right:24px; bottom:24px; z-index:900; isolation:isolate;">
   <span class="ai-fab-particles" id="aiFabParticles" aria-hidden="true"></span>
-  <button id="aiAdviceFab" onclick="openAiAdviceModal()" style="position:relative; z-index:1; display:inline-flex; align-items:center; gap:8px; padding:11px 20px 11px 16px; border-radius:30px; cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:700; transition:transform 0.15s ease, box-shadow 0.15s ease;
-    border:2.75px solid transparent; background-image:linear-gradient(var(--bg2),var(--bg2)), linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%); background-origin:border-box; background-clip:padding-box, border-box;
-    color:var(--text); box-shadow:0 6px 20px rgba(155,114,203,0.35);"
+  <button id="aiAdviceFab" onclick="openAiAdviceModal()" style="position:relative; z-index:1; display:inline-flex; align-items:center; gap:8px; padding:11px 20px 11px 16px; border-radius:30px; cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:700; transition:transform 0.15s ease, box-shadow 0.15s ease, color 0.25s ease;
+    border:2.75px solid transparent; background-image:linear-gradient(#fff,#fff), linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%); background-origin:border-box; background-clip:padding-box, border-box;
+    color:#3c3450; box-shadow:0 6px 20px rgba(155,114,203,0.35);"
     onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 26px rgba(155,114,203,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(155,114,203,0.35)';"
     title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
     <span class="ai-fab-mask" aria-hidden="true"></span>
