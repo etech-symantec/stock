@@ -4934,6 +4934,22 @@ function updateRangeButtonReadiness() {
         btn10y.style.transition = 'opacity 0.4s';
     }
 }
+// 🌟 우측 하단 실시간 로딩 알림이 떠 있는 동안, 같은 자리에 겹치는 AI 조언/탐사선 버튼을 잠시 숨깁니다.
+function setFabButtonsHiddenForLoading(hidden) {
+    const aiFab = document.getElementById('aiAdviceFab');
+    const probeFab = document.getElementById('probeFabBtn');
+    [aiFab, probeFab].forEach(btn => {
+        if (!btn) return;
+        if (hidden) {
+            btn.style.opacity = '0';
+            btn.style.pointerEvents = 'none';
+        } else {
+            btn.style.opacity = '';
+            btn.style.pointerEvents = '';
+        }
+        btn.style.transition = 'opacity 0.25s ease';
+    });
+}
 // 🌟 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
 let isFetchingMarketData = false;
 async function fetchMissingMarketData(symbolsToFetch) {
@@ -4961,6 +4977,7 @@ async function fetchMissingMarketData(symbolsToFetch) {
         document.body.appendChild(loadingEl);
     }
     loadingEl.style.opacity = '1';
+    setFabButtonsHiddenForLoading(true);
 
     for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
         if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 쾌속 로딩 중... (${Math.min(i + batchSize, symbolsToFetch.length)}/${symbolsToFetch.length})`;
@@ -4981,6 +4998,7 @@ async function fetchMissingMarketData(symbolsToFetch) {
     
     isFetchingMarketData = false;
     if(loadingEl) loadingEl.style.opacity = '0';
+    setFabButtonsHiddenForLoading(false);
 
     // 🌟 10년치를 한 번에 받으므로 모든 버튼 즉시 활성화
     const btn5y  = document.getElementById('rtab-5y');
@@ -5022,6 +5040,7 @@ async function fetchExtendedMarketData(yahooRange, rangeLevel) {
         document.body.appendChild(loadingEl);
     }
     loadingEl.style.opacity = '1';
+    setFabButtonsHiddenForLoading(true);
 
     for (let i = 0; i < allSymbols.length; i += batchSize) {
         const batch = allSymbols.slice(i, i + batchSize);
@@ -5050,6 +5069,7 @@ async function fetchExtendedMarketData(yahooRange, rangeLevel) {
     loadingEl.innerHTML = `✅ ${label}치 데이터 준비 완료!`;
     await new Promise(res => setTimeout(res, 1200));
     loadingEl.style.opacity = '0';
+    setFabButtonsHiddenForLoading(false);
 
     try {
         localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData));
