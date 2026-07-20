@@ -1240,10 +1240,11 @@
       <button class="btn-submit" id="aiFollowupSendBtn" style="width:auto; flex:0 0 auto; height:44px; padding:0 20px; white-space:nowrap; margin-top:0;" onclick="sendAiFollowup()">전송</button>
     </div>
 
-    <!-- 푸터 -->
-    <div style="display:flex; gap:8px; padding:16px 28px; border-top:1px solid var(--border); flex-shrink:0;">
-      <button class="btn-sm" style="flex:1; justify-content:center;" onclick="showAiPromptEditor()">🔄 새로 분석하기</button>
-      <div style="font-size:10px; color:var(--text3); align-self:center; flex:1.4; line-height:1.4;">⚠️ AI 조언은 투자 참고용이며 투자 판단과 책임은 본인에게 있습니다.</div>
+    <!-- 푸터: 새로 분석하기 + 유의사항 + 전송(편집 화면일 때만 표시) -->
+    <div style="display:flex; align-items:center; gap:10px; padding:16px 28px; border-top:1px solid var(--border); flex-shrink:0;">
+      <button class="btn-sm" style="flex:0 0 auto; width:auto; justify-content:center; padding:6px 10px; font-size:11px; white-space:nowrap;" onclick="showAiPromptEditor()">🔄 새로 분석하기</button>
+      <div style="font-size:12px; color:var(--text3); flex:1; line-height:1.4;">⚠️ AI 조언은 투자 참고용이며 투자 판단과 책임은 본인에게 있습니다.</div>
+      <button class="btn-submit" id="aiSendBtn" style="display:none; width:auto; flex:0 0 auto; padding:0 22px; height:36px; margin-top:0; white-space:nowrap;" onclick="requestAiAdvice()">전송</button>
     </div>
   </div>
 </div>
@@ -2171,6 +2172,8 @@ async function loadMoonlightDashboard(){
     if (banner) banner.style.display = 'block';
     if (historyPanel) historyPanel.classList.remove('open');
     if (followupRow) followupRow.style.display = 'flex';
+    const sendBtn = document.getElementById('aiSendBtn');
+    if (sendBtn) sendBtn.style.display = 'none';
   };
 
   // ── 현재 탭(전체/소유자1/소유자2) 정보 ──────────────
@@ -2471,12 +2474,14 @@ async function loadMoonlightDashboard(){
       if (panel) panel.classList.add('open');
       const modelInput = document.getElementById('inputGeminiModel');
       if (modelInput && !modelInput.value) modelInput.value = getGeminiModel();
+      const sendBtnOff = document.getElementById('aiSendBtn');
+      if (sendBtnOff) sendBtnOff.style.display = 'none';
       return;
     }
 
     body.innerHTML = `
       <div style="font-size:12px; color:var(--text2); margin-bottom:10px; line-height:1.5;">
-        아래 버튼으로 빠르게 질문을 채우거나 직접 입력한 뒤 <b>전송</b> 버튼을 눌러주세요. 보유 종목·평가손익 등 포트폴리오 데이터는 전송 시 자동으로 함께 첨부됩니다.
+        아래 버튼으로 빠르게 질문을 채우거나 직접 입력한 뒤 아래쪽 <b>전송</b> 버튼을 눌러주세요. 보유 종목·평가손익 등 포트폴리오 데이터는 전송 시 자동으로 함께 첨부됩니다.
       </div>
       <div id="aiQuickQuestionsRow" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;"></div>
       <div id="aiAddQuestionForm" style="display:none; margin-bottom:12px; padding:12px; border:1px solid var(--border2); border-radius:8px; background:var(--bg3);">
@@ -2494,11 +2499,10 @@ async function loadMoonlightDashboard(){
         </div>
       </div>
       <textarea id="aiPromptTextarea" class="form-input" style="width:100%; min-height:180px; resize:vertical; font-family:var(--font-sans); font-size:13px; line-height:1.65; padding:12px;" placeholder="궁금한 점을 자유롭게 입력하거나, 위 버튼을 눌러 질문을 빠르게 채워보세요."></textarea>
-      <div style="display:flex; justify-content:flex-end; margin-top:14px;">
-        <button class="btn-submit" style="width:auto; flex:0 0 auto; padding:0 22px; height:36px; margin-top:0;" onclick="requestAiAdvice()">전송</button>
-      </div>
     `;
     renderQuickQuestionButtons();
+    const sendBtnOn = document.getElementById('aiSendBtn');
+    if (sendBtnOn) sendBtnOn.style.display = 'inline-flex';
   };
 
   // ── 빠른 질문 버튼 목록(기본 제공 + 사용자 등록) 렌더링 ──
@@ -2583,6 +2587,10 @@ async function loadMoonlightDashboard(){
     const followupRow = document.getElementById('aiFollowupRow');
     if (followupRow) followupRow.style.display = 'none';
     currentThread = null;
+
+    // 요청이 시작되면 편집 화면의 전송 버튼은 숨깁니다 (로딩/결과/에러 화면에서는 필요 없음).
+    const sendBtn = document.getElementById('aiSendBtn');
+    if (sendBtn) sendBtn.style.display = 'none';
 
     const apiKey = getGeminiApiKey();
     if (!apiKey) {
