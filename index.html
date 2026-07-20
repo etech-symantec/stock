@@ -148,6 +148,52 @@
     65%  { opacity: 0.5; }
     100% { transform: translate(var(--tx, 40px), var(--ty, -20px)) scale(1); opacity: 0; }
   }
+
+  /* ✨ button-container-2 스타일 이식: urban-sprite를 steps()로 마스킹 애니메이션 →
+     AI 투자조언 버튼에 마우스오버 시 손그림처럼 번지는 효과를 추가합니다.
+     버튼 자체 모양(알약형, 그라디언트 보더)은 그대로 유지하고, 그 위에 마스크 레이어만 얹습니다. */
+  #aiAdviceFab{
+    overflow: hidden;
+  }
+  #aiAdviceFab .ai-fab-mask{
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 30px;
+    background: linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%);
+    -webkit-mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
+    mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
+    -webkit-mask-size: 3000% 100%;
+    mask-size: 3000% 100%;
+    -webkit-animation: aiFabAni2 0.7s steps(29) forwards;
+    animation: aiFabAni2 0.7s steps(29) forwards;
+  }
+  #aiAdviceFab:hover .ai-fab-mask{
+    -webkit-animation: aiFabAni 0.7s steps(29) forwards;
+    animation: aiFabAni 0.7s steps(29) forwards;
+  }
+  #aiAdviceFab > svg,
+  #aiAdviceFab > span{
+    position: relative;
+    z-index: 1;
+  }
+  @-webkit-keyframes aiFabAni{
+    from{ -webkit-mask-position: 0 0; mask-position: 0 0; }
+    to{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+  }
+  @keyframes aiFabAni{
+    from{ -webkit-mask-position: 0 0; mask-position: 0 0; }
+    to{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+  }
+  @-webkit-keyframes aiFabAni2{
+    from{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+    to{ -webkit-mask-position: 0 0; mask-position: 0 0; }
+  }
+  @keyframes aiFabAni2{
+    from{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+    to{ -webkit-mask-position: 0 0; mask-position: 0 0; }
+  }
 </style>
 </head>
 <body>
@@ -1191,6 +1237,7 @@
     color:var(--text); box-shadow:0 6px 20px rgba(155,114,203,0.35);"
     onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 26px rgba(155,114,203,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(155,114,203,0.35)';"
     title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
+    <span class="ai-fab-mask" aria-hidden="true"></span>
     <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px rgba(155,114,203,0.55)); flex-shrink:0;"><defs><linearGradient id="geminiGradFab" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285F4"/><stop offset="35%" stop-color="#9B72CB"/><stop offset="70%" stop-color="#D96570"/><stop offset="100%" stop-color="#F9AB00"/></linearGradient></defs><path fill="url(#geminiGradFab)" d="M12 1 Q13 11 23 12 Q13 13 12 23 Q11 13 1 12 Q11 11 12 1 Z"/></svg>
     <span id="aiAdviceFabLabel">AI 투자조언</span>
   </button>
