@@ -121,28 +121,23 @@
     overflow-y: auto;
     flex: 1;
   }
-  /* ✨ AI 투자조언 버튼 — 버튼 뒤로 파티클이 항상 은은하게 퍼져나가는 효과 */
-  #aiAdviceFab{
-    position: fixed;
-    isolation: isolate;
-    overflow: visible;
-  }
-  #aiAdviceFab .ai-fab-particles{
+  /* ✨ AI 투자조언 버튼 — 버튼 뒤로 파티클이 항상 은은하게 퍼져나가는 효과 (버튼보다 z-index가 낮아 뒤에 가려짐) */
+  #aiAdviceFabWrap .ai-fab-particles{
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
   }
-  #aiAdviceFab .ai-fab-particle{
+  #aiAdviceFabWrap .ai-fab-particle{
     position: absolute;
     top: 50%;
     left: 50%;
-    width: var(--size, 4px);
-    height: var(--size, 4px);
-    margin: calc(var(--size, 4px) / -2) 0 0 calc(var(--size, 4px) / -2);
+    width: var(--size, 6px);
+    height: var(--size, 6px);
+    margin: calc(var(--size, 6px) / -2) 0 0 calc(var(--size, 6px) / -2);
     border-radius: 50%;
     background: var(--pcolor, #9B72CB);
-    box-shadow: 0 0 6px var(--pcolor, #9B72CB);
+    box-shadow: 0 0 7px var(--pcolor, #9B72CB);
     opacity: 0;
     animation: aiFabParticleBurst var(--dur, 2.4s) ease-out infinite;
     animation-delay: var(--delay, 0s);
@@ -1189,17 +1184,19 @@
     </main> </div>
 
 <!-- ✨ AI 투자조언 플로팅 버튼 (전체보기 / 소유자별 탭에서만 표시) — Gemini 스타일 -->
-<button id="aiAdviceFab" onclick="openAiAdviceModal()" style="display:none; position:fixed; right:24px; bottom:24px; z-index:900; align-items:center; gap:8px; padding:11px 20px 11px 16px; border-radius:30px; cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:700; transition:transform 0.15s ease, box-shadow 0.15s ease;
-  border:2.75px solid transparent; background-image:linear-gradient(var(--bg2),var(--bg2)), linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%); background-origin:border-box; background-clip:padding-box, border-box;
-  color:var(--text); box-shadow:0 6px 20px rgba(155,114,203,0.35);"
-  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 26px rgba(155,114,203,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(155,114,203,0.35)';"
-  title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
-  <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px rgba(155,114,203,0.55)); flex-shrink:0;"><defs><linearGradient id="geminiGradFab" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285F4"/><stop offset="35%" stop-color="#9B72CB"/><stop offset="70%" stop-color="#D96570"/><stop offset="100%" stop-color="#F9AB00"/></linearGradient></defs><path fill="url(#geminiGradFab)" d="M12 1 Q13 11 23 12 Q13 13 12 23 Q11 13 1 12 Q11 11 12 1 Z"/></svg>
-  <span id="aiAdviceFabLabel">AI 투자조언</span>
+<div id="aiAdviceFabWrap" style="display:none; position:fixed; right:24px; bottom:24px; z-index:900; isolation:isolate;">
   <span class="ai-fab-particles" id="aiFabParticles" aria-hidden="true"></span>
-</button>
+  <button id="aiAdviceFab" onclick="openAiAdviceModal()" style="position:relative; z-index:1; display:inline-flex; align-items:center; gap:8px; padding:11px 20px 11px 16px; border-radius:30px; cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:700; transition:transform 0.15s ease, box-shadow 0.15s ease;
+    border:2.75px solid transparent; background-image:linear-gradient(var(--bg2),var(--bg2)), linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%); background-origin:border-box; background-clip:padding-box, border-box;
+    color:var(--text); box-shadow:0 6px 20px rgba(155,114,203,0.35);"
+    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 26px rgba(155,114,203,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(155,114,203,0.35)';"
+    title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
+    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px rgba(155,114,203,0.55)); flex-shrink:0;"><defs><linearGradient id="geminiGradFab" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285F4"/><stop offset="35%" stop-color="#9B72CB"/><stop offset="70%" stop-color="#D96570"/><stop offset="100%" stop-color="#F9AB00"/></linearGradient></defs><path fill="url(#geminiGradFab)" d="M12 1 Q13 11 23 12 Q13 13 12 23 Q11 13 1 12 Q11 11 12 1 Z"/></svg>
+    <span id="aiAdviceFabLabel">AI 투자조언</span>
+  </button>
+</div>
 <script>
-  // ✨ AI 투자조언 버튼 뒤로 흩날리는 파티클을 랜덤하게 생성 (항상 동작)
+  // ✨ AI 투자조언 버튼 뒤로 흩날리는 타원형 파티클을 랜덤하게 생성 (항상 동작, 버튼 뒤에서만 보임)
   (function () {
     const wrap = document.getElementById('aiFabParticles');
     if (!wrap) return;
@@ -1209,10 +1206,12 @@
       const p = document.createElement('span');
       p.className = 'ai-fab-particle';
       const angle = (Math.PI * 2 * i) / COUNT + Math.random() * 0.5;
-      const dist = 26 + Math.random() * 30;
-      const tx = Math.cos(angle) * dist;
-      const ty = Math.sin(angle) * dist;
-      const size = 2.5 + Math.random() * 2.5;
+      // 알약 버튼 형태에 맞춰 가로로 더 길게, 세로로 짧게 퍼지는 타원형 궤적
+      const rx = 46 + Math.random() * 34;   // 가로 반경
+      const ry = 16 + Math.random() * 12;   // 세로 반경
+      const tx = Math.cos(angle) * rx;
+      const ty = Math.sin(angle) * ry;
+      const size = 4 + Math.random() * 3.5;
       const dur = 1.8 + Math.random() * 1.6;
       const delay = Math.random() * dur;
       p.style.setProperty('--tx', tx.toFixed(1) + 'px');
@@ -2247,10 +2246,10 @@ async function loadMoonlightDashboard(){
 
   // ── FAB 노출 여부: 전체보기 / 소유자1 / 소유자2 탭에서만 ──
   function updateAiFabVisibility() {
-    const fab = document.getElementById('aiAdviceFab');
+    const fab = document.getElementById('aiAdviceFabWrap');
     if (!fab) return;
     const scope = getAiScope();
-    fab.style.display = scope ? 'inline-flex' : 'none';
+    fab.style.display = scope ? 'block' : 'none';
   }
 
   // setView는 app.js에 정의된 전역 함수 → 뷰 전환 시점마다 FAB 표시 여부를 함께 갱신
