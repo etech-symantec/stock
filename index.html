@@ -64,6 +64,42 @@
     border: 1px solid var(--border2, rgba(148,163,184,0.35));
     cursor: pointer;
   }
+  /* 🕘⚙️ AI 투자조언 모달의 "기록" / "설정" 패널: 상단에 끼어들지 않고 우측에서 슬라이드로 나타납니다 */
+  .ai-side-panel{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    max-width: 88vw;
+    height: 100%;
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    box-shadow: -10px 0 28px rgba(0,0,0,0.18);
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.22s ease;
+  }
+  .ai-side-panel.open{
+    transform: translateX(0);
+  }
+  .ai-side-panel-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .ai-side-panel-body{
+    padding: 16px 18px;
+    overflow-y: auto;
+    flex: 1;
+  }
 </style>
 </head>
 <body>
@@ -1129,30 +1165,42 @@
       </div>
     </div>
 
-    <!-- 지난 기록 패널 -->
-    <div id="aiHistoryPanel" style="display:none; padding:14px 28px; border-bottom:1px solid var(--border); background:var(--bg3); flex-shrink:0; max-height:260px; overflow-y:auto;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <div style="font-size:11px; color:var(--text2);">최근 조언 기록 (이 브라우저에만 저장됩니다)</div>
-        <button class="btn-sm" style="font-size:10px; padding:3px 8px;" onclick="clearAiHistory()">전체 삭제</button>
+    <!-- 🕘 지난 기록 패널 (우측 슬라이드) -->
+    <div id="aiHistoryPanel" class="ai-side-panel">
+      <div class="ai-side-panel-header">
+        <span>🕘 지난 조언 기록</span>
+        <button class="btn-sm" style="width:auto; flex:0 0 auto;" onclick="toggleAiHistoryPanel()">✕ 닫기</button>
       </div>
-      <div id="aiHistoryList"></div>
+      <div class="ai-side-panel-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:11px; color:var(--text2);">최근 조언 기록 (이 브라우저에만 저장됩니다)</div>
+          <button class="btn-sm" style="width:auto; flex:0 0 auto; font-size:10px; padding:3px 8px;" onclick="clearAiHistory()">전체 삭제</button>
+        </div>
+        <div id="aiHistoryList"></div>
+      </div>
     </div>
 
-    <!-- API 키 / 모델 설정 패널 -->
-    <div id="aiSettingsPanel" style="display:none; padding:16px 28px; border-bottom:1px solid var(--border); background:var(--bg3); flex-shrink:0;">
-      <div style="font-size:11px; color:var(--text2); line-height:1.5; margin-bottom:10px;">
-        Google AI Studio에서 발급받은 <b>Gemini API 키</b>가 필요합니다. 키는 이 브라우저에만(localStorage) 저장되며 서버로 전송되지 않습니다.
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--accent);">API 키 발급받기 →</a>
+    <!-- ⚙️ API 키 / 모델 설정 패널 (우측 슬라이드) -->
+    <div id="aiSettingsPanel" class="ai-side-panel">
+      <div class="ai-side-panel-header">
+        <span>⚙️ Gemini 설정</span>
+        <button class="btn-sm" style="width:auto; flex:0 0 auto;" onclick="toggleAiSettingsPanel()">✕ 닫기</button>
       </div>
-      <div class="form-group" style="margin-bottom:10px;">
-        <label>Gemini API 키</label>
-        <input type="password" id="inputGeminiApiKey" class="form-input" placeholder="AIza...">
+      <div class="ai-side-panel-body">
+        <div style="font-size:11px; color:var(--text2); line-height:1.5; margin-bottom:14px;">
+          Google AI Studio에서 발급받은 <b>Gemini API 키</b>가 필요합니다. 키는 이 브라우저에만(localStorage) 저장되며 서버로 전송되지 않습니다.
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--accent);">API 키 발급받기 →</a>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>Gemini API 키</label>
+          <input type="password" id="inputGeminiApiKey" class="form-input" placeholder="AIza...">
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>모델</label>
+          <input type="text" id="inputGeminiModel" class="form-input" placeholder="gemini-flash-latest">
+        </div>
+        <button class="btn-submit" onclick="saveGeminiSettings()">저장</button>
       </div>
-      <div class="form-group" style="margin-bottom:12px;">
-        <label>모델</label>
-        <input type="text" id="inputGeminiModel" class="form-input" placeholder="gemini-flash-latest">
-      </div>
-      <button class="btn-submit" style="background:var(--accent); width:100%;" onclick="saveGeminiSettings()">저장</button>
     </div>
 
     <!-- 과거 기록을 보고 있을 때 표시되는 안내 배너 -->
@@ -1167,8 +1215,8 @@
 
     <!-- 💬 후속 질문 입력창 (첫 분석이 끝난 뒤에만 표시됩니다) -->
     <div id="aiFollowupRow" style="display:none; gap:8px; padding:12px 28px; border-top:1px solid var(--border); flex-shrink:0;">
-      <input type="text" id="aiFollowupInput" class="form-input" style="flex:1;" placeholder="예: 배당 위주로 재편하면 어떨까요?" onkeydown="if(event.key==='Enter'){event.preventDefault(); sendAiFollowup();}">
-      <button class="btn-submit" id="aiFollowupSendBtn" style="background:var(--accent); padding:0 18px; white-space:nowrap;" onclick="sendAiFollowup()">전송</button>
+      <input type="text" id="aiFollowupInput" class="form-input" style="flex:1 1 auto; min-width:0; height:44px;" placeholder="예: 배당 위주로 재편하면 어떨까요?" onkeydown="if(event.key==='Enter'){event.preventDefault(); sendAiFollowup();}">
+      <button class="btn-submit" id="aiFollowupSendBtn" style="width:auto; flex:0 0 auto; height:44px; padding:0 20px; white-space:nowrap; margin-top:0;" onclick="sendAiFollowup()">전송</button>
     </div>
 
     <!-- 푸터 -->
@@ -1940,17 +1988,17 @@ async function loadMoonlightDashboard(){
       localStorage.setItem(GEMINI_MODEL_STORAGE, model);
     } catch(e) { alert('이 브라우저에서는 설정을 저장할 수 없습니다.'); return; }
     const panel = document.getElementById('aiSettingsPanel');
-    if (panel) panel.style.display = 'none';
-    requestAiAdvice();
+    if (panel) panel.classList.remove('open');
+    showAiPromptEditor();
   };
 
   window.toggleAiSettingsPanel = function () {
     const panel = document.getElementById('aiSettingsPanel');
     if (!panel) return;
     const historyPanel = document.getElementById('aiHistoryPanel');
-    if (historyPanel) historyPanel.style.display = 'none';
-    const show = panel.style.display === 'none';
-    panel.style.display = show ? 'block' : 'none';
+    if (historyPanel) historyPanel.classList.remove('open');
+    const show = !panel.classList.contains('open');
+    panel.classList.toggle('open', show);
     if (show) {
       const keyInput   = document.getElementById('inputGeminiApiKey');
       const modelInput = document.getElementById('inputGeminiModel');
@@ -2067,9 +2115,9 @@ async function loadMoonlightDashboard(){
     const panel = document.getElementById('aiHistoryPanel');
     if (!panel) return;
     const settingsPanel = document.getElementById('aiSettingsPanel');
-    if (settingsPanel) settingsPanel.style.display = 'none';
-    const show = panel.style.display === 'none';
-    panel.style.display = show ? 'block' : 'none';
+    if (settingsPanel) settingsPanel.classList.remove('open');
+    const show = !panel.classList.contains('open');
+    panel.classList.toggle('open', show);
     if (show) renderAiHistoryList();
   };
 
@@ -2100,7 +2148,7 @@ async function loadMoonlightDashboard(){
     if (body) body.innerHTML = renderThreadHtml(currentThread);
     if (bannerLabel) bannerLabel.textContent = `${formatKoreanDateTime(item.timestamp)} · ${item.scopeLabel}`;
     if (banner) banner.style.display = 'block';
-    if (historyPanel) historyPanel.style.display = 'none';
+    if (historyPanel) historyPanel.classList.remove('open');
     if (followupRow) followupRow.style.display = 'flex';
   };
 
@@ -2341,8 +2389,8 @@ async function loadMoonlightDashboard(){
     const scope = getAiScope();
     if (!scope) return;
     document.getElementById('aiAdviceScopeLabel').textContent = scope.label + ' 기준으로 분석합니다';
-    document.getElementById('aiSettingsPanel').style.display = 'none';
-    document.getElementById('aiHistoryPanel').style.display = 'none';
+    document.getElementById('aiSettingsPanel').classList.remove('open');
+    document.getElementById('aiHistoryPanel').classList.remove('open');
     document.getElementById('aiHistoryViewingBanner').style.display = 'none';
     document.getElementById('aiFollowupRow').style.display = 'none';
     document.getElementById('aiAdviceOverlay').classList.add('open');
@@ -2359,7 +2407,7 @@ async function loadMoonlightDashboard(){
     const viewingBanner = document.getElementById('aiHistoryViewingBanner');
     if (viewingBanner) viewingBanner.style.display = 'none';
     const historyPanel = document.getElementById('aiHistoryPanel');
-    if (historyPanel) historyPanel.style.display = 'none';
+    if (historyPanel) historyPanel.classList.remove('open');
     const followupRow = document.getElementById('aiFollowupRow');
     if (followupRow) followupRow.style.display = 'none';
     currentThread = null;
@@ -2370,7 +2418,7 @@ async function loadMoonlightDashboard(){
         먼저 우측 상단 ⚙️ 버튼을 눌러 Gemini API 키를 등록해 주세요.
       </div>`;
       const panel = document.getElementById('aiSettingsPanel');
-      if (panel) panel.style.display = 'block';
+      if (panel) panel.classList.add('open');
       const modelInput = document.getElementById('inputGeminiModel');
       if (modelInput && !modelInput.value) modelInput.value = getGeminiModel();
       return;
@@ -2382,7 +2430,7 @@ async function loadMoonlightDashboard(){
       </div>
       <textarea id="aiPromptTextarea" class="form-input" style="width:100%; min-height:240px; resize:vertical; font-family:var(--font-sans); font-size:13px; line-height:1.65; padding:12px;">${escapeHtml(DEFAULT_AI_INSTRUCTION)}</textarea>
       <div style="display:flex; justify-content:flex-end; margin-top:14px;">
-        <button class="btn-submit" style="background:var(--accent); padding:0 22px; height:36px;" onclick="requestAiAdvice()">전송</button>
+        <button class="btn-submit" style="width:auto; flex:0 0 auto; padding:0 22px; height:36px; margin-top:0;" onclick="requestAiAdvice()">전송</button>
       </div>
     `;
   };
@@ -2401,7 +2449,7 @@ async function loadMoonlightDashboard(){
     const viewingBanner = document.getElementById('aiHistoryViewingBanner');
     if (viewingBanner) viewingBanner.style.display = 'none';
     const historyPanel = document.getElementById('aiHistoryPanel');
-    if (historyPanel) historyPanel.style.display = 'none';
+    if (historyPanel) historyPanel.classList.remove('open');
     const followupRow = document.getElementById('aiFollowupRow');
     if (followupRow) followupRow.style.display = 'none';
     currentThread = null;
@@ -2412,7 +2460,7 @@ async function loadMoonlightDashboard(){
         먼저 우측 상단 ⚙️ 버튼을 눌러 Gemini API 키를 등록해 주세요.
       </div>`;
       const panel = document.getElementById('aiSettingsPanel');
-      if (panel) panel.style.display = 'block';
+      if (panel) panel.classList.add('open');
       const modelInput = document.getElementById('inputGeminiModel');
       if (modelInput && !modelInput.value) modelInput.value = getGeminiModel();
       return;
@@ -2481,7 +2529,7 @@ async function loadMoonlightDashboard(){
     const apiKey = getGeminiApiKey();
     if (!apiKey) {
       const panel = document.getElementById('aiSettingsPanel');
-      if (panel) panel.style.display = 'block';
+      if (panel) panel.classList.add('open');
       return;
     }
 
