@@ -121,40 +121,37 @@
     overflow-y: auto;
     flex: 1;
   }
-  /* ✨ AI 투자조언 버튼 — 알약 테두리를 따라 은은한 빛이 한 바퀴씩 도는 효과 */
+  /* ✨ AI 투자조언 버튼 — 버튼 뒤로 파티클이 항상 은은하게 퍼져나가는 효과 */
   #aiAdviceFab{
     position: fixed;
     isolation: isolate;
     overflow: visible;
   }
-  #aiAdviceFab .ai-fab-orbit{
-    content: '';
+  #aiAdviceFab .ai-fab-particles{
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 1.1em;
-    height: 100%;
+    inset: 0;
+    z-index: -1;
     pointer-events: none;
-    z-index: 2;
-    animation: aiFabOrbit 3s infinite linear;
   }
-  #aiAdviceFab .ai-fab-orbit::after{
-    content: '';
+  #aiAdviceFab .ai-fab-particle{
     position: absolute;
-    left: calc(50% - 0.6em);
-    top: -0.6em;
-    width: 1.2em;
-    height: 1.2em;
+    top: 50%;
+    left: 50%;
+    width: var(--size, 4px);
+    height: var(--size, 4px);
+    margin: calc(var(--size, 4px) / -2) 0 0 calc(var(--size, 4px) / -2);
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(155,114,203,0.85) 35%, rgba(66,133,244,0.5) 60%, rgba(155,114,203,0) 78%);
-    filter: blur(3.5px);
+    background: var(--pcolor, #9B72CB);
+    box-shadow: 0 0 6px var(--pcolor, #9B72CB);
+    opacity: 0;
+    animation: aiFabParticleBurst var(--dur, 2.4s) ease-out infinite;
+    animation-delay: var(--delay, 0s);
   }
-  @keyframes aiFabOrbit{
-    0%   { left: 0;                        transform: rotate(0deg); }
-    30%  { left: calc(100% - 1.1em);       transform: rotate(0deg); }
-    50%  { left: calc(100% - 1.1em);       transform: rotate(180deg); }
-    80%  { left: 0;                        transform: rotate(180deg); }
-    100% { left: 0;                        transform: rotate(360deg); }
+  @keyframes aiFabParticleBurst{
+    0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+    18%  { opacity: 0.9; }
+    65%  { opacity: 0.5; }
+    100% { transform: translate(var(--tx, 40px), var(--ty, -20px)) scale(1); opacity: 0; }
   }
 </style>
 </head>
@@ -1199,8 +1196,36 @@
   title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
   <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px rgba(155,114,203,0.55)); flex-shrink:0;"><defs><linearGradient id="geminiGradFab" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285F4"/><stop offset="35%" stop-color="#9B72CB"/><stop offset="70%" stop-color="#D96570"/><stop offset="100%" stop-color="#F9AB00"/></linearGradient></defs><path fill="url(#geminiGradFab)" d="M12 1 Q13 11 23 12 Q13 13 12 23 Q11 13 1 12 Q11 11 12 1 Z"/></svg>
   <span id="aiAdviceFabLabel">AI 투자조언</span>
-  <span class="ai-fab-orbit" aria-hidden="true"></span>
+  <span class="ai-fab-particles" id="aiFabParticles" aria-hidden="true"></span>
 </button>
+<script>
+  // ✨ AI 투자조언 버튼 뒤로 흩날리는 파티클을 랜덤하게 생성 (항상 동작)
+  (function () {
+    const wrap = document.getElementById('aiFabParticles');
+    if (!wrap) return;
+    const colors = ['#4285F4', '#9B72CB', '#D96570', '#F9AB00'];
+    const COUNT = 16;
+    for (let i = 0; i < COUNT; i++) {
+      const p = document.createElement('span');
+      p.className = 'ai-fab-particle';
+      const angle = (Math.PI * 2 * i) / COUNT + Math.random() * 0.5;
+      const dist = 26 + Math.random() * 30;
+      const tx = Math.cos(angle) * dist;
+      const ty = Math.sin(angle) * dist;
+      const size = 2.5 + Math.random() * 2.5;
+      const dur = 1.8 + Math.random() * 1.6;
+      const delay = Math.random() * dur;
+      p.style.setProperty('--tx', tx.toFixed(1) + 'px');
+      p.style.setProperty('--ty', ty.toFixed(1) + 'px');
+      p.style.setProperty('--size', size.toFixed(1) + 'px');
+      p.style.setProperty('--dur', dur.toFixed(2) + 's');
+      p.style.setProperty('--delay', '-' + delay.toFixed(2) + 's');
+      p.style.setProperty('--pcolor', colors[i % colors.length]);
+      wrap.appendChild(p);
+    }
+  })();
+</script>
+
 
 <!-- ✨ AI 투자조언 모달 -->
 <div class="overlay" id="aiAdviceOverlay" onclick="closeModal('aiAdviceOverlay')">
