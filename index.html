@@ -1116,9 +1116,19 @@
         <div id="aiAdviceScopeLabel" style="font-size:11px; color:var(--text2); margin-top:3px;">—</div>
       </div>
       <div style="display:flex; align-items:center; gap:6px;">
+        <button class="btn-sm" onclick="toggleAiHistoryPanel()" title="지난 AI 조언 기록 보기">🕘 기록</button>
         <button class="btn-sm" onclick="toggleAiSettingsPanel()" title="Gemini API 키 / 모델 설정">⚙️</button>
         <button class="btn-sm" onclick="closeModal('aiAdviceOverlay')">닫기</button>
       </div>
+    </div>
+
+    <!-- 지난 기록 패널 -->
+    <div id="aiHistoryPanel" style="display:none; padding:14px 24px; border-bottom:1px solid var(--border); background:var(--bg3); flex-shrink:0; max-height:260px; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div style="font-size:11px; color:var(--text2);">최근 조언 기록 (이 브라우저에만 저장됩니다)</div>
+        <button class="btn-sm" style="font-size:10px; padding:3px 8px;" onclick="clearAiHistory()">전체 삭제</button>
+      </div>
+      <div id="aiHistoryList"></div>
     </div>
 
     <!-- API 키 / 모델 설정 패널 -->
@@ -1136,6 +1146,11 @@
         <input type="text" id="inputGeminiModel" class="form-input" placeholder="gemini-flash-latest">
       </div>
       <button class="btn-submit" style="background:var(--accent); width:100%;" onclick="saveGeminiSettings()">저장</button>
+    </div>
+
+    <!-- 과거 기록을 보고 있을 때 표시되는 안내 배너 -->
+    <div id="aiHistoryViewingBanner" style="display:none; padding:8px 24px; font-size:11px; color:#a78bfa; background:rgba(167,139,250,0.1); border-bottom:1px solid rgba(167,139,250,0.25); flex-shrink:0;">
+      🕘 <span id="aiHistoryViewingLabel"></span> — 지난 기록을 보고 있습니다.
     </div>
 
     <!-- 본문: 로딩 / 결과 -->
@@ -1879,6 +1894,8 @@ async function loadMoonlightDashboard(){
 (function () {
   const GEMINI_KEY_STORAGE   = 'ttm_gemini_api_key';
   const GEMINI_MODEL_STORAGE = 'ttm_gemini_model';
+  const AI_HISTORY_STORAGE   = 'ttm_ai_advice_history';
+  const AI_HISTORY_MAX       = 30; // 브라우저 저장 용량을 고려해 최근 30건만 보관
   // 🌟 특정 버전(gemini-2.5-flash 등)을 못박아두면 구글이 해당 모델을 조기 종료할 때마다
   //    404 에러가 나므로, 항상 최신 Flash 모델을 자동으로 가리키는 별칭을 기본값으로 사용합니다.
   const DEFAULT_GEMINI_MODEL = 'gemini-flash-latest';
@@ -1913,6 +1930,8 @@ async function loadMoonlightDashboard(){
   window.toggleAiSettingsPanel = function () {
     const panel = document.getElementById('aiSettingsPanel');
     if (!panel) return;
+    const historyPanel = document.getElementById('aiHistoryPanel');
+    if (historyPanel) historyPanel.style.display = 'none';
     const show = panel.style.display === 'none';
     panel.style.display = show ? 'block' : 'none';
     if (show) {
@@ -1921,6 +1940,98 @@ async function loadMoonlightDashboard(){
       if (keyInput)   keyInput.value   = getGeminiApiKey();
       if (modelInput) modelInput.value = getGeminiModel();
     }
+  };
+
+  // ── 📜 AI 조언 기록 (날짜/시간별 저장) ──────────────
+  function getAiHistory() {
+    try {
+      const raw = localStorage.getItem(AI_HISTORY_STORAGE);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch(e) { return []; }
+  }
+
+  function saveAiHistoryList(list) {
+    try { localStorage.setItem(AI_HISTORY_STORAGE, JSON.stringify(list)); } catch(e) { /* 저장 공간 부족 등은 조용히 무시 */ }
+  }
+
+  // 새 AI 응답을 성공적으로 받았을 때 기록에 추가 (최신순으로 앞에 쌓고, 최대 개수를 넘으면 오래된 것부터 삭제)
+  function addAiHistoryEntry(entry) {
+    const list = getAiHistory();
+    list.unshift(entry);
+    while (list.length > AI_HISTORY_MAX) list.pop();
+    saveAiHistoryList(list);
+  }
+
+  window.deleteAiHistoryEntry = function (id, evt) {
+    if (evt) evt.stopPropagation();
+    const list = getAiHistory().filter(item => item.id !== id);
+    saveAiHistoryList(list);
+    renderAiHistoryList();
+  };
+
+  window.clearAiHistory = function () {
+    if (!confirm('저장된 AI 조언 기록을 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다.')) return;
+    saveAiHistoryList([]);
+    renderAiHistoryList();
+  };
+
+  function formatKoreanDateTime(ts) {
+    const d = new Date(ts);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function renderAiHistoryList() {
+    const container = document.getElementById('aiHistoryList');
+    if (!container) return;
+    const list = getAiHistory();
+    if (!list.length) {
+      container.innerHTML = `<div style="text-align:center; color:var(--text3); font-size:11px; padding:16px 0;">아직 저장된 AI 조언 기록이 없습니다.</div>`;
+      return;
+    }
+    container.innerHTML = list.map(item => {
+      const pnl = item.summary ? item.summary.totalProfitLossPercent : null;
+      const pnlColor = pnl > 0 ? '#00C578' : (pnl < 0 ? '#3A9AFF' : 'var(--text3)');
+      const pnlSign = pnl > 0 ? '+' : '';
+      const pnlBadge = (pnl !== null && pnl !== undefined)
+        ? `<span style="font-family:var(--font-mono); font-size:10px; font-weight:700; color:${pnlColor}; margin-left:6px;">${pnlSign}${pnl.toFixed(2)}%</span>`
+        : '';
+      return `
+      <div onclick="viewAiHistoryEntry('${item.id}')"
+           style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; margin-bottom:6px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:0.15s;"
+           onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="min-width:0;">
+          <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(item.scopeLabel)}${pnlBadge}</div>
+          <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono); margin-top:2px;">${formatKoreanDateTime(item.timestamp)} · ${escapeHtml(item.model || '')}</div>
+        </div>
+        <button class="btn-sm" style="font-size:10px; padding:3px 8px; flex-shrink:0;" onclick="deleteAiHistoryEntry('${item.id}', event)">삭제</button>
+      </div>`;
+    }).join('');
+  }
+
+  window.toggleAiHistoryPanel = function () {
+    const panel = document.getElementById('aiHistoryPanel');
+    if (!panel) return;
+    const settingsPanel = document.getElementById('aiSettingsPanel');
+    if (settingsPanel) settingsPanel.style.display = 'none';
+    const show = panel.style.display === 'none';
+    panel.style.display = show ? 'block' : 'none';
+    if (show) renderAiHistoryList();
+  };
+
+  // 기록 목록에서 항목을 클릭하면 그 시점의 응답을 다시 보여줍니다 (새로 요청하지 않음)
+  window.viewAiHistoryEntry = function (id) {
+    const item = getAiHistory().find(e => e.id === id);
+    if (!item) return;
+    const body = document.getElementById('aiAdviceBody');
+    const banner = document.getElementById('aiHistoryViewingBanner');
+    const bannerLabel = document.getElementById('aiHistoryViewingLabel');
+    const historyPanel = document.getElementById('aiHistoryPanel');
+    if (body) body.innerHTML = lightMarkdownToHtml(item.responseText);
+    if (bannerLabel) bannerLabel.textContent = `${formatKoreanDateTime(item.timestamp)} · ${item.scopeLabel}`;
+    if (banner) banner.style.display = 'block';
+    if (historyPanel) historyPanel.style.display = 'none';
   };
 
   // ── 현재 탭(전체/소유자1/소유자2) 정보 ──────────────
@@ -2092,6 +2203,8 @@ async function loadMoonlightDashboard(){
     if (!scope) return;
     document.getElementById('aiAdviceScopeLabel').textContent = scope.label + ' 기준으로 분석합니다';
     document.getElementById('aiSettingsPanel').style.display = 'none';
+    document.getElementById('aiHistoryPanel').style.display = 'none';
+    document.getElementById('aiHistoryViewingBanner').style.display = 'none';
     document.getElementById('aiAdviceOverlay').classList.add('open');
     requestAiAdvice();
   };
@@ -2101,6 +2214,12 @@ async function loadMoonlightDashboard(){
     const scope = getAiScope();
     const body = document.getElementById('aiAdviceBody');
     if (!scope || !body) return;
+
+    // 새로 요청할 때는 과거 기록 보기 배너/패널을 닫고 실시간 결과 화면으로 되돌립니다.
+    const viewingBanner = document.getElementById('aiHistoryViewingBanner');
+    if (viewingBanner) viewingBanner.style.display = 'none';
+    const historyPanel = document.getElementById('aiHistoryPanel');
+    if (historyPanel) historyPanel.style.display = 'none';
 
     const apiKey = getGeminiApiKey();
     if (!apiKey) {
@@ -2136,6 +2255,14 @@ async function loadMoonlightDashboard(){
       const prompt = buildPrompt(payload);
       const resultText = await callGeminiApi(apiKey, getGeminiModel(), prompt);
       body.innerHTML = lightMarkdownToHtml(resultText);
+      addAiHistoryEntry({
+        id: 'ai_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+        timestamp: Date.now(),
+        scopeLabel: payload.scope,
+        model: getGeminiModel(),
+        summary: payload.summary,
+        responseText: resultText
+      });
     } catch (e) {
       const isModelIssue = /no longer available|not found|NOT_FOUND/i.test(e.message || '');
       const hint = isModelIssue
