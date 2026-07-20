@@ -1133,7 +1133,7 @@
       </div>
       <div class="form-group" style="margin-bottom:12px;">
         <label>모델</label>
-        <input type="text" id="inputGeminiModel" class="form-input" placeholder="gemini-2.5-flash">
+        <input type="text" id="inputGeminiModel" class="form-input" placeholder="gemini-flash-latest">
       </div>
       <button class="btn-submit" style="background:var(--accent); width:100%;" onclick="saveGeminiSettings()">저장</button>
     </div>
@@ -1879,11 +1879,21 @@ async function loadMoonlightDashboard(){
 (function () {
   const GEMINI_KEY_STORAGE   = 'ttm_gemini_api_key';
   const GEMINI_MODEL_STORAGE = 'ttm_gemini_model';
-  const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+  // 🌟 특정 버전(gemini-2.5-flash 등)을 못박아두면 구글이 해당 모델을 조기 종료할 때마다
+  //    404 에러가 나므로, 항상 최신 Flash 모델을 자동으로 가리키는 별칭을 기본값으로 사용합니다.
+  const DEFAULT_GEMINI_MODEL = 'gemini-flash-latest';
 
   // ── 설정값 read/write ──────────────────────────────
   function getGeminiApiKey()  { try { return localStorage.getItem(GEMINI_KEY_STORAGE) || ''; } catch(e) { return ''; } }
-  function getGeminiModel()   { try { return localStorage.getItem(GEMINI_MODEL_STORAGE) || DEFAULT_GEMINI_MODEL; } catch(e) { return DEFAULT_GEMINI_MODEL; } }
+  // 🌟 예전에 저장해두었던 모델명이 이제는 막힌(deprecated) 버전이면 자동으로 최신 기본값으로 대체합니다.
+  const DEPRECATED_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+  function getGeminiModel() {
+    try {
+      const saved = localStorage.getItem(GEMINI_MODEL_STORAGE);
+      if (!saved || DEPRECATED_MODELS.includes(saved)) return DEFAULT_GEMINI_MODEL;
+      return saved;
+    } catch(e) { return DEFAULT_GEMINI_MODEL; }
+  }
 
   window.saveGeminiSettings = function () {
     const keyInput   = document.getElementById('inputGeminiApiKey');
@@ -2127,10 +2137,14 @@ async function loadMoonlightDashboard(){
       const resultText = await callGeminiApi(apiKey, getGeminiModel(), prompt);
       body.innerHTML = lightMarkdownToHtml(resultText);
     } catch (e) {
+      const isModelIssue = /no longer available|not found|NOT_FOUND/i.test(e.message || '');
+      const hint = isModelIssue
+        ? `⚙️ 설정에서 모델명을 <b>gemini-flash-latest</b> 로 바꿔보세요. (구글이 특정 버전 모델을 예고 없이 조기 종료하는 경우가 있어, 이 별칭을 쓰면 항상 최신 Flash 모델로 자동 연결됩니다.)`
+        : `API 키/모델이 올바른지 ⚙️ 설정에서 확인해 주세요.`;
       body.innerHTML = `<div style="text-align:center; color:#e11d48; padding:30px 10px; line-height:1.6;">
         AI 조언을 가져오지 못했습니다.<br>
         <span style="font-size:11px; color:var(--text3);">${escapeHtml(e.message)}</span><br><br>
-        API 키/모델이 올바른지 ⚙️ 설정에서 확인해 주세요.
+        ${hint}
       </div>`;
     }
   };
