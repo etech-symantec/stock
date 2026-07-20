@@ -1173,7 +1173,7 @@
 
     <!-- 푸터 -->
     <div style="display:flex; gap:8px; padding:16px 28px; border-top:1px solid var(--border); flex-shrink:0;">
-      <button class="btn-sm" style="flex:1; justify-content:center;" onclick="requestAiAdvice()">🔄 새로 분석하기</button>
+      <button class="btn-sm" style="flex:1; justify-content:center;" onclick="showAiPromptEditor()">🔄 새로 분석하기</button>
       <div style="font-size:10px; color:var(--text3); align-self:center; flex:1.4; line-height:1.4;">⚠️ AI 조언은 투자 참고용이며 투자 판단과 책임은 본인에게 있습니다.</div>
     </div>
   </div>
@@ -2248,25 +2248,31 @@ async function loadMoonlightDashboard(){
     };
   }
 
-  function buildPrompt(payload) {
+  // ✏️ AI에게 보낼 "질문(지시문)" 기본값. AI 버튼을 누르면 바로 분석하지 않고
+  //    이 텍스트를 편집 가능한 상태로 먼저 보여준 뒤, 사용자가 "전송"을 눌러야 실제 분석이 시작됩니다.
+  const DEFAULT_AI_INSTRUCTION = [
+    '당신은 신중하고 균형 잡힌 시각을 가진 투자 어시스턴트입니다.',
+    '아래 데이터를 바탕으로 다음 항목을 한국어로, 마크다운(##, -, **) 형식을 사용해 간결하고 실용적으로 작성해 주세요:',
+    '1. 전체 포트폴리오 총평 (수익률, 분산 정도, 눈에 띄는 특징)',
+    '2. 비중이 큰 종목 위주 코멘트 (섹터 쏠림, 리스크 요인 등)',
+    '3. 분산/리스크 관리 관점의 개선 아이디어',
+    '4. "달빛정보" 시황(종합 점수·계산 모드·VIX/버핏지수/CAPE 등 주요 지표)을 참고했을 때, 지금이 매수 확대/분할 매수/관망/비중 축소 중 어디에 가까운 시점인지에 대한 참고 의견',
+    '5. 유의사항: 이 조언은 참고용이며 투자 손익에 대한 책임은 본인에게 있다는 점을 짧게 안내',
+    '특정 종목의 즉시 매수/매도를 단정적으로 지시하지 말고, 근거와 함께 균형 잡힌 관점을 제시하세요.'
+  ].join('\n');
+
+  function buildPrompt(payload, customInstruction) {
     const hasMarketSignal = !!payload.marketSignal;
+    const instructionText = (customInstruction && customInstruction.trim()) ? customInstruction.trim() : DEFAULT_AI_INSTRUCTION;
     const lines = [
-      '당신은 신중하고 균형 잡힌 시각을 가진 투자 어시스턴트입니다.',
       '아래 JSON은 사용자가 실제 보유 중인 종목, 수량, 평단가, 현재가, 투자금, 평가손익, 포트폴리오 비중 데이터입니다' + (hasMarketSignal ? ', 그리고 현재 시장 상황을 보여주는 "달빛정보" 종합 신호 데이터(marketSignal)입니다.' : '.'),
-      '이 데이터를 바탕으로 다음 항목을 한국어로, 마크다운(##, -, ** ) 형식을 사용해 간결하고 실용적으로 작성해 주세요:',
-      '1. 전체 포트폴리오 총평 (수익률, 분산 정도, 눈에 띄는 특징)',
-      '2. 비중이 큰 종목 위주 코멘트 (섹터 쏠림, 리스크 요인 등)',
-      '3. 분산/리스크 관리 관점의 개선 아이디어',
-      hasMarketSignal
-        ? '4. "달빛정보" 시황(marketSignal의 종합 점수·계산 모드·VIX/버핏지수/CAPE 등 주요 지표)을 참고했을 때, 지금이 매수 확대/분할 매수/관망/비중 축소 중 어디에 가까운 시점인지에 대한 참고 의견 (marketSignal이 없다면 이 항목은 "현재 시장 신호 데이터가 없어 생략합니다"라고만 짧게 언급)'
-        : '4. (참고: 현재 시장 신호(달빛정보) 데이터가 없어 이 항목은 생략합니다)',
-      '5. 유의사항: 이 조언은 참고용이며 투자 손익에 대한 책임은 본인에게 있다는 점을 짧게 안내',
-      '특정 종목의 즉시 매수/매도를 단정적으로 지시하지 말고, 근거와 함께 균형 잡힌 관점을 제시하세요.',
+      instructionText,
+      hasMarketSignal ? '' : '(참고: 현재 시장 신호(달빛정보) 데이터가 없으므로 관련 항목은 짧게 생략하고 넘어가 주세요.)',
       '',
       '```json',
       JSON.stringify(payload, null, 2),
       '```'
-    ];
+    ].filter(line => line !== '');
     return lines.join('\n');
   }
 
@@ -2330,7 +2336,7 @@ async function loadMoonlightDashboard(){
     return thread.messages.map(m => ({ role: m.role, parts: [{ text: m.text }] }));
   }
 
-  // ── 모달 열기 ──
+  // ── 모달 열기: 바로 분석하지 않고 편집 가능한 질문 프롬프트 화면을 먼저 보여줍니다 ──
   window.openAiAdviceModal = function () {
     const scope = getAiScope();
     if (!scope) return;
@@ -2340,14 +2346,56 @@ async function loadMoonlightDashboard(){
     document.getElementById('aiHistoryViewingBanner').style.display = 'none';
     document.getElementById('aiFollowupRow').style.display = 'none';
     document.getElementById('aiAdviceOverlay').classList.add('open');
-    requestAiAdvice();
+    showAiPromptEditor();
   };
 
-  // ── 실제 요청 실행 (새 분석 시작 — 기존 대화 스레드는 초기화됩니다) ──
+  // ── 질문(지시문) 편집 화면 표시 — 여기서 내용을 수정한 뒤 "전송"을 눌러야 실제 분석이 시작됩니다 ──
+  window.showAiPromptEditor = function () {
+    const scope = getAiScope();
+    const body = document.getElementById('aiAdviceBody');
+    if (!scope || !body) return;
+
+    document.getElementById('aiAdviceScopeLabel').textContent = scope.label + ' 기준으로 분석합니다';
+    const viewingBanner = document.getElementById('aiHistoryViewingBanner');
+    if (viewingBanner) viewingBanner.style.display = 'none';
+    const historyPanel = document.getElementById('aiHistoryPanel');
+    if (historyPanel) historyPanel.style.display = 'none';
+    const followupRow = document.getElementById('aiFollowupRow');
+    if (followupRow) followupRow.style.display = 'none';
+    currentThread = null;
+
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) {
+      body.innerHTML = `<div style="text-align:center; color:var(--text2); padding:30px 10px;">
+        먼저 우측 상단 ⚙️ 버튼을 눌러 Gemini API 키를 등록해 주세요.
+      </div>`;
+      const panel = document.getElementById('aiSettingsPanel');
+      if (panel) panel.style.display = 'block';
+      const modelInput = document.getElementById('inputGeminiModel');
+      if (modelInput && !modelInput.value) modelInput.value = getGeminiModel();
+      return;
+    }
+
+    body.innerHTML = `
+      <div style="font-size:12px; color:var(--text2); margin-bottom:10px; line-height:1.5;">
+        AI에게 보낼 질문입니다. 필요한 대로 수정한 뒤 아래 <b>전송</b> 버튼을 눌러주세요. 보유 종목·평가손익 등 포트폴리오 데이터는 전송 시 자동으로 함께 첨부됩니다.
+      </div>
+      <textarea id="aiPromptTextarea" class="form-input" style="width:100%; min-height:240px; resize:vertical; font-family:var(--font-sans); font-size:13px; line-height:1.65; padding:12px;">${escapeHtml(DEFAULT_AI_INSTRUCTION)}</textarea>
+      <div style="display:flex; justify-content:flex-end; margin-top:14px;">
+        <button class="btn-submit" style="background:var(--accent); padding:0 22px; height:36px;" onclick="requestAiAdvice()">전송</button>
+      </div>
+    `;
+  };
+
+  // ── 실제 요청 실행 (편집한 질문으로 새 분석 시작 — 기존 대화 스레드는 초기화됩니다) ──
   window.requestAiAdvice = async function () {
     const scope = getAiScope();
     const body = document.getElementById('aiAdviceBody');
     if (!scope || !body) return;
+
+    // 편집 화면의 textarea가 있다면 그 내용을 질문으로 사용합니다 (없으면 "새로 분석하기" 등 기본 재요청).
+    const promptTextarea = document.getElementById('aiPromptTextarea');
+    const customInstruction = promptTextarea ? promptTextarea.value : '';
 
     // 새로 요청할 때는 과거 기록 보기 배너/패널과 후속 질문창을 닫고 실시간 결과 화면으로 되돌립니다.
     const viewingBanner = document.getElementById('aiHistoryViewingBanner');
@@ -2389,7 +2437,7 @@ async function loadMoonlightDashboard(){
     </div>`;
 
     const model = getGeminiModel();
-    const initialPrompt = buildPrompt(payload);
+    const initialPrompt = buildPrompt(payload, customInstruction);
     const draftThread = {
       id: 'ai_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
       scopeLabel: payload.scope,
