@@ -5181,14 +5181,22 @@ async function fetchMissingMarketData(symbolsToFetch) {
     if(!loadingEl) {
         loadingEl = document.createElement('div');
         loadingEl.id = 'bgLoadingIndicator';
-        loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--accent); color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition: 0.3s; opacity: 1;";
+        loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition: opacity 0.3s;";
+        // 🌟 버튼 배경이 좌측→우측으로 로딩 %에 따라 차오르는 채움 레이어 + 그 위에 표시되는 텍스트
+        loadingEl.innerHTML = `<div class="bg-loading-fill" id="bgLoadingFill"></div><span class="bg-loading-text" id="bgLoadingText"></span>`;
         document.body.appendChild(loadingEl);
     }
+    const loadingFillEl = document.getElementById('bgLoadingFill');
+    const loadingTextEl = document.getElementById('bgLoadingText');
+    if (loadingFillEl) loadingFillEl.style.width = '0%';
     loadingEl.style.opacity = '1';
     setFabButtonsHiddenForLoading(true);
 
     for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
-        if(loadingEl) loadingEl.innerHTML = `🔄 실시간 데이터 쾌속 로딩 중... (${Math.min(i + batchSize, symbolsToFetch.length)}/${symbolsToFetch.length})`;
+        const doneCount = Math.min(i + batchSize, symbolsToFetch.length);
+        const pct = Math.round((doneCount / symbolsToFetch.length) * 100);
+        if (loadingTextEl) loadingTextEl.textContent = `🔄 실시간 데이터 쾌속 로딩 중... (${doneCount}/${symbolsToFetch.length})`;
+        if (loadingFillEl) loadingFillEl.style.width = pct + '%';
         const batch = symbolsToFetch.slice(i, i + batchSize);
         await Promise.all(batch.map(async t => {
             let fetchSym = /^\d{6}$/.test(t) ? t + '.KS' : t;
@@ -5206,6 +5214,7 @@ async function fetchMissingMarketData(symbolsToFetch) {
     
     isFetchingMarketData = false;
     if(loadingEl) loadingEl.style.opacity = '0';
+    if (loadingFillEl) loadingFillEl.style.width = '0%'; // 다음 로딩을 위해 초기화
     setFabButtonsHiddenForLoading(false);
 
     // 🌟 10년치를 한 번에 받으므로 모든 버튼 즉시 활성화
