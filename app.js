@@ -697,8 +697,30 @@ window.unlockGhCredentialsWithPassword = async function (autoSync = false) {
     // 공개 Gist 목록은 인증 없이도 조회 가능 (최근 것부터 페이지네이션으로 탐색)
     let found = null;
     for (let page = 1; page <= 5 && !found; page++) {
-      const res = await fetch(`https://api.github.com/users/${encodeURIComponent(user)}/gists?per_page=100&page=${page}`);
-      if (!res.ok) break;
+      let res;
+      try {
+        res = await fetch(`https://api.github.com/users/${encodeURIComponent(user)}/gists?per_page=100&page=${page}`);
+      } catch (netErr) {
+        throw new Error('GitHub에 접속할 수 없어요. 인터넷 연결을 확인해주세요.');
+      }
+
+      if (!res.ok) {
+        // 🩺 실패 이유를 구체적으로 구분해서 "그냥 못 찾음"으로 뭉뚱그리지 않습니다.
+        if (res.status === 404) {
+          throw new Error('"' + user + '" GitHub 아이디를 찾을 수 없어요. 아이디를 다시 확인해주세요.');
+        }
+        if (res.status === 403 || res.status === 429) {
+          const remaining = res.headers.get('x-ratelimit-remaining');
+          if (remaining === '0') {
+            const resetHeader = res.headers.get('x-ratelimit-reset');
+            const resetMin = resetHeader ? Math.max(1, Math.ceil((Number(resetHeader) * 1000 - Date.now()) / 60000)) : null;
+            throw new Error('GitHub API 요청 한도를 초과했어요.' + (resetMin ? ` 약 ${resetMin}분 후 다시 시도해주세요.` : ' 잠시 후 다시 시도해주세요.') + ' (로그인 없이 조회하는 요청은 시간당 60회로 제한돼요)');
+          }
+          throw new Error('GitHub API 요청이 거부됐어요 (' + res.status + '). 잠시 후 다시 시도해주세요.');
+        }
+        throw new Error('GitHub Gist 목록을 불러오지 못했어요 (' + res.status + '). 잠시 후 다시 시도해주세요.');
+      }
+
       const gists = await res.json();
       if (!gists.length) break;
       found = gists.find(g => g.description === tag);
@@ -763,6 +785,11 @@ let _ghAutoUnlockInProgress = false;
 window.autoUnlockGhOnPasswordEntry = async function () {
   const user = document.getElementById('ghUser').value.trim();
   const password = document.getElementById('ghSyncPassword').value;
+  const tokenField = document.getElementById('ghToken');
+  // 🌟 [추가] 이 브라우저에 이미 토큰이 채워져 있다면(방금 직접 저장했거나 이미 불러온 상태) 자동 불러오기를 건너뜁니다.
+  //    - 방금 "🔒 저장" 직후라면, GitHub이 방금 만든 공개 Gist를 목록 조회에 아직 반영하지 못해
+  //      "저장된 정보를 찾을 수 없어요"가 잘못 뜰 수 있어서 아예 재조회를 시도하지 않습니다.
+  if (tokenField && tokenField.value.trim()) return;
   if (!user || !password || _ghAutoUnlockInProgress) return;
   _ghAutoUnlockInProgress = true;
   try {
