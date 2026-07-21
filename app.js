@@ -5371,7 +5371,7 @@ async function render() {
     updateViewHeader('⭐', '관심종목');
     const _lob = document.getElementById('listOptionsBar');
     if (_lob) _lob.classList.add('non-sticky');
-    if (probeFab) probeFab.style.display = 'block';
+    if (probeFab) probeFab.style.display = 'inline-flex';
     if (typeof renderProbeCollectionPanel === 'function') renderProbeCollectionPanel();
   } else {
     // 🌟 전체보기, 소유자별 탭 (메인 대시보드)
