@@ -176,9 +176,15 @@
      (버튼을 보여줄 때 app.js가 넣던 display:'block'은 flex 레이아웃이 깨지는 원인이라 'inline-flex'로 함께 수정했습니다) */
   #probeFabBtn{
     display: inline-flex;
-    position: relative;
-    z-index: 1;
+    position: fixed !important; /* probe.css가 position:relative 등으로 흐트러뜨렸던 것을 AI 버튼처럼 뷰포트에 고정 */
+    right: 24px !important;
+    bottom: 90px !important; /* AI 투자조언 버튼(bottom:24px) 바로 위에 겹치지 않게 쌓음 */
+    left: auto !important;
+    top: auto !important;
+    z-index: 900;
     align-items: center;
+    width: auto !important;
+    max-width: none !important;
     padding: 12px !important;
     border-radius: 999px !important;
     cursor: pointer;
