@@ -1387,6 +1387,24 @@ function triggerAutoSync() {
   if(s.autoSync && s.token) pushToGithub(true);
 }
 
+// ==========================================
+// 🌟 페이지를 새로고침(로드)할 때마다 GitHub의 최신 데이터를 자동으로 가져오기 (Pull)
+//   - autoSync 체크박스 여부와 관계없이, GitHub 연동 정보(user/repo/token)가 저장되어 있으면 항상 실행
+//   - 다른 기기에서 먼저 저장한 최신 데이터를 이 기기에도 반영해서, 여러 기기 간 데이터가 어긋나지 않도록 함
+// ==========================================
+async function autoPullOnLoad() {
+  const s = getGhSettings();
+  if (!s.user || !s.repo || !s.token) return; // 연동 정보가 없으면 조용히 스킵
+
+  updateSyncStatus('syncing');
+  try {
+    await pullFromGithub(true);
+  } catch (e) {
+    console.warn('페이지 로드 시 자동 불러오기 실패:', e);
+    updateSyncStatus('error');
+  }
+}
+
 async function pullFromGithub(silent = false) {
   let user = document.getElementById('ghUser').value.trim();
   let repo = document.getElementById('ghRepo').value.trim();
@@ -6009,6 +6027,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(s.autoSync) triggerAutoSync();
       });
   }
+
+  // 5. 🌟 페이지를 열 때마다 GitHub의 최신 데이터를 자동으로 가져오기 (다른 기기 최신 반영)
+  await autoPullOnLoad();
 });
 
 // ==========================================
