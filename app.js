@@ -617,8 +617,22 @@ window.lockGhCredentialsWithPassword = async function () {
 
   if (statusEl) statusEl.textContent = '🔒 암호화해서 저장하는 중...';
   try {
+    // 🌟 [추가] Gemini API 키가 이 브라우저에 등록되어 있으면 GitHub 접속정보와 함께 암호화해서 담아둡니다.
+    //    (다른 기기에서 비밀번호로 불러올 때 Gemini 키도 같이 복원되도록)
+    let geminiApiKey = '', geminiModel = '';
+    try {
+      geminiApiKey = localStorage.getItem('ttm_gemini_api_key') || '';
+      geminiModel = localStorage.getItem('ttm_gemini_model') || '';
+    } catch (e) {}
+
+    const credsObj = { user, repo, token, autoSyncEnabled };
+    if (geminiApiKey) {
+      credsObj.geminiApiKey = geminiApiKey;
+      if (geminiModel) credsObj.geminiModel = geminiModel;
+    }
+
     const tag = await _ghSyncLookupTag(user, password);
-    const encrypted = await _encryptGhCredentials(password, { user, repo, token, autoSyncEnabled });
+    const encrypted = await _encryptGhCredentials(password, credsObj);
     const fileContent = JSON.stringify(encrypted);
 
     // 이미 같은 태그의 Gist가 있으면(비밀번호 안 바꾸고 재잠금) 갱신, 없으면 새로 생성
@@ -658,7 +672,7 @@ window.lockGhCredentialsWithPassword = async function () {
       throw new Error('Gist 저장 실패 (' + saveRes.status + ')' + (detail ? ': ' + detail : ''));
     }
 
-    if (statusEl) statusEl.textContent = '✅ 저장 완료! 다른 기기에서 "' + user + '" 아이디 + 비밀번호로 불러올 수 있어요.';
+    if (statusEl) statusEl.textContent = '✅ 저장 완료! 다른 기기에서 "' + user + '" 아이디 + 비밀번호로 불러올 수 있어요.' + (geminiApiKey ? ' (Gemini API 키도 함께 저장됨)' : '');
   } catch (e) {
     console.error(e);
     if (statusEl) statusEl.textContent = '';
@@ -714,12 +728,27 @@ window.unlockGhCredentialsWithPassword = async function (autoSync = false) {
     if (typeof creds.autoSyncEnabled === 'boolean') s.autoSync = creds.autoSyncEnabled;
     saveGhSettings(s);
 
+    // 🌟 [추가] 잠글 때 Gemini API 키가 같이 담겨있었다면 이 브라우저에도 복원합니다.
+    let geminiRestored = false;
+    if (creds.geminiApiKey) {
+      try {
+        localStorage.setItem('ttm_gemini_api_key', creds.geminiApiKey);
+        if (creds.geminiModel) localStorage.setItem('ttm_gemini_model', creds.geminiModel);
+        geminiRestored = true;
+      } catch (e) {}
+      // ⚙️ Gemini 설정 패널이 이미 열려있는 상태라면 입력창 값도 같이 채워줍니다.
+      const geminiKeyInput = document.getElementById('inputGeminiApiKey');
+      const geminiModelInput = document.getElementById('inputGeminiModel');
+      if (geminiKeyInput) geminiKeyInput.value = creds.geminiApiKey;
+      if (geminiModelInput && creds.geminiModel) geminiModelInput.value = creds.geminiModel;
+    }
+
     if (autoSync) {
       if (statusEl) statusEl.textContent = '⬇️ 정보를 불러왔어요. 이어서 데이터 동기화 중...';
       await pullFromGithub(true); // 내부에서 실패해도 조용히 무시되므로 아래에서 완료 문구만 안내
-      if (statusEl) statusEl.textContent = '✅ 비밀번호로 접속정보를 불러오고 자동 동기화까지 실행했어요.';
+      if (statusEl) statusEl.textContent = '✅ 비밀번호로 접속정보를 불러오고 자동 동기화까지 실행했어요.' + (geminiRestored ? ' (Gemini API 키도 함께 불러왔어요)' : '');
     } else {
-      if (statusEl) statusEl.textContent = '✅ 불러오기 완료! 이어서 "⬇️ 불러오기" 버튼으로 데이터를 동기화하세요.';
+      if (statusEl) statusEl.textContent = '✅ 불러오기 완료! 이어서 "⬇️ 불러오기" 버튼으로 데이터를 동기화하세요.' + (geminiRestored ? ' (Gemini API 키도 함께 불러왔어요)' : '');
     }
   } catch (e) {
     console.error(e);
