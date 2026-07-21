@@ -588,6 +588,21 @@ async function _decryptGhCredentials(password, blob) {
   return JSON.parse(new TextDecoder().decode(plainBuf));
 }
 
+// 🩺 Gist API가 401/403을 반환했을 때 원인(fine-grained 토큰 / gist 권한 누락 / 만료 등)을 구체적으로 안내
+function _diagnoseGhTokenError(token, res) {
+  if (token.startsWith('github_pat_')) {
+    return 'Fine-grained 토큰은 Gist API를 지원하지 않아요. github.com/settings/tokens 에서 Classic 토큰(ghp_...)을 "gist" 권한 체크와 함께 새로 발급해주세요.';
+  }
+  const scopes = res.headers.get('x-oauth-scopes');
+  if (scopes !== null && !scopes.split(',').map(s => s.trim()).includes('gist')) {
+    return '토큰에 "gist" 권한이 없어요. github.com/settings/tokens 에서 이 토큰을 편집해 "gist" 항목을 체크하거나, gist 권한을 포함해 새로 발급해주세요.';
+  }
+  if (res.status === 401) {
+    return '토큰이 유효하지 않거나 만료됐어요. github.com/settings/tokens 에서 토큰을 다시 확인해주세요.';
+  }
+  return '토큰 권한 문제로 저장에 실패했어요 (' + res.status + '). github.com/settings/tokens 에서 "gist" 권한이 포함된 Classic 토큰인지 확인해주세요.';
+}
+
 // 🔒 현재 입력된 user/repo/token을 비밀번호로 암호화해서 "공개 Gist"에 저장(있으면 갱신)
 window.lockGhCredentialsWithPassword = async function () {
   const statusEl = document.getElementById('ghSyncPwStatus');
@@ -609,6 +624,12 @@ window.lockGhCredentialsWithPassword = async function () {
     const listRes = await fetch('https://api.github.com/gists', {
       headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
     });
+
+    // 🔎 목록 조회 단계에서부터 막히면(토큰 권한 문제) 원인을 구체적으로 안내
+    if (listRes.status === 401 || listRes.status === 403) {
+      throw new Error(_diagnoseGhTokenError(token, listRes));
+    }
+
     let existing = null;
     if (listRes.ok) {
       const gists = await listRes.json();
@@ -627,7 +648,14 @@ window.lockGhCredentialsWithPassword = async function () {
       body: JSON.stringify(body)
     });
 
-    if (!saveRes.ok) throw new Error('Gist 저장 실패 (' + saveRes.status + ')');
+    if (!saveRes.ok) {
+      if (saveRes.status === 401 || saveRes.status === 403) {
+        throw new Error(_diagnoseGhTokenError(token, saveRes));
+      }
+      let detail = '';
+      try { const errJson = await saveRes.json(); detail = errJson && errJson.message ? errJson.message : ''; } catch (e) {}
+      throw new Error('Gist 저장 실패 (' + saveRes.status + ')' + (detail ? ': ' + detail : ''));
+    }
 
     if (statusEl) statusEl.textContent = '✅ 저장 완료! 다른 기기에서 "' + user + '" 아이디 + 비밀번호로 불러올 수 있어요.';
   } catch (e) {
