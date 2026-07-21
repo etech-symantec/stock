@@ -4938,7 +4938,8 @@ function updateRangeButtonReadiness() {
 function setFabButtonsHiddenForLoading(hidden) {
     const aiFab = document.getElementById('aiAdviceFab');
     const probeFab = document.getElementById('probeFabBtn');
-    [aiFab, probeFab].forEach(btn => {
+    const aiFabParticles = document.getElementById('aiFabParticles'); // 🌟 AI 버튼 뒤에서 계속 뿜어져 나오는 파티클도 함께 숨김/복구
+    [aiFab, probeFab, aiFabParticles].forEach(btn => {
         if (!btn) return;
         if (hidden) {
             btn.style.opacity = '0';
