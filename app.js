@@ -536,6 +536,12 @@ function getGhSettings() {
 }
 function saveGhSettings(settings) { localStorage.setItem('gh_settings', JSON.stringify(settings)); }
 
+// 🌟 마지막으로 동기화(push/pull)된 GitHub 파일의 sha를 기억해두고,
+//    다음 pull 때 sha가 그대로면 "변경사항 없음"으로 판단해 불필요한 재로딩을 건너뜀
+const GH_LAST_SHA_KEY = 'gh_last_synced_sha';
+function getLastSyncedSha() { return localStorage.getItem(GH_LAST_SHA_KEY) || null; }
+function setLastSyncedSha(sha) { if (sha) localStorage.setItem(GH_LAST_SHA_KEY, sha); }
+
 // ============================================
 // 🔐 비밀번호 기반 GitHub 동기화 정보 부트스트랩
 //   - 최초 기기: user/repo/token + 비밀번호 입력 → 암호화해서 "공개 Gist"에 저장
@@ -1370,6 +1376,10 @@ async function pushToGithub(silent = false) {
 
     const putRes = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }, body: JSON.stringify(body) });
     if(putRes.ok) { 
+      try {
+        const putJson = await putRes.json();
+        if (putJson && putJson.content && putJson.content.sha) setLastSyncedSha(putJson.content.sha);
+      } catch(e) {}
       updateSyncStatus('success');
       if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('masterSettingsOverlay'); }
     } else { 
@@ -1422,11 +1432,20 @@ async function pullFromGithub(silent = false) {
   try {
     const fileInfo = await getGithubFileSha({user, token, repo}, path);
     if (fileInfo && fileInfo.content) {
+      // 🌟 이전에 동기화했던 파일과 sha(내용 해시)가 같으면 변경사항이 없는 것이므로 다시 불러오지 않고 스킵
+      const lastSha = getLastSyncedSha();
+      if (lastSha && fileInfo.sha === lastSha) {
+        updateSyncStatus('success');
+        if(!silent) { alert('이미 최신 상태예요. (변경사항 없음)'); closeModal('masterSettingsOverlay'); }
+        return;
+      }
+
       const dataStr = b64_to_utf8(fileInfo.content);
       const data = JSON.parse(dataStr);
       if(data.tickers && data.transactions) {
         state = data; saveState(); cachedMarketData = {};
         updateOwnerLabels(); renderTxList(); render();
+        setLastSyncedSha(fileInfo.sha);
         updateSyncStatus('success');
         if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('masterSettingsOverlay'); }
       } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
