@@ -200,6 +200,21 @@
     from{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
     to{ -webkit-mask-position: 0 0; mask-position: 0 0; }
   }
+
+  /* ☁️ GitHub 클라우드 동기화 — 입력칸과 버튼을 같은 모양/크기로 정렬 */
+  .gh-sync-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:stretch; }
+  .gh-sync-row .form-input{ flex:1 1 60px; min-width:56px; border-radius:10px; }
+  .gh-sync-btn{
+    flex:0 0 auto;
+    display:inline-flex; align-items:center; justify-content:center; gap:5px;
+    padding:0 13px; border-radius:10px;
+    border:1px solid var(--border2); background:var(--bg3); color:var(--text);
+    font-size:12.5px; font-weight:700; font-family:var(--font-sans);
+    white-space:nowrap; cursor:pointer; transition:filter 0.15s, opacity 0.15s;
+  }
+  .gh-sync-btn:hover{ filter:brightness(0.96); }
+  .gh-sync-btn-accent{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .gh-sync-btn-accent:hover{ filter:brightness(1.08); }
 </style>
 </head>
 <body>
@@ -1550,13 +1565,13 @@
 
           <!-- 그룹 1: 계정 · 비밀번호 — 다른 기기에서는 이 두 칸만 입력하면 저장소/토큰이 자동으로 채워지고 바로 동기화됩니다 -->
           <div style="font-size:11px; font-weight:700; color:var(--text2); letter-spacing:0.3px; margin:2px 0 6px;">🔑 계정 · 비밀번호</div>
-          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:6px;">
-            <input type="text" id="ghUser" class="form-input" placeholder="GitHub 아이디" style="flex:1 1 100px; min-width:80px;">
-            <input type="password" id="ghSyncPassword" class="form-input" placeholder="동기화 비밀번호" style="flex:1 1 100px; min-width:80px;"
+          <div class="gh-sync-row" style="margin-bottom:6px;">
+            <input type="text" id="ghUser" class="form-input" placeholder="GitHub 아이디">
+            <input type="password" id="ghSyncPassword" class="form-input" placeholder="동기화 비밀번호"
               onkeydown="if(event.key==='Enter'){ this.blur(); }"
               onblur="autoUnlockGhOnPasswordEntry()">
-            <button class="btn-sm" style="width:auto; flex:0 0 auto; padding:0 10px; white-space:nowrap;" onclick="lockGhCredentialsWithPassword()" title="현재 저장소·토큰 정보를 비밀번호로 암호화해 저장">🔒 저장</button>
-            <button class="btn-sm" style="width:auto; flex:0 0 auto; padding:0 10px; white-space:nowrap;" onclick="unlockGhCredentialsWithPassword()" title="비밀번호로 저장소·토큰 정보 불러오기">🔑 불러오기</button>
+            <button class="gh-sync-btn" onclick="lockGhCredentialsWithPassword()" title="현재 저장소·토큰 정보를 비밀번호로 암호화해 저장">🔒 저장</button>
+            <button class="gh-sync-btn" onclick="unlockGhCredentialsWithPassword()" title="비밀번호로 저장소·토큰 정보 불러오기">🔑 불러오기</button>
           </div>
           <div class="settings-hint" style="margin-bottom:14px;">
             💡 다른 기기에서는 이 두 칸만 입력하면(입력 후 다른 곳을 클릭) 저장소·토큰이 자동으로 채워지고 바로 동기화까지 실행됩니다.
@@ -1564,11 +1579,11 @@
 
           <!-- 그룹 2: 저장소 연결 정보 — 최초 설정 기기에서 직접 입력 -->
           <div style="font-size:11px; font-weight:700; color:var(--text2); letter-spacing:0.3px; margin:0 0 6px;">📦 저장소 연결 정보</div>
-          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
-            <input type="text" id="ghRepo" class="form-input" placeholder="저장소 이름" style="flex:1 1 100px; min-width:80px;">
-            <input type="password" id="ghToken" class="form-input" placeholder="Personal Access Token (ghp_...)" style="flex:1 1 100px; min-width:80px;">
-            <button class="btn-sm" style="width:auto; flex:0 0 auto; padding:0 10px; white-space:nowrap;" onclick="pullFromGithub(false)">⬇️ 불러오기</button>
-            <button class="btn-sm" style="width:auto; flex:0 0 auto; padding:0 10px; white-space:nowrap; background:var(--accent); color:#fff; border-color:var(--accent);" onclick="pushToGithub(false)">⬆️ 백업</button>
+          <div class="gh-sync-row">
+            <input type="text" id="ghRepo" class="form-input" placeholder="저장소 이름">
+            <input type="password" id="ghToken" class="form-input" placeholder="Personal Access Token (ghp_...)">
+            <button class="gh-sync-btn" onclick="pullFromGithub(false)">⬇️ 불러오기</button>
+            <button class="gh-sync-btn gh-sync-btn-accent" onclick="pushToGithub(false)">⬆️ 백업</button>
           </div>
           <div id="ghSyncPwStatus" style="font-size:11px; color:var(--text2); margin-top:6px; min-height:14px;"></div>
 
@@ -1581,23 +1596,29 @@
           </div>
         </div>
 
-        <div class="settings-section">
-          <div class="settings-section-title">💻 로컬 데이터 · CSV 관리</div>
-          <div class="settings-action-grid">
-            <button class="settings-action-btn" onclick="exportData()"><span>⬇️</span>JSON 백업</button>
-            <button class="settings-action-btn" onclick="document.getElementById('importFile').click()"><span>⬆️</span>JSON 불러오기</button>
-            <button class="settings-action-btn" onclick="downloadCsvSample()"><span>📋</span>CSV 양식 받기</button>
-            <button class="settings-action-btn settings-action-btn-accent" onclick="document.getElementById('importCsvFile').click()"><span>📄</span>CSV 일괄 업로드</button>
-          </div>
-        </div>
-
-        <div class="settings-section settings-section-danger" style="margin-bottom:0;">
-          <div class="settings-danger-row">
-            <div>
-              <div class="settings-section-title" style="color:var(--red);">🚨 데이터 초기화</div>
-              <span style="font-size:10.5px; color:var(--text2);">저장된 모든 장부 내역을 완전히 비웁니다.</span>
+        <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:stretch;">
+          <div class="settings-section" style="flex:1 1 200px; margin:0;">
+            <div class="settings-section-title">💻 로컬 데이터</div>
+            <div class="settings-hint" style="margin-bottom:10px;">이 기기에 저장된 장부 전체를 파일로 백업하거나, 백업 파일에서 복원합니다.</div>
+            <div class="settings-action-grid" style="grid-template-columns:1fr;">
+              <button class="settings-action-btn" onclick="exportData()"><span>⬇️</span>JSON 백업</button>
+              <button class="settings-action-btn" onclick="document.getElementById('importFile').click()"><span>⬆️</span>JSON 불러오기</button>
             </div>
-            <button class="btn-danger-solid" onclick="resetAllTransactions()">초기화 실행</button>
+          </div>
+
+          <div class="settings-section" style="flex:1 1 200px; margin:0;">
+            <div class="settings-section-title">📄 CSV 관리</div>
+            <div class="settings-hint" style="margin-bottom:10px;">증권사 거래내역을 CSV로 한 번에 등록하거나, 입력용 양식을 내려받습니다.</div>
+            <div class="settings-action-grid" style="grid-template-columns:1fr;">
+              <button class="settings-action-btn" onclick="downloadCsvSample()"><span>📋</span>CSV 양식 받기</button>
+              <button class="settings-action-btn settings-action-btn-accent" onclick="document.getElementById('importCsvFile').click()"><span>📄</span>CSV 일괄 업로드</button>
+            </div>
+          </div>
+
+          <div class="settings-section settings-section-danger" style="flex:1 1 200px; margin:0;">
+            <div class="settings-section-title" style="color:var(--red);">🚨 데이터 초기화</div>
+            <div class="settings-hint" style="margin-bottom:10px;">저장된 모든 장부 내역을 완전히 비웁니다. 되돌릴 수 없으니 신중히 눌러주세요.</div>
+            <button class="btn-danger-solid" style="width:100%;" onclick="resetAllTransactions()">초기화 실행</button>
           </div>
         </div>
       </div>
