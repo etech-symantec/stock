@@ -536,6 +536,158 @@ function getGhSettings() {
 }
 function saveGhSettings(settings) { localStorage.setItem('gh_settings', JSON.stringify(settings)); }
 
+// ============================================
+// 🔐 비밀번호 기반 GitHub 동기화 정보 부트스트랩
+//   - 최초 기기: user/repo/token + 비밀번호 입력 → 암호화해서 "공개 Gist"에 저장
+//   - 다른 기기: GitHub 아이디 + 비밀번호만 입력 → 그 Gist를 찾아 복호화해서 자동 입력
+//   - 실제 포트폴리오 데이터가 든 저장소(repo)는 그대로 private으로 둬도 되고,
+//     이 Gist에는 오직 "AES-GCM으로 암호화된 접속정보"만 들어갑니다 (평문 노출 없음).
+// ============================================
+const GH_SYNC_TAG_PREFIX = 'ttm-sync-cred-v1:';
+const GH_SYNC_GIST_FILENAME = 'ttm-sync-credentials.json';
+
+function _strToBuf(str) { return new TextEncoder().encode(str); }
+function _bufToB64(buf) { return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function _b64ToBuf(b64) { return Uint8Array.from(atob(b64), c => c.charCodeAt(0)).buffer; }
+
+// 검색용 태그: 비밀번호가 바로 역산되지 않도록 SHA-256 해시만 공개 메타데이터(Gist 설명)로 사용
+async function _ghSyncLookupTag(username, password) {
+  const data = _strToBuf(GH_SYNC_TAG_PREFIX + username.toLowerCase() + ':' + password);
+  const hashBuf = await crypto.subtle.digest('SHA-256', data);
+  const hex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return GH_SYNC_TAG_PREFIX + hex.slice(0, 32);
+}
+
+// 비밀번호 → AES-GCM 키 (PBKDF2, salt는 매번 랜덤 생성해서 암호문과 함께 저장)
+async function _deriveAesKey(password, saltBuf) {
+  const baseKey = await crypto.subtle.importKey('raw', _strToBuf(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: saltBuf, iterations: 250000, hash: 'SHA-256' },
+    baseKey,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function _encryptGhCredentials(password, credsObj) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await _deriveAesKey(password, salt);
+  const plaintext = _strToBuf(JSON.stringify(credsObj));
+  const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext);
+  return { v: 1, salt: _bufToB64(salt), iv: _bufToB64(iv), data: _bufToB64(cipherBuf) };
+}
+
+async function _decryptGhCredentials(password, blob) {
+  const salt = new Uint8Array(_b64ToBuf(blob.salt));
+  const iv = new Uint8Array(_b64ToBuf(blob.iv));
+  const key = await _deriveAesKey(password, salt);
+  const cipherBuf = _b64ToBuf(blob.data);
+  const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipherBuf);
+  return JSON.parse(new TextDecoder().decode(plainBuf));
+}
+
+// 🔒 현재 입력된 user/repo/token을 비밀번호로 암호화해서 "공개 Gist"에 저장(있으면 갱신)
+window.lockGhCredentialsWithPassword = async function () {
+  const statusEl = document.getElementById('ghSyncPwStatus');
+  const user = document.getElementById('ghUser').value.trim();
+  const repo = document.getElementById('ghRepo').value.trim();
+  const token = document.getElementById('ghToken').value.trim();
+  const password = document.getElementById('ghSyncPassword').value;
+
+  if (!user || !repo || !token) { alert('먼저 GitHub 아이디·저장소·토큰을 모두 입력해주세요.'); return; }
+  if (!password || password.length < 6) { alert('비밀번호를 6자 이상 입력해주세요.'); return; }
+
+  if (statusEl) statusEl.textContent = '🔒 암호화해서 저장하는 중...';
+  try {
+    const tag = await _ghSyncLookupTag(user, password);
+    const encrypted = await _encryptGhCredentials(password, { user, repo, token });
+    const fileContent = JSON.stringify(encrypted);
+
+    // 이미 같은 태그의 Gist가 있으면(비밀번호 안 바꾸고 재잠금) 갱신, 없으면 새로 생성
+    const listRes = await fetch('https://api.github.com/gists', {
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    let existing = null;
+    if (listRes.ok) {
+      const gists = await listRes.json();
+      existing = gists.find(g => g.description === tag);
+    }
+
+    const body = {
+      description: tag,
+      public: true,
+      files: { [GH_SYNC_GIST_FILENAME]: { content: fileContent } }
+    };
+
+    const saveRes = await fetch(existing ? `https://api.github.com/gists/${existing.id}` : 'https://api.github.com/gists', {
+      method: existing ? 'PATCH' : 'POST',
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!saveRes.ok) throw new Error('Gist 저장 실패 (' + saveRes.status + ')');
+
+    if (statusEl) statusEl.textContent = '✅ 저장 완료! 다른 기기에서 "' + user + '" 아이디 + 비밀번호로 불러올 수 있어요.';
+  } catch (e) {
+    console.error(e);
+    if (statusEl) statusEl.textContent = '';
+    alert('비밀번호 저장에 실패했습니다: ' + e.message);
+  }
+};
+
+// 🔑 GitHub 아이디 + 비밀번호로 Gist를 찾아 복호화해서 user/repo/token 자동 입력
+window.unlockGhCredentialsWithPassword = async function () {
+  const statusEl = document.getElementById('ghSyncPwStatus');
+  const user = document.getElementById('ghUser').value.trim();
+  const password = document.getElementById('ghSyncPassword').value;
+
+  if (!user) { alert('GitHub 아이디를 입력해주세요.'); return; }
+  if (!password) { alert('비밀번호를 입력해주세요.'); return; }
+
+  if (statusEl) statusEl.textContent = '🔎 저장된 정보를 찾는 중...';
+  try {
+    const tag = await _ghSyncLookupTag(user, password);
+
+    // 공개 Gist 목록은 인증 없이도 조회 가능 (최근 것부터 페이지네이션으로 탐색)
+    let found = null;
+    for (let page = 1; page <= 5 && !found; page++) {
+      const res = await fetch(`https://api.github.com/users/${encodeURIComponent(user)}/gists?per_page=100&page=${page}`);
+      if (!res.ok) break;
+      const gists = await res.json();
+      if (!gists.length) break;
+      found = gists.find(g => g.description === tag);
+      if (gists.length < 100) break;
+    }
+
+    if (!found) throw new Error('저장된 정보를 찾을 수 없어요. 아이디나 비밀번호를 확인해주세요.');
+
+    const gistRes = await fetch(found.url);
+    const gistData = await gistRes.json();
+    const file = gistData.files[GH_SYNC_GIST_FILENAME];
+    if (!file) throw new Error('Gist 파일 형식이 올바르지 않습니다.');
+
+    const blob = JSON.parse(file.content);
+    const creds = await _decryptGhCredentials(password, blob);
+
+    document.getElementById('ghUser').value = creds.user;
+    document.getElementById('ghRepo').value = creds.repo;
+    document.getElementById('ghToken').value = creds.token;
+
+    const s = getGhSettings();
+    s.user = creds.user; s.repo = creds.repo; s.token = creds.token;
+    saveGhSettings(s);
+
+    if (statusEl) statusEl.textContent = '✅ 불러오기 완료! 이어서 "⬇️ 불러오기" 버튼으로 데이터를 동기화하세요.';
+  } catch (e) {
+    console.error(e);
+    if (statusEl) statusEl.textContent = '';
+    // AES-GCM 복호화 실패(비밀번호 오류) 시 DOMException이 발생 → 사용자에게는 통일된 메시지로 안내
+    alert(e && e.message && e.message !== 'Failed to fetch' ? e.message : '비밀번호가 틀렸거나 정보를 찾을 수 없습니다.');
+  }
+};
+
 function openMasterSettingsModal() {
   let s = getGhSettings();
   document.getElementById('ghUser').value = s.user;
