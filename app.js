@@ -666,13 +666,14 @@ window.lockGhCredentialsWithPassword = async function () {
 };
 
 // 🔑 GitHub 아이디 + 비밀번호로 Gist를 찾아 복호화해서 user/repo/token 자동 입력
-window.unlockGhCredentialsWithPassword = async function () {
+//   autoSync=true면 성공 시 바로 이어서 pullFromGithub까지 자동 실행 (비밀번호 입력만으로 완결)
+window.unlockGhCredentialsWithPassword = async function (autoSync = false) {
   const statusEl = document.getElementById('ghSyncPwStatus');
   const user = document.getElementById('ghUser').value.trim();
   const password = document.getElementById('ghSyncPassword').value;
 
-  if (!user) { alert('GitHub 아이디를 입력해주세요.'); return; }
-  if (!password) { alert('비밀번호를 입력해주세요.'); return; }
+  if (!user) { if (!autoSync) alert('GitHub 아이디를 입력해주세요.'); return; }
+  if (!password) { if (!autoSync) alert('비밀번호를 입력해주세요.'); return; }
 
   if (statusEl) statusEl.textContent = '🔎 저장된 정보를 찾는 중...';
   try {
@@ -707,12 +708,32 @@ window.unlockGhCredentialsWithPassword = async function () {
     s.user = creds.user; s.repo = creds.repo; s.token = creds.token;
     saveGhSettings(s);
 
-    if (statusEl) statusEl.textContent = '✅ 불러오기 완료! 이어서 "⬇️ 불러오기" 버튼으로 데이터를 동기화하세요.';
+    if (autoSync) {
+      if (statusEl) statusEl.textContent = '⬇️ 정보를 불러왔어요. 이어서 데이터 동기화 중...';
+      await pullFromGithub(true); // 내부에서 실패해도 조용히 무시되므로 아래에서 완료 문구만 안내
+      if (statusEl) statusEl.textContent = '✅ 비밀번호로 접속정보를 불러오고 자동 동기화까지 실행했어요.';
+    } else {
+      if (statusEl) statusEl.textContent = '✅ 불러오기 완료! 이어서 "⬇️ 불러오기" 버튼으로 데이터를 동기화하세요.';
+    }
   } catch (e) {
     console.error(e);
     if (statusEl) statusEl.textContent = '';
     // AES-GCM 복호화 실패(비밀번호 오류) 시 DOMException이 발생 → 사용자에게는 통일된 메시지로 안내
     alert(e && e.message && e.message !== 'Failed to fetch' ? e.message : '비밀번호가 틀렸거나 정보를 찾을 수 없습니다.');
+  }
+};
+
+// 🔑 비밀번호 입력란에서 포커스가 빠져나갈 때(다른 기기에서 아이디+비번만 입력한 경우) 자동으로 불러오기+동기화 실행
+let _ghAutoUnlockInProgress = false;
+window.autoUnlockGhOnPasswordEntry = async function () {
+  const user = document.getElementById('ghUser').value.trim();
+  const password = document.getElementById('ghSyncPassword').value;
+  if (!user || !password || _ghAutoUnlockInProgress) return;
+  _ghAutoUnlockInProgress = true;
+  try {
+    await unlockGhCredentialsWithPassword(true);
+  } finally {
+    _ghAutoUnlockInProgress = false;
   }
 };
 
