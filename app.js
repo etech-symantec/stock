@@ -610,6 +610,7 @@ window.lockGhCredentialsWithPassword = async function () {
   const repo = document.getElementById('ghRepo').value.trim();
   const token = document.getElementById('ghToken').value.trim();
   const password = document.getElementById('ghSyncPassword').value;
+  const autoSyncEnabled = !!document.getElementById('ghAutoSync').checked;
 
   if (!user || !repo || !token) { alert('먼저 GitHub 아이디·저장소·토큰을 모두 입력해주세요.'); return; }
   if (!password || password.length < 6) { alert('비밀번호를 6자 이상 입력해주세요.'); return; }
@@ -617,7 +618,7 @@ window.lockGhCredentialsWithPassword = async function () {
   if (statusEl) statusEl.textContent = '🔒 암호화해서 저장하는 중...';
   try {
     const tag = await _ghSyncLookupTag(user, password);
-    const encrypted = await _encryptGhCredentials(password, { user, repo, token });
+    const encrypted = await _encryptGhCredentials(password, { user, repo, token, autoSyncEnabled });
     const fileContent = JSON.stringify(encrypted);
 
     // 이미 같은 태그의 Gist가 있으면(비밀번호 안 바꾸고 재잠금) 갱신, 없으면 새로 생성
@@ -703,9 +704,14 @@ window.unlockGhCredentialsWithPassword = async function (autoSync = false) {
     document.getElementById('ghUser').value = creds.user;
     document.getElementById('ghRepo').value = creds.repo;
     document.getElementById('ghToken').value = creds.token;
+    if (typeof creds.autoSyncEnabled === 'boolean') {
+      const autoSyncCheckbox = document.getElementById('ghAutoSync');
+      if (autoSyncCheckbox) autoSyncCheckbox.checked = creds.autoSyncEnabled;
+    }
 
     const s = getGhSettings();
     s.user = creds.user; s.repo = creds.repo; s.token = creds.token;
+    if (typeof creds.autoSyncEnabled === 'boolean') s.autoSync = creds.autoSyncEnabled;
     saveGhSettings(s);
 
     if (autoSync) {
