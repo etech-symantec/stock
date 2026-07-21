@@ -9657,6 +9657,16 @@
       "qty": 0,
       "price": 4568.4,
       "txType": "dividend"
+    },
+    {
+      "id": 1784593555895,
+      "date": "2026-07-21",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "015760.KS",
+      "qty": -20,
+      "price": 32500,
+      "txType": "trade"
     }
   ],
   "range": "all",
@@ -9835,6 +9845,15 @@
       "buyPrice": 67000,
       "buyDate": "2026-07-18",
       "isKr": true
+    },
+    {
+      "id": "probe_1784392692607",
+      "symbol": "KO",
+      "name": "Coca-Cola Company (The)",
+      "qty": 1,
+      "buyPrice": 81.55999755859375,
+      "buyDate": "2026-07-18",
+      "isKr": false
     }
   ]
 }
