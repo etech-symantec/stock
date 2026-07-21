@@ -2744,3 +2744,23 @@ nav {
   animation: cardJustAddedPulse 0.9s ease-out 2;
   border-color: rgba(124,106,247,0.6) !important;
 }
+/* 실시간 로딩 알림(bgLoadingIndicator): 버튼 배경이 좌측에서 우측으로 로딩 %에 따라 차오르는 효과 */
+#bgLoadingIndicator{
+  overflow: hidden;
+  background-color: #4a3fa8; /* 아직 채워지지 않은 구간(어두운 베이스) */
+}
+#bgLoadingIndicator .bg-loading-fill{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.3s ease-out;
+  z-index: 0;
+}
+#bgLoadingIndicator .bg-loading-text{
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
