@@ -168,13 +168,19 @@
     mask-repeat: no-repeat;
     -webkit-mask-position: 0 0;
     mask-position: 0 0;
+    /* 붓 텍스처의 첫 프레임도 완전히 빈 화면은 아니라서, 평소엔 opacity로 확실히 숨겨둡니다. */
+    opacity: 0;
     /* 🔁 keyframe 애니메이션 대신 transition으로 바꿔, 마우스를 뗄 때 같은 붓 텍스처가
-       "칠해질 때와 정확히 반대 방향"으로 자연스럽게 되돌아가며 지워지도록 합니다. */
-    transition: -webkit-mask-position 0.5s steps(29), mask-position 0.5s steps(29);
+       "칠해질 때와 정확히 반대 방향"으로 자연스럽게 되돌아가며 지워지도록 합니다.
+       opacity는 붓이 다 지워지는 0.5s 뒤에야 꺼지도록 딜레이를 줘서, 지워지는 과정이 그대로 보이게 합니다. */
+    transition: -webkit-mask-position 0.5s steps(29), mask-position 0.5s steps(29), opacity 0s linear 0.5s;
   }
   #aiAdviceFab:hover .ai-fab-mask{
+    opacity: 1;
     -webkit-mask-position: 100% 0;
     mask-position: 100% 0;
+    /* 마우스를 올릴 땐 opacity가 지연 없이 바로 켜져서, 처음부터 붓이 칠해지는 과정이 보입니다. */
+    transition: -webkit-mask-position 0.5s steps(29), mask-position 0.5s steps(29), opacity 0s linear 0s;
   }
   /* 🖌️ 붓 마스크(urban-sprite)는 손그림 텍스처라 가장자리/모서리가 완전히 칠해지지 않는 틈이 생깁니다.
      붓 애니메이션이 끝난 직후 아래에 깔린 이 레이어가 opacity로 서서히 차올라 빈틈 없이 꽉 채웁니다. */
