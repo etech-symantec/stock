@@ -149,47 +149,25 @@
     100% { transform: translate(var(--tx, 40px), var(--ty, -20px)) scale(1); opacity: 0; }
   }
 
-  /* ✨ button-container-2 스타일 이식: urban-sprite를 steps()로 마스킹 애니메이션 →
-     AI 투자조언 버튼에 마우스오버 시 손그림처럼 번지는 효과를 추가합니다.
-     버튼 자체 모양(알약형, 그라디언트 보더)은 그대로 유지하고, 그 위에 마스크 레이어만 얹습니다. */
-  #aiAdviceFab .ai-fab-mask{
-    position: absolute;
-    inset: -3px; /* 🖌️ 버튼의 투명 보더(2.75px) 안쪽까지만 칠해지면서 좌우 끝 둥근 부분에 하얀 틈이 생기던 것을,
-                     보더 바깥쪽까지 살짝 더 크게(bleed) 그려서 틈 없이 완전히 덮도록 합니다. */
-    z-index: 0;
-    pointer-events: none;
-    border-radius: 32px;
-    background: linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%);
-    -webkit-mask-image: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
-    mask-image: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
-    -webkit-mask-size: 3000% 100%;
-    mask-size: 3000% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: 0 0;
-    mask-position: 0 0;
-    /* 붓 텍스처의 첫 프레임도 완전히 빈 화면은 아니라서, 평소엔 opacity로 확실히 숨겨둡니다. */
+  /* ✨ AI 투자조언 버튼: 평소엔 아이콘만 보이는 원형, 마우스 오버 시 옆으로 늘어나며 글씨가 나타납니다. */
+  #aiAdviceFab .ai-fab-label{
+    display: inline-block;
+    max-width: 0;
+    margin-left: 0;
     opacity: 0;
-    /* 🔁 keyframe 애니메이션 대신 transition으로 바꿔, 마우스를 뗄 때 같은 붓 텍스처가
-       "칠해질 때와 정확히 반대 방향"으로 자연스럽게 되돌아가며 지워지도록 합니다.
-       opacity는 붓이 다 지워지는 0.5s 뒤에야 꺼지도록 딜레이를 줘서, 지워지는 과정이 그대로 보이게 합니다. */
-    transition: -webkit-mask-position 0.5s steps(29), mask-position 0.5s steps(29), opacity 0s linear 0.5s;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: max-width 0.35s ease, margin-left 0.35s ease, opacity 0.25s ease;
   }
-  #aiAdviceFab:hover .ai-fab-mask{
+  #aiAdviceFab:hover .ai-fab-label{
+    max-width: 110px;
+    margin-left: 8px;
     opacity: 1;
-    -webkit-mask-position: 100% 0;
-    mask-position: 100% 0;
-    /* 마우스를 올릴 땐 opacity가 지연 없이 바로 켜져서, 처음부터 붓이 칠해지는 과정이 보입니다. */
-    transition: -webkit-mask-position 0.5s steps(29), mask-position 0.5s steps(29), opacity 0s linear 0s;
   }
   #aiAdviceFab > svg,
   #aiAdviceFab > span{
     position: relative;
     z-index: 1;
-  }
-  /* 평소엔 진한 텍스트, 호버 시(색이 채워지는 동안) 하얀 글씨로 전환 */
-  #aiAdviceFab:hover{
-    color: #fff !important;
   }
 
   /* ☁️ GitHub 클라우드 동기화 — 입력칸과 버튼을 같은 모양/크기로 정렬 */
@@ -1244,14 +1222,13 @@
 <!-- ✨ AI 투자조언 플로팅 버튼 (전체보기 / 소유자별 탭에서만 표시) — Gemini 스타일 -->
 <div id="aiAdviceFabWrap" style="display:none; position:fixed; right:24px; bottom:24px; z-index:900; isolation:isolate;">
   <span class="ai-fab-particles" id="aiFabParticles" aria-hidden="true"></span>
-  <button id="aiAdviceFab" onclick="openAiAdviceModal()" style="position:relative; z-index:1; display:inline-flex; align-items:center; gap:8px; padding:11px 20px 11px 16px; border-radius:30px; cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:700; transition:transform 0.15s ease, box-shadow 0.15s ease, color 0.25s ease;
+  <button id="aiAdviceFab" onclick="openAiAdviceModal()" style="position:relative; z-index:1; display:inline-flex; align-items:center; padding:12px; border-radius:999px; cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:700; transition:transform 0.15s ease, box-shadow 0.15s ease, color 0.25s ease;
     border:2.75px solid transparent; background-image:linear-gradient(#fff,#fff), linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%); background-origin:border-box; background-clip:padding-box, border-box;
     color:#3c3450; box-shadow:0 6px 20px rgba(155,114,203,0.35);"
     onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 26px rgba(155,114,203,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(155,114,203,0.35)';"
     title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
-    <span class="ai-fab-mask" aria-hidden="true"></span>
     <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px rgba(155,114,203,0.55)); flex-shrink:0;"><defs><linearGradient id="geminiGradFab" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285F4"/><stop offset="35%" stop-color="#9B72CB"/><stop offset="70%" stop-color="#D96570"/><stop offset="100%" stop-color="#F9AB00"/></linearGradient></defs><path fill="url(#geminiGradFab)" d="M12 1 Q13 11 23 12 Q13 13 12 23 Q11 13 1 12 Q11 11 12 1 Z"/></svg>
-    <span id="aiAdviceFabLabel">AI 투자조언</span>
+    <span id="aiAdviceFabLabel" class="ai-fab-label">AI 투자조언</span>
   </button>
 </div>
 <script>
