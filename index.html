@@ -182,25 +182,6 @@
     /* 마우스를 올릴 땐 opacity가 지연 없이 바로 켜져서, 처음부터 붓이 칠해지는 과정이 보입니다. */
     transition: -webkit-mask-position 0.5s steps(29), mask-position 0.5s steps(29), opacity 0s linear 0s;
   }
-  /* 🖌️ 붓 마스크(urban-sprite)는 손그림 텍스처라 가장자리/모서리가 완전히 칠해지지 않는 틈이 생깁니다.
-     붓 애니메이션이 끝난 직후 아래에 깔린 이 레이어가 opacity로 서서히 차올라 빈틈 없이 꽉 채웁니다. */
-  #aiAdviceFab .ai-fab-fill{
-    position: absolute;
-    inset: -3px; /* 마스크 레이어와 동일하게 보더 바깥까지 bleed */
-    z-index: 0;
-    pointer-events: none;
-    border-radius: 32px;
-    background: linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%);
-    opacity: 0;
-    /* 마우스를 뗄 때는 붓이 지워지는 애니메이션(0.5s)이 시작되자마자 이 단색 레이어부터 먼저 사라져야
-       밑에서 진행되는 붓 지우기 효과가 그대로 보입니다. */
-    transition: opacity 0.1s ease-in;
-  }
-  #aiAdviceFab:hover .ai-fab-fill{
-    opacity: 1;
-    /* 마우스를 올릴 때는 붓 애니메이션(0.5s)이 끝나갈 즈음 이 레이어가 나타나 빈틈을 마무리로 메웁니다. */
-    transition: opacity 0.15s ease-out 0.35s;
-  }
   #aiAdviceFab > svg,
   #aiAdviceFab > span{
     position: relative;
@@ -1269,7 +1250,6 @@
     onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 26px rgba(155,114,203,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(155,114,203,0.35)';"
     title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
     <span class="ai-fab-mask" aria-hidden="true"></span>
-    <span class="ai-fab-fill" aria-hidden="true"></span>
     <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px rgba(155,114,203,0.55)); flex-shrink:0;"><defs><linearGradient id="geminiGradFab" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285F4"/><stop offset="35%" stop-color="#9B72CB"/><stop offset="70%" stop-color="#D96570"/><stop offset="100%" stop-color="#F9AB00"/></linearGradient></defs><path fill="url(#geminiGradFab)" d="M12 1 Q13 11 23 12 Q13 13 12 23 Q11 13 1 12 Q11 11 12 1 Z"/></svg>
     <span id="aiAdviceFabLabel">AI 투자조언</span>
   </button>
