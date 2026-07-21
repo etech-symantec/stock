@@ -5159,15 +5159,46 @@ function setFabButtonsHiddenForLoading(hidden) {
     });
 }
 // 🌟 화면 멈춤 없이 백그라운드에서 데이터를 몰래 가져오는 함수
+// 🚀 [개선] 보유종목 배치가 진행 중일 때 관심종목 배치가 들어오면 그냥 버려지던 문제를 막기 위해,
+//    단순 boolean 잠금 대신 "대기열(큐)"을 둡니다. 지금 진행 중인 배치가 끝나면 큐에 쌓인
+//    다음 배치(예: 늦게 들어온 관심종목)를 이어서 처리합니다.
 let isFetchingMarketData = false;
-async function fetchMissingMarketData(symbolsToFetch) {
-    if(isFetchingMarketData || !symbolsToFetch || symbolsToFetch.length === 0) return;
+let marketDataFetchQueue = []; // [{ symbols, opts }, ...]
+
+async function fetchMissingMarketData(symbolsToFetch, opts = {}) {
+    if (!symbolsToFetch || symbolsToFetch.length === 0) return;
+
+    if (isFetchingMarketData) {
+        // 이미 다른 배치(보통 보유종목)가 처리 중이면 끼어들지 않고 큐 뒤에 예약만 해둡니다.
+        marketDataFetchQueue.push({ symbols: symbolsToFetch, opts });
+        return;
+    }
     isFetchingMarketData = true;
+    try {
+        await runMarketDataFetchBatch(symbolsToFetch, opts);
+    } finally {
+        isFetchingMarketData = false;
+    }
+
+    // 큐에 쌓여있던 다음 배치(예: 관심종목)를 이어서 처리
+    if (marketDataFetchQueue.length > 0) {
+        const next = marketDataFetchQueue.shift();
+        fetchMissingMarketData(next.symbols, next.opts);
+    }
+}
+
+async function runMarketDataFetchBatch(symbolsToFetch, opts = {}) {
+    // 그 사이 다른 배치가 이미 받아온 종목은 다시 받을 필요 없으므로 제외
+    symbolsToFetch = symbolsToFetch.filter(t => !cachedMarketData[t]);
+    if (symbolsToFetch.length === 0) return;
+
+    const label = opts.label || '실시간 데이터';
+    const silent = !!opts.silent; // 관심종목 백그라운드 예약분처럼 화면을 방해하지 않고 조용히 받을 때
 
     // 🌟 Phase 1 시작 시 5Y/10Y 버튼 즉시 흐리게
     updateRangeButtonReadiness();
-    
-    // 🌟 장부에 한 번이라도 기록된 종목(보유/매도)을 1순위로 끌어올리기
+
+    // 🌟 장부에 한 번이라도 기록된 종목(보유/매도)을 1순위로 끌어올리기 (같은 배치 내에서도 보유종목 우선)
     const transactedSymbols = new Set(state.transactions.map(tx => tx.symbol));
     symbolsToFetch.sort((a, b) => {
         const aOwned = transactedSymbols.has(a) ? 1 : 0;
@@ -5175,27 +5206,30 @@ async function fetchMissingMarketData(symbolsToFetch) {
         return bOwned - aOwned; // 1(내 종목)이 0(단순 관심종목)보다 무조건 먼저 오게 정렬
     });
     const batchSize = 3;
-    
-    // 우측 하단에 조그맣게 '로딩 중' 알림 띄우기
-    let loadingEl = document.getElementById('bgLoadingIndicator');
-    if(!loadingEl) {
-        loadingEl = document.createElement('div');
-        loadingEl.id = 'bgLoadingIndicator';
-        loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition: opacity 0.3s;";
-        // 🌟 버튼 배경이 좌측→우측으로 로딩 %에 따라 차오르는 채움 레이어 + 그 위에 표시되는 텍스트
-        loadingEl.innerHTML = `<div class="bg-loading-fill" id="bgLoadingFill"></div><span class="bg-loading-text" id="bgLoadingText"></span>`;
-        document.body.appendChild(loadingEl);
+
+    // 우측 하단에 조그맣게 '로딩 중' 알림 띄우기 (silent면 생략 — 사용자가 안 보고 있는 화면이므로 방해하지 않음)
+    let loadingEl = null, loadingFillEl = null, loadingTextEl = null;
+    if (!silent) {
+        loadingEl = document.getElementById('bgLoadingIndicator');
+        if(!loadingEl) {
+            loadingEl = document.createElement('div');
+            loadingEl.id = 'bgLoadingIndicator';
+            loadingEl.style.cssText = "position:fixed; bottom:20px; right:20px; color:#fff; padding:10px 16px; border-radius:20px; font-size:12px; font-weight:bold; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition: opacity 0.3s;";
+            // 🌟 버튼 배경이 좌측→우측으로 로딩 %에 따라 차오르는 채움 레이어 + 그 위에 표시되는 텍스트
+            loadingEl.innerHTML = `<div class="bg-loading-fill" id="bgLoadingFill"></div><span class="bg-loading-text" id="bgLoadingText"></span>`;
+            document.body.appendChild(loadingEl);
+        }
+        loadingFillEl = document.getElementById('bgLoadingFill');
+        loadingTextEl = document.getElementById('bgLoadingText');
+        if (loadingFillEl) loadingFillEl.style.width = '0%';
+        loadingEl.style.opacity = '1';
+        setFabButtonsHiddenForLoading(true);
     }
-    const loadingFillEl = document.getElementById('bgLoadingFill');
-    const loadingTextEl = document.getElementById('bgLoadingText');
-    if (loadingFillEl) loadingFillEl.style.width = '0%';
-    loadingEl.style.opacity = '1';
-    setFabButtonsHiddenForLoading(true);
 
     for (let i = 0; i < symbolsToFetch.length; i += batchSize) {
         const doneCount = Math.min(i + batchSize, symbolsToFetch.length);
         const pct = Math.round((doneCount / symbolsToFetch.length) * 100);
-        if (loadingTextEl) loadingTextEl.textContent = `🔄 실시간 데이터 쾌속 로딩 중... (${doneCount}/${symbolsToFetch.length})`;
+        if (loadingTextEl) loadingTextEl.textContent = `🔄 ${label} 쾌속 로딩 중... (${doneCount}/${symbolsToFetch.length})`;
         if (loadingFillEl) loadingFillEl.style.width = pct + '%';
         const batch = symbolsToFetch.slice(i, i + batchSize);
         await Promise.all(batch.map(async t => {
@@ -5212,10 +5246,9 @@ async function fetchMissingMarketData(symbolsToFetch) {
         }
     }
     
-    isFetchingMarketData = false;
-    if(loadingEl) loadingEl.style.opacity = '0';
+    if (loadingEl) loadingEl.style.opacity = '0';
     if (loadingFillEl) loadingFillEl.style.width = '0%'; // 다음 로딩을 위해 초기화
-    setFabButtonsHiddenForLoading(false);
+    if (!silent) setFabButtonsHiddenForLoading(false);
 
     // 🌟 10년치를 한 번에 받으므로 모든 버튼 즉시 활성화
     const btn5y  = document.getElementById('rtab-5y');
@@ -5227,6 +5260,26 @@ async function fetchMissingMarketData(symbolsToFetch) {
         localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
         localStorage.setItem('sw_market_cache_time', Date.now().toString());
     } catch(e){}
+}
+
+// 🚀 관심종목 전용 배경 예약 함수
+// - 보유종목이 아닌, 순수 관심종목만 있는 티커는 '관심종목' 탭에 실제로 들어가야만 화면에 쓰이므로,
+//   그 탭을 보고 있지 않을 때는 굳이 바로 받아올 필요가 없습니다.
+// - 그렇다고 영영 안 받아오면 나중에 탭을 열었을 때 처음부터 기다려야 하니, 보유종목 로딩이
+//   웬만큼 끝났을 시간(딜레이) 뒤에 "낮은 우선순위"로 조용히(silent) 받아둡니다.
+// - render()가 반복 호출되며 같은 요청을 중복 예약하지 않도록 디바운스 처리합니다.
+let watchlistBackgroundTimer = null;
+function scheduleWatchlistBackgroundFetch(symbols) {
+    if (!symbols || symbols.length === 0) return;
+    if (watchlistBackgroundTimer) clearTimeout(watchlistBackgroundTimer);
+    watchlistBackgroundTimer = setTimeout(() => {
+        watchlistBackgroundTimer = null;
+        // 예약 대기 중에 사용자가 이미 관심종목 탭에 들어가 즉시 받아졌을 수 있으니 다시 한번 필터링
+        const stillMissing = symbols.filter(t => !cachedMarketData[t]);
+        if (stillMissing.length > 0) {
+            fetchMissingMarketData(stillMissing, { label: '관심종목', silent: true });
+        }
+    }, 2500); // 보유종목 배치가 먼저 처리될 여유 시간
 }
 
 async function fetchExtendedMarketData(yahooRange, rangeLevel) {
@@ -5424,23 +5477,29 @@ async function render() {
     return;
   }
 
-  let allSymbols = new Set();
-  
-  // 🌟 [수정됨] 수량이 0이더라도 (전량 매도) 차트 데이터를 가져오도록 allSymbols에 추가합니다.
-  for(let sym in symbolHoldings) {
-      allSymbols.add(sym); 
-  }
-  
-  state.tickers.forEach(sym => {
-      allSymbols.add(sym);
-  });
+  // 🚀 [개선] 보유종목과 관심종목을 분리해서 받습니다.
+  // - 보유종목: 어떤 화면(전체보기/소유자별 탭)을 보고 있어도 항상 필요하므로 최우선으로 즉시 받습니다.
+  // - 순수 관심종목(내가 산 적 없는 티커): '관심종목' 탭에서만 실제로 화면에 쓰이므로,
+  //   지금 그 탭을 보고 있을 때만 즉시 받고, 아니라면 보유종목보다 낮은 우선순위로
+  //   조용히 백그라운드에 예약해둡니다(굳이 안 볼 화면 데이터부터 대역폭을 쓰지 않도록).
+  const ownedSymbols = Object.keys(symbolHoldings);
+  const watchOnlySymbols = state.tickers.filter(sym => !symbolHoldings[sym]);
 
+  let allSymbols = new Set([...ownedSymbols, ...watchOnlySymbols]);
   allSymbols = Array.from(allSymbols);
 
-  let symbolsToFetch = allSymbols.filter(t => !cachedMarketData[t]);
-  // 🌟 [핵심] 화면을 멈추게 했던 옛날 로딩 방식을 지우고 백그라운드 호출로 바꿈
-  if (symbolsToFetch.length > 0) {
-    fetchMissingMarketData(symbolsToFetch); // 뒤에서 몰래 가져오라고 시키고 바로 다음 줄로 넘어감
+  const ownedSymbolsToFetch = ownedSymbols.filter(t => !cachedMarketData[t]);
+  const watchSymbolsToFetch = watchOnlySymbols.filter(t => !cachedMarketData[t]);
+
+  if (ownedSymbolsToFetch.length > 0) {
+    fetchMissingMarketData(ownedSymbolsToFetch, { label: '보유종목' }); // 뒤에서 몰래 가져오라고 시키고 바로 다음 줄로 넘어감
+  }
+  if (watchSymbolsToFetch.length > 0) {
+    if (currentView === 'watch') {
+      fetchMissingMarketData(watchSymbolsToFetch, { label: '관심종목' }); // 지금 보고 있는 탭이므로 즉시 받기
+    } else {
+      scheduleWatchlistBackgroundFetch(watchSymbolsToFetch); // 안 보이는 곳이니 낮은 우선순위로 예약
+    }
   }
   
   let displayItems = [];
