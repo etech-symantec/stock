@@ -152,44 +152,48 @@
   /* ✨ button-container-2 스타일 이식: urban-sprite를 steps()로 마스킹 애니메이션 →
      AI 투자조언 버튼에 마우스오버 시 손그림처럼 번지는 효과를 추가합니다.
      버튼 자체 모양(알약형, 그라디언트 보더)은 그대로 유지하고, 그 위에 마스크 레이어만 얹습니다. */
-  #aiAdviceFab{
-    overflow: hidden;
-  }
   #aiAdviceFab .ai-fab-mask{
     position: absolute;
-    inset: 0;
+    inset: -3px; /* 🖌️ 버튼의 투명 보더(2.75px) 안쪽까지만 칠해지면서 좌우 끝 둥근 부분에 하얀 틈이 생기던 것을,
+                     보더 바깥쪽까지 살짝 더 크게(bleed) 그려서 틈 없이 완전히 덮도록 합니다. */
     z-index: 0;
     pointer-events: none;
-    border-radius: 30px;
+    border-radius: 32px;
     background: linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%);
-    -webkit-mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
-    mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
+    -webkit-mask-image: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
+    mask-image: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/urban-sprite.png");
     -webkit-mask-size: 3000% 100%;
     mask-size: 3000% 100%;
-    opacity: 0;
-    -webkit-animation: aiFabAni 0.35s steps(29) forwards;
-    animation: aiFabAni 0.35s steps(29) forwards;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+    /* 🔁 keyframe 애니메이션 대신 transition으로 바꿔, 마우스를 뗄 때 같은 붓 텍스처가
+       "칠해질 때와 정확히 반대 방향"으로 자연스럽게 되돌아가며 지워지도록 합니다. */
+    transition: -webkit-mask-position 0.5s steps(29), mask-position 0.5s steps(29);
   }
   #aiAdviceFab:hover .ai-fab-mask{
-    opacity: 1;
-    -webkit-animation: aiFabAni2 0.5s steps(29) forwards;
-    animation: aiFabAni2 0.5s steps(29) forwards;
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
   }
   /* 🖌️ 붓 마스크(urban-sprite)는 손그림 텍스처라 가장자리/모서리가 완전히 칠해지지 않는 틈이 생깁니다.
      붓 애니메이션이 끝난 직후 아래에 깔린 이 레이어가 opacity로 서서히 차올라 빈틈 없이 꽉 채웁니다. */
   #aiAdviceFab .ai-fab-fill{
     position: absolute;
-    inset: 0;
+    inset: -3px; /* 마스크 레이어와 동일하게 보더 바깥까지 bleed */
     z-index: 0;
     pointer-events: none;
-    border-radius: 30px;
+    border-radius: 32px;
     background: linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%);
     opacity: 0;
-    transition: opacity 0.15s ease-in;
+    /* 마우스를 뗄 때는 붓이 지워지는 애니메이션(0.5s)이 시작되자마자 이 단색 레이어부터 먼저 사라져야
+       밑에서 진행되는 붓 지우기 효과가 그대로 보입니다. */
+    transition: opacity 0.1s ease-in;
   }
   #aiAdviceFab:hover .ai-fab-fill{
     opacity: 1;
-    transition: opacity 0.15s ease-out 0.3s; /* 붓 애니메이션(0.5s)이 대부분 끝난 뒤 마무리로 빈틈을 메움 */
+    /* 마우스를 올릴 때는 붓 애니메이션(0.5s)이 끝나갈 즈음 이 레이어가 나타나 빈틈을 마무리로 메웁니다. */
+    transition: opacity 0.15s ease-out 0.35s;
   }
   #aiAdviceFab > svg,
   #aiAdviceFab > span{
@@ -199,22 +203,6 @@
   /* 평소엔 진한 텍스트, 호버 시(색이 채워지는 동안) 하얀 글씨로 전환 */
   #aiAdviceFab:hover{
     color: #fff !important;
-  }
-  @-webkit-keyframes aiFabAni{
-    from{ -webkit-mask-position: 0 0; mask-position: 0 0; }
-    to{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
-  }
-  @keyframes aiFabAni{
-    from{ -webkit-mask-position: 0 0; mask-position: 0 0; }
-    to{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
-  }
-  @-webkit-keyframes aiFabAni2{
-    from{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
-    to{ -webkit-mask-position: 0 0; mask-position: 0 0; }
-  }
-  @keyframes aiFabAni2{
-    from{ -webkit-mask-position: 100% 0; mask-position: 100% 0; }
-    to{ -webkit-mask-position: 0 0; mask-position: 0 0; }
   }
 
   /* ☁️ GitHub 클라우드 동기화 — 입력칸과 버튼을 같은 모양/크기로 정렬 */
