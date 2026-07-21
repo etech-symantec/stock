@@ -175,6 +175,22 @@
     -webkit-animation: aiFabAni2 0.5s steps(29) forwards;
     animation: aiFabAni2 0.5s steps(29) forwards;
   }
+  /* 🖌️ 붓 마스크(urban-sprite)는 손그림 텍스처라 가장자리/모서리가 완전히 칠해지지 않는 틈이 생깁니다.
+     붓 애니메이션이 끝난 직후 아래에 깔린 이 레이어가 opacity로 서서히 차올라 빈틈 없이 꽉 채웁니다. */
+  #aiAdviceFab .ai-fab-fill{
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 30px;
+    background: linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%);
+    opacity: 0;
+    transition: opacity 0.15s ease-in;
+  }
+  #aiAdviceFab:hover .ai-fab-fill{
+    opacity: 1;
+    transition: opacity 0.15s ease-out 0.3s; /* 붓 애니메이션(0.5s)이 대부분 끝난 뒤 마무리로 빈틈을 메움 */
+  }
   #aiAdviceFab > svg,
   #aiAdviceFab > span{
     position: relative;
@@ -1259,6 +1275,7 @@
     onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 26px rgba(155,114,203,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(155,114,203,0.35)';"
     title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
     <span class="ai-fab-mask" aria-hidden="true"></span>
+    <span class="ai-fab-fill" aria-hidden="true"></span>
     <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px rgba(155,114,203,0.55)); flex-shrink:0;"><defs><linearGradient id="geminiGradFab" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285F4"/><stop offset="35%" stop-color="#9B72CB"/><stop offset="70%" stop-color="#D96570"/><stop offset="100%" stop-color="#F9AB00"/></linearGradient></defs><path fill="url(#geminiGradFab)" d="M12 1 Q13 11 23 12 Q13 13 12 23 Q11 13 1 12 Q11 11 12 1 Z"/></svg>
     <span id="aiAdviceFabLabel">AI 투자조언</span>
   </button>
