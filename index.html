@@ -178,7 +178,7 @@
     display: inline-flex;
     position: fixed !important; /* probe.css가 position:relative 등으로 흐트러뜨렸던 것을 AI 버튼처럼 뷰포트에 고정 */
     right: 24px !important;
-    bottom: 90px !important; /* AI 투자조언 버튼(bottom:24px) 바로 위에 겹치지 않게 쌓음 */
+    bottom: 24px !important; /* 탐사선 버튼과 AI 투자조언 버튼은 서로 다른 탭(페이지)에서만 표시되므로 동일한 위치에 고정 */
     left: auto !important;
     top: auto !important;
     z-index: 900;
@@ -215,6 +215,9 @@
     height: 24px;
     font-size: 22px;
     line-height: 1;
+    /* 🛰️ 이모지 자체의 글자 상자 안에서 그림이 아래쪽으로 치우쳐 보이는 폰트 메트릭 특성을
+       보정하기 위해 살짝 위로 올려 버튼 정중앙에 오도록 맞춥니다. */
+    transform: translateY(-1px);
   }
   #probeFabBtn .probe-fab-label{
     display: inline-block;
