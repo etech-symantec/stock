@@ -1548,13 +1548,31 @@
           <div class="settings-section-title">☁️ GitHub 클라우드 동기화</div>
           <div class="settings-hint">개인 GitHub 저장소를 연결하면 모든 기기에서 장부를 안전하게 동기화합니다.</div>
 
-          <div class="settings-input-row">
+          <!-- 그룹 1: 계정 · 비밀번호 — 다른 기기에서는 이 두 칸만 입력하면 저장소/토큰이 자동으로 채워지고 바로 동기화됩니다 -->
+          <div style="font-size:11px; font-weight:700; color:var(--text2); letter-spacing:0.3px; margin:2px 0 6px;">🔑 계정 · 비밀번호</div>
+          <div class="settings-input-row" style="margin-bottom:6px;">
             <input type="text" id="ghUser" class="form-input" placeholder="GitHub 아이디">
-            <input type="text" id="ghRepo" class="form-input" placeholder="저장소 이름">
+            <input type="password" id="ghSyncPassword" class="form-input" placeholder="동기화 비밀번호"
+              onkeydown="if(event.key==='Enter'){ this.blur(); }"
+              onblur="autoUnlockGhOnPasswordEntry()">
           </div>
-          <input type="password" id="ghToken" class="form-input" placeholder="Personal Access Token (ghp_...)" style="margin-bottom:8px;">
+          <div class="settings-hint" style="margin-bottom:14px;">
+            💡 다른 기기에서는 이 두 칸만 입력하면(입력 후 다른 곳을 클릭) 저장소·토큰이 자동으로 채워지고 바로 동기화까지 실행됩니다.
+          </div>
 
-          <div class="settings-toggle-row">
+          <!-- 그룹 2: 저장소 연결 정보 — 최초 설정 기기에서 직접 입력 -->
+          <div style="font-size:11px; font-weight:700; color:var(--text2); letter-spacing:0.3px; margin:0 0 6px;">📦 저장소 연결 정보</div>
+          <div class="settings-input-row" style="margin-bottom:6px;">
+            <input type="text" id="ghRepo" class="form-input" placeholder="저장소 이름">
+            <input type="password" id="ghToken" class="form-input" placeholder="Personal Access Token (ghp_...)">
+          </div>
+          <div class="settings-input-row" style="margin-bottom:0;">
+            <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="lockGhCredentialsWithPassword()">🔒 비밀번호로 저장</button>
+            <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="unlockGhCredentialsWithPassword()">🔑 비밀번호로 불러오기</button>
+          </div>
+          <div id="ghSyncPwStatus" style="font-size:11px; color:var(--text2); margin-top:6px; min-height:14px;"></div>
+
+          <div class="settings-toggle-row" style="margin-top:16px; padding-top:14px; border-top:1px dashed var(--border2);">
             <span>🔄 내역 수정 시 자동 저장(Sync)</span>
             <label class="toggle-switch">
               <input type="checkbox" id="ghAutoSync">
@@ -1565,18 +1583,6 @@
           <div class="settings-input-row" style="margin-bottom:0;">
             <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="pullFromGithub(false)">⬇️ 불러오기</button>
             <button class="btn-submit" style="background:var(--accent);" onclick="pushToGithub(false)">⬆️ 백업</button>
-          </div>
-
-          <div style="margin-top:16px; padding-top:14px; border-top:1px dashed var(--border2);">
-            <div class="settings-hint" style="margin-bottom:8px;">
-              🔐 다른 기기에서는 저장소 이름·토큰을 몰라도 <b>GitHub 아이디 + 비밀번호</b>만 입력하면 자동으로 불러올 수 있어요. (정보는 비밀번호로 암호화되어 공개 Gist에 저장되며, 비밀번호를 모르면 열람이 불가능합니다)
-            </div>
-            <input type="password" id="ghSyncPassword" class="form-input" placeholder="동기화 비밀번호 (최초 1회 설정)" style="margin-bottom:8px;">
-            <div class="settings-input-row" style="margin-bottom:0;">
-              <button class="btn-submit" style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="unlockGhCredentialsWithPassword()">🔑 비밀번호로 불러오기</button>
-              <button class="btn-submit" style="background:var(--accent);" onclick="lockGhCredentialsWithPassword()">🔒 비밀번호로 저장</button>
-            </div>
-            <div id="ghSyncPwStatus" style="font-size:11px; color:var(--text2); margin-top:6px; min-height:14px;"></div>
           </div>
         </div>
 
