@@ -9982,8 +9982,8 @@
       "targetPrice": 261000,
       "stopLossPrice": 100000,
       "averagingPrice": 150000,
-      "proximity": 3,
-      "updatedAt": "2026-07-22T14:44:01.234Z"
+      "proximity": 4,
+      "updatedAt": "2026-07-22T14:44:16.012Z"
     }
   }
 }
