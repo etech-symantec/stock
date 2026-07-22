@@ -276,25 +276,27 @@
   </div>
 
   <!-- 우측: 기간 + 테마 + 설정 -->
-  <div class="nav-right" style="display:flex; align-items:center; gap:10px;">
-    <select class="range-select" id="rangeSelect" title="조회 기간 선택" onchange="setRange(this.value)">
-      <option value="1d">1D</option>
-      <option value="1w">1W</option>
-      <option value="1m">1M</option>
-      <option value="3m">3M</option>
-      <option value="6m">6M</option>
-      <option value="1y" selected>1Y</option>
-      <option value="3y">3Y</option>
-      <option value="5y" id="rtab-5y">5Y</option>
-      <option value="all">전체</option>
-    </select>
+  <div class="nav-right">
+    <div class="nav-right-controls">
+      <select class="range-select" id="rangeSelect" title="조회 기간 선택" onchange="setRange(this.value)">
+        <option value="1d">1D</option>
+        <option value="1w">1W</option>
+        <option value="1m">1M</option>
+        <option value="3m">3M</option>
+        <option value="6m">6M</option>
+        <option value="1y" selected>1Y</option>
+        <option value="3y">3Y</option>
+        <option value="5y" id="rtab-5y">5Y</option>
+        <option value="all">전체</option>
+      </select>
+      <button class="btn-theme-toggle" onclick="toggleTheme()" id="btnThemeToggle" title="라이트/다크 모드 전환">🌙</button>
+      <button class="btn-sm" onclick="openMasterSettingsModal()" title="전체 설정 및 데이터 관리">⚙️ 설정</button>
+      <button class="btn-mobile-menu" onclick="openMobileMenu()" title="메뉴">☰</button>
+    </div>
     <div class="sync-status" id="syncStatus">
       <div class="sync-spinner" id="syncSpinner"></div>
       <span id="syncText"></span>
     </div>
-    <button class="btn-theme-toggle" onclick="toggleTheme()" id="btnThemeToggle" title="라이트/다크 모드 전환">🌙</button>
-    <button class="btn-sm" onclick="openMasterSettingsModal()" title="전체 설정 및 데이터 관리">⚙️ 설정</button>
-    <button class="btn-mobile-menu" onclick="openMobileMenu()" title="메뉴">☰</button>
   </div>
 </nav>
 
