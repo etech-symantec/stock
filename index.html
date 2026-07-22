@@ -13,7 +13,7 @@
      늦거나 fallback(sans-serif)으로 주저앉는 경우가 있어(특히 Saira Condensed 같은 조건부
      weight 지정 폰트), 여기서 한 번 더 미리 불러와 항상 안정적으로 적용되도록 합니다. -->
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Saira+Condensed:wght@700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20260722-price-alert-v2">
 <link rel="stylesheet" href="/plus/market-signal.css">
 <!-- 🚀 탐사선(Probe) 기능 — Plus 프리미엄 전용 스타일 -->
 <link rel="stylesheet" href="/plus/probe.css">
@@ -735,6 +735,20 @@
               </div>
             </div>
           </div>
+
+          <!-- 🔔 목표가 · 손절가 · 물타기 가격 근접 알림 -->
+          <section id="portfolioPriceAlerts" class="portfolio-price-alerts" style="display:none;" aria-live="polite">
+            <div class="portfolio-price-alerts-head">
+              <div class="portfolio-price-alerts-title">
+                <span class="portfolio-price-alerts-icon">🔔</span>
+                <span>가격 알림</span>
+                <span id="portfolioPriceAlertCount" class="portfolio-price-alert-count">0</span>
+              </div>
+              <span class="portfolio-price-alerts-hint">알림을 누르면 종목 상세카드가 열립니다</span>
+            </div>
+            <div id="portfolioPriceAlertList" class="portfolio-price-alert-list"></div>
+          </section>
+
           <div class="gs-group" style="display:flex; gap:15px; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:-5px;">
             <div style="flex:1;">
               <div style="font-size:11px; color:var(--text3); margin-bottom:4px;">통합 투자 원금</div>
@@ -1487,6 +1501,49 @@
     <!-- 변경 후 -->
     <div style="height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
 
+    <!-- 🎯 보유 종목 매매 기준 설정 -->
+    <section id="mPriceStrategy" class="price-strategy-panel" style="display:none;">
+      <div class="price-strategy-head">
+        <div>
+          <div class="price-strategy-title">🎯 매매 기준 설정</div>
+          <div class="price-strategy-sub">
+            현재가 <strong id="mStrategyCurrentPrice">—</strong>
+            <span class="price-strategy-dot">·</span>
+            보유 평단 <strong id="mStrategyAveragePrice">—</strong>
+          </div>
+        </div>
+        <span class="price-strategy-saved" id="mStrategySavedBadge">미설정</span>
+      </div>
+
+      <div class="price-strategy-grid">
+        <label class="price-strategy-field strategy-target">
+          <span class="price-strategy-label"><span>🎯 목표가</span><small>익절 기준</small></span>
+          <input type="text" inputmode="decimal" id="mTargetPrice" class="form-input price-strategy-input" placeholder="가격 입력" oninput="formatPriceStrategyInput(this)">
+        </label>
+        <label class="price-strategy-field strategy-stop">
+          <span class="price-strategy-label"><span>🛑 손절가</span><small>손실 제한</small></span>
+          <input type="text" inputmode="decimal" id="mStopLossPrice" class="form-input price-strategy-input" placeholder="가격 입력" oninput="formatPriceStrategyInput(this)">
+        </label>
+        <label class="price-strategy-field strategy-average">
+          <span class="price-strategy-label"><span>💧 물타기</span><small>추가매수 기준</small></span>
+          <input type="text" inputmode="decimal" id="mAveragingPrice" class="form-input price-strategy-input" placeholder="가격 입력" oninput="formatPriceStrategyInput(this)">
+        </label>
+        <label class="price-strategy-field strategy-proximity">
+          <span class="price-strategy-label"><span>🔔 근접 범위</span><small>현재가와의 거리</small></span>
+          <div class="price-strategy-percent-wrap">
+            <input type="number" id="mPriceAlertProximity" class="form-input price-strategy-input" min="0.1" max="20" step="0.1" value="3">
+            <span>%</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="price-strategy-actions">
+        <div id="mPriceStrategyStatus" class="price-strategy-status">설정한 가격은 포트폴리오 데이터와 함께 저장됩니다.</div>
+        <button type="button" class="btn-sm price-strategy-clear" onclick="clearPriceStrategy()">초기화</button>
+        <button type="button" class="btn-submit price-strategy-save" onclick="savePriceStrategy()">저장</button>
+      </div>
+    </section>
+
     <!-- 🌟 매매기록 요약 + What if 섹션 -->
     <div id="mTradeStats" style="display:none; margin-top:16px; border-top:1px solid var(--border2); padding-top:14px;">
       <!-- 매매 요약 -->
@@ -2183,7 +2240,7 @@ async function loadMoonlightDashboard(){
   });
 })();
 </script>
-<script src="app.js"></script>
+<script src="app.js?v=20260722-price-alert-v2"></script>
 <!-- 🚀 탐사선(Probe) 기능 — Plus 프리미엄 전용 스크립트 (app.js 이후에 로드) -->
 <script src="/plus/probe.js"></script>
 <script src="/plus/market-signal.js"></script>
