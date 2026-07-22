@@ -76,6 +76,8 @@ let historyRankingSortDir = 'desc'; // 'desc' 내림차순 | 'asc' 오름차순
 // 🌟 사이드바 "평가 자산 랭킹" 정렬 기준('roi': 수익률 | 'amount': 금액) 및 종목 범위('current': 보유 중만 | 'all': 역대 전체)
 let sidebarYieldSortBy = 'roi';
 let sidebarYieldScope = 'current';
+// 🌟 사이드바 "평가 자산 랭킹" 소유자 필터('all': 전체 | 'user1' | 'user2') — 현재 보고 있는 메인 탭(전체보기/소유자별)과 무관하게 독립적으로 동작합니다.
+let sidebarYieldOwnerFilter = 'all';
 
 // 🚀 탐사선 발사 지점 마커용 아이콘 이미지 (1회만 생성해서 재사용)
 const _rocketMarkerImg = (() => {
@@ -1475,6 +1477,10 @@ function updateOwnerLabels() {
   const histTab2 = document.getElementById('histTabUser2');
   if (histTab1) histTab1.textContent = `${o1.icon} ${o1.name}`;
   if (histTab2) histTab2.textContent = `${o2.icon} ${o2.name}`;
+  const sidebarYieldTab1 = document.getElementById('sidebarYieldOwnerTabUser1');
+  const sidebarYieldTab2 = document.getElementById('sidebarYieldOwnerTabUser2');
+  if (sidebarYieldTab1) sidebarYieldTab1.textContent = `${o1.icon} ${o1.name}`;
+  if (sidebarYieldTab2) sidebarYieldTab2.textContent = `${o2.icon} ${o2.name}`;
 }
 
 function toggleAccountFilter(broker) {
@@ -1627,6 +1633,15 @@ function getCurrentOwnerFilter() {
   let ownerFilter = 'all';
   if (currentView === 'user1') ownerFilter = state.owners.user1.name;
   if (currentView === 'user2') ownerFilter = state.owners.user2.name;
+  return ownerFilter;
+}
+
+// 🌟 사이드바 "평가 자산 랭킹"의 소유자 필터(sidebarYieldOwnerFilter)에 맞는 ownerFilter 값을 반환합니다.
+//    (메인 탭이 전체보기든 소유자별 탭이든 상관없이, 사이드바 자체 토글로 독립적으로 선택 가능)
+function getSidebarYieldOwnerFilter() {
+  let ownerFilter = 'all';
+  if (sidebarYieldOwnerFilter === 'user1') ownerFilter = state.owners.user1.name;
+  if (sidebarYieldOwnerFilter === 'user2') ownerFilter = state.owners.user2.name;
   return ownerFilter;
 }
 
@@ -3156,15 +3171,21 @@ function setDivFilter(filter, el) {
 // ==========================================
 // 5. 시각화 및 대시보드 렌더링 세부 함수들
 // ==========================================
-function renderSidebarYieldList(currentHoldings, ownerFilter = 'all') {
+function renderSidebarYieldList() {
   const container = document.getElementById('sidebarYieldList');
   if (!container) return;
 
-  // 🌟 상단 토글(정렬 기준 / 종목 기준) 버튼들의 활성 표시를 현재 상태와 동기화
+  // 🌟 상단 토글(정렬 기준 / 종목 기준 / 소유자) 버튼들의 활성 표시를 현재 상태와 동기화
   const sortGroup = document.getElementById('sidebarYieldSortGroup');
   if (sortGroup) sortGroup.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.val === sidebarYieldSortBy));
   const scopeGroup = document.getElementById('sidebarYieldScopeGroup');
   if (scopeGroup) scopeGroup.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.val === sidebarYieldScope));
+  const ownerGroup = document.getElementById('sidebarYieldOwnerGroup');
+  if (ownerGroup) ownerGroup.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.val === sidebarYieldOwnerFilter));
+
+  // 🌟 사이드바 자체 "소유자" 토글에 따라 독립적으로 종목 범위를 계산합니다 (메인 탭과 무관).
+  const ownerFilter = getSidebarYieldOwnerFilter();
+  const currentHoldings = calculateHoldings(ownerFilter);
 
   let yieldItems = [];
 
@@ -3252,16 +3273,21 @@ function renderSidebarYieldList(currentHoldings, ownerFilter = 'all') {
 function setSidebarYieldSort(mode) {
   if (sidebarYieldSortBy === mode) return;
   sidebarYieldSortBy = mode;
-  const ownerFilter = getCurrentOwnerFilter();
-  renderSidebarYieldList(calculateHoldings(ownerFilter), ownerFilter);
+  renderSidebarYieldList();
 }
 
 // 🌟 "평가 자산 랭킹" 종목 범위(보유 중만/역대 전체) 전환
 function setSidebarYieldScope(scope) {
   if (sidebarYieldScope === scope) return;
   sidebarYieldScope = scope;
-  const ownerFilter = getCurrentOwnerFilter();
-  renderSidebarYieldList(calculateHoldings(ownerFilter), ownerFilter);
+  renderSidebarYieldList();
+}
+
+// 🌟 "평가 자산 랭킹" 소유자 필터(전체/소유자1/소유자2) 전환 — 메인 탭(전체보기/소유자별)과 독립적으로 동작합니다.
+function setSidebarYieldOwnerFilter(mode) {
+  if (sidebarYieldOwnerFilter === mode) return;
+  sidebarYieldOwnerFilter = mode;
+  renderSidebarYieldList();
 }
 
 function generateCardHtml(item) {
@@ -5686,7 +5712,7 @@ async function render() {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
     updateSummaryAndAllocation(currentHoldings, []); 
     renderPortfolioChart(ownerFilter, currentSliceLen);
-    renderSidebarYieldList(currentHoldings, ownerFilter); 
+    renderSidebarYieldList(); 
     return;
   }
 
@@ -5826,7 +5852,7 @@ async function render() {
   updateSummaryAndAllocation(currentHoldings, displayItems);
   renderPortfolioChart(ownerFilter, currentSliceLen);
   renderTodayStocksPanel(displayItems);
-  renderSidebarYieldList(currentHoldings, ownerFilter);
+  renderSidebarYieldList();
 
   if (activeAccountFilter) {
     displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
