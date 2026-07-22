@@ -1734,6 +1734,15 @@ nav {
   box-shadow: 0 2px 6px rgba(124, 106, 247, 0.35);
 }
 
+/* 🌟 사이드바 평가 자산 랭킹의 정렬/범위 토글 — 버튼 2개가 균등하게 늘어나도록 */
+#sidebarYieldSortGroup, #sidebarYieldScopeGroup {
+  display: flex;
+}
+#sidebarYieldSortGroup .rtab, #sidebarYieldScopeGroup .rtab {
+  flex: 1;
+  text-align: center;
+}
+
 /* 테마 토글 */
 .btn-theme-toggle {
   width: 34px !important;
