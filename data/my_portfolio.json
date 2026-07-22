@@ -9979,11 +9979,11 @@
   ],
   "priceAlerts": {
     "005930.KS": {
-      "targetPrice": 300000,
+      "targetPrice": 261000,
       "stopLossPrice": 100000,
       "averagingPrice": 150000,
       "proximity": 3,
-      "updatedAt": "2026-07-22T14:43:45.264Z"
+      "updatedAt": "2026-07-22T14:44:01.234Z"
     }
   }
 }
