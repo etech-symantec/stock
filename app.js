@@ -20,16 +20,26 @@ function loadState() {
       if(!parsed.riaExcludeSymbols) parsed.riaExcludeSymbols = [];
       if(!parsed.customOverseasAssets) parsed.customOverseasAssets = [];
       if(!parsed.probes) parsed.probes = [];
+      if(!parsed.priceAlerts || typeof parsed.priceAlerts !== 'object' || Array.isArray(parsed.priceAlerts)) parsed.priceAlerts = {};
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [], probes: [] };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [], probes: [], priceAlerts: {} };
+}
+
+function ensurePriceAlertState(targetState) {
+  const target = targetState || state;
+  if (!target.priceAlerts || typeof target.priceAlerts !== 'object' || Array.isArray(target.priceAlerts)) {
+    target.priceAlerts = {};
+  }
+  return target.priceAlerts;
 }
 
 let state = loadState();
+ensurePriceAlertState(state);
 let currentView = 'all'; 
 
 // 🌟 선택된 기간의 시작 날짜(Cut-off Date)를 계산하는 함수
@@ -532,6 +542,229 @@ function getOwnerInfo(ownerName) {
 
 
 // ==========================================
+// 🎯 목표가 · 손절가 · 물타기 가격 및 근접 알림
+// ==========================================
+const DEFAULT_PRICE_ALERT_PROXIMITY = 3;
+
+function _escapePriceAlertHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function _parsePriceStrategyValue(value) {
+  const parsed = Number(String(value ?? '').replace(/,/g, '').trim());
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+function _formatStrategyStoredValue(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return '';
+  const maxDigits = Number.isInteger(num) ? 0 : 4;
+  return num.toLocaleString('en-US', { maximumFractionDigits: maxDigits });
+}
+
+function formatPriceStrategyInput(input) {
+  if (!input) return;
+  let raw = String(input.value || '').replace(/,/g, '').replace(/[^0-9.]/g, '');
+  const dotIndex = raw.indexOf('.');
+  if (dotIndex !== -1) raw = raw.slice(0, dotIndex + 1) + raw.slice(dotIndex + 1).replace(/\./g, '');
+  const hasTrailingDot = raw.endsWith('.');
+  const parts = raw.split('.');
+  const integer = parts[0] ? Number(parts[0]).toLocaleString('en-US') : '';
+  const decimal = parts.length > 1 ? '.' + parts[1].slice(0, 4) : (hasTrailingDot ? '.' : '');
+  input.value = integer + decimal;
+}
+
+function getPriceStrategy(symbol) {
+  const raw = ensurePriceAlertState(state)[symbol] || {};
+  const proximity = Number(raw.proximity);
+  return {
+    targetPrice: Number(raw.targetPrice) > 0 ? Number(raw.targetPrice) : 0,
+    stopLossPrice: Number(raw.stopLossPrice) > 0 ? Number(raw.stopLossPrice) : 0,
+    averagingPrice: Number(raw.averagingPrice) > 0 ? Number(raw.averagingPrice) : 0,
+    proximity: Number.isFinite(proximity) && proximity > 0 ? proximity : DEFAULT_PRICE_ALERT_PROXIMITY
+  };
+}
+
+function hasPriceStrategy(symbol) {
+  const cfg = getPriceStrategy(symbol);
+  return !!(cfg.targetPrice || cfg.stopLossPrice || cfg.averagingPrice);
+}
+
+function _getPriceStrategyHoldingSummary(symbol) {
+  const ownerFilter = getCurrentOwnerFilter();
+  const holdings = calculateHoldings(ownerFilter);
+  const rows = Object.values(holdings).filter(h => h.symbol === symbol && h.qty > 0);
+  const qty = rows.reduce((sum, h) => sum + h.qty, 0);
+  const cost = rows.reduce((sum, h) => sum + h.qty * h.avg, 0);
+  return { qty, avg: qty > 0 ? cost / qty : 0 };
+}
+
+function renderModalPriceStrategy(currentPrice, forceReload = false) {
+  const panel = document.getElementById('mPriceStrategy');
+  if (!panel || !currentModalTicker) return;
+
+  const holding = _getPriceStrategyHoldingSummary(currentModalTicker);
+  if (holding.qty <= 0) {
+    panel.style.display = 'none';
+    panel.dataset.symbol = '';
+    return;
+  }
+
+  panel.style.display = 'block';
+  document.getElementById('mStrategyCurrentPrice').textContent = formatPrice(currentPrice, currentModalTicker);
+  document.getElementById('mStrategyAveragePrice').textContent = formatPrice(holding.avg, currentModalTicker);
+
+  if (forceReload || panel.dataset.symbol !== currentModalTicker) {
+    const cfg = getPriceStrategy(currentModalTicker);
+    document.getElementById('mTargetPrice').value = _formatStrategyStoredValue(cfg.targetPrice);
+    document.getElementById('mStopLossPrice').value = _formatStrategyStoredValue(cfg.stopLossPrice);
+    document.getElementById('mAveragingPrice').value = _formatStrategyStoredValue(cfg.averagingPrice);
+    document.getElementById('mPriceAlertProximity').value = cfg.proximity;
+    document.getElementById('mPriceStrategyStatus').textContent = '현재가가 설정 가격에 지정 범위만큼 가까워지면 통합자산 상단에 알립니다.';
+    panel.dataset.symbol = currentModalTicker;
+  }
+
+  const savedBadge = document.getElementById('mStrategySavedBadge');
+  const configured = hasPriceStrategy(currentModalTicker);
+  savedBadge.textContent = configured ? '설정됨' : '미설정';
+  savedBadge.classList.toggle('configured', configured);
+}
+
+function savePriceStrategy() {
+  if (!currentModalTicker) return;
+  const targetPrice = _parsePriceStrategyValue(document.getElementById('mTargetPrice').value);
+  const stopLossPrice = _parsePriceStrategyValue(document.getElementById('mStopLossPrice').value);
+  const averagingPrice = _parsePriceStrategyValue(document.getElementById('mAveragingPrice').value);
+  let proximity = Number(document.getElementById('mPriceAlertProximity').value);
+  if (!Number.isFinite(proximity)) proximity = DEFAULT_PRICE_ALERT_PROXIMITY;
+  proximity = Math.min(20, Math.max(0.1, proximity));
+  document.getElementById('mPriceAlertProximity').value = proximity;
+
+  const strategies = ensurePriceAlertState(state);
+  if (!targetPrice && !stopLossPrice && !averagingPrice) {
+    delete strategies[currentModalTicker];
+  } else {
+    strategies[currentModalTicker] = {
+      targetPrice,
+      stopLossPrice,
+      averagingPrice,
+      proximity,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  saveState();
+  triggerAutoSync();
+  renderModalPriceStrategy(cachedMarketData[currentModalTicker]?.last || 0, true);
+  const status = document.getElementById('mPriceStrategyStatus');
+  status.textContent = hasPriceStrategy(currentModalTicker) ? '✅ 매매 기준을 저장했습니다.' : '설정값을 비워 가격 알림을 해제했습니다.';
+  renderPortfolioPriceAlerts(getCurrentOwnerFilter());
+}
+
+function clearPriceStrategy() {
+  if (!currentModalTicker) return;
+  delete ensurePriceAlertState(state)[currentModalTicker];
+  saveState();
+  triggerAutoSync();
+  ['mTargetPrice', 'mStopLossPrice', 'mAveragingPrice'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const proximityEl = document.getElementById('mPriceAlertProximity');
+  if (proximityEl) proximityEl.value = DEFAULT_PRICE_ALERT_PROXIMITY;
+  renderModalPriceStrategy(cachedMarketData[currentModalTicker]?.last || 0, true);
+  const status = document.getElementById('mPriceStrategyStatus');
+  if (status) status.textContent = '가격 알림 설정을 초기화했습니다.';
+  renderPortfolioPriceAlerts(getCurrentOwnerFilter());
+}
+
+function _buildPortfolioPriceAlerts(ownerFilter = 'all') {
+  const holdings = calculateHoldings(ownerFilter);
+  const heldSymbols = new Set(Object.values(holdings).filter(h => h.qty > 0).map(h => h.symbol));
+  const alerts = [];
+
+  heldSymbols.forEach(symbol => {
+    if (!hasPriceStrategy(symbol)) return;
+    const data = cachedMarketData[symbol];
+    if (!data || data._failed) return;
+    const currentPrice = Number(data.last || (Array.isArray(data.prices) ? data.prices[data.prices.length - 1] : 0));
+    if (!Number.isFinite(currentPrice) || currentPrice <= 0) return;
+
+    const cfg = getPriceStrategy(symbol);
+    const name = data.name || localStockDB.find(s => s.symbol === symbol)?.name || symbol;
+    const rules = [
+      { key: 'stopLossPrice', type: 'stop', label: '손절가', icon: '🛑', level: cfg.stopLossPrice, reached: p => currentPrice <= p, priority: 0 },
+      { key: 'targetPrice', type: 'target', label: '목표가', icon: '🎯', level: cfg.targetPrice, reached: p => currentPrice >= p, priority: 1 },
+      { key: 'averagingPrice', type: 'average', label: '물타기', icon: '💧', level: cfg.averagingPrice, reached: p => currentPrice <= p, priority: 2 }
+    ];
+
+    rules.forEach(rule => {
+      if (!rule.level) return;
+      const distancePct = Math.abs(currentPrice - rule.level) / rule.level * 100;
+      const reached = rule.reached(rule.level);
+      if (!reached && distancePct > cfg.proximity) return;
+      alerts.push({
+        symbol, name, currentPrice, level: rule.level, distancePct, reached,
+        type: rule.type, label: rule.label, icon: rule.icon,
+        priority: reached ? rule.priority : 10 + rule.priority
+      });
+    });
+  });
+
+  return alerts.sort((a, b) => a.priority - b.priority || a.distancePct - b.distancePct || a.name.localeCompare(b.name, 'ko'));
+}
+
+function renderPortfolioPriceAlerts(ownerFilter = 'all') {
+  const wrap = document.getElementById('portfolioPriceAlerts');
+  const list = document.getElementById('portfolioPriceAlertList');
+  const count = document.getElementById('portfolioPriceAlertCount');
+  if (!wrap || !list || !count) return;
+
+  const alerts = _buildPortfolioPriceAlerts(ownerFilter);
+  if (alerts.length === 0) {
+    wrap.style.display = 'none';
+    list.innerHTML = '';
+    count.textContent = '0';
+    return;
+  }
+
+  count.textContent = String(alerts.length);
+  list.innerHTML = alerts.map(alert => {
+    const stateText = alert.reached
+      ? `${alert.label} 도달`
+      : `${alert.label} ${alert.distancePct.toFixed(alert.distancePct < 1 ? 1 : 0)}% 근접`;
+    return `
+      <button type="button" class="portfolio-price-alert alert-${alert.type} ${alert.reached ? 'reached' : ''}"
+              onclick="openPriceAlertDetail('${alert.symbol}')" title="${_escapePriceAlertHtml(alert.name)} 상세카드 열기">
+        <span class="portfolio-price-alert-symbol">${alert.icon}</span>
+        <span class="portfolio-price-alert-copy">
+          <span class="portfolio-price-alert-name">${_escapePriceAlertHtml(alert.name)}</span>
+          <span class="portfolio-price-alert-state">${stateText}</span>
+          <span class="portfolio-price-alert-meta">현재 ${formatPrice(alert.currentPrice, alert.symbol)} · 기준 ${formatPrice(alert.level, alert.symbol)}</span>
+        </span>
+      </button>`;
+  }).join('');
+  wrap.style.display = 'flex';
+}
+
+function openPriceAlertDetail(symbol) {
+  openChartModal(symbol);
+  setTimeout(() => {
+    const panel = document.getElementById('mPriceStrategy');
+    if (!panel || panel.style.display === 'none') return;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    panel.classList.add('price-strategy-focus');
+    setTimeout(() => panel.classList.remove('price-strategy-focus'), 1300);
+  }, 120);
+}
+
+
+// ==========================================
 // 2. 모달, UI 및 클라우드 설정 
 // ==========================================
 function getGhSettings() {
@@ -901,7 +1134,8 @@ function closeModal(id) {
 function resetAllTransactions() {
   if(confirm("🚨 경고: 모든 거래 내역이 영구적으로 삭제됩니다.\n정말로 전체 데이터를 초기화하시겠습니까?")) {
     state.transactions = [];
-    state.tickers = ['AAPL','TSLA','005930.KS']; 
+    state.tickers = ['AAPL','TSLA','005930.KS'];
+    state.priceAlerts = {}; 
     saveState();
     renderTxList();
     if(currentView === 'history') renderHistoryDashboard();
@@ -973,12 +1207,14 @@ function importData(event) {
                 // 구 종목명, 태그 데이터 병합
                 if (data.oldNames) state.oldNames = { ...state.oldNames, ...data.oldNames };
                 if (data.tags) state.tags = { ...state.tags, ...data.tags };
+                if (data.priceAlerts) state.priceAlerts = { ...ensurePriceAlertState(state), ...data.priceAlerts };
 
                 alert(`데이터 병합 완료!\n총 ${data.transactions.length}건의 거래가 기존 장부에 추가되었습니다.`);
                 
             } else {
                 // 📌 덮어쓰기 모드 (기존 로직)
                 state = data;
+                ensurePriceAlertState(state);
                 if(!state.owners) {
                    state.owners = {
                      user1: { name: state.ownerNames?.user1 || '소유자1', color: '#7c6af7', icon: '👤' },
@@ -1419,7 +1655,7 @@ async function pullFromGithub(silent = false) {
       const dataStr = b64_to_utf8(fileInfo.content);
       const data = JSON.parse(dataStr);
       if(data.tickers && data.transactions) {
-        state = data; saveState(); cachedMarketData = {};
+        state = data; ensurePriceAlertState(state); saveState(); cachedMarketData = {};
         updateOwnerLabels(); renderTxList(); render();
         updateSyncStatus('success');
         if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('masterSettingsOverlay'); }
@@ -5197,6 +5433,8 @@ function highlightNewlyAddedCard(symbol) {
 
 function openChartModal(ticker, probeId = null) {
   currentModalTicker = ticker;
+  const strategyPanel = document.getElementById('mPriceStrategy');
+  if (strategyPanel) strategyPanel.dataset.symbol = '';
   currentProbeId = probeId;
   currentModalRange = state.range;
   
@@ -5264,6 +5502,8 @@ function renderModalChart() {
   document.getElementById('mMeta').textContent = probe
     ? `🚀 ${probe.buyDate} 탐사선 발사 이후 · 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`
     : `해당 기간 내 최고 ${formatPrice(hi, currentModalTicker)} · 최저 ${formatPrice(lo, currentModalTicker)}`;
+
+  renderModalPriceStrategy(last);
   
   if (modalChartInst) { modalChartInst.destroy(); modalChartInst = null; }
   const _modalOwnerFilter = currentView === 'user1' ? state.owners.user1.name
@@ -5754,7 +5994,8 @@ async function render() {
 
   if (state.tickers.length === 0 && Object.keys(symbolHoldings).length === 0) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
-    updateSummaryAndAllocation(currentHoldings, []); 
+    updateSummaryAndAllocation(currentHoldings, []);
+    renderPortfolioPriceAlerts(ownerFilter);
     renderPortfolioChart(ownerFilter, currentSliceLen);
     renderSidebarYieldList(); 
     return;
@@ -5894,6 +6135,7 @@ async function render() {
   });
 
   updateSummaryAndAllocation(currentHoldings, displayItems);
+  renderPortfolioPriceAlerts(ownerFilter);
   renderPortfolioChart(ownerFilter, currentSliceLen);
   renderTodayStocksPanel(displayItems);
   renderSidebarYieldList();
