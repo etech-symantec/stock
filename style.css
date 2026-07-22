@@ -499,6 +499,110 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
   background: rgba(98, 80, 224, 0.08);
 }
 
+/* 🏆 사이드바 "평가 자산 랭킹" — "{소유자} {종목 기준} {정렬 기준} 기준 랭킹" 문장형 드롭다운 */
+.yield-rank-phrase {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+}
+.yield-rank-phrase .yield-phrase-suffix {
+  color: var(--text2);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.yield-phrase-dd {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.yield-phrase-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--accent);
+  cursor: pointer;
+  border-bottom: 1.5px dashed var(--accent);
+  padding: 0 1px 1px;
+  transition: opacity 0.12s ease;
+  white-space: nowrap;
+}
+.yield-phrase-word::after {
+  content: '';
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 4.5px solid var(--accent);
+  opacity: 0.7;
+  transition: transform 0.16s ease;
+}
+.yield-phrase-dd.open .yield-phrase-word::after {
+  transform: rotate(180deg);
+}
+.yield-phrase-word:hover {
+  opacity: 0.75;
+}
+.yield-phrase-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 96px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.16);
+  padding: 6px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.97);
+  transform-origin: top left;
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+}
+.yield-phrase-dd.open .yield-phrase-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.yield-phrase-option {
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text2);
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease;
+  user-select: none;
+}
+.yield-phrase-option:hover {
+  background: rgba(124, 106, 247, 0.1);
+  color: var(--text);
+}
+.yield-phrase-option.active {
+  background: var(--accent);
+  color: #fff;
+}
+.yield-phrase-option.active:hover {
+  background: var(--accent);
+}
+[data-theme="light"] .yield-phrase-menu {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .yield-phrase-option:hover {
+  background: rgba(98, 80, 224, 0.08);
+}
+
 .grid-container { padding-bottom: 40px; container-type: inline-size; container-name: cardregion; }
 /* 좌우(KR/US) 분할 배치 시 각 영역(region-col)도 별도의 컨테이너 쿼리 기준이 됩니다 */
 .region-col { container-type: inline-size; container-name: cardregion; }
