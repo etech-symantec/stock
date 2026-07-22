@@ -3060,6 +3060,87 @@ function setRange(rangeStr, el) {
   else render();
 }
 
+// ==========================================
+// 🎚️ 상단 "조회 기간" 슬라이더 — 버튼 9개 대신 트랙 위의 점 하나를 드래그해서 1D~전체 사이를 이동
+// ==========================================
+const RANGE_STEPS = ['1d','1w','1m','3m','6m','1y','3y','5y','all'];
+
+function rangeStepPercent(idx) {
+  return (idx / (RANGE_STEPS.length - 1)) * 100;
+}
+
+// 현재 state.range에 맞춰 슬라이더의 점 위치 / 라벨 / 눈금 강조를 갱신 (실제 선택 로직은 건드리지 않음)
+function updateRangeSliderUI(rangeStr) {
+  const idx = RANGE_STEPS.indexOf(rangeStr);
+  if (idx === -1) return;
+  const pct = rangeStepPercent(idx);
+  const thumb = document.getElementById('rangeSliderThumb');
+  const fill = document.getElementById('rangeSliderFill');
+  const label = document.getElementById('rangeSliderLabel');
+  if (thumb) thumb.style.left = pct + '%';
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = rangeStr === 'all' ? '전체' : rangeStr.toUpperCase();
+  document.querySelectorAll('.range-slider-tick').forEach(t => {
+    t.classList.toggle('active', t.dataset.range === rangeStr);
+  });
+}
+
+// 슬라이더에서 idx번째 단계를 선택: UI를 먼저 즉시 이동시키고, 실제 값이 바뀐 경우에만 setRange 호출
+function selectRangeStep(idx) {
+  idx = Math.max(0, Math.min(RANGE_STEPS.length - 1, idx));
+  const rangeStr = RANGE_STEPS[idx];
+  updateRangeSliderUI(rangeStr);
+  if (rangeStr !== state.range) setRange(rangeStr);
+}
+
+function initRangeSlider() {
+  const track = document.getElementById('rangeSliderTrack');
+  const thumb = document.getElementById('rangeSliderThumb');
+  if (!track || !thumb) return;
+
+  updateRangeSliderUI(state.range || '1y');
+
+  // 눈금(점)을 직접 클릭하면 바로 그 기간으로 이동
+  track.querySelectorAll('.range-slider-tick').forEach((tick, idx) => {
+    tick.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectRangeStep(idx);
+    });
+  });
+
+  function idxFromClientX(clientX) {
+    const rect = track.getBoundingClientRect();
+    let ratio = (clientX - rect.left) / rect.width;
+    ratio = Math.max(0, Math.min(1, ratio));
+    return Math.round(ratio * (RANGE_STEPS.length - 1));
+  }
+
+  let dragging = false;
+  function onDragMove(clientX) { selectRangeStep(idxFromClientX(clientX)); }
+
+  // 마우스로 드래그
+  thumb.addEventListener('mousedown', (e) => { dragging = true; e.preventDefault(); });
+  track.addEventListener('mousedown', (e) => {
+    if (e.target === thumb || e.target.classList.contains('range-slider-tick')) return;
+    onDragMove(e.clientX);
+    dragging = true;
+  });
+  window.addEventListener('mousemove', (e) => { if (dragging) onDragMove(e.clientX); });
+  window.addEventListener('mouseup', () => { dragging = false; });
+
+  // 터치(모바일)로 드래그
+  thumb.addEventListener('touchstart', () => { dragging = true; }, { passive: true });
+  track.addEventListener('touchstart', (e) => {
+    if (e.target === thumb || e.target.classList.contains('range-slider-tick')) return;
+    if (e.touches[0]) onDragMove(e.touches[0].clientX);
+    dragging = true;
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (dragging && e.touches[0]) onDragMove(e.touches[0].clientX);
+  }, { passive: true });
+  window.addEventListener('touchend', () => { dragging = false; });
+}
+
 function setSortMode(mode) { currentSortMode = mode; render(); }
 
 function toggleSortDirection() {
@@ -5451,6 +5532,7 @@ async function render() {
     const btnRange = b.id ? b.id.replace('rtab-', '') : '';
     if (btnRange === state.range) b.classList.add('active');
   });
+  updateRangeSliderUI(state.range);
 
   const container = document.getElementById('gridContainer');
   const dash = document.getElementById('dashboardTopWrapper');
@@ -6035,6 +6117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateOwnerLabels();
   renderTxList();
   render(); 
+  initRangeSlider();
   
   // 4. 자동 동기화 설정 적용
   const ghAutoSyncCheckbox = document.getElementById('ghAutoSync');
