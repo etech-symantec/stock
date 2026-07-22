@@ -512,6 +512,22 @@
     </div>
 
     <div id="sidebarYieldView" style="display: none; flex-direction: column; flex: 1; overflow-y: auto; padding: 15px 20px;">
+      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; color:var(--text3); width:52px; flex-shrink:0;">정렬 기준</span>
+          <div class="range-group" id="sidebarYieldSortGroup" style="flex:1;">
+            <button type="button" class="rtab active" data-val="roi" onclick="setSidebarYieldSort('roi')">수익률</button>
+            <button type="button" class="rtab" data-val="amount" onclick="setSidebarYieldSort('amount')">금액</button>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; color:var(--text3); width:52px; flex-shrink:0;">종목 기준</span>
+          <div class="range-group" id="sidebarYieldScopeGroup" style="flex:1;">
+            <button type="button" class="rtab active" data-val="current" onclick="setSidebarYieldScope('current')">보유 중</button>
+            <button type="button" class="rtab" data-val="all" onclick="setSidebarYieldScope('all')">역대 전체</button>
+          </div>
+        </div>
+      </div>
       <div id="sidebarYieldList" style="display:flex; flex-direction:column; gap:6px;"></div>
     </div>
   </aside>
