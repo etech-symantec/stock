@@ -9981,9 +9981,9 @@
     "005930.KS": {
       "targetPrice": 300000,
       "stopLossPrice": 0,
-      "averagingPrice": 0,
+      "averagingPrice": 150000,
       "proximity": 3,
-      "updatedAt": "2026-07-22T14:43:27.805Z"
+      "updatedAt": "2026-07-22T14:43:38.133Z"
     }
   }
 }
