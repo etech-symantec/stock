@@ -1477,10 +1477,7 @@ function updateOwnerLabels() {
   const histTab2 = document.getElementById('histTabUser2');
   if (histTab1) histTab1.textContent = `${o1.icon} ${o1.name}`;
   if (histTab2) histTab2.textContent = `${o2.icon} ${o2.name}`;
-  const sidebarYieldTab1 = document.getElementById('sidebarYieldOwnerTabUser1');
-  const sidebarYieldTab2 = document.getElementById('sidebarYieldOwnerTabUser2');
-  if (sidebarYieldTab1) sidebarYieldTab1.textContent = `${o1.icon} ${o1.name}`;
-  if (sidebarYieldTab2) sidebarYieldTab2.textContent = `${o2.icon} ${o2.name}`;
+  syncYieldPhraseUI();
 }
 
 function toggleAccountFilter(broker) {
@@ -3175,15 +3172,10 @@ function renderSidebarYieldList() {
   const container = document.getElementById('sidebarYieldList');
   if (!container) return;
 
-  // 🌟 상단 토글(정렬 기준 / 종목 기준 / 소유자) 버튼들의 활성 표시를 현재 상태와 동기화
-  const sortGroup = document.getElementById('sidebarYieldSortGroup');
-  if (sortGroup) sortGroup.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.val === sidebarYieldSortBy));
-  const scopeGroup = document.getElementById('sidebarYieldScopeGroup');
-  if (scopeGroup) scopeGroup.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.val === sidebarYieldScope));
-  const ownerGroup = document.getElementById('sidebarYieldOwnerGroup');
-  if (ownerGroup) ownerGroup.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.val === sidebarYieldOwnerFilter));
+  // 🌟 상단 문장형 드롭다운("{소유자} {종목 기준} {정렬 기준} 기준 랭킹") 표시를 현재 상태와 동기화
+  syncYieldPhraseUI();
 
-  // 🌟 사이드바 자체 "소유자" 토글에 따라 독립적으로 종목 범위를 계산합니다 (메인 탭과 무관).
+  // 🌟 사이드바 자체 "소유자" 드롭다운에 따라 독립적으로 종목 범위를 계산합니다 (메인 탭과 무관).
   const ownerFilter = getSidebarYieldOwnerFilter();
   const currentHoldings = calculateHoldings(ownerFilter);
 
@@ -3269,24 +3261,76 @@ function renderSidebarYieldList() {
   }).join('');
 }
 
-// 🌟 "평가 자산 랭킹" 정렬 기준(수익률/금액) 전환
-function setSidebarYieldSort(mode) {
-  if (sidebarYieldSortBy === mode) return;
-  sidebarYieldSortBy = mode;
+// 🌟 "평가 자산 랭킹" 문장형 드롭다운 — 열려있는 드롭다운을 모두 닫습니다.
+function closeAllYieldPhraseDD(exceptId) {
+  document.querySelectorAll('.yield-phrase-dd.open').forEach(dd => {
+    if (dd.id !== exceptId) dd.classList.remove('open');
+  });
+}
+
+// 🌟 소유자/종목 기준/정렬 기준 드롭다운 열고 닫기 (같은 걸 다시 누르면 닫힘, 다른 걸 누르면 그것만 열림)
+function toggleYieldPhraseDD(ddId, event) {
+  if (event) event.stopPropagation();
+  const dd = document.getElementById(ddId);
+  if (!dd) return;
+  const willOpen = !dd.classList.contains('open');
+  closeAllYieldPhraseDD();
+  if (willOpen) dd.classList.add('open');
+}
+
+// 바깥 영역을 클릭하면 열려있던 드롭다운을 자동으로 닫습니다.
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.yield-phrase-dd')) closeAllYieldPhraseDD();
+});
+
+// 🌟 문장("{소유자} {종목 기준} {정렬 기준} 기준 랭킹")에 표시되는 단어와, 각 드롭다운의 active 옵션을 현재 상태와 동기화합니다.
+function syncYieldPhraseUI() {
+  const o1 = state.owners.user1, o2 = state.owners.user2;
+
+  // 소유자 — 드롭다운 옵션 라벨(이름 변경 반영) + 현재 선택된 단어
+  const ownerOpt1 = document.getElementById('yieldOwnerOptUser1');
+  const ownerOpt2 = document.getElementById('yieldOwnerOptUser2');
+  if (ownerOpt1) ownerOpt1.textContent = o1.name;
+  if (ownerOpt2) ownerOpt2.textContent = o2.name;
+  const ownerWord = document.getElementById('yieldWordOwner');
+  if (ownerWord) ownerWord.textContent = sidebarYieldOwnerFilter === 'user1' ? o1.name : (sidebarYieldOwnerFilter === 'user2' ? o2.name : '전체');
+  const ownerDD = document.getElementById('yieldOwnerDD');
+  if (ownerDD) ownerDD.querySelectorAll('.yield-phrase-option').forEach(opt => opt.classList.toggle('active', opt.dataset.value === sidebarYieldOwnerFilter));
+
+  // 종목 기준 — 보유 중 / 역대 전체
+  const scopeWord = document.getElementById('yieldWordScope');
+  if (scopeWord) scopeWord.textContent = sidebarYieldScope === 'all' ? '역대 전체' : '보유 중';
+  const scopeDD = document.getElementById('yieldScopeDD');
+  if (scopeDD) scopeDD.querySelectorAll('.yield-phrase-option').forEach(opt => opt.classList.toggle('active', opt.dataset.value === sidebarYieldScope));
+
+  // 정렬 기준 — 수익률 / 금액
+  const sortWord = document.getElementById('yieldWordSort');
+  if (sortWord) sortWord.textContent = sidebarYieldSortBy === 'amount' ? '금액' : '수익률';
+  const sortDD = document.getElementById('yieldSortDD');
+  if (sortDD) sortDD.querySelectorAll('.yield-phrase-option').forEach(opt => opt.classList.toggle('active', opt.dataset.value === sidebarYieldSortBy));
+}
+
+// 🌟 "평가 자산 랭킹" 소유자 선택(전체/소유자1/소유자2) — 메인 탭(전체보기/소유자별)과 독립적으로 동작합니다.
+function selectYieldOwnerOption(mode) {
+  closeAllYieldPhraseDD();
+  if (sidebarYieldOwnerFilter === mode) return;
+  sidebarYieldOwnerFilter = mode;
   renderSidebarYieldList();
 }
 
-// 🌟 "평가 자산 랭킹" 종목 범위(보유 중만/역대 전체) 전환
-function setSidebarYieldScope(scope) {
+// 🌟 "평가 자산 랭킹" 종목 기준 선택(보유 중만/역대 전체)
+function selectYieldScopeOption(scope) {
+  closeAllYieldPhraseDD();
   if (sidebarYieldScope === scope) return;
   sidebarYieldScope = scope;
   renderSidebarYieldList();
 }
 
-// 🌟 "평가 자산 랭킹" 소유자 필터(전체/소유자1/소유자2) 전환 — 메인 탭(전체보기/소유자별)과 독립적으로 동작합니다.
-function setSidebarYieldOwnerFilter(mode) {
-  if (sidebarYieldOwnerFilter === mode) return;
-  sidebarYieldOwnerFilter = mode;
+// 🌟 "평가 자산 랭킹" 정렬 기준 선택(수익률/금액)
+function selectYieldSortOption(mode) {
+  closeAllYieldPhraseDD();
+  if (sidebarYieldSortBy === mode) return;
+  sidebarYieldSortBy = mode;
   renderSidebarYieldList();
 }
 
