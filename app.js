@@ -596,8 +596,11 @@ function hasPriceStrategy(symbol) {
 }
 
 function _getPriceStrategyHoldingSummary(symbol) {
-  const ownerFilter = getCurrentOwnerFilter();
-  const holdings = calculateHoldings(ownerFilter);
+  // 매매 기준은 종목 단위로 저장하므로 현재 탭의 소유자 필터와 관계없이
+  // 전체 계좌에서 한 주라도 보유 중이면 상세카드에 설정 영역을 표시합니다.
+  // 기존에는 getCurrentOwnerFilter()를 적용해 다른 소유자가 보유한 종목의
+  // 설정 영역이 숨겨지는 문제가 있었습니다.
+  const holdings = calculateHoldings('all');
   const rows = Object.values(holdings).filter(h => h.symbol === symbol && h.qty > 0);
   const qty = rows.reduce((sum, h) => sum + h.qty, 0);
   const cost = rows.reduce((sum, h) => sum + h.qty * h.avg, 0);
