@@ -536,12 +536,6 @@ function getGhSettings() {
 }
 function saveGhSettings(settings) { localStorage.setItem('gh_settings', JSON.stringify(settings)); }
 
-// 🌟 마지막으로 동기화(push/pull)된 GitHub 파일의 sha를 기억해두고,
-//    다음 pull 때 sha가 그대로면 "변경사항 없음"으로 판단해 불필요한 재로딩을 건너뜀
-const GH_LAST_SHA_KEY = 'gh_last_synced_sha';
-function getLastSyncedSha() { return localStorage.getItem(GH_LAST_SHA_KEY) || null; }
-function setLastSyncedSha(sha) { if (sha) localStorage.setItem(GH_LAST_SHA_KEY, sha); }
-
 // ============================================
 // 🔐 비밀번호 기반 GitHub 동기화 정보 부트스트랩
 //   - 최초 기기: user/repo/token + 비밀번호 입력 → 암호화해서 "공개 Gist"에 저장
@@ -1376,10 +1370,6 @@ async function pushToGithub(silent = false) {
 
     const putRes = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }, body: JSON.stringify(body) });
     if(putRes.ok) { 
-      try {
-        const putJson = await putRes.json();
-        if (putJson && putJson.content && putJson.content.sha) setLastSyncedSha(putJson.content.sha);
-      } catch(e) {}
       updateSyncStatus('success');
       if(!silent) { alert('✅ 성공적으로 GitHub에 저장되었습니다!'); closeModal('masterSettingsOverlay'); }
     } else { 
@@ -1395,24 +1385,6 @@ async function pushToGithub(silent = false) {
 function triggerAutoSync() {
   const s = getGhSettings();
   if(s.autoSync && s.token) pushToGithub(true);
-}
-
-// ==========================================
-// 🌟 페이지를 새로고침(로드)할 때마다 GitHub의 최신 데이터를 자동으로 가져오기 (Pull)
-//   - autoSync 체크박스 여부와 관계없이, GitHub 연동 정보(user/repo/token)가 저장되어 있으면 항상 실행
-//   - 다른 기기에서 먼저 저장한 최신 데이터를 이 기기에도 반영해서, 여러 기기 간 데이터가 어긋나지 않도록 함
-// ==========================================
-async function autoPullOnLoad() {
-  const s = getGhSettings();
-  if (!s.user || !s.repo || !s.token) return; // 연동 정보가 없으면 조용히 스킵
-
-  updateSyncStatus('syncing');
-  try {
-    await pullFromGithub(true);
-  } catch (e) {
-    console.warn('페이지 로드 시 자동 불러오기 실패:', e);
-    updateSyncStatus('error');
-  }
 }
 
 async function pullFromGithub(silent = false) {
@@ -1432,20 +1404,11 @@ async function pullFromGithub(silent = false) {
   try {
     const fileInfo = await getGithubFileSha({user, token, repo}, path);
     if (fileInfo && fileInfo.content) {
-      // 🌟 이전에 동기화했던 파일과 sha(내용 해시)가 같으면 변경사항이 없는 것이므로 다시 불러오지 않고 스킵
-      const lastSha = getLastSyncedSha();
-      if (lastSha && fileInfo.sha === lastSha) {
-        updateSyncStatus('success');
-        if(!silent) { alert('이미 최신 상태예요. (변경사항 없음)'); closeModal('masterSettingsOverlay'); }
-        return;
-      }
-
       const dataStr = b64_to_utf8(fileInfo.content);
       const data = JSON.parse(dataStr);
       if(data.tickers && data.transactions) {
         state = data; saveState(); cachedMarketData = {};
         updateOwnerLabels(); renderTxList(); render();
-        setLastSyncedSha(fileInfo.sha);
         updateSyncStatus('success');
         if(!silent) { alert('✅ 성공적으로 불러왔습니다!'); closeModal('masterSettingsOverlay'); }
       } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
@@ -3048,97 +3011,22 @@ function setRange(rangeStr, el) {
   if(el) {
       el.classList.add('active'); 
   } else {
-      document.querySelectorAll('.rtab').forEach(b => {
+      // 🌟 상단 기간 드롭다운(select)에는 .rtab 클래스가 없으므로, 모달 전용 미니 기간 버튼(.m-rtab)까지
+      //    텍스트가 우연히 같다는 이유로 잘못 활성화되지 않도록 제외합니다.
+      document.querySelectorAll('.rtab:not(.m-rtab)').forEach(b => {
           if(b.textContent.toLowerCase() === rangeStr.toLowerCase()) b.classList.add('active');
       });
   }
+
+  // 🌟 상단 기간 드롭다운의 현재 선택값도 함께 동기화
+  const rangeSelectEl = document.getElementById('rangeSelect');
+  if (rangeSelectEl && rangeSelectEl.value !== rangeStr) rangeSelectEl.value = rangeStr;
 
   // 🌟 기간 변경 시 현재 보고 있는 뷰에 맞춰 전체 재계산 및 렌더링
   if (currentView === 'dividend') renderDividendDashboard();
   else if (currentView === 'history') renderHistoryDashboard();
   else if (currentView === 'realized') renderRealizedDashboard();
   else render();
-}
-
-// ==========================================
-// 🎚️ 상단 "조회 기간" 슬라이더 — 버튼 9개 대신 트랙 위의 점 하나를 드래그해서 1D~전체 사이를 이동
-// ==========================================
-const RANGE_STEPS = ['1d','1w','1m','3m','6m','1y','3y','5y','all'];
-
-function rangeStepPercent(idx) {
-  return (idx / (RANGE_STEPS.length - 1)) * 100;
-}
-
-// 현재 state.range에 맞춰 슬라이더의 점 위치 / 라벨 / 눈금 강조를 갱신 (실제 선택 로직은 건드리지 않음)
-function updateRangeSliderUI(rangeStr) {
-  const idx = RANGE_STEPS.indexOf(rangeStr);
-  if (idx === -1) return;
-  const pct = rangeStepPercent(idx);
-  const thumb = document.getElementById('rangeSliderThumb');
-  const fill = document.getElementById('rangeSliderFill');
-  const label = document.getElementById('rangeSliderLabel');
-  if (thumb) thumb.style.left = pct + '%';
-  if (fill) fill.style.width = pct + '%';
-  if (label) label.textContent = rangeStr === 'all' ? '전체' : rangeStr.toUpperCase();
-  document.querySelectorAll('.range-slider-tick').forEach(t => {
-    t.classList.toggle('active', t.dataset.range === rangeStr);
-  });
-}
-
-// 슬라이더에서 idx번째 단계를 선택: UI를 먼저 즉시 이동시키고, 실제 값이 바뀐 경우에만 setRange 호출
-function selectRangeStep(idx) {
-  idx = Math.max(0, Math.min(RANGE_STEPS.length - 1, idx));
-  const rangeStr = RANGE_STEPS[idx];
-  updateRangeSliderUI(rangeStr);
-  if (rangeStr !== state.range) setRange(rangeStr);
-}
-
-function initRangeSlider() {
-  const track = document.getElementById('rangeSliderTrack');
-  const thumb = document.getElementById('rangeSliderThumb');
-  if (!track || !thumb) return;
-
-  updateRangeSliderUI(state.range || '1y');
-
-  // 눈금(점)을 직접 클릭하면 바로 그 기간으로 이동
-  track.querySelectorAll('.range-slider-tick').forEach((tick, idx) => {
-    tick.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectRangeStep(idx);
-    });
-  });
-
-  function idxFromClientX(clientX) {
-    const rect = track.getBoundingClientRect();
-    let ratio = (clientX - rect.left) / rect.width;
-    ratio = Math.max(0, Math.min(1, ratio));
-    return Math.round(ratio * (RANGE_STEPS.length - 1));
-  }
-
-  let dragging = false;
-  function onDragMove(clientX) { selectRangeStep(idxFromClientX(clientX)); }
-
-  // 마우스로 드래그
-  thumb.addEventListener('mousedown', (e) => { dragging = true; e.preventDefault(); });
-  track.addEventListener('mousedown', (e) => {
-    if (e.target === thumb || e.target.classList.contains('range-slider-tick')) return;
-    onDragMove(e.clientX);
-    dragging = true;
-  });
-  window.addEventListener('mousemove', (e) => { if (dragging) onDragMove(e.clientX); });
-  window.addEventListener('mouseup', () => { dragging = false; });
-
-  // 터치(모바일)로 드래그
-  thumb.addEventListener('touchstart', () => { dragging = true; }, { passive: true });
-  track.addEventListener('touchstart', (e) => {
-    if (e.target === thumb || e.target.classList.contains('range-slider-tick')) return;
-    if (e.touches[0]) onDragMove(e.touches[0].clientX);
-    dragging = true;
-  }, { passive: true });
-  window.addEventListener('touchmove', (e) => {
-    if (dragging && e.touches[0]) onDragMove(e.touches[0].clientX);
-  }, { passive: true });
-  window.addEventListener('touchend', () => { dragging = false; });
 }
 
 function setSortMode(mode) { currentSortMode = mode; render(); }
@@ -5302,6 +5190,7 @@ function updateRangeButtonReadiness() {
 
     if (btn5y) {
         const ready = minLevel >= 3;
+        btn5y.disabled         = !ready;
         btn5y.style.opacity    = ready ? '1'       : '0.35';
         btn5y.style.cursor     = ready ? 'pointer' : 'not-allowed';
         btn5y.title            = ready ? ''        : '5년치 데이터 로딩 중...';
@@ -5309,6 +5198,7 @@ function updateRangeButtonReadiness() {
     }
     if (btn10y) {
         const ready = minLevel >= 4;
+        btn10y.disabled         = !ready;
         btn10y.style.opacity    = ready ? '1'       : '0.35';
         btn10y.style.cursor     = ready ? 'pointer' : 'not-allowed';
         btn10y.title            = ready ? ''        : '10년치 데이터 로딩 중...';
@@ -5427,8 +5317,8 @@ async function runMarketDataFetchBatch(symbolsToFetch, opts = {}) {
     // 🌟 10년치를 한 번에 받으므로 모든 버튼 즉시 활성화
     const btn5y  = document.getElementById('rtab-5y');
     const btn10y = document.getElementById('rtab-10y');
-    if (btn5y)  { btn5y.style.opacity  = '1'; btn5y.style.cursor  = 'pointer'; btn5y.title  = ''; }
-    if (btn10y) { btn10y.style.opacity = '1'; btn10y.style.cursor = 'pointer'; btn10y.title = ''; }
+    if (btn5y)  { btn5y.disabled  = false; btn5y.style.opacity  = '1'; btn5y.style.cursor  = 'pointer'; btn5y.title  = ''; }
+    if (btn10y) { btn10y.disabled = false; btn10y.style.opacity = '1'; btn10y.style.cursor = 'pointer'; btn10y.title = ''; }
 
     try { 
         localStorage.setItem('sw_market_cache', JSON.stringify(cachedMarketData)); 
@@ -5532,7 +5422,9 @@ async function render() {
     const btnRange = b.id ? b.id.replace('rtab-', '') : '';
     if (btnRange === state.range) b.classList.add('active');
   });
-  updateRangeSliderUI(state.range);
+  // 🌟 상단 기간 드롭다운도 항상 state.range와 일치하도록 동기화
+  const rangeSelectSync = document.getElementById('rangeSelect');
+  if (rangeSelectSync && rangeSelectSync.value !== state.range) rangeSelectSync.value = state.range;
 
   const container = document.getElementById('gridContainer');
   const dash = document.getElementById('dashboardTopWrapper');
@@ -6117,7 +6009,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateOwnerLabels();
   renderTxList();
   render(); 
-  initRangeSlider();
   
   // 4. 자동 동기화 설정 적용
   const ghAutoSyncCheckbox = document.getElementById('ghAutoSync');
@@ -6129,9 +6020,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(s.autoSync) triggerAutoSync();
       });
   }
-
-  // 5. 🌟 페이지를 열 때마다 GitHub의 최신 데이터를 자동으로 가져오기 (다른 기기 최신 반영)
-  await autoPullOnLoad();
 });
 
 // ==========================================
