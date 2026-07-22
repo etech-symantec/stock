@@ -9977,5 +9977,13 @@
       "isKr": false
     }
   ],
-  "priceAlerts": {}
+  "priceAlerts": {
+    "005930.KS": {
+      "targetPrice": 300000,
+      "stopLossPrice": 0,
+      "averagingPrice": 0,
+      "proximity": 3,
+      "updatedAt": "2026-07-22T14:43:27.805Z"
+    }
+  }
 }
