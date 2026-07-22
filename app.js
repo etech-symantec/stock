@@ -3026,8 +3026,7 @@ function setRange(rangeStr, el) {
   }
 
   // 🌟 상단 기간 드롭다운의 현재 선택값도 함께 동기화
-  const rangeSelectEl = document.getElementById('rangeSelect');
-  if (rangeSelectEl && rangeSelectEl.value !== rangeStr) rangeSelectEl.value = rangeStr;
+  syncRangeDropdownUI(rangeStr);
 
   // 🌟 기간 변경 시 현재 보고 있는 뷰에 맞춰 전체 재계산 및 렌더링
   if (currentView === 'dividend') renderDividendDashboard();
@@ -3037,6 +3036,45 @@ function setRange(rangeStr, el) {
 }
 
 function setSortMode(mode) { currentSortMode = mode; render(); }
+
+// ── 🎚️ 상단 "조회 기간" 커스텀 드롭다운 (네이티브 select 대체 UI) ──
+const RANGE_LABELS = { '1d':'1D', '1w':'1W', '1m':'1M', '3m':'3M', '6m':'6M', '1y':'1Y', '3y':'3Y', '5y':'5Y', 'all':'전체' };
+
+function toggleRangeDropdown(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('rangeDropdown');
+  if (!dd) return;
+  dd.classList.toggle('open');
+}
+
+function closeRangeDropdown() {
+  const dd = document.getElementById('rangeDropdown');
+  if (dd) dd.classList.remove('open');
+}
+
+function selectRangeOption(value) {
+  closeRangeDropdown();
+  setRange(value);
+}
+
+// 드롭다운 바깥을 클릭하면 자동으로 닫힙니다.
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('rangeDropdown');
+  if (dd && dd.classList.contains('open') && !dd.contains(e.target)) closeRangeDropdown();
+});
+
+// 트리거 라벨 / 메뉴 옵션 강조 / 숨겨진 select 값을 state.range와 항상 일치시킵니다.
+function syncRangeDropdownUI(rangeStr) {
+  const label = document.getElementById('rangeSelectLabel');
+  if (label) label.textContent = RANGE_LABELS[rangeStr] || rangeStr.toUpperCase();
+
+  document.querySelectorAll('.range-select-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.value === rangeStr);
+  });
+
+  const rangeSelectEl = document.getElementById('rangeSelect');
+  if (rangeSelectEl && rangeSelectEl.value !== rangeStr) rangeSelectEl.value = rangeStr;
+}
 
 function toggleSortDirection() {
   sortDirection = sortDirection === 1 ? -1 : 1;
@@ -5430,8 +5468,7 @@ async function render() {
     if (btnRange === state.range) b.classList.add('active');
   });
   // 🌟 상단 기간 드롭다운도 항상 state.range와 일치하도록 동기화
-  const rangeSelectSync = document.getElementById('rangeSelect');
-  if (rangeSelectSync && rangeSelectSync.value !== state.range) rangeSelectSync.value = state.range;
+  syncRangeDropdownUI(state.range);
 
   const container = document.getElementById('gridContainer');
   const dash = document.getElementById('dashboardTopWrapper');
