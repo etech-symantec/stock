@@ -527,6 +527,14 @@
             <button type="button" class="rtab" data-val="all" onclick="setSidebarYieldScope('all')">역대 전체</button>
           </div>
         </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; color:var(--text3); width:52px; flex-shrink:0;">소유자</span>
+          <div class="range-group" id="sidebarYieldOwnerGroup" style="flex:1;">
+            <button type="button" class="rtab active" data-val="all" onclick="setSidebarYieldOwnerFilter('all')">전체</button>
+            <button type="button" class="rtab" data-val="user1" id="sidebarYieldOwnerTabUser1" onclick="setSidebarYieldOwnerFilter('user1')">소유자1</button>
+            <button type="button" class="rtab" data-val="user2" id="sidebarYieldOwnerTabUser2" onclick="setSidebarYieldOwnerFilter('user2')">소유자2</button>
+          </div>
+        </div>
       </div>
       <div id="sidebarYieldList" style="display:flex; flex-direction:column; gap:6px;"></div>
     </div>
