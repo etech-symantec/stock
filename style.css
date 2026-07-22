@@ -1688,6 +1688,7 @@ nav {
   justify-content: flex-end !important;
   flex: 0 0 auto;
   position: relative;
+  top: -6px; /* 버튼 줄을 살짝 위로 올려 아래쪽에 sync 문구 공간 확보 */
   z-index: 2;
 }
 
@@ -1764,7 +1765,7 @@ nav {
   flex-shrink: 0;
 }
 
-/* sync 표시 — 버튼 줄 레이아웃에 영향을 주지 않도록 절대 위치로 그 아래에 표시 */
+/* sync 표시 — 버튼 줄과 nav 하단 사이 여백의 중간에 위치 (레이아웃에는 영향 없음) */
 .nav-right .sync-status {
   position: absolute;
   top: 100%;
