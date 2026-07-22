@@ -512,29 +512,30 @@
     </div>
 
     <div id="sidebarYieldView" style="display: none; flex-direction: column; flex: 1; overflow-y: auto; padding: 15px 20px;">
-      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; flex-shrink:0;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:11px; color:var(--text3); width:52px; flex-shrink:0;">정렬 기준</span>
-          <div class="range-group" id="sidebarYieldSortGroup" style="flex:1;">
-            <button type="button" class="rtab active" data-val="roi" onclick="setSidebarYieldSort('roi')">수익률</button>
-            <button type="button" class="rtab" data-val="amount" onclick="setSidebarYieldSort('amount')">금액</button>
+      <div class="yield-rank-phrase" id="yieldRankPhrase" style="margin-bottom:14px; flex-shrink:0;">
+        <div class="yield-phrase-dd" id="yieldOwnerDD">
+          <span class="yield-phrase-word" id="yieldWordOwner" onclick="toggleYieldPhraseDD('yieldOwnerDD', event)">전체</span>
+          <div class="yield-phrase-menu">
+            <div class="yield-phrase-option active" data-value="all" onclick="selectYieldOwnerOption('all')">전체</div>
+            <div class="yield-phrase-option" data-value="user1" id="yieldOwnerOptUser1" onclick="selectYieldOwnerOption('user1')">소유자1</div>
+            <div class="yield-phrase-option" data-value="user2" id="yieldOwnerOptUser2" onclick="selectYieldOwnerOption('user2')">소유자2</div>
           </div>
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:11px; color:var(--text3); width:52px; flex-shrink:0;">종목 기준</span>
-          <div class="range-group" id="sidebarYieldScopeGroup" style="flex:1;">
-            <button type="button" class="rtab active" data-val="current" onclick="setSidebarYieldScope('current')">보유 중</button>
-            <button type="button" class="rtab" data-val="all" onclick="setSidebarYieldScope('all')">역대 전체</button>
+        <div class="yield-phrase-dd" id="yieldScopeDD">
+          <span class="yield-phrase-word" id="yieldWordScope" onclick="toggleYieldPhraseDD('yieldScopeDD', event)">보유 중</span>
+          <div class="yield-phrase-menu">
+            <div class="yield-phrase-option active" data-value="current" onclick="selectYieldScopeOption('current')">보유 중</div>
+            <div class="yield-phrase-option" data-value="all" onclick="selectYieldScopeOption('all')">역대 전체</div>
           </div>
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:11px; color:var(--text3); width:52px; flex-shrink:0;">소유자</span>
-          <div class="range-group" id="sidebarYieldOwnerGroup" style="flex:1;">
-            <button type="button" class="rtab active" data-val="all" onclick="setSidebarYieldOwnerFilter('all')">전체</button>
-            <button type="button" class="rtab" data-val="user1" id="sidebarYieldOwnerTabUser1" onclick="setSidebarYieldOwnerFilter('user1')">소유자1</button>
-            <button type="button" class="rtab" data-val="user2" id="sidebarYieldOwnerTabUser2" onclick="setSidebarYieldOwnerFilter('user2')">소유자2</button>
+        <div class="yield-phrase-dd" id="yieldSortDD">
+          <span class="yield-phrase-word" id="yieldWordSort" onclick="toggleYieldPhraseDD('yieldSortDD', event)">수익률</span>
+          <div class="yield-phrase-menu">
+            <div class="yield-phrase-option active" data-value="roi" onclick="selectYieldSortOption('roi')">수익률</div>
+            <div class="yield-phrase-option" data-value="amount" onclick="selectYieldSortOption('amount')">금액</div>
           </div>
         </div>
+        <span class="yield-phrase-suffix">기준 랭킹</span>
       </div>
       <div id="sidebarYieldList" style="display:flex; flex-direction:column; gap:6px;"></div>
     </div>
