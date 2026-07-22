@@ -1337,7 +1337,14 @@ function updateSyncStatus(status) {
   if(status === 'syncing') {
     spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
   } else if(status === 'success') {
-    spinner.style.display = 'none'; text.textContent = '✅ 저장됨'; el.classList.add('active');
+    spinner.style.display = 'none';
+    const now = new Date();
+    const formatted = now.toLocaleString('ko-KR', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    });
+    text.textContent = `✅ ${formatted} 저장됨`;
+    el.classList.add('active');
   } else if(status === 'error') {
     spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
   } else {
