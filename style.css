@@ -1684,11 +1684,10 @@ nav {
 /* ── 우측: 기간 + 테마 + 설정 ── */
 .nav-right {
   display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-end !important;
-  justify-content: center !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
   flex: 0 0 auto;
-  gap: 3px !important;
+  position: relative;
   z-index: 2;
 }
 
@@ -1765,8 +1764,12 @@ nav {
   flex-shrink: 0;
 }
 
-/* sync 표시 — 버튼 줄 아래에 별도 줄로 표시 */
+/* sync 표시 — 버튼 줄 레이아웃에 영향을 주지 않도록 절대 위치로 그 아래에 표시 */
 .nav-right .sync-status {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 7px;
   font-size: 10px;
   font-family: var(--font-mono);
   color: var(--text3);
@@ -1775,7 +1778,6 @@ nav {
   justify-content: flex-end;
   gap: 4px;
   white-space: nowrap;
-  width: 100%;
 }
 
 /* ── 라이트 모드 ── */
