@@ -373,6 +373,29 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .rtab.active { background: var(--accent); color: #fff; }
 .rtab:hover:not(.active) { background: var(--bg3); color: var(--text); }
 
+/* 🎚️ 상단 "조회 기간" 드롭다운 — 버튼 9개를 나열하던 바 대신, 화면 폭에 상관없이 항상 고정된 좁은 폭만 차지 */
+.range-select {
+  flex-shrink: 0;
+  width: 60px;
+  height: 34px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  text-align: center;
+  text-align-last: center;
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.range-select:hover { background: var(--bg3); border-color: var(--accent); }
+.range-select:focus { outline: none; border-color: var(--accent); }
+.range-select option { background: var(--bg2); color: var(--text); text-align: left; }
+.range-select option:disabled { color: var(--text3); }
+
 .grid-container { padding-bottom: 40px; container-type: inline-size; container-name: cardregion; }
 /* 좌우(KR/US) 분할 배치 시 각 영역(region-col)도 별도의 컨테이너 쿼리 기준이 됩니다 */
 .region-col { container-type: inline-size; container-name: cardregion; }
@@ -787,6 +810,9 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 
   /* 탭 메뉴 - 데스크탑 탭 숨김 */
   .view-tabs { display: none !important; }
+
+  /* 기간 드롭다운도 모바일에서는 숨김 (하단 탭바/드로어 체계로 대체) */
+  .range-select { display: none !important; }
 
   /* 우측 네비 - 테마 버튼만 */
   .nav-right .sync-status { display: none; }
@@ -1424,11 +1450,12 @@ nav {
 
 /* ── 중앙: 네비탭 — position:absolute로 완전 정중앙 ── */
 .view-tabs {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
+  position: static !important;
   display: flex !important;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  justify-content: center;
   gap: 2px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--border2);
@@ -1437,9 +1464,7 @@ nav {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
   white-space: nowrap;
   z-index: 1;
-  margin: 0 !important;
-  /* 좌우 nav 영역과 겹치지 않도록 최대폭 제한 */
-  max-width: calc(100% - 600px);
+  margin: 0 auto !important;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -1508,11 +1533,12 @@ nav {
 
 /* ── 뷰탭 컨테이너 — 여백 줄어들면 텍스트 숨김 ── */
 .view-tabs {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
+  position: static !important;
   display: flex !important;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  justify-content: center;
   gap: 2px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--border2);
@@ -1521,53 +1547,25 @@ nav {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
   white-space: nowrap;
   z-index: 1;
-  margin: 0 !important;
-  max-width: calc(100% - 600px);
+  margin: 0 auto !important;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .view-tabs::-webkit-scrollbar { display: none; }
-
-/* ── 1800px 이하: 5Y 숨김 ── */
-@media (max-width: 1800px) and (min-width: 769px) {
-  #rtab-5y  { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
-}
-
-/* ── 1700px 이하: 3Y 숨김 ── */
-@media (max-width: 1700px) and (min-width: 769px) {
-  #rtab-3y  { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
-}
-
-/* ── 1600px 이하: 1Y 숨김 ── */
-@media (max-width: 1600px) and (min-width: 769px) {
-  #rtab-1y  { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
-}
 
 /* ── 1740px 이하: 네비탭 아이콘 전용 전환 ── */
 @media (max-width: 1740px) and (min-width: 769px) {
   .vtab-text { display: none; }
   .vtab { padding: 9px 11px; gap: 0; }
   .vtab-icon { font-size: 20px; }
-  .view-tabs { max-width: calc(100% - 440px); }
 
   /* 소유자 탭은 1480px에서 텍스트 유지 */
   #tabUser1 .vtab-text, #tabUser2 .vtab-text { display: inline; }
   #tabUser1, #tabUser2 { padding: 8px 16px; gap: 6px; }
 }
 
-/* ── 1360px 이하: 6M 숨김 ── */
-@media (max-width: 1360px) and (min-width: 769px) {
-  #rtab-6m { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
-}
-
-/* ── 1240px 이하: 3M 숨김 ── */
-@media (max-width: 1240px) and (min-width: 769px) {
-  #rtab-3m { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
-}
-
-/* ── 1100px 이하: 1M 숨김 ── */
+/* ── 1100px 이하: 소유자1/2 탭 텍스트 숨김 ── */
 @media (max-width: 1100px) and (min-width: 769px) {
-  #rtab-1m { max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; font-size: 0; pointer-events: none; }
   #tabUser1 .vtab-text, #tabUser2 .vtab-text { display: none; }
   #tabUser1, #tabUser2 { padding: 9px 11px; gap: 0; }
 }
@@ -1689,6 +1687,7 @@ nav {
   }
   .view-tabs { display: none !important; }
   .range-group { display: none !important; }
+  .range-select { display: none !important; }
   .nav-right .sync-status { display: none; }
   .btn-mobile-menu { display: flex !important; }
 }
