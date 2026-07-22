@@ -18,96 +18,6 @@
 <!-- 🚀 탐사선(Probe) 기능 — Plus 프리미엄 전용 스타일 -->
 <link rel="stylesheet" href="/plus/probe.css">
 <style>
-  /* 🎚️ 상단 "조회 기간" 슬라이더 — 버튼 9개(1D~전체) 대신 트랙 위의 점 하나를 드래그해서 선택.
-     기존 버튼 나열 방식보다 훨씬 좁은 폭만 차지해서, 화면이 커도 상단 메뉴들이 겹치지 않도록 함. */
-  .range-slider{
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    user-select: none;
-  }
-  .range-slider-track{
-    position: relative;
-    width: 130px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-  .range-slider-track::before{
-    content: '';
-    position: absolute;
-    left: 2px;
-    right: 2px;
-    top: 50%;
-    height: 3px;
-    margin-top: -1.5px;
-    background: var(--border2, rgba(148,163,184,0.35));
-    border-radius: 3px;
-  }
-  .range-slider-fill{
-    position: absolute;
-    left: 2px;
-    top: 50%;
-    height: 3px;
-    margin-top: -1.5px;
-    background: var(--accent);
-    border-radius: 3px;
-    transition: width 0.18s ease;
-    pointer-events: none;
-  }
-  .range-slider-tick{
-    position: absolute;
-    top: 50%;
-    width: 8px;
-    height: 8px;
-    margin-top: -4px;
-    margin-left: -4px;
-    padding: 0;
-    border-radius: 50%;
-    background: var(--bg2);
-    border: 2px solid var(--border2, rgba(148,163,184,0.45));
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, transform 0.15s;
-    z-index: 1;
-  }
-  .range-slider-tick:hover{ transform: scale(1.35); border-color: var(--accent); }
-  .range-slider-tick.active{ border-color: var(--accent); background: var(--accent); }
-  .range-slider-thumb{
-    position: absolute;
-    top: 50%;
-    width: 16px;
-    height: 16px;
-    margin-top: -8px;
-    margin-left: -8px;
-    left: 0%;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 1px 5px rgba(0,0,0,0.35);
-    cursor: grab;
-    z-index: 2;
-    transition: left 0.18s ease;
-  }
-  .range-slider-thumb:active{ cursor: grabbing; transition: none; }
-  .range-slider-label{
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text);
-    min-width: 30px;
-    text-align: center;
-    font-family: 'Space Mono', monospace;
-  }
-  /* 각 눈금(tick)마다 균등 간격 위치 (1D~전체 총 9단계, 0%~100%를 8등분) */
-  .range-slider-tick:nth-child(2){ left: 0%; }
-  .range-slider-tick:nth-child(3){ left: 12.5%; }
-  .range-slider-tick:nth-child(4){ left: 25%; }
-  .range-slider-tick:nth-child(5){ left: 37.5%; }
-  .range-slider-tick:nth-child(6){ left: 50%; }
-  .range-slider-tick:nth-child(7){ left: 62.5%; }
-  .range-slider-tick:nth-child(8){ left: 75%; }
-  .range-slider-tick:nth-child(9){ left: 87.5%; }
-  .range-slider-tick:nth-child(10){ left: 100%; }
-
   /* 🌕 달빛정보 섹션 컨테이너 (내부 콘텐츠는 moonlight.html을 Shadow DOM으로 그대로 불러와 채웁니다) */
   .moonlight-section{
     flex-direction: column;
@@ -367,22 +277,17 @@
 
   <!-- 우측: 기간 + 테마 + 설정 -->
   <div class="nav-right" style="display:flex; align-items:center; gap:10px;">
-    <div class="range-slider" id="rangeSlider" title="드래그하여 조회 기간 선택">
-      <div class="range-slider-track" id="rangeSliderTrack">
-        <div class="range-slider-fill" id="rangeSliderFill"></div>
-        <button type="button" class="range-slider-tick" data-range="1d" title="1D"></button>
-        <button type="button" class="range-slider-tick" data-range="1w" title="1W"></button>
-        <button type="button" class="range-slider-tick" data-range="1m" title="1M"></button>
-        <button type="button" class="range-slider-tick" data-range="3m" title="3M"></button>
-        <button type="button" class="range-slider-tick" data-range="6m" title="6M"></button>
-        <button type="button" class="range-slider-tick" data-range="1y" title="1Y"></button>
-        <button type="button" class="range-slider-tick" data-range="3y" title="3Y"></button>
-        <button type="button" class="range-slider-tick" id="rtab-5y" data-range="5y" title="5Y"></button>
-        <button type="button" class="range-slider-tick" data-range="all" title="전체"></button>
-        <div class="range-slider-thumb" id="rangeSliderThumb"></div>
-      </div>
-      <span class="range-slider-label" id="rangeSliderLabel">1Y</span>
-    </div>
+    <select class="range-select" id="rangeSelect" title="조회 기간 선택" onchange="setRange(this.value)">
+      <option value="1d">1D</option>
+      <option value="1w">1W</option>
+      <option value="1m">1M</option>
+      <option value="3m">3M</option>
+      <option value="6m">6M</option>
+      <option value="1y" selected>1Y</option>
+      <option value="3y">3Y</option>
+      <option value="5y" id="rtab-5y">5Y</option>
+      <option value="all">전체</option>
+    </select>
     <div class="sync-status" id="syncStatus">
       <div class="sync-spinner" id="syncSpinner"></div>
       <span id="syncText"></span>
