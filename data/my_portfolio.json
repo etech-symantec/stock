@@ -9788,16 +9788,6 @@
       "qty": -400,
       "price": 15450,
       "txType": "trade"
-    },
-    {
-      "id": 1784700294384,
-      "date": "2026-07-22",
-      "owner": "끄니",
-      "broker": "키움",
-      "symbol": "099430.KQ",
-      "qty": 1,
-      "price": 1,
-      "txType": "trade"
     }
   ],
   "range": "6m",
