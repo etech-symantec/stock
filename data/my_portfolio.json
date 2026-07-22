@@ -9787,9 +9787,19 @@
       "qty": -400,
       "price": 15450,
       "txType": "trade"
+    },
+    {
+      "id": 1784696329720,
+      "date": "2026-07-22",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "373220.KS",
+      "qty": 1,
+      "price": 1111,
+      "txType": "trade"
     }
   ],
-  "range": "1y",
+  "range": "6m",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
