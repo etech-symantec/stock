@@ -73,6 +73,9 @@ let divRankingSortDir = 'desc'; // 'desc' | 'asc'
 let _histSelectedIds = new Set(); // 거래내역 체크된 항목 ID
 let historyRankingTab = 'bigbuy'; // 'bigbuy' | 'hold' | 'freq' | 'total'
 let historyRankingSortDir = 'desc'; // 'desc' 내림차순 | 'asc' 오름차순
+// 🌟 사이드바 "평가 자산 랭킹" 정렬 기준('roi': 수익률 | 'amount': 금액) 및 종목 범위('current': 보유 중만 | 'all': 역대 전체)
+let sidebarYieldSortBy = 'roi';
+let sidebarYieldScope = 'current';
 
 // 🚀 탐사선 발사 지점 마커용 아이콘 이미지 (1회만 생성해서 재사용)
 const _rocketMarkerImg = (() => {
@@ -1619,6 +1622,48 @@ function calculateHoldings(ownerFilter = 'all') {
   return holdings;
 }
 
+// 🌟 현재 화면(전체보기/소유자별 탭)에 맞는 ownerFilter 값을 반환합니다.
+function getCurrentOwnerFilter() {
+  let ownerFilter = 'all';
+  if (currentView === 'user1') ownerFilter = state.owners.user1.name;
+  if (currentView === 'user2') ownerFilter = state.owners.user2.name;
+  return ownerFilter;
+}
+
+// 🌟 이미 전량 매도되어 현재는 보유하지 않지만(qty=0), 과거에 거래했던 "역대 종목"의
+//    실현손익(realizedPnl) / 실현수익률(roi)을 종목::계좌 단위로 계산합니다.
+//    (사이드바 "평가 자산 랭킹" - 종목 기준: 역대 전체 보기용)
+function calculateClosedPositionStats(ownerFilter = 'all') {
+  let stats = {};
+  const sortedTx = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  sortedTx.forEach(tx => {
+    if (tx.txType === 'dividend' || tx.txType === 'transfer') return;
+    if (ownerFilter !== 'all' && tx.owner !== ownerFilter) return;
+
+    let broker = tx.broker ? tx.broker.trim() : '미지정';
+    let key = `${tx.symbol}::${broker}`;
+    if (!stats[key]) stats[key] = { qty: 0, avg: 0, realizedPnl: 0, realizedCost: 0, symbol: tx.symbol, broker, lastOwner: tx.owner || '' };
+    let s = stats[key];
+    if (tx.owner) s.lastOwner = tx.owner;
+
+    if (tx.qty > 0) {
+      let totalValue = (s.qty * s.avg) + (tx.qty * tx.price);
+      s.qty += tx.qty;
+      s.avg = s.qty > 0 ? totalValue / s.qty : 0;
+    } else if (tx.qty < 0) {
+      let sellQty = Math.abs(tx.qty);
+      s.realizedPnl  += (tx.price - s.avg) * sellQty;
+      s.realizedCost += s.avg * sellQty;
+      s.qty -= sellQty;
+      if (s.qty <= 0) { s.qty = 0; s.avg = 0; }
+    }
+  });
+
+  // 현재 수량이 0이고(=완전히 청산됨), 실제로 매수한 이력(원가)이 있는 종목만 반환
+  return Object.values(stats).filter(s => s.qty === 0 && s.realizedCost > 0);
+}
+
 function editTransaction(id) {
   const tx = state.transactions.find(t => t.id === id);
   if (!tx) return;
@@ -3111,11 +3156,19 @@ function setDivFilter(filter, el) {
 // ==========================================
 // 5. 시각화 및 대시보드 렌더링 세부 함수들
 // ==========================================
-function renderSidebarYieldList(currentHoldings) {
+function renderSidebarYieldList(currentHoldings, ownerFilter = 'all') {
   const container = document.getElementById('sidebarYieldList');
   if (!container) return;
 
+  // 🌟 상단 토글(정렬 기준 / 종목 기준) 버튼들의 활성 표시를 현재 상태와 동기화
+  const sortGroup = document.getElementById('sidebarYieldSortGroup');
+  if (sortGroup) sortGroup.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.val === sidebarYieldSortBy));
+  const scopeGroup = document.getElementById('sidebarYieldScopeGroup');
+  if (scopeGroup) scopeGroup.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.val === sidebarYieldScope));
+
   let yieldItems = [];
+
+  // 1) 현재 보유 중인 종목 (기존 로직)
   for (let key in currentHoldings) {
       let h = currentHoldings[key];
       if (h.qty > 0 && cachedMarketData[h.symbol] && !cachedMarketData[h.symbol]._failed && cachedMarketData[h.symbol].last) {
@@ -3126,40 +3179,89 @@ function renderSidebarYieldList(currentHoldings) {
           if (roi !== -9999) {
               yieldItems.push({
                   symbol: h.symbol, name: cachedMarketData[h.symbol].name, broker: h.broker, roi: roi, pnl: evalAmt - costAmt,
-                  owner: state.transactions.filter(t => t.symbol===h.symbol && (t.broker+' ('+t.owner+')'===h.broker || t.broker===h.broker) && t.txType!=='dividend').pop()?.owner || '보유'
+                  owner: state.transactions.filter(t => t.symbol===h.symbol && (t.broker+' ('+t.owner+')'===h.broker || t.broker===h.broker) && t.txType!=='dividend').pop()?.owner || '보유',
+                  closed: false
               });
           }
       }
   }
 
-  yieldItems.sort((a, b) => b.roi - a.roi);
+  // 2) "역대 전체 보기"일 때만 이미 전량 매도한(청산된) 종목도 함께 표시
+  if (sidebarYieldScope === 'all') {
+      const closedStats = calculateClosedPositionStats(ownerFilter);
+      closedStats.forEach(s => {
+          let stockName = s.symbol;
+          const dbMatch = localStockDB && localStockDB.find(x => x.symbol === s.symbol);
+          const cachedMatch = cachedMarketData[s.symbol];
+          if (dbMatch) stockName = dbMatch.name;
+          else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+
+          yieldItems.push({
+              symbol: s.symbol, name: stockName, broker: s.broker,
+              roi: s.realizedCost > 0 ? (s.realizedPnl / s.realizedCost) * 100 : 0,
+              pnl: s.realizedPnl, owner: s.lastOwner || '보유', closed: true
+          });
+      });
+  }
+
+  // 🌟 정렬 기준: 수익률(%) 또는 금액(₩/$)
+  if (sidebarYieldSortBy === 'amount') {
+      yieldItems.sort((a, b) => b.pnl - a.pnl);
+  } else {
+      yieldItems.sort((a, b) => b.roi - a.roi);
+  }
 
   if (yieldItems.length === 0) {
-      container.innerHTML = '<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">보유한 자산이 없습니다.</div>';
+      const emptyMsg = sidebarYieldScope === 'all' ? '거래 내역이 없습니다.' : '보유한 자산이 없습니다.';
+      container.innerHTML = `<div style="color:var(--text3); font-size:12px; text-align:center; padding:20px;">${emptyMsg}</div>`;
       return;
   }
+
+  const isAmountSort = sidebarYieldSortBy === 'amount';
 
   container.innerHTML = yieldItems.map((item, idx) => {
       let sign = item.roi > 0 ? '+' : ''; let color = item.roi > 0 ? '#00C578' : (item.roi < 0 ? '#3A9AFF' : 'var(--text)');
       let rankColor = idx === 0 ? '#ffb703' : (idx === 1 ? '#a259ff' : (idx === 2 ? '#4d9fff' : 'var(--text3)'));
       let cleanBroker = item.broker.split(' (')[0]; let brokerText = cleanBroker !== '미지정' ? `<span style="font-size:10px; color:var(--text3); margin-left:6px;">[${cleanBroker}]</span>` : '';
-      
+      let closedBadge = item.closed ? `<span style="font-size:9px; color:var(--text3); background:rgba(255,255,255,0.06); border:1px solid var(--border2); border-radius:4px; padding:1px 5px; margin-left:6px; flex-shrink:0;">청산</span>` : '';
+      let pnlStr = `${sign}${formatPrice(Math.abs(item.pnl), item.symbol)}`;
+      let roiStr = `${sign}${item.roi.toFixed(2)}%`;
+      // 🌟 정렬 기준으로 선택된 값을 위쪽(강조)에, 나머지는 아래쪽(보조)에 표시
+      let primaryStr = isAmountSort ? pnlStr : roiStr;
+      let secondaryStr = isAmountSort ? roiStr : pnlStr;
+
       return `
       <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); padding:12px; border-radius:6px; border:1px solid var(--border); transition:0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; margin-right:10px;">
               <span style="font-weight:900; font-style:italic; color:${rankColor}; width:18px; text-align:center; flex-shrink:0;">${idx+1}</span>
               <div style="min-width:0; overflow:hidden;">
-                  <div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name} ${brokerText}</div>
+                  <div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center;">${item.name} ${brokerText}${closedBadge}</div>
                   <div style="font-size:10px; font-family:var(--font-mono); color:var(--text2);">${item.symbol}</div>
               </div>
           </div>
           <div style="text-align:right; flex-shrink:0;">
-              <div style="font-size:14px; font-family:var(--font-mono); font-weight:700; color:${color};">${sign}${item.roi.toFixed(2)}%</div>
-              <div style="font-size:10px; color:var(--text3);">${sign}${formatPrice(Math.abs(item.pnl), item.symbol)}</div>
+              <div style="font-size:14px; font-family:var(--font-mono); font-weight:700; color:${color};">${primaryStr}</div>
+              <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">${secondaryStr}</div>
           </div>
       </div>
       `;
   }).join('');
+}
+
+// 🌟 "평가 자산 랭킹" 정렬 기준(수익률/금액) 전환
+function setSidebarYieldSort(mode) {
+  if (sidebarYieldSortBy === mode) return;
+  sidebarYieldSortBy = mode;
+  const ownerFilter = getCurrentOwnerFilter();
+  renderSidebarYieldList(calculateHoldings(ownerFilter), ownerFilter);
+}
+
+// 🌟 "평가 자산 랭킹" 종목 범위(보유 중만/역대 전체) 전환
+function setSidebarYieldScope(scope) {
+  if (sidebarYieldScope === scope) return;
+  sidebarYieldScope = scope;
+  const ownerFilter = getCurrentOwnerFilter();
+  renderSidebarYieldList(calculateHoldings(ownerFilter), ownerFilter);
 }
 
 function generateCardHtml(item) {
@@ -5584,7 +5686,7 @@ async function render() {
     container.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><p>상단 검색창에서 관심종목을 추가하거나,<br>좌측에서 거래 내역을 입력하세요.</p></div>`;
     updateSummaryAndAllocation(currentHoldings, []); 
     renderPortfolioChart(ownerFilter, currentSliceLen);
-    renderSidebarYieldList(currentHoldings); 
+    renderSidebarYieldList(currentHoldings, ownerFilter); 
     return;
   }
 
@@ -5724,7 +5826,7 @@ async function render() {
   updateSummaryAndAllocation(currentHoldings, displayItems);
   renderPortfolioChart(ownerFilter, currentSliceLen);
   renderTodayStocksPanel(displayItems);
-  renderSidebarYieldList(currentHoldings);
+  renderSidebarYieldList(currentHoldings, ownerFilter);
 
   if (activeAccountFilter) {
     displayItems = displayItems.filter(item => item.type === 'held' && item.broker.includes(activeAccountFilter));
