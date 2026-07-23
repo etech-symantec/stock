@@ -319,6 +319,9 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
   50% { box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
 }
 
+/* 🚀 실제 보유 중인 종목의 상세카드에서는 탐사선 버튼을 강제로 숨깁니다 (관심종목엔 영향 없음) */
+#probeModalFab.probe-fab-hidden-held { display: none !important; }
+
 .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
 .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
 .acc-row:hover { border-color: var(--border2); }
