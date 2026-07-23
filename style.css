@@ -336,6 +336,7 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
   flex-shrink: 0;
   padding: 0 !important;
   margin: 0 !important;
+  line-height: 0;
   border-radius: 999px !important;
   overflow: hidden;
   cursor: pointer;
@@ -359,14 +360,18 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
   box-shadow: 0 8px 20px rgba(6,182,212,0.5);
 }
 #chartOverlay .modal #probeModalFab.probe-fab-modal .probe-fab-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
   width: 22px;
   height: 22px;
   font-size: 20px;
   line-height: 1;
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
+#chartOverlay .modal #probeModalFab.probe-fab-modal:hover .probe-fab-icon {
+  transform: translateY(-1px) scale(1.2);
 }
 #chartOverlay .modal #probeModalFab.probe-fab-modal .probe-fab-label {
   display: inline-block;
@@ -375,6 +380,7 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
   opacity: 0;
   overflow: hidden;
   white-space: nowrap;
+  line-height: normal;
   transition: max-width 0.35s ease, margin-left 0.35s ease, opacity 0.25s ease;
 }
 #chartOverlay .modal #probeModalFab.probe-fab-modal:hover .probe-fab-label {
