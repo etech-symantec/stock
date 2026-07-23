@@ -327,7 +327,7 @@ function getColors(prices) {
 }
 
 // 🌟 미니 차트 & 종목 모달 통합 차트 생성기 (연도 표시 + 매매 마커 완벽 복구!)
-function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all', hideTradeMarkers = false, datasetLabel = '주가') {
+function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all', hideTradeMarkers = false, datasetLabel = '주가', priceAlertLines = null) {
   const {line, fill} = getColors(prices);
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
@@ -447,6 +447,30 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
       }
   }
 
+  // 🎯 목표가·손절가·물타기 가로선 (annotation 플러그인)
+  const annotationsObj = {};
+  if (!mini && priceAlertLines && priceAlertLines.length) {
+    priceAlertLines.forEach((ln, i) => {
+      annotationsObj[`priceAlertLine_${i}`] = {
+        type: 'line',
+        yMin: ln.value, yMax: ln.value,
+        borderColor: ln.color,
+        borderWidth: 1.5,
+        borderDash: [6, 4],
+        label: {
+          display: true,
+          content: ln.label,
+          position: 'end',
+          backgroundColor: ln.color,
+          color: '#fff',
+          font: { size: 10, weight: '700' },
+          padding: { top: 2, bottom: 2, left: 6, right: 6 },
+          borderRadius: 4
+        }
+      };
+    });
+  }
+
   return new Chart(canvas, {
     type: 'line',
     data: { labels: displayDates, datasets: datasets },
@@ -454,6 +478,7 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
         responsive: true, maintainAspectRatio: false, 
         plugins: { 
           legend: { display: false }, 
+          annotation: { annotations: annotationsObj },
           tooltip: mini ? { enabled: false } : { 
               mode: 'index', intersect: false, displayColors: false,
               callbacks: {
@@ -5274,7 +5299,7 @@ function renderModalChart() {
   const _modalOwnerFilter = currentView === 'user1' ? state.owners.user1.name
                           : currentView === 'user2' ? state.owners.user2.name
                           : 'all'; // watch, all 등 나머지는 전체 표시
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, _modalOwnerFilter); }, 50);
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, _modalOwnerFilter, false, '주가', buildPriceAlertChartLines(currentModalTicker)); }, 50);
 
   // 🌟 매매기록 요약 + What if 계산
   const sym = currentModalTicker;
@@ -5413,12 +5438,24 @@ function getPriceAlertSettings(symbol) {
   return s;
 }
 
+// 목표가/손절가/물타기 지점을 차트에 가로선으로 표시하기 위한 annotation 배열을 만듭니다.
+function buildPriceAlertChartLines(symbol) {
+  if (!symbol || !state.priceAlerts || !state.priceAlerts[symbol]) return [];
+  const s = state.priceAlerts[symbol];
+  const lines = [];
+  if (s.target) lines.push({ value: s.target, color: '#00C578', label: `🎯 ${formatPrice(s.target, symbol)}` });
+  if (s.stopLoss) lines.push({ value: s.stopLoss, color: '#ff4d6a', label: `🚨 ${formatPrice(s.stopLoss, symbol)}` });
+  (s.dca || []).forEach(p => lines.push({ value: p, color: '#3A9AFF', label: `💧 ${formatPrice(p, symbol)}` }));
+  return lines;
+}
+
 window.savePriceAlertTarget = function (symbol, value) {
   const s = getPriceAlertSettings(symbol);
   const v = parseFloat(value);
   s.target = (value === '' || isNaN(v) || v <= 0) ? null : v;
   saveState();
   updatePriceAlertBanner();
+  renderModalChart();
 };
 
 window.savePriceAlertStopLoss = function (symbol, value) {
@@ -5427,6 +5464,7 @@ window.savePriceAlertStopLoss = function (symbol, value) {
   s.stopLoss = (value === '' || isNaN(v) || v <= 0) ? null : v;
   saveState();
   updatePriceAlertBanner();
+  renderModalChart();
 };
 
 window.addDcaAlertLevel = function (symbol) {
@@ -5441,6 +5479,7 @@ window.addDcaAlertLevel = function (symbol) {
   saveState();
   updatePriceAlertBanner();
   renderPriceAlertSettingsPanel(symbol);
+  renderModalChart();
 };
 
 window.removeDcaAlertLevel = function (symbol, idx) {
@@ -5449,6 +5488,7 @@ window.removeDcaAlertLevel = function (symbol, idx) {
   saveState();
   updatePriceAlertBanner();
   renderPriceAlertSettingsPanel(symbol);
+  renderModalChart();
 };
 
 // 모달 안의 "🎯 목표가 · 손절가 · 물타기 설정" 패널을 그립니다.
@@ -5461,36 +5501,29 @@ function renderPriceAlertSettingsPanel(symbol) {
 
   const dcaHtml = s.dca.length
     ? s.dca.map((p, i) => `
-        <div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:5px 8px; margin-top:4px;">
-          <span style="font-family:var(--font-mono); font-size:12px; color:var(--text);">${currency}${p.toLocaleString()}</span>
-          <span onclick="removeDcaAlertLevel('${symbol}', ${i})" style="cursor:pointer; color:var(--text3); font-size:12px; padding:0 2px;" title="삭제">✕</span>
+        <div class="pa-dca-row">
+          <span style="font-family:var(--font-mono); color:var(--text);">${currency}${p.toLocaleString()}</span>
+          <span onclick="removeDcaAlertLevel('${symbol}', ${i})" style="cursor:pointer; color:var(--text3); padding:0 2px;" title="삭제">✕</span>
         </div>`).join('')
-    : `<div style="font-size:11px; color:var(--text3); margin-top:6px;">설정된 물타기(추가매수) 지점이 없습니다.</div>`;
+    : `<div class="pa-dca-empty">설정된 지점 없음</div>`;
 
   wrap.innerHTML = `
-    <div style="font-size:12px; font-weight:600; color:var(--text2); margin-bottom:10px;">🎯 목표가 · 손절가 · 물타기 설정</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-      <div>
-        <div style="font-size:10px; color:var(--text3); margin-bottom:4px;">🟢 목표가</div>
-        <input type="number" id="mTargetInput" value="${s.target != null ? s.target : ''}" placeholder="예: ${currency}100,000"
-          onchange="savePriceAlertTarget('${symbol}', this.value)"
-          style="width:100%; box-sizing:border-box; padding:7px 8px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-family:var(--font-mono); font-size:12px;">
-      </div>
-      <div>
-        <div style="font-size:10px; color:var(--text3); margin-bottom:4px;">🔴 손절가</div>
-        <input type="number" id="mStopLossInput" value="${s.stopLoss != null ? s.stopLoss : ''}" placeholder="예: ${currency}50,000"
-          onchange="savePriceAlertStopLoss('${symbol}', this.value)"
-          style="width:100%; box-sizing:border-box; padding:7px 8px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-family:var(--font-mono); font-size:12px;">
-      </div>
+    <div class="pa-title">🎯 목표가 · 손절가 · 물타기</div>
+    <div class="pa-field">
+      <div class="pa-label">🟢 목표가</div>
+      <input type="number" id="mTargetInput" value="${s.target != null ? s.target : ''}" placeholder="${currency} 입력"
+        onchange="savePriceAlertTarget('${symbol}', this.value)">
     </div>
-    <div>
-      <div style="font-size:10px; color:var(--text3); margin-bottom:4px;">🔵 물타기(추가매수) 지점</div>
-      <div style="display:flex; gap:6px;">
-        <input type="number" id="mDcaInput" placeholder="추가 매수 희망가 입력"
-          onkeydown="if(event.key==='Enter'){addDcaAlertLevel('${symbol}');}"
-          style="flex:1; box-sizing:border-box; padding:7px 8px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-family:var(--font-mono); font-size:12px;">
-        <button class="btn-sm" onclick="addDcaAlertLevel('${symbol}')">+ 추가</button>
-      </div>
+    <div class="pa-field">
+      <div class="pa-label">🔴 손절가</div>
+      <input type="number" id="mStopLossInput" value="${s.stopLoss != null ? s.stopLoss : ''}" placeholder="${currency} 입력"
+        onchange="savePriceAlertStopLoss('${symbol}', this.value)">
+    </div>
+    <div class="pa-field" style="margin-bottom:4px;">
+      <div class="pa-label">🔵 물타기(추가매수)</div>
+      <input type="number" id="mDcaInput" placeholder="${currency} 입력 후 Enter"
+        onkeydown="if(event.key==='Enter'){addDcaAlertLevel('${symbol}');}">
+      <button class="btn-sm pa-add-btn" onclick="addDcaAlertLevel('${symbol}')">+ 지점 추가</button>
       ${dcaHtml}
     </div>
   `;
