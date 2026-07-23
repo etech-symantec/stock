@@ -9788,6 +9788,16 @@
       "qty": -400,
       "price": 15450,
       "txType": "trade"
+    },
+    {
+      "id": 1784767189298,
+      "date": "2026-07-23",
+      "owner": "끄니",
+      "broker": "키움",
+      "symbol": "GOOGL",
+      "qty": -4,
+      "price": 348.5,
+      "txType": "trade"
     }
   ],
   "range": "6m",
