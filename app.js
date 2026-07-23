@@ -5235,13 +5235,12 @@ function isSymbolCurrentlyHeld(symbol) {
 }
 
 // 🚀 실제 보유 중인 종목의 상세카드에는 '탐사선 띄우기' 버튼을 숨깁니다.
-// (probe.js가 별도로 버튼 표시 여부를 제어하더라도, 보유 종목이면 항상 숨김 상태를 유지합니다.)
+// (probe.js가 별도로 버튼 표시 여부를 제어하므로, style.display를 직접 건드리지 않고
+//  전용 CSS 클래스(!important)로만 덮어써서 관심종목(비보유) 상세창에는 영향을 주지 않습니다.)
 function enforceProbeFabVisibility() {
   const fab = document.getElementById('probeModalFab');
   if (!fab) return;
-  if (isSymbolCurrentlyHeld(currentModalTicker)) {
-    fab.style.display = 'none';
-  }
+  fab.classList.toggle('probe-fab-hidden-held', isSymbolCurrentlyHeld(currentModalTicker));
 }
 
 (function watchProbeFabForHeldStocks() {
@@ -5249,10 +5248,10 @@ function enforceProbeFabVisibility() {
     const fab = document.getElementById('probeModalFab');
     if (!fab) return;
     enforceProbeFabVisibility();
-    // probe.js 등이 나중에 style/class를 바꿔 버튼을 다시 표시하더라도 보유 종목이면 계속 숨김 처리
+    // probe.js 등이 나중에 style/class를 바꾸더라도, 보유 종목이면 계속 숨김 클래스를 유지합니다.
     const observer = new MutationObserver(() => {
-      if (isSymbolCurrentlyHeld(currentModalTicker) && fab.style.display !== 'none') {
-        fab.style.display = 'none';
+      if (isSymbolCurrentlyHeld(currentModalTicker) && !fab.classList.contains('probe-fab-hidden-held')) {
+        fab.classList.add('probe-fab-hidden-held');
       }
     });
     observer.observe(fab, { attributes: true, attributeFilter: ['style', 'class'] });
@@ -5622,6 +5621,13 @@ function updatePriceAlertBanner(rawHoldingsArg) {
   const wrap = document.getElementById('priceAlertBanner');
   if (!wrap) return;
 
+  // 🎯 알림 배너는 전체보기 / 소유자1 / 소유자2 화면에서만 노출합니다.
+  if (!['all', 'user1', 'user2'].includes(currentView)) {
+    wrap.style.display = 'none';
+    wrap.innerHTML = '';
+    return;
+  }
+
   let rawHoldings = rawHoldingsArg;
   if (!rawHoldings) {
     let ownerFilter = 'all';
@@ -5937,6 +5943,9 @@ async function render() {
   const probePanel = document.getElementById('probeCollectionPanel');
   if (probeFab) probeFab.style.display = 'none';
   if (probePanel) probePanel.style.display = 'none';
+  // 🎯 알림 배너는 전체보기/소유자1/소유자2 화면에서만 표시 (다른 화면 전환 시 우선 숨김)
+  const priceAlertBannerEl = document.getElementById('priceAlertBanner');
+  if (priceAlertBannerEl) priceAlertBannerEl.style.display = 'none';
   
   if (currentView === 'dividend') {
     if (msBar) msBar.style.display = 'none';
