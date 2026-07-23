@@ -5637,23 +5637,35 @@ function updatePriceAlertBanner(rawHoldingsArg) {
     return;
   }
 
-  const typeStyle = {
-    target: { icon: '🎯', color: '#00C578', bg: 'rgba(0,197,120,0.12)' },
-    stop:   { icon: '🚨', color: '#ff4d6a', bg: 'rgba(255,77,106,0.12)' },
-    dca:    { icon: '💧', color: '#3A9AFF', bg: 'rgba(58,154,255,0.12)' }
+  const typeMeta = {
+    target: { icon: '🎯', label: '목표가', color: '#00C578', bg: 'rgba(0,197,120,0.10)' },
+    stop:   { icon: '🚨', label: '손절가', color: '#ff4d6a', bg: 'rgba(255,77,106,0.10)' },
+    dca:    { icon: '💧', label: '물타기', color: '#3A9AFF', bg: 'rgba(58,154,255,0.10)' }
   };
 
+  // 알림 유형(목표가/손절가/물타기)별로 그룹핑
+  const groups = { target: [], stop: [], dca: [] };
+  alerts.forEach(a => { if (groups[a.type]) groups[a.type].push(a); });
+
   wrap.style.display = 'flex';
-  wrap.innerHTML = alerts.map(a => {
-    const st = typeStyle[a.type];
-    const sign = a.diffPct > 0 ? '+' : '';
+  wrap.innerHTML = ['target', 'stop', 'dca'].filter(t => groups[t].length).map(t => {
+    const meta = typeMeta[t];
+    const chips = groups[t].map(a => {
+      const sign = a.diffPct > 0 ? '+' : '';
+      return `
+        <span class="price-alert-stock-chip" onclick="openChartModal('${a.symbol}')" title="클릭하면 ${_escAlertText(a.name)} 상세카드가 열립니다">
+          <strong>${_escAlertText(a.name)}</strong>
+          <span style="color:${meta.color};">${sign}${a.diffPct.toFixed(1)}%</span>
+        </span>`;
+    }).join('');
     return `
-      <div class="price-alert-chip" style="border-color:${st.color}; background:${st.bg};" onclick="openChartModal('${a.symbol}')" title="클릭하면 상세카드가 열립니다">
-        <span class="price-alert-icon">${st.icon}</span>
-        <span class="price-alert-text">
-          <strong>${_escAlertText(a.name)}</strong> ${a.label}
-          <span class="price-alert-diff" style="color:${st.color};">(${sign}${a.diffPct.toFixed(1)}%)</span>
-        </span>
+      <div class="price-alert-group" style="border-color:${meta.color}; background:${meta.bg};">
+        <div class="price-alert-group-head">
+          <span>${meta.icon}</span>
+          <span>${meta.label} 근접·도달</span>
+          <span class="price-alert-group-count" style="background:${meta.color};">${groups[t].length}</span>
+        </div>
+        <div class="price-alert-group-chips">${chips}</div>
       </div>`;
   }).join('');
 }
