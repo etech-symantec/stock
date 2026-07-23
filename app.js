@@ -80,7 +80,7 @@ let sidebarYieldScope = 'current';
 // 🌟 사이드바 "평가 자산 랭킹" 소유자 필터('all': 전체 | 'user1' | 'user2') — 현재 보고 있는 메인 탭(전체보기/소유자별)과 무관하게 독립적으로 동작합니다.
 let sidebarYieldOwnerFilter = 'all';
 
-// 🚀 탐사선 발사 지점 마커용 아이콘 이미지 (1회만 생성해서 재사용)
+// 🛰️ 탐사선 발사 지점 마커용 아이콘 이미지 (1회만 생성해서 재사용)
 const _rocketMarkerImg = (() => {
   const size = 32;
   const c = document.createElement('canvas');
@@ -89,7 +89,7 @@ const _rocketMarkerImg = (() => {
   ctx.font = `${size - 6}px sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('🚀', size / 2, size / 2 + 1);
+  ctx.fillText('🛰️', size / 2, size / 2 + 1);
   const img = new Image();
   img.src = c.toDataURL();
   return img;
