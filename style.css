@@ -289,7 +289,7 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 .cp-sum-val.up { color: var(--profit); } .cp-sum-val.down { color: var(--loss); }
 
 /* 🎯 목표가·손절가·물타기 알림 배너 */
-.price-alert-banner { display: none; flex-direction: column; gap: 6px; }
+.price-alert-banner { display: none; flex-direction: column; gap: 6px; margin-top: 14px; }
 .price-alert-chip {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 12px; border: 1px solid; border-radius: 10px;
