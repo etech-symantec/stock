@@ -8372,6 +8372,127 @@ if (_origToggleSidebar) {
 }
 
 // ==========================================
+// 🌟 거래내역 / 실현수익 / 배당통계: 상단 필터바를 스크롤과 무관하게 항상 고정
+//    (기존 position:sticky는 부모 flex 레이아웃 구조상 일정 스크롤 이후
+//     고정이 풀리며 화면 위로 사라지는 문제가 있어, position:fixed 기반의
+//     동적 위치 계산 방식으로 교체한다.)
+// ==========================================
+(function () {
+  const PCB_MAP = [
+    { dashboardId: 'historyDashboard',  boxId: 'historyControlsBox' },
+    { dashboardId: 'realizedDashboard', boxId: 'realizedControlsBox' },
+    { dashboardId: 'dividendDashboard', boxId: 'dividendControlsBox' }
+  ];
+
+  function getSpacer(box) {
+    let spacer = box.nextElementSibling;
+    if (!spacer || !spacer.classList || !spacer.classList.contains('pcb-fixed-spacer')) {
+      spacer = document.createElement('div');
+      spacer.className = 'pcb-fixed-spacer';
+      spacer.style.display = 'none';
+      spacer.style.flexShrink = '0';
+      box.insertAdjacentElement('afterend', spacer);
+    }
+    return spacer;
+  }
+
+  function unfix(box) {
+    if (box.style.position === 'fixed') {
+      box.style.position = '';
+      box.style.top = '';
+      box.style.left = '';
+      box.style.width = '';
+      box.style.zIndex = '';
+      const spacer = getSpacer(box);
+      spacer.style.display = 'none';
+      spacer.style.height = '';
+    }
+  }
+
+  function applyFixed(dashboardId, boxId) {
+    const dashboard = document.getElementById(dashboardId);
+    const box = document.getElementById(boxId);
+    const main = document.querySelector('.dashboard-main');
+    if (!dashboard || !box || !main) return;
+
+    const isVisible = dashboard.style.display !== 'none' && getComputedStyle(dashboard).display !== 'none';
+    if (!isVisible) { unfix(box); return; }
+
+    // 실제(고정되지 않은) 높이를 정확히 재기 위해 잠시 고정을 해제한 뒤 측정
+    const wasFixed = box.style.position === 'fixed';
+    if (wasFixed) { box.style.position = ''; box.style.top = ''; box.style.left = ''; box.style.width = ''; }
+    const boxHeight = box.offsetHeight;
+
+    const mainRect = main.getBoundingClientRect();
+    const mainStyle = getComputedStyle(main);
+    const padLeft = parseFloat(mainStyle.paddingLeft) || 0;
+    const padRight = parseFloat(mainStyle.paddingRight) || 0;
+    const scrollbarW = main.offsetWidth - main.clientWidth; // 세로 스크롤바 폭 보정
+
+    box.style.position = 'fixed';
+    box.style.top = mainRect.top + 'px';
+    box.style.left = (mainRect.left + padLeft) + 'px';
+    box.style.width = (mainRect.width - padLeft - padRight - scrollbarW) + 'px';
+    box.style.zIndex = 60;
+
+    const spacer = getSpacer(box);
+    spacer.style.display = 'block';
+    spacer.style.height = boxHeight + 'px';
+  }
+
+  function syncFixedFilterBars() {
+    PCB_MAP.forEach(m => applyFixed(m.dashboardId, m.boxId));
+  }
+  window._syncFixedFilterBars = syncFixedFilterBars;
+
+  // 창 크기 변경 시 재계산
+  window.addEventListener('resize', syncFixedFilterBars);
+
+  // 사이드바 접기/펼치기 트랜지션(0.4s) 동안 위치를 계속 재계산
+  function watchSidebarTransition() {
+    const start = performance.now();
+    const dur = 450;
+    function tick(now) {
+      syncFixedFilterBars();
+      if (now - start < dur) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  const _origToggleSidebar2 = typeof toggleSidebar === 'function' ? toggleSidebar : null;
+  if (_origToggleSidebar2) {
+    toggleSidebar = function () {
+      _origToggleSidebar2();
+      watchSidebarTransition();
+    };
+  }
+
+  // 필터 배지 등으로 박스 내용 줄바꿈이 생겨 높이가 바뀔 때도 스페이서 높이 동기화
+  if (window.ResizeObserver) {
+    PCB_MAP.forEach(m => {
+      const box = document.getElementById(m.boxId);
+      if (box) {
+        const ro = new ResizeObserver(() => syncFixedFilterBars());
+        ro.observe(box);
+      }
+    });
+  }
+
+  // 탭 전환으로 각 대시보드의 display 값이 바뀌는 시점을 감지해 즉시 재계산
+  if (window.MutationObserver) {
+    PCB_MAP.forEach(m => {
+      const dashboard = document.getElementById(m.dashboardId);
+      if (dashboard) {
+        const mo = new MutationObserver(() => syncFixedFilterBars());
+        mo.observe(dashboard, { attributes: true, attributeFilter: ['style'] });
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', syncFixedFilterBars);
+  syncFixedFilterBars();
+})();
+
+// ==========================================
 // 🚀 초기화 (DOMContentLoaded)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -8598,12 +8719,20 @@ function renderUpcomingDividends() {
 
     const holdings = calculateHoldings(filterName);
     let heldSymbols = {};
+    // 🌟 "현재 보유중인 종목"만 집계 (전량 매도된 종목은 제외). 부동소수점 오차로
+    //    0에 아주 가까운 잔여 수량이 남는 경우까지 "보유중"으로 잘못 인식하지 않도록
+    //    아주 작은 임계값(EPS) 이하는 0으로 취급한다.
+    const HELD_QTY_EPS = 1e-6;
     for (let key in holdings) {
         let h = holdings[key];
-        if (h.qty > 0) {
+        if (h.qty > HELD_QTY_EPS) {
             if (!heldSymbols[h.symbol]) heldSymbols[h.symbol] = 0;
             heldSymbols[h.symbol] += h.qty;
         }
+    }
+    // 계좌를 합산했을 때도 실제로는 보유 수량이 0(또는 그에 준하는 오차) 이하인 종목은 제외
+    for (let sym in heldSymbols) {
+        if (heldSymbols[sym] <= HELD_QTY_EPS) delete heldSymbols[sym];
     }
 
     let divTxs = state.transactions.filter(t => t.txType === 'dividend');
