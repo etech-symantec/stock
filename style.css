@@ -364,11 +364,11 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
   height: 22px;
   font-size: 20px;
   line-height: 1;
-  transform: translateY(-1px);
+  transform: translate(-1.5px, -1px);
   transition: transform 0.2s ease;
 }
 #chartOverlay .modal #probeModalFab.probe-fab-modal:hover .probe-fab-icon {
-  transform: translateY(-1px) scale(1.2);
+  transform: translate(-1.5px, -1px) scale(1.5);
 }
 #chartOverlay .modal #probeModalFab.probe-fab-modal .probe-fab-label {
   display: none;
