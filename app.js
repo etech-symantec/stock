@@ -423,28 +423,34 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
       });
 
       Object.values(datasetMap).forEach(ds => datasets.push(ds));
-    
-      // 🚀 탐사선 발사 지점 마커
-      if (!mini && symbol && state.probes) {
-        const probeEntry = state.probes.find(pr => pr.symbol === symbol);
-        if (probeEntry) {
-          let pIdx = displayRawDates.findIndex(d => d >= probeEntry.buyDate);
-          // 🌟 buyDate가 아직 시세 데이터에 없는 최신 날짜라면(당일 발사 등) 맨 오른쪽(최신) 지점에 표시
-          if (pIdx === -1) pIdx = displayRawDates.length - 1;
-          if (displayDates[pIdx] !== undefined) {
-            datasets.push({
-              label: '🚀 탐사선 발사',
-              data: [{ x: displayDates[pIdx], y: probeEntry.buyPrice }],
-              type: 'line',
-              showLine: false,
-              pointStyle: _rocketMarkerImg,
-              pointRadius: mini ? 8 : 14,
-              pointHoverRadius: mini ? 10 : 16,
-              order: 0
-            });
-          }
+  }
+
+  // 🛰️ 탐사선 발사 지점 마커 (매수/매도 마커를 숨긴 경우에도 항상 표시)
+  if (!mini && symbol && state.probes) {
+    const probeEntry = state.probes.find(pr => pr.symbol === symbol);
+    if (probeEntry && displayRawDates.length) {
+      const rangeStart = displayRawDates[0];
+      // 🌟 발사일이 현재 표시 중인 기간보다 이전이면 이 차트에는 그리지 않습니다.
+      //    (범위 밖인데도 억지로 맨 끝에 표시하면 실제 발사일이 아닌 엉뚱한 위치에 찍히는 문제가 있었습니다.)
+      if (probeEntry.buyDate >= rangeStart) {
+        let pIdx = displayRawDates.indexOf(probeEntry.buyDate);
+        if (pIdx === -1) pIdx = displayRawDates.findIndex(d => d >= probeEntry.buyDate);
+        // 🌟 buyDate가 아직 시세 데이터에 없는 최신 날짜라면(당일 발사 등) 맨 오른쪽(최신) 지점에 표시
+        if (pIdx === -1) pIdx = displayRawDates.length - 1;
+        if (displayDates[pIdx] !== undefined) {
+          datasets.push({
+            label: '🛰️ 탐사선 발사',
+            data: [{ x: displayDates[pIdx], y: probeEntry.buyPrice }],
+            type: 'line',
+            showLine: false,
+            pointStyle: _rocketMarkerImg,
+            pointRadius: mini ? 8 : 14,
+            pointHoverRadius: mini ? 10 : 16,
+            order: 0
+          });
         }
       }
+    }
   }
 
   // 🎯 목표가·손절가·물타기 가로선 (annotation 플러그인)
@@ -5339,7 +5345,9 @@ function renderModalChart() {
   const _modalOwnerFilter = currentView === 'user1' ? state.owners.user1.name
                           : currentView === 'user2' ? state.owners.user2.name
                           : 'all'; // watch, all 등 나머지는 전체 표시
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, _modalOwnerFilter, false, '주가', buildPriceAlertChartLines(currentModalTicker)); }, 50);
+  // 🛰️ 탐사선을 띄운 종목은 상세카드 그래프에서 과거 매수/매도 마커를 숨기고 발사 지점만 보여줍니다.
+  const _hasProbeForModalTicker = !!(state.probes && state.probes.some(p => p.symbol === currentModalTicker));
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, _modalOwnerFilter, _hasProbeForModalTicker, '주가', buildPriceAlertChartLines(currentModalTicker)); }, 50);
   enforceProbeFabVisibility();
 
   // 🌟 매매기록 요약 + What if 계산
