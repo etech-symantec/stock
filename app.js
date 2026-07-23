@@ -5224,6 +5224,46 @@ function highlightNewlyAddedCard(symbol) {
   setTimeout(() => el.classList.remove('card-just-added'), 1800);
 }
 
+// 🌟 특정 종목을 (계좌/소유자 구분 없이) 실제로 보유 중인지 확인합니다.
+function isSymbolCurrentlyHeld(symbol) {
+  if (!symbol) return false;
+  const holdings = calculateHoldings('all');
+  for (let key in holdings) {
+    if (holdings.hasOwnProperty(key) && holdings[key].symbol === symbol && holdings[key].qty > 0) return true;
+  }
+  return false;
+}
+
+// 🚀 실제 보유 중인 종목의 상세카드에는 '탐사선 띄우기' 버튼을 숨깁니다.
+// (probe.js가 별도로 버튼 표시 여부를 제어하더라도, 보유 종목이면 항상 숨김 상태를 유지합니다.)
+function enforceProbeFabVisibility() {
+  const fab = document.getElementById('probeModalFab');
+  if (!fab) return;
+  if (isSymbolCurrentlyHeld(currentModalTicker)) {
+    fab.style.display = 'none';
+  }
+}
+
+(function watchProbeFabForHeldStocks() {
+  const setup = () => {
+    const fab = document.getElementById('probeModalFab');
+    if (!fab) return;
+    enforceProbeFabVisibility();
+    // probe.js 등이 나중에 style/class를 바꿔 버튼을 다시 표시하더라도 보유 종목이면 계속 숨김 처리
+    const observer = new MutationObserver(() => {
+      if (isSymbolCurrentlyHeld(currentModalTicker) && fab.style.display !== 'none') {
+        fab.style.display = 'none';
+      }
+    });
+    observer.observe(fab, { attributes: true, attributeFilter: ['style', 'class'] });
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
 function openChartModal(ticker, probeId = null) {
   currentModalTicker = ticker;
   currentProbeId = probeId;
@@ -5239,6 +5279,7 @@ function openChartModal(ticker, probeId = null) {
   
   renderModalChart();
   renderPriceAlertSettingsPanel(ticker);
+  enforceProbeFabVisibility();
   document.getElementById('chartOverlay').classList.add('open');
 }
 
@@ -5300,6 +5341,7 @@ function renderModalChart() {
                           : currentView === 'user2' ? state.owners.user2.name
                           : 'all'; // watch, all 등 나머지는 전체 표시
   setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, _modalOwnerFilter, false, '주가', buildPriceAlertChartLines(currentModalTicker)); }, 50);
+  enforceProbeFabVisibility();
 
   // 🌟 매매기록 요약 + What if 계산
   const sym = currentModalTicker;
