@@ -1466,7 +1466,11 @@
        <div id="mTicker" style="font-size:18px; font-weight:700;"></div>
        <div id="mBroker" style="font-family:var(--font-mono); font-size:12px; color:var(--text3); margin-top:2px;"></div>
       </div>
-      <button class="btn-sm" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0;" onclick="closeModal('chartOverlay')">✕</button>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <!-- 🛰️ 탐사선 띄우기 버튼 (관심종목 페이지 하단 버튼과 동일한 디자인, 위치만 닫기 버튼 옆으로) -->
+        <button id="probeModalFab" class="probe-fab-modal" onclick="launchProbeFromModal()"><span class="probe-fab-icon" aria-hidden="true">🛰️</span><span class="probe-fab-label">탐사선 띄우기</span></button>
+        <button class="btn-sm" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0;" onclick="closeModal('chartOverlay')">✕</button>
+      </div>
     </div>
     <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
       <div id="mPrice" style="font-family:var(--font-mono); font-size:28px; font-weight:700;"></div>
@@ -1561,8 +1565,6 @@
         <div id="mProbePnl" style="font-family:var(--font-mono); font-size:14px; font-weight:700;"></div>
       </div>
     </div>
-     <!-- 🚀 상세창 전용 플로팅 버튼 (모달 위에 떠 있음) · 관심종목 페이지 하단 버튼과 동일한 디자인 -->
-    <button id="probeModalFab" class="probe-fab-modal" onclick="launchProbeFromModal()"><span class="probe-fab-icon" aria-hidden="true">🛰️</span><span class="probe-fab-label">탐사선 띄우기</span></button>
   </div>
 </div>
 
