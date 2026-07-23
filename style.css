@@ -696,8 +696,8 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .overlay.open { display: flex; }
 .modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
 
-/* 🌟 종목 상세카드(차트 모달)는 우측 목표가 설정 패널 공간 확보를 위해 더 넓게 */
-#chartOverlay .modal { max-width: 760px; }
+/* 🌟 종목 상세카드(차트 모달)는 우측 목표가 설정 패널 공간 확보를 위해 더 넓게 (그래프는 기존 크기 유지) */
+#chartOverlay .modal { max-width: 860px; }
 
 /* 🎯 목표가·손절가·물타기 설정 - 그래프 우측 사이드 패널 */
 .price-alert-side-panel { width: 190px; flex-shrink: 0; background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px; padding: 12px; }
@@ -716,10 +716,15 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 }
 .price-alert-side-panel .pa-dca-empty { font-size: 10px; color: var(--text3); margin-top: 5px; }
 .price-alert-side-panel .pa-add-btn { width: 100%; margin-top: 6px; }
-@media (max-width: 780px) {
+
+/* 📋 매매기록 요약 / What if 그리드 - 넓어진 모달 폭에 맞춰 4열, 좁아지면 2열로 */
+.mts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+@media (max-width: 900px) {
   #chartOverlay .modal { max-width: 600px; }
   #chartOverlay .modal > div[style*="display:flex; gap:16px"] { flex-direction: column; }
   .price-alert-side-panel { width: 100%; }
+  .mts-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 .modal-sm { max-width: 400px; }
