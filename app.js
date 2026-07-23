@@ -5544,6 +5544,16 @@ window.removeDcaAlertLevel = function (symbol, idx) {
 function renderPriceAlertSettingsPanel(symbol) {
   const wrap = document.getElementById('mPriceAlertSettings');
   if (!wrap || !symbol) return;
+
+  // 🛰️ 탐사선을 띄운 종목의 상세카드에는 목표가·손절가·물타기 설정 영역을 표시하지 않습니다.
+  const hasProbe = !!(state.probes && state.probes.some(p => p.symbol === symbol));
+  if (hasProbe) {
+    wrap.style.display = 'none';
+    wrap.innerHTML = '';
+    return;
+  }
+  wrap.style.display = '';
+
   const s = getPriceAlertSettings(symbol);
   const isKr = isKorean(symbol);
   const currency = isKr ? '₩' : '$';
