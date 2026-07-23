@@ -353,9 +353,6 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
   white-space: nowrap;
 }
 #chartOverlay .modal #probeModalFab.probe-fab-modal:hover {
-  max-width: 200px !important;
-  padding: 0 14px 0 12px !important;
-  justify-content: flex-start !important;
   transform: translateY(-1px);
   box-shadow: 0 8px 20px rgba(6,182,212,0.5);
 }
@@ -374,19 +371,7 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
   transform: translateY(-1px) scale(1.2);
 }
 #chartOverlay .modal #probeModalFab.probe-fab-modal .probe-fab-label {
-  display: inline-block;
-  max-width: 0;
-  margin-left: 0;
-  opacity: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  line-height: normal;
-  transition: max-width 0.35s ease, margin-left 0.35s ease, opacity 0.25s ease;
-}
-#chartOverlay .modal #probeModalFab.probe-fab-modal:hover .probe-fab-label {
-  max-width: 160px;
-  margin-left: 6px;
-  opacity: 1;
+  display: none;
 }
 
 /* 🚀 실제 보유 중인 종목의 상세카드에서는 탐사선 버튼을 강제로 숨깁니다 (관심종목엔 영향 없음) */
