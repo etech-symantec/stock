@@ -288,19 +288,32 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
 .cp-sum-val.up { color: var(--profit); } .cp-sum-val.down { color: var(--loss); }
 
-/* 🎯 목표가·손절가·물타기 알림 배너 */
-.price-alert-banner { display: none; flex-direction: column; gap: 6px; margin-top: 14px; }
-.price-alert-chip {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px; border: 1px solid; border-radius: 10px;
-  cursor: pointer; font-size: 12px; line-height: 1.4;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+/* 🎯 목표가·손절가·물타기 알림 배너 - 유형별 그룹 카드 */
+.price-alert-banner { display: none; flex-direction: row; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.price-alert-group {
+  flex: 1 1 220px; min-width: 200px;
+  border: 1px solid; border-radius: 12px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 8px;
   animation: priceAlertPulse 2.4s ease-in-out infinite;
 }
-.price-alert-chip:hover { transform: translateY(-1px); }
-.price-alert-icon { font-size: 14px; flex-shrink: 0; }
-.price-alert-text { color: var(--text); }
-.price-alert-diff { font-family: var(--font-mono); font-weight: 700; margin-left: 4px; }
+.price-alert-group-head {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 700; color: var(--text);
+}
+.price-alert-group-count {
+  margin-left: auto; color: #fff; border-radius: 20px;
+  padding: 1px 8px; font-size: 11px; font-weight: 700;
+}
+.price-alert-group-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.price-alert-stock-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 5px 9px; font-size: 11.5px; color: var(--text);
+  cursor: pointer; transition: transform 0.15s ease;
+  font-family: var(--font-mono);
+}
+.price-alert-stock-chip strong { font-family: var(--font-sans); font-weight: 600; }
+.price-alert-stock-chip:hover { transform: translateY(-1px); }
 @keyframes priceAlertPulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
   50% { box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
