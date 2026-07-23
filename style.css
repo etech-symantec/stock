@@ -321,49 +321,54 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 
 /* 🛰️ 상세카드(모달) 전용 탐사선 버튼 - 관심종목 페이지 하단의 probeFabBtn과 동일한 디자인
    (그라디언트 테두리 알약형, 아이콘 전용 원형 → 호버 시 문구가 펼쳐지는 방식)
-   위치만 모달 내부에 맞게 absolute로 하단 우측에 살짝 걸치도록 띄웠습니다. */
-#probeModalFab {
+   위치는 모달 우측 상단, 닫기(✕) 버튼 바로 왼쪽에 배치합니다.
+   너비/높이를 고정값으로 지정해 완전한 원형을 보장하고, 아이콘은 flex 중앙 정렬로 항상 정중앙에 오도록 합니다.
+   (선택자 특이도를 높여 probe.js 등 다른 스크립트가 주입하는 스타일보다 항상 우선 적용되도록 함) */
+#chartOverlay .modal #probeModalFab.probe-fab-modal {
   display: inline-flex !important;
-  position: absolute !important;
-  right: 24px !important;
-  bottom: -20px !important;
-  left: auto !important;
-  top: auto !important;
-  z-index: 5;
-  align-items: center;
-  width: auto !important;
-  max-width: none !important;
-  padding: 12px !important;
+  position: static !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  flex-shrink: 0;
+  padding: 0 !important;
+  margin: 0 !important;
   border-radius: 999px !important;
+  overflow: hidden;
   cursor: pointer;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 700;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.25s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, width 0.35s ease, max-width 0.35s ease, padding 0.35s ease;
   border: 2.75px solid transparent !important;
   background-image: linear-gradient(#fff,#fff), linear-gradient(120deg,#2563eb 0%,#06b6d4 45%,#6366f1 100%) !important;
   background-origin: border-box;
   background-clip: padding-box, border-box;
   color: #1e3a5f !important;
-  box-shadow: 0 6px 20px rgba(6,182,212,0.35);
+  box-shadow: 0 4px 14px rgba(6,182,212,0.35);
   white-space: nowrap;
 }
-#probeModalFab:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(6,182,212,0.5);
+#chartOverlay .modal #probeModalFab.probe-fab-modal:hover {
+  max-width: 200px !important;
+  padding: 0 14px 0 12px !important;
+  justify-content: flex-start !important;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(6,182,212,0.5);
 }
-#probeModalFab .probe-fab-icon {
+#chartOverlay .modal #probeModalFab.probe-fab-modal .probe-fab-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  font-size: 20px;
   line-height: 1;
-  transform: translateY(-1px);
 }
-#probeModalFab .probe-fab-label {
+#chartOverlay .modal #probeModalFab.probe-fab-modal .probe-fab-label {
   display: inline-block;
   max-width: 0;
   margin-left: 0;
@@ -372,14 +377,14 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
   white-space: nowrap;
   transition: max-width 0.35s ease, margin-left 0.35s ease, opacity 0.25s ease;
 }
-#probeModalFab:hover .probe-fab-label {
+#chartOverlay .modal #probeModalFab.probe-fab-modal:hover .probe-fab-label {
   max-width: 160px;
-  margin-left: 8px;
+  margin-left: 6px;
   opacity: 1;
 }
 
 /* 🚀 실제 보유 중인 종목의 상세카드에서는 탐사선 버튼을 강제로 숨깁니다 (관심종목엔 영향 없음) */
-#probeModalFab.probe-fab-hidden-held { display: none !important; }
+#chartOverlay .modal #probeModalFab.probe-fab-modal.probe-fab-hidden-held { display: none !important; }
 
 .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
 .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
