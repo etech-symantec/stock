@@ -288,6 +288,24 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 .cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
 .cp-sum-val.up { color: var(--profit); } .cp-sum-val.down { color: var(--loss); }
 
+/* 🎯 목표가·손절가·물타기 알림 배너 */
+.price-alert-banner { display: none; flex-direction: column; gap: 6px; }
+.price-alert-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border: 1px solid; border-radius: 10px;
+  cursor: pointer; font-size: 12px; line-height: 1.4;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  animation: priceAlertPulse 2.4s ease-in-out infinite;
+}
+.price-alert-chip:hover { transform: translateY(-1px); }
+.price-alert-icon { font-size: 14px; flex-shrink: 0; }
+.price-alert-text { color: var(--text); }
+.price-alert-diff { font-family: var(--font-mono); font-weight: 700; margin-left: 4px; }
+@keyframes priceAlertPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  50% { box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+}
+
 .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
 .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
 .acc-row:hover { border-color: var(--border2); }
@@ -2993,166 +3011,3 @@ nav {
   z-index: 1;
   white-space: nowrap;
 }
-
-/* =====================================================
-   🔔 보유 종목 목표가 · 손절가 · 물타기 알림
-   ===================================================== */
-.portfolio-price-alerts {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 12px;
-  border: 1px solid rgba(245, 158, 11, 0.32);
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.10), rgba(124, 106, 247, 0.06));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-}
-.portfolio-price-alerts-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.portfolio-price-alerts-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 700;
-}
-.portfolio-price-alerts-icon { animation: priceAlertBell 1.8s ease-in-out infinite; transform-origin: 50% 0; }
-@keyframes priceAlertBell {
-  0%, 72%, 100% { transform: rotate(0deg); }
-  78% { transform: rotate(13deg); }
-  84% { transform: rotate(-10deg); }
-  90% { transform: rotate(7deg); }
-}
-.portfolio-price-alert-count {
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #f59e0b;
-  color: #111827;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-}
-.portfolio-price-alerts-hint { color: var(--text3); font-size: 10px; }
-.portfolio-price-alert-list {
-  display: flex;
-  gap: 7px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scroll-snap-type: x proximity;
-}
-.portfolio-price-alert {
-  flex: 0 0 auto;
-  min-width: 184px;
-  max-width: 235px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 9px 10px;
-  border: 1px solid var(--border2);
-  border-radius: 9px;
-  background: var(--bg2);
-  color: var(--text);
-  cursor: pointer;
-  text-align: left;
-  font-family: var(--font-sans);
-  scroll-snap-align: start;
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-}
-.portfolio-price-alert:hover { transform: translateY(-1px); border-color: var(--accent); background: var(--bg3); }
-.portfolio-price-alert.reached { box-shadow: 0 0 0 1px rgba(245,158,11,0.15), 0 5px 16px rgba(0,0,0,0.16); }
-.portfolio-price-alert-symbol {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--bg3);
-  font-size: 15px;
-}
-.portfolio-price-alert-copy { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.portfolio-price-alert-name { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.portfolio-price-alert-state { font-size: 10px; font-weight: 700; }
-.portfolio-price-alert-meta { font-family: var(--font-mono); font-size: 9px; color: var(--text3); white-space: nowrap; }
-.portfolio-price-alert.alert-target .portfolio-price-alert-state { color: var(--green); }
-.portfolio-price-alert.alert-stop .portfolio-price-alert-state { color: var(--blue); }
-.portfolio-price-alert.alert-average .portfolio-price-alert-state { color: #f59e0b; }
-
-/* =====================================================
-   🎯 종목 상세 모달 매매 기준 설정
-   ===================================================== */
-#chartOverlay .modal { max-height: 92vh; overflow-y: auto; }
-.price-strategy-panel {
-  margin-top: 16px;
-  padding: 14px;
-  border: 1px solid var(--border2);
-  border-radius: 11px;
-  background: linear-gradient(135deg, rgba(124,106,247,0.08), rgba(245,158,11,0.04));
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
-}
-.price-strategy-panel.price-strategy-focus {
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 3px rgba(245,158,11,0.16);
-}
-.price-strategy-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-.price-strategy-title { font-size: 13px; font-weight: 700; color: var(--text); }
-.price-strategy-sub { margin-top: 3px; font-size: 10px; color: var(--text3); }
-.price-strategy-sub strong { color: var(--text2); font-family: var(--font-mono); font-weight: 600; }
-.price-strategy-dot { margin: 0 4px; }
-.price-strategy-saved {
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--border2);
-  background: var(--bg3);
-  color: var(--text3);
-  font-size: 9px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.price-strategy-saved.configured { color: var(--accent); border-color: rgba(124,106,247,0.45); background: var(--accent-bg); }
-.price-strategy-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.price-strategy-field {
-  min-width: 0;
-  padding: 9px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg2);
-}
-.price-strategy-label { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 6px; }
-.price-strategy-label > span { color: var(--text2); font-size: 10px; font-weight: 700; }
-.price-strategy-label small { color: var(--text3); font-size: 8px; white-space: nowrap; }
-.price-strategy-input { height: 36px; padding: 7px 9px; font-family: var(--font-mono); font-size: 11px; }
-.price-strategy-percent-wrap { position: relative; }
-.price-strategy-percent-wrap .price-strategy-input { padding-right: 25px; }
-.price-strategy-percent-wrap > span { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); color: var(--text3); font-family: var(--font-mono); font-size: 10px; pointer-events: none; }
-.price-strategy-actions { display: flex; align-items: center; gap: 7px; margin-top: 10px; }
-.price-strategy-status { flex: 1; min-width: 0; color: var(--text3); font-size: 9px; }
-.price-strategy-clear { color: var(--text2); }
-.price-strategy-save { width: auto; min-width: 72px; height: 32px; margin: 0; padding: 0 15px; }
-
-@media (max-width: 768px) {
-  .portfolio-price-alerts-hint { display: none; }
-  .portfolio-price-alert { min-width: 172px; }
-  .price-strategy-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .price-strategy-actions { flex-wrap: wrap; }
-  .price-strategy-status { flex-basis: 100%; }
-}
-@media (max-width: 430px) {
-  .price-strategy-grid { grid-template-columns: 1fr; }
-}
-[data-theme="light"] .portfolio-price-alerts {
-  background: linear-gradient(135deg, rgba(245,158,11,0.09), rgba(98,80,224,0.04));
-}
-[data-theme="light"] .portfolio-price-alert,
-[data-theme="light"] .price-strategy-field { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
