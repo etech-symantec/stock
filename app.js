@@ -882,8 +882,8 @@ function openMasterSettingsModal() {
   const customOverseasEl = document.getElementById('inputCustomOverseas');
   if (customOverseasEl) customOverseasEl.value = (state.customOverseasAssets || []).join(', ');
 
-  syncMarketSignalSettingsUI();
-  applyMarketSignalVisibility();
+  if (typeof syncMarketSignalSettingsUI === 'function') syncMarketSignalSettingsUI();
+  if (typeof applyMarketSignalVisibility === 'function') applyMarketSignalVisibility();
   document.getElementById('masterSettingsOverlay').classList.add('open');
   switchSettingsTab('data');
 }
@@ -913,7 +913,7 @@ function switchSettingsTab(tabName) {
     item.button.style.color = active ? 'var(--text)' : 'var(--text2)';
   });
 
-  if (tabName === 'signal') syncMarketSignalSettingsUI();
+  if (tabName === 'signal' && typeof syncMarketSignalSettingsUI === 'function') syncMarketSignalSettingsUI();
 }
 // 🌟 [추가] 수동 해외자산 목록 저장 함수
 function saveCustomOverseas() {
