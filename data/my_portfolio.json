@@ -10015,8 +10015,8 @@
       "fuel": []
     },
     "396500.KS": {
-      "docking": 39000,
-      "escape": 37000,
+      "docking": null,
+      "escape": null,
       "fuel": []
     },
     "SMR": {
@@ -10028,7 +10028,22 @@
       "docking": null,
       "escape": null,
       "fuel": []
+    },
+    "001250.KS": {
+      "docking": null,
+      "escape": null,
+      "fuel": []
+    },
+    "487240.KS": {
+      "docking": null,
+      "escape": null,
+      "fuel": []
+    },
+    "SOFI": {
+      "docking": null,
+      "escape": null,
+      "fuel": []
     }
   },
-  "_updatedAt": 1784879031608
+  "_updatedAt": 1784906382766
 }
