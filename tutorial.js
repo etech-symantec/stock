@@ -26,7 +26,7 @@ const STEPS = [
         icon: '🗺️',
         label: '01 — 네비게이션',
         title: '상단 메뉴로 화면을 전환하세요',
-        body: '전체보기·소유자1·소유자2·관심종목·거래내역·실현수익·배당통계 탭을 클릭해 각 대시보드로 이동합니다. 각 화면에 첫 방문 시 해당 페이지 가이드가 자동으로 안내됩니다.',
+        body: '전체보기·소유자1·소유자2·관심종목·거래내역·실현수익·배당통계·달빛정보 탭을 클릭해 각 대시보드로 이동합니다. 각 화면에 첫 방문 시 해당 페이지 가이드가 자동으로 안내됩니다.',
         tip: '💡 기간 탭(1D·1W…전체)으로 조회 기간을 바꿀 수 있어요',
     },
     {
@@ -75,10 +75,19 @@ const STEPS = [
         tip: '💡 초록 막대 = 익절, 파랑 막대 = 손절로 매도 타이밍을 되돌아볼 수 있어요',
     },
     {
+        target: '#aiAdviceFab',
+        arrow: 'left',
+        icon: '🤖',
+        label: '07 — AI 투자조언',
+        title: 'AI에게 내 포트폴리오에 대한 조언을 물어보세요',
+        body: '우측 하단의 AI 투자조언 버튼을 누르면 현재 시장 신호와 내 보유 종목을 종합해 AI가 분석 의견을 제공합니다. 지난 조언은 기록으로 남아 언제든 다시 확인할 수 있어요.',
+        tip: '⚠️ AI 조언은 투자 참고용이며, 최종 투자 판단과 책임은 본인에게 있어요',
+    },
+    {
         target: '.vtab[onclick*="history"]',
         arrow: 'top',
         icon: '📜',
-        label: '07 — 거래 내역',
+        label: '08 — 거래 내역',
         title: '전체 거래 이력을 필터링해서 조회하세요',
         body: '국가·유형·계좌·기간·종목명으로 거래를 검색하고, 날짜 일괄수정 기능으로 잘못 입력된 날짜를 한 번에 수정할 수 있어요. CSV 파일로 기존 거래 내역을 일괄 업로드할 수도 있습니다.',
         tip: '💡 각 행의 소유자를 클릭해 바로 변경하거나, 체크박스로 선택 후 일괄 삭제할 수 있어요',
@@ -87,7 +96,7 @@ const STEPS = [
         target: '.vtab[onclick*="realized"]',
         arrow: 'top',
         icon: '💵',
-        label: '08 — 실현수익',
+        label: '09 — 실현수익',
         title: '매도를 통해 확정된 수익을 분석하세요',
         body: '누적 실현수익 차트, 종목별 수익금·수익률·단타왕 랭킹을 제공합니다. 해외주식 매도 시 양도소득세(22%)를 자동 계산해 신고 예정세액을 미리 확인할 수 있어요.',
         tip: '💡 랭킹 항목을 클릭하면 해당 종목의 거래 내역만 필터링됩니다',
@@ -96,19 +105,28 @@ const STEPS = [
         target: '.vtab[onclick*="dividend"]',
         arrow: 'top',
         icon: '🌿',
-        label: '09 — 배당통계',
+        label: '10 — 배당통계',
         title: '배당금 현황과 예정 배당을 추적하세요',
         body: '월별 배당 추이 차트와 종목별 배당금 목록을 제공합니다. 배당 주기를 자동 감지해 다음 예상 배당월과 예상 수령액을 미리 보여주는 \"예정 배당\" 기능이 있어요.',
         tip: '💡 배당 입력 시 \"세전 금액\" 체크하면 배당세(15.4%)가 자동 차감됩니다',
     },
     {
+        target: '.vtab[onclick*="moonlight"]',
+        arrow: 'top',
+        icon: '🌕',
+        label: '11 — 달빛정보',
+        title: '통합 밸류에이션 대시보드를 확인하세요',
+        body: '심리·리스크, 자금환경, 경기선행, 밸류에이션 4대 카테고리를 종합한 0~100점 시장 점수를 더 자세히 보여줍니다. 적극적·중립적·보수적 3가지 계산 모드를 선택하면 상단 시장 신호 점수에도 동일하게 반영돼요.',
+        tip: '💡 점수가 낮을수록 저평가(매수 유리), 높을수록 고평가(비중축소 경고) 구간이에요',
+    },
+    {
         target: '.btn-sm[onclick*="openMasterSettings"]',
         arrow: 'top',
         icon: '☁️',
-        label: '10 — 설정 & 백업',
+        label: '12 — 설정 & 백업',
         title: 'GitHub 백업과 화면 설정을 관리하세요',
-        body: '개인 GitHub 저장소를 연결하면 모든 기기에서 장부를 동기화할 수 있습니다. 수익/손실 색상 커스텀, 폰트 크기 조절, JSON/CSV 로컬 백업 등 다양한 설정을 제공해요.',
-        tip: '💡 \"자동 동기화\"를 켜면 거래 추가·수정 시 GitHub에 자동으로 저장됩니다',
+        body: '⚙️ 설정은 3개 탭으로 구성돼요. \"데이터 관리\"에서 GitHub 클라우드 동기화·JSON/CSV 백업·초기화를, \"화면 설정\"에서 폰트 크기·수익/손실 색상을, \"지표 설정\"에서 시장 신호 카드에 표시할 지표를 그룹/개별로 선택할 수 있습니다.',
+        tip: '💡 \"자동 동기화\"를 켜면 거래 추가·수정 시 GitHub에 자동으로 저장돼요',
     },
 ];
 
@@ -141,6 +159,15 @@ const PAGE_STEPS = {
             title: '태그로 종목을 그룹핑하고 필터링하세요',
             body: '종목 카드의 🏷️ 버튼으로 태그를 설정하면 (예: 2차전지, 배당용, 장기투자) 여기서 태그별로 필터링할 수 있어요. 여러 태그를 동시에 선택하면 OR 조건으로 필터링됩니다.',
             tip: '💡 태그는 포트폴리오 맵의 선택 모드에서도 활용할 수 있어요',
+        },
+        {
+            target: '#aiAdviceFab',
+            arrow: 'left',
+            icon: '🤖',
+            label: '전체보기 — AI 투자조언',
+            title: '내 자산 현황을 바탕으로 AI 의견을 받아보세요',
+            body: '우측 하단 버튼을 누르면 현재 시장 신호와 보유 포트폴리오를 함께 분석한 AI 투자조언을 받을 수 있어요. \"기록\" 버튼으로 이전에 받았던 조언들도 날짜별로 다시 볼 수 있습니다.',
+            tip: '⚠️ AI 조언은 참고용이며, 투자 판단과 책임은 본인에게 있어요',
         },
     ],
 
@@ -296,6 +323,27 @@ const PAGE_STEPS = {
             tip: '💡 배당 주기와 예상월은 과거 배당 이력을 기반으로 추정한 값입니다',
         },
     ],
+
+    moonlight: [
+        {
+            target: '#moonlightShadowHost',
+            arrow: 'top',
+            icon: '🌕',
+            label: '달빛정보 — 통합 밸류에이션',
+            title: '시장 전체의 저평가/고평가 상태를 진단하세요',
+            body: '심리·리스크(VIX·공포&탐욕 등), 자금환경(금리·달러·신용잔고), 경기선행(Russell·구리·BDI), 밸류에이션(버핏지수·CAPE PE) 4대 카테고리를 종합해 0~100점의 시장 신호 점수를 계산합니다.',
+            tip: '💡 0~30 적극 매수 · 30~50 분할 매수 · 50~70 관망 유지 · 70~100 비중 축소 구간이에요',
+        },
+        {
+            target: '#moonlightShadowHost',
+            arrow: 'top',
+            icon: '🌗',
+            label: '달빛정보 — 계산 모드',
+            title: '적극적·중립적·보수적 모드 중 선택하세요',
+            body: '지표별 가중치를 다르게 적용하는 3가지 계산 모드를 제공합니다. 여기서 모드를 바꾸면 전체보기 화면 상단의 \"시장 신호\" 종합 점수에도 동일한 모드가 함께 적용됩니다.',
+            tip: '💡 선택한 모드는 자동으로 저장되어 다음 접속 시에도 유지돼요',
+        },
+    ],
 };
 
 // ── 환영 모달 주입 ─────────────────────────────────────────
@@ -311,7 +359,7 @@ function injectWelcomeModal() {
         <p>
           국내·미국 주식 포트폴리오를 한 곳에서 관리하는
           <span class="highlight-text">스마트 주식 장부</span>입니다.<br>
-          10단계 가이드로 핵심 기능을 바로 익혀보세요!
+          ${STEPS.length}단계 가이드로 핵심 기능을 바로 익혀보세요!
         </p>
 
         <div class="tutorial-feature-grid">
@@ -326,6 +374,10 @@ function injectWelcomeModal() {
           <div class="tutorial-feature-item">
             <span class="feat-icon">💵</span>
             <span>실현수익 & <b>양도세 자동계산</b><br>배당통계 & 예정배당</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">🤖</span>
+            <span><b>AI 투자조언</b><br>& 🌕 달빛정보 밸류에이션</span>
           </div>
           <div class="tutorial-feature-item">
             <span class="feat-icon">☁️</span>
@@ -656,7 +708,7 @@ window.dontShowPageTutorial = function() {
 };
 
 window.resetPageTutorials = function() {
-    ['all','user1','user2','watch','history','realized','dividend'].forEach(v => {
+    ['all','user1','user2','watch','history','realized','dividend','moonlight'].forEach(v => {
         localStorage.removeItem(PAGE_DONE_PREFIX + v);
     });
     alert('모든 페이지 가이드가 초기화됐습니다. 각 탭을 방문하면 다시 표시됩니다.');
@@ -689,26 +741,22 @@ function injectRestartButton() {
 
     const sec = document.createElement('div');
     sec.className = 'settings-section tutorial-restart-section';
-    sec.style.cssText = 'margin-top:10px; margin-bottom:0;';
+    sec.style.cssText = 'margin-top:16px; margin-bottom:0;';
     sec.innerHTML = `
-      <div class="tutorial-restart-row">
-        <span class="settings-section-title">📡 주가</span>
-        <span id="marketDataLastUpdated"></span>
-        <button class="btn-restart-tutorial" onclick="forceMarketDataUpdate()">
-          <span>🔄</span> 최신화
+      <div class="settings-section-title">📡 주가 데이터</div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <span id="marketDataLastUpdated" style="font-size:12px; color:var(--text2);"></span>
+        <button class="btn-restart-tutorial" onclick="forceMarketDataUpdate()" style="margin:0;">
+          <span>🔄</span> 캐시 삭제 후 최신화
         </button>
       </div>
-      <div class="tutorial-restart-row">
-        <span class="settings-section-title">🎓 가이드</span>
-        <div class="tutorial-btn-group">
-          <button class="btn-restart-tutorial" onclick="restartTutorial()">
-            <span>🔁</span> 전체 다시 보기
-          </button>
-          <button class="btn-restart-tutorial" onclick="resetPageTutorials(); closeModal('masterSettingsOverlay');">
-            <span>📄</span> 페이지별 초기화
-          </button>
-        </div>
-      </div>
+      <div class="settings-section-title" style="margin-top:12px;">🎓 튜토리얼</div>
+      <button class="btn-restart-tutorial" onclick="restartTutorial()" style="margin-bottom:8px;">
+        <span>🔁</span> 전체 가이드 다시 보기
+      </button>
+      <button class="btn-restart-tutorial" onclick="resetPageTutorials(); closeModal('masterSettingsOverlay');">
+        <span>📄</span> 페이지별 가이드 초기화
+      </button>
     `;
     settingsModal.appendChild(sec);
     if (typeof updateLastSyncTimeDisplay === 'function') updateLastSyncTimeDisplay();
