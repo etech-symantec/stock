@@ -1,24 +1,13 @@
 /* ==========================================
    🚀 비행 계획 (Flight Plan) — Plus 프리미엄 전용 스타일
+   ------------------------------------------
+   예전 이름: 목표가 · 손절가 · 물타기 알림
+   🌕 도킹 지점 (구 목표가) · 🛸 비상 탈출 (구 손절가) · ⛽ 연료 보급 (구 물타기)
    ========================================== */
-
-/* 공통: PLUS 배지 — 우주선 관제창 느낌의 작은 라벨 */
-.fp-plus-badge {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #0d0f14;
-  background: linear-gradient(135deg, #c7b9ff, #7c6af7);
-  padding: 1px 5px;
-  border-radius: 4px;
-  margin-left: 6px;
-  vertical-align: middle;
-}
 
 /* ------------------------------------------
    🛰️ 알림 배너 - 유형별(도킹/탈출/연료) 그룹 카드
+   "통합 자산" 카드 위, 관제 화면처럼 은은한 별빛 배경
    ------------------------------------------ */
 .flight-plan-banner { display: none; flex-direction: row; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 .flight-plan-group {
@@ -54,42 +43,123 @@
 
 /* ------------------------------------------
    🚀 상세카드(차트 모달) 우측 - 비행 계획 설정 패널
+   고급스러운 우주 관제 콘솔 컨셉: 깊은 우주 그라디언트 + 은은한 별빛 + 네온 글로우
    ------------------------------------------ */
 .flight-plan-panel {
   width: 190px; flex-shrink: 0;
-  background: linear-gradient(160deg, var(--bg3) 0%, rgba(124,106,247,0.06) 100%);
-  border: 1px dashed var(--border2);
-  border-radius: 10px;
-  padding: 12px;
   position: relative;
+  overflow: hidden;
+  background-color: #1c1836;
+  background-image:
+    radial-gradient(1.6px 1.6px at 22px 20px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1.4px 1.4px at 150px 34px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.8px 1.8px at 100px 62px, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1.3px 1.3px at 40px 100px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.6px 1.6px at 168px 120px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1.4px 1.4px at 70px 160px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.8px 1.8px at 130px 195px, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1.3px 1.3px at 18px 220px, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1.6px 1.6px at 160px 250px, rgba(255,255,255,0.75), transparent),
+    linear-gradient(165deg, #171a2b 0%, #1c1836 55%, #241a3d 100%);
+  background-repeat: no-repeat;
+  border: 1px solid rgba(167,150,255,0.28);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow:
+    0 0 0 1px rgba(124,106,247,0.08) inset,
+    0 8px 24px rgba(0,0,0,0.35),
+    0 0 22px rgba(124,106,247,0.12);
 }
+/* 라이트 모드에서는 우주 배경이 과하지 않도록 톤을 살짝 눌러줍니다 */
+[data-theme="light"] .flight-plan-panel {
+  background-color: #2b2456;
+  background-image:
+    radial-gradient(1.6px 1.6px at 22px 20px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1.4px 1.4px at 150px 34px, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1.8px 1.8px at 100px 62px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1.3px 1.3px at 168px 120px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.6px 1.6px at 130px 195px, rgba(255,255,255,0.8), transparent),
+    linear-gradient(165deg, #232047 0%, #2b2456 55%, #33255e 100%);
+  background-repeat: no-repeat;
+  border-color: rgba(167,150,255,0.35);
+}
+
 .flight-plan-panel .fp-title {
-  font-size: 11px; font-weight: 700; color: var(--text2);
-  margin-bottom: 10px;
-  display: flex; align-items: center;
+  font-size: 12.5px; font-weight: 700;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+  letter-spacing: 0.2px;
+  background: linear-gradient(100deg, #e3ddff 0%, #b7a6ff 55%, #8f7dff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.flight-plan-panel .fp-field { margin-bottom: 10px; }
+.flight-plan-panel .fp-title-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,150,255,0.35) 0%, rgba(167,150,255,0.05) 70%);
+  filter: drop-shadow(0 0 4px rgba(167,150,255,0.6));
+  font-size: 12px;
+}
+
+.flight-plan-panel .fp-field { margin-bottom: 12px; }
 .flight-plan-panel .fp-label {
-  font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 4px;
-  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; color: #d8d3f5; font-weight: 600; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
 }
+.flight-plan-panel .fp-sublabel {
+  font-weight: 500; font-size: 10px; color: rgba(216,211,245,0.5);
+  margin-left: 1px;
+}
+.fp-icon-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  font-size: 10.5px; flex-shrink: 0;
+}
+.fp-icon-docking { background: radial-gradient(circle, rgba(0,197,120,0.35) 0%, rgba(0,197,120,0.08) 70%); filter: drop-shadow(0 0 3px rgba(0,197,120,0.55)); }
+.fp-icon-escape  { background: radial-gradient(circle, rgba(255,77,106,0.35) 0%, rgba(255,77,106,0.08) 70%); filter: drop-shadow(0 0 3px rgba(255,77,106,0.55)); }
+.fp-icon-fuel    { background: radial-gradient(circle, rgba(58,154,255,0.35) 0%, rgba(58,154,255,0.08) 70%); filter: drop-shadow(0 0 3px rgba(58,154,255,0.55)); }
+
 .flight-plan-panel input {
-  width: 100%; box-sizing: border-box; padding: 6px 7px; background: var(--bg);
-  border: 1px solid var(--border); border-radius: 6px; color: var(--text);
+  width: 100%; box-sizing: border-box; padding: 7px 8px;
+  background: rgba(10,10,20,0.35);
+  border: 1px solid rgba(167,150,255,0.2); border-radius: 7px;
+  color: #f1eeff;
   font-family: var(--font-mono); font-size: 11px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.flight-plan-panel input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-bg);
-}
+.flight-plan-panel input::placeholder { color: rgba(216,211,245,0.35); }
+.flight-plan-panel input:focus { outline: none; }
+.flight-plan-panel .fp-input-docking:focus { border-color: #00C578; box-shadow: 0 0 0 2px rgba(0,197,120,0.18); }
+.flight-plan-panel .fp-input-escape:focus  { border-color: #ff4d6a; box-shadow: 0 0 0 2px rgba(255,77,106,0.18); }
+.flight-plan-panel .fp-input-fuel:focus    { border-color: #3A9AFF; box-shadow: 0 0 0 2px rgba(58,154,255,0.18); }
+
 .flight-plan-panel .fp-fuel-row {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
-  padding: 4px 7px; margin-top: 4px; font-size: 11px;
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(10,10,20,0.35); border: 1px solid rgba(167,150,255,0.15); border-radius: 7px;
+  padding: 5px 8px; margin-top: 5px; font-size: 11px;
 }
-.flight-plan-panel .fp-fuel-empty { font-size: 10px; color: var(--text3); margin-top: 5px; }
-.flight-plan-panel .fp-add-btn { width: 100%; margin-top: 6px; }
+.fp-fuel-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: #3A9AFF; box-shadow: 0 0 5px rgba(58,154,255,0.85);
+}
+.fp-fuel-value { font-family: var(--font-mono); color: #f1eeff; flex: 1; }
+.fp-fuel-remove {
+  cursor: pointer; color: rgba(216,211,245,0.45); padding: 0 2px;
+  transition: color 0.15s ease;
+}
+.fp-fuel-remove:hover { color: #ff4d6a; }
+.flight-plan-panel .fp-fuel-empty { font-size: 10px; color: rgba(216,211,245,0.4); margin-top: 6px; }
+
+.flight-plan-panel .fp-add-btn {
+  width: 100%; margin-top: 7px;
+  background: linear-gradient(135deg, #8f7dff, #5f4fd6);
+  color: #fff; border: none; font-weight: 600;
+  box-shadow: 0 2px 10px rgba(124,106,247,0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.flight-plan-panel .fp-add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(124,106,247,0.5);
+}
 
 @media (max-width: 900px) {
   .flight-plan-panel { width: 100%; }
