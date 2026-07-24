@@ -294,7 +294,13 @@ function setListStyle(style) {
     render(); // 스타일 변경 즉시 화면 다시 그리기
 }
 
-function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function saveState() {
+    state._updatedAt = Date.now(); // 🌟 클라우드에 저장된 버전과 비교하기 위한 최신수정시각
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    // ☁️ saveState()가 호출되는 모든 곳(거래 · 비행 계획 · 탐사선 등)에서 자동 동기화 설정이 켜져 있으면
+    //    바로 클라우드에 반영되도록 합니다. (실제 전송은 triggerAutoSync 내부에서 살짝 디바운스됩니다)
+    if (typeof triggerAutoSync === 'function') triggerAutoSync();
+}
 
 function formatDate(dateStr) {
     if (!dateStr) return '';
@@ -1393,13 +1399,14 @@ async function getGithubFileSha(settings, path) {
   return null;
 }
 
-function updateSyncStatus(status) {
+function updateSyncStatus(status, customText) {
   const el = document.getElementById('syncStatus');
   const spinner = document.getElementById('syncSpinner');
   const text = document.getElementById('syncText');
+  if (!el || !spinner || !text) return;
   el.className = 'sync-status';
   if(status === 'syncing') {
-    spinner.style.display = 'block'; text.textContent = '클라우드 저장 중...';
+    spinner.style.display = 'block'; text.textContent = customText || '클라우드 저장 중...';
   } else if(status === 'success') {
     spinner.style.display = 'none';
     const now = new Date();
@@ -1407,10 +1414,10 @@ function updateSyncStatus(status) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     });
-    text.textContent = `✅ ${formatted} 저장됨`;
+    text.textContent = customText || `✅ ${formatted} 저장됨`;
     el.classList.add('active');
   } else if(status === 'error') {
-    spinner.style.display = 'none'; text.textContent = '❌ 동기화 실패'; el.classList.add('error');
+    spinner.style.display = 'none'; text.textContent = customText || '❌ 동기화 실패'; el.classList.add('error');
   } else {
     spinner.style.display = 'none'; text.textContent = '';
   }
@@ -1453,9 +1460,16 @@ async function pushToGithub(silent = false) {
   }
 }
 
+let _autoSyncDebounceTimer = null;
 function triggerAutoSync() {
   const s = getGhSettings();
-  if(s.autoSync && s.token) pushToGithub(true);
+  if(!(s.autoSync && s.token)) return;
+  // 🌥️ 짧은 시간 안에 여러 번 saveState()가 호출돼도(예: 연속 입력) 실제 전송은 한 번만 나가도록 살짝 지연시킵니다.
+  if (_autoSyncDebounceTimer) clearTimeout(_autoSyncDebounceTimer);
+  _autoSyncDebounceTimer = setTimeout(() => {
+    _autoSyncDebounceTimer = null;
+    pushToGithub(true);
+  }, 1200);
 }
 
 async function pullFromGithub(silent = false) {
@@ -1485,6 +1499,53 @@ async function pullFromGithub(silent = false) {
       } else if(!silent) alert('유효한 포트폴리오 파일이 아닙니다.');
     } else if(!silent) alert('저장소에 파일이 없습니다.');
   } catch(e) { if(!silent) alert('가져오기 실패'); }
+}
+
+// 🌥️ 페이지 접속 시, 클라우드(GitHub)에 이 브라우저보다 더 최신 데이터가 있는지 조용히 확인하고
+//    있으면 자동으로 받아와 반영합니다. (비행 계획·탐사선 포함, state 전체가 대상)
+//    - 로컬이 더 최신이거나 같으면 아무것도 하지 않습니다 (괜히 로컬의 아직 안 올라간 변경사항을 덮어쓰지 않기 위해)
+//    - 동기화 설정(user/repo/token)이 없으면 그냥 건너뜁니다
+async function checkCloudForUpdatesOnLoad() {
+  const s = getGhSettings();
+  if (!(s.user && s.repo && s.token)) return;
+
+  try {
+    updateSyncStatus('syncing', '☁️ 클라우드 데이터 확인 중...');
+    const path = 'data/my_portfolio.json';
+    const fileInfo = await getGithubFileSha({ user: s.user, repo: s.repo, token: s.token }, path);
+
+    if (!fileInfo || !fileInfo.content) { updateSyncStatus(''); return; }
+
+    const dataStr = b64_to_utf8(fileInfo.content);
+    const cloudData = JSON.parse(dataStr);
+    if (!(cloudData && cloudData.tickers && cloudData.transactions)) { updateSyncStatus(''); return; }
+
+    const cloudUpdatedAt = cloudData._updatedAt || 0;
+    const localUpdatedAt = state._updatedAt || 0;
+
+    if (cloudUpdatedAt > localUpdatedAt) {
+      // ☁️ 클라우드가 더 최신 → 로컬을 클라우드 데이터로 갱신 (다시 push하지 않도록 saveState() 대신 직접 저장)
+      state = cloudData;
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+      cachedMarketData = {};
+      updateOwnerLabels();
+      renderTxList();
+      render();
+      if (typeof updateFlightPlanBanner === 'function') updateFlightPlanBanner();
+      if (typeof renderProbeCollectionPanel === 'function') renderProbeCollectionPanel();
+
+      const formatted = new Date().toLocaleString('ko-KR', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      });
+      updateSyncStatus('success', `✅ ${formatted} 클라우드 최신 데이터로 업데이트됨`);
+    } else {
+      updateSyncStatus('');
+    }
+  } catch (e) {
+    console.error('클라우드 동기화 확인 실패:', e);
+    updateSyncStatus('error', '❌ 클라우드 확인 실패');
+  }
 }
 
 // ==========================================
@@ -6335,11 +6396,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. 종목 DB 로드 완료를 기다린 후 화면 그리기
   await loadStockDB();
 
-  // 3. UI 업데이트 및 첫 화면 렌더링
+  // 3. UI 업데이트 및 첫 화면 렌더링 (일단 로컬 데이터로 먼저 그려서 빠르게 화면을 보여줍니다)
   updateOwnerLabels();
   renderTxList();
   render(); 
-  
+
+  // 3-1. ☁️ 클라우드에 더 최신 데이터가 있는지 조용히 확인하고, 있으면 반영합니다.
+  //      (동기화 설정이 안 되어 있으면 내부에서 바로 건너뜁니다)
+  checkCloudForUpdatesOnLoad();
+
   // 4. 자동 동기화 설정 적용
   const ghAutoSyncCheckbox = document.getElementById('ghAutoSync');
   if (ghAutoSyncCheckbox) {
