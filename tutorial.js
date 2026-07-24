@@ -22,6 +22,7 @@ function $(sel) { return document.querySelector(sel); }
 const STEPS = [
     {
         target: 'nav',
+        view: 'all',
         arrow: 'top',
         icon: '🗺️',
         label: '01 — 네비게이션',
@@ -31,6 +32,7 @@ const STEPS = [
     },
     {
         target: '#sidebar',
+        view: 'all',
         arrow: 'left',
         icon: '✏️',
         label: '02 — 거래 장부',
@@ -40,6 +42,7 @@ const STEPS = [
     },
     {
         target: '#marketSignalBar',
+        view: 'all',
         arrow: 'top',
         icon: '📡',
         label: '03 — 시장 신호 분석',
@@ -49,6 +52,7 @@ const STEPS = [
     },
     {
         target: '#dashboardTopWrapper',
+        view: 'all',
         arrow: 'top',
         icon: '📊',
         label: '04 — 통합 자산 패널',
@@ -58,6 +62,7 @@ const STEPS = [
     },
     {
         target: '#allocationTreemap',
+        view: 'all',
         arrow: 'top',
         icon: '🗺️',
         label: '05 — 포트폴리오 맵',
@@ -67,6 +72,7 @@ const STEPS = [
     },
     {
         target: '#portfolioChartWrapper',
+        view: 'all',
         arrow: 'bottom',
         icon: '📈',
         label: '06 — 자산 성장 추이',
@@ -76,6 +82,7 @@ const STEPS = [
     },
     {
         target: '#aiAdviceFab',
+        view: 'all',
         arrow: 'left',
         icon: '🤖',
         label: '07 — AI 투자조언',
@@ -84,7 +91,9 @@ const STEPS = [
         tip: '⚠️ AI 조언은 투자 참고용이며, 최종 투자 판단과 책임은 본인에게 있어요',
     },
     {
-        target: '.vtab[onclick*="history"]',
+        target: '#historyControlsBox',
+        view: 'history',
+        navSelector: '.vtab[onclick*="history"]',
         arrow: 'top',
         icon: '📜',
         label: '08 — 거래 내역',
@@ -93,7 +102,9 @@ const STEPS = [
         tip: '💡 각 행의 소유자를 클릭해 바로 변경하거나, 체크박스로 선택 후 일괄 삭제할 수 있어요',
     },
     {
-        target: '.vtab[onclick*="realized"]',
+        target: '#realStatBanner',
+        view: 'realized',
+        navSelector: '.vtab[onclick*="realized"]',
         arrow: 'top',
         icon: '💵',
         label: '09 — 실현수익',
@@ -102,7 +113,9 @@ const STEPS = [
         tip: '💡 랭킹 항목을 클릭하면 해당 종목의 거래 내역만 필터링됩니다',
     },
     {
-        target: '.vtab[onclick*="dividend"]',
+        target: '#divStatBanner',
+        view: 'dividend',
+        navSelector: '.vtab[onclick*="dividend"]',
         arrow: 'top',
         icon: '🌿',
         label: '10 — 배당통계',
@@ -111,7 +124,9 @@ const STEPS = [
         tip: '💡 배당 입력 시 \"세전 금액\" 체크하면 배당세(15.4%)가 자동 차감됩니다',
     },
     {
-        target: '.vtab[onclick*="moonlight"]',
+        target: '#moonlightShadowHost',
+        view: 'moonlight',
+        navSelector: '.vtab[onclick*="moonlight"]',
         arrow: 'top',
         icon: '🌕',
         label: '11 — 달빛정보',
@@ -121,6 +136,7 @@ const STEPS = [
     },
     {
         target: '.btn-sm[onclick*="openMasterSettings"]',
+        view: 'all',
         arrow: 'top',
         icon: '☁️',
         label: '12 — 설정 & 백업',
@@ -500,8 +516,30 @@ function positionTooltip(targetRect, arrow) {
     tt.style.left = `${left}px`;
 }
 
+// ── 뷰 전환 헬퍼 (스텝에 view가 지정되어 있으면 해당 화면으로 자동 이동) ──
+function ensureStepView(step, callback) {
+    const targetView = step && step.view;
+    if (!targetView || typeof setView !== 'function') { callback(); return; }
+
+    const nowView = (typeof currentView !== 'undefined') ? currentView : null;
+    if (nowView === targetView) { callback(); return; }
+
+    try {
+        const navBtn = step.navSelector ? $(step.navSelector) : null;
+        setView(targetView, navBtn);
+    } catch (e) { /* 화면 전환 실패 시에도 가이드는 계속 진행 */ }
+
+    // 화면이 바뀐 뒤 대시보드가 그려질 시간을 잠깐 기다립니다
+    // (달빛정보는 비동기로 콘텐츠를 불러오므로 조금 더 여유를 둡니다)
+    setTimeout(callback, targetView === 'moonlight' ? 450 : 150);
+}
+
 // ── 메인 튜토리얼 스텝 렌더 ───────────────────────────────
 function renderStep(idx) {
+    ensureStepView(STEPS[idx], () => paintStep(idx));
+}
+
+function paintStep(idx) {
     const step = STEPS[idx];
     const total = STEPS.length;
 
