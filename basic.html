@@ -1113,7 +1113,6 @@
     <div style="display:flex; border-bottom:1px solid var(--border); padding: 0 20px; flex-shrink: 0;">
       <button id="tabBtnData" onclick="switchSettingsTab('data')" style="flex:1; padding:10px; font-size:14px; font-weight:700; background:transparent; border:none; border-bottom:2px solid var(--accent); color:var(--text); cursor:pointer; transition:0.2s;">💾 데이터 관리</button>
       <button id="tabBtnDisplay" onclick="switchSettingsTab('display')" style="flex:1; padding:10px; font-size:14px; font-weight:700; background:transparent; border:none; border-bottom:2px solid transparent; color:var(--text2); cursor:pointer; transition:0.2s;">🎨 화면 설정</button>
-      <button id="tabBtnSignal" onclick="switchSettingsTab('signal')" style="flex:1; padding:10px; font-size:14px; font-weight:700; background:transparent; border:none; border-bottom:2px solid transparent; color:var(--text2); cursor:pointer; transition:0.2s;">📡 지표 설정</button>
     </div>
 
     <!-- 📌 콘텐츠 영역 (스크롤 가능) -->
@@ -1226,88 +1225,6 @@
 
       </div><!-- /settingsTabDisplay -->
 
-      <!-- ========================================== -->
-      <!-- 탭 3: Market Signal 지표 설정 -->
-      <!-- ========================================== -->
-      <div id="settingsTabSignal" style="display: none;">
-        <div class="settings-section" style="margin-top:0;">
-          <div class="settings-section-title">📡 Market Signal 표시 관리</div>
-          <div class="signal-settings-intro">
-            통합 대시보드 상단의 지표 그룹 또는 개별 지표를 숨기거나 다시 표시할 수 있습니다.
-            설정값은 자동 저장되며 다음 접속 시에도 유지됩니다.
-          </div>
-          <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
-            <button type="button" class="btn-sm" onclick="resetMarketSignalVisibility()" style="font-size:11px;">전체 다시 표시</button>
-          </div>
-
-          <div class="signal-settings-grid">
-            <div class="signal-settings-group signal-risk-box">
-              <label class="signal-toggle-row">
-                <input type="checkbox" id="sig-group-risk" onchange="toggleSignalGroupVisibility('risk', this.checked)">
-                <span>
-                  <b>🔥 심리 · 리스크</b>
-                  <small>시장 공포와 신용 스트레스</small>
-                </span>
-              </label>
-              <div class="signal-indicator-grid">
-                <label class="signal-check"><input type="checkbox" id="sig-ind-vix" onchange="toggleSignalIndicatorVisibility('vix', this.checked)"><span>VIX</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-move" onchange="toggleSignalIndicatorVisibility('move', this.checked)"><span>MOVE</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-hy" onchange="toggleSignalIndicatorVisibility('hy', this.checked)"><span>하이일드</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-fg" onchange="toggleSignalIndicatorVisibility('fg', this.checked)"><span>공포 & 탐욕</span></label>
-              </div>
-            </div>
-
-            <div class="signal-settings-group signal-valuation-box">
-              <label class="signal-toggle-row">
-                <input type="checkbox" id="sig-group-valuation" onchange="toggleSignalGroupVisibility('valuation', this.checked)">
-                <span>
-                  <b>📐 밸류에이션</b>
-                  <small>장기 가격 부담도</small>
-                </span>
-              </label>
-              <div class="signal-indicator-grid">
-                <label class="signal-check"><input type="checkbox" id="sig-ind-buffett" onchange="toggleSignalIndicatorVisibility('buffett', this.checked)"><span>버핏 지수(미)</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-buffett-kr" onchange="toggleSignalIndicatorVisibility('buffett-kr', this.checked)"><span>버핏 지수(한)</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-cape" onchange="toggleSignalIndicatorVisibility('cape', this.checked)"><span>CAPE PE</span></label>
-              </div>
-            </div>
-
-            <div class="signal-settings-group signal-cycle-box">
-              <label class="signal-toggle-row">
-                <input type="checkbox" id="sig-group-cycle" onchange="toggleSignalGroupVisibility('cycle', this.checked)">
-                <span>
-                  <b>📦 경기 선행</b>
-                  <small>실물 수요와 경기 민감도</small>
-                </span>
-              </label>
-              <div class="signal-indicator-grid">
-                <label class="signal-check"><input type="checkbox" id="sig-ind-russell" onchange="toggleSignalIndicatorVisibility('russell', this.checked)"><span>Russell 2000</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-copper" onchange="toggleSignalIndicatorVisibility('copper', this.checked)"><span>구리 가격</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-bdi" onchange="toggleSignalIndicatorVisibility('bdi', this.checked)"><span>BDI</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-krexport" onchange="toggleSignalIndicatorVisibility('krexport', this.checked)"><span>한국 수출</span></label>
-              </div>
-            </div>
-
-            <div class="signal-settings-group signal-liquidity-box">
-              <label class="signal-toggle-row">
-                <input type="checkbox" id="sig-group-liquidity" onchange="toggleSignalGroupVisibility('liquidity', this.checked)">
-                <span>
-                  <b>💧 자금 환경</b>
-                  <small>금리 · 달러 · 레버리지</small>
-                </span>
-              </label>
-              <div class="signal-indicator-grid">
-                <label class="signal-check"><input type="checkbox" id="sig-ind-us10y" onchange="toggleSignalIndicatorVisibility('us10y', this.checked)"><span>미국 10Y</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-dxy" onchange="toggleSignalIndicatorVisibility('dxy', this.checked)"><span>DXY</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-usdkrw" onchange="toggleSignalIndicatorVisibility('usdkrw', this.checked)"><span>USD/KRW</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-margin-us" onchange="toggleSignalIndicatorVisibility('margin-us', this.checked)"><span>신용잔고(미)</span></label>
-                <label class="signal-check"><input type="checkbox" id="sig-ind-margin-kr" onchange="toggleSignalIndicatorVisibility('margin-kr', this.checked)"><span>신용잔고(한)</span></label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /settingsTabSignal -->
-    </div><!-- /스크롤 콘텐츠 영역 -->
   </div>
 </div>
 
@@ -1471,18 +1388,6 @@
 <script src="tutorial.js"></script>
 
 <script>
-  // 📡 Market Signal 관련 함수는 /plus/market-signal.js(Plus 전용, index.html에만 로드됨)에 정의되어 있습니다.
-  // basic.html에는 해당 스크립트가 없지만 "지표 설정" 탭 UI는 남아있어 호출 시 에러가 나므로, 없을 때만 안전한 빈 함수로 대체합니다.
-  if (typeof window.resetMarketSignalVisibility !== 'function') {
-    window.resetMarketSignalVisibility = function () {};
-  }
-  if (typeof window.toggleSignalGroupVisibility !== 'function') {
-    window.toggleSignalGroupVisibility = function () {};
-  }
-  if (typeof window.toggleSignalIndicatorVisibility !== 'function') {
-    window.toggleSignalIndicatorVisibility = function () {};
-  }
-
   // ✨ Plus 잠금 버튼(달빛정보 탭, 탐사선 FAB) 클릭 시 안내 모달 표시
   function openPlusTeaser() {
     const el = document.getElementById('plusTeaserOverlay');
