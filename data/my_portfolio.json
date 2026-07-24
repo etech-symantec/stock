@@ -9800,7 +9800,7 @@
       "txType": "trade"
     }
   ],
-  "range": "6m",
+  "range": "1y",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
@@ -9985,15 +9985,52 @@
       "buyPrice": 81.55999755859375,
       "buyDate": "2026-07-18",
       "isKr": false
+    },
+    {
+      "id": "probe_1784791382840",
+      "symbol": "347700.KQ",
+      "name": "스피어",
+      "qty": 1,
+      "buyPrice": 18530,
+      "buyDate": "2026-07-23",
+      "isKr": true
     }
   ],
-  "priceAlerts": {
+  "flightPlans": {
     "005930.KS": {
-      "targetPrice": 261000,
-      "stopLossPrice": 100000,
-      "averagingPrice": 150000,
-      "proximity": 4,
-      "updatedAt": "2026-07-22T14:44:16.012Z"
+      "docking": 400000,
+      "escape": 350000,
+      "fuel": [
+        222222
+      ]
+    },
+    "AAPL": {
+      "docking": 326,
+      "escape": 300,
+      "fuel": [
+        315
+      ]
+    },
+    "005935.KS": {
+      "docking": null,
+      "escape": null,
+      "fuel": []
+    },
+    "396500.KS": {
+      "docking": 39000,
+      "escape": 37000,
+      "fuel": []
+    },
+    "SMR": {
+      "docking": null,
+      "escape": null,
+      "fuel": []
+    },
+    "347700.KQ": {
+      "docking": null,
+      "escape": null,
+      "fuel": []
     }
-  }
+  },
+  "_updatedAt": 1784862538122
 }
