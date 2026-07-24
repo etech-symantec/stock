@@ -426,6 +426,7 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
   }
 
   // 🛰️ 탐사선 발사 지점 마커 (매수/매도 마커를 숨긴 경우에도 항상 표시)
+  let probeLineValue = null; // 🛰️ 탐사선 발사가 기준 점선(가로선) 표시용
   if (!mini && symbol && state.probes) {
     const probeEntry = state.probes.find(pr => pr.symbol === symbol);
     if (probeEntry && displayRawDates.length) {
@@ -450,6 +451,9 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
           });
         }
       }
+      // 🛰️ 발사가 기준 가로 점선은 발사일이 현재 표시 기간보다 이전이어도(과거 발사) 계속 표시해서
+      //    현재가와의 등락을 그래프 전체에서 바로 비교할 수 있게 합니다.
+      probeLineValue = probeEntry.buyPrice;
     }
   }
 
@@ -475,6 +479,27 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
         }
       };
     });
+  }
+
+  // 🛰️ 탐사선 발사가 기준 얇은 점선 (그래프 전체를 가로질러 등락을 명확히 비교할 수 있도록 표시)
+  if (!mini && probeLineValue !== null) {
+    annotationsObj.probeLine = {
+      type: 'line',
+      yMin: probeLineValue, yMax: probeLineValue,
+      borderColor: 'rgba(148, 163, 184, 0.75)',
+      borderWidth: 1,
+      borderDash: [3, 3],
+      label: {
+        display: true,
+        content: `🛰️ ${formatPrice(probeLineValue, symbol)}`,
+        position: 'start',
+        backgroundColor: 'rgba(148, 163, 184, 0.85)',
+        color: '#fff',
+        font: { size: 9, weight: '600' },
+        padding: { top: 1, bottom: 1, left: 5, right: 5 },
+        borderRadius: 3
+      }
+    };
   }
 
   return new Chart(canvas, {
