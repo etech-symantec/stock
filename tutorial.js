@@ -736,29 +736,31 @@ function finishTutorial() {
 
 // ── 설정 모달에 재시작 버튼 주입 ──────────────────────────
 function injectRestartButton() {
-    const settingsModal = $('#masterSettingsOverlay .modal');
-    if (!settingsModal || settingsModal.querySelector('.tutorial-restart-section')) return;
+    const container = $('#settingsTabData');
+    if (!container || container.querySelector('.tutorial-restart-section')) return;
 
     const sec = document.createElement('div');
-    sec.className = 'settings-section tutorial-restart-section';
-    sec.style.cssText = 'margin-top:16px; margin-bottom:0;';
+    sec.className = 'tutorial-restart-section';
+    sec.style.cssText = 'display:flex; flex-wrap:wrap; gap:14px; align-items:stretch; margin-top:14px;';
     sec.innerHTML = `
-      <div class="settings-section-title">📡 주가 데이터</div>
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-        <span id="marketDataLastUpdated" style="font-size:12px; color:var(--text2);"></span>
-        <button class="btn-restart-tutorial" onclick="forceMarketDataUpdate()" style="margin:0;">
-          <span>🔄</span> 캐시 삭제 후 최신화
-        </button>
+      <div class="settings-section" style="flex:1 1 200px; margin:0;">
+        <div class="settings-section-title">📡 주가 데이터</div>
+        <div class="settings-hint" style="margin-bottom:10px;">시세 캐시를 지우고 최신 가격을 다시 받아옵니다.</div>
+        <div id="marketDataLastUpdated" style="font-size:11px; color:var(--text2); margin-bottom:10px;"></div>
+        <div class="settings-action-grid" style="grid-template-columns:1fr;">
+          <button class="settings-action-btn settings-action-btn-accent" onclick="forceMarketDataUpdate()"><span>🔄</span>캐시 삭제 후 최신화</button>
+        </div>
       </div>
-      <div class="settings-section-title" style="margin-top:12px;">🎓 튜토리얼</div>
-      <button class="btn-restart-tutorial" onclick="restartTutorial()" style="margin-bottom:8px;">
-        <span>🔁</span> 전체 가이드 다시 보기
-      </button>
-      <button class="btn-restart-tutorial" onclick="resetPageTutorials(); closeModal('masterSettingsOverlay');">
-        <span>📄</span> 페이지별 가이드 초기화
-      </button>
+      <div class="settings-section" style="flex:1 1 200px; margin:0;">
+        <div class="settings-section-title">🎓 튜토리얼</div>
+        <div class="settings-hint" style="margin-bottom:10px;">전체 가이드를 다시 보거나, 페이지별 안내를 초기화합니다.</div>
+        <div class="settings-action-grid" style="grid-template-columns:1fr;">
+          <button class="settings-action-btn" onclick="restartTutorial()"><span>🔁</span>전체 가이드 다시 보기</button>
+          <button class="settings-action-btn" onclick="resetPageTutorials(); closeModal('masterSettingsOverlay');"><span>📄</span>페이지별 가이드 초기화</button>
+        </div>
+      </div>
     `;
-    settingsModal.appendChild(sec);
+    container.appendChild(sec);
     if (typeof updateLastSyncTimeDisplay === 'function') updateLastSyncTimeDisplay();
 }
 
