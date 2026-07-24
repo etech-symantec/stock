@@ -9800,7 +9800,7 @@
       "txType": "trade"
     }
   ],
-  "range": "1y",
+  "range": "1w",
   "ownerNames": {
     "user1": "끄니",
     "user2": "미니"
@@ -10030,5 +10030,5 @@
       "fuel": []
     }
   },
-  "_updatedAt": 1784864162164
+  "_updatedAt": 1784877070280
 }
