@@ -48,16 +48,19 @@
     transition: transform 0.2s, opacity 0.2s;
   }
   .probe-fab-locked:hover { transform: scale(1.05); opacity: 0.85; }
-  .plus-teaser-icon-row { display: flex; flex-wrap: wrap; gap: 14px; margin: 16px 0; }
+  .plus-teaser-icon-row { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
   .plus-teaser-item {
-    flex: 1 1 130px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     background: var(--bg3);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 14px;
-    text-align: center;
+    padding: 12px 14px;
+    text-align: left;
   }
-  .plus-teaser-item .icon { font-size: 24px; margin-bottom: 6px; }
+  .plus-teaser-item .icon { font-size: 22px; flex-shrink: 0; }
+  .plus-teaser-item .text-wrap { flex: 1; min-width: 0; }
   .plus-teaser-item .title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
   .plus-teaser-item .desc { font-size: 11px; color: var(--text3); line-height: 1.4; }
 
@@ -89,8 +92,7 @@
   .flight-plan-panel-locked .fppl-desc { font-size: 11px; color: var(--text3); line-height: 1.5; }
   @media (max-width: 900px) { .flight-plan-panel-locked { width: 100%; } }
 
-  /* 🤖 AI 투자조언 — Plus 잠금 플로팅 버튼 (탐사선 잠금 버튼과 겹치지 않도록 위쪽에 배치) */
-  .ai-advice-fab-locked { bottom: 92px !important; }
+  /* 🤖 AI 투자조언 — Plus 잠금 플로팅 버튼 (탐사선 잠금 버튼과 동일한 위치에 배치) */
 </style>
 </head>
 <body>
@@ -543,8 +545,8 @@
      <!-- 🚀 탐사선 띄우기 — Plus 전용 기능 힌트 -->
      <button id="probeFabBtn" class="probe-fab-locked" style="display:none;" onclick="openPlusTeaser()" title="Plus 전용 기능입니다">🔒 탐사선 띄우기 <span class="plus-badge">PLUS</span></button>
 
-     <!-- 🤖 AI 투자조언 — Plus 전용 기능 힌트 (탐사선 버튼 위에 겹치지 않게 배치, 항상 노출) -->
-     <button id="aiAdviceFabLocked" class="probe-fab-locked ai-advice-fab-locked" onclick="openPlusTeaser()" title="Plus 전용 기능입니다">🔒 AI 투자조언 <span class="plus-badge">PLUS</span></button>
+     <!-- 🤖 AI 투자조언 — Plus 전용 기능 힌트 (탐사선 버튼과 동일 위치, 전체보기/소유자1/소유자2 페이지에서만 노출) -->
+     <button id="aiAdviceFabLocked" class="probe-fab-locked" style="display:none;" onclick="openPlusTeaser()" title="Plus 전용 기능입니다">🔒 AI 투자조언 <span class="plus-badge">PLUS</span></button>
 
 
     <div id="dividendDashboard" class="dashboard-page" style="display:none;">
@@ -1430,24 +1432,32 @@
     <div style="font-size:12px; color:var(--text3); margin-bottom:4px;">Plus로 업그레이드하면 아래 기능을 사용할 수 있어요.</div>
     <div class="plus-teaser-icon-row">
       <div class="plus-teaser-item">
-        <div class="icon">🚀</div>
-        <div class="title">탐사선 띄우기</div>
-        <div class="desc">관심종목을 가상으로 매수해보고<br>가상 손익·그래프를 추적</div>
-      </div>
-      <div class="plus-teaser-item">
         <div class="icon">🌕</div>
-        <div class="title">달빛정보</div>
-        <div class="desc">시장 밸류에이션 종합 신호로<br>매수 타이밍을 점검</div>
-      </div>
-      <div class="plus-teaser-item">
-        <div class="icon">🚀</div>
-        <div class="title">비행 계획</div>
-        <div class="desc">도킹 지점·비상 탈출·연료 보급<br>지점 근접 시 알림</div>
+        <div class="text-wrap">
+          <div class="title">달빛정보</div>
+          <div class="desc">시장 밸류에이션 종합 신호로 매수 타이밍을 점검</div>
+        </div>
       </div>
       <div class="plus-teaser-item">
         <div class="icon">🤖</div>
-        <div class="title">AI 투자조언</div>
-        <div class="desc">내 포트폴리오를 분석해<br>맞춤 투자 조언 제공</div>
+        <div class="text-wrap">
+          <div class="title">AI 투자조언</div>
+          <div class="desc">내 포트폴리오를 분석해 맞춤 투자 조언 제공</div>
+        </div>
+      </div>
+      <div class="plus-teaser-item">
+        <div class="icon">🛰️</div>
+        <div class="text-wrap">
+          <div class="title">탐사선 띄우기</div>
+          <div class="desc">관심종목을 가상으로 매수해보고 가상 손익·그래프를 추적</div>
+        </div>
+      </div>
+      <div class="plus-teaser-item">
+        <div class="icon">🚀</div>
+        <div class="text-wrap">
+          <div class="title">비행 계획</div>
+          <div class="desc">도킹 지점·비상 탈출·연료 보급 지점 근접 시 알림</div>
+        </div>
       </div>
     </div>
     <button class="btn-sm" style="width:100%; justify-content:center; background:linear-gradient(135deg,#7c6af7,#4d9fff); color:#fff; border:none;"
@@ -1461,6 +1471,25 @@
     const el = document.getElementById('plusTeaserOverlay');
     if (el) el.classList.add('open');
   }
+
+  // 🤖 AI 투자조언 잠금 버튼 노출 여부: 전체보기 / 소유자1 / 소유자2 탭에서만
+  function updateAiAdviceFabLockedVisibility() {
+    const fab = document.getElementById('aiAdviceFabLocked');
+    if (!fab) return;
+    const show = (typeof currentView !== 'undefined') &&
+      (currentView === 'all' || currentView === 'user1' || currentView === 'user2');
+    fab.style.display = show ? 'flex' : 'none';
+  }
+
+  // setView는 app.js에 정의된 전역 함수 → 뷰 전환 시점마다 노출 여부 함께 갱신
+  const _origSetViewForAiAdviceLocked = window.setView;
+  if (typeof _origSetViewForAiAdviceLocked === 'function') {
+    window.setView = function (view, el) {
+      _origSetViewForAiAdviceLocked(view, el);
+      updateAiAdviceFabLockedVisibility();
+    };
+  }
+  document.addEventListener('DOMContentLoaded', () => setTimeout(updateAiAdviceFabLockedVisibility, 300));
 </script>
 
 <script src="app.js"></script>
