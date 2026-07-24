@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+<rect x="0" y="0" width="1440" height="900" rx="0" fill="#0d0f14" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="28" y="24" width="1384" height="852" rx="26" fill="#0f1219" stroke="#242a39" stroke-width="1" opacity="1"/>
+<rect x="28" y="24" width="1384" height="76" rx="26" fill="#151923" stroke="#242a39" stroke-width="1" opacity="1"/>
+<circle cx="58" cy="62" r="7" fill="#ff4d6a" stroke="none" stroke-width="0" opacity="1"/>
+<circle cx="80" cy="62" r="7" fill="#ffb703" stroke="none" stroke-width="0" opacity="1"/>
+<circle cx="102" cy="62" r="7" fill="#00c87a" stroke="none" stroke-width="0" opacity="1"/>
+<text x="132" y="69" font-family="Noto Sans KR, Arial, sans-serif" font-size="24" fill="#e8eaf0" font-weight="700" text-anchor="start" opacity="1">Two the Moon</text>
+<text x="1386" y="67" font-family="Space Mono, monospace" font-size="14" fill="#00c87a" font-weight="700" text-anchor="end" opacity="1">● LIVE PORTFOLIO</text>
+<rect x="410" y="45" width="86" height="38" rx="12" fill="#252a3a" stroke="#7c6af7" stroke-width="1" opacity="1"/>
+<text x="453.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#e8eaf0" font-weight="700" text-anchor="middle" opacity="1">전체보기</text>
+<text x="547.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">소유자별</text>
+<text x="641.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">관심종목</text>
+<text x="735.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">거래내역</text>
+<text x="829.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">실현수익</text>
+<text x="923.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">배당통계</text>
+<text x="1017.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">달빛정보</text>
+<text x="54" y="140" font-family="Noto Sans KR, Arial, sans-serif" font-size="38" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">거래 장부</text>
+<text x="54" y="174" font-family="Noto Sans KR, Arial, sans-serif" font-size="16" fill="#8890a4" font-weight="400" text-anchor="start" opacity="1">매수·매도·배당·계좌 이동·주식 분할을 한 곳에서 기록</text>
+<rect x="54" y="212" width="420" height="632" rx="18" fill="#141720" stroke="#292f40" stroke-width="1" opacity="1"/>
+<text x="78" y="246" font-family="Noto Sans KR, Arial, sans-serif" font-size="18" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">✏️ 거래 장부</text>
+<text x="450" y="246" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="600" text-anchor="end" opacity="1">🏆 평가 자산 랭킹</text>
+<text x="78" y="282" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="600" text-anchor="start" opacity="1">소유자</text>
+<rect x="78" y="294" width="178" height="42" rx="10" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<rect x="82" y="298" width="84" height="34" rx="8" fill="#7c6af7" stroke="none" stroke-width="1" opacity="1"/>
+<text x="124" y="320" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="white" font-weight="700" text-anchor="middle" opacity="1">👤 희찬</text>
+<text x="211" y="320" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="600" text-anchor="middle" opacity="1">👤 가족</text>
+<text x="278" y="282" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="600" text-anchor="start" opacity="1">거래 유형</text>
+<rect x="278" y="294" width="172" height="42" rx="10" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<rect x="282" y="298" width="51" height="34" rx="8" fill="#351c28" stroke="#ff4d6a" stroke-width="1" opacity="1"/>
+<text x="307" y="320" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#ff4d6a" font-weight="700" text-anchor="middle" opacity="1">매수</text>
+<text x="362" y="320" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">매도</text>
+<text x="417" y="320" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">배당</text>
+<text x="78" y="372" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="600" text-anchor="start" opacity="1">발생 일자</text>
+<rect x="78" y="382" width="372" height="46" rx="10" fill="#1c2030" stroke="#343b50" stroke-width="1" opacity="1"/>
+<text x="94" y="412" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="600" text-anchor="start" opacity="1">2026-07-24</text>
+<text x="78" y="450" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="600" text-anchor="start" opacity="1">종목</text>
+<rect x="78" y="460" width="372" height="46" rx="10" fill="#1c2030" stroke="#343b50" stroke-width="1" opacity="1"/>
+<text x="94" y="490" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="600" text-anchor="start" opacity="1">AAPL · Apple Inc.</text>
+<text x="78" y="528" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="600" text-anchor="start" opacity="1">수량</text>
+<rect x="78" y="538" width="372" height="46" rx="10" fill="#1c2030" stroke="#343b50" stroke-width="1" opacity="1"/>
+<text x="94" y="568" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="600" text-anchor="start" opacity="1">10</text>
+<text x="78" y="606" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="600" text-anchor="start" opacity="1">단가</text>
+<rect x="78" y="616" width="372" height="46" rx="10" fill="#1c2030" stroke="#343b50" stroke-width="1" opacity="1"/>
+<text x="94" y="646" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="600" text-anchor="start" opacity="1">₩ 285,000</text>
+<text x="78" y="684" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="600" text-anchor="start" opacity="1">계좌명</text>
+<rect x="78" y="694" width="372" height="46" rx="10" fill="#1c2030" stroke="#343b50" stroke-width="1" opacity="1"/>
+<text x="94" y="724" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="600" text-anchor="start" opacity="1">키움증권</text>
+<rect x="78" y="764" width="372" height="52" rx="12" fill="#7c6af7" stroke="none" stroke-width="1" opacity="1"/>
+<text x="264" y="797" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="white" font-weight="800" text-anchor="middle" opacity="1">내역 추가하기</text>
+<rect x="500" y="212" width="886" height="632" rx="18" fill="#141720" stroke="#292f40" stroke-width="1" opacity="1"/>
+<text x="524" y="246" font-family="Noto Sans KR, Arial, sans-serif" font-size="18" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">최근 거래 내역</text>
+<rect x="524" y="292" width="838" height="62" rx="12" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<text x="544" y="318" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="Space Mono, monospace" opacity="1">07.24</text>
+<rect x="608" y="306" width="58" height="32" rx="16" fill="#ff4d6a22" stroke="#ff4d6a" stroke-width="1" opacity="1"/>
+<text x="637" y="327" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#ff4d6a" font-weight="800" text-anchor="middle" opacity="1">매수</text>
+<text x="688" y="318" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">AAPL</text>
+<text x="688" y="339" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="500" text-anchor="start" opacity="1">10주</text>
+<text x="1338" y="328" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#e8eaf0" font-weight="700" text-anchor="end" opacity="1">₩2,850,000</text>
+<rect x="524" y="370" width="838" height="62" rx="12" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<text x="544" y="396" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="Space Mono, monospace" opacity="1">07.23</text>
+<rect x="608" y="384" width="58" height="32" rx="16" fill="#00c87a22" stroke="#00c87a" stroke-width="1" opacity="1"/>
+<text x="637" y="405" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#00c87a" font-weight="800" text-anchor="middle" opacity="1">배당</text>
+<text x="688" y="396" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">MSFT</text>
+<text x="688" y="417" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="500" text-anchor="start" opacity="1">—</text>
+<text x="1338" y="406" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#e8eaf0" font-weight="700" text-anchor="end" opacity="1">₩48,320</text>
+<rect x="524" y="448" width="838" height="62" rx="12" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<text x="544" y="474" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="Space Mono, monospace" opacity="1">07.22</text>
+<rect x="608" y="462" width="58" height="32" rx="16" fill="#4d9fff22" stroke="#4d9fff" stroke-width="1" opacity="1"/>
+<text x="637" y="483" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#4d9fff" font-weight="800" text-anchor="middle" opacity="1">매도</text>
+<text x="688" y="474" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">TSLA</text>
+<text x="688" y="495" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="500" text-anchor="start" opacity="1">5주</text>
+<text x="1338" y="484" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#e8eaf0" font-weight="700" text-anchor="end" opacity="1">₩1,920,000</text>
+<rect x="524" y="526" width="838" height="62" rx="12" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<text x="544" y="552" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="Space Mono, monospace" opacity="1">07.20</text>
+<rect x="608" y="540" width="58" height="32" rx="16" fill="#ffb70322" stroke="#ffb703" stroke-width="1" opacity="1"/>
+<text x="637" y="561" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#ffb703" font-weight="800" text-anchor="middle" opacity="1">이동</text>
+<text x="688" y="552" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">005930.KS</text>
+<text x="688" y="573" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="500" text-anchor="start" opacity="1">30주</text>
+<text x="1338" y="562" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#e8eaf0" font-weight="700" text-anchor="end" opacity="1">키움 → 토스</text>
+<rect x="524" y="604" width="838" height="62" rx="12" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<text x="544" y="630" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="Space Mono, monospace" opacity="1">07.18</text>
+<rect x="608" y="618" width="58" height="32" rx="16" fill="#7c6af722" stroke="#7c6af7" stroke-width="1" opacity="1"/>
+<text x="637" y="639" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#7c6af7" font-weight="800" text-anchor="middle" opacity="1">분할</text>
+<text x="688" y="630" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">NVDA</text>
+<text x="688" y="651" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="500" text-anchor="start" opacity="1">1 : 10</text>
+<text x="1338" y="640" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#e8eaf0" font-weight="700" text-anchor="end" opacity="1">자동 단가 보정</text>
+<rect x="524" y="682" width="838" height="62" rx="12" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<text x="544" y="708" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="Space Mono, monospace" opacity="1">07.16</text>
+<rect x="608" y="696" width="58" height="32" rx="16" fill="#ff4d6a22" stroke="#ff4d6a" stroke-width="1" opacity="1"/>
+<text x="637" y="717" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#ff4d6a" font-weight="800" text-anchor="middle" opacity="1">매수</text>
+<text x="688" y="708" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">000660.KS</text>
+<text x="688" y="729" font-family="Noto Sans KR, Arial, sans-serif" font-size="11" fill="#8890a4" font-weight="500" text-anchor="start" opacity="1">20주</text>
+<text x="1338" y="718" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#e8eaf0" font-weight="700" text-anchor="end" opacity="1">₩4,120,000</text>
+</svg>

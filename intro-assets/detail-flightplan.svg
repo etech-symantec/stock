@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+<rect x="0" y="0" width="1440" height="900" rx="0" fill="#0d0f14" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="28" y="24" width="1384" height="852" rx="26" fill="#0f1219" stroke="#242a39" stroke-width="1" opacity="1"/>
+<rect x="28" y="24" width="1384" height="76" rx="26" fill="#151923" stroke="#242a39" stroke-width="1" opacity="1"/>
+<circle cx="58" cy="62" r="7" fill="#ff4d6a" stroke="none" stroke-width="0" opacity="1"/>
+<circle cx="80" cy="62" r="7" fill="#ffb703" stroke="none" stroke-width="0" opacity="1"/>
+<circle cx="102" cy="62" r="7" fill="#00c87a" stroke="none" stroke-width="0" opacity="1"/>
+<text x="132" y="69" font-family="Noto Sans KR, Arial, sans-serif" font-size="24" fill="#e8eaf0" font-weight="700" text-anchor="start" opacity="1">Two the Moon</text>
+<text x="1386" y="67" font-family="Space Mono, monospace" font-size="14" fill="#00c87a" font-weight="700" text-anchor="end" opacity="1">● LIVE PORTFOLIO</text>
+<rect x="410" y="45" width="86" height="38" rx="12" fill="#252a3a" stroke="#7c6af7" stroke-width="1" opacity="1"/>
+<text x="453.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#e8eaf0" font-weight="700" text-anchor="middle" opacity="1">전체보기</text>
+<text x="547.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">소유자별</text>
+<text x="641.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">관심종목</text>
+<text x="735.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">거래내역</text>
+<text x="829.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">실현수익</text>
+<text x="923.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">배당통계</text>
+<text x="1017.0" y="70" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#8890a4" font-weight="500" text-anchor="middle" opacity="1">달빛정보</text>
+<text x="54" y="140" font-family="Noto Sans KR, Arial, sans-serif" font-size="38" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">종목 상세카드 &amp; 비행 계획</text>
+<text x="54" y="174" font-family="Noto Sans KR, Arial, sans-serif" font-size="16" fill="#8890a4" font-weight="400" text-anchor="start" opacity="1">차트, 매매 마커, 보유 정보, What-if, 목표·손절·추가매수 지점</text>
+<rect x="54" y="210" width="1332" height="634" rx="18" fill="#141720" stroke="#292f40" stroke-width="1" opacity="1"/>
+<text x="82" y="248" font-family="Noto Sans KR, Arial, sans-serif" font-size="22" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">Apple Inc.</text>
+<text x="82" y="275" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="Space Mono, monospace" opacity="1">AAPL · NASDAQ</text>
+<text x="370" y="248" font-family="Noto Sans KR, Arial, sans-serif" font-size="28" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">$214.62</text>
+<text x="370" y="276" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#00c87a" font-weight="800" text-anchor="start" opacity="1">+2.48%  ·  +$5.20</text>
+<text x="106" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">1D</text>
+<text x="164" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">1W</text>
+<text x="222" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">1M</text>
+<text x="280" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">3M</text>
+<text x="338" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">6M</text>
+<rect x="372" y="304" width="48" height="30" rx="8" fill="#7c6af7" stroke="none" stroke-width="1" opacity="1"/>
+<text x="396" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="white" font-weight="700" text-anchor="middle" opacity="1">1Y</text>
+<text x="454" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">3Y</text>
+<text x="512" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">5Y</text>
+<text x="570" y="324" font-family="Noto Sans KR, Arial, sans-serif" font-size="10" fill="#8890a4" font-weight="700" text-anchor="middle" opacity="1">전체</text>
+<rect x="82" y="354" width="852" height="310" rx="14" fill="#11151e" stroke="#283043" stroke-width="1" opacity="1"/>
+<line x1="98" y1="406" x2="918" y2="406" stroke="#232a3a" stroke-width="1" opacity="1"/>
+<line x1="98" y1="476" x2="918" y2="476" stroke="#232a3a" stroke-width="1" opacity="1"/>
+<line x1="98" y1="546" x2="918" y2="546" stroke="#232a3a" stroke-width="1" opacity="1"/>
+<line x1="98" y1="616" x2="918" y2="616" stroke="#232a3a" stroke-width="1" opacity="1"/>
+<polyline points="100,602.0 131,580.6501230410722 162,564.2180417680713 193,555.1423533096953 224,559.3481782322855 255,569.968898266567 286,580.90760684914 317,586.0693966481751 348,583.8938306247921 379,578.7266525145573 410,557.6181469643435 441,547.3080146711412 472,524.4013118522922 503,497.9833189900073 534,493.0899653807399 565,487.49388264906446 596,488.17122396729724 627,499.6096216948643 658,507.8646544375705 689,515.0470542151431 720,519.7933243161023 751,506.27742823333426 782,481.4592489510527 813,453.49508578774646 844,437.48750242811127" fill="none" stroke="#00c87a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="1"/>
+<line x1="98" y1="438" x2="918" y2="438" stroke="#00c87a" stroke-width="2" opacity="0.75" stroke-dasharray="8 6"/>
+<line x1="98" y1="572" x2="918" y2="572" stroke="#ff4d6a" stroke-width="2" opacity="0.75" stroke-dasharray="8 6"/>
+<line x1="98" y1="520" x2="918" y2="520" stroke="#4d9fff" stroke-width="2" opacity="0.75" stroke-dasharray="8 6"/>
+<polygon points="255,518 247,534 263,534" fill="#ff4d6a" stroke="#fff" stroke-width="1"/>
+<polygon points="441,468 433,484 449,484" fill="#4d9fff" stroke="#fff" stroke-width="1"/>
+<polygon points="658,418 650,434 666,434" fill="#ff4d6a" stroke="#fff" stroke-width="1"/>
+<rect x="964" y="304" width="394" height="360" rx="14" fill="#151b26" stroke="#344158" stroke-width="1" opacity="1"/>
+<text x="988" y="340" font-family="Noto Sans KR, Arial, sans-serif" font-size="18" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">🚀 비행 계획</text>
+<text x="988" y="386" font-family="Noto Sans KR, Arial, sans-serif" font-size="19" fill="#e8eaf0" font-weight="700" text-anchor="start" opacity="1">🌕</text>
+<text x="1020" y="386" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="start" opacity="1">도킹 지점</text>
+<rect x="988" y="402" width="346" height="44" rx="9" fill="#1c2030" stroke="#00c87a" stroke-width="1" opacity="1"/>
+<text x="1004" y="430" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">$245.00</text>
+<text x="988" y="470" font-family="Noto Sans KR, Arial, sans-serif" font-size="19" fill="#e8eaf0" font-weight="700" text-anchor="start" opacity="1">🛸</text>
+<text x="1020" y="470" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="start" opacity="1">비상 탈출</text>
+<rect x="988" y="486" width="346" height="44" rx="9" fill="#1c2030" stroke="#ff4d6a" stroke-width="1" opacity="1"/>
+<text x="1004" y="514" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">$188.00</text>
+<text x="988" y="554" font-family="Noto Sans KR, Arial, sans-serif" font-size="19" fill="#e8eaf0" font-weight="700" text-anchor="start" opacity="1">⛽</text>
+<text x="1020" y="554" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="start" opacity="1">연료 보급</text>
+<rect x="988" y="570" width="346" height="44" rx="9" fill="#1c2030" stroke="#4d9fff" stroke-width="1" opacity="1"/>
+<text x="1004" y="598" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">$202 / $195 / $184</text>
+<rect x="82" y="690" width="620" height="128" rx="13" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<text x="104" y="724" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="start" opacity="1">현재 보유</text>
+<text x="104" y="758" font-family="Noto Sans KR, Arial, sans-serif" font-size="16" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">32주 · 평균단가 $176.40</text>
+<text x="104" y="787" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#00c87a" font-weight="800" text-anchor="start" opacity="1">평가손익 +$1,223.04 (+21.67%)</text>
+<text x="432" y="724" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="start" opacity="1">매매 기록</text>
+<text x="432" y="758" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">매수 4회 · 매도 2회</text>
+<text x="432" y="787" font-family="Noto Sans KR, Arial, sans-serif" font-size="13" fill="#00c87a" font-weight="800" text-anchor="start" opacity="1">실현수익 +$684.20</text>
+<rect x="726" y="690" width="632" height="128" rx="13" fill="#1c2030" stroke="#30374a" stroke-width="1" opacity="1"/>
+<text x="748" y="724" font-family="Noto Sans KR, Arial, sans-serif" font-size="12" fill="#8890a4" font-weight="700" text-anchor="start" opacity="1">What if</text>
+<text x="748" y="758" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#e8eaf0" font-weight="800" text-anchor="start" opacity="1">최고점 매도 시 +₩2.18M</text>
+<text x="748" y="788" font-family="Noto Sans KR, Arial, sans-serif" font-size="14" fill="#7c6af7" font-weight="800" text-anchor="start" opacity="1">현재까지 계속 보유 시 +₩1.62M</text>
+</svg>
