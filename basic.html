@@ -48,9 +48,9 @@
     transition: transform 0.2s, opacity 0.2s;
   }
   .probe-fab-locked:hover { transform: scale(1.05); opacity: 0.85; }
-  .plus-teaser-icon-row { display: flex; gap: 14px; margin: 16px 0; }
+  .plus-teaser-icon-row { display: flex; flex-wrap: wrap; gap: 14px; margin: 16px 0; }
   .plus-teaser-item {
-    flex: 1;
+    flex: 1 1 130px;
     background: var(--bg3);
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -60,6 +60,37 @@
   .plus-teaser-item .icon { font-size: 24px; margin-bottom: 6px; }
   .plus-teaser-item .title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
   .plus-teaser-item .desc { font-size: 11px; color: var(--text3); line-height: 1.4; }
+
+  /* 🚀 비행 계획 — Plus 잠금 배너(통합 자산 카드 위) / 모달 사이드 패널 */
+  .flight-plan-locked-banner {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px; padding: 10px 14px;
+    border: 1px dashed var(--border2); border-radius: 12px;
+    background: var(--bg3); color: var(--text2);
+    font-size: 12.5px; cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .flight-plan-locked-banner:hover { opacity: 0.85; transform: translateY(-1px); }
+  .flight-plan-locked-banner .fplb-icon { font-size: 17px; flex-shrink: 0; }
+  .flight-plan-locked-banner .fplb-text { flex: 1; line-height: 1.4; }
+  .flight-plan-locked-banner .fplb-text strong { color: var(--text); font-weight: 700; }
+
+  .flight-plan-panel-locked {
+    width: 190px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; text-align: center; padding: 14px;
+    border: 1px dashed var(--border2); border-radius: 14px;
+    background: var(--bg3); color: var(--text2);
+    cursor: pointer; transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .flight-plan-panel-locked:hover { opacity: 0.85; transform: translateY(-1px); }
+  .flight-plan-panel-locked .fppl-icon { font-size: 26px; }
+  .flight-plan-panel-locked .fppl-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .flight-plan-panel-locked .fppl-desc { font-size: 11px; color: var(--text3); line-height: 1.5; }
+  @media (max-width: 900px) { .flight-plan-panel-locked { width: 100%; } }
+
+  /* 🤖 AI 투자조언 — Plus 잠금 플로팅 버튼 (탐사선 잠금 버튼과 겹치지 않도록 위쪽에 배치) */
+  .ai-advice-fab-locked { bottom: 92px !important; }
 </style>
 </head>
 <body>
@@ -310,6 +341,13 @@
   <main class="dashboard-main">
     <div id="viewHeader" class="view-header"></div>
     <div id="dashboardTopWrapper" class="dashboard-top-wrapper">
+      <!-- 🚀 비행 계획(도킹 지점 · 비상 탈출 · 연료 보급) 알림 — Plus 전용 기능 힌트
+           dashboardTopWrapper 안에 두어, 전체보기/소유자1/소유자2 화면에서만 보이는 기존 표시 로직을 그대로 따라갑니다 -->
+      <div class="flight-plan-locked-banner" onclick="openPlusTeaser()" title="Plus 전용 기능입니다">
+        <span class="fplb-icon">🚀</span>
+        <span class="fplb-text"><strong>비행 계획</strong> — 도킹 지점 · 비상 탈출 · 연료 보급 지점에 근접하면 알림을 받아보세요</span>
+        <span class="plus-badge">PLUS</span>
+      </div>
       <div class="dashboard-top">
         <div class="country-panel">
           <div class="cp-header">
@@ -504,6 +542,9 @@
 
      <!-- 🚀 탐사선 띄우기 — Plus 전용 기능 힌트 -->
      <button id="probeFabBtn" class="probe-fab-locked" style="display:none;" onclick="openPlusTeaser()" title="Plus 전용 기능입니다">🔒 탐사선 띄우기 <span class="plus-badge">PLUS</span></button>
+
+     <!-- 🤖 AI 투자조언 — Plus 전용 기능 힌트 (탐사선 버튼 위에 겹치지 않게 배치, 항상 노출) -->
+     <button id="aiAdviceFabLocked" class="probe-fab-locked ai-advice-fab-locked" onclick="openPlusTeaser()" title="Plus 전용 기능입니다">🔒 AI 투자조언 <span class="plus-badge">PLUS</span></button>
 
 
     <div id="dividendDashboard" class="dashboard-page" style="display:none;">
@@ -948,7 +989,16 @@
     </div>
     
     <!-- 변경 후 -->
-    <div style="height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
+    <div style="display:flex; gap:16px; align-items:stretch;">
+      <div style="flex:1; min-width:0; min-height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
+
+      <!-- 🚀 비행 계획 설정 패널 자리 — Plus 전용 기능 힌트 -->
+      <div class="flight-plan-panel-locked" onclick="openPlusTeaser()" title="Plus 전용 기능입니다">
+        <span class="fppl-icon">🔒</span>
+        <span class="fppl-title">비행 계획 <span class="plus-badge">PLUS</span></span>
+        <span class="fppl-desc">도킹 지점 · 비상 탈출 · 연료 보급 지점을 설정하고 알림을 받아보세요</span>
+      </div>
+    </div>
 
     <!-- 🌟 매매기록 요약 + What if 섹션 -->
     <div id="mTradeStats" style="display:none; margin-top:16px; border-top:1px solid var(--border2); padding-top:14px;">
@@ -1370,7 +1420,7 @@
 </div>
 
 
-<!-- ✨ Plus 기능 안내 모달 (탐사선/달빛정보 잠금 버튼 클릭 시 표시) -->
+<!-- ✨ Plus 기능 안내 모달 (탐사선/달빛정보/비행계획/AI 투자조언 잠금 버튼 클릭 시 표시) -->
 <div class="overlay" id="plusTeaserOverlay" onclick="closeModal('plusTeaserOverlay')">
   <div class="modal modal-sm" onclick="event.stopPropagation()">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
@@ -1388,6 +1438,16 @@
         <div class="icon">🌕</div>
         <div class="title">달빛정보</div>
         <div class="desc">시장 밸류에이션 종합 신호로<br>매수 타이밍을 점검</div>
+      </div>
+      <div class="plus-teaser-item">
+        <div class="icon">🚀</div>
+        <div class="title">비행 계획</div>
+        <div class="desc">도킹 지점·비상 탈출·연료 보급<br>지점 근접 시 알림</div>
+      </div>
+      <div class="plus-teaser-item">
+        <div class="icon">🤖</div>
+        <div class="title">AI 투자조언</div>
+        <div class="desc">내 포트폴리오를 분석해<br>맞춤 투자 조언 제공</div>
       </div>
     </div>
     <button class="btn-sm" style="width:100%; justify-content:center; background:linear-gradient(135deg,#7c6af7,#4d9fff); color:#fff; border:none;"
