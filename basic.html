@@ -1471,6 +1471,18 @@
 <script src="tutorial.js"></script>
 
 <script>
+  // 📡 Market Signal 관련 함수는 /plus/market-signal.js(Plus 전용, index.html에만 로드됨)에 정의되어 있습니다.
+  // basic.html에는 해당 스크립트가 없지만 "지표 설정" 탭 UI는 남아있어 호출 시 에러가 나므로, 없을 때만 안전한 빈 함수로 대체합니다.
+  if (typeof window.resetMarketSignalVisibility !== 'function') {
+    window.resetMarketSignalVisibility = function () {};
+  }
+  if (typeof window.toggleSignalGroupVisibility !== 'function') {
+    window.toggleSignalGroupVisibility = function () {};
+  }
+  if (typeof window.toggleSignalIndicatorVisibility !== 'function') {
+    window.toggleSignalIndicatorVisibility = function () {};
+  }
+
   // ✨ Plus 잠금 버튼(달빛정보 탭, 탐사선 FAB) 클릭 시 안내 모달 표시
   function openPlusTeaser() {
     const el = document.getElementById('plusTeaserOverlay');
