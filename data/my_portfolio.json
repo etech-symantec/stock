@@ -10005,11 +10005,9 @@
       ]
     },
     "AAPL": {
-      "docking": 326,
+      "docking": null,
       "escape": 300,
-      "fuel": [
-        315
-      ]
+      "fuel": []
     },
     "005935.KS": {
       "docking": null,
@@ -10032,5 +10030,5 @@
       "fuel": []
     }
   },
-  "_updatedAt": 1784862538122
+  "_updatedAt": 1784864162164
 }
