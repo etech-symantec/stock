@@ -20,14 +20,16 @@ function loadState() {
       if(!parsed.riaExcludeSymbols) parsed.riaExcludeSymbols = [];
       if(!parsed.customOverseasAssets) parsed.customOverseasAssets = [];
       if(!parsed.probes) parsed.probes = [];
-      if(!parsed.priceAlerts) parsed.priceAlerts = {}; // 🎯 목표가·손절가·물타기 알림 설정
+      if(!parsed.flightPlans) parsed.flightPlans = {}; // 🚀 비행 계획(도킹 지점·비상 탈출·연료 보급) 설정
+      // 🌟 예전 이름(priceAlerts)으로 저장된 데이터는 그대로 남겨둡니다 — plus/flightplan.js가 최초 로드 시
+      //    필드 이름을 변환(target→docking, stopLoss→escape, dca→fuel)해서 flightPlans로 옮겨줍니다.
       if(parsed.transactions) {
           parsed.transactions.forEach(tx => { tx.date = formatDate(tx.date); });
       }
       return parsed;
     }
   } catch(e){}
-  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [], probes: [], priceAlerts: {} };
+  return { tickers: ['AAPL','TSLA','005930.KS','000660.KS'], transactions: [], range: '1y', tags: {}, owners: { user1: { name: '소유자1', color: '#7c6af7', icon: '👤' }, user2: { name: '소유자2', color: '#00c87a', icon: '👤' } }, riaAccounts: [], riaExcludeSymbols: [], probes: [], flightPlans: {} };
 }
 
 let state = loadState();
@@ -327,7 +329,7 @@ function getColors(prices) {
 }
 
 // 🌟 미니 차트 & 종목 모달 통합 차트 생성기 (연도 표시 + 매매 마커 완벽 복구!)
-function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all', hideTradeMarkers = false, datasetLabel = '주가', priceAlertLines = null) {
+function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = 'all', hideTradeMarkers = false, datasetLabel = '주가', flightPlanLines = null) {
   const {line, fill} = getColors(prices);
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
@@ -457,11 +459,11 @@ function buildChart(canvasId, prices, passedDates, mini, symbol, ownerFilter = '
     }
   }
 
-  // 🎯 목표가·손절가·물타기 가로선 (annotation 플러그인)
+  // 🚀 비행 계획(도킹 지점·비상 탈출·연료 보급) 가로선 (annotation 플러그인) — plus/flightplan.js에서 값 전달
   const annotationsObj = {};
-  if (!mini && priceAlertLines && priceAlertLines.length) {
-    priceAlertLines.forEach((ln, i) => {
-      annotationsObj[`priceAlertLine_${i}`] = {
+  if (!mini && flightPlanLines && flightPlanLines.length) {
+    flightPlanLines.forEach((ln, i) => {
+      annotationsObj[`flightPlanLine_${i}`] = {
         type: 'line',
         yMin: ln.value, yMax: ln.value,
         borderColor: ln.color,
@@ -4918,8 +4920,8 @@ function updateSummaryAndAllocation(rawHoldings, fullDisplayItems) {
     [...krwGrowthConfigs].forEach(cfg => buildAccountGrowthChart(cfg.id, cfg.broker, true));
     [...usdGrowthConfigs].forEach(cfg => buildAccountGrowthChart(cfg.id, cfg.broker, false));
 
-    // 🎯 목표가·손절가·물타기 알림 배너 갱신
-    updatePriceAlertBanner(rawHoldings);
+    // 🚀 비행 계획(도킹 지점·비상 탈출·연료 보급) 알림 배너 갱신 — plus/flightplan.js
+    if (typeof updateFlightPlanBanner === 'function') updateFlightPlanBanner(rawHoldings);
 
     setTimeout(() => {
         // 방금 화면에 그려진 포트맵 중 'should-open(열려야 할 대상)' 클래스를 가진 것을 모두 찾습니다.
@@ -5308,7 +5310,7 @@ function openChartModal(ticker, probeId = null) {
   });
   
   renderModalChart();
-  renderPriceAlertSettingsPanel(ticker);
+  if (typeof renderFlightPlanPanel === 'function') renderFlightPlanPanel(ticker);
   enforceProbeFabVisibility();
   document.getElementById('chartOverlay').classList.add('open');
 }
@@ -5372,7 +5374,7 @@ function renderModalChart() {
                           : 'all'; // watch, all 등 나머지는 전체 표시
   // 🛰️ 탐사선을 띄운 종목은 상세카드 그래프에서 과거 매수/매도 마커를 숨기고 발사 지점만 보여줍니다.
   const _hasProbeForModalTicker = !!(state.probes && state.probes.some(p => p.symbol === currentModalTicker));
-  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, _modalOwnerFilter, _hasProbeForModalTicker, '주가', buildPriceAlertChartLines(currentModalTicker)); }, 50);
+  setTimeout(() => { modalChartInst = buildChart('modalCanvas', displayPrices, displayDates, false, currentModalTicker, _modalOwnerFilter, _hasProbeForModalTicker, '주가', (typeof buildFlightPlanChartLines === 'function') ? buildFlightPlanChartLines(currentModalTicker) : null); }, 50);
   enforceProbeFabVisibility();
 
   // 🌟 매매기록 요약 + What if 계산
@@ -5494,230 +5496,10 @@ function renderModalChart() {
   }
 }
 
-// ==========================================
-// 🎯 목표가 · 손절가 · 물타기(추가매수) 알림 기능
-// ==========================================
-const PRICE_ALERT_PROXIMITY_PCT = 3; // 목표/손절/물타기 지점과의 거리(%)가 이 값 이내면 "근접"으로 알림 표시
-
-function _escAlertText(str) {
-  return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-// 종목별 알림 설정을 가져오고, 없으면 기본값으로 초기화합니다.
-function getPriceAlertSettings(symbol) {
-  if (!state.priceAlerts) state.priceAlerts = {};
-  if (!state.priceAlerts[symbol]) state.priceAlerts[symbol] = { target: null, stopLoss: null, dca: [] };
-  const s = state.priceAlerts[symbol];
-  if (!Array.isArray(s.dca)) s.dca = [];
-  return s;
-}
-
-// 목표가/손절가/물타기 지점을 차트에 가로선으로 표시하기 위한 annotation 배열을 만듭니다.
-function buildPriceAlertChartLines(symbol) {
-  if (!symbol || !state.priceAlerts || !state.priceAlerts[symbol]) return [];
-  const s = state.priceAlerts[symbol];
-  const lines = [];
-  if (s.target) lines.push({ value: s.target, color: '#00C578', label: `🎯 ${formatPrice(s.target, symbol)}` });
-  if (s.stopLoss) lines.push({ value: s.stopLoss, color: '#ff4d6a', label: `🚨 ${formatPrice(s.stopLoss, symbol)}` });
-  (s.dca || []).forEach(p => lines.push({ value: p, color: '#3A9AFF', label: `💧 ${formatPrice(p, symbol)}` }));
-  return lines;
-}
-
-window.savePriceAlertTarget = function (symbol, value) {
-  const s = getPriceAlertSettings(symbol);
-  const v = parseFloat(value);
-  s.target = (value === '' || isNaN(v) || v <= 0) ? null : v;
-  saveState();
-  updatePriceAlertBanner();
-  renderModalChart();
-};
-
-window.savePriceAlertStopLoss = function (symbol, value) {
-  const s = getPriceAlertSettings(symbol);
-  const v = parseFloat(value);
-  s.stopLoss = (value === '' || isNaN(v) || v <= 0) ? null : v;
-  saveState();
-  updatePriceAlertBanner();
-  renderModalChart();
-};
-
-window.addDcaAlertLevel = function (symbol) {
-  const input = document.getElementById('mDcaInput');
-  if (!input) return;
-  const v = parseFloat(input.value);
-  if (isNaN(v) || v <= 0) return;
-  const s = getPriceAlertSettings(symbol);
-  s.dca.push(v);
-  s.dca.sort((a, b) => b - a);
-  input.value = '';
-  saveState();
-  updatePriceAlertBanner();
-  renderPriceAlertSettingsPanel(symbol);
-  renderModalChart();
-};
-
-window.removeDcaAlertLevel = function (symbol, idx) {
-  const s = getPriceAlertSettings(symbol);
-  s.dca.splice(idx, 1);
-  saveState();
-  updatePriceAlertBanner();
-  renderPriceAlertSettingsPanel(symbol);
-  renderModalChart();
-};
-
-// 모달 안의 "🎯 목표가 · 손절가 · 물타기 설정" 패널을 그립니다.
-function renderPriceAlertSettingsPanel(symbol) {
-  const wrap = document.getElementById('mPriceAlertSettings');
-  if (!wrap || !symbol) return;
-
-  // 🛰️ 탐사선을 띄운 종목의 상세카드에는 목표가·손절가·물타기 설정 영역을 표시하지 않습니다.
-  const hasProbe = !!(state.probes && state.probes.some(p => p.symbol === symbol));
-  if (hasProbe) {
-    wrap.style.display = 'none';
-    wrap.innerHTML = '';
-    return;
-  }
-  wrap.style.display = '';
-
-  const s = getPriceAlertSettings(symbol);
-  const isKr = isKorean(symbol);
-  const currency = isKr ? '₩' : '$';
-
-  const dcaHtml = s.dca.length
-    ? s.dca.map((p, i) => `
-        <div class="pa-dca-row">
-          <span style="font-family:var(--font-mono); color:var(--text);">${currency}${p.toLocaleString()}</span>
-          <span onclick="removeDcaAlertLevel('${symbol}', ${i})" style="cursor:pointer; color:var(--text3); padding:0 2px;" title="삭제">✕</span>
-        </div>`).join('')
-    : `<div class="pa-dca-empty">설정된 지점 없음</div>`;
-
-  wrap.innerHTML = `
-    <div class="pa-title">🎯 목표가 · 손절가 · 물타기</div>
-    <div class="pa-field">
-      <div class="pa-label">🟢 목표가</div>
-      <input type="number" id="mTargetInput" value="${s.target != null ? s.target : ''}" placeholder="${currency} 입력"
-        onchange="savePriceAlertTarget('${symbol}', this.value)">
-    </div>
-    <div class="pa-field">
-      <div class="pa-label">🔴 손절가</div>
-      <input type="number" id="mStopLossInput" value="${s.stopLoss != null ? s.stopLoss : ''}" placeholder="${currency} 입력"
-        onchange="savePriceAlertStopLoss('${symbol}', this.value)">
-    </div>
-    <div class="pa-field" style="margin-bottom:4px;">
-      <div class="pa-label">🔵 물타기(추가매수)</div>
-      <input type="number" id="mDcaInput" placeholder="${currency} 입력 후 Enter"
-        onkeydown="if(event.key==='Enter'){addDcaAlertLevel('${symbol}');}">
-      <button class="btn-sm pa-add-btn" onclick="addDcaAlertLevel('${symbol}')">+ 지점 추가</button>
-      ${dcaHtml}
-    </div>
-  `;
-}
-
-// 현재 보유 중인 종목들의 목표가/손절가/물타기 지점 중 현재가에 근접하거나 도달한 것을 찾습니다.
-function computeActivePriceAlerts(rawHoldings) {
-  const alerts = [];
-  if (!state.priceAlerts) return alerts;
-
-  const bySymbol = {};
-  for (let key in rawHoldings) {
-    if (!rawHoldings.hasOwnProperty(key)) continue;
-    const h = rawHoldings[key];
-    if (h.qty > 0) {
-      if (!bySymbol[h.symbol]) bySymbol[h.symbol] = 0;
-      bySymbol[h.symbol] += h.qty;
-    }
-  }
-
-  Object.keys(state.priceAlerts).forEach(symbol => {
-    if (!bySymbol[symbol] || bySymbol[symbol] <= 0) return; // 현재 보유 중인 종목만 알림 대상
-    const settings = state.priceAlerts[symbol];
-    const data = cachedMarketData[symbol];
-    if (!data || data._failed) return;
-    const price = data.last || (data.prices && data.prices.length ? data.prices[data.prices.length - 1] : null);
-    if (!price) return;
-    const name = data.name || symbol;
-
-    const pushIfNear = (point, type, reachedLabel, nearLabel, reachedCond) => {
-      if (!point) return;
-      const diffPct = (price - point) / point * 100;
-      if (reachedCond(price, point) || Math.abs(diffPct) <= PRICE_ALERT_PROXIMITY_PCT) {
-        alerts.push({
-          symbol, name, type,
-          label: reachedCond(price, point) ? reachedLabel : nearLabel,
-          price, point, diffPct
-        });
-      }
-    };
-
-    pushIfNear(settings.target, 'target', '목표가 도달', '목표가 근접', (p, t) => p >= t);
-    pushIfNear(settings.stopLoss, 'stop', '손절가 도달', '손절가 근접', (p, t) => p <= t);
-    (settings.dca || []).forEach(dcaPoint => {
-      pushIfNear(dcaPoint, 'dca', '물타기 지점 도달', '물타기 지점 근접', (p, t) => p <= t);
-    });
-  });
-
-  return alerts;
-}
-
-// "🌐 통합 자산" 영역 상단의 알림 배너를 그립니다.
-function updatePriceAlertBanner(rawHoldingsArg) {
-  const wrap = document.getElementById('priceAlertBanner');
-  if (!wrap) return;
-
-  // 🎯 알림 배너는 전체보기 / 소유자1 / 소유자2 화면에서만 노출합니다.
-  if (!['all', 'user1', 'user2'].includes(currentView)) {
-    wrap.style.display = 'none';
-    wrap.innerHTML = '';
-    return;
-  }
-
-  let rawHoldings = rawHoldingsArg;
-  if (!rawHoldings) {
-    let ownerFilter = 'all';
-    if (currentView === 'user1') ownerFilter = state.owners.user1.name;
-    if (currentView === 'user2') ownerFilter = state.owners.user2.name;
-    rawHoldings = calculateHoldings(ownerFilter);
-  }
-
-  const alerts = computeActivePriceAlerts(rawHoldings);
-  if (!alerts.length) {
-    wrap.style.display = 'none';
-    wrap.innerHTML = '';
-    return;
-  }
-
-  const typeMeta = {
-    target: { icon: '🎯', label: '목표가', color: '#00C578', bg: 'rgba(0,197,120,0.10)' },
-    stop:   { icon: '🚨', label: '손절가', color: '#ff4d6a', bg: 'rgba(255,77,106,0.10)' },
-    dca:    { icon: '💧', label: '물타기', color: '#3A9AFF', bg: 'rgba(58,154,255,0.10)' }
-  };
-
-  // 알림 유형(목표가/손절가/물타기)별로 그룹핑
-  const groups = { target: [], stop: [], dca: [] };
-  alerts.forEach(a => { if (groups[a.type]) groups[a.type].push(a); });
-
-  wrap.style.display = 'flex';
-  wrap.innerHTML = ['target', 'stop', 'dca'].filter(t => groups[t].length).map(t => {
-    const meta = typeMeta[t];
-    const chips = groups[t].map(a => {
-      const sign = a.diffPct > 0 ? '+' : '';
-      return `
-        <span class="price-alert-stock-chip" onclick="openChartModal('${a.symbol}')" title="클릭하면 ${_escAlertText(a.name)} 상세카드가 열립니다">
-          <strong>${_escAlertText(a.name)}</strong>
-          <span style="color:${meta.color};">${sign}${a.diffPct.toFixed(1)}%</span>
-        </span>`;
-    }).join('');
-    return `
-      <div class="price-alert-group" style="border-color:${meta.color}; background:${meta.bg};">
-        <div class="price-alert-group-head">
-          <span>${meta.icon}</span>
-          <span>${meta.label} 근접·도달</span>
-          <span class="price-alert-group-count" style="background:${meta.color};">${groups[t].length}</span>
-        </div>
-        <div class="price-alert-group-chips">${chips}</div>
-      </div>`;
-  }).join('');
-}
+// ── 🚀 비행 계획(도킹 지점 · 비상 탈출 · 연료 보급) 기능은 plus/flightplan.js로 분리되었습니다 (Plus 프리미엄 전용) ──
+// getFlightPlanSettings / buildFlightPlanChartLines / saveFlightPlanDocking / saveFlightPlanEscape /
+// addFlightPlanFuel / removeFlightPlanFuel / renderFlightPlanPanel / computeActiveFlightPlanAlerts /
+// updateFlightPlanBanner 는 plus/flightplan.js 참고
 
 // ── 🚀 탐사선(Probe) 기능은 probe.js로 분리되었습니다 (Plus 프리미엄 전용) ──
 // ensureProbeStateShape / buildProbeSeries / openProbePicker / renderProbePickerList /
@@ -5986,9 +5768,9 @@ async function render() {
   const probePanel = document.getElementById('probeCollectionPanel');
   if (probeFab) probeFab.style.display = 'none';
   if (probePanel) probePanel.style.display = 'none';
-  // 🎯 알림 배너는 전체보기/소유자1/소유자2 화면에서만 표시 (다른 화면 전환 시 우선 숨김)
-  const priceAlertBannerEl = document.getElementById('priceAlertBanner');
-  if (priceAlertBannerEl) priceAlertBannerEl.style.display = 'none';
+  // 🚀 비행 계획 알림 배너는 전체보기/소유자1/소유자2 화면에서만 표시 (다른 화면 전환 시 우선 숨김)
+  const flightPlanBannerEl = document.getElementById('flightPlanBanner');
+  if (flightPlanBannerEl) flightPlanBannerEl.style.display = 'none';
   
   if (currentView === 'dividend') {
     if (msBar) msBar.style.display = 'none';
