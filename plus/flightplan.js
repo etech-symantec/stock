@@ -125,26 +125,27 @@ function renderFlightPlanPanel(symbol) {
   const fuelHtml = s.fuel.length
     ? s.fuel.map((p, i) => `
         <div class="fp-fuel-row">
-          <span style="font-family:var(--font-mono); color:var(--text);">${currency}${p.toLocaleString()}</span>
-          <span onclick="removeFlightPlanFuel('${symbol}', ${i})" style="cursor:pointer; color:var(--text3); padding:0 2px;" title="삭제">✕</span>
+          <span class="fp-fuel-dot"></span>
+          <span class="fp-fuel-value">${currency}${p.toLocaleString()}</span>
+          <span class="fp-fuel-remove" onclick="removeFlightPlanFuel('${symbol}', ${i})" title="삭제">✕</span>
         </div>`).join('')
     : `<div class="fp-fuel-empty">설정된 지점 없음</div>`;
 
   wrap.innerHTML = `
-    <div class="fp-title">🚀 비행 계획 <span class="fp-plus-badge">PLUS</span></div>
+    <div class="fp-title"><span class="fp-title-icon">🚀</span> 비행 계획</div>
     <div class="fp-field">
-      <div class="fp-label">🌕 도킹 지점</div>
-      <input type="number" id="mDockingInput" value="${s.docking != null ? s.docking : ''}" placeholder="${currency} 입력"
+      <div class="fp-label"><span class="fp-icon-badge fp-icon-docking">🌕</span> 도킹 지점 <span class="fp-sublabel">(목표가)</span></div>
+      <input type="number" id="mDockingInput" class="fp-input-docking" value="${s.docking != null ? s.docking : ''}" placeholder="${currency} 입력"
         onchange="saveFlightPlanDocking('${symbol}', this.value)">
     </div>
     <div class="fp-field">
-      <div class="fp-label">🛸 비상 탈출</div>
-      <input type="number" id="mEscapeInput" value="${s.escape != null ? s.escape : ''}" placeholder="${currency} 입력"
+      <div class="fp-label"><span class="fp-icon-badge fp-icon-escape">🛸</span> 비상 탈출 <span class="fp-sublabel">(손절가)</span></div>
+      <input type="number" id="mEscapeInput" class="fp-input-escape" value="${s.escape != null ? s.escape : ''}" placeholder="${currency} 입력"
         onchange="saveFlightPlanEscape('${symbol}', this.value)">
     </div>
     <div class="fp-field" style="margin-bottom:4px;">
-      <div class="fp-label">⛽ 연료 보급(추가매수)</div>
-      <input type="number" id="mFuelInput" placeholder="${currency} 입력 후 Enter"
+      <div class="fp-label"><span class="fp-icon-badge fp-icon-fuel">⛽</span> 연료 보급 <span class="fp-sublabel">(물타기)</span></div>
+      <input type="number" id="mFuelInput" class="fp-input-fuel" placeholder="${currency} 입력 후 Enter"
         onkeydown="if(event.key==='Enter'){addFlightPlanFuel('${symbol}');}">
       <button class="btn-sm fp-add-btn" onclick="addFlightPlanFuel('${symbol}')">+ 지점 추가</button>
       ${fuelHtml}
