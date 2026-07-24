@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="/plus/market-signal.css">
 <!-- Plus 프리미엄 전용 스타일 -->
 <link rel="stylesheet" href="/plus/probe.css">
+<link rel="stylesheet" href="/plus/flightplan.css">
 <style>
   .moonlight-section{
     flex-direction: column;
@@ -701,8 +702,8 @@
         </div>
       </div>
     </div>
-    <!-- 🎯 목표가·손절가·물타기 알림 배너 (근접/도달 시에만 표시) · 종합 신호 바로 아래, 통합 자산 카드 바깥 -->
-    <div id="priceAlertBanner" class="price-alert-banner" style="display:none;"></div>
+    <!-- 🚀 비행 계획(도킹 지점·비상 탈출·연료 보급) 알림 배너 (근접/도달 시에만 표시) · 종합 신호 바로 아래, 통합 자산 카드 바깥 · Plus 전용 -->
+    <div id="flightPlanBanner" class="flight-plan-banner" style="display:none;"></div>
     <div id="viewHeader" class="view-header"></div>
     <div id="dashboardTopWrapper" class="dashboard-top-wrapper">
       <div class="dashboard-top">
@@ -1481,8 +1482,8 @@
         <div style="height:220px; position:relative;"><canvas id="modalCanvas"></canvas></div>
       </div>
 
-      <!-- 🎯 목표가 · 손절가 · 물타기 설정 (그래프 우측 사이드 패널) -->
-      <div id="mPriceAlertSettings" class="price-alert-side-panel"></div>
+      <!-- 🚀 비행 계획(도킹 지점 · 비상 탈출 · 연료 보급) 설정 (그래프 우측 사이드 패널) · Plus 전용 -->
+      <div id="mFlightPlanPanel" class="flight-plan-panel"></div>
     </div>
 
     <!-- 🌟 매매기록 요약 + What if 섹션 -->
@@ -2185,6 +2186,8 @@ async function loadMoonlightDashboard(){
 <!-- 🚀 탐사선(Probe) 기능 — Plus 프리미엄 전용 스크립트 (app.js 이후에 로드) -->
 <script src="/plus/probe.js"></script>
 <script src="/plus/market-signal.js"></script>
+<!-- 🚀 비행 계획(도킹 지점·비상 탈출·연료 보급) 기능 — Plus 프리미엄 전용 스크립트 (app.js 이후에 로드) -->
+<script src="/plus/flightplan.js"></script>
 <script src="tutorial.js"></script>
 
 <script>
