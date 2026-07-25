@@ -93,46 +93,6 @@
   @media (max-width: 900px) { .flight-plan-panel-locked { width: 100%; } }
 
   /* 🤖 AI 투자조언 — Plus 잠금 플로팅 버튼 (탐사선 잠금 버튼과 동일한 위치에 배치) */
-
-  /* 🔧 버그 수정: 잠금 트리거 요소들이 다른 레이어에 가려 클릭이 씹히는 문제 방지 */
-  .vtab.plus-locked-tab,
-  .probe-fab-locked,
-  .flight-plan-locked-banner,
-  .flight-plan-panel-locked {
-    position: relative;
-    z-index: 501;
-    pointer-events: auto;
-  }
-
-  /* 🔧 버그 수정: style.css의 .overlay/.modal 규칙 여부와 무관하게
-     Plus 안내 팝업이 항상 정상적으로 뜨도록 이 팝업 전용 규칙을 명시적으로 정의합니다.
-     (다른 모달에는 영향 없이 #plusTeaserOverlay 에만 적용됩니다) */
-  #plusTeaserOverlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 10000;
-  }
-  #plusTeaserOverlay.open {
-    display: flex;
-  }
-  #plusTeaserOverlay .modal {
-    position: relative;
-    z-index: 10001;
-    width: 90%;
-    max-width: 420px;
-    max-height: 85vh;
-    overflow-y: auto;
-    background: var(--bg2, #1c1f26);
-    border: 1px solid var(--border2, #333);
-    border-radius: 16px;
-    padding: 20px;
-    color: var(--text, #fff);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  }
 </style>
 </head>
 <body>
