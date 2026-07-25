@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Two the Moon — 상세 소개</title>
+<meta name="description" content="국내·미국 주식 통합 관리 장부, Two the Moon의 모든 기능을 한눈에 소개합니다.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -14,16 +15,18 @@
     --green:#00c87a; --green-bg:rgba(0,200,122,0.1);
     --red:#ff4d6a; --red-bg:rgba(255,77,106,0.1);
     --blue:#4d9fff; --accent:#7c6af7; --accent-bg:rgba(124,106,247,0.12);
+    --gold:#ffbd4a; --gold-bg:rgba(255,189,74,0.12);
     --radius:8px; --radius-lg:12px;
     --font-mono:'Space Mono', monospace; --font-sans:'Noto Sans KR', sans-serif;
   }
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth; scroll-padding-top:74px;}
   body{
     margin:0; background:var(--bg); color:var(--text);
     font-family:var(--font-sans); line-height:1.6; overflow-x:hidden;
   }
   a{color:inherit; text-decoration:none;}
+  ul{list-style:none; margin:0; padding:0;}
   .wrap{max-width:1120px; margin:0 auto; padding:0 24px;}
   .eyebrow{
     font-family:var(--font-mono); font-size:12px; font-weight:700;
@@ -31,8 +34,14 @@
     display:flex; align-items:center; gap:8px; margin-bottom:14px;
   }
   .eyebrow::before{content:''; width:20px; height:2px; background:var(--accent); display:inline-block; border-radius:2px;}
+  .eyebrow.gold{color:var(--gold);}
+  .eyebrow.gold::before{background:var(--gold);}
   h1,h2,h3{font-family:var(--font-sans); font-weight:900; letter-spacing:-0.02em; margin:0;}
   p{color:var(--text2); margin:0;}
+
+  .ambient{position:fixed; pointer-events:none; filter:blur(120px); opacity:.14; border-radius:50%; z-index:0;}
+  .ambient-a{width:520px; height:520px; top:-100px; right:-160px; background:var(--accent);}
+  .ambient-b{width:420px; height:420px; top:70vh; left:-180px; background:#0bc4cb;}
 
   /* ── 상단 고정 네비 ───────────────────────── */
   .topnav{
@@ -51,10 +60,10 @@
     display:flex; align-items:center; justify-content:center; font-size:16px;
     box-shadow:0 4px 14px rgba(124,106,247,0.45);
   }
-  .navlinks{display:flex; gap:4px; overflow-x:auto; scrollbar-width:none;}
+  .navlinks{display:flex; gap:2px; overflow-x:auto; scrollbar-width:none;}
   .navlinks::-webkit-scrollbar{display:none;}
   .navlinks a{
-    font-size:12px; font-weight:700; color:var(--text2); padding:7px 12px;
+    font-size:12px; font-weight:700; color:var(--text2); padding:7px 11px;
     border-radius:999px; white-space:nowrap; transition:0.2s;
   }
   .navlinks a:hover{color:var(--text); background:var(--bg3);}
@@ -62,7 +71,7 @@
     font-family:var(--font-sans); font-weight:700; font-size:13px;
     padding:9px 18px; border-radius:999px; white-space:nowrap;
     background:var(--accent); color:#fff; box-shadow:0 4px 14px rgba(124,106,247,0.35);
-    transition:0.2s; flex-shrink:0;
+    transition:0.2s; flex-shrink:0; border:none; cursor:pointer; display:inline-block;
   }
   .btn-cta:hover{transform:translateY(-1px); box-shadow:0 6px 18px rgba(124,106,247,0.5);}
   .btn-ghost{
@@ -73,34 +82,55 @@
 
   /* ── 히어로 ───────────────────────────────── */
   .hero{
-    padding:96px 24px 70px; text-align:center; position:relative;
-    background:
-      radial-gradient(ellipse 700px 400px at 50% -10%, rgba(124,106,247,0.22), transparent 70%);
+    padding:96px 24px 60px; text-align:center; position:relative;
+    background:radial-gradient(ellipse 700px 400px at 50% -10%, rgba(124,106,247,0.22), transparent 70%);
   }
   .hero .eyebrow{justify-content:center;}
   .hero h1{font-size:clamp(32px,5.5vw,56px); line-height:1.15; margin-bottom:18px;}
   .hero h1 .accent-word{color:var(--accent); position:relative;}
-  .hero-sub{font-size:16px; max-width:560px; margin:0 auto 34px; color:var(--text2);}
+  .hero-sub{font-size:16px; max-width:600px; margin:0 auto 34px; color:var(--text2);}
   .hero-cta-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:52px;}
   .hero-cta-row .btn-cta, .hero-cta-row .btn-ghost{font-size:14px; padding:13px 26px;}
-  .stat-strip{
-    display:flex; justify-content:center; gap:0; flex-wrap:wrap;
-    font-family:var(--font-mono);
-  }
-  .stat-strip div{padding:0 28px; border-right:1px solid var(--border);}
+  .stat-strip{display:flex; justify-content:center; gap:0; flex-wrap:wrap; font-family:var(--font-mono);}
+  .stat-strip div{padding:0 26px; border-right:1px solid var(--border);}
   .stat-strip div:last-child{border-right:none;}
   .stat-strip b{display:block; font-size:24px; color:var(--text); font-weight:700;}
   .stat-strip span{font-size:11px; color:var(--text3); font-family:var(--font-sans);}
 
+  /* ── 노트: 라이브 렌더링 안내 ─────────────── */
+  .note-banner{
+    max-width:820px; margin:0 auto 70px; padding:12px 18px; border-radius:10px;
+    background:var(--bg2); border:1px dashed var(--border2);
+    font-size:12px; color:var(--text3); text-align:center; line-height:1.6;
+  }
+  .note-banner b{color:var(--text2);}
+
+  /* ── 전체 기능 지도(퀵 네비) ──────────────── */
+  .feature-map{padding:0 0 90px;}
+  .feature-map-head{text-align:center; margin-bottom:30px;}
+  .feature-map-head h2{font-size:clamp(22px,3vw,30px); margin-bottom:10px;}
+  .feature-map-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  .feature-map-grid a{
+    display:flex; flex-direction:column; justify-content:flex-end; min-height:118px;
+    padding:16px; border:1px solid var(--border); border-radius:12px;
+    background:var(--bg2); transition:.2s;
+  }
+  .feature-map-grid a:hover{transform:translateY(-3px); border-color:rgba(124,106,247,.6); background:var(--accent-bg);}
+  .feature-map-grid a.premium{border-color:rgba(255,189,74,.35); background:linear-gradient(160deg, rgba(255,189,74,.08), var(--bg2));}
+  .feature-map-grid a.premium:hover{border-color:var(--gold); background:var(--gold-bg);}
+  .feature-map-grid span.fm-icon{font-size:22px; margin-bottom:auto;}
+  .feature-map-grid b{font-size:13.5px;}
+  .feature-map-grid small{color:var(--text3); font-size:10.5px; margin-top:3px;}
+  @media (max-width:820px){ .feature-map-grid{grid-template-columns:repeat(2,1fr);} }
+
   /* ── 기능 섹션 공통 ───────────────────────── */
   .feature{
-    padding:86px 0; border-top:1px solid var(--border);
+    padding:86px 0; border-top:1px solid var(--border); position:relative; z-index:1;
     opacity:0; transform:translateY(24px); transition:opacity 0.7s ease, transform 0.7s ease;
   }
   .feature.in-view{opacity:1; transform:translateY(0);}
-  .feature-grid{
-    display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;
-  }
+  .feature.premium{background:linear-gradient(180deg, rgba(255,189,74,0.035), transparent 60%);}
+  .feature-grid{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;}
   .feature:nth-of-type(even) .feature-grid{direction:rtl;}
   .feature:nth-of-type(even) .feature-grid > *{direction:ltr;}
   .feature-copy h2{font-size:clamp(22px,3vw,32px); margin-bottom:16px;}
@@ -110,9 +140,20 @@
     font-size:12.5px; color:var(--accent); background:var(--accent-bg);
     padding:8px 14px; border-radius:999px;
   }
+  .feature.premium .tip-line{color:var(--gold); background:var(--gold-bg);}
+  .badge-plus{
+    display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono);
+    font-size:10.5px; font-weight:700; color:#1a1408; background:linear-gradient(120deg,#ffe08a,#ffbd4a);
+    padding:4px 10px; border-radius:999px; margin-left:10px; letter-spacing:.5px; vertical-align:middle;
+  }
+  .feature-copy ul.small-list{margin-top:12px;}
+  .feature-copy ul.small-list li{position:relative; padding-left:16px; font-size:13px; color:var(--text2); margin:6px 0;}
+  .feature-copy ul.small-list li::before{content:''; position:absolute; left:0; top:.6em; width:5px; height:5px; border-radius:50%; background:var(--accent);}
+  .feature.premium .feature-copy ul.small-list li::before{background:var(--gold);}
+
   .mockup{
     background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg);
-    padding:20px; box-shadow:0 24px 60px -20px rgba(0,0,0,0.6);
+    padding:20px; box-shadow:0 24px 60px -20px rgba(0,0,0,0.6); position:relative;
   }
   .mockup-label{
     font-family:var(--font-mono); font-size:10px; color:var(--text3);
@@ -141,8 +182,22 @@
   .signal-mock .ind-card .bar{height:4px; border-radius:2px; background:var(--border2); overflow:hidden;}
   .signal-mock .ind-card .bar i{display:block; height:100%; border-radius:2px;}
   .signal-mock .ind-card small{font-size:9.5px; color:var(--text3); display:block; margin-top:5px;}
+  .cat-chip-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:14px;}
+  .cat-chip-row span{font-size:10.5px; padding:5px 10px; border-radius:999px; background:var(--bg3); color:var(--text3); border:1px solid var(--border);}
 
-  /* ── 02 포트폴리오 목업 ───────────────────── */
+  /* ── 02 달빛정보 목업 ─────────────────────── */
+  .moon-mock{text-align:center;}
+  .moon-mock svg{margin:0 auto;}
+  .moon-mock .modes{display:flex; gap:6px; justify-content:center; margin-top:14px;}
+  .moon-mock .modes span{font-size:10.5px; padding:6px 12px; border-radius:999px; border:1px solid var(--border2); color:var(--text3);}
+  .moon-mock .modes span.on{background:var(--accent-bg); border-color:var(--accent); color:var(--accent); font-weight:700;}
+  .moon-mock .cat-bars{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:16px; text-align:left;}
+  .moon-mock .cat-bars div{background:var(--bg3); border-radius:7px; padding:8px 10px;}
+  .moon-mock .cat-bars small{display:block; color:var(--text3); font-size:9.5px; margin-bottom:5px;}
+  .moon-mock .cat-bars .bar{height:4px; border-radius:2px; background:var(--border2); overflow:hidden;}
+  .moon-mock .cat-bars .bar i{display:block; height:100%; border-radius:2px; background:var(--blue);}
+
+  /* ── 03 포트폴리오 목업 ───────────────────── */
   .port-mock .stat-row{display:flex; gap:10px; margin-bottom:16px;}
   .port-mock .stat-card{flex:1; background:var(--bg3); border-radius:8px; padding:10px 12px;}
   .port-mock .stat-card small{font-size:10px; color:var(--text3);}
@@ -151,7 +206,16 @@
   .treemap div{border-radius:4px; display:flex; align-items:center; justify-content:center;
     font-size:9px; font-weight:700; color:rgba(255,255,255,0.9); font-family:var(--font-mono);}
 
-  /* ── 03 거래장부 목업 ─────────────────────── */
+  /* ── 04 관심종목 목업 ─────────────────────── */
+  .watch-mock .w-row{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border);}
+  .watch-mock .w-row:last-child{border-bottom:none;}
+  .watch-mock .w-name{flex:1; font-size:12.5px;}
+  .watch-mock .w-name b{display:block; font-size:12.5px;}
+  .watch-mock .w-name small{color:var(--text3); font-size:10px; font-family:var(--font-mono);}
+  .watch-mock .w-price{font-family:var(--font-mono); font-size:12px; text-align:right;}
+  .watch-mock .w-tag{font-size:9px; background:var(--accent-bg); color:var(--accent); padding:2px 7px; border-radius:999px; margin-left:6px;}
+
+  /* ── 05 거래장부 목업 ─────────────────────── */
   .ledger-mock .pill-row{display:flex; gap:6px; margin-bottom:12px;}
   .ledger-mock .pill{flex:1; text-align:center; padding:8px 0; border-radius:6px; font-size:11px; font-weight:700; border:1px solid var(--border2); color:var(--text3);}
   .ledger-mock .pill.on-buy{background:var(--red-bg); color:var(--red); border-color:rgba(255,77,106,0.3);}
@@ -160,10 +224,23 @@
   .ledger-mock .field b{color:var(--text); font-weight:500;}
   .ledger-mock .submit{background:var(--accent); color:#fff; text-align:center; padding:11px; border-radius:6px; font-size:12.5px; font-weight:700; margin-top:6px;}
 
-  /* ── 04 차트 목업 ─────────────────────────── */
+  /* ── 06 차트 목업 ─────────────────────────── */
   .chart-mock svg{width:100%; height:auto; display:block;}
 
-  /* ── 05 AI 조언 목업 ──────────────────────── */
+  /* ── 07 거래내역/세금 목업 ────────────────── */
+  .hist-mock table{width:100%; border-collapse:collapse; font-size:11.5px; margin-bottom:14px;}
+  .hist-mock th{text-align:left; color:var(--text3); font-weight:500; font-size:10px; padding:6px 8px; border-bottom:1px solid var(--border);}
+  .hist-mock td{padding:7px 8px; border-bottom:1px solid var(--border); color:var(--text2); font-family:var(--font-mono);}
+  .hist-mock .tax-card{background:var(--accent-bg); border:1px solid rgba(124,106,247,0.3); border-radius:8px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center;}
+  .hist-mock .tax-card b{font-family:var(--font-mono); font-size:16px; color:var(--accent);}
+
+  /* ── 08 배당 목업 ─────────────────────────── */
+  .div-mock .bars{display:flex; align-items:flex-end; gap:6px; height:90px; margin-bottom:16px;}
+  .div-mock .bars i{flex:1; background:linear-gradient(180deg, var(--green), rgba(0,200,122,0.35)); border-radius:3px 3px 0 0;}
+  .div-mock .up-row{display:flex; justify-content:space-between; font-size:11.5px; padding:8px 0; border-top:1px dashed var(--border); color:var(--text2);}
+  .div-mock .up-row b{color:var(--green); font-family:var(--font-mono);}
+
+  /* ── 09 AI 조언 목업 ──────────────────────── */
   .ai-mock{position:relative; text-align:center; padding:30px 10px 10px;}
   .ai-fab-mock{
     width:64px; height:64px; border-radius:50%; margin:0 auto 18px;
@@ -184,27 +261,28 @@
   }
   .ai-bubble b{color:var(--accent); display:block; font-size:11px; margin-bottom:6px; font-family:var(--font-mono);}
 
-  /* ── 06 거래내역/세금 목업 ────────────────── */
-  .hist-mock table{width:100%; border-collapse:collapse; font-size:11.5px; margin-bottom:14px;}
-  .hist-mock th{text-align:left; color:var(--text3); font-weight:500; font-size:10px; padding:6px 8px; border-bottom:1px solid var(--border);}
-  .hist-mock td{padding:7px 8px; border-bottom:1px solid var(--border); color:var(--text2); font-family:var(--font-mono);}
-  .hist-mock .tax-card{background:var(--accent-bg); border:1px solid rgba(124,106,247,0.3); border-radius:8px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center;}
-  .hist-mock .tax-card b{font-family:var(--font-mono); font-size:16px; color:var(--accent);}
+  /* ── 10 탐사선 목업 ───────────────────────── */
+  .probe-mock{text-align:left;}
+  .probe-mock .p-head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .probe-mock .p-head b{font-size:14px;}
+  .probe-mock .p-head span{font-size:10px; color:var(--text3); font-family:var(--font-mono);}
+  .probe-mock svg{width:100%; height:auto; display:block; margin-bottom:12px;}
+  .probe-mock .p-stat-row{display:flex; gap:10px;}
+  .probe-mock .p-stat{flex:1; background:var(--bg3); border-radius:8px; padding:9px 11px;}
+  .probe-mock .p-stat small{font-size:9.5px; color:var(--text3); display:block;}
+  .probe-mock .p-stat b{font-family:var(--font-mono); font-size:14px; color:var(--green);}
 
-  /* ── 07 배당 목업 ─────────────────────────── */
-  .div-mock .bars{display:flex; align-items:flex-end; gap:6px; height:90px; margin-bottom:16px;}
-  .div-mock .bars i{flex:1; background:linear-gradient(180deg, var(--green), rgba(0,200,122,0.35)); border-radius:3px 3px 0 0;}
-  .div-mock .up-row{display:flex; justify-content:space-between; font-size:11.5px; padding:8px 0; border-top:1px dashed var(--border); color:var(--text2);}
-  .div-mock .up-row b{color:var(--green); font-family:var(--font-mono);}
+  /* ── 11 비행계획 목업 ─────────────────────── */
+  .flight-mock .fp-row{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; margin-bottom:8px; border:1px solid var(--border);}
+  .flight-mock .fp-row .fp-icon{font-size:16px;}
+  .flight-mock .fp-row .fp-label{flex:1; font-size:12px; color:var(--text2);}
+  .flight-mock .fp-row .fp-val{font-family:var(--font-mono); font-size:12px;}
+  .flight-mock .fp-docking{background:var(--green-bg); border-color:rgba(0,200,122,.3);}
+  .flight-mock .fp-escape{background:var(--red-bg); border-color:rgba(255,77,106,.3);}
+  .flight-mock .fp-fuel{background:rgba(77,159,255,.1); border-color:rgba(77,159,255,.3);}
+  .flight-mock .fp-banner-chip{display:inline-flex; align-items:center; gap:6px; font-size:11px; background:var(--bg3); border:1px solid var(--border2); border-radius:999px; padding:6px 12px; margin-top:8px;}
 
-  /* ── 08 달빛정보 목업 ─────────────────────── */
-  .moon-mock{text-align:center;}
-  .moon-mock svg{margin:0 auto;}
-  .moon-mock .modes{display:flex; gap:6px; justify-content:center; margin-top:14px;}
-  .moon-mock .modes span{font-size:10.5px; padding:6px 12px; border-radius:999px; border:1px solid var(--border2); color:var(--text3);}
-  .moon-mock .modes span.on{background:var(--accent-bg); border-color:var(--accent); color:var(--accent); font-weight:700;}
-
-  /* ── 09 설정 목업 ─────────────────────────── */
+  /* ── 12 설정 목업 ─────────────────────────── */
   .set-mock .tabs{display:flex; gap:2px; margin-bottom:14px; border-bottom:1px solid var(--border);}
   .set-mock .tabs span{flex:1; text-align:center; font-size:11px; font-weight:700; padding:9px 0; color:var(--text3);}
   .set-mock .tabs span.on{color:var(--text); border-bottom:2px solid var(--accent);}
@@ -215,10 +293,25 @@
   .set-mock .fsizes span{flex:1; text-align:center; padding:6px 0; border:1px solid var(--border2); border-radius:5px; font-size:10px; color:var(--text3);}
   .set-mock .fsizes span.on{background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700;}
 
+  /* ── 데이터 관리 상세 카탈로그(FAQ 아코디언) ── */
+  .catalog{padding:90px 0; border-top:1px solid var(--border);}
+  .catalog-head{text-align:center; margin-bottom:40px;}
+  .catalog-head h2{font-size:clamp(22px,3vw,30px); margin-bottom:10px;}
+  .catalog-head p{max-width:560px; margin:0 auto;}
+  .catalog-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  details{border:1px solid var(--border); border-radius:14px; background:var(--bg2); overflow:hidden;}
+  summary{cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px 18px; list-style:none; font-size:13px; font-weight:700;}
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:'+'; color:var(--text3); font-family:var(--font-mono); font-size:16px; font-weight:400;}
+  details[open] summary::after{content:'–';}
+  details p{margin:0; padding:0 18px 18px; color:var(--text2); font-size:12.5px; line-height:1.7;}
+  @media (max-width:820px){ .catalog-grid{grid-template-columns:1fr;} }
+
   /* ── 푸터 CTA ─────────────────────────────── */
   .footer-cta{
     text-align:center; padding:100px 24px 70px; border-top:1px solid var(--border);
     background:radial-gradient(ellipse 600px 300px at 50% 100%, rgba(124,106,247,0.16), transparent 70%);
+    position:relative; z-index:1;
   }
   .footer-cta h2{font-size:clamp(24px,4vw,38px); margin-bottom:16px;}
   .footer-cta p{margin-bottom:30px; font-size:15px;}
@@ -232,16 +325,22 @@
 </head>
 <body>
 
+<div class="ambient ambient-a"></div>
+<div class="ambient ambient-b"></div>
+
 <div class="topnav">
   <div class="topnav-inner">
     <div class="brand"><span class="brand-badge">🌕</span> Two the Moon</div>
     <div class="navlinks">
       <a href="#signal">시장신호</a>
+      <a href="#moonlight">달빛정보</a>
       <a href="#portfolio">포트폴리오</a>
+      <a href="#watchlist">관심종목</a>
       <a href="#ledger">거래장부</a>
       <a href="#ai">AI조언</a>
-      <a href="#dividend">배당</a>
-      <a href="#moonlight">달빛정보</a>
+      <a href="#probe">탐사선</a>
+      <a href="#flightplan">비행계획</a>
+      <a href="#settings">설정</a>
     </div>
     <a class="btn-cta" href="index.html">앱 열기 →</a>
   </div>
@@ -252,16 +351,45 @@
   <div class="wrap">
     <div class="eyebrow">국내 · 미국 주식 통합 관리</div>
     <h1>포트폴리오,<br><span class="accent-word">달까지</span> 함께 가요 🚀</h1>
-    <p class="hero-sub">매수부터 배당, 양도세, 시장 밸류에이션까지 — 흩어진 계좌와 스프레드시트 없이 한 화면에서 관리하는 스마트 주식 장부입니다.</p>
+    <p class="hero-sub">매수부터 배당, 양도세, 시장 밸류에이션, 종목별 목표가 알림까지 — 흩어진 계좌와 스프레드시트 없이 한 화면에서 관리하는 스마트 주식 장부입니다.</p>
     <div class="hero-cta-row">
       <a class="btn-cta" href="index.html">지금 시작하기</a>
-      <a class="btn-ghost" href="#signal">기능 살펴보기 ↓</a>
+      <a class="btn-ghost" href="#signal">전체 기능 살펴보기 ↓</a>
     </div>
     <div class="stat-strip">
-      <div><b>9</b><span>대시보드</span></div>
+      <div><b>13</b><span>기능 대시보드</span></div>
       <div><b>15+</b><span>시장 지표</span></div>
       <div><b>22%</b><span>양도세 자동계산</span></div>
       <div><b>0원</b><span>GitHub 백업 비용</span></div>
+    </div>
+  </div>
+  <div class="note-banner">
+    이 페이지의 화면 목업은 <b>실제 앱의 색상·폰트·컴포넌트 스타일을 그대로 사용해 재현</b>한 것입니다.
+    Two the Moon은 브라우저 로컬 저장소와 실시간 시세 API로 동작하는 개인용 웹앱이라 정적 스크린샷 대신
+    실제 데이터 구조를 반영한 목업으로 기능을 안내해요 — <b>index.html</b>에서 실제 화면을 바로 확인할 수 있습니다.
+  </div>
+</section>
+
+<!-- ═══════════════ 전체 기능 지도 ═══════════════ -->
+<section class="feature-map">
+  <div class="wrap">
+    <div class="feature-map-head">
+      <div class="eyebrow" style="justify-content:center;">전체 기능 지도</div>
+      <h2>13개 대시보드, 한눈에 훑어보기</h2>
+    </div>
+    <div class="feature-map-grid">
+      <a href="#signal"><span class="fm-icon">📊</span><b>시장 신호 분석</b><small>15+ 지표 · 0~100점</small></a>
+      <a href="#moonlight"><span class="fm-icon">🌕</span><b>달빛정보</b><small>4대 카테고리 상세</small></a>
+      <a href="#portfolio"><span class="fm-icon">🌐</span><b>포트폴리오 맵</b><small>통합자산 · 트리맵</small></a>
+      <a href="#watchlist"><span class="fm-icon">⭐</span><b>관심종목</b><small>실시간 시세 추적</small></a>
+      <a href="#ledger"><span class="fm-icon">📋</span><b>거래 장부</b><small>매수·매도·배당·이동·분할</small></a>
+      <a href="#growth"><span class="fm-icon">📈</span><b>자산 성장 추이</b><small>구간 확대 차트</small></a>
+      <a href="#history"><span class="fm-icon">💰</span><b>실현수익 · 양도세</b><small>거래내역 검색</small></a>
+      <a href="#dividend"><span class="fm-icon">🏦</span><b>배당통계</b><small>예정 배당 예측</small></a>
+      <a href="#ai"><span class="fm-icon">🤖</span><b>AI 투자조언</b><small>내 보유 종목 기반</small></a>
+      <a href="#probe" class="premium"><span class="fm-icon">🛰️</span><b>탐사선</b><small>가상 매수 시뮬레이션</small></a>
+      <a href="#flightplan" class="premium"><span class="fm-icon">🚀</span><b>비행 계획</b><small>목표가·손절가 알림</small></a>
+      <a href="#settings"><span class="fm-icon">⚙️</span><b>설정 & 백업</b><small>GitHub 동기화</small></a>
     </div>
   </div>
 </section>
@@ -272,9 +400,9 @@
     <div class="feature-copy">
       <div class="eyebrow">01 — 시장 신호 분석</div>
       <h2>지금 사도 될지,<br>데이터가 먼저 알려줘요</h2>
-      <p>VIX·공포&탐욕 등 심리·리스크 지표, 미국 10Y 금리·DXY·신용잔고 등 자금 환경, Russell 2000·구리·BDI 등 경기 선행지표, 버핏지수·CAPE PE 밸류에이션까지 4대 카테고리 15개 이상의 지표를 종합합니다.</p>
-      <p>모든 지표는 0~100점 하나의 시장 신호 점수로 압축되어, 매일 아침 홈 화면에서 바로 확인할 수 있어요.</p>
-      <div class="tip-line">💡 점수가 낮을수록 저평가 구간, 높을수록 비중축소 경고 구간이에요</div>
+      <p>VIX·공포&탐욕 지수 같은 심리·리스크 지표, 미국 10년물 금리·DXY·신용잔고 등 자금 환경 지표, Russell 2000·구리·BDI 등 경기 선행지표, 버핏지수·CAPE PE 같은 밸류에이션 지표까지 4대 카테고리 15개 이상의 지표를 종합합니다.</p>
+      <p>모든 지표는 0~100점 하나의 시장 신호 점수로 압축되어, 매일 아침 홈 화면 상단에서 바로 확인할 수 있어요.</p>
+      <div class="tip-line">💡 점수가 낮을수록 저평가·매수 구간, 높을수록 비중축소 경고 구간이에요</div>
     </div>
     <div class="mockup signal-mock">
       <div class="mockup-label"><span>MARKET SIGNAL</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
@@ -294,18 +422,56 @@
         <div class="ind-card"><b>공포&탐욕 41</b><div class="bar"><i style="width:41%; background:var(--blue);"></i></div><small>중립</small></div>
         <div class="ind-card"><b>버핏지수 187%</b><div class="bar"><i style="width:80%; background:var(--red);"></i></div><small>고평가 경계</small></div>
       </div>
+      <div class="cat-chip-row">
+        <span>😨 심리·리스크</span><span>💵 자금환경</span><span>🚚 경기선행</span><span>📐 밸류에이션</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════ 02 포트폴리오 ═══════════════ -->
+<!-- ═══════════════ 02 달빛정보 ═══════════════ -->
+<section class="feature" id="moonlight">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">02 — 달빛정보</div>
+      <h2>지금 시장,<br>저평가일까 고평가일까</h2>
+      <p>시장 신호 점수를 만들어낸 4대 카테고리(심리·리스크, 자금환경, 경기선행, 밸류에이션)를 각각 뜯어볼 수 있는 전용 대시보드예요. 지표 하나하나의 현재 값과 과거 대비 위치를 함께 보여줍니다.</p>
+      <p>적극적·중립적·보수적 3가지 계산 모드 중 나에게 맞는 기준을 고르면, 전체보기 화면의 시장 신호 점수에도 동일한 기준이 즉시 반영돼요.</p>
+      <div class="tip-line">💡 0~30 적극 매수 · 30~50 분할 매수 · 50~70 관망 · 70~100 비중 축소</div>
+    </div>
+    <div class="mockup moon-mock">
+      <div class="mockup-label"><span>MOONLIGHT INDEX</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <svg width="180" height="110" viewBox="0 0 180 110">
+        <path d="M14,100 A76,76 0 0 1 166,100" fill="none" stroke="var(--bg3)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M14,100 A76,76 0 0 1 120,32" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="var(--green)"/>
+            <stop offset="100%" stop-color="var(--blue)"/>
+          </linearGradient>
+        </defs>
+        <text x="90" y="88" text-anchor="middle" font-family="Space Mono" font-size="30" font-weight="700" fill="var(--text)">47</text>
+        <text x="90" y="104" text-anchor="middle" font-family="Noto Sans KR" font-size="10" fill="var(--text3)">🌗 중립적 모드</text>
+      </svg>
+      <div class="modes"><span>적극적</span><span class="on">중립적</span><span>보수적</span></div>
+      <div class="cat-bars">
+        <div><small>😨 심리·리스크</small><div class="bar"><i style="width:38%;"></i></div></div>
+        <div><small>💵 자금환경</small><div class="bar"><i style="width:55%;"></i></div></div>
+        <div><small>🚚 경기선행</small><div class="bar"><i style="width:44%;"></i></div></div>
+        <div><small>📐 밸류에이션</small><div class="bar"><i style="width:72%; background:var(--red);"></i></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 03 포트폴리오 ═══════════════ -->
 <section class="feature" id="portfolio">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">02 — 포트폴리오 맵</div>
+      <div class="eyebrow">03 — 포트폴리오 맵</div>
       <h2>내 자산이 어디에,<br>얼마나 있는지 한 장으로</h2>
       <p>국내·해외 투자 원금, 현재 평가액, 수익률을 실시간으로 집계하는 통합 자산 패널과, 종목별 비중을 직사각형 크기로 보여주는 트리맵을 제공합니다.</p>
-      <p>트리맵을 꾹 누르면 선택 모드로 들어가 여러 종목을 골라 합산 금액을 바로 계산할 수 있어요.</p>
+      <p>트리맵을 꾹 누르면 선택 모드로 들어가 여러 종목을 골라 합산 금액을 바로 계산할 수 있고, "🌐 전체 / 👤 소유자1 / 👥 소유자2" 탭으로 가족 구성원별 자산도 즉시 전환해서 볼 수 있어요.</p>
       <div class="tip-line">💡 "현재 보유 / 누적 자산" 전환으로 실현수익까지 포함한 총자산도 볼 수 있어요</div>
     </div>
     <div class="mockup port-mock">
@@ -328,14 +494,42 @@
   </div>
 </section>
 
-<!-- ═══════════════ 03 거래 장부 ═══════════════ -->
+<!-- ═══════════════ 04 관심종목 ═══════════════ -->
+<section class="feature" id="watchlist">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">04 — 관심종목</div>
+      <h2>아직 안 샀어도,<br>꾸준히 지켜볼 수 있어요</h2>
+      <p>보유하지 않은 종목도 관심종목에 등록해 실시간 시세와 등락률을 함께 추적할 수 있습니다. ⭐ 관심종목 탭에서 국내·해외 종목을 검색해 바로 추가해요.</p>
+      <p>종목마다 태그와 메모를 남겨 "2차전지 · 배당용 · 장기투자"처럼 나만의 기준으로 분류할 수 있고, 여기서 등록한 관심종목은 아래 소개할 🛰️ 탐사선 기능의 대상이 됩니다.</p>
+      <div class="tip-line">💡 태그는 쉼표로 구분해 종목당 최대 5개까지 붙일 수 있어요</div>
+    </div>
+    <div class="mockup watch-mock">
+      <div class="mockup-label"><span>WATCHLIST</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="w-row">
+        <div class="w-name"><b>NVIDIA <span class="w-tag">반도체</span></b><small>NVDA</small></div>
+        <div class="w-price">$186.42<br><span style="color:var(--red); font-size:10.5px;">+2.4%</span></div>
+      </div>
+      <div class="w-row">
+        <div class="w-name"><b>SK하이닉스 <span class="w-tag">장기투자</span></b><small>000660</small></div>
+        <div class="w-price">₩248,000<br><span style="color:var(--red); font-size:10.5px;">+1.1%</span></div>
+      </div>
+      <div class="w-row">
+        <div class="w-name"><b>JEPI <span class="w-tag">배당용</span></b><small>JEPI</small></div>
+        <div class="w-price">$58.10<br><span style="color:var(--blue); font-size:10.5px;">-0.3%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 05 거래 장부 ═══════════════ -->
 <section class="feature" id="ledger">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">03 — 거래 장부</div>
+      <div class="eyebrow">05 — 거래 장부</div>
       <h2>매수 한 줄이면<br>전체 포트폴리오가 다시 계산돼요</h2>
       <p>소유자, 거래 유형(매수·매도·배당·이동·분할), 종목, 수량, 단가만 입력하면 모든 대시보드에 즉시 반영됩니다.</p>
-      <p>계좌명을 함께 남기면 계좌별 수익률도 따로 확인할 수 있고, "이동"으로 계좌 간 종목 이동, "분할"로 액면분할도 정확히 기록돼요.</p>
+      <p>계좌명을 함께 남기면 계좌별 수익률도 따로 확인할 수 있고, "이동"으로 계좌 간 종목 이동, "분할"로 액면분할도 정확히 기록돼요. CSV 업로드로 여러 건을 한 번에 가져올 수도 있습니다.</p>
       <div class="tip-line">💡 가족 2인의 자산을 소유자별로 완전히 분리해서 관리할 수 있어요</div>
     </div>
     <div class="mockup ledger-mock">
@@ -359,15 +553,15 @@
   </div>
 </section>
 
-<!-- ═══════════════ 04 자산 성장 추이 ═══════════════ -->
+<!-- ═══════════════ 06 자산 성장 추이 ═══════════════ -->
 <section class="feature" id="growth">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">04 — 자산 성장 추이</div>
+      <div class="eyebrow">06 — 자산 성장 추이</div>
       <h2>투자원금과 평가액이<br>벌어진 만큼이 내 수익이에요</h2>
       <p>시간 흐름에 따른 총 투자액과 총 평가액을 영역 차트로 겹쳐 보여주고, 매도로 확정된 손익은 막대 그래프로 함께 표시합니다.</p>
       <p>차트 위를 드래그하면 원하는 구간만 확대해서 매매 타이밍을 되돌아볼 수 있어요.</p>
-      <div class="tip-line">💡 초록 막대 = 익절, 파랑 막대 = 손절로 한눈에 구분돼요</div>
+      <div class="tip-line">💡 빨간 막대 = 익절, 파랑 막대 = 손절 (국내 관행 기준)로 한눈에 구분돼요</div>
     </div>
     <div class="mockup chart-mock">
       <div class="mockup-label"><span>ASSET GROWTH</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
@@ -383,40 +577,20 @@
           fill="none" stroke="#7c6af7" stroke-width="2.5"/>
         <path d="M0,168 L40,165 L80,162 L120,158 L160,152 L200,148 L240,142 L280,136 L320,130 L360,124 L400,118"
           fill="none" stroke="var(--text3)" stroke-width="2" stroke-dasharray="4 3"/>
-        <rect x="70" y="150" width="10" height="14" fill="var(--green)" rx="2"/>
+        <rect x="70" y="150" width="10" height="14" fill="var(--red)" rx="2"/>
         <rect x="150" y="140" width="10" height="24" fill="var(--blue)" rx="2"/>
-        <rect x="230" y="120" width="10" height="44" fill="var(--green)" rx="2"/>
-        <rect x="310" y="100" width="10" height="64" fill="var(--green)" rx="2"/>
+        <rect x="230" y="120" width="10" height="44" fill="var(--red)" rx="2"/>
+        <rect x="310" y="100" width="10" height="64" fill="var(--red)" rx="2"/>
       </svg>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════ 05 AI 투자조언 ═══════════════ -->
-<section class="feature" id="ai">
-  <div class="wrap feature-grid">
-    <div class="feature-copy">
-      <div class="eyebrow">05 — AI 투자조언</div>
-      <h2>지금 상황,<br>AI에게 다시 한번 물어보세요</h2>
-      <p>현재 시장 신호와 내 보유 종목을 함께 분석해 AI가 투자 의견을 제공합니다. 우측 하단 버튼 하나로 언제든 물어볼 수 있어요.</p>
-      <p>받았던 조언은 날짜별 기록으로 남아 나중에 다시 꺼내볼 수 있습니다.</p>
-      <div class="tip-line">⚠️ AI 조언은 참고용이며, 투자 판단과 책임은 본인에게 있어요</div>
-    </div>
-    <div class="mockup ai-mock">
-      <div class="ai-fab-mock">🤖</div>
-      <div class="ai-bubble">
-        <b>AI 투자조언 · 방금 전</b>
-        현재 시장 신호는 34점(분할 매수 구간)이에요. 보유 중인 반도체 비중이 42%로 다소 높은 편이니, 신규 매수는 배당주나 방어주 위주로 분산해보는 걸 추천해요.
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════ 06 거래내역/실현수익/양도세 ═══════════════ -->
+<!-- ═══════════════ 07 거래내역/실현수익/양도세 ═══════════════ -->
 <section class="feature" id="history">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">06 — 거래내역 · 실현수익 · 양도세</div>
+      <div class="eyebrow">07 — 거래내역 · 실현수익 · 양도세</div>
       <h2>판 뒤에 남는 숫자까지<br>미리 계산해요</h2>
       <p>국가·유형·계좌·기간·종목명으로 거래를 검색하고, 매도로 확정된 실현수익을 종목별 수익금·수익률 랭킹으로 확인합니다.</p>
       <p>해외주식 매도 시 양도소득세(22%)를 기본공제(250만원)까지 반영해 자동 계산하므로, 연말 세금 신고를 미리 준비할 수 있어요.</p>
@@ -426,23 +600,23 @@
       <div class="mockup-label"><span>REALIZED · TAX</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
       <table>
         <tr><th>날짜</th><th>종목</th><th>유형</th><th>손익</th></tr>
-        <tr><td>07.18</td><td>NVDA</td><td>매도</td><td style="color:var(--green)">+1,842,000</td></tr>
+        <tr><td>07.18</td><td>NVDA</td><td>매도</td><td style="color:var(--red)">+1,842,000</td></tr>
         <tr><td>07.11</td><td>TSLA</td><td>매도</td><td style="color:var(--blue)">-320,000</td></tr>
-        <tr><td>06.29</td><td>AAPL</td><td>매도</td><td style="color:var(--green)">+960,500</td></tr>
+        <tr><td>06.29</td><td>AAPL</td><td>매도</td><td style="color:var(--red)">+960,500</td></tr>
       </table>
       <div class="tax-card"><span>해외주식 양도세 예정세액</span><b>2,417,800원</b></div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════ 07 배당통계 ═══════════════ -->
+<!-- ═══════════════ 08 배당통계 ═══════════════ -->
 <section class="feature" id="dividend">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">07 — 배당통계</div>
+      <div class="eyebrow">08 — 배당통계</div>
       <h2>다음 배당,<br>언제 얼마나 들어올지 미리 보기</h2>
-      <p>월별 배당 추이 차트와 종목별 배당금 목록을 제공하고, 배당세(15.4%)도 세전 금액 입력만으로 자동 차감할 수 있어요.</p>
-      <p>보유 종목의 배당 주기를 자동 감지해 다음 예상 배당월과 예상 수령액을 미리 계산해주는 "예정 배당" 기능도 있습니다.</p>
+      <p>월별 배당 추이 차트와 종목별 배당금 목록을 제공하고, 배당세(15.4%)도 세전 금액 입력만으로 자동 차감할 수 있어요. 소유자·시장·계좌·종목명으로 필터링도 가능합니다.</p>
+      <p>보유 종목의 배당 주기를 자동 감지해 다음 예상 배당월과 예상 수령액을 미리 계산해주는 "예정 배당" 기능과, 배당 기여도가 큰 "효자 종목" 패널도 함께 제공돼요.</p>
       <div class="tip-line">💡 1,000만원 투자 시 월 예상 세후 배당금도 함께 계산돼요</div>
     </div>
     <div class="mockup div-mock">
@@ -458,43 +632,87 @@
   </div>
 </section>
 
-<!-- ═══════════════ 08 달빛정보 ═══════════════ -->
-<section class="feature" id="moonlight">
+<!-- ═══════════════ 09 AI 투자조언 ═══════════════ -->
+<section class="feature" id="ai">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">08 — 달빛정보</div>
-      <h2>지금 시장,<br>저평가일까 고평가일까</h2>
-      <p>심리·리스크, 자금환경, 경기선행, 밸류에이션 4대 카테고리를 종합한 0~100점 통합 점수를 더 자세히 들여다볼 수 있는 전용 대시보드예요.</p>
-      <p>적극적·중립적·보수적 3가지 계산 모드 중 나에게 맞는 기준을 고르면, 전체보기 화면의 시장 신호 점수에도 똑같이 반영됩니다.</p>
-      <div class="tip-line">💡 0~30 적극 매수 · 30~50 분할 매수 · 50~70 관망 · 70~100 비중 축소</div>
+      <div class="eyebrow">09 — AI 투자조언</div>
+      <h2>지금 상황,<br>AI에게 다시 한번 물어보세요</h2>
+      <p>현재 시장 신호와 내 보유 종목 구성을 함께 분석해 AI가 투자 의견을 제공합니다. 우측 하단 플로팅 버튼 하나로 언제든 물어볼 수 있어요.</p>
+      <p>받았던 조언은 날짜별 기록으로 남아 나중에 다시 꺼내볼 수 있습니다.</p>
+      <div class="tip-line">⚠️ AI 조언은 참고용이며, 투자 판단과 책임은 본인에게 있어요</div>
     </div>
-    <div class="mockup moon-mock">
-      <div class="mockup-label"><span>MOONLIGHT INDEX</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
-      <svg width="180" height="110" viewBox="0 0 180 110">
-        <path d="M14,100 A76,76 0 0 1 166,100" fill="none" stroke="var(--bg3)" stroke-width="14" stroke-linecap="round"/>
-        <path d="M14,100 A76,76 0 0 1 120,32" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round"/>
-        <defs>
-          <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="var(--green)"/>
-            <stop offset="100%" stop-color="var(--blue)"/>
-          </linearGradient>
-        </defs>
-        <text x="90" y="88" text-anchor="middle" font-family="Space Mono" font-size="30" font-weight="700" fill="var(--text)">47</text>
-        <text x="90" y="104" text-anchor="middle" font-family="Noto Sans KR" font-size="10" fill="var(--text3)">🌗 중립적 모드</text>
-      </svg>
-      <div class="modes"><span>적극적</span><span class="on">중립적</span><span>보수적</span></div>
+    <div class="mockup ai-mock">
+      <div class="ai-fab-mock">🤖</div>
+      <div class="ai-bubble">
+        <b>AI 투자조언 · 방금 전</b>
+        현재 시장 신호는 34점(분할 매수 구간)이에요. 보유 중인 반도체 비중이 42%로 다소 높은 편이니, 신규 매수는 배당주나 방어주 위주로 분산해보는 걸 추천해요.
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════ 09 설정 & 백업 ═══════════════ -->
+<!-- ═══════════════ 10 탐사선 (Plus) ═══════════════ -->
+<section class="feature premium" id="probe">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow gold">10 — 탐사선<span class="badge-plus">✨ PLUS</span></div>
+      <h2>사지 않고도,<br>샀다면 어땠을지 미리 체험</h2>
+      <p>관심종목 중 궁금한 종목을 원하는 날짜·가격으로 "가상 매수"해보는 프리미엄 기능이에요. 실제 자산에는 전혀 영향을 주지 않고, 가상의 손익과 그래프만 별도로 확인할 수 있습니다.</p>
+      <p>탐사선을 띄운 종목은 관심종목 상단의 전용 패널에 모여 실시간으로 가상 수익률을 보여줘요. 매수를 망설이는 종목의 "만약"을 데이터로 미리 검증해볼 수 있습니다.</p>
+      <div class="tip-line">💡 관심종목 탭의 🛰️ "탐사선 띄우기" 버튼으로 언제든 시작할 수 있어요</div>
+    </div>
+    <div class="mockup probe-mock">
+      <div class="mockup-label"><span>PROBE · 가상 매수</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="p-head"><b>🛰️ 삼성전자</b><span>발사일 07.02 · ₩71,200</span></div>
+      <svg viewBox="0 0 320 90" preserveAspectRatio="none">
+        <path d="M0,70 L40,64 L80,58 L120,50 L160,44 L200,34 L240,26 L280,16 L320,10"
+          fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+        <path d="M0,70 L40,64 L80,58 L120,50 L160,44 L200,34 L240,26 L280,16 L320,10 L320,90 L0,90 Z"
+          fill="var(--gold)" opacity="0.12"/>
+      </svg>
+      <div class="p-stat-row">
+        <div class="p-stat"><small>현재가</small><b>₩79,400</b></div>
+        <div class="p-stat"><small>가상 수익률</small><b>+11.5%</b></div>
+        <div class="p-stat"><small>경과일</small><b style="color:var(--text)">23일</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 11 비행 계획 (Plus) ═══════════════ -->
+<section class="feature premium" id="flightplan">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow gold">11 — 비행 계획<span class="badge-plus">✨ PLUS</span></div>
+      <h2>도킹, 탈출, 연료 보급 —<br>가격이 알아서 알려줘요</h2>
+      <p>보유 종목마다 🌕 도킹 지점(목표가), 🛸 비상 탈출(손절가), ⛽ 연료 보급(추가매수 지점)을 설정해두면, 현재가가 각 지점에 근접하거나 도달했을 때 자동으로 알림을 띄워줘요.</p>
+      <p>설정한 지점들은 차트에 가로선으로 함께 표시되고, "🌐 통합 자산" 화면 상단 배너에서 도킹·탈출·연료 알림을 종목별로 한눈에 모아볼 수 있습니다.</p>
+      <ul class="small-list">
+        <li>연료 보급 지점은 종목당 여러 개를 등록해 단계별 물타기 계획을 세울 수 있어요</li>
+        <li>알림 배너의 종목 칩을 클릭하면 바로 해당 종목 상세카드로 이동해요</li>
+      </ul>
+      <div class="tip-line">💡 현재가가 지점의 ±3% 이내로 들어오면 "근접" 알림이 먼저 떠요</div>
+    </div>
+    <div class="mockup flight-mock">
+      <div class="mockup-label"><span>🚀 FLIGHT PLAN</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="fp-row fp-docking"><span class="fp-icon">🌕</span><span class="fp-label">도킹 지점 (목표가)</span><span class="fp-val">$220.00</span></div>
+      <div class="fp-row fp-escape"><span class="fp-icon">🛸</span><span class="fp-label">비상 탈출 (손절가)</span><span class="fp-val">$178.50</span></div>
+      <div class="fp-row fp-fuel"><span class="fp-icon">⛽</span><span class="fp-label">연료 보급 1차</span><span class="fp-val">$190.00</span></div>
+      <div class="fp-row fp-fuel"><span class="fp-icon">⛽</span><span class="fp-label">연료 보급 2차</span><span class="fp-val">$182.00</span></div>
+      <div class="fp-banner-chip">🌕 <b>AAPL</b> <span style="color:var(--green)">+1.8%</span> · 도킹 지점 근접</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 12 설정 & 백업 ═══════════════ -->
 <section class="feature" id="settings">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">09 — 설정 & 백업</div>
+      <div class="eyebrow">12 — 설정 & 백업</div>
       <h2>내 장부는 내 GitHub에,<br>안전하게</h2>
       <p>개인 GitHub 저장소를 연결하면 모든 기기에서 장부가 자동으로 동기화돼요. 거래를 추가·수정할 때마다 조용히 백업됩니다.</p>
-      <p>폰트 크기, 손익 색상, 시장 신호 카드에 표시할 지표까지 취향대로 바꿀 수 있는 화면 설정도 함께 제공해요.</p>
+      <p>💾 데이터 관리, 🎨 화면 설정, 📡 지표 설정 세 개의 탭으로 구성되어 있고, 폰트 크기·손익 색상·시장 신호 카드에 표시할 지표까지 취향대로 바꿀 수 있어요.</p>
       <div class="tip-line">💡 JSON·CSV 파일로 로컬 백업 및 복원도 언제든 가능해요</div>
     </div>
     <div class="mockup set-mock">
@@ -503,6 +721,43 @@
       <div class="toggle-row"><span>🔄 내역 수정 시 자동 저장</span><div class="switch"></div></div>
       <div class="toggle-row" style="border-bottom:none;"><span>☁️ GitHub 연결됨 · etech-symantec</span><span style="color:var(--green); font-size:11px;">● 동기화됨</span></div>
       <div class="fsizes"><span>XS</span><span>소</span><span class="on">기본</span><span>대</span><span>XL</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 세부 기능 카탈로그 (아코디언) ═══════════════ -->
+<section class="catalog">
+  <div class="wrap">
+    <div class="catalog-head">
+      <div class="eyebrow" style="justify-content:center;">더 자세히</div>
+      <h2>눈에 잘 안 띄지만, 은근히 자주 쓰는 기능들</h2>
+      <p>큼직한 대시보드 뒤에 숨어있는 세세한 편의 기능도 소개할게요.</p>
+    </div>
+    <div class="catalog-grid">
+      <details open>
+        <summary><span>📥 CSV 거래내역 가져오기</span><span>DATA</span></summary>
+        <p>증권사에서 내려받은 CSV 파일을 업로드하면 거래 내역을 한 번에 불러옵니다. 티커를 자동으로 찾지 못한 종목은 "⚠️ 알 수 없는 종목 연결" 화면에서 종목명이나 영문 티커를 검색해 직접 매칭해줄 수 있어요.</p>
+      </details>
+      <details>
+        <summary><span>🏷️ 종목 태그 / 메모</span><span>ORGANIZE</span></summary>
+        <p>종목마다 "2차전지, 배당용, 장기투자"처럼 쉼표로 구분된 태그를 최대 5개까지 붙일 수 있습니다. 포트폴리오가 커질수록 종목을 분류하고 찾는 데 유용해요.</p>
+      </details>
+      <details>
+        <summary><span>📅 날짜 일괄수정</span><span>EDIT</span></summary>
+        <p>필터링된 여러 거래의 날짜를 한 번에 관리하는 도구예요. 📆 날짜 이동(며칠씩 앞/뒤로), 🔄 날짜 치환(특정 날짜를 다른 날짜로), 📌 날짜 설정(선택한 거래를 모두 같은 날짜로) 세 가지 방식 중 골라 쓸 수 있습니다.</p>
+      </details>
+      <details>
+        <summary><span>👥 소유자 설정</span><span>PROFILE</span></summary>
+        <p>장부와 대시보드 전반에 표시될 소유자1·소유자2의 이름, 고유 아이콘, 테마 색상을 자유롭게 바꿀 수 있어요. 가족 구성원마다 개성 있게 구분해서 관리할 수 있습니다.</p>
+      </details>
+      <details>
+        <summary><span>🌗 라이트 / 다크 모드</span><span>THEME</span></summary>
+        <p>어두운 화면이 부담스럽다면 라이트 모드로 즉시 전환할 수 있어요. 익절(수익)은 빨강, 손절(손실)은 파랑이라는 국내 투자자 관행 색상 컨벤션이 테마 전반에 일관되게 적용됩니다.</p>
+      </details>
+      <details>
+        <summary><span>📱 모바일 최적화 UI</span><span>RESPONSIVE</span></summary>
+        <p>하단 탭 바와 슬라이드형 드로어 메뉴로 구성된 모바일 전용 레이아웃을 제공해, 폰에서도 데스크톱과 동일한 기능을 불편함 없이 사용할 수 있어요.</p>
+      </details>
     </div>
   </div>
 </section>
