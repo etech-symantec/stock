@@ -12,13 +12,108 @@
 //   window.saveFlightPlanDocking, window.saveFlightPlanEscape,
 //   window.addFlightPlanFuel, window.removeFlightPlanFuel,
 //   renderFlightPlanPanel, computeActiveFlightPlanAlerts, updateFlightPlanBanner
+//
+// 🌟 "매수가 대비 %" 지점 설정 기능:
+//   getFlightPlanAvgBuyPrice, window.adjustFlightPlanPct, window.applyFlightPlanPct
+//   각 필드(도킹/비상탈출/연료 보급)마다 매수 평단가 대비 %를 기본 5%로 시작해
+//   5%씩 올리거나 내릴 수 있고, "적용"(연료는 "지점 추가") 버튼으로 계산된 가격을 반영합니다.
 // ==========================================
 
 const FLIGHT_PLAN_PROXIMITY_PCT = 3; // 도킹/탈출/연료 지점과의 거리(%)가 이 값 이내면 "근접"으로 알림 표시
+const FLIGHT_PLAN_PCT_STEP = 5;   // 매수가 대비 % 스텝(한 번에 조절되는 %)
+const FLIGHT_PLAN_PCT_MIN = 5;    // 매수가 대비 % 최솟값
+const FLIGHT_PLAN_PCT_MAX = 95;   // 매수가 대비 % 최댓값
 
 function _escFlightPlanText(str) {
   return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+
+// 🌟 도킹/비상탈출/연료 보급 입력칸의 "매수가 대비 %" 설정값을 심볼별로 기억합니다. (세션 내 UI 상태, 저장 X)
+const _fpPercentState = {};
+function getFlightPlanPct(symbol, type) {
+  if (!_fpPercentState[symbol]) _fpPercentState[symbol] = { docking: FLIGHT_PLAN_PCT_STEP, escape: FLIGHT_PLAN_PCT_STEP, fuel: FLIGHT_PLAN_PCT_STEP };
+  return _fpPercentState[symbol][type] || FLIGHT_PLAN_PCT_STEP;
+}
+
+// 종목의 평균 매수가(모든 소유자·계좌 합산 가중평균)를 계산합니다. 보유 중이 아니면 0을 반환합니다.
+function getFlightPlanAvgBuyPrice(symbol) {
+  if (typeof calculateHoldings !== 'function') return 0;
+  const holdings = calculateHoldings('all');
+  let totalQty = 0, totalValue = 0;
+  Object.keys(holdings).forEach(key => {
+    const h = holdings[key];
+    if (h && h.symbol === symbol && h.qty > 0) {
+      totalQty += h.qty;
+      totalValue += h.qty * h.avg;
+    }
+  });
+  return totalQty > 0 ? totalValue / totalQty : 0;
+}
+
+// 통화 단위에 맞춰 계산된 가격을 적절히 반올림합니다. (원화: 정수, 그 외: 소수 2자리)
+function _fpRoundPrice(value, symbol) {
+  if (typeof isKorean === 'function' && isKorean(symbol)) return Math.round(value);
+  return Math.round(value * 100) / 100;
+}
+
+// 도킹/비상탈출/연료 보급 각각의 "매수가 대비 %" 조절 행 HTML을 만듭니다.
+function _fpPctRowHtml(symbol, type, avgPrice) {
+  const pct = getFlightPlanPct(symbol, type);
+  const sign = type === 'docking' ? 1 : -1;
+  const signLabel = sign > 0 ? '+' : '−';
+  const hasAvg = avgPrice > 0;
+  const preview = hasAvg
+    ? formatPrice(_fpRoundPrice(avgPrice * (1 + sign * pct / 100), symbol), symbol)
+    : '보유 내역 없음';
+  const disabledAttr = hasAvg ? '' : 'disabled';
+  const applyLabel = type === 'fuel' ? '지점 추가' : '적용';
+  return `
+    <div class="fp-pct-row">
+      <div class="fp-pct-top">
+        <span class="fp-pct-label">매수가 대비 ${signLabel}${pct}%</span>
+        <span class="fp-pct-preview">${preview}</span>
+      </div>
+      <div class="fp-pct-controls">
+        <button type="button" class="fp-pct-btn" ${disabledAttr} onclick="adjustFlightPlanPct('${symbol}','${type}',-${FLIGHT_PLAN_PCT_STEP})">−</button>
+        <span class="fp-pct-value">${pct}%</span>
+        <button type="button" class="fp-pct-btn" ${disabledAttr} onclick="adjustFlightPlanPct('${symbol}','${type}',${FLIGHT_PLAN_PCT_STEP})">+</button>
+        <button type="button" class="fp-pct-apply" ${disabledAttr} onclick="applyFlightPlanPct('${symbol}','${type}')">${applyLabel}</button>
+      </div>
+    </div>`;
+}
+
+// 매수가 대비 % 값을 5%씩 올리거나 내립니다. (최소 5%, 최대 95%)
+window.adjustFlightPlanPct = function (symbol, type, delta) {
+  if (!_fpPercentState[symbol]) _fpPercentState[symbol] = { docking: FLIGHT_PLAN_PCT_STEP, escape: FLIGHT_PLAN_PCT_STEP, fuel: FLIGHT_PLAN_PCT_STEP };
+  let next = (_fpPercentState[symbol][type] || FLIGHT_PLAN_PCT_STEP) + delta;
+  next = Math.max(FLIGHT_PLAN_PCT_MIN, Math.min(FLIGHT_PLAN_PCT_MAX, next));
+  _fpPercentState[symbol][type] = next;
+  renderFlightPlanPanel(symbol);
+};
+
+// 현재 설정된 %를 실제 도킹/비상탈출 가격에 반영하거나, 연료 보급 지점으로 추가합니다.
+window.applyFlightPlanPct = function (symbol, type) {
+  const avgPrice = getFlightPlanAvgBuyPrice(symbol);
+  if (!avgPrice || avgPrice <= 0) return;
+  const pct = getFlightPlanPct(symbol, type);
+  const sign = type === 'docking' ? 1 : -1;
+  const price = _fpRoundPrice(avgPrice * (1 + sign * pct / 100), symbol);
+
+  if (type === 'fuel') {
+    const s = getFlightPlanSettings(symbol);
+    s.fuel.push(price);
+    s.fuel.sort((a, b) => b - a);
+    saveState();
+    updateFlightPlanBanner();
+    renderModalChart();
+    renderFlightPlanPanel(symbol);
+    return;
+  }
+
+  if (type === 'docking') window.saveFlightPlanDocking(symbol, String(price));
+  if (type === 'escape') window.saveFlightPlanEscape(symbol, String(price));
+  renderFlightPlanPanel(symbol);
+};
 
 // 🌟 예전 이름(priceAlerts)으로 저장돼 있던 데이터를 새 이름(flightPlans)으로 1회 변환합니다.
 //    target → docking, stopLoss → escape, dca → fuel
@@ -121,6 +216,7 @@ function renderFlightPlanPanel(symbol) {
   const s = getFlightPlanSettings(symbol);
   const isKr = isKorean(symbol);
   const currency = isKr ? '₩' : '$';
+  const avgPrice = getFlightPlanAvgBuyPrice(symbol);
 
   const fuelHtml = s.fuel.length
     ? s.fuel.map((p, i) => `
@@ -137,17 +233,20 @@ function renderFlightPlanPanel(symbol) {
       <div class="fp-label"><span class="fp-icon-badge fp-icon-docking">🌕</span> 도킹 지점 <span class="fp-sublabel">(목표가)</span></div>
       <input type="number" id="mDockingInput" class="fp-input-docking" value="${s.docking != null ? s.docking : ''}" placeholder="${currency} 입력"
         onchange="saveFlightPlanDocking('${symbol}', this.value)">
+      ${_fpPctRowHtml(symbol, 'docking', avgPrice)}
     </div>
     <div class="fp-field">
       <div class="fp-label"><span class="fp-icon-badge fp-icon-escape">🛸</span> 비상 탈출 <span class="fp-sublabel">(손절가)</span></div>
       <input type="number" id="mEscapeInput" class="fp-input-escape" value="${s.escape != null ? s.escape : ''}" placeholder="${currency} 입력"
         onchange="saveFlightPlanEscape('${symbol}', this.value)">
+      ${_fpPctRowHtml(symbol, 'escape', avgPrice)}
     </div>
     <div class="fp-field" style="margin-bottom:4px;">
       <div class="fp-label"><span class="fp-icon-badge fp-icon-fuel">⛽</span> 연료 보급 <span class="fp-sublabel">(물타기)</span></div>
       <input type="number" id="mFuelInput" class="fp-input-fuel" placeholder="${currency} 입력 후 Enter"
         onkeydown="if(event.key==='Enter'){addFlightPlanFuel('${symbol}');}">
       <button class="btn-sm fp-add-btn" onclick="addFlightPlanFuel('${symbol}')">+ 지점 추가</button>
+      ${_fpPctRowHtml(symbol, 'fuel', avgPrice)}
       ${fuelHtml}
     </div>
   `;
