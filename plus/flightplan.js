@@ -70,7 +70,7 @@ function _fpPctRowHtml(symbol, type, avgPrice) {
   return `
     <div class="fp-pct-row">
       <div class="fp-pct-top">
-        <span class="fp-pct-label">매수가 대비 ${signLabel}${pct}%</span>
+        <span class="fp-pct-label">평균 매수가 대비 ${signLabel}${pct}%</span>
         <span class="fp-pct-preview">${preview}</span>
       </div>
       <div class="fp-pct-controls">
