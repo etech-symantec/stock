@@ -51725,13 +51725,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "SPXN",
-    "name": "ProShares S&P 500 Ex-Financials ETF",
+    "symbol": "SPFF",
+    "name": "Global X SuperIncome Preferred Etf",
     "exch": "US_ETF"
   },
   {
-    "symbol": "SPFF",
-    "name": "Global X SuperIncome Preferred Etf",
+    "symbol": "SPXN",
+    "name": "ProShares S&P 500 Ex-Financials ETF",
     "exch": "US_ETF"
   },
   {
@@ -59730,13 +59730,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "VCLN",
-    "name": "Virtus Duff & Phelps Clean Energy ETF",
+    "symbol": "NOVZ",
+    "name": "TrueShares Structured Outcome (November) ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "NOVZ",
-    "name": "TrueShares Structured Outcome (November) ETF",
+    "symbol": "VCLN",
+    "name": "Virtus Duff & Phelps Clean Energy ETF",
     "exch": "US_ETF"
   },
   {
@@ -60110,13 +60110,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "LIAE",
-    "name": "LifeX 2050 Inflation-Protected Lngvty In ETF",
+    "symbol": "LFAW",
+    "name": "LifeX 2060 Longevity Income ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "LFAW",
-    "name": "LifeX 2060 Longevity Income ETF",
+    "symbol": "LIAE",
+    "name": "LifeX 2050 Inflation-Protected Lngvty In ETF",
     "exch": "US_ETF"
   },
   {
@@ -61315,13 +61315,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "CMCI",
-    "name": "VanEck CMCI Commodity Strategy ETF",
+    "symbol": "CVRD",
+    "name": "Madison Covered Call ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "CVRD",
-    "name": "Madison Covered Call ETF",
+    "symbol": "CMCI",
+    "name": "VanEck CMCI Commodity Strategy ETF",
     "exch": "US_ETF"
   },
   {
