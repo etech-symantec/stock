@@ -3052,6 +3052,7 @@ nav {
 #bgLoadingIndicator{
   overflow: hidden;
   background-color: #4a3fa8; /* 아직 채워지지 않은 구간(어두운 베이스) */
+  pointer-events: none; /* opacity:0으로 숨겨진 뒤에도 같은 자리의 FAB 버튼 클릭을 가로채지 않도록 */
 }
 #bgLoadingIndicator .bg-loading-fill{
   position: absolute;
