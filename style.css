@@ -348,6 +348,9 @@ input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); co
 /* 🚀 실제 보유 중인 종목의 상세카드에서는 탐사선 버튼을 강제로 숨깁니다 (관심종목엔 영향 없음) */
 #chartOverlay .modal #probeModalFab.probe-fab-modal.probe-fab-hidden-held { display: none !important; }
 
+/* 🚀 관심종목(비보유) 상세창에는 비행계획 패널이 필요 없으므로 숨김 */
+#chartOverlay .modal #mFlightPlanPanel.flight-plan-panel-hidden-watchlist { display: none !important; }
+
 .cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
 .acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
 .acc-row:hover { border-color: var(--border2); }
@@ -564,6 +567,7 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 4px 6px;
   font-size: 13px;
   font-weight: 700;
@@ -739,7 +743,7 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
 
 /* 🌟 종목 상세카드(차트 모달)는 우측 비행 계획 설정 패널 공간 확보를 위해 더 넓게 (그래프는 기존 크기 유지) */
-#chartOverlay .modal { max-width: 1032px; }
+#chartOverlay .modal { max-width: 1127px; } /* 🌟 비행계획 패널 1.5배 확대(190px→285px, /plus/flightplan.css)만큼 함께 확대 */
 
 /* 🚀 비행 계획(도킹 지점·비상 탈출·연료 보급) 설정 패널 스타일은 /plus/flightplan.css로 이동했습니다 (Plus 전용). */
 
@@ -3052,7 +3056,6 @@ nav {
 #bgLoadingIndicator{
   overflow: hidden;
   background-color: #4a3fa8; /* 아직 채워지지 않은 구간(어두운 베이스) */
-  pointer-events: none; /* opacity:0으로 숨겨진 뒤에도 같은 자리의 FAB 버튼 클릭을 가로채지 않도록 */
 }
 #bgLoadingIndicator .bg-loading-fill{
   position: absolute;
