@@ -3419,13 +3419,13 @@ function syncYieldPhraseUI() {
 
   // 종목 기준 — 보유 중 / 역대 전체
   const scopeWord = document.getElementById('yieldWordScope');
-  if (scopeWord) scopeWord.textContent = sidebarYieldScope === 'all' ? '역대 전체' : '보유 중';
+  if (scopeWord) scopeWord.textContent = sidebarYieldScope === 'all' ? '매매했던 모든 종목' : '보유 중인 종목';
   const scopeDD = document.getElementById('yieldScopeDD');
   if (scopeDD) scopeDD.querySelectorAll('.yield-phrase-option').forEach(opt => opt.classList.toggle('active', opt.dataset.value === sidebarYieldScope));
 
   // 정렬 기준 — 수익률 / 금액
   const sortWord = document.getElementById('yieldWordSort');
-  if (sortWord) sortWord.textContent = sidebarYieldSortBy === 'amount' ? '금액' : '수익률';
+  if (sortWord) sortWord.textContent = sidebarYieldSortBy === 'amount' ? '평가/청산액' : '수익률';
   const sortDD = document.getElementById('yieldSortDD');
   if (sortDD) sortDD.querySelectorAll('.yield-phrase-option').forEach(opt => opt.classList.toggle('active', opt.dataset.value === sidebarYieldSortBy));
 }
@@ -5357,6 +5357,35 @@ function enforceProbeFabVisibility() {
   }
 })();
 
+// 🚀 관심종목(비보유)의 상세카드에는 비행계획 패널을 숨깁니다.
+// (flightplan.js가 별도로 패널 내용을 그리므로, innerHTML을 직접 건드리지 않고
+//  전용 CSS 클래스(!important)로만 덮어써서 보유 종목 상세창에는 영향을 주지 않습니다.)
+function enforceFlightPlanPanelVisibility() {
+  const panel = document.getElementById('mFlightPlanPanel');
+  if (!panel) return;
+  panel.classList.toggle('flight-plan-panel-hidden-watchlist', !isSymbolCurrentlyHeld(currentModalTicker));
+}
+
+(function watchFlightPlanPanelForWatchlistStocks() {
+  const setup = () => {
+    const panel = document.getElementById('mFlightPlanPanel');
+    if (!panel) return;
+    enforceFlightPlanPanelVisibility();
+    // flightplan.js가 나중에 내용을 다시 그리더라도, 관심종목(비보유)이면 계속 숨김 클래스를 유지합니다.
+    const observer = new MutationObserver(() => {
+      if (!isSymbolCurrentlyHeld(currentModalTicker) && !panel.classList.contains('flight-plan-panel-hidden-watchlist')) {
+        panel.classList.add('flight-plan-panel-hidden-watchlist');
+      }
+    });
+    observer.observe(panel, { attributes: true, childList: true, attributeFilter: ['style', 'class'] });
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
 function openChartModal(ticker, probeId = null) {
   currentModalTicker = ticker;
   currentProbeId = probeId;
@@ -5373,6 +5402,7 @@ function openChartModal(ticker, probeId = null) {
   renderModalChart();
   if (typeof renderFlightPlanPanel === 'function') renderFlightPlanPanel(ticker);
   enforceProbeFabVisibility();
+  enforceFlightPlanPanelVisibility();
   document.getElementById('chartOverlay').classList.add('open');
 }
 
