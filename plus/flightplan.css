@@ -46,7 +46,7 @@
    고급스러운 우주 관제 콘솔 컨셉: 깊은 우주 그라디언트 + 은은한 별빛 + 네온 글로우
    ------------------------------------------ */
 .flight-plan-panel {
-  width: 190px; flex-shrink: 0;
+  width: 285px; flex-shrink: 0;
   position: relative;
   overflow: hidden;
   background-color: #1c1836;
