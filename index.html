@@ -509,20 +509,20 @@
           </div>
         </div>
         <div class="yield-phrase-dd" id="yieldScopeDD">
-          <span class="yield-phrase-word" id="yieldWordScope" onclick="toggleYieldPhraseDD('yieldScopeDD', event)">보유 중</span>
+          <span class="yield-phrase-word" id="yieldWordScope" onclick="toggleYieldPhraseDD('yieldScopeDD', event)">보유 중인 종목</span>
           <div class="yield-phrase-menu">
-            <div class="yield-phrase-option active" data-value="current" onclick="selectYieldScopeOption('current')">보유 중</div>
-            <div class="yield-phrase-option" data-value="all" onclick="selectYieldScopeOption('all')">역대 전체</div>
+            <div class="yield-phrase-option active" data-value="current" onclick="selectYieldScopeOption('current')">보유 중인 종목</div>
+            <div class="yield-phrase-option" data-value="all" onclick="selectYieldScopeOption('all')">매매했던 모든 종목</div>
           </div>
         </div>
         <div class="yield-phrase-dd" id="yieldSortDD">
           <span class="yield-phrase-word" id="yieldWordSort" onclick="toggleYieldPhraseDD('yieldSortDD', event)">수익률</span>
           <div class="yield-phrase-menu">
             <div class="yield-phrase-option active" data-value="roi" onclick="selectYieldSortOption('roi')">수익률</div>
-            <div class="yield-phrase-option" data-value="amount" onclick="selectYieldSortOption('amount')">금액</div>
+            <div class="yield-phrase-option" data-value="amount" onclick="selectYieldSortOption('amount')">평가/청산액</div>
           </div>
         </div>
-        <span class="yield-phrase-suffix">기준 랭킹</span>
+        <span class="yield-phrase-suffix">기준</span>
       </div>
       <div id="sidebarYieldList" style="display:flex; flex-direction:column; gap:6px;"></div>
     </div>
