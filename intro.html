@@ -36,29 +36,6 @@
   .eyebrow::before{content:''; width:20px; height:2px; background:var(--accent); display:inline-block; border-radius:2px;}
   .eyebrow.gold{color:var(--gold);}
   .eyebrow.gold::before{background:var(--gold);}
-  .gemini-icon{display:inline-block; vertical-align:middle; flex-shrink:0;}
-  .gemini-icon.on-dark path{fill:#fff;}
-
-  /* ── 차별점 배너 ──────────────────────────── */
-  .diff-banner{
-    max-width:720px; margin:0 auto 30px; padding:16px 22px; border-radius:12px;
-    background:linear-gradient(120deg, rgba(124,106,247,0.14), rgba(11,196,203,0.1));
-    border:1px solid rgba(124,106,247,0.35);
-    display:flex; align-items:center; gap:12px; text-align:left;
-  }
-  .diff-banner .diff-emoji{font-size:22px; flex-shrink:0;}
-  .diff-banner b{display:block; font-size:13.5px; color:var(--text); margin-bottom:2px;}
-  .diff-banner span{font-size:12.5px; color:var(--text2); line-height:1.5;}
-
-  /* ── Plus 기능 구간 구분선 ─────────────────── */
-  .plus-divider{
-    padding:60px 24px 10px; text-align:center; position:relative; z-index:1;
-    border-top:1px solid var(--border);
-    background:radial-gradient(ellipse 600px 260px at 50% 0%, rgba(255,189,74,0.1), transparent 70%);
-  }
-  .plus-divider .eyebrow{justify-content:center;}
-  .plus-divider h2{font-size:clamp(20px,2.6vw,26px); margin-bottom:10px;}
-  .plus-divider p{max-width:520px; margin:0 auto;}
   h1,h2,h3{font-family:var(--font-sans); font-weight:900; letter-spacing:-0.02em; margin:0;}
   p{color:var(--text2); margin:0;}
 
@@ -316,6 +293,99 @@
   .set-mock .fsizes span{flex:1; text-align:center; padding:6px 0; border:1px solid var(--border2); border-radius:5px; font-size:10px; color:var(--text3);}
   .set-mock .fsizes span.on{background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700;}
 
+  /* ── 13 CSV 가져오기 목업 ──────────────────── */
+  .csv-mock .csv-drop{
+    display:flex; align-items:center; gap:10px; background:var(--bg3); border:1px dashed var(--border2);
+    border-radius:8px; padding:12px 14px; font-size:12px; color:var(--text2); margin-bottom:14px;
+  }
+  .csv-mock .csv-drop b{color:var(--text); font-weight:700;}
+  .csv-mock table{width:100%; border-collapse:collapse; font-size:11px; margin-bottom:14px;}
+  .csv-mock th{text-align:left; color:var(--text3); font-weight:500; font-size:9.5px; padding:5px 7px; border-bottom:1px solid var(--border);}
+  .csv-mock td{padding:6px 7px; border-bottom:1px solid var(--border); color:var(--text2); font-family:var(--font-mono);}
+  .csv-mock .csv-warn{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--gold-bg); border:1px solid rgba(255,189,74,.35); border-radius:8px; padding:10px 12px; font-size:11.5px; color:var(--gold);
+  }
+  .csv-mock .csv-warn .csv-fix{font-size:10.5px; background:var(--bg3); color:var(--text2); padding:4px 9px; border-radius:999px;}
+
+  /* ── 14 태그 / 메모 목업 ──────────────────── */
+  .tag-mock .tag-stock{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .tag-mock .tag-stock b{font-size:14.5px;}
+  .tag-mock .tag-stock span{font-size:10.5px; color:var(--text3); font-family:var(--font-mono);}
+  .tag-mock .tag-chip-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;}
+  .tag-mock .tag-chip{font-size:11.5px; font-weight:700; padding:6px 13px; border-radius:999px; background:var(--accent-bg); color:var(--accent); border:1px solid rgba(124,106,247,.3);}
+  .tag-mock .tag-chip.c2{background:var(--green-bg); color:var(--green); border-color:rgba(0,200,122,.3);}
+  .tag-mock .tag-chip.c3{background:var(--gold-bg); color:var(--gold); border-color:rgba(255,189,74,.35);}
+  .tag-mock .tag-input{background:var(--bg3); border:1px solid var(--border2); border-radius:6px; padding:10px 12px; font-size:11.5px; color:var(--text3);}
+
+  /* ── 15 날짜 일괄수정 목업 ────────────────── */
+  .bulk-mock .bd-tabs{display:flex; gap:2px; margin-bottom:14px; border-bottom:1px solid var(--border);}
+  .bulk-mock .bd-tabs span{flex:1; text-align:center; font-size:11px; font-weight:700; padding:9px 0; color:var(--text3);}
+  .bulk-mock .bd-tabs span.on{color:var(--accent); border-bottom:2px solid var(--accent);}
+  .bulk-mock .bd-row{display:flex; gap:8px; margin-bottom:12px;}
+  .bulk-mock .bd-row button{flex:1; text-align:center; padding:9px 0; border-radius:6px; font-size:11.5px; font-weight:700; border:1px solid var(--border2); color:var(--text2); background:var(--bg3);}
+  .bulk-mock .bd-row button.on{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .bulk-mock .bd-preview{background:var(--bg3); border-radius:8px; padding:11px 13px; font-size:11.5px; color:var(--text2); line-height:1.7;}
+  .bulk-mock .bd-preview b{color:var(--accent);}
+
+  /* ── 16 소유자 설정 목업 ──────────────────── */
+  .owner-mock .owner-row{display:flex; gap:12px;}
+  .owner-mock .owner-card{flex:1; background:var(--bg3); border-radius:10px; padding:14px; text-align:center;}
+  .owner-mock .owner-avatar{width:44px; height:44px; border-radius:50%; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:20px;}
+  .owner-mock .owner-card b{display:block; font-size:12.5px; margin-bottom:6px;}
+  .owner-mock .owner-swatch{width:100%; height:10px; border-radius:999px; margin-top:6px;}
+
+  /* ── 17 테마 & 색상 목업 ──────────────────── */
+  .theme-mock .theme-toggle-row{display:flex; gap:8px; margin-bottom:16px;}
+  .theme-mock .theme-toggle-row span{flex:1; text-align:center; padding:10px 0; border-radius:8px; font-size:12px; font-weight:700; border:1px solid var(--border2); color:var(--text3);}
+  .theme-mock .theme-toggle-row span.on{background:var(--accent-bg); color:var(--accent); border-color:var(--accent);}
+  .theme-mock .color-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .theme-mock .color-dot{width:20px; height:20px; border-radius:6px; flex-shrink:0;}
+  .theme-mock .color-chip{flex:1; padding:7px 12px; border-radius:6px; font-size:11.5px; font-weight:700; text-align:center;}
+
+  /* ── 18 모바일 UI 목업 ────────────────────── */
+  .mobile-mock{display:flex; justify-content:center;}
+  .mobile-mock .phone-frame{width:190px; border:1px solid var(--border2); border-radius:22px; padding:10px 8px 0; background:var(--bg3);}
+  .mobile-mock .phone-screen{background:var(--bg); border-radius:12px; padding:12px 10px; min-height:150px;}
+  .mobile-mock .phone-screen .ps-line{height:8px; border-radius:4px; background:var(--border2); margin-bottom:8px;}
+  .mobile-mock .phone-screen .ps-line.w60{width:60%;}
+  .mobile-mock .phone-screen .ps-line.w40{width:40%;}
+  .mobile-mock .phone-tabbar{display:flex; justify-content:space-around; padding:10px 0; margin-top:8px;}
+  .mobile-mock .phone-tabbar span{font-size:15px;}
+  .mobile-mock .phone-tabbar span.on{filter:drop-shadow(0 0 5px var(--accent));}
+
+  /* ── 19 평가 자산 랭킹 목업 ───────────────── */
+  .rank-mock .rank-phrase{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;}
+  .rank-mock .rank-phrase span{font-size:11px; padding:5px 11px; border-radius:999px; background:var(--bg3); color:var(--accent); font-weight:700;}
+  .rank-mock .rank-row{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border);}
+  .rank-mock .rank-row:last-child{border-bottom:none;}
+  .rank-mock .rank-medal{font-size:15px; width:22px; text-align:center;}
+  .rank-mock .rank-name{flex:1; font-size:12.5px;}
+  .rank-mock .rank-name small{display:block; color:var(--text3); font-size:9.5px; font-family:var(--font-mono);}
+  .rank-mock .rank-roi{font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--green);}
+
+  /* ── 20 오늘의 등락 목업 ──────────────────── */
+  .today-mock .today-total{display:flex; justify-content:space-between; align-items:center; background:var(--bg3); border-radius:8px; padding:12px 14px; margin-bottom:14px;}
+  .today-mock .today-total b{font-family:var(--font-mono); font-size:17px; color:var(--green);}
+  .today-mock .today-cols{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .today-mock .today-col-head{font-size:10.5px; color:var(--text3); margin-bottom:8px; font-weight:700;}
+  .today-mock .today-row{display:flex; justify-content:space-between; font-size:11.5px; padding:6px 0; border-bottom:1px solid var(--border);}
+  .today-mock .today-row:last-child{border-bottom:none;}
+  .today-mock .today-row b{font-family:var(--font-mono);}
+
+  /* ── 21 실현손익 자금흐름 목업 ────────────── */
+  .sankey-mock svg{width:100%; height:auto; display:block; margin-bottom:12px;}
+  .sankey-mock .sk-legend{display:flex; justify-content:space-between; font-size:11px;}
+  .sankey-mock .sk-legend span b{font-family:var(--font-mono); display:block; font-size:14px; margin-top:2px;}
+
+  /* ── 22 AI 개인화 목업 ────────────────────── */
+  .ai-set-mock .ai-set-row{background:var(--bg3); border-radius:8px; padding:10px 12px; margin-bottom:10px;}
+  .ai-set-mock .ai-set-row label{display:block; font-size:10.5px; color:var(--text3); margin-bottom:5px;}
+  .ai-set-mock .ai-set-row .val{font-family:var(--font-mono); font-size:12px; color:var(--text2);}
+  .ai-set-mock .ai-hist-item{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border); font-size:11.5px; color:var(--text2);}
+  .ai-set-mock .ai-hist-item:last-child{border-bottom:none;}
+  .ai-set-mock .ai-hist-item small{color:var(--text3); font-family:var(--font-mono); font-size:10px;}
+
   /* ── 데이터 관리 상세 카탈로그(FAQ 아코디언) ── */
   .catalog{padding:90px 0; border-top:1px solid var(--border);}
   .catalog-head{text-align:center; margin-bottom:40px;}
@@ -348,16 +418,6 @@
 </head>
 <body>
 
-<svg width="0" height="0" style="position:absolute;">
-  <defs>
-    <linearGradient id="geminiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3186FF"/>
-      <stop offset="50%" stop-color="#9C6ADE"/>
-      <stop offset="100%" stop-color="#FF6F91"/>
-    </linearGradient>
-  </defs>
-</svg>
-
 <div class="ambient ambient-a"></div>
 <div class="ambient ambient-b"></div>
 
@@ -370,10 +430,10 @@
       <a href="#portfolio">포트폴리오</a>
       <a href="#watchlist">관심종목</a>
       <a href="#ledger">거래장부</a>
-      <a href="#settings">설정</a>
       <a href="#ai">AI조언</a>
       <a href="#probe">탐사선</a>
       <a href="#flightplan">비행계획</a>
+      <a href="#settings">설정</a>
     </div>
     <a class="btn-cta" href="index.html">앱 열기 →</a>
   </div>
@@ -389,13 +449,8 @@
       <a class="btn-cta" href="index.html">지금 시작하기</a>
       <a class="btn-ghost" href="#signal">전체 기능 살펴보기 ↓</a>
     </div>
-    <div class="diff-banner">
-      <span class="diff-emoji">🆚</span>
-      <div><b>다른 주식 포트폴리오 사이트와 다른 점</b><span>대부분의 앱은 계좌 하나, 사람 한 명 기준이에요. Two the Moon은 가족 두 명이 여러 증권사에 나눠 가진 계좌를 한 곳에서 합쳐서 볼 수 있어요.</span></div>
-    </div>
     <div class="stat-strip">
-      <div><b>13</b><span>기능 대시보드</span></div>
-      <div><b>2인</b><span>여러 계좌 통합 관리</span></div>
+      <div><b>22</b><span>기능 대시보드</span></div>
       <div><b>15+</b><span>시장 지표</span></div>
       <div><b>22%</b><span>양도세 자동계산</span></div>
       <div><b>0원</b><span>GitHub 백업 비용</span></div>
@@ -413,7 +468,7 @@
   <div class="wrap">
     <div class="feature-map-head">
       <div class="eyebrow" style="justify-content:center;">전체 기능 지도</div>
-      <h2>13개 대시보드, 한눈에 훑어보기</h2>
+      <h2>22개 기능, 한눈에 훑어보기</h2>
     </div>
     <div class="feature-map-grid">
       <a href="#signal"><span class="fm-icon">📊</span><b>시장 신호 분석</b><small>15+ 지표 · 0~100점</small></a>
@@ -424,10 +479,20 @@
       <a href="#growth"><span class="fm-icon">📈</span><b>자산 성장 추이</b><small>구간 확대 차트</small></a>
       <a href="#history"><span class="fm-icon">💰</span><b>실현수익 · 양도세</b><small>거래내역 검색</small></a>
       <a href="#dividend"><span class="fm-icon">🏦</span><b>배당통계</b><small>예정 배당 예측</small></a>
-      <a href="#settings"><span class="fm-icon">⚙️</span><b>설정 & 백업</b><small>GitHub 동기화</small></a>
-      <a href="#ai" class="premium"><span class="fm-icon"><svg class="gemini-icon" width="20" height="20" viewBox="0 0 100 100"><path d="M50 4 C54 40 60 46 96 50 C60 54 54 60 50 96 C46 60 40 54 4 50 C40 46 46 40 50 4 Z" fill="url(#geminiGrad)"/></svg></span><b>AI 투자조언</b><small>내 보유 종목 기반</small></a>
+      <a href="#ai"><span class="fm-icon">🤖</span><b>AI 투자조언</b><small>내 보유 종목 기반</small></a>
       <a href="#probe" class="premium"><span class="fm-icon">🛰️</span><b>탐사선</b><small>가상 매수 시뮬레이션</small></a>
       <a href="#flightplan" class="premium"><span class="fm-icon">🚀</span><b>비행 계획</b><small>목표가·손절가 알림</small></a>
+      <a href="#settings"><span class="fm-icon">⚙️</span><b>설정 & 백업</b><small>GitHub 동기화</small></a>
+      <a href="#csvimport"><span class="fm-icon">📥</span><b>CSV 가져오기</b><small>증권사 내역 일괄 등록</small></a>
+      <a href="#tags"><span class="fm-icon">🏷️</span><b>종목 태그 · 메모</b><small>최대 5개 · 자유 분류</small></a>
+      <a href="#bulkdate"><span class="fm-icon">📅</span><b>날짜 일괄수정</b><small>이동·치환·설정</small></a>
+      <a href="#owners"><span class="fm-icon">👥</span><b>소유자 설정</b><small>이름·아이콘·색상</small></a>
+      <a href="#theme"><span class="fm-icon">🌗</span><b>테마 & 색상</b><small>라이트/다크 · 손익 색상</small></a>
+      <a href="#mobile"><span class="fm-icon">📱</span><b>모바일 최적화</b><small>하단탭 · 드로어 메뉴</small></a>
+      <a href="#ranking"><span class="fm-icon">🏆</span><b>평가 자산 랭킹</b><small>수익률순 종목 정렬</small></a>
+      <a href="#today"><span class="fm-icon">🔔</span><b>오늘의 등락</b><small>실시간 일일 손익</small></a>
+      <a href="#sankey"><span class="fm-icon">💧</span><b>실현손익 자금흐름</b><small>국내·해외 흐름도</small></a>
+      <a href="#aisettings"><span class="fm-icon">🔑</span><b>AI 개인 설정</b><small>나만의 API 키 · 기록</small></a>
     </div>
   </div>
 </section>
@@ -510,7 +575,6 @@
       <h2>내 자산이 어디에,<br>얼마나 있는지 한 장으로</h2>
       <p>국내·해외 투자 원금, 현재 평가액, 수익률을 실시간으로 집계하는 통합 자산 패널과, 종목별 비중을 직사각형 크기로 보여주는 트리맵을 제공합니다.</p>
       <p>트리맵을 꾹 누르면 선택 모드로 들어가 여러 종목을 골라 합산 금액을 바로 계산할 수 있고, "🌐 전체 / 👤 소유자1 / 👥 소유자2" 탭으로 가족 구성원별 자산도 즉시 전환해서 볼 수 있어요.</p>
-      <p>다른 포트폴리오 앱들은 계좌 하나만 붙여 보여주는 게 보통이지만, Two the Moon은 두 사람이 여러 증권사에 나눠 가진 계좌를 전부 합산해 "🌐 전체" 탭 하나로 한눈에 보여줘요.</p>
       <div class="tip-line">💡 "현재 보유 / 누적 자산" 전환으로 실현수익까지 포함한 총자산도 볼 수 있어요</div>
     </div>
     <div class="mockup port-mock">
@@ -569,8 +633,7 @@
       <h2>매수 한 줄이면<br>전체 포트폴리오가 다시 계산돼요</h2>
       <p>소유자, 거래 유형(매수·매도·배당·이동·분할), 종목, 수량, 단가만 입력하면 모든 대시보드에 즉시 반영됩니다.</p>
       <p>계좌명을 함께 남기면 계좌별 수익률도 따로 확인할 수 있고, "이동"으로 계좌 간 종목 이동, "분할"로 액면분할도 정확히 기록돼요. CSV 업로드로 여러 건을 한 번에 가져올 수도 있습니다.</p>
-      <p>소유자1·소유자2 각자 여러 증권사 계좌를 등록해도 장부 안에서는 계좌명으로 완전히 구분되면서, 필요할 땐 두 사람 것을 한 화면에서 합쳐 볼 수 있어요 — 흩어진 계좌를 하나하나 따로 열어봐야 하는 다른 앱과 가장 다른 부분이에요.</p>
-      <div class="tip-line">💡 가족 2인의 자산을 소유자별로 완전히 분리해서, 또는 통합해서 관리할 수 있어요</div>
+      <div class="tip-line">💡 가족 2인의 자산을 소유자별로 완전히 분리해서 관리할 수 있어요</div>
     </div>
     <div class="mockup ledger-mock">
       <div class="mockup-label"><span>거래 장부</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
@@ -672,45 +735,18 @@
   </div>
 </section>
 
-<!-- ═══════════════ 09 설정 & 백업 ═══════════════ -->
-<section class="feature" id="settings">
+<!-- ═══════════════ 09 AI 투자조언 ═══════════════ -->
+<section class="feature" id="ai">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">09 — 설정 & 백업</div>
-      <h2>내 장부는 내 GitHub에,<br>안전하게</h2>
-      <p>개인 GitHub 저장소를 연결하면 모든 기기에서 장부가 자동으로 동기화돼요. 거래를 추가·수정할 때마다 조용히 백업됩니다.</p>
-      <p>💾 데이터 관리, 🎨 화면 설정, 📡 지표 설정 세 개의 탭으로 구성되어 있고, 폰트 크기·손익 색상·시장 신호 카드에 표시할 지표까지 취향대로 바꿀 수 있어요.</p>
-      <div class="tip-line">💡 JSON·CSV 파일로 로컬 백업 및 복원도 언제든 가능해요</div>
-    </div>
-    <div class="mockup set-mock">
-      <div class="mockup-label"><span>SETTINGS</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
-      <div class="tabs"><span class="on">💾 데이터 관리</span><span>🎨 화면 설정</span><span>📡 지표 설정</span></div>
-      <div class="toggle-row"><span>🔄 내역 수정 시 자동 저장</span><div class="switch"></div></div>
-      <div class="toggle-row" style="border-bottom:none;"><span>☁️ GitHub 연결됨 · etech-symantec</span><span style="color:var(--green); font-size:11px;">● 동기화됨</span></div>
-      <div class="fsizes"><span>XS</span><span>소</span><span class="on">기본</span><span>대</span><span>XL</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════ Plus 기능 구간 시작 ═══════════════ -->
-<div class="plus-divider">
-  <div class="eyebrow gold">여기서부터 PLUS</div>
-  <h2>더 적극적으로 굴리고 싶다면,<br>Plus 기능도 있어요</h2>
-  <p>AI 투자조언, 탐사선, 비행 계획은 Plus 구독자에게 제공되는 프리미엄 기능이에요. 아래 3가지를 모아서 소개할게요.</p>
-</div>
-
-<!-- ═══════════════ 10 AI 투자조언 (Plus) ═══════════════ -->
-<section class="feature premium" id="ai">
-  <div class="wrap feature-grid">
-    <div class="feature-copy">
-      <div class="eyebrow gold">10 — AI 투자조언<span class="badge-plus">✨ PLUS</span></div>
+      <div class="eyebrow">09 — AI 투자조언</div>
       <h2>지금 상황,<br>AI에게 다시 한번 물어보세요</h2>
       <p>현재 시장 신호와 내 보유 종목 구성을 함께 분석해 AI가 투자 의견을 제공합니다. 우측 하단 플로팅 버튼 하나로 언제든 물어볼 수 있어요.</p>
       <p>받았던 조언은 날짜별 기록으로 남아 나중에 다시 꺼내볼 수 있습니다.</p>
       <div class="tip-line">⚠️ AI 조언은 참고용이며, 투자 판단과 책임은 본인에게 있어요</div>
     </div>
     <div class="mockup ai-mock">
-      <div class="ai-fab-mock"><svg class="gemini-icon on-dark" width="30" height="30" viewBox="0 0 100 100"><path d="M50 4 C54 40 60 46 96 50 C60 54 54 60 50 96 C46 60 40 54 4 50 C40 46 46 40 50 4 Z"/></svg></div>
+      <div class="ai-fab-mock">🤖</div>
       <div class="ai-bubble">
         <b>AI 투자조언 · 방금 전</b>
         현재 시장 신호는 34점(분할 매수 구간)이에요. 보유 중인 반도체 비중이 42%로 다소 높은 편이니, 신규 매수는 배당주나 방어주 위주로 분산해보는 걸 추천해요.
@@ -719,11 +755,11 @@
   </div>
 </section>
 
-<!-- ═══════════════ 11 탐사선 (Plus) ═══════════════ -->
+<!-- ═══════════════ 10 탐사선 (Plus) ═══════════════ -->
 <section class="feature premium" id="probe">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow gold">11 — 탐사선<span class="badge-plus">✨ PLUS</span></div>
+      <div class="eyebrow gold">10 — 탐사선<span class="badge-plus">✨ PLUS</span></div>
       <h2>사지 않고도,<br>샀다면 어땠을지 미리 체험</h2>
       <p>관심종목 중 궁금한 종목을 원하는 날짜·가격으로 "가상 매수"해보는 프리미엄 기능이에요. 실제 자산에는 전혀 영향을 주지 않고, 가상의 손익과 그래프만 별도로 확인할 수 있습니다.</p>
       <p>탐사선을 띄운 종목은 관심종목 상단의 전용 패널에 모여 실시간으로 가상 수익률을 보여줘요. 매수를 망설이는 종목의 "만약"을 데이터로 미리 검증해볼 수 있습니다.</p>
@@ -747,11 +783,11 @@
   </div>
 </section>
 
-<!-- ═══════════════ 12 비행 계획 (Plus) ═══════════════ -->
+<!-- ═══════════════ 11 비행 계획 (Plus) ═══════════════ -->
 <section class="feature premium" id="flightplan">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow gold">12 — 비행 계획<span class="badge-plus">✨ PLUS</span></div>
+      <div class="eyebrow gold">11 — 비행 계획<span class="badge-plus">✨ PLUS</span></div>
       <h2>도킹, 탈출, 연료 보급 —<br>가격이 알아서 알려줘요</h2>
       <p>보유 종목마다 🌕 도킹 지점(목표가), 🛸 비상 탈출(손절가), ⛽ 연료 보급(추가매수 지점)을 설정해두면, 현재가가 각 지점에 근접하거나 도달했을 때 자동으로 알림을 띄워줘요.</p>
       <p>설정한 지점들은 차트에 가로선으로 함께 표시되고, "🌐 통합 자산" 화면 상단 배너에서 도킹·탈출·연료 알림을 종목별로 한눈에 모아볼 수 있습니다.</p>
@@ -772,39 +808,261 @@
   </div>
 </section>
 
-<!-- ═══════════════ 세부 기능 카탈로그 (아코디언) ═══════════════ -->
-<section class="catalog">
-  <div class="wrap">
-    <div class="catalog-head">
-      <div class="eyebrow" style="justify-content:center;">더 자세히</div>
-      <h2>눈에 잘 안 띄지만, 은근히 자주 쓰는 기능들</h2>
-      <p>큼직한 대시보드 뒤에 숨어있는 세세한 편의 기능도 소개할게요.</p>
+<!-- ═══════════════ 12 설정 & 백업 ═══════════════ -->
+<section class="feature" id="settings">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">12 — 설정 & 백업</div>
+      <h2>내 장부는 내 GitHub에,<br>안전하게</h2>
+      <p>개인 GitHub 저장소를 연결하면 모든 기기에서 장부가 자동으로 동기화돼요. 거래를 추가·수정할 때마다 조용히 백업됩니다.</p>
+      <p>💾 데이터 관리, 🎨 화면 설정, 📡 지표 설정 세 개의 탭으로 구성되어 있고, 폰트 크기·손익 색상·시장 신호 카드에 표시할 지표까지 취향대로 바꿀 수 있어요.</p>
+      <div class="tip-line">💡 JSON·CSV 파일로 로컬 백업 및 복원도 언제든 가능해요</div>
     </div>
-    <div class="catalog-grid">
-      <details open>
-        <summary><span>📥 CSV 거래내역 가져오기</span><span>DATA</span></summary>
-        <p>증권사에서 내려받은 CSV 파일을 업로드하면 거래 내역을 한 번에 불러옵니다. 티커를 자동으로 찾지 못한 종목은 "⚠️ 알 수 없는 종목 연결" 화면에서 종목명이나 영문 티커를 검색해 직접 매칭해줄 수 있어요.</p>
-      </details>
-      <details>
-        <summary><span>🏷️ 종목 태그 / 메모</span><span>ORGANIZE</span></summary>
-        <p>종목마다 "2차전지, 배당용, 장기투자"처럼 쉼표로 구분된 태그를 최대 5개까지 붙일 수 있습니다. 포트폴리오가 커질수록 종목을 분류하고 찾는 데 유용해요.</p>
-      </details>
-      <details>
-        <summary><span>📅 날짜 일괄수정</span><span>EDIT</span></summary>
-        <p>필터링된 여러 거래의 날짜를 한 번에 관리하는 도구예요. 📆 날짜 이동(며칠씩 앞/뒤로), 🔄 날짜 치환(특정 날짜를 다른 날짜로), 📌 날짜 설정(선택한 거래를 모두 같은 날짜로) 세 가지 방식 중 골라 쓸 수 있습니다.</p>
-      </details>
-      <details>
-        <summary><span>👥 소유자 설정</span><span>PROFILE</span></summary>
-        <p>장부와 대시보드 전반에 표시될 소유자1·소유자2의 이름, 고유 아이콘, 테마 색상을 자유롭게 바꿀 수 있어요. 가족 구성원마다 개성 있게 구분해서 관리할 수 있습니다.</p>
-      </details>
-      <details>
-        <summary><span>🌗 라이트 / 다크 모드</span><span>THEME</span></summary>
-        <p>어두운 화면이 부담스럽다면 라이트 모드로 즉시 전환할 수 있어요. 익절(수익)은 빨강, 손절(손실)은 파랑이라는 국내 투자자 관행 색상 컨벤션이 테마 전반에 일관되게 적용됩니다.</p>
-      </details>
-      <details>
-        <summary><span>📱 모바일 최적화 UI</span><span>RESPONSIVE</span></summary>
-        <p>하단 탭 바와 슬라이드형 드로어 메뉴로 구성된 모바일 전용 레이아웃을 제공해, 폰에서도 데스크톱과 동일한 기능을 불편함 없이 사용할 수 있어요.</p>
-      </details>
+    <div class="mockup set-mock">
+      <div class="mockup-label"><span>SETTINGS</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="tabs"><span class="on">💾 데이터 관리</span><span>🎨 화면 설정</span><span>📡 지표 설정</span></div>
+      <div class="toggle-row"><span>🔄 내역 수정 시 자동 저장</span><div class="switch"></div></div>
+      <div class="toggle-row" style="border-bottom:none;"><span>☁️ GitHub 연결됨 · etech-symantec</span><span style="color:var(--green); font-size:11px;">● 동기화됨</span></div>
+      <div class="fsizes"><span>XS</span><span>소</span><span class="on">기본</span><span>대</span><span>XL</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 13 CSV 거래내역 가져오기 ═══════════════ -->
+<section class="feature" id="csvimport">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">13 — CSV 거래내역 가져오기</div>
+      <h2>수백 건의 매매 내역,<br>업로드 한 번으로 끝내세요</h2>
+      <p>증권사에서 내려받은 CSV 파일을 그대로 올리면 거래 내역이 한 번에 파싱되어 장부에 등록됩니다. 매수·매도·배당 여러 계좌의 이력을 손으로 한 줄씩 입력할 필요가 없어요.</p>
+      <p>티커를 자동으로 찾지 못한 종목은 "⚠️ 알 수 없는 종목 연결" 화면이 별도로 뜨고, 여기서 종목명이나 영문 티커를 검색해 직접 매칭해주면 나머지 내역도 그대로 이어서 불러올 수 있습니다.</p>
+      <div class="tip-line">💡 한 번 매칭한 종목은 기억해두어, 다음 CSV 업로드부터는 자동으로 연결돼요</div>
+    </div>
+    <div class="mockup csv-mock">
+      <div class="mockup-label"><span>CSV IMPORT</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="csv-drop">📄 <b>trades_2026.csv</b> 업로드 완료 · 128건 인식</div>
+      <table>
+        <tr><th>날짜</th><th>종목</th><th>구분</th><th>수량</th></tr>
+        <tr><td>26.07.02</td><td>삼성전자</td><td>매수</td><td>10</td></tr>
+        <tr><td>26.07.03</td><td>NVDA</td><td>매수</td><td>3</td></tr>
+        <tr><td>26.07.05</td><td>알 수 없음</td><td>매수</td><td>5</td></tr>
+      </table>
+      <div class="csv-warn">⚠️ "TQQQ 3X" 종목을 찾을 수 없어요 <span class="csv-fix">🔍 검색해서 연결</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 14 종목 태그 / 메모 ═══════════════ -->
+<section class="feature" id="tags">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">14 — 종목 태그 · 메모</div>
+      <h2>내 방식대로 종목을<br>분류하고, 다시 찾아보세요</h2>
+      <p>종목마다 "2차전지, 배당용, 장기투자"처럼 쉼표로 구분한 태그를 최대 5개까지 자유롭게 붙일 수 있어요. 시황이나 매매 전략에 따라 나만의 기준으로 포트폴리오를 나눠볼 수 있습니다.</p>
+      <p>붙여둔 태그는 포트폴리오 맵의 트리맵 필터와 관심종목 목록의 태그 필터에도 그대로 연동되어, 특정 그룹의 종목만 모아 보거나 합산 금액을 바로 확인할 수 있어요.</p>
+      <div class="tip-line">💡 종목 상세 모달의 🏷️ 아이콘을 누르면 태그를 바로 추가·수정할 수 있어요</div>
+    </div>
+    <div class="mockup tag-mock">
+      <div class="mockup-label"><span>STOCK TAGS</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="tag-stock"><b>🔋 LG에너지솔루션</b><span>373220</span></div>
+      <div class="tag-chip-row">
+        <span class="tag-chip">2차전지</span>
+        <span class="tag-chip c2">장기투자</span>
+        <span class="tag-chip c3">배당용</span>
+      </div>
+      <div class="tag-input">태그 입력 (쉼표로 구분, 최대 5개)…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 15 날짜 일괄수정 ═══════════════ -->
+<section class="feature" id="bulkdate">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">15 — 날짜 일괄수정</div>
+      <h2>거래 날짜, 하나씩<br>고치지 말고 한 번에 바꾸세요</h2>
+      <p>필터링된 여러 거래의 날짜를 한 화면에서 관리하는 도구예요. 📆 날짜 이동(선택한 거래를 며칠씩 앞이나 뒤로), 🔄 날짜 치환(특정 날짜를 다른 날짜로 일괄 교체), 📌 날짜 설정(선택한 거래를 모두 같은 날짜로) 세 가지 방식 중 상황에 맞게 골라 쓸 수 있습니다.</p>
+      <p>CSV로 대량 등록한 뒤 영업일 기준으로 미세 조정하거나, 실수로 잘못 입력된 날짜를 한 번에 바로잡을 때 특히 유용해요.</p>
+      <div class="tip-line">💡 적용 전에 변경될 거래 건수와 결과 날짜를 미리보기로 먼저 확인할 수 있어요</div>
+    </div>
+    <div class="mockup bulk-mock">
+      <div class="mockup-label"><span>BULK DATE EDIT</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="bd-tabs"><span class="on">📆 날짜 이동</span><span>🔄 날짜 치환</span><span>📌 날짜 설정</span></div>
+      <div class="bd-row"><button class="on">← 과거로</button><button>미래로 →</button></div>
+      <div class="bd-preview">선택된 거래 <b>14건</b>의 날짜를 <b>3일</b> 과거로 이동합니다.<br>07.05 → 07.02 로 변경돼요.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 16 소유자 설정 ═══════════════ -->
+<section class="feature" id="owners">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">16 — 소유자 설정</div>
+      <h2>가족 계좌도,<br>각자의 색깔로 관리하세요</h2>
+      <p>장부와 대시보드 전반에 표시될 소유자1·소유자2의 이름, 고유 아이콘, 테마 색상을 자유롭게 바꿀 수 있어요. "아빠 👨"와 "엄마 👩"처럼 실제 가족 구성원 이름으로 바꿔두면 거래를 입력할 때마다 헷갈릴 일이 없습니다.</p>
+      <p>설정한 색상은 통합 자산 화면의 소유자별 탭, 트리맵, 배당·실현수익 필터 등 앱 전반에 일관되게 반영돼요.</p>
+      <div class="tip-line">💡 설정 화면의 👥 소유자 설정 버튼에서 언제든 이름과 색상을 바꿀 수 있어요</div>
+    </div>
+    <div class="mockup owner-mock">
+      <div class="mockup-label"><span>OWNER PROFILE</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="owner-row">
+        <div class="owner-card">
+          <div class="owner-avatar" style="background:rgba(124,106,247,.18); color:var(--accent);">👨</div>
+          <b>아빠</b>
+          <div class="owner-swatch" style="background:var(--accent);"></div>
+        </div>
+        <div class="owner-card">
+          <div class="owner-avatar" style="background:rgba(255,77,106,.18); color:var(--red);">👩</div>
+          <b>엄마</b>
+          <div class="owner-swatch" style="background:var(--red);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 17 테마 & 색상 커스터마이징 ═══════════════ -->
+<section class="feature" id="theme">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">17 — 테마 & 색상 커스터마이징</div>
+      <h2>어두운 화면이 부담스럽다면,<br>라이트 모드로 즉시 전환</h2>
+      <p>상단의 🌙 버튼 하나로 라이트/다크 모드를 즉시 전환할 수 있어요. 익절(수익)은 빨강, 손절(손실)은 파랑이라는 국내 투자자 관행 색상 컨벤션이 기본값으로 적용되지만, 색상 자체도 취향대로 바꿀 수 있습니다.</p>
+      <p>설정의 🎨 화면 설정 탭에서 수익·손실 색상을 직접 골라 저장하면, 차트·카드·랭킹 등 앱 전체의 색상 표시가 한 번에 바뀌어요.</p>
+      <div class="tip-line">💡 폰트 크기도 XS~XL 5단계로 조절해 가독성을 맞출 수 있어요</div>
+    </div>
+    <div class="mockup theme-mock">
+      <div class="mockup-label"><span>THEME & COLOR</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="theme-toggle-row"><span>☀️ 라이트</span><span class="on">🌙 다크</span></div>
+      <div class="color-row">
+        <div class="color-dot" style="background:#00C578;"></div>
+        <div class="color-chip" style="background:rgba(0,200,122,.15); color:#00C578;">+12.34% ▲ 수익</div>
+      </div>
+      <div class="color-row">
+        <div class="color-dot" style="background:#3A9AFF;"></div>
+        <div class="color-chip" style="background:rgba(58,154,255,.15); color:#3A9AFF;">-8.76% ▼ 손실</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 18 모바일 최적화 UI ═══════════════ -->
+<section class="feature" id="mobile">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">18 — 모바일 최적화 UI</div>
+      <h2>폰에서도,<br>데스크톱과 똑같이 편하게</h2>
+      <p>하단 탭 바와 슬라이드형 드로어 메뉴로 구성된 모바일 전용 레이아웃을 제공해요. 전체보기·관심종목·거래장부·더보기 네 개의 아이콘만으로 데스크톱의 모든 기능에 접근할 수 있습니다.</p>
+      <p>거래 장부는 하단 탭을 누르면 화면 아래에서 올라오는 시트 형태로 열려, 좁은 화면에서도 매수·매도 입력이 불편하지 않아요.</p>
+      <div class="tip-line">💡 더보기 탭을 누르면 배당통계·실현수익·달빛정보까지 한 번에 모아볼 수 있어요</div>
+    </div>
+    <div class="mockup mobile-mock">
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="ps-line w60"></div>
+          <div class="ps-line w40"></div>
+          <div class="ps-line" style="width:80%;"></div>
+          <div class="ps-line w60"></div>
+        </div>
+        <div class="phone-tabbar">
+          <span class="on">📊</span><span>⭐</span><span>📋</span><span>📈</span><span>☰</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 19 평가 자산 랭킹 ═══════════════ -->
+<section class="feature" id="ranking">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">19 — 평가 자산 랭킹</div>
+      <h2>내 계좌에서,<br>제일 잘하고 있는 종목은?</h2>
+      <p>거래 장부 사이드바 안에 있는 전용 랭킹 패널이에요. "전체/소유자1/소유자2 × 보유 중/누적 × 수익률/평가금액" 조합을 문장형 드롭다운으로 골라 정렬 기준을 바로 바꿀 수 있습니다.</p>
+      <p>메인 화면의 필터와는 별개로 동작해서, 전체보기 화면은 그대로 두고 사이드바에서만 다른 기준으로 종목 순위를 확인할 수 있어요.</p>
+      <div class="tip-line">💡 🥇🥈🥉 상위 3개 종목은 메달 아이콘으로 표시돼요</div>
+    </div>
+    <div class="mockup rank-mock">
+      <div class="mockup-label"><span>ASSET RANKING</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="rank-phrase"><span>전체</span><span>보유 중</span><span>수익률 ▾</span></div>
+      <div class="rank-row"><span class="rank-medal">🥇</span><span class="rank-name">엔비디아<small>NVDA</small></span><span class="rank-roi">+68.2%</span></div>
+      <div class="rank-row"><span class="rank-medal">🥈</span><span class="rank-name">삼성전자<small>005930</small></span><span class="rank-roi">+24.7%</span></div>
+      <div class="rank-row"><span class="rank-medal">🥉</span><span class="rank-name">애플<small>AAPL</small></span><span class="rank-roi">+15.3%</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 20 오늘의 등락 ═══════════════ -->
+<section class="feature" id="today">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">20 — 오늘의 등락</div>
+      <h2>오늘 하루,<br>내 자산은 얼마나 움직였을까</h2>
+      <p>전날 종가 대비 오늘 보유 종목들의 등락을 한 화면에 모아 보여주는 패널이에요. 국내·미국 종목의 손익을 환율까지 반영해 하나의 원화 기준 금액으로 합산해 보여줍니다.</p>
+      <p>상승 종목과 하락 종목을 자동으로 나누어 정렬해주기 때문에, 오늘 어떤 종목이 계좌를 끌어올리고 끌어내렸는지 한눈에 파악할 수 있어요.</p>
+      <div class="tip-line">💡 자산 성장 추이 차트 옆에 나란히 배치되어 있어요</div>
+    </div>
+    <div class="mockup today-mock">
+      <div class="mockup-label"><span>TODAY'S MOVERS</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="today-total">오늘 전체 손익<b>+2.14% (+₩318,000)</b></div>
+      <div class="today-cols">
+        <div>
+          <div class="today-col-head">🔺 상승</div>
+          <div class="today-row">엔비디아 <b style="color:var(--green);">+4.2%</b></div>
+          <div class="today-row">삼성전자 <b style="color:var(--green);">+1.8%</b></div>
+        </div>
+        <div>
+          <div class="today-col-head">🔻 하락</div>
+          <div class="today-row">테슬라 <b style="color:var(--red);">-2.1%</b></div>
+          <div class="today-row">카카오 <b style="color:var(--red);">-0.9%</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 21 실현손익 자금흐름 ═══════════════ -->
+<section class="feature" id="sankey">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">21 — 실현손익 자금흐름</div>
+      <h2>번 돈이,<br>어디서 어떻게 흘러왔는지 보이게</h2>
+      <p>실현수익 화면에 있는 흐름도예요. 국내·해외 시장에서 각각 실현된 손익이 하나의 합산 금액으로 모이는 과정을 곡선 형태의 흐름 그래프로 보여줍니다.</p>
+      <p>숫자 표로만 보던 실현손익을 시각적인 흐름으로 확인할 수 있어, 어느 시장에서 수익 비중이 더 큰지 직관적으로 파악하기 좋아요.</p>
+      <div class="tip-line">💡 막대를 클릭하면 해당 시장의 실현손익 내역으로 바로 필터링돼요</div>
+    </div>
+    <div class="mockup sankey-mock">
+      <div class="mockup-label"><span>REALIZED FLOW</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <svg viewBox="0 0 320 120">
+        <path d="M0,20 C120,20 140,55 220,55" fill="none" stroke="var(--green)" stroke-width="14" opacity="0.75"/>
+        <path d="M0,95 C120,95 140,60 220,60" fill="none" stroke="var(--blue)" stroke-width="10" opacity="0.75"/>
+        <circle cx="230" cy="57" r="16" fill="var(--bg3)" stroke="var(--border2)"/>
+      </svg>
+      <div class="sk-legend">
+        <span>🇰🇷 국내 실현<b style="color:var(--green);">+9,820,000</b></span>
+        <span>🇺🇸 해외 실현<b style="color:var(--blue);">+4,110,000</b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 22 AI 개인 설정 & 기록 ═══════════════ -->
+<section class="feature" id="aisettings">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <div class="eyebrow">22 — AI 개인 설정 & 기록</div>
+      <h2>내 Gemini API 키로,<br>더 자유롭게 물어보세요</h2>
+      <p>AI 투자조언 창의 ⚙️ 설정에서 나만의 Gemini API 키와 원하는 모델명을 등록할 수 있어요. 개인 키를 연결하면 사용량 제한 없이 더 자주, 더 깊이 있는 질문을 이어갈 수 있습니다.</p>
+      <p>🕘 기록 패널에서는 과거에 받았던 조언을 날짜별로 다시 열어볼 수 있고, 지난 기록을 보는 중에는 "지난 기록을 보고 있습니다" 배너가 상단에 표시되어 실시간 조언과 헷갈리지 않게 구분해줘요.</p>
+      <div class="tip-line">💡 API 키는 브라우저에만 저장되고 서버로 전송되지 않아요</div>
+    </div>
+    <div class="mockup ai-set-mock">
+      <div class="mockup-label"><span>AI SETTINGS</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="ai-set-row"><label>Gemini API 키</label><div class="val">AIza••••••••••••4f2c</div></div>
+      <div class="ai-set-row"><label>모델</label><div class="val">gemini-flash-latest</div></div>
+      <div class="ai-hist-item">반도체 비중 조정 조언 <small>07.21</small></div>
+      <div class="ai-hist-item">배당주 재편 질문 <small>07.14</small></div>
     </div>
   </div>
 </section>
