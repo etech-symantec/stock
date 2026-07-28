@@ -472,7 +472,7 @@
     </div>
     <div class="feature-map-grid">
       <a href="#signal"><span class="fm-icon">📊</span><b>시장 신호 분석</b><small>15+ 지표 · 0~100점</small></a>
-      <a href="#moonlight"><span class="fm-icon">🌕</span><b>달빛정보</b><small>4대 카테고리 상세</small></a>
+      <a href="#moonlight" class="premium"><span class="fm-icon">🌕</span><b>달빛정보</b><small>4대 카테고리 상세</small></a>
       <a href="#portfolio"><span class="fm-icon">🌐</span><b>포트폴리오 맵</b><small>통합자산 · 트리맵</small></a>
       <a href="#watchlist"><span class="fm-icon">⭐</span><b>관심종목</b><small>실시간 시세 추적</small></a>
       <a href="#ledger"><span class="fm-icon">📋</span><b>거래 장부</b><small>매수·매도·배당·이동·분할</small></a>
@@ -532,14 +532,20 @@
   </div>
 </section>
 
-<!-- ═══════════════ 02 달빛정보 ═══════════════ -->
-<section class="feature" id="moonlight">
+<!-- ═══════════════ 02 달빛정보 (Plus) ═══════════════ -->
+<section class="feature premium" id="moonlight">
   <div class="wrap feature-grid">
     <div class="feature-copy">
-      <div class="eyebrow">02 — 달빛정보</div>
+      <div class="eyebrow gold">02 — 달빛정보<span class="badge-plus">✨ PLUS</span></div>
       <h2>지금 시장,<br>저평가일까 고평가일까</h2>
-      <p>시장 신호 점수를 만들어낸 4대 카테고리(심리·리스크, 자금환경, 경기선행, 밸류에이션)를 각각 뜯어볼 수 있는 전용 대시보드예요. 지표 하나하나의 현재 값과 과거 대비 위치를 함께 보여줍니다.</p>
-      <p>적극적·중립적·보수적 3가지 계산 모드 중 나에게 맞는 기준을 고르면, 전체보기 화면의 시장 신호 점수에도 동일한 기준이 즉시 반영돼요.</p>
+      <p>시장 신호 점수를 만들어낸 4대 카테고리를 각각 뜯어서 파고드는 프리미엄 전용 대시보드예요. 지표 하나하나의 현재 값과 과거 대비 위치, 그리고 그 지표가 왜 중요한지에 대한 설명까지 함께 보여줍니다.</p>
+      <p>적극적·중립적·보수적 3가지 계산 모드 중 나에게 맞는 기준을 고르면, 전체보기 화면 상단의 시장 신호 점수에도 동일한 기준이 즉시 반영돼요. 공격적으로 저점을 노리는 성향인지, 보수적으로 안전마진을 넉넉히 두는 성향인지에 따라 같은 시장도 다른 점수로 읽을 수 있습니다.</p>
+      <ul class="small-list">
+        <li>😨 심리·리스크 — VIX, MOVE(채권 변동성), 하이일드 스프레드, 공포&탐욕 지수</li>
+        <li>📐 밸류에이션 — 버핏지수(한·미), CAPE PE로 장기 고평가/저평가 진단</li>
+        <li>🚚 경기선행 — Russell 2000, 구리 가격, BDI, 한국 수출로 실물경기 방향 포착</li>
+        <li>💵 자금환경 — 미국 10년물 금리, DXY, 원/달러 환율, 한·미 신용잔고로 유동성 점검</li>
+      </ul>
       <div class="tip-line">💡 0~30 적극 매수 · 30~50 분할 매수 · 50~70 관망 · 70~100 비중 축소</div>
     </div>
     <div class="mockup moon-mock">
@@ -549,7 +555,7 @@
         <path d="M14,100 A76,76 0 0 1 120,32" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round"/>
         <defs>
           <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="var(--green)"/>
+            <stop offset="0%" stop-color="var(--gold)"/>
             <stop offset="100%" stop-color="var(--blue)"/>
           </linearGradient>
         </defs>
@@ -695,17 +701,24 @@
     <div class="feature-copy">
       <div class="eyebrow">07 — 거래내역 · 실현수익 · 양도세</div>
       <h2>판 뒤에 남는 숫자까지<br>미리 계산해요</h2>
-      <p>국가·유형·계좌·기간·종목명으로 거래를 검색하고, 매도로 확정된 실현수익을 종목별 수익금·수익률 랭킹으로 확인합니다.</p>
+      <p>국가·유형·계좌·기간·종목명으로 거래를 검색하고, 매도로 확정된 실현수익을 종목별로 모아볼 수 있어요. 두 화면 모두 옆에 전용 랭킹 패널이 항상 붙어있어, 표를 뒤지지 않아도 어떤 종목이 두드러졌는지 바로 보입니다.</p>
+      <p><b style="color:var(--text);">거래내역 랭킹</b>은 최대 매수(한 번에 가장 크게 매수한 종목), 장기 보유(가장 오래 들고 있는 종목), 거래 빈도(가장 자주 사고판 종목), 누적 매수액(총 투입 금액이 가장 큰 종목) 네 가지 기준으로 전환하며 매매 습관을 되짚어볼 수 있어요.</p>
+      <p><b style="color:var(--text);">실현수익 랭킹</b>은 💵 수익금, 📊 수익률, ⚡ 단타왕(짧은 보유 기간 대비 높은 수익을 낸 종목에 점수를 매기는 랭킹) 세 가지 탭을 제공하고, 오름차순·내림차순도 자유롭게 뒤집어볼 수 있습니다.</p>
       <p>해외주식 매도 시 양도소득세(22%)를 기본공제(250만원)까지 반영해 자동 계산하므로, 연말 세금 신고를 미리 준비할 수 있어요.</p>
       <div class="tip-line">💡 랭킹 항목을 클릭하면 해당 종목의 거래 내역만 필터링돼요</div>
     </div>
     <div class="mockup hist-mock">
       <div class="mockup-label"><span>REALIZED · TAX</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="bd-tabs" style="display:flex; gap:2px; margin-bottom:12px; border-bottom:1px solid var(--border);">
+        <span style="flex:1; text-align:center; font-size:11px; font-weight:700; padding:8px 0; color:var(--green); border-bottom:2px solid var(--green);">💵 수익금</span>
+        <span style="flex:1; text-align:center; font-size:11px; font-weight:700; padding:8px 0; color:var(--text3);">📊 수익률</span>
+        <span style="flex:1; text-align:center; font-size:11px; font-weight:700; padding:8px 0; color:var(--text3);">⚡ 단타왕</span>
+      </div>
       <table>
-        <tr><th>날짜</th><th>종목</th><th>유형</th><th>손익</th></tr>
-        <tr><td>07.18</td><td>NVDA</td><td>매도</td><td style="color:var(--red)">+1,842,000</td></tr>
-        <tr><td>07.11</td><td>TSLA</td><td>매도</td><td style="color:var(--blue)">-320,000</td></tr>
-        <tr><td>06.29</td><td>AAPL</td><td>매도</td><td style="color:var(--red)">+960,500</td></tr>
+        <tr><th>순위</th><th>종목</th><th>유형</th><th>손익</th></tr>
+        <tr><td>🥇</td><td>NVDA</td><td>매도</td><td style="color:var(--red)">+1,842,000</td></tr>
+        <tr><td>🥈</td><td>AAPL</td><td>매도</td><td style="color:var(--red)">+960,500</td></tr>
+        <tr><td>🥉</td><td>TSLA</td><td>매도</td><td style="color:var(--blue)">-320,000</td></tr>
       </table>
       <div class="tax-card"><span>해외주식 양도세 예정세액</span><b>2,417,800원</b></div>
     </div>
@@ -719,11 +732,16 @@
       <div class="eyebrow">08 — 배당통계</div>
       <h2>다음 배당,<br>언제 얼마나 들어올지 미리 보기</h2>
       <p>월별 배당 추이 차트와 종목별 배당금 목록을 제공하고, 배당세(15.4%)도 세전 금액 입력만으로 자동 차감할 수 있어요. 소유자·시장·계좌·종목명으로 필터링도 가능합니다.</p>
-      <p>보유 종목의 배당 주기를 자동 감지해 다음 예상 배당월과 예상 수령액을 미리 계산해주는 "예정 배당" 기능과, 배당 기여도가 큰 "효자 종목" 패널도 함께 제공돼요.</p>
+      <p>종목 목록 위에는 <b style="color:var(--text);">📊 배당률 · 💰 배당금</b> 두 기준으로 전환하는 랭킹 탭이 붙어있어요. 배당률 기준으로 보면 투자 대비 가장 효율적으로 배당을 주는 "효자 종목"이, 배당금 기준으로 보면 실제로 가장 많은 현금을 안겨준 종목이 위로 올라옵니다. 오름차순·내림차순 전환도 가능해요.</p>
+      <p>보유 종목의 배당 주기를 자동 감지해 다음 예상 배당월과 예상 수령액을 미리 계산해주는 "예정 배당" 기능도 함께 제공돼요.</p>
       <div class="tip-line">💡 1,000만원 투자 시 월 예상 세후 배당금도 함께 계산돼요</div>
     </div>
     <div class="mockup div-mock">
       <div class="mockup-label"><span>DIVIDEND</span><div class="mockup-dots"><span></span><span></span><span></span></div></div>
+      <div class="bd-tabs" style="display:flex; gap:2px; margin-bottom:12px; border-bottom:1px solid var(--border);">
+        <span style="flex:1; text-align:center; font-size:11px; font-weight:700; padding:8px 0; color:var(--green); border-bottom:2px solid var(--green);">📊 배당률</span>
+        <span style="flex:1; text-align:center; font-size:11px; font-weight:700; padding:8px 0; color:var(--text3);">💰 배당금</span>
+      </div>
       <div class="bars">
         <i style="height:30%;"></i><i style="height:45%;"></i><i style="height:38%;"></i>
         <i style="height:62%;"></i><i style="height:50%;"></i><i style="height:80%;"></i>
