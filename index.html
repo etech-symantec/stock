@@ -171,7 +171,7 @@
     bottom: 24px !important;
     left: auto !important;
     top: auto !important;
-    z-index: 900;
+    z-index: 9500 !important;
     align-items: center;
     width: auto !important;
     max-width: none !important;
@@ -1319,7 +1319,7 @@
     </main> </div>
 
 <!-- ✨ AI 투자조언 플로팅 버튼 (전체보기 / 소유자별 탭에서만 표시) — Gemini 스타일 -->
-<div id="aiAdviceFabWrap" style="display:none; position:fixed; right:24px; bottom:24px; z-index:900; isolation:isolate;">
+<div id="aiAdviceFabWrap" style="display:none; position:fixed; right:24px; bottom:24px; z-index:9500; isolation:isolate;">
   <span class="ai-fab-particles" id="aiFabParticles" aria-hidden="true"></span>
   <button id="aiAdviceFab" onclick="openAiAdviceModal()" style="position:relative; z-index:1; display:inline-flex; align-items:center; padding:12px; border-radius:999px; cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:700; transition:transform 0.15s ease, box-shadow 0.15s ease, color 0.25s ease;
     border:2.75px solid transparent; background-image:linear-gradient(#fff,#fff), linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%); background-origin:border-box; background-clip:padding-box, border-box;
@@ -1357,6 +1357,37 @@
       p.style.setProperty('--pcolor', colors[i % colors.length]);
       wrap.appendChild(p);
     }
+  })();
+</script>
+
+<script>
+  // 🛠️ 하단 플로팅 버튼(AI 투자조언 / 탐사선 띄우기)이 모바일 하단 탭바에
+  // 가려져 버튼 아랫부분이 클릭/호버되지 않는 문제 방지: 탭바가 보이면
+  // 그 높이만큼 버튼을 위로 띄워서 항상 버튼 전체가 탭바 위에 오도록 함.
+  (function () {
+    function adjustFloatingButtons() {
+      var bar = document.getElementById('mobileBottomBar');
+      var offsetPx = 24; // 기본값 (탭바가 없을 때)
+      if (bar) {
+        var cs = window.getComputedStyle(bar);
+        if (cs.display !== 'none' && cs.visibility !== 'hidden' && bar.offsetHeight > 0) {
+          offsetPx = bar.offsetHeight + 16; // 탭바 높이 + 여유 간격
+        }
+      }
+      var bottomVal = offsetPx + 'px';
+      var probeBtn = document.getElementById('probeFabBtn');
+      var aiWrap = document.getElementById('aiAdviceFabWrap');
+      if (probeBtn) probeBtn.style.setProperty('bottom', bottomVal, 'important');
+      if (aiWrap) aiWrap.style.setProperty('bottom', bottomVal, 'important');
+    }
+    window.addEventListener('resize', adjustFloatingButtons);
+    window.addEventListener('orientationchange', adjustFloatingButtons);
+    document.addEventListener('DOMContentLoaded', function () {
+      adjustFloatingButtons();
+      // 탭 전환/초기 렌더링 이후에도 다시 한번 보정
+      setTimeout(adjustFloatingButtons, 300);
+      setTimeout(adjustFloatingButtons, 1000);
+    });
   })();
 </script>
 
