@@ -1215,7 +1215,7 @@ async function getGithubFileSha(settings, path) {
   return null;
 }
 
-function updateSyncStatus(status, customText) {
+function updateSyncStatus(status, customText, defaultLabel) {
   const el = document.getElementById('syncStatus');
   const spinner = document.getElementById('syncSpinner');
   const text = document.getElementById('syncText');
@@ -1230,7 +1230,9 @@ function updateSyncStatus(status, customText) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     });
-    text.textContent = customText || `✅ ${formatted} 저장됨`;
+    // 🌟 클라우드 동기화 완료 / 종목 시세 최신화 완료 등 같은 표시 영역을 공유하는 여러 이벤트가
+    //    서로 다른 기본 문구를 쓸 수 있도록 defaultLabel을 지원 (항상 최신 이벤트만 표시됨)
+    text.textContent = customText || `✅ ${formatted} ${defaultLabel || '저장됨'}`;
     el.classList.add('active');
   } else if(status === 'error') {
     spinner.style.display = 'none'; text.textContent = customText || '❌ 동기화 실패'; el.classList.add('error');
@@ -5521,6 +5523,10 @@ async function runMarketDataFetchBatch(symbolsToFetch, opts = {}) {
     if (loadingEl) loadingEl.style.opacity = '0';
     if (loadingFillEl) loadingFillEl.style.width = '0%'; // 다음 로딩을 위해 초기화
     if (!silent) setFabButtonsHiddenForLoading(false);
+
+    // 🌟 클라우드 동기화 완료 메시지와 같은 자리(우측 상단 syncStatus)에 종목 시세 최신화 완료 메시지를 표시
+    //    같은 영역을 공유하므로 이전 메시지(클라우드 동기화든 시세 최신화든)는 자연히 사라지고 마지막 메시지만 남음
+    if (!silent) updateSyncStatus('success', null, '시세 업데이트됨');
 
     // 🌟 10년치를 한 번에 받으므로 모든 버튼 즉시 활성화
     const btn5y  = document.getElementById('rtab-5y');
