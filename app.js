@@ -224,6 +224,7 @@ const chartInstances = {};
 let accountPieChartInsts = []; 
 let accountGrowthChartInsts = {}; // 🌟 계좌별 자산 성장 추이 미니 차트 인스턴스 저장
 let cachedMarketData = {}; 
+let initialMarketStatusShown = false; // 🌟 접속 직후 '시세 최신화 불필요' 안내를 딱 한 번만 보여주기 위한 플래그
 let localStockDB = []; 
 
 // 🌟 [추가됨] 로컬 스토리지에서 이전 차트 데이터(캐시)를 불러옵니다. (접속 속도 10배 향상)
@@ -5782,6 +5783,24 @@ async function render() {
       fetchMissingMarketData(watchSymbolsToFetch, { label: '관심종목' }); // 지금 보고 있는 탭이므로 즉시 받기
     } else {
       scheduleWatchlistBackgroundFetch(watchSymbolsToFetch); // 안 보이는 곳이니 낮은 우선순위로 예약
+    }
+  }
+
+  // 🌟 접속 직후 첫 렌더링에서, 보유종목/관심종목 시세가 이미 캐시에 다 있어서
+  //    새로 받아올 필요가 없다면 "언제 기준 시세인지" 마지막 최신화 시각을 안내합니다.
+  //    (클라우드 동기화 메시지와 같은 자리를 쓰므로, 나중에 뜨는 다른 메시지가 있으면 자연히 덮어써집니다.)
+  if (!initialMarketStatusShown) {
+    initialMarketStatusShown = true;
+    if (ownedSymbolsToFetch.length === 0 && watchSymbolsToFetch.length === 0) {
+      const cacheTimeStr = localStorage.getItem('sw_market_cache_time');
+      if (cacheTimeStr) {
+        const cachedAt = new Date(parseInt(cacheTimeStr));
+        const formatted = cachedAt.toLocaleString('ko-KR', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+        });
+        updateSyncStatus('success', `✅ ${formatted} 시세 최신 (갱신 불필요)`);
+      }
     }
   }
   
