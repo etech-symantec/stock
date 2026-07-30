@@ -141,16 +141,6 @@ function updateRealizedFilter(key, value) {
     renderRealizedDashboard();
 }
 
-function setRealizedPeriodFilter(period, el) {
-    realizedFilters.period = period;
-    realizedFilters.year = 'all';
-    realizedFilters.month = 'all';
-    
-    document.querySelectorAll('.real-period-btn').forEach(b => b.classList.remove('active'));
-    if (el) el.classList.add('active');
-    
-    renderRealizedDashboard();
-}
 
 function updateRealizedDateFilter(type, value) {
     realizedFilters[type] = value;
@@ -915,38 +905,7 @@ function switchSettingsTab(tabName) {
 
   if (tabName === 'signal' && typeof syncMarketSignalSettingsUI === 'function') syncMarketSignalSettingsUI();
 }
-// 🌟 [추가] 수동 해외자산 목록 저장 함수
-function saveCustomOverseas() {
-    const val = document.getElementById('inputCustomOverseas').value;
-    // 쉼표로 구분된 종목명/티커를 대문자로 변환하고 공백 제거하여 배열로 저장
-    state.customOverseasAssets = val.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
-    saveState();
-    triggerAutoSync();
-    renderCapitalGainsTax(currentRealizedOwnerFilter); // 저장 시 양도세 즉시 재계산
-    
-    const btn = document.getElementById('btnSaveCustomOverseas');
-    if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = '✅ 저장됨';
-        btn.disabled = true;
-        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
-    }
-}
 
-function saveRiaAccounts() {
-    const val = document.getElementById('inputRiaAccounts').value;
-    state.riaAccounts = val.split(',').map(s => s.trim()).filter(Boolean);
-    saveState();
-    triggerAutoSync();
-    renderCapitalGainsTax(currentRealizedOwnerFilter);
-    const btn = document.getElementById('btnSaveRia');
-    if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = '✅ 저장됨';
-        btn.disabled = true;
-        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
-    }
-}
 
 function openOwnerModal() {
   document.getElementById('inputOwner1Name').value = state.owners.user1.name;
@@ -1090,24 +1049,6 @@ function downloadCsvSample() {
   document.body.removeChild(a);
 }
 
-// ── 🌟 구글 번역 API를 활용한 한글 -> 영어 변환 함수 (캐시 적용) ──
-const translationCache = {};
-
-async function translateKoToEn(text) {
-  // 이미 번역한 종목명은 캐시에서 바로 가져옴 (서버 차단 방지 및 속도 향상)
-  if (translationCache[text]) return translationCache[text];
-  try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=en&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const translated = data[0][0][0].trim();
-    translationCache[text] = translated; // 결과 캐싱
-    return translated;
-  } catch (error) {
-    console.error("번역 실패:", error);
-    return text; // 번역 실패 시 원본 텍스트 반환
-  }
-}
 
 // 🌟 수동 매핑 및 CSV 업로드 처리 로직 (진행률 팝업 추가)
 function importCsvData(event) {
@@ -1620,13 +1561,6 @@ function calculateHoldings(ownerFilter = 'all') {
   return holdings;
 }
 
-// 🌟 현재 화면(전체보기/소유자별 탭)에 맞는 ownerFilter 값을 반환합니다.
-function getCurrentOwnerFilter() {
-  let ownerFilter = 'all';
-  if (currentView === 'user1') ownerFilter = state.owners.user1.name;
-  if (currentView === 'user2') ownerFilter = state.owners.user2.name;
-  return ownerFilter;
-}
 
 // 🌟 사이드바 "평가 자산 랭킹"의 소유자 필터(sidebarYieldOwnerFilter)에 맞는 ownerFilter 값을 반환합니다.
 //    (메인 탭이 전체보기든 소유자별 탭이든 상관없이, 사이드바 자체 토글로 독립적으로 선택 가능)
@@ -2309,26 +2243,6 @@ function renderHistoryRanking(txs) {
     </div>`;
 }
 
-function setHistoryDatePreset(preset) {
-    const today = new Date();
-    const fmt = d => d.toISOString().slice(0, 10);
-    let from = '';
-    const to = fmt(today);
-    if (preset === '1m') {
-        const d = new Date(today); d.setMonth(d.getMonth() - 1); from = fmt(d);
-    } else if (preset === '3m') {
-        const d = new Date(today); d.setMonth(d.getMonth() - 3); from = fmt(d);
-    } else if (preset === '6m') {
-        const d = new Date(today); d.setMonth(d.getMonth() - 6); from = fmt(d);
-    } else if (preset === '1y') {
-        const d = new Date(today); d.setFullYear(d.getFullYear() - 1); from = fmt(d);
-    } else if (preset === 'ytd') {
-        from = `${today.getFullYear()}-01-01`;
-    }
-    historyFilters.dateFrom = from;
-    historyFilters.dateTo = to;
-    renderHistoryDashboard();
-}
 
 function resetHistoryFilters() {
   historyFilters = { market: 'all', type: 'all', search: '', dateFrom: '', dateTo: '', broker: 'all', owner: 'all' };
