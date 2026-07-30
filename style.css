@@ -1781,62 +1781,11 @@ nav {
   color: var(--text2);
   background: rgba(255, 255, 255, 0.05);
 }
-.vtab.active {
-  background: var(--accent-bg);
-  color: var(--accent);
-  border-color: rgba(124, 106, 247, 0.28);
-  transform: none;
-  box-shadow: none;
-  transition: color 0.2s ease, background 0.22s ease, border-color 0.22s ease !important;
-}
-.vtab::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: rgba(124, 106, 247, 0.08);
-  opacity: 0;
-  transform: scale(0.85);
-  transition: opacity 0.22s ease, transform 0.22s ease;
-  pointer-events: none;
-}
-.vtab:hover::before { opacity: 1; transform: scale(1); }
-.vtab:hover:not(.active) {
-  color: rgba(124, 106, 247, 0.75);
-  background: rgba(124, 106, 247, 0.06);
-  border-color: rgba(124, 106, 247, 0.15);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(124, 106, 247, 0.1);
-}
-.vtab:active:not(.active) {
-  transform: translateY(0px) scale(0.97);
-  transition-duration: 0.08s !important;
-}
 
 /* ── 아이콘 / 텍스트 분리 ── */
 .vtab-icon { font-size: 16px; line-height: 1; flex-shrink: 0; }
 .vtab-text { flex-shrink: 0; }
 
-/* ── 뷰탭 컨테이너 — 여백 줄어들면 텍스트 숨김 ── */
-.view-tabs {
-  position: static !important;
-  display: flex !important;
-  flex: 0 1 auto;
-  min-width: 0;
-  max-width: 100%;
-  justify-content: center;
-  gap: 2px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  padding: 4px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-  white-space: nowrap;
-  z-index: 1;
-  margin: 0 auto !important;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
 .view-tabs::-webkit-scrollbar { display: none; }
 
 /* ── 1650px 이하: 네비탭 아이콘 전용 전환 ── */
@@ -1856,13 +1805,6 @@ nav {
   #tabUser1, #tabUser2 { padding: 9px 11px; gap: 0; }
 }
 
-/* 라이트 모드 */
-[data-theme="light"] .vtab:hover:not(.active) {
-  color: var(--accent);
-  background: rgba(98, 80, 224, 0.07);
-  border-color: rgba(98, 80, 224, 0.18);
-  box-shadow: 0 2px 8px rgba(98, 80, 224, 0.08);
-}
 
 /* ── 우측: 기간 + 테마 + 설정 ── */
 .nav-right {
@@ -1906,15 +1848,6 @@ nav {
   transition: all 0.15s;
   line-height: 1.4;
   white-space: nowrap;
-}
-.rtab:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text2);
-}
-.rtab.active {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(124, 106, 247, 0.35);
 }
 
 /* 🌟 사이드바 평가 자산 랭킹의 정렬/범위 토글 — 버튼 2개가 균등하게 늘어나도록 */
