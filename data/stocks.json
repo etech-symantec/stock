@@ -50135,13 +50135,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "UDIV",
-    "name": "Franklin US Core Dividend Tilt Index ETF",
+    "symbol": "NDIV",
+    "name": "Amplify Energy & Natural Resources Coverd Call ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "NDIV",
-    "name": "Amplify Energy & Natural Resources Coverd Call ETF",
+    "symbol": "UDIV",
+    "name": "Franklin US Core Dividend Tilt Index ETF",
     "exch": "US_ETF"
   },
   {
@@ -53010,13 +53010,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "ITDE",
-    "name": "iShares LifePath Target Date 2045 ETF",
+    "symbol": "ITDH",
+    "name": "iShares LifePath Target Date 2060 ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "ITDH",
-    "name": "iShares LifePath Target Date 2060 ETF",
+    "symbol": "ITDE",
+    "name": "iShares LifePath Target Date 2045 ETF",
     "exch": "US_ETF"
   },
   {
@@ -54030,13 +54030,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "AZTD",
-    "name": "Aztlan Global Stock Selection DM SMID ETF",
+    "symbol": "IBRN",
+    "name": "iShares Neuroscience and Healthcare ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "IBRN",
-    "name": "iShares Neuroscience and Healthcare ETF",
+    "symbol": "AZTD",
+    "name": "Aztlan Global Stock Selection DM SMID ETF",
     "exch": "US_ETF"
   },
   {
@@ -59060,13 +59060,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "XCOR",
-    "name": "FundX ETF",
+    "symbol": "NVBT",
+    "name": "AllianzIM US Equity Buffer10 Nov ETF",
     "exch": "US_ETF"
   },
   {
-    "symbol": "NVBT",
-    "name": "AllianzIM US Equity Buffer10 Nov ETF",
+    "symbol": "XCOR",
+    "name": "FundX ETF",
     "exch": "US_ETF"
   },
   {
@@ -59185,13 +59185,13 @@
     "exch": "US_ETF"
   },
   {
-    "symbol": "PSCJ",
-    "name": "Pacer Swan SOS Conservative (July) ETF",
+    "symbol": "XTJL",
+    "name": "Innovator US Equity Accelerated Plus ETF - July",
     "exch": "US_ETF"
   },
   {
-    "symbol": "XTJL",
-    "name": "Innovator US Equity Accelerated Plus ETF - July",
+    "symbol": "PSCJ",
+    "name": "Pacer Swan SOS Conservative (July) ETF",
     "exch": "US_ETF"
   },
   {
