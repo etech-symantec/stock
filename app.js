@@ -1561,6 +1561,39 @@ function toggleTxType() {
   }
 }
 
+// 🏦 계좌명 입력창 — 클릭/포커스 시 등록된 계좌 목록을 드롭다운으로 보여주고,
+//    입력하는 대로 필터링됩니다. (직접 새 계좌명을 타이핑해도 됩니다.)
+function renderBrokerDropdown(filterText) {
+  const dd = document.getElementById('brokerDropdown');
+  if (!dd) return;
+  const all = [...new Set(state.transactions.map(t => t.broker).filter(b => b && b.trim()))]
+    .sort((a, b) => a.localeCompare(b, 'ko'));
+  const q = (filterText || '').trim().toLowerCase();
+  const list = q ? all.filter(b => b.toLowerCase().includes(q)) : all;
+
+  if (list.length === 0) {
+    dd.style.display = 'none';
+    dd.innerHTML = '';
+    return;
+  }
+  dd.innerHTML = list.map(b => {
+    const safe = b.replace(/'/g, "\\'");
+    return `<li class="search-item" onmousedown="selectBrokerOption('${safe}')"><span>🏦 ${b}</span></li>`;
+  }).join('');
+  dd.style.display = 'block';
+}
+
+function selectBrokerOption(name) {
+  const input = document.getElementById('txBroker');
+  if (input) input.value = name;
+  closeBrokerDropdown();
+}
+
+function closeBrokerDropdown() {
+  const dd = document.getElementById('brokerDropdown');
+  if (dd) dd.style.display = 'none';
+}
+
 function saveOwnerNames() {
   const old1 = state.owners.user1.name;
   const old2 = state.owners.user2.name;
@@ -1832,8 +1865,6 @@ function deleteTransaction(id) {
 function renderTxList() {
   const listEl = document.getElementById('txList');
   if(!listEl) return;
-  const uniqueBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b))];
-  document.getElementById('brokerTags').innerHTML = uniqueBrokers.map(b => `<button type="button" class="broker-tag" onclick="document.getElementById('txBroker').value='${b}'">${b}</button>`).join('');
 
   if(state.transactions.length === 0) {
     listEl.innerHTML = `<li style="text-align:center; padding:20px; color:var(--text3); font-size:11px;">등록된 내역이 없습니다.</li>`;
