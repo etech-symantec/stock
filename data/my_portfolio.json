@@ -9798,6 +9798,16 @@
       "qty": -4,
       "price": 348.5,
       "txType": "trade"
+    },
+    {
+      "id": 1785814724208,
+      "date": "2026-08-04",
+      "owner": "끄니",
+      "broker": "미래에셋",
+      "symbol": "458730.KS",
+      "qty": 0,
+      "price": 31302,
+      "txType": "dividend"
     }
   ],
   "range": "1y",
@@ -10055,5 +10065,5 @@
       "fuel": []
     }
   },
-  "_updatedAt": 1785059270080
+  "_updatedAt": 1785814724210
 }
