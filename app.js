@@ -2603,6 +2603,85 @@ function applyBulkDate() {
 }
 // ── 날짜 일괄수정 끝 ─────────────────────────────────────────────────────────
 
+// ── 🏦 계좌 일괄변경 (거래내역 페이지에서 체크한 항목 대상) ─────────────────────
+let _baTargetIds = [];
+
+function openBulkAccountModal() {
+  const filtered = state.transactions.filter(t => _histSelectedIds.has(t.id));
+  _baTargetIds = filtered.map(t => t.id);
+
+  const infoEl = document.getElementById('bulkAccountTargetInfo');
+  if (filtered.length === 0) {
+    infoEl.innerHTML = `<span style="color:var(--red);">⚠️ 선택된 거래 내역이 없습니다. 표에서 계좌를 변경할 항목을 먼저 체크해주세요.</span>`;
+    document.getElementById('btnBulkAccountApply').disabled = true;
+    document.getElementById('btnBulkAccountApply').style.opacity = '0.4';
+  } else {
+    const brokers = [...new Set(filtered.map(t => t.broker || '계좌 미지정'))];
+    infoEl.innerHTML = `
+      <b style="color:var(--text);">대상: ${filtered.length}건</b> 선택됨<br>
+      <span style="font-size:11px;">현재 계좌: ${brokers.join(', ')}</span>`;
+    document.getElementById('btnBulkAccountApply').disabled = false;
+    document.getElementById('btnBulkAccountApply').style.opacity = '1';
+  }
+
+  // 계좌명 자동완성 목록 채우기
+  const dataList = document.getElementById('baBrokerOptions');
+  if (dataList) {
+    const uniqueBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b))].sort();
+    dataList.innerHTML = uniqueBrokers.map(b => `<option value="${b}"></option>`).join('');
+  }
+
+  document.getElementById('baNewBroker').value = '';
+  document.getElementById('baPreview').innerHTML = '';
+  document.getElementById('bulkAccountOverlay').style.display = 'flex';
+}
+
+function closeBulkAccountModal() {
+  document.getElementById('bulkAccountOverlay').style.display = 'none';
+}
+
+function _updateBaPreview() {
+  const newBroker = document.getElementById('baNewBroker').value.trim();
+  const previewEl = document.getElementById('baPreview');
+  if (!previewEl) return;
+  if (!newBroker) { previewEl.innerHTML = ''; return; }
+  const existingBrokers = [...new Set(state.transactions.map(t => t.broker).filter(b => b))];
+  const isMerge = existingBrokers.includes(newBroker) && _baTargetIds.some(id => {
+    const tx = state.transactions.find(t => t.id === id);
+    return tx && tx.broker !== newBroker;
+  });
+  previewEl.innerHTML = isMerge
+    ? `<span style="color:var(--orange, #e0a030);">⚠️ '${newBroker}' 계좌가 이미 존재합니다. 선택한 내역이 해당 계좌로 합쳐집니다.</span>`
+    : `선택한 ${_baTargetIds.length}건의 계좌가 <b style="color:var(--accent);">${newBroker}</b>(으)로 변경됩니다.`;
+}
+
+function applyBulkAccount() {
+  const targets = _baTargetIds.map(id => state.transactions.find(t => t.id === id)).filter(Boolean);
+  if (!targets.length) { alert('선택된 거래 내역이 없습니다.'); return; }
+
+  const newBroker = document.getElementById('baNewBroker').value.trim();
+  if (!newBroker) { alert('변경할 계좌명을 입력해주세요.'); return; }
+
+  if (!confirm(`선택한 거래 내역 ${targets.length}건의 계좌를 '${newBroker}'(으)로 일괄 변경합니다.\n계속하시겠습니까?`)) return;
+
+  let changeCount = 0;
+  targets.forEach(tx => {
+    if (tx.broker !== newBroker) { tx.broker = newBroker; changeCount++; }
+  });
+
+  if (changeCount > 0) {
+    saveState();
+    _histSelectedIds.clear();
+    closeBulkAccountModal();
+    renderHistoryDashboard();
+    triggerAutoSync();
+    alert(`✅ ${changeCount}건의 계좌가 '${newBroker}'(으)로 변경되었습니다.`);
+  } else {
+    closeBulkAccountModal();
+  }
+}
+// ── 계좌 일괄변경 끝 ─────────────────────────────────────────────────────────
+
 
 function updateDividendFilter(key, value) {
   dividendFilters[key] = value;
