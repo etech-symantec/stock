@@ -2406,7 +2406,9 @@ let _bdCurrentTab = 'shift';
 let _bdFilteredIds = []; // 현재 필터 기준 대상 tx id 목록
 
 function _getBdFilteredTxs() {
-  // renderHistoryDashboard와 동일한 필터 로직으로 대상 목록 반환
+  // ⚠️ 반드시 renderHistoryDashboard()의 필터링 로직과 100% 동일해야 합니다.
+  //    (다르면 전체선택 체크박스 상태와 실제 표에 보이는 행이 어긋나서
+  //     "전체선택 → 다시 클릭해도 해제 안 됨" 같은 버그가 발생합니다.)
   return state.transactions.filter(tx => {
     let pass = true;
     const isKr = isKorean(tx.symbol);
@@ -2414,8 +2416,8 @@ function _getBdFilteredTxs() {
     if (historyFilters.owner === 'user2' && tx.owner !== state.owners.user2.name) pass = false;
     if (historyFilters.market === 'kr' && !isKr) pass = false;
     if (historyFilters.market === 'us' && isKr) pass = false;
-    if (historyFilters.type === 'buy' && (tx.txType !== 'trade' || tx.qty <= 0)) pass = false;
-    if (historyFilters.type === 'sell' && (tx.txType !== 'trade' || tx.qty >= 0)) pass = false;
+    if (historyFilters.type === 'buy'  && !(tx.qty > 0 && (!tx.txType || tx.txType === 'trade' || tx.txType === 'buy')))  pass = false;
+    if (historyFilters.type === 'sell' && !(tx.qty < 0 && (!tx.txType || tx.txType === 'trade' || tx.txType === 'sell'))) pass = false;
     if (historyFilters.type === 'dividend' && tx.txType !== 'dividend') pass = false;
     if (historyFilters.dateFrom && tx.date < historyFilters.dateFrom) pass = false;
     if (historyFilters.dateTo   && tx.date > historyFilters.dateTo)   pass = false;
@@ -2427,10 +2429,11 @@ function _getBdFilteredTxs() {
       const cachedMatch = cachedMarketData[tx.symbol];
       if (dbMatch) stockName = dbMatch.name;
       else if (cachedMatch && !cachedMatch._failed && cachedMatch.name) stockName = cachedMatch.name;
+      if (state.oldNames && state.oldNames[tx.symbol] && state.oldNames[tx.symbol] !== '상장폐지') {
+        stockName = state.oldNames[tx.symbol];
+      }
       if (!tx.symbol.toLowerCase().includes(s) && !stockName.toLowerCase().includes(s)) pass = false;
     }
-    const cutoff = getCutoffDateFromRange(state.range);
-    if (tx.date < cutoff) pass = false;
     return pass;
   });
 }
@@ -2673,6 +2676,15 @@ function applyBulkAccount() {
     saveState();
     _histSelectedIds.clear();
     closeBulkAccountModal();
+
+    // 방금 변경으로 인해 현재 "계좌" 필터에 해당하는 내역이 더 이상 없으면
+    // (예: 필터된 계좌를 통째로 다른 계좌로 옮긴 경우) 필터를 자동으로 초기화합니다.
+    if (historyFilters.broker !== 'all' && !state.transactions.some(t => t.broker === historyFilters.broker)) {
+      historyFilters.broker = 'all';
+      const brokerSel = document.getElementById('histBrokerFilter');
+      if (brokerSel) brokerSel.value = 'all';
+    }
+
     renderHistoryDashboard();
     triggerAutoSync();
     alert(`✅ ${changeCount}건의 계좌가 '${newBroker}'(으)로 변경되었습니다.`);
