@@ -1109,6 +1109,10 @@
           style="border-color:var(--accent); color:var(--accent); gap:5px; height:34px; padding:0 14px; display:flex; align-items:center;">
           📅 날짜 일괄수정
         </button>
+        <button class="f-btn" onclick="openBulkAccountModal()" title="체크박스로 선택한 거래 내역의 계좌를 일괄 변경"
+          style="border-color:var(--accent); color:var(--accent); gap:5px; height:34px; padding:0 14px; display:flex; align-items:center;">
+          🏦 계좌 일괄변경
+        </button>
         <div id="historyActiveBadges" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-left:auto;"></div>
       </div>
 
@@ -1988,6 +1992,32 @@
     <div style="display:flex; gap:10px; margin-top:20px;">
       <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="closeBulkDateModal()">취소</button>
       <button class="btn-submit" id="btnBulkDateApply" style="flex:1; background:var(--accent);" onclick="applyBulkDate()">✔ 적용하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🏦 계좌 일괄변경 모달 -->
+<div class="overlay" id="bulkAccountOverlay" onclick="closeBulkAccountModal()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:420px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <h3 style="font-size:16px;">🏦 계좌 일괄변경</h3>
+      <button class="btn-sm" onclick="closeBulkAccountModal()">닫기</button>
+    </div>
+
+    <!-- 대상 건수 안내 -->
+    <div id="bulkAccountTargetInfo" style="background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:var(--text2); line-height:1.6;"></div>
+
+    <div class="form-group">
+      <label style="font-size:12px;">변경할 계좌명</label>
+      <input type="text" id="baNewBroker" class="form-input" style="height:36px;" list="baBrokerOptions" placeholder="계좌명 입력 또는 목록에서 선택" oninput="_updateBaPreview()">
+      <datalist id="baBrokerOptions"></datalist>
+    </div>
+    <div id="baPreview" style="margin-top:8px; font-size:11px; color:var(--text3); min-height:18px;"></div>
+
+    <!-- 확인 버튼 -->
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn-submit" style="flex:1; background:var(--bg3); border:1px solid var(--border2); color:var(--text);" onclick="closeBulkAccountModal()">취소</button>
+      <button class="btn-submit" id="btnBulkAccountApply" style="flex:1; background:var(--accent);" onclick="applyBulkAccount()">✔ 적용하기</button>
     </div>
   </div>
 </div>
