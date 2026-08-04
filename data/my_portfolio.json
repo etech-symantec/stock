@@ -9828,6 +9828,16 @@
       "qty": 0,
       "price": 250,
       "txType": "dividend"
+    },
+    {
+      "id": 1785815273329,
+      "date": "2026-08-04",
+      "owner": "끄니",
+      "broker": "KB (종합위탁)",
+      "symbol": "441800.KS",
+      "qty": 3,
+      "price": 26630,
+      "txType": "trade"
     }
   ],
   "range": "1y",
@@ -10085,5 +10095,5 @@
       "fuel": []
     }
   },
-  "_updatedAt": 1785814871944
+  "_updatedAt": 1785815273329
 }
