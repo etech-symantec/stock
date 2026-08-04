@@ -9808,6 +9808,16 @@
       "qty": 0,
       "price": 31302,
       "txType": "dividend"
+    },
+    {
+      "id": 1785814761684,
+      "date": "2026-08-04",
+      "owner": "끄니",
+      "broker": "미래에셋 (ISA)",
+      "symbol": "360750.KS",
+      "qty": 0,
+      "price": 16750.8,
+      "txType": "dividend"
     }
   ],
   "range": "1y",
@@ -10065,5 +10075,5 @@
       "fuel": []
     }
   },
-  "_updatedAt": 1785814724210
+  "_updatedAt": 1785814761684
 }
