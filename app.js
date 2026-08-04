@@ -875,8 +875,76 @@ function openMasterSettingsModal() {
 
   if (typeof syncMarketSignalSettingsUI === 'function') syncMarketSignalSettingsUI();
   if (typeof applyMarketSignalVisibility === 'function') applyMarketSignalVisibility();
+  renderAccountManageList();
   document.getElementById('masterSettingsOverlay').classList.add('open');
   switchSettingsTab('data');
+}
+
+// 🏦 계좌명 관리 — 등록된(=거래 내역에 사용된) 계좌 목록을 표시하고, 이름 변경 시
+//    관련된 모든 거래 내역(및 RIA 계좌 설정 등)에 새 이름을 일괄 반영합니다.
+function renderAccountManageList() {
+  const container = document.getElementById('accountManageList');
+  if (!container) return;
+
+  const uniqueBrokers = [...new Set((state.transactions || []).map(t => t.broker).filter(b => b && b.trim()))]
+    .sort((a, b) => a.localeCompare(b, 'ko'));
+
+  if (uniqueBrokers.length === 0) {
+    container.innerHTML = '<div style="color:var(--text3); font-size:12px; padding:8px 0;">등록된 계좌가 없습니다. 거래 내역을 추가하면 계좌가 자동으로 목록에 나타납니다.</div>';
+    return;
+  }
+
+  container.innerHTML = uniqueBrokers.map(b => {
+    const cnt = state.transactions.filter(t => t.broker === b).length;
+    const safe = b.replace(/'/g, "\\'");
+    return `
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border:1px solid var(--border2); border-radius:8px; margin-bottom:6px; background:var(--bg2);">
+        <div style="font-size:12px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+          <span style="font-weight:700;">🏦 ${b}</span>
+          <span style="color:var(--text3); font-size:11px; margin-left:6px;">${cnt}건의 거래</span>
+        </div>
+        <button type="button" class="btn-sm" style="font-size:11px; flex-shrink:0;" onclick="renameAccount('${safe}')">✏️ 이름 변경</button>
+      </div>`;
+  }).join('');
+}
+
+function renameAccount(oldName) {
+  const newNameRaw = prompt(`'${oldName}' 계좌의 새 이름을 입력하세요.`, oldName);
+  if (newNameRaw === null) return; // 취소
+  const newName = newNameRaw.trim();
+
+  if (!newName) { alert('계좌명을 입력해주세요.'); return; }
+  if (newName === oldName) return;
+
+  const existingBrokers = [...new Set((state.transactions || []).map(t => t.broker).filter(b => b))];
+  const isMerge = existingBrokers.includes(newName);
+
+  const confirmMsg = isMerge
+    ? `⚠️ '${newName}' 계좌가 이미 존재합니다.\n'${oldName}' 계좌의 모든 거래 내역이 '${newName}' 계좌로 합쳐집니다.\n계속하시겠습니까?`
+    : `'${oldName}' → '${newName}'(으)로 계좌명을 변경합니다.\n해당 계좌로 등록된 모든 거래 내역이 자동으로 일괄 업데이트됩니다.\n계속하시겠습니까?`;
+  if (!confirm(confirmMsg)) return;
+
+  // 1) 거래 내역 일괄 업데이트
+  let updated = 0;
+  (state.transactions || []).forEach(tx => {
+    if (tx.broker === oldName) { tx.broker = newName; updated++; }
+  });
+
+  // 2) RIA 계좌로 등록된 이름도 함께 변경
+  if (Array.isArray(state.riaAccounts)) {
+    state.riaAccounts = state.riaAccounts.map(a => (a === oldName ? newName : a));
+    const riaEl = document.getElementById('inputRiaAccounts');
+    if (riaEl) riaEl.value = state.riaAccounts.join(', ');
+  }
+
+  saveState();
+  renderAccountManageList();
+  renderTxList();
+  if (currentView === 'history') renderHistoryDashboard();
+  else render();
+  triggerAutoSync();
+
+  alert(`✅ 계좌명이 변경되었습니다.\n'${oldName}' → '${newName}' (${updated}건의 거래 내역 업데이트)`);
 }
 
 // 설정 모달 탭 전환 함수
