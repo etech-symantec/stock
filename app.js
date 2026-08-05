@@ -1530,7 +1530,7 @@ function toggleTxType() {
   document.getElementById('txTransferFromWrap').style.display = 'none';
   document.getElementById('txSplitRatioWrap').style.display = 'none';
   document.getElementById('txBrokerGroup').style.display = 'block';
-  document.getElementById('txBrokerLabel').textContent = '계좌명 (선택)';
+  document.getElementById('txBrokerLabel').textContent = '계좌명';
   document.getElementById('txBroker').placeholder = '예: 키움증권, 토스 등';
 
   if (type === 'dividend') {
@@ -9531,7 +9531,7 @@ function updateTxQtyTotal() {
 
     const total = Math.round(Math.abs(qty) * price);
     const korean = numberToKorean(String(total));
-    txQtyTotalEl.innerText = korean ? `= ${total.toLocaleString('ko-KR')} (${korean})` : '';
+    txQtyTotalEl.innerText = korean ? korean : '';
 }
 
 if (txQtyInputForTotal) {
