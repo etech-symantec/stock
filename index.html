@@ -152,7 +152,13 @@
     white-space: nowrap;
     transition: max-width 0.35s ease, margin-left 0.35s ease, opacity 0.25s ease;
   }
-  #aiAdviceFab:hover .ai-fab-label{
+  #aiAdviceFab:hover,
+  #aiAdviceFab.force-hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(155,114,203,0.5);
+  }
+  #aiAdviceFab:hover .ai-fab-label,
+  #aiAdviceFab.force-hover .ai-fab-label{
     max-width: 110px;
     margin-left: 8px;
     opacity: 1;
@@ -190,9 +196,10 @@
     box-shadow: 0 6px 20px rgba(6,182,212,0.35);
     white-space: nowrap;
   }
-  #probeFabBtn:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 10px 26px rgba(6,182,212,0.5);
+  #probeFabBtn:hover,
+  #probeFabBtn.force-hover{
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 26px rgba(6,182,212,0.5) !important;
   }
 
   #probeFabBtn .probe-fab-icon{
@@ -215,7 +222,8 @@
     white-space: nowrap;
     transition: max-width 0.35s ease, margin-left 0.35s ease, opacity 0.25s ease;
   }
-  #probeFabBtn:hover .probe-fab-label{
+  #probeFabBtn:hover .probe-fab-label,
+  #probeFabBtn.force-hover .probe-fab-label{
     max-width: 160px;
     margin-left: 8px;
     opacity: 1;
@@ -433,7 +441,7 @@
             <label>발생 일자</label>
             <input type="date" id="txDate" class="form-input">
           </div>
-          <div class="form-group tx-search-container" style="flex:1; z-index:9998;" id="txBrokerGroup">
+          <div class="form-group tx-search-container" style="flex:1; z-index:100000;" id="txBrokerGroup">
             <label id="txBrokerLabel">계좌명</label>
             <input type="text" id="txBroker" class="form-input" placeholder="입력 또는 클릭해서 선택" autocomplete="off"
               onfocus="renderBrokerDropdown(this.value)" oninput="renderBrokerDropdown(this.value)" onblur="setTimeout(closeBrokerDropdown, 150)">
@@ -1332,7 +1340,6 @@
   <button id="aiAdviceFab" onclick="openAiAdviceModal()" style="position:relative; z-index:1; display:inline-flex; align-items:center; padding:12px; border-radius:999px; cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:700; transition:transform 0.15s ease, box-shadow 0.15s ease, color 0.25s ease;
     border:2.75px solid transparent; background-image:linear-gradient(#fff,#fff), linear-gradient(120deg,#4285F4 0%,#9B72CB 45%,#D96570 75%,#F9AB00 100%); background-origin:border-box; background-clip:padding-box, border-box;
     color:#3c3450; box-shadow:0 6px 20px rgba(155,114,203,0.35);"
-    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 26px rgba(155,114,203,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(155,114,203,0.35)';"
     title="보유 종목과 투자금을 바탕으로 Gemini AI에게 투자 의견을 물어봅니다">
     <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px rgba(155,114,203,0.55)); flex-shrink:0;"><defs><linearGradient id="geminiGradFab" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285F4"/><stop offset="35%" stop-color="#9B72CB"/><stop offset="70%" stop-color="#D96570"/><stop offset="100%" stop-color="#F9AB00"/></linearGradient></defs><path fill="url(#geminiGradFab)" d="M12 1 Q13 11 23 12 Q13 13 12 23 Q11 13 1 12 Q11 11 12 1 Z"/></svg>
     <span id="aiAdviceFabLabel" class="ai-fab-label">AI 투자조언</span>
@@ -1395,6 +1402,36 @@
       // 탭 전환/초기 렌더링 이후에도 다시 한번 보정
       setTimeout(adjustFloatingButtons, 300);
       setTimeout(adjustFloatingButtons, 1000);
+    });
+  })();
+</script>
+
+<script>
+  // 🎯 AI 투자조언 / 탐사선 띄우기 버튼 — 좌표 기반 강제 호버 보정
+  //    (버튼 위에 다른 요소(뱃지, 파티클 등)가 겹쳐서 CSS :hover가 부분적으로
+  //     씹히는 경우를 대비해, 실제 마우스 좌표가 버튼의 사각 영역 안에 있으면
+  //     항상 .force-hover 클래스를 부여해 버튼 전체가 예외 없이 호버되도록 함)
+  (function () {
+    function withinRect(x, y, r) {
+      return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    }
+    function setup(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      function onMove(e) {
+        if (getComputedStyle(el).display === 'none') {
+          el.classList.remove('force-hover');
+          return;
+        }
+        const r = el.getBoundingClientRect();
+        el.classList.toggle('force-hover', withinRect(e.clientX, e.clientY, r));
+      }
+      document.addEventListener('mousemove', onMove, { passive: true });
+      document.addEventListener('mouseleave', function () { el.classList.remove('force-hover'); });
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      setup('aiAdviceFab');
+      setup('probeFabBtn');
     });
   })();
 </script>
