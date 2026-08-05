@@ -1738,6 +1738,7 @@ function editTransaction(id) {
   document.getElementById('txQty').value = Math.abs(tx.qty);
   document.getElementById('txPrice').value = Number(tx.price).toLocaleString('ko-KR');
   if (txPriceKorean) txPriceKorean.innerText = numberToKorean(String(tx.price));
+  if (typeof updateTxQtyTotal === 'function') updateTxQtyTotal();
   document.getElementById('txBroker').value = tx.broker || '';
   
   const isUser1 = tx.owner === state.owners.user1.name;
@@ -1770,6 +1771,7 @@ function cancelEdit() {
   document.getElementById('txQty').value = '';
   document.getElementById('txPrice').value = '';
   if (txPriceKorean) txPriceKorean.innerText = '';
+  if (typeof updateTxQtyTotal === 'function') updateTxQtyTotal();
   toggleTxType();
 }
 
@@ -1846,6 +1848,8 @@ function addOrUpdateTransaction() {
     document.getElementById('txSymbol').value = '';
     document.getElementById('txQty').value = '';
     document.getElementById('txPrice').value = '';
+    if (txPriceKorean) txPriceKorean.innerText = '';
+    if (typeof updateTxQtyTotal === 'function') updateTxQtyTotal();
   }
 
   if(!state.tickers.includes(symbol)) state.tickers.push(symbol);
@@ -9501,5 +9505,35 @@ if (txPriceInput) {
         
         // 하단 한글 텍스트 업데이트
         txPriceKorean.innerText = numberToKorean(integerPart);
+
+        // 🌟 수량 × 단가 = 총 금액 (한글) 갱신
+        updateTxQtyTotal();
     });
+}
+
+// 🌟 수량 입력칸 아래에 "수량 × 단가" 총 금액을 한글로 표기
+const txQtyInputForTotal = document.getElementById('txQty');
+const txQtyTotalEl = document.getElementById('txQtyTotal');
+
+function updateTxQtyTotal() {
+    if (!txQtyTotalEl) return;
+    const qtyEl = document.getElementById('txQty');
+    const priceEl = document.getElementById('txPrice');
+    if (!qtyEl || !priceEl) { txQtyTotalEl.innerText = ''; return; }
+
+    const qty = parseFloat(qtyEl.value);
+    const price = parseFloat(String(priceEl.value).replace(/,/g, ''));
+
+    if (!qty || !price || isNaN(qty) || isNaN(price)) {
+        txQtyTotalEl.innerText = '';
+        return;
+    }
+
+    const total = Math.round(Math.abs(qty) * price);
+    const korean = numberToKorean(String(total));
+    txQtyTotalEl.innerText = korean ? `= ${total.toLocaleString('ko-KR')} (${korean})` : '';
+}
+
+if (txQtyInputForTotal) {
+    txQtyInputForTotal.addEventListener('input', updateTxQtyTotal);
 }
