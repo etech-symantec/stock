@@ -5123,12 +5123,10 @@ function renderDividendDashboard() {
   const divKrPct = divGrand > 0 ? Math.round(divKrwNum / divGrand * 100) : 50;
   const divUsPct = 100 - divKrPct;
   const rKr = document.getElementById('divRatioKr');
-  const rUs = document.getElementById('divRatioUs');
   const rPKr = document.getElementById('divRatioPctKr');
   const rPUs = document.getElementById('divRatioPctUs');
   const rConv = document.getElementById('divTotalUsdConverted');
   if (rKr) rKr.style.width = divKrPct + '%';
-  if (rUs) rUs.style.width = divUsPct + '%';
   if (rPKr) rPKr.textContent = `🇰🇷 ${divKrPct}%`;
   if (rPUs) rPUs.textContent = `${divUsPct}% 🇺🇸`;
   if (rConv) rConv.textContent = usdTotal > 0 ? `≈ ₩${Math.round(divUsdKrwNum).toLocaleString()}` : '';
@@ -7899,50 +7897,61 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
   const usPct = 100 - krPct;
 
   container.innerHTML = `
-    <div class="rfp-balance-grid">
+    <div class="stat-banner" style="margin-bottom:15px; flex-shrink:0; align-items:stretch;">
+      <div class="stat-banner-accent" style="background:${totalColor};"></div>
 
-      <!-- 합산 손익 -->
-      <div class="rfp-bcard" style="border-top-color:${totalColor};">
-        <div class="rfp-bcard-head">
+      <div class="stat-banner-total">
+        <div class="stat-banner-label">
           <span class="stat-dot" style="background:${totalColor};"></span>
           합산 손익
         </div>
-        <div class="rfp-bcard-val" style="color:${totalColor};">${_fmt(combinedTotal)}</div>
-        <div class="rfp-bcard-sub">국내 + 해외 합산</div>
-        <div class="rfp-mini-ratio">
-          <div class="rfp-mini-ratio-bar">
-            <div style="width:${krPct}%; background:var(--profit);"></div>
-            <div style="width:${usPct}%; background:var(--loss);"></div>
+        <div class="stat-banner-val" style="color:${totalColor};">${_fmt(combinedTotal)}</div>
+        <div class="stat-banner-sub">국내 + 해외 합산</div>
+      </div>
+
+      <div class="stat-banner-right">
+        <div class="stat-markets" style="align-items:stretch;">
+
+          <!-- 국내주식 -->
+          <div class="stat-market" style="flex-direction:column; align-items:stretch; gap:0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="stat-flag">🇰🇷</span>
+              <div class="stat-market-info">
+                <div class="stat-market-label">국내주식</div>
+                <div class="stat-market-val" style="color:${krColor};">${_fmt(krwTotal)}</div>
+              </div>
+            </div>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border); font-size:11px; color:var(--text3); line-height:1.5;">
+              🛡️ 국내주식은 양도소득세 비과세 대상입니다
+            </div>
           </div>
-          <div class="rfp-mini-ratio-pcts">
+
+          <!-- 미국주식 + 양도세 -->
+          <div class="stat-market" style="flex-direction:column; align-items:stretch; gap:0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="stat-flag">🇺🇸</span>
+              <div class="stat-market-info">
+                <div class="stat-market-label">미국주식 순수익</div>
+                <div class="stat-market-val" style="color:${usColor};">${_fmt(usdTotalKrw)}</div>
+              </div>
+            </div>
+            <div id="capitalGainsTaxPanel" style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);"></div>
+          </div>
+
+        </div>
+
+        <!-- 비중 바 -->
+        <div class="stat-ratio-row">
+          <div class="stat-ratio-bar">
+            <div class="stat-ratio-kr-fill" id="rfpRatioKrFill" style="width:${krPct}%; background:var(--profit);"></div>
+            <div class="stat-ratio-us-fill" style="background:var(--loss);"></div>
+          </div>
+          <div class="stat-ratio-pcts">
             <span style="color:var(--profit);">🇰🇷 ${krPct}%</span>
             <span style="color:var(--loss);">${usPct}% 🇺🇸</span>
           </div>
         </div>
       </div>
-
-      <!-- 국내주식 -->
-      <div class="rfp-bcard" style="border-top-color:${krColor};">
-        <div class="rfp-bcard-head">
-          <span class="stat-flag" style="font-size:15px;">🇰🇷</span>
-          국내주식
-        </div>
-        <div class="rfp-bcard-val" style="color:${krColor};">${_fmt(krwTotal)}</div>
-        <div class="rfp-bcard-spacer"></div>
-        <div class="rfp-bcard-note">🛡️ 국내주식은 양도소득세 비과세 대상입니다</div>
-      </div>
-
-      <!-- 미국주식 + 양도세 -->
-      <div class="rfp-bcard" style="border-top-color:${usColor};">
-        <div class="rfp-bcard-head">
-          <span class="stat-flag" style="font-size:15px;">🇺🇸</span>
-          미국주식 순수익
-        </div>
-        <div class="rfp-bcard-val" style="color:${usColor};">${_fmt(usdTotalKrw)}</div>
-        <div class="rfp-bcard-spacer"></div>
-        <div id="capitalGainsTaxPanel"></div>
-      </div>
-
     </div>
   `;
 }
