@@ -7189,35 +7189,6 @@ function renderCapitalGainsTax(ownerFilter) {
     const thisYear = String(new Date().getFullYear());
     const curRow = rows.find(r => r.year === thisYear);
 
-    // 올해 한 줄 인라인 렌더
-    const curRowHtml = (() => {
-        const r = curRow;
-        if (!r) return `<div style="font-size:12px; color:var(--text3); padding:6px 0;">${thisYear}년 매도 내역 없음</div>`;
-        const netColor = r.netUsd > 0 ? '#00C578' : r.netUsd < 0 ? '#3A9AFF' : 'var(--text3)';
-        const taxStr = r.taxKrw > 0
-            ? `<span style="font-family:var(--font-mono); font-size:17px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:#ff4d6a;">₩${r.taxKrw.toLocaleString()}</span>`
-            : `<span style="font-size:13px; color:var(--text3);">납부 없음</span>`;
-        const riaInfoHtml = r.riaDeduction > 0
-            ? `<div style="font-size:10px; color:var(--green); font-family:var(--font-mono); margin-top:3px;">📌 RIA공제 −₩${Math.round(r.riaDeduction/10000).toLocaleString()}만</div>`
-            : (riaAccounts.length === 0 && thisYear === '2026')
-                ? `<div style="font-size:10px; color:var(--text3); margin-top:3px;">⚙️ RIA 계좌 미설정 — <span style="cursor:pointer; text-decoration:underline;" onclick="openMasterSettingsModal()">설정에서 등록</span></div>`
-                : '';
-        return `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0;">
-            <div>
-                <div style="font-size:12px; color:var(--text3); font-weight:700; letter-spacing:0.03em; margin-bottom:3px;">순손익</div>
-                <div style="font-family:var(--font-mono); font-size:17px; font-weight:700; line-height:1.15; letter-spacing:-0.02em; color:${netColor};">${fmtUsd(r.netUsd)}</div>
-                <div style="font-size:12px; color:${netColor}; font-family:var(--font-mono); margin-top:4px;">${fmtKrw(r.netKrw)}</div>
-            </div>
-            <div style="text-align:right;">
-                <div style="font-size:12px; color:var(--text3); font-weight:700; letter-spacing:0.03em; margin-bottom:3px;">예상 세금</div>
-                ${taxStr}
-                ${riaInfoHtml}
-                ${r.netKrw > 0 && r.netKrw <= DEDUCTION ? `<div style="font-size:11px; color:var(--text3); margin-top:4px;">공제 범위 내</div>` : ''}
-            </div>
-        </div>`;
-    })();
-
     // 전체 테이블 (모달용 빌더 - 클로저로 데이터 캡처)
     const buildFullTableHtml = () => `
     <div style="overflow-x:auto;">
@@ -7689,21 +7660,37 @@ function renderCapitalGainsTax(ownerFilter) {
     overlay.style.display = 'flex';
     }
 
-    // 인라인 패널: 올해만 표시 + 더 보기 버튼
+    // 인라인 패널: 올해만 표시 + 더 보기 버튼 (컴팩트 버전 — 카드 밸런스 유지)
+    const netColor = curRow ? (curRow.netUsd > 0 ? '#00C578' : curRow.netUsd < 0 ? '#3A9AFF' : 'var(--text3)') : 'var(--text3)';
+    const taxMiniHtml = !curRow
+        ? `<div class="rfp-tax-mini-label">${thisYear}년 매도 내역 없음</div>`
+        : `
+        <div class="rfp-tax-mini-row">
+            <span class="rfp-tax-mini-label">${thisYear}년 순손익</span>
+            <span style="font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:${netColor};">${fmtUsd(curRow.netUsd)}</span>
+        </div>
+        <div class="rfp-tax-mini-row">
+            <span class="rfp-tax-mini-label">예상 세금</span>
+            ${curRow.taxKrw > 0
+                ? `<span class="rfp-tax-mini-amt">₩${curRow.taxKrw.toLocaleString()}</span>`
+                : `<span class="rfp-tax-mini-safe">납부 없음</span>`}
+        </div>
+        ${curRow.riaDeduction > 0
+            ? `<div style="font-size:9.5px; color:var(--green); font-family:var(--font-mono); margin-top:2px;">📌 RIA공제 −₩${Math.round(curRow.riaDeduction/10000).toLocaleString()}만</div>`
+            : (riaAccounts.length === 0 && thisYear === '2026')
+                ? `<div style="font-size:9.5px; color:var(--text3); margin-top:2px;">⚙️ RIA 계좌 미설정 — <span style="cursor:pointer; text-decoration:underline;" onclick="openMasterSettingsModal()">설정에서 등록</span></div>`
+                : ''}`;
+
     panel.innerHTML = `
-    <div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <div style="display:flex; align-items:center; gap:6px;">
-                <span class="stat-flag">📋</span>
-                <div class="stat-market-label">${thisYear}년 양도소득세</div>
-            </div>
-            <button onclick="if(typeof window._openCgTaxModal==='function') window._openCgTaxModal(); else alert('데이터를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')"
-                style="font-size:10px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0; font-family:var(--font-sans); white-space:nowrap;">
+    <div class="rfp-tax-mini">
+        ${taxMiniHtml}
+        <div class="rfp-tax-mini-foot">
+            <span style="font-size:9.5px; color:var(--text3);">공제 250만 · 세율 22%</span>
+            <button class="rfp-tax-mini-more"
+                onclick="if(typeof window._openCgTaxModal==='function') window._openCgTaxModal(); else alert('데이터를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')">
                 전체 보기 ▶
             </button>
         </div>
-        ${curRowHtml}
-        <div style="font-size:9px; color:var(--text3); margin-top:4px;">공제 250만 · 세율 22% · 거래일 환율 적용</div>
     </div>`;
 }
 
@@ -7910,56 +7897,50 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
   const usPct = 100 - krPct;
 
   container.innerHTML = `
-    <div class="stat-banner" style="margin-bottom:15px; flex-shrink:0; align-items:stretch;">
-      <div class="stat-banner-accent" style="background:${totalColor};"></div>
+    <div class="rfp-balance-grid">
 
-      <div class="stat-banner-total">
-        <div class="stat-banner-label">
+      <!-- 합산 손익 -->
+      <div class="rfp-bcard" style="border-top-color:${totalColor};">
+        <div class="rfp-bcard-head">
           <span class="stat-dot" style="background:${totalColor};"></span>
           합산 손익
         </div>
-        <div style="font-family:var(--font-mono); font-size:22px; font-weight:700; color:${totalColor}; margin-top:6px; line-height:1.2;">${_fmt(combinedTotal)}</div>
-        <div style="font-size:10px; color:var(--text3); margin-top:5px;">국내 + 해외 합산</div>
-      </div>
-
-      <div class="stat-banner-right">
-        <div class="stat-markets" style="align-items:stretch;">
-
-          <!-- 국내주식 -->
-          <div class="stat-market">
-            <span class="stat-flag">🇰🇷</span>
-            <div class="stat-market-info">
-              <div class="stat-market-label">국내주식</div>
-              <div class="stat-market-val" style="color:${krColor};">${_fmt(krwTotal)}</div>
-            </div>
+        <div class="rfp-bcard-val" style="color:${totalColor};">${_fmt(combinedTotal)}</div>
+        <div class="rfp-bcard-sub">국내 + 해외 합산</div>
+        <div class="rfp-mini-ratio">
+          <div class="rfp-mini-ratio-bar">
+            <div style="width:${krPct}%; background:var(--profit);"></div>
+            <div style="width:${usPct}%; background:var(--loss);"></div>
           </div>
-
-          <!-- 미국주식 + 양도세 -->
-          <div class="stat-market" style="flex-direction:column; align-items:stretch; gap:0;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span class="stat-flag">🇺🇸</span>
-              <div class="stat-market-info">
-                <div class="stat-market-label">미국주식 순수익</div>
-                <div class="stat-market-val" style="color:${usColor};">${_fmt(usdTotalKrw)}</div>
-              </div>
-            </div>
-            <div id="capitalGainsTaxPanel" style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);"></div>
-          </div>
-
-        </div>
-
-        <!-- 비중 바 -->
-        <div class="stat-ratio-row">
-          <div class="stat-ratio-bar">
-            <div class="stat-ratio-kr-fill" id="rfpRatioKrFill" style="width:${krPct}%; background:var(--profit);"></div>
-            <div class="stat-ratio-us-fill" style="background:var(--loss);"></div>
-          </div>
-          <div class="stat-ratio-pcts">
+          <div class="rfp-mini-ratio-pcts">
             <span style="color:var(--profit);">🇰🇷 ${krPct}%</span>
             <span style="color:var(--loss);">${usPct}% 🇺🇸</span>
           </div>
         </div>
       </div>
+
+      <!-- 국내주식 -->
+      <div class="rfp-bcard" style="border-top-color:${krColor};">
+        <div class="rfp-bcard-head">
+          <span class="stat-flag" style="font-size:15px;">🇰🇷</span>
+          국내주식
+        </div>
+        <div class="rfp-bcard-val" style="color:${krColor};">${_fmt(krwTotal)}</div>
+        <div class="rfp-bcard-spacer"></div>
+        <div class="rfp-bcard-note">🛡️ 국내주식은 양도소득세 비과세 대상입니다</div>
+      </div>
+
+      <!-- 미국주식 + 양도세 -->
+      <div class="rfp-bcard" style="border-top-color:${usColor};">
+        <div class="rfp-bcard-head">
+          <span class="stat-flag" style="font-size:15px;">🇺🇸</span>
+          미국주식 순수익
+        </div>
+        <div class="rfp-bcard-val" style="color:${usColor};">${_fmt(usdTotalKrw)}</div>
+        <div class="rfp-bcard-spacer"></div>
+        <div id="capitalGainsTaxPanel"></div>
+      </div>
+
     </div>
   `;
 }
