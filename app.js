@@ -1594,6 +1594,33 @@ function closeBrokerDropdown() {
   if (dd) dd.style.display = 'none';
 }
 
+// 🌟 계좌별 상세 내역 접기/펼치기 (실현손익 · 배당통계 공용)
+function toggleAcctBreakdown(id, btnEl) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const opening = el.style.display !== 'block';
+    el.style.display = opening ? 'block' : 'none';
+    const arrow = btnEl.querySelector('.rfp-acct-arrow');
+    if (arrow) arrow.textContent = opening ? '▴' : '▾';
+}
+
+// breakdownMap: { 계좌명: 금액 } → 정렬된 행 HTML 문자열 생성
+function _buildAcctRowsHtml(breakdownMap, fmtFn) {
+    const entries = Object.entries(breakdownMap || {}).filter(([, v]) => v !== 0);
+    if (entries.length === 0) {
+        return `<div style="font-size:11px; color:var(--text3); padding:4px 0;">계좌 정보가 없습니다</div>`;
+    }
+    entries.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+    return entries.map(([broker, amt]) => {
+        const color = amt > 0 ? '#00C578' : amt < 0 ? '#3A9AFF' : 'var(--text3)';
+        return `
+        <div class="rfp-acct-row">
+            <span class="rfp-acct-row-name">🏦 ${broker}</span>
+            <span class="rfp-acct-row-val" style="color:${color};">${fmtFn(amt)}</span>
+        </div>`;
+    }).join('');
+}
+
 function saveOwnerNames() {
   const old1 = state.owners.user1.name;
   const old2 = state.owners.user2.name;
@@ -4984,7 +5011,9 @@ function renderDividendDashboard() {
   let krwTotal = 0, usdTotal = 0, usdTotalKrw = 0;
   let monthlyKrw = {}, monthlyUsd = {}, monthlyUsdKrw = {};
   let symTotals = {};
-  let divYields = {}; 
+  let divYields = {};
+  let brokerKrwMap = {};   // 국내주식: 계좌별 배당금 (KRW)
+  let brokerUsdMap = {};   // 해외주식: 계좌별 배당금 { usd, krw }
 
   const cutoff = getCutoffDateFromRange(state.range);
 // 배당 계좌 드롭다운 동적 업데이트
@@ -5076,12 +5105,18 @@ function renderDividendDashboard() {
 
      if (isKRW) {
         krwTotal += amt; monthlyKrw[month] += amt; symTotals[sym].krw += amt;
+        const b = tx.broker && tx.broker.trim() ? tx.broker.trim() : '미지정';
+        brokerKrwMap[b] = (brokerKrwMap[b] || 0) + amt;
     } else {
         const txFx = getHistoricalFxRate(tx.date);
         usdTotal += amt; monthlyUsd[month] += amt; symTotals[sym].usd += amt;
         usdTotalKrw += amt * txFx;
         monthlyUsdKrw[month] = (monthlyUsdKrw[month] || 0) + (amt * txFx);
         symTotals[sym].usdKrw = (symTotals[sym].usdKrw || 0) + (amt * txFx);
+        const b = tx.broker && tx.broker.trim() ? tx.broker.trim() : '미지정';
+        if (!brokerUsdMap[b]) brokerUsdMap[b] = { usd: 0, krw: 0 };
+        brokerUsdMap[b].usd += amt;
+        brokerUsdMap[b].krw += amt * txFx;
     }
      
      divYields[sym].totalDiv += amt;
@@ -5115,6 +5150,15 @@ function renderDividendDashboard() {
 
   document.getElementById('divTotalKrw').textContent = `₩ ${Math.round(krwTotal).toLocaleString()}`;
   document.getElementById('divTotalUsd').textContent = `$ ${usdTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
+  // 계좌별 배당금 상세 (국내: KRW / 해외: KRW 환산)
+  const _fmtDivKrw = v => `+₩${Math.round(Math.abs(v)).toLocaleString()}`;
+  const divAcctKrEl = document.getElementById('divAcctKr');
+  if (divAcctKrEl) divAcctKrEl.innerHTML = _buildAcctRowsHtml(brokerKrwMap, _fmtDivKrw);
+  const divAcctUsKrwMap = {};
+  Object.keys(brokerUsdMap).forEach(b => { divAcctUsKrwMap[b] = brokerUsdMap[b].krw; });
+  const divAcctUsEl = document.getElementById('divAcctUs');
+  if (divAcctUsEl) divAcctUsEl.innerHTML = _buildAcctRowsHtml(divAcctUsKrwMap, _fmtDivKrw);
 
   // 배당 비율바 + 환산액
   const divKrwNum = krwTotal;
@@ -6566,6 +6610,8 @@ function renderRealizedDashboard() {
     let krwTotal = 0;
     let usdTotal = 0;
     let usdTotalKrw = 0;
+    let brokerKrwMap = {};   // 국내주식: 계좌별 실현손익 (KRW)
+    let brokerUsdMap = {};   // 해외주식: 계좌별 실현손익 { usd, krw }
     let chartLabels = [];
     let chartLineData = [];
     let chartBarData = [];
@@ -6630,9 +6676,13 @@ function renderRealizedDashboard() {
             
                 if (isKr) {
                     krwTotal += pnl;
+                    brokerKrwMap[broker] = (brokerKrwMap[broker] || 0) + pnl;
                 } else {
                     usdTotal += pnl;
                     usdTotalKrw += pnl * txFxRate;
+                    if (!brokerUsdMap[broker]) brokerUsdMap[broker] = { usd: 0, krw: 0 };
+                    brokerUsdMap[broker].usd += pnl;
+                    brokerUsdMap[broker].krw += pnl * txFxRate;
                 }
             }
         }
@@ -6947,7 +6997,7 @@ function renderRealizedDashboard() {
         </tr>
         `;
     }).join('');
-  updateRfpSankey(krwTotal, usdTotalKrw);
+  updateRfpSankey(krwTotal, usdTotalKrw, brokerKrwMap, brokerUsdMap);
   renderCapitalGainsTax(currentRealizedOwnerFilter);
 }
 
@@ -7858,7 +7908,9 @@ function renderRealizedChart(labels, lineData, barData, txInfo = []) {
 /**
  * 실현수익 Sankey 패널 (전체보기 버튼 복구 및 부드러운 곡선 UI 적용)
  */
-function updateRfpSankey(krwTotal, usdTotalKrw) {
+function updateRfpSankey(krwTotal, usdTotalKrw, brokerKrwMap, brokerUsdMap) {
+  brokerKrwMap = brokerKrwMap || {};
+  brokerUsdMap = brokerUsdMap || {};
   let container = document.getElementById('newSankeyContainer');
 
   if (!container) {
@@ -7896,6 +7948,12 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
   const krPct = grandAbs > 0 ? Math.round(absKr / grandAbs * 100) : 50;
   const usPct = 100 - krPct;
 
+  // 계좌별 상세 (국내: KRW 실현손익 / 해외: KRW 환산 실현손익)
+  const krAcctRowsHtml = _buildAcctRowsHtml(brokerKrwMap, _fmt);
+  const usAcctKrwMap = {};
+  Object.keys(brokerUsdMap).forEach(b => { usAcctKrwMap[b] = brokerUsdMap[b].krw; });
+  const usAcctRowsHtml = _buildAcctRowsHtml(usAcctKrwMap, _fmt);
+
   container.innerHTML = `
     <div class="stat-banner" style="margin-bottom:15px; flex-shrink:0; align-items:stretch;">
       <div class="stat-banner-accent" style="background:${totalColor};"></div>
@@ -7924,6 +7982,10 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
             <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border); font-size:11px; color:var(--text3); line-height:1.5;">
               🛡️ 국내주식은 양도소득세 비과세 대상입니다
             </div>
+            <div class="rfp-acct-toggle" onclick="toggleAcctBreakdown('realAcctKr', this)">
+              <span>계좌별 보기</span><span class="rfp-acct-arrow">▾</span>
+            </div>
+            <div class="rfp-acct-list" id="realAcctKr" style="display:none;">${krAcctRowsHtml}</div>
           </div>
 
           <!-- 미국주식 + 양도세 -->
@@ -7936,6 +7998,10 @@ function updateRfpSankey(krwTotal, usdTotalKrw) {
               </div>
             </div>
             <div id="capitalGainsTaxPanel" style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);"></div>
+            <div class="rfp-acct-toggle" onclick="toggleAcctBreakdown('realAcctUs', this)">
+              <span>계좌별 보기</span><span class="rfp-acct-arrow">▾</span>
+            </div>
+            <div class="rfp-acct-list" id="realAcctUs" style="display:none;">${usAcctRowsHtml}</div>
           </div>
 
         </div>
