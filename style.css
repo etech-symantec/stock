@@ -2093,6 +2093,49 @@ nav {
 /* ── stat-banner (실현수익 / 배당통계 요약 패널) ── */
 /* ── 🌟 실현손익 — 미국주식 카드 내 양도소득세 컴팩트 요약 ── */
 .rfp-tax-mini { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+
+/* ── 🌟 국내/해외 박스 내 계좌별 상세 내역 (접기/펼치기) ── */
+.rfp-acct-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 10.5px;
+  color: var(--text3);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+.rfp-acct-toggle:hover { color: var(--text2); }
+.rfp-acct-arrow { font-size: 9px; transition: transform 0.15s; }
+.rfp-acct-list {
+  margin-top: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.rfp-acct-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 11px;
+}
+.rfp-acct-row-name {
+  color: var(--text2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.rfp-acct-row-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  flex-shrink: 0;
+}
 .rfp-tax-mini-row {
   display: flex;
   align-items: center;
