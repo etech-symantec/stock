@@ -5123,10 +5123,12 @@ function renderDividendDashboard() {
   const divKrPct = divGrand > 0 ? Math.round(divKrwNum / divGrand * 100) : 50;
   const divUsPct = 100 - divKrPct;
   const rKr = document.getElementById('divRatioKr');
+  const rUs = document.getElementById('divRatioUs');
   const rPKr = document.getElementById('divRatioPctKr');
   const rPUs = document.getElementById('divRatioPctUs');
   const rConv = document.getElementById('divTotalUsdConverted');
   if (rKr) rKr.style.width = divKrPct + '%';
+  if (rUs) rUs.style.width = divUsPct + '%';
   if (rPKr) rPKr.textContent = `🇰🇷 ${divKrPct}%`;
   if (rPUs) rPUs.textContent = `${divUsPct}% 🇺🇸`;
   if (rConv) rConv.textContent = usdTotal > 0 ? `≈ ₩${Math.round(divUsdKrwNum).toLocaleString()}` : '';
