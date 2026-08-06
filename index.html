@@ -993,21 +993,33 @@
               <div class="stat-banner-sub">국내 + 해외 합산</div>
             </div>
             <div class="stat-banner-right">
-              <div class="stat-markets">
-                <div class="stat-market">
-                  <span class="stat-flag">🇰🇷</span>
-                  <div class="stat-market-info">
-                    <div class="stat-market-label">국내주식 배당금</div>
-                    <div id="divTotalKrw" class="stat-market-val" style="color:var(--green);">—</div>
+              <div class="stat-markets" style="align-items:stretch;">
+                <div class="stat-market" style="flex-direction:column; align-items:stretch; gap:0;">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="stat-flag">🇰🇷</span>
+                    <div class="stat-market-info">
+                      <div class="stat-market-label">국내주식 배당금</div>
+                      <div id="divTotalKrw" class="stat-market-val" style="color:var(--green);">—</div>
+                    </div>
                   </div>
+                  <div class="rfp-acct-toggle" onclick="toggleAcctBreakdown('divAcctKr', this)">
+                    <span>계좌별 보기</span><span class="rfp-acct-arrow">▾</span>
+                  </div>
+                  <div class="rfp-acct-list" id="divAcctKr" style="display:none;"></div>
                 </div>
-                <div class="stat-market">
-                  <span class="stat-flag">🇺🇸</span>
-                  <div class="stat-market-info">
-                    <div class="stat-market-label">해외주식 배당금</div>
-                    <div id="divTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
-                    <div id="divTotalUsdConverted" class="stat-market-converted">—</div>
+                <div class="stat-market" style="flex-direction:column; align-items:stretch; gap:0;">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="stat-flag">🇺🇸</span>
+                    <div class="stat-market-info">
+                      <div class="stat-market-label">해외주식 배당금</div>
+                      <div id="divTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
+                      <div id="divTotalUsdConverted" class="stat-market-converted">—</div>
+                    </div>
                   </div>
+                  <div class="rfp-acct-toggle" onclick="toggleAcctBreakdown('divAcctUs', this)">
+                    <span>계좌별 보기</span><span class="rfp-acct-arrow">▾</span>
+                  </div>
+                  <div class="rfp-acct-list" id="divAcctUs" style="display:none;"></div>
                 </div>
               </div>
               <div class="stat-ratio-row">
