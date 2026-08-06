@@ -982,49 +982,45 @@
         <!-- ▶ 오른쪽 콘텐츠 -->
         <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:15px;">
       
-          <div class="rfp-balance-grid" id="divStatBanner">
-
-            <!-- 누적 배당금 (합산) -->
-            <div class="rfp-bcard" style="border-top-color:var(--green);">
-              <div class="rfp-bcard-head">
+          <div class="stat-banner" id="divStatBanner">
+            <div class="stat-banner-accent" style="background:var(--green);"></div>
+            <div class="stat-banner-total">
+              <div class="stat-banner-label">
                 <span class="stat-dot" style="background:var(--green);"></span>
                 누적 배당금 (환산)
               </div>
-              <div id="divTotalConverted" class="rfp-bcard-val" style="color:var(--green);">—</div>
-              <div class="rfp-bcard-sub">국내 + 해외 합산</div>
-              <div class="rfp-mini-ratio">
-                <div class="rfp-mini-ratio-bar">
-                  <div id="divRatioKr" style="width:50%; background:var(--green);"></div>
-                  <div id="divRatioUs" style="width:50%; background:var(--blue);"></div>
+              <div id="divTotalConverted" class="stat-banner-val" style="color:var(--green);">—</div>
+              <div class="stat-banner-sub">국내 + 해외 합산</div>
+            </div>
+            <div class="stat-banner-right">
+              <div class="stat-markets">
+                <div class="stat-market">
+                  <span class="stat-flag">🇰🇷</span>
+                  <div class="stat-market-info">
+                    <div class="stat-market-label">국내주식 배당금</div>
+                    <div id="divTotalKrw" class="stat-market-val" style="color:var(--green);">—</div>
+                  </div>
                 </div>
-                <div class="rfp-mini-ratio-pcts">
+                <div class="stat-market">
+                  <span class="stat-flag">🇺🇸</span>
+                  <div class="stat-market-info">
+                    <div class="stat-market-label">해외주식 배당금</div>
+                    <div id="divTotalUsd" class="stat-market-val" style="color:var(--blue);">—</div>
+                    <div id="divTotalUsdConverted" class="stat-market-converted">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="stat-ratio-row">
+                <div class="stat-ratio-bar">
+                  <div id="divRatioKr" class="stat-ratio-kr" style="background:var(--green);"></div>
+                  <div class="stat-ratio-us" style="background:var(--blue);"></div>
+                </div>
+                <div class="stat-ratio-pcts">
                   <span id="divRatioPctKr" style="color:var(--green);">🇰🇷 —</span>
                   <span id="divRatioPctUs" style="color:var(--blue);">— 🇺🇸</span>
                 </div>
               </div>
             </div>
-
-            <!-- 국내주식 배당금 -->
-            <div class="rfp-bcard" style="border-top-color:var(--green);">
-              <div class="rfp-bcard-head">
-                <span class="stat-flag" style="font-size:15px;">🇰🇷</span>
-                국내주식 배당금
-              </div>
-              <div id="divTotalKrw" class="rfp-bcard-val" style="color:var(--green);">—</div>
-              <div class="rfp-bcard-spacer"></div>
-            </div>
-
-            <!-- 해외주식 배당금 -->
-            <div class="rfp-bcard" style="border-top-color:var(--blue);">
-              <div class="rfp-bcard-head">
-                <span class="stat-flag" style="font-size:15px;">🇺🇸</span>
-                해외주식 배당금
-              </div>
-              <div id="divTotalUsd" class="rfp-bcard-val" style="color:var(--blue);">—</div>
-              <div class="rfp-bcard-spacer"></div>
-              <div id="divTotalUsdConverted" class="rfp-bcard-sub">—</div>
-            </div>
-
           </div>
       
           <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px;">
