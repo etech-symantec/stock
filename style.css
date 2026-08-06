@@ -2091,72 +2091,7 @@ nav {
   box-shadow: 0 2px 6px rgba(98, 80, 224, 0.08);
 }
 /* ── stat-banner (실현수익 / 배당통계 요약 패널) ── */
-/* ── 🌟 실현손익 밸런스 요약 카드 (합산/국내/해외 3등분 균형 디자인) ── */
-.rfp-balance-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 15px;
-}
-.rfp-bcard {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  border-top: 3px solid var(--border2);
-}
-.rfp-bcard-head {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text3);
-  letter-spacing: 0.04em;
-  margin-bottom: 8px;
-}
-.rfp-bcard-val {
-  font-family: var(--font-mono);
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
-.rfp-bcard-sub {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 5px;
-}
-.rfp-bcard-spacer { flex: 1; min-height: 8px; }
-.rfp-bcard-note {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed var(--border);
-  line-height: 1.5;
-}
-/* 합산 손익 카드 내부 미니 비중 바 */
-.rfp-mini-ratio { margin-top: auto; padding-top: 12px; }
-.rfp-mini-ratio-bar {
-  height: 5px;
-  border-radius: 3px;
-  background: var(--bg3);
-  overflow: hidden;
-  display: flex;
-}
-.rfp-mini-ratio-pcts {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  margin-top: 5px;
-}
-/* 해외(미국) 카드 하단 — 양도소득세 요약 (컴팩트) */
+/* ── 🌟 실현손익 — 미국주식 카드 내 양도소득세 컴팩트 요약 ── */
 .rfp-tax-mini { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
 .rfp-tax-mini-row {
   display: flex;
@@ -2184,10 +2119,6 @@ nav {
   font-family: var(--font-sans);
   white-space: nowrap;
 }
-@media (max-width: 768px) {
-  .rfp-balance-grid { grid-template-columns: 1fr; }
-}
-
 .stat-banner {
   display: flex;
   align-items: stretch;
