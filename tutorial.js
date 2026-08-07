@@ -1,364 +1,874 @@
-/**
- * ============================================================================
- * 🎓 투더문(Two the Moon) 7대 핵심 페이지 통합 튜토리얼
- * ============================================================================
- */
+// ============================================================
+// 🎓 Two the Moon 튜토리얼 시스템 v2 — 페이지별 튜토리얼 포함
+// ============================================================
+(function() {
+'use strict';
 
-const TutorialSystem = (function() {
-    let currentStep = 0;
-    let isActive = false;
-    let resizeTimer = null;
+// ── 상수 & 상태 ────────────────────────────────────────────
+const TUTORIAL_DONE_KEY = 'ttm_tutorial_done_v2';
+const PAGE_DONE_PREFIX  = 'ttm_page_v2_';
 
-    // 헬퍼 함수: 탭 버튼 클릭 처리 (data-tab 속성 또는 클래스 기반)
-    const switchTab = (tabName) => {
-        const tabBtn = document.querySelector(`[data-tab="${tabName}"]`) || document.querySelector(`.tab-${tabName}`);
-        if (tabBtn) tabBtn.click();
-    };
+let tutorialActive     = false;
+let currentStep        = 0;
+let pageTutorialActive = false;
+let currentPageStep    = 0;
+let currentPageSteps   = [];
+let currentPageView    = '';
 
-    // 🌟 7개 주요 페이지 순서별 튜토리얼 스텝 정의
-    const steps = [
-        // --------------------------------------------------------------------
-        // 1. 전체보기 페이지
-        // --------------------------------------------------------------------
+// ── DOM 헬퍼 ───────────────────────────────────────────────
+function $(sel) { return document.querySelector(sel); }
+
+// ── 메인 튜토리얼 스텝 ────────────────────────────────────
+const STEPS = [
+    {
+        target: 'nav',
+        view: 'all',
+        arrow: 'top',
+        icon: '🗺️',
+        label: '01 — 네비게이션',
+        title: '상단 메뉴로 화면을 전환하세요',
+        body: '전체보기·소유자1·소유자2·관심종목·거래내역·실현수익·배당통계·달빛정보 탭을 클릭해 각 대시보드로 이동합니다. 각 화면에 첫 방문 시 해당 페이지 가이드가 자동으로 안내됩니다.',
+        tip: '💡 기간 탭(1D·1W…전체)으로 조회 기간을 바꾸고, 🌙 버튼으로 라이트/다크 모드를 전환할 수 있어요',
+    },
+    {
+        target: '#sidebar',
+        view: 'all',
+        arrow: 'left',
+        icon: '✏️',
+        label: '02 — 거래 장부',
+        title: '좌측 장부에서 거래를 기록하세요',
+        body: '소유자, 거래 유형(매수/매도/배당/이동/분할), 발생 일자, 종목, 수량, 단가를 입력하면 전체 포트폴리오에 즉시 반영됩니다. 수량 칸 아래에는 수량×단가 총액이 한글로 자동 표기돼요.',
+        tip: '💡 계좌명 칸을 클릭하면 이미 등록된 계좌 목록이 떠서 바로 선택할 수 있고, 새 이름을 입력하면 새 계좌로 등록돼요. \"이동\" 유형으로 계좌 간 종목 이동을, \"분할\"로 액면분할을 기록할 수 있어요',
+    },
+    {
+        target: '#marketSignalBar',
+        view: 'all',
+        arrow: 'top',
+        icon: '📡',
+        label: '03 — 시장 신호 분석',
+        title: '실시간 시장 상황을 한눈에 파악하세요',
+        body: 'VIX(공포지수)·MOVE·하이일드·공포&탐욕 등 심리/리스크 지표부터, 미국 10Y 금리·DXY·USD/KRW·신용잔고, Russell 2000·구리·BDI 등 경기 선행지표, 버핏지수·CAPE PE 밸류에이션까지 종합 분석합니다.',
+        tip: '💡 종합 신호 점수가 낮을수록 리스크 경계 구간입니다',
+    },
+    {
+        target: '#dashboardTopWrapper',
+        view: 'all',
+        arrow: 'top',
+        icon: '📊',
+        label: '04 — 통합 자산 패널',
+        title: '내 전체 자산 현황을 한눈에 확인하세요',
+        body: '국내·해외 주식의 투자 원금, 현재 평가액, 수익률을 실시간으로 집계합니다. \"현재 보유 / 누적 자산\" 버튼으로 실현수익까지 포함한 누적 자산을 볼 수 있어요.',
+        tip: '💡 포트폴리오 맵에서 종목을 꾹 누르면 여러 종목을 선택해 합산 금액을 확인할 수 있어요',
+    },
+    {
+        target: '#allocationTreemap',
+        view: 'all',
+        arrow: 'top',
+        icon: '🗺️',
+        label: '05 — 포트폴리오 맵',
+        title: '비중 시각화 맵으로 포트폴리오를 분석하세요',
+        body: '종목별 비중을 직사각형 크기로 시각화합니다. 클릭하면 종목 상세 차트가 열리고, 꾹 누르면 선택 모드로 진입해 국장/미장 일괄 선택 또는 태그별 선택으로 합산 금액을 즉시 확인할 수 있어요.',
+        tip: '💡 태그 바 차트를 통해 섹터별 비중도 확인할 수 있어요',
+    },
+    {
+        target: '#portfolioChartWrapper',
+        view: 'all',
+        arrow: 'bottom',
+        icon: '📈',
+        label: '06 — 자산 성장 추이',
+        title: '투자 원금 대비 평가액 흐름을 추적하세요',
+        body: '시간 흐름에 따른 총 투자액과 총 평가액을 영역 차트로 보여줍니다. 차트 위를 드래그하면 원하는 구간을 확대할 수 있고, 막대 그래프로 건별 실현수익도 표시됩니다.',
+        tip: '💡 초록 막대 = 익절, 파랑 막대 = 손절로 매도 타이밍을 되돌아볼 수 있어요',
+    },
+    {
+        target: '#aiAdviceFab',
+        view: 'all',
+        arrow: 'left',
+        icon: '🤖',
+        label: '07 — AI 투자조언',
+        title: 'AI에게 내 포트폴리오에 대한 조언을 물어보세요',
+        body: '우측 하단의 AI 투자조언 버튼을 누르면 현재 시장 신호와 내 보유 종목을 종합해 AI가 분석 의견을 제공합니다. 지난 조언은 기록으로 남아 언제든 다시 확인할 수 있어요.',
+        tip: '⚠️ AI 조언은 투자 참고용이며, 최종 투자 판단과 책임은 본인에게 있어요',
+    },
+    {
+        target: '#probeFabBtn',
+        view: 'all',
+        arrow: 'left',
+        icon: '🛰️',
+        label: '08 — 탐사선 띄우기',
+        title: '탐사선으로 관심 조건을 자동 추적하세요',
+        body: 'AI 투자조언 버튼 바로 옆의 탐사선 버튼은 지정한 조건(가격·지표 등)을 주기적으로 점검해 알려주는 Plus 전용 기능이에요. 매번 직접 확인하지 않아도 원하는 조건에 도달하면 놓치지 않을 수 있어요.',
+        tip: '💡 버튼 위에 마우스를 올리면 라벨이 펼쳐지며 기능을 바로 확인할 수 있어요',
+    },
+    {
+        target: '#historyControlsBox',
+        view: 'history',
+        navSelector: '.vtab[onclick*="history"]',
+        arrow: 'top',
+        icon: '📜',
+        label: '09 — 거래 내역',
+        title: '전체 거래 이력을 필터링해서 조회하세요',
+        body: '국가·유형·계좌·기간·종목명으로 거래를 검색하고, 날짜 일괄수정·계좌 일괄변경 기능으로 잘못 입력된 정보를 한 번에 수정할 수 있어요. CSV 파일로 기존 거래 내역을 일괄 업로드할 수도 있습니다.',
+        tip: '💡 체크박스로 여러 건을 선택한 뒤 🏦 계좌 일괄변경 버튼을 누르면 선택한 거래의 계좌를 한 번에 바꿀 수 있어요',
+    },
+    {
+        target: '#newSankeyContainer, .real-flow-panel',
+        view: 'realized',
+        navSelector: '.vtab[onclick*="realized"]',
+        arrow: 'top',
+        icon: '💵',
+        label: '10 — 실현수익',
+        title: '매도를 통해 확정된 수익을 분석하세요',
+        body: '합산·국내·해외 실현손익을 균형 있게 3분할로 보여주고, 각 박스 안에는 계좌별 상세 실현손익 내역까지 바로 표시돼요. 해외주식 매도 시 양도소득세(22%)를 자동 계산해 신고 예정세액도 미리 확인할 수 있습니다.',
+        tip: '💡 랭킹 항목을 클릭하면 해당 종목의 거래 내역만 필터링됩니다',
+    },
+    {
+        target: '#divStatBanner',
+        view: 'dividend',
+        navSelector: '.vtab[onclick*="dividend"]',
+        arrow: 'top',
+        icon: '🌿',
+        label: '11 — 배당통계',
+        title: '배당금 현황과 예정 배당을 추적하세요',
+        body: '누적 배당금을 국내·해외로 나눠 균형 있게 보여주고, 각 박스 안에 계좌별 배당금 상세 내역도 함께 표시돼요. 배당 주기를 자동 감지해 다음 예상 배당월과 예상 수령액을 보여주는 \"예정 배당\" 기능도 있어요.',
+        tip: '💡 배당 입력 시 \"세전 금액\" 체크하면 배당세(15.4%)가 자동 차감됩니다',
+    },
+    {
+        target: '#moonlightShadowHost',
+        view: 'moonlight',
+        navSelector: '.vtab[onclick*="moonlight"]',
+        arrow: 'top',
+        icon: '🌕',
+        label: '12 — 달빛정보',
+        title: '통합 밸류에이션 대시보드를 확인하세요',
+        body: '심리·리스크, 자금환경, 경기선행, 밸류에이션 4대 카테고리를 종합한 0~100점 시장 점수를 더 자세히 보여줍니다. 적극적·중립적·보수적 3가지 계산 모드를 선택하면 상단 시장 신호 점수에도 동일하게 반영돼요.',
+        tip: '💡 점수가 낮을수록 저평가(매수 유리), 높을수록 고평가(비중축소 경고) 구간이에요',
+    },
+    {
+        target: '.btn-sm[onclick*="openMasterSettings"]',
+        view: 'all',
+        arrow: 'top',
+        icon: '⚙️',
+        label: '13 — 설정 & 계좌 관리',
+        title: '계좌 · 화면 · 백업을 한곳에서 관리하세요',
+        body: '⚙️ 설정은 3개 탭으로 구성돼요. \"데이터 관리\"에서 GitHub 클라우드 동기화·JSON/CSV 백업·초기화는 물론, 🏦 계좌명 관리로 계좌명을 변경하면 관련된 모든 거래 내역이 자동으로 일괄 업데이트됩니다. \"화면 설정\"에서 폰트 크기·수익/손실 색상을, \"지표 설정\"에서 시장 신호 카드에 표시할 지표를 그룹/개별로 선택할 수 있어요.',
+        tip: '💡 \"자동 동기화\"를 켜면 거래 추가·수정 시 GitHub에 자동으로 저장돼요',
+    },
+];
+
+// ── 페이지별 튜토리얼 스텝 ─────────────────────────────────
+const PAGE_STEPS = {
+    all: [
         {
-            target: '.view-all-container, #view-all',
-            title: '1. 전체보기 (Overview)',
-            content: '모든 계좌와 종목을 한눈에 파악하는 종합 대시보드입니다. 총 자산 규모, 실시간 총 평가 손익, 자산 배분 비중을 한곳에서 확인하세요.',
-            position: 'bottom',
-            icon: '🌕',
-            action: () => switchTab('all')
+            target: '#marketSignalBar',
+            arrow: 'top',
+            icon: '📡',
+            label: '전체보기 — 시장 신호',
+            title: '실시간 매크로 지표를 분석합니다',
+            body: 'VIX·공포&탐욕·하이일드 스프레드 등 심리/리스크, 금리·달러·환율 등 자금 환경, Russell 2000·구리·BDI 등 경기 선행지표, 버핏지수·CAPE PE 밸류에이션을 종합해 시장 신호 점수를 계산합니다.',
+            tip: '💡 각 지표 카드 위에 마우스를 올리면 세부 설명을 볼 수 있어요',
         },
-
-        // --------------------------------------------------------------------
-        // 2. 소유자 페이지
-        // --------------------------------------------------------------------
         {
-            target: '.view-owner-container, #view-owner',
-            title: '2. 소유자 페이지 (Owner)',
-            content: '본인 및 가계 구성원별(예: 배우자, 가족) 자산을 분리하여 관리할 수 있습니다. 소유자별 자산 기여도와 개별 수익률을 명확하게 파악해 보세요.',
-            position: 'bottom',
+            target: '#allocationTreemap',
+            arrow: 'top',
+            icon: '🗺️',
+            label: '전체보기 — 포트폴리오 맵',
+            title: '트리맵으로 종목 비중을 확인하세요',
+            body: '클릭 → 종목 상세 차트 열기 / 꾹 누르기(롱프레스) → 선택 모드 진입. 선택 모드에서 국장/미장 일괄 선택 또는 태그별 선택으로 합산 평가금액을 즉시 계산합니다.',
+            tip: '💡 하단 태그 바 차트로 섹터별 자산 비중을 확인할 수 있어요',
+        },
+        {
+            target: '#localTagFilterContainer',
+            arrow: 'top',
+            icon: '🏷️',
+            label: '전체보기 — 태그 필터',
+            title: '태그로 종목을 그룹핑하고 필터링하세요',
+            body: '종목 카드의 🏷️ 버튼으로 태그를 설정하면 (예: 2차전지, 배당용, 장기투자) 여기서 태그별로 필터링할 수 있어요. 여러 태그를 동시에 선택하면 OR 조건으로 필터링됩니다.',
+            tip: '💡 태그는 포트폴리오 맵의 선택 모드에서도 활용할 수 있어요',
+        },
+        {
+            target: '#aiAdviceFab',
+            arrow: 'left',
+            icon: '🤖',
+            label: '전체보기 — AI 투자조언',
+            title: '내 자산 현황을 바탕으로 AI 의견을 받아보세요',
+            body: '우측 하단 버튼을 누르면 현재 시장 신호와 보유 포트폴리오를 함께 분석한 AI 투자조언을 받을 수 있어요. \"기록\" 버튼으로 이전에 받았던 조언들도 날짜별로 다시 볼 수 있습니다.',
+            tip: '⚠️ AI 조언은 참고용이며, 투자 판단과 책임은 본인에게 있어요',
+        },
+    ],
+
+    user1: [
+        {
+            target: '#dashboardTopWrapper',
+            arrow: 'top',
             icon: '👤',
-            action: () => switchTab('owner')
+            label: '소유자1 — 개인 포트폴리오',
+            title: '소유자1의 자산만 필터링해서 봅니다',
+            body: '거래 장부에서 소유자1로 입력된 거래만 집계해 별도 대시보드로 보여줍니다. 국내/해외 투자액, 평가액, 수익률이 소유자1 기준으로 표시돼요.',
+            tip: '💡 ⚙️ 설정 → 소유자 이름·아이콘·색상을 자유롭게 바꿀 수 있어요',
         },
-
-        // --------------------------------------------------------------------
-        // 3. 관심종목 페이지
-        // --------------------------------------------------------------------
         {
-            target: '.view-watchlist-container, #view-watchlist',
-            title: '3. 관심종목 (Watchlist)',
-            content: '현재 매수를 고려 중이거나 주가 추이를 지적 관찰하고 싶은 종목들을 모아두는 공간입니다. 목표가 설정과 실시간 가격 모니터링을 지원합니다.',
-            position: 'bottom',
+            target: '#listOptionsBar',
+            arrow: 'top',
+            icon: '🗂️',
+            label: '소유자1 — 종목 보기 옵션',
+            title: '카드/리스트 뷰와 정렬을 조절하세요',
+            body: '카드형 보기와 리스트형 보기 중 선택하고, 등락률·평가금액·수익률 기준으로 정렬할 수 있습니다. ↕️/↔️ 버튼으로 국내/해외 섹션의 배치 방향도 바꿀 수 있어요.',
+            tip: '💡 🔍 검색창으로 종목명이나 티커를 빠르게 찾을 수 있어요',
+        },
+    ],
+
+    user2: [
+        {
+            target: '#dashboardTopWrapper',
+            arrow: 'top',
+            icon: '👥',
+            label: '소유자2 — 개인 포트폴리오',
+            title: '소유자2의 자산만 필터링해서 봅니다',
+            body: '거래 장부에서 소유자2로 입력된 거래만 집계해 별도 대시보드로 보여줍니다. 국내/해외 투자액, 평가액, 수익률이 소유자2 기준으로 표시돼요.',
+            tip: '💡 ⚙️ 설정 → 소유자 이름·아이콘·색상을 자유롭게 바꿀 수 있어요',
+        },
+        {
+            target: '#listOptionsBar',
+            arrow: 'top',
+            icon: '🗂️',
+            label: '소유자2 — 종목 보기 옵션',
+            title: '카드/리스트 뷰와 정렬을 조절하세요',
+            body: '카드형 보기와 리스트형 보기 중 선택하고, 등락률·평가금액·수익률 기준으로 정렬할 수 있습니다. ↕️/↔️ 버튼으로 국내/해외 섹션의 배치 방향도 바꿀 수 있어요.',
+            tip: '💡 🔍 검색창으로 종목명이나 티커를 빠르게 찾을 수 있어요',
+        },
+    ],
+
+    watch: [
+        {
+            target: '#watchlistSearchGroup',
+            arrow: 'top',
             icon: '⭐',
-            action: () => switchTab('watchlist')
+            label: '관심종목 — 종목 추가',
+            title: '관심 종목을 검색해서 추가하세요',
+            body: '국내/미국 필터를 선택한 뒤 종목명이나 티커를 입력하면 자동 완성 목록이 나타납니다. 종목을 선택하고 추가 버튼을 누르면 실시간 시세 모니터링이 시작돼요.',
+            tip: '💡 모바일에서는 상단 검색바를 이용해 관심종목을 추가할 수 있어요',
         },
-
-        // --------------------------------------------------------------------
-        // 4. 거래내역 페이지
-        // --------------------------------------------------------------------
         {
-            target: '.view-transactions-container, #view-transactions',
-            title: '4. 거래내역 (Transactions)',
-            content: '매수, 매도, 환전 등 모든 투자 활동을 기록하는 장부입니다. 소유자 지정 및 계좌별 거래 입력을 통해 정확한 포트폴리오 데이터를 유지합니다.',
-            position: 'bottom',
-            icon: '📝',
-            action: () => switchTab('transactions')
+            target: '#listOptionsBar',
+            arrow: 'top',
+            icon: '🏷️',
+            label: '관심종목 — 뷰 & 태그',
+            title: '카드/리스트 뷰와 태그를 활용하세요',
+            body: '카드형 보기에서는 미니 차트와 함께 시세를 확인하고, 리스트형 보기에서는 많은 종목을 한눈에 비교할 수 있어요. 각 종목에 태그를 달아 그룹별로 필터링할 수도 있습니다.',
+            tip: '💡 종목 카드에서 ✕ 버튼을 누르면 관심종목에서 삭제됩니다',
         },
+    ],
 
-        // --------------------------------------------------------------------
-        // 5. 실현수익 페이지
-        // --------------------------------------------------------------------
+    history: [
         {
-            target: '.view-realized-container, #view-realized',
-            title: '5. 실현수익 (Realized Gains)',
-            content: '매도가 완료되어 확정된 손익(누적 실현 손익)과 투자 승률을 분석합니다. 기간별 확정 수익과 매도 기록을 통해 투자 성과를 복기해보세요.',
-            position: 'bottom',
-            icon: '💰',
-            action: () => switchTab('realized')
+            target: '#historyControlsBox',
+            arrow: 'top',
+            icon: '🔍',
+            label: '거래내역 — 필터',
+            title: '다양한 조건으로 거래를 검색하세요',
+            body: '기간·소유자·시장(국내/미국)·거래유형(매수/매도/배당)·계좌·종목명으로 복합 필터링할 수 있습니다. 활성화된 필터는 우측에 배지로 표시되고, 클릭하면 해당 필터만 바로 해제됩니다.',
+            tip: '💡 📅 기간 선택 버튼으로 특정 날짜 범위만 조회할 수 있어요',
         },
-
-        // --------------------------------------------------------------------
-        // 6. 배당통계 페이지
-        // --------------------------------------------------------------------
         {
-            target: '.view-dividend-container, #view-dividend',
-            title: '6. 배당통계 (Dividend Stats)',
-            content: '월별/연도별 수령 배당금을 시각적인 차트로 제공합니다. 배당 수익률과 월별 현금 흐름을 예측하여 안정한 제2의 월급을 설계해 보세요.',
-            position: 'bottom',
-            icon: '💸',
-            action: () => switchTab('dividend')
+            target: '#historyRankingPanel',
+            arrow: 'left',
+            icon: '🏆',
+            label: '거래내역 — 거래 랭킹',
+            title: '종목별 거래 통계와 랭킹을 확인하세요',
+            body: '좌측 패널에서 거래 횟수, 매수/매도 총액, 수익 기여도 등 종목별 거래 랭킹을 볼 수 있습니다. 항목을 클릭하면 우측 테이블이 해당 종목으로 바로 필터링돼요.',
+            tip: '💡 체크박스로 여러 거래를 선택한 뒤 일괄 삭제도 가능해요',
         },
-
-        // --------------------------------------------------------------------
-        // 7. 달빛정보 페이지
-        // --------------------------------------------------------------------
         {
-            target: '.view-info-container, #view-info',
-            title: '7. 달빛정보 (Moonlight Info)',
-            content: '투더문 활용 팁, 주요 업데이트 소식, 포트폴리오 관리 노하우 등 유용한 정보와 가이드를 확인할 수 있는 지식 공간입니다.',
-            position: 'bottom',
-            icon: '🌙',
-            action: () => switchTab('info')
-        }
-    ];
+            target: 'button[onclick*="openBulkDateModal"]',
+            arrow: 'top',
+            icon: '📅',
+            label: '거래내역 — 날짜 일괄수정',
+            title: '날짜를 한 번에 수정하거나 이동하세요',
+            body: '필터된 거래 전체의 날짜를 일괄 처리합니다. 날짜 이동(N일 앞/뒤로 이동), 날짜 치환(특정 날짜를 다른 날짜로 교체), 날짜 설정(모두 같은 날짜로 통일) 세 가지 모드가 있어요.',
+            tip: '💡 CSV 일괄 업로드 후 날짜를 한 번에 정리할 때 유용해요',
+        },
+        {
+            target: 'button[onclick*="openBulkAccountModal"]',
+            arrow: 'top',
+            icon: '🏦',
+            label: '거래내역 — 계좌 일괄변경',
+            title: '선택한 거래의 계좌를 한 번에 바꾸세요',
+            body: '표에서 체크박스로 거래를 선택한 뒤 이 버튼을 누르면, 새 계좌명을 입력하거나 기존 계좌 목록에서 골라 선택된 거래 전체의 계좌를 한 번에 변경할 수 있어요. 이미 있는 계좌명을 입력하면 두 계좌가 하나로 합쳐집니다.',
+            tip: '💡 상단 헤더의 전체선택 체크박스로 필터된 거래를 한 번에 모두 선택할 수 있어요',
+        },
+    ],
 
-    let elements = {};
+    realized: [
+        {
+            target: '#newSankeyContainer, .real-flow-panel',
+            arrow: 'top',
+            icon: '💵',
+            label: '실현수익 — 수익 요약',
+            title: '확정된 수익의 전체 흐름을 파악하세요',
+            body: '합산 손익 · 국내주식 · 미국주식 순수익을 균형 있게 3분할로 보여줍니다. 국내/미국 박스 안에는 계좌별 실현손익 상세 내역이 바로 표시되어, 어느 계좌에서 얼마나 벌었는지 한눈에 비교할 수 있어요.',
+            tip: '💡 필터를 적용하면 특정 기간·종목·계좌의 실현수익만 집계됩니다',
+        },
+        {
+            target: '#capitalGainsTaxPanel',
+            arrow: 'top',
+            icon: '🧾',
+            label: '실현수익 — 양도소득세',
+            title: '해외주식 양도소득세를 자동으로 계산합니다',
+            body: '해외주식 매도 시 발생하는 양도소득세(22%)를 자동 계산합니다. 기본 공제(250만원)를 적용한 실질 납부 예정세액이 표시되므로 연말 세금 신고를 미리 준비할 수 있어요.',
+            tip: '💡 소유자 필터로 가족 구성원별 세금을 각각 확인할 수 있어요',
+        },
+        {
+            target: '#realizedRankingPanel',
+            arrow: 'left',
+            icon: '🏆',
+            label: '실현수익 — 종목 랭킹',
+            title: '수익을 가장 많이 준 종목을 확인하세요',
+            body: '종목별 실현 수익금, 수익률, 단타 횟수 랭킹을 제공합니다. 탭을 전환하며 수익금 순/수익률 순으로 정렬하고, 항목을 클릭하면 우측 테이블이 해당 종목으로 필터링됩니다.',
+            tip: '💡 \"What if?\" 섹션으로 매도하지 않고 보유했을 때의 가상 수익도 볼 수 있어요',
+        },
+    ],
 
-    function initDOM() {
-        if (document.querySelector('.tutorial-backdrop')) return;
+    dividend: [
+        {
+            target: '#divStatBanner',
+            arrow: 'top',
+            icon: '🌿',
+            label: '배당통계 — 배당금 요약',
+            title: '누적 배당금 현황을 한눈에 확인하세요',
+            body: '국내·해외 배당금을 환산해 합산하고, 국내/해외 비율을 막대 그래프로 보여줍니다. 각 박스 안에는 계좌별 배당금 상세 내역이 바로 표시돼요. 소유자·시장·계좌·기간 필터를 조합해 원하는 조건의 배당 내역만 분석할 수 있어요.',
+            tip: '💡 배당금 입력 시 \"세전 금액\" 옵션으로 배당세(15.4%)를 자동 차감할 수 있어요',
+        },
+        {
+            target: '#divStockList',
+            arrow: 'right',
+            icon: '🏆',
+            label: '배당통계 — 효자 종목',
+            title: '배당금을 가장 많이 준 종목을 확인하세요',
+            body: '좌측 패널에서 배당금 합계, 배당률, 연환산 배당수익률 순으로 정렬해 종목별 배당 기여도를 분석합니다. 종목을 클릭하면 우측에 해당 종목의 배당 내역만 필터링돼요.',
+            tip: '💡 1,000만원 투자 시 월 예상 세후 배당금도 자동으로 계산됩니다',
+        },
+        {
+            target: '#upcomingDivTableBody',
+            arrow: 'top',
+            icon: '🔮',
+            label: '배당통계 — 예정 배당',
+            title: '다음에 받을 배당금을 미리 확인하세요',
+            body: '보유 종목의 과거 배당 패턴을 분석해 다음 배당 예상월과 예상 수령 금액을 자동으로 계산합니다. 배당 주기(월·분기·반기·연)를 파악해 현금 흐름을 계획하는 데 도움이 됩니다.',
+            tip: '💡 배당 주기와 예상월은 과거 배당 이력을 기반으로 추정한 값입니다',
+        },
+    ],
 
-        const html = `
-            <div class="tutorial-welcome-overlay">
-                <div class="tutorial-welcome-modal">
-                    <span class="tutorial-welcome-logo">🚀</span>
-                    <h2>투더문(Two the Moon) 탐험하기</h2>
-                    <p>자산 관리부터 배당 통계까지, <span class="highlight-text">7가지 핵심 기능</span>을 빠르게 둘러보세요.</p>
-                    <div class="tutorial-feature-grid">
-                        <div class="tutorial-feature-item"><span class="feat-icon">🌕</span>전체 자산 요약</div>
-                        <div class="tutorial-feature-item"><span class="feat-icon">👤</span>소유자별 분리</div>
-                        <div class="tutorial-feature-item"><span class="feat-icon">📝</span>거래/실현 손익</div>
-                        <div class="tutorial-feature-item"><span class="feat-icon">💸</span>배당 현금 흐름</div>
-                    </div>
-                    <div class="tutorial-welcome-actions">
-                        <button class="btn-tutorial-start">투어 시작하기</button>
-                        <button class="btn-tutorial-skip">건너뛰기</button>
-                    </div>
-                </div>
-            </div>
+    moonlight: [
+        {
+            target: '#moonlightShadowHost',
+            arrow: 'top',
+            icon: '🌕',
+            label: '달빛정보 — 통합 밸류에이션',
+            title: '시장 전체의 저평가/고평가 상태를 진단하세요',
+            body: '심리·리스크(VIX·공포&탐욕 등), 자금환경(금리·달러·신용잔고), 경기선행(Russell·구리·BDI), 밸류에이션(버핏지수·CAPE PE) 4대 카테고리를 종합해 0~100점의 시장 신호 점수를 계산합니다.',
+            tip: '💡 0~30 적극 매수 · 30~50 분할 매수 · 50~70 관망 유지 · 70~100 비중 축소 구간이에요',
+        },
+        {
+            target: '#moonlightShadowHost',
+            arrow: 'top',
+            icon: '🌗',
+            label: '달빛정보 — 계산 모드',
+            title: '적극적·중립적·보수적 모드 중 선택하세요',
+            body: '지표별 가중치를 다르게 적용하는 3가지 계산 모드를 제공합니다. 여기서 모드를 바꾸면 전체보기 화면 상단의 \"시장 신호\" 종합 점수에도 동일한 모드가 함께 적용됩니다.',
+            tip: '💡 선택한 모드는 자동으로 저장되어 다음 접속 시에도 유지돼요',
+        },
+    ],
+};
 
-            <div class="tutorial-backdrop"></div>
-            <div class="tutorial-curtain tutorial-curtain-top"></div>
-            <div class="tutorial-curtain tutorial-curtain-bottom"></div>
-            <div class="tutorial-curtain tutorial-curtain-left"></div>
-            <div class="tutorial-curtain tutorial-curtain-right"></div>
-            <div class="tutorial-highlight-ring"></div>
+// ── 환영 모달 주입 ─────────────────────────────────────────
+function injectWelcomeModal() {
+    if ($('#tutorialWelcomeOverlay')) return;
+    const el = document.createElement('div');
+    el.id = 'tutorialWelcomeOverlay';
+    el.className = 'tutorial-welcome-overlay';
+    el.innerHTML = `
+      <div class="tutorial-welcome-modal" onclick="event.stopPropagation()">
+        <span class="tutorial-welcome-logo">🚀</span>
+        <h2>Two the Moon에 오신 걸 환영합니다!</h2>
+        <p>
+          국내·미국 주식 포트폴리오를 한 곳에서 관리하는
+          <span class="highlight-text">스마트 주식 장부</span>입니다.<br>
+          ${STEPS.length}단계 가이드로 핵심 기능을 바로 익혀보세요!
+        </p>
 
-            <div class="tutorial-tooltip" style="display: none;">
-                <button class="btn-tutorial-close-x">✕</button>
-                <div class="tutorial-tooltip-step">STEP <span class="step-current">1</span>/<span class="step-total">7</span></div>
-                <span class="tutorial-tooltip-icon"></span>
-                <h3 class="tooltip-title"></h3>
-                <p class="tooltip-desc"></p>
-                <div class="tutorial-nav">
-                    <button class="btn-tutorial-prev">이전</button>
-                    <div class="tutorial-progress-dots"></div>
-                    <button class="btn-tutorial-next">다음</button>
-                </div>
-            </div>
+        <div class="tutorial-feature-grid">
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">📡</span>
+            <span>실시간 <b>시장 신호</b><br>& 매크로 지표 분석</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">🗺️</span>
+            <span>트리맵 <b>포트폴리오 맵</b><br>& 태그 그룹핑</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">💵</span>
+            <span>실현수익 & <b>양도세 자동계산</b><br>배당통계 & 예정배당</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">🤖</span>
+            <span><b>AI 투자조언</b><br>& 🌕 달빛정보 밸류에이션</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">☁️</span>
+            <span>GitHub <b>클라우드 동기화</b><br>& 자동 백업</span>
+          </div>
+        </div>
 
-            <div class="tutorial-done-toast">🎉 모든 기능 둘러보기가 완료되었습니다! 즐거운 투자 되세요.</div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', html);
+        <div class="tutorial-welcome-actions">
+          <button class="btn-tutorial-start" onclick="startTutorial()">
+            🎓 전체 가이드 시작하기 (${STEPS.length}단계)
+          </button>
+          <button class="btn-tutorial-skip" onclick="skipTutorial()">
+            건너뛰기 — 각 페이지 방문 시 자동 안내가 표시됩니다
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(el);
+}
 
-        elements = {
-            welcomeOverlay: document.querySelector('.tutorial-welcome-overlay'),
-            startBtn: document.querySelector('.btn-tutorial-start'),
-            skipBtn: document.querySelector('.btn-tutorial-skip'),
-            backdrop: document.querySelector('.tutorial-backdrop'),
-            curtains: {
-                top: document.querySelector('.tutorial-curtain-top'),
-                bottom: document.querySelector('.tutorial-curtain-bottom'),
-                left: document.querySelector('.tutorial-curtain-left'),
-                right: document.querySelector('.tutorial-curtain-right')
-            },
-            ring: document.querySelector('.tutorial-highlight-ring'),
-            tooltip: document.querySelector('.tutorial-tooltip'),
-            closeX: document.querySelector('.btn-tutorial-close-x'),
-            prevBtn: document.querySelector('.btn-tutorial-prev'),
-            nextBtn: document.querySelector('.btn-tutorial-next'),
-            dotsContainer: document.querySelector('.tutorial-progress-dots'),
-            doneToast: document.querySelector('.tutorial-done-toast')
-        };
+// ── 튜토리얼 DOM 주입 ─────────────────────────────────────
+function injectTutorialDOM() {
+    if ($('#tutorialCurtain_top')) return;
 
-        elements.startBtn.addEventListener('click', startTutorial);
-        elements.skipBtn.addEventListener('click', endTutorial);
-        elements.closeX.addEventListener('click', endTutorial);
-        elements.prevBtn.addEventListener('click', prevStep);
-        elements.nextBtn.addEventListener('click', nextStep);
-        window.addEventListener('resize', handleResize);
+    ['top','bottom','left','right'].forEach(dir => {
+        const c = document.createElement('div');
+        c.id = `tutorialCurtain_${dir}`;
+        c.className = 'tutorial-curtain';
+        c.style.display = 'none';
+        c.onclick = () => tutorialActive ? closeTutorial() : closePageTutorial();
+        document.body.appendChild(c);
+    });
 
-        document.querySelectorAll('.btn-restart-tutorial').forEach(btn => {
-            btn.addEventListener('click', showWelcomeModal);
-        });
+    const ring = document.createElement('div');
+    ring.id = 'tutorialHighlightRing';
+    ring.className = 'tutorial-highlight-ring';
+    ring.style.display = 'none';
+    document.body.appendChild(ring);
+
+    const tt = document.createElement('div');
+    tt.id = 'tutorialTooltip';
+    tt.className = 'tutorial-tooltip';
+    tt.style.display = 'none';
+    document.body.appendChild(tt);
+
+    const toast = document.createElement('div');
+    toast.id = 'tutorialDoneToast';
+    toast.className = 'tutorial-done-toast';
+    toast.innerHTML = '🎉 튜토리얼 완료! 이제 Two the Moon을 마음껏 사용하세요';
+    document.body.appendChild(toast);
+}
+
+// ── 스포트라이트 포지셔닝 ─────────────────────────────────
+const PAD = 8;
+
+function positionSpotlight(rect) {
+    const { top: t, left: l, right: r, bottom: b, width: w, height: h } = rect;
+    const vw = window.innerWidth, vh = window.innerHeight;
+
+    function curtain(id, styles) {
+        const el = $(`#tutorialCurtain_${id}`);
+        if (el) Object.assign(el.style, { display: 'block', ...styles });
+    }
+    curtain('top',    { top:'0',           left:'0',          width:`${vw}px`,         height:`${t-PAD}px` });
+    curtain('bottom', { top:`${b+PAD}px`,  left:'0',          width:`${vw}px`,         height:`${vh-(b+PAD)}px` });
+    curtain('left',   { top:`${t-PAD}px`,  left:'0',          width:`${l-PAD}px`,      height:`${h+PAD*2}px` });
+    curtain('right',  { top:`${t-PAD}px`,  left:`${r+PAD}px`, width:`${vw-(r+PAD)}px`, height:`${h+PAD*2}px` });
+
+    const ring = $('#tutorialHighlightRing');
+    if (ring) Object.assign(ring.style, {
+        display: 'block',
+        top:    `${t - PAD}px`,
+        left:   `${l - PAD}px`,
+        width:  `${w + PAD*2}px`,
+        height: `${h + PAD*2}px`,
+    });
+}
+
+function hideCurtains() {
+    ['top','bottom','left','right'].forEach(id => {
+        const el = $(`#tutorialCurtain_${id}`);
+        if (el) el.style.display = 'none';
+    });
+    const ring = $('#tutorialHighlightRing');
+    if (ring) ring.style.display = 'none';
+}
+
+function positionTooltip(targetRect, arrow) {
+    const tt = $('#tutorialTooltip');
+    if (!tt) return;
+
+    tt.className = `tutorial-tooltip arrow-${arrow}`;
+    tt.style.display = 'block';
+
+    const TW = tt.offsetWidth  || 300;
+    const TH = tt.offsetHeight || 260;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const MARGIN = 14;
+
+    let top, left;
+
+    if (arrow === 'top') {
+        top  = (targetRect ? targetRect.bottom + PAD + MARGIN : vh / 2 - TH / 2);
+        left = targetRect ? Math.min(targetRect.left, vw - TW - MARGIN) : vw / 2 - TW / 2;
+    } else if (arrow === 'bottom') {
+        top  = (targetRect ? targetRect.top - TH - PAD - MARGIN : vh / 2 - TH / 2);
+        left = targetRect ? Math.min(targetRect.left, vw - TW - MARGIN) : vw / 2 - TW / 2;
+    } else if (arrow === 'left') {
+        left = (targetRect ? targetRect.right + PAD + MARGIN : vw / 2 - TW / 2);
+        top  = targetRect ? targetRect.top : vh / 2 - TH / 2;
+    } else {
+        left = (targetRect ? targetRect.left - TW - PAD - MARGIN : vw / 2 - TW / 2);
+        top  = targetRect ? targetRect.top : vh / 2 - TH / 2;
     }
 
-    function showWelcomeModal() {
-        if (!elements.welcomeOverlay) initDOM();
-        elements.welcomeOverlay.classList.add('open');
-    }
+    left = Math.max(MARGIN, Math.min(left, vw - TW - MARGIN));
+    top  = Math.max(MARGIN, Math.min(top,  vh - TH - MARGIN));
 
-    function startTutorial() {
-        elements.welcomeOverlay.classList.remove('open');
-        currentStep = 0;
-        isActive = true;
-        document.body.style.overflow = 'hidden';
-        renderStep();
-    }
+    tt.style.top  = `${top}px`;
+    tt.style.left = `${left}px`;
+}
 
-    function renderStep() {
-        if (!isActive) return;
+// ── 뷰 전환 헬퍼 (스텝에 view가 지정되어 있으면 해당 화면으로 자동 이동) ──
+function ensureStepView(step, callback) {
+    const targetView = step && step.view;
+    if (!targetView || typeof setView !== 'function') { callback(); return; }
 
-        const step = steps[currentStep];
+    const nowView = (typeof currentView !== 'undefined') ? currentView : null;
+    if (nowView === targetView) { callback(); return; }
 
-        // 1. 페이지 전환 클릭 실행
-        if (typeof step.action === 'function') {
-            try {
-                step.action();
-            } catch (e) {
-                console.warn('탭 전환 처리 중 오류:', e);
-            }
-        }
+    try {
+        const navBtn = step.navSelector ? $(step.navSelector) : null;
+        setView(targetView, navBtn);
+    } catch (e) { /* 화면 전환 실패 시에도 가이드는 계속 진행 */ }
 
-        // 2. 탭 전환 애니메이션/렌더링 대기 후 렌더링
-        setTimeout(() => {
-            let targetEl = document.querySelector(step.target);
+    // 화면이 바뀐 뒤 대시보드가 그려질 시간을 잠깐 기다립니다
+    // (달빛정보는 비동기로 콘텐츠를 불러오므로 조금 더 여유를 둡니다)
+    setTimeout(callback, targetView === 'moonlight' ? 450 : 150);
+}
 
-            // 해당 DOM을 찾지 못할 경우 탭 버튼 자체라도 하이라이트
-            if (!targetEl) {
-                targetEl = document.querySelector(`[data-tab="${step.action.toString().match(/'([^']+)'/)?.[1]}"]`) ||
-                           document.querySelector('.view-tabs');
-            }
+// ── 메인 튜토리얼 스텝 렌더 ───────────────────────────────
+function renderStep(idx) {
+    ensureStepView(STEPS[idx], () => paintStep(idx));
+}
 
-            if (!targetEl) {
-                nextStep();
-                return;
-            }
+function paintStep(idx) {
+    const step = STEPS[idx];
+    const total = STEPS.length;
 
-            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            setTimeout(() => {
-                highlightElement(targetEl);
-                updateTooltip(step, targetEl);
-            }, 250);
-
-        }, 350);
-    }
-
-    function highlightElement(el) {
-        const rect = el.getBoundingClientRect();
-        const padding = 10;
-
-        const top = rect.top - padding;
-        const left = rect.left - padding;
-        const width = rect.width + (padding * 2);
-        const height = rect.height + (padding * 2);
-
-        elements.backdrop.classList.add('active');
-
-        Object.assign(elements.ring.style, {
-            display: 'block', top: `${top}px`, left: `${left}px`, width: `${width}px`, height: `${height}px`
-        });
-
-        const w = window.innerWidth, h = window.innerHeight;
-        Object.assign(elements.curtains.top.style, { top: 0, left: 0, width: '100%', height: `${Math.max(0, top)}px` });
-        Object.assign(elements.curtains.bottom.style, { top: `${top + height}px`, left: 0, width: '100%', height: `${Math.max(0, h - (top + height))}px` });
-        Object.assign(elements.curtains.left.style, { top: `${top}px`, left: 0, width: `${Math.max(0, left)}px`, height: `${height}px` });
-        Object.assign(elements.curtains.right.style, { top: `${top}px`, left: `${left + width}px`, width: `${Math.max(0, w - (left + width))}px`, height: `${height}px` });
-    }
-
-    function updateTooltip(step, targetEl) {
-        elements.tooltip.style.display = 'block';
-
-        elements.tooltip.querySelector('.step-current').innerText = currentStep + 1;
-        elements.tooltip.querySelector('.step-total').innerText = steps.length;
-        elements.tooltip.querySelector('.tutorial-tooltip-icon').innerText = step.icon;
-        elements.tooltip.querySelector('.tooltip-title').innerText = step.title;
-        elements.tooltip.querySelector('.tooltip-desc').innerHTML = step.content;
-
-        elements.prevBtn.disabled = currentStep === 0;
-        elements.nextBtn.innerText = currentStep === steps.length - 1 ? '시작하기' : '다음';
-
-        elements.dotsContainer.innerHTML = steps.map((_, i) =>
-            `<div class="tutorial-dot ${i === currentStep ? 'active' : (i < currentStep ? 'done' : '')}"></div>`
-        ).join('');
-
+    let targetEl = step.target ? $(step.target) : null;
+    if (targetEl) {
         const rect = targetEl.getBoundingClientRect();
-        const tooltipRect = elements.tooltip.getBoundingClientRect();
-        const padding = 15;
-
-        let tTop, tLeft, arrowClass = 'arrow-top';
-
-        if (step.position === 'bottom') {
-            tTop = rect.bottom + padding;
-            tLeft = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-            arrowClass = 'arrow-top';
-        } else if (step.position === 'top') {
-            tTop = rect.top - tooltipRect.height - padding;
-            tLeft = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-            arrowClass = 'arrow-bottom';
-        } else if (step.position === 'right') {
-            tTop = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
-            tLeft = rect.right + padding;
-            arrowClass = 'arrow-left';
-        } else if (step.position === 'left') {
-            tTop = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
-            tLeft = rect.left - tooltipRect.width - padding;
-            arrowClass = 'arrow-right';
-        }
-
-        // 화면 영역 이탈 방지
-        if (tLeft < 10) tLeft = 10;
-        if (tLeft + tooltipRect.width > window.innerWidth - 10) tLeft = window.innerWidth - tooltipRect.width - 10;
-        if (tTop < 10) tTop = 10;
-        if (tTop + tooltipRect.height > window.innerHeight - 10) tTop = window.innerHeight - tooltipRect.height - 10;
-
-        elements.tooltip.className = `tutorial-tooltip ${arrowClass}`;
-        elements.tooltip.style.top = `${tTop}px`;
-        elements.tooltip.style.left = `${tLeft}px`;
+        if (rect.width === 0 && rect.height === 0) targetEl = null;
     }
 
-    function nextStep() {
-        if (currentStep < steps.length - 1) {
-            currentStep++;
-            renderStep();
-        } else {
-            endTutorial(true);
-        }
+    if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        positionSpotlight(rect);
+        positionTooltip(rect, step.arrow);
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        hideCurtains();
+        positionTooltip(null, 'top');
     }
 
-    function prevStep() {
-        if (currentStep > 0) {
-            currentStep--;
-            renderStep();
-        }
+    const dots = STEPS.map((_, i) => {
+        const cls = i === idx ? 'active' : (i < idx ? 'done' : '');
+        return `<div class="tutorial-dot ${cls}" onclick="goToStep(${i})" title="${i+1}단계"></div>`;
+    }).join('');
+
+    const tt = $('#tutorialTooltip');
+    const isLast = idx === total - 1;
+    tt.innerHTML = `
+      <button class="btn-tutorial-close-x" onclick="closeTutorial()" title="튜토리얼 닫기">✕</button>
+      <div class="tutorial-tooltip-step">${step.label}</div>
+      <span class="tutorial-tooltip-icon">${step.icon}</span>
+      <h3>${step.title}</h3>
+      <p>${step.body}</p>
+      ${step.tip ? `<div class="tip-tag">${step.tip}</div>` : ''}
+      <div class="tutorial-nav">
+        <button class="btn-tutorial-prev" onclick="prevStep()" ${idx === 0 ? 'disabled' : ''}>← 이전</button>
+        <div class="tutorial-progress-dots">${dots}</div>
+        <button class="btn-tutorial-next" onclick="nextStep()">
+          ${isLast ? '🎉 완료!' : '다음 →'}
+        </button>
+      </div>
+    `;
+}
+
+// ── 페이지 튜토리얼 렌더 ──────────────────────────────────
+function renderPageStep(idx) {
+    const step = currentPageSteps[idx];
+    const total = currentPageSteps.length;
+
+    let targetEl = step.target ? $(step.target) : null;
+    if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) targetEl = null;
     }
 
-    function endTutorial(isCompleted = false) {
-        isActive = false;
-        document.body.style.overflow = '';
-
-        elements.welcomeOverlay.classList.remove('open');
-        elements.backdrop.classList.remove('active');
-        elements.ring.style.display = 'none';
-        elements.tooltip.style.display = 'none';
-        Object.values(elements.curtains).forEach(c => c.style.width = '0');
-
-        // 종료 시 기본 '전체보기' 탭으로 원상 복구
-        switchTab('all');
-
-        if (isCompleted) {
-            elements.doneToast.classList.add('show');
-            setTimeout(() => elements.doneToast.classList.remove('show'), 3500);
-            localStorage.setItem('hasCompletedTutorial', 'true');
-        }
+    if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        positionSpotlight(rect);
+        positionTooltip(rect, step.arrow);
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        hideCurtains();
+        positionTooltip(null, 'top');
     }
 
-    function handleResize() {
-        if (!isActive) return;
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(renderStep, 100);
-    }
+    const dots = currentPageSteps.map((_, i) => {
+        const cls = i === idx ? 'active' : (i < idx ? 'done' : '');
+        return `<div class="tutorial-dot ${cls}" onclick="pageGoToStep(${i})" title="${i+1}단계"></div>`;
+    }).join('');
 
-    return {
-        init: () => {
-            initDOM();
-            if (!localStorage.getItem('hasCompletedTutorial')) {
-                setTimeout(showWelcomeModal, 500);
-            }
-        },
-        start: showWelcomeModal,
-        close: endTutorial
+    const tt = $('#tutorialTooltip');
+    const isLast = idx === total - 1;
+    tt.innerHTML = `
+      <button class="btn-tutorial-close-x" onclick="closePageTutorial()" title="닫기">✕</button>
+      <div class="tutorial-tooltip-step" style="background:rgba(0,200,122,0.1); border-color:rgba(0,200,122,0.3); color:var(--green);">${step.label}</div>
+      <span class="tutorial-tooltip-icon">${step.icon}</span>
+      <h3>${step.title}</h3>
+      <p>${step.body}</p>
+      ${step.tip ? `<div class="tip-tag">${step.tip}</div>` : ''}
+      <div class="tutorial-nav">
+        <button class="btn-tutorial-prev" onclick="pagePrevStep()" ${idx === 0 ? 'disabled' : ''}>← 이전</button>
+        <div class="tutorial-progress-dots">${dots}</div>
+        <button class="btn-tutorial-next" onclick="pageNextStep()">
+          ${isLast ? '✅ 닫기' : '다음 →'}
+        </button>
+      </div>
+      <div style="text-align:center; margin-top:8px;">
+        <button onclick="dontShowPageTutorial()" style="background:none; border:none; font-size:10px; color:var(--text3); cursor:pointer; font-family:var(--font-sans);">다시 보지 않기</button>
+      </div>
+    `;
+}
+
+// ── 페이지 튜토리얼 트리거 ────────────────────────────────
+function showPageTutorial(view) {
+    if (tutorialActive) return;
+    const steps = PAGE_STEPS[view];
+    if (!steps || steps.length === 0) return;
+    const key = PAGE_DONE_PREFIX + view;
+    if (localStorage.getItem(key)) return;
+
+    setTimeout(() => {
+        injectTutorialDOM();
+        currentPageSteps = steps;
+        currentPageStep  = 0;
+        currentPageView  = view;
+        pageTutorialActive = true;
+
+        const tt = $('#tutorialTooltip');
+        if (tt) { tt.style.display = 'none'; tt.className = 'tutorial-tooltip'; }
+        hideCurtains();
+
+        renderPageStep(0);
+    }, 700);
+}
+
+// ── 공개 API — 메인 튜토리얼 ─────────────────────────────
+window.startTutorial = function() {
+    closeWelcome();
+    injectTutorialDOM();
+    tutorialActive = true;
+    pageTutorialActive = false;
+    hideCurtains();
+    currentStep = 0;
+    renderStep(0);
+};
+
+window.skipTutorial = function() {
+    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
+    closeWelcome();
+};
+
+window.closeTutorial = function() {
+    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
+    tutorialActive = false;
+    hideCurtains();
+    const tt = $('#tutorialTooltip');
+    if (tt) tt.style.display = 'none';
+};
+
+window.nextStep = function() {
+    if (!tutorialActive) return;
+    if (currentStep >= STEPS.length - 1) {
+        finishTutorial();
+    } else {
+        currentStep++;
+        renderStep(currentStep);
+    }
+};
+
+window.prevStep = function() {
+    if (!tutorialActive || currentStep <= 0) return;
+    currentStep--;
+    renderStep(currentStep);
+};
+
+window.goToStep = function(idx) {
+    if (!tutorialActive) return;
+    currentStep = idx;
+    renderStep(idx);
+};
+
+window.restartTutorial = function() {
+    closeModal('masterSettingsOverlay');
+    localStorage.removeItem(TUTORIAL_DONE_KEY);
+    injectWelcomeModal();
+    const overlay = $('#tutorialWelcomeOverlay');
+    if (overlay) overlay.classList.add('open');
+};
+
+// ── 공개 API — 페이지 튜토리얼 ───────────────────────────
+window.pageNextStep = function() {
+    if (!pageTutorialActive) return;
+    if (currentPageStep >= currentPageSteps.length - 1) {
+        closePageTutorial();
+    } else {
+        currentPageStep++;
+        renderPageStep(currentPageStep);
+    }
+};
+
+window.pagePrevStep = function() {
+    if (!pageTutorialActive || currentPageStep <= 0) return;
+    currentPageStep--;
+    renderPageStep(currentPageStep);
+};
+
+window.pageGoToStep = function(idx) {
+    if (!pageTutorialActive) return;
+    currentPageStep = idx;
+    renderPageStep(idx);
+};
+
+window.closePageTutorial = function() {
+    pageTutorialActive = false;
+    hideCurtains();
+    const tt = $('#tutorialTooltip');
+    if (tt) tt.style.display = 'none';
+};
+
+window.dontShowPageTutorial = function() {
+    if (currentPageView) {
+        localStorage.setItem(PAGE_DONE_PREFIX + currentPageView, '1');
+    }
+    window.closePageTutorial();
+};
+
+window.resetPageTutorials = function() {
+    ['all','user1','user2','watch','history','realized','dividend','moonlight'].forEach(v => {
+        localStorage.removeItem(PAGE_DONE_PREFIX + v);
+    });
+    alert('모든 페이지 가이드가 초기화됐습니다. 각 탭을 방문하면 다시 표시됩니다.');
+};
+
+// ── 내부 헬퍼 ─────────────────────────────────────────────
+function closeWelcome() {
+    const el = $('#tutorialWelcomeOverlay');
+    if (el) el.classList.remove('open');
+}
+
+function finishTutorial() {
+    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
+    tutorialActive = false;
+    hideCurtains();
+    const tt = $('#tutorialTooltip');
+    if (tt) tt.style.display = 'none';
+
+    const toast = $('#tutorialDoneToast');
+    if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3800);
+    }
+}
+
+// ── 설정 모달에 재시작 버튼 주입 ──────────────────────────
+function injectRestartButton() {
+    const container = $('#settingsTabData');
+    if (!container || container.querySelector('.tutorial-restart-section')) return;
+
+    const sec = document.createElement('div');
+    sec.className = 'tutorial-restart-section';
+    sec.style.cssText = 'display:flex; flex-wrap:wrap; gap:14px; align-items:stretch; margin-top:14px;';
+    sec.innerHTML = `
+      <div class="settings-section" style="flex:1 1 200px; margin:0;">
+        <div class="settings-section-title">📡 주가 데이터</div>
+        <div class="settings-hint" style="margin-bottom:10px;">시세 캐시를 지우고 최신 가격을 다시 받아옵니다.</div>
+        <div id="marketDataLastUpdated" style="font-size:11px; color:var(--text2); margin-bottom:10px;"></div>
+        <div class="settings-action-grid" style="grid-template-columns:1fr;">
+          <button class="settings-action-btn settings-action-btn-accent" onclick="forceMarketDataUpdate()"><span>🔄</span>캐시 삭제 후 최신화</button>
+        </div>
+      </div>
+      <div class="settings-section" style="flex:1 1 200px; margin:0;">
+        <div class="settings-section-title">🎓 튜토리얼</div>
+        <div class="settings-hint" style="margin-bottom:10px;">전체 가이드를 다시 보거나, 페이지별 안내를 초기화합니다.</div>
+        <div class="settings-action-grid" style="grid-template-columns:1fr;">
+          <button class="settings-action-btn" onclick="restartTutorial()"><span>🔁</span>전체 가이드 다시 보기</button>
+          <button class="settings-action-btn" onclick="resetPageTutorials(); closeModal('masterSettingsOverlay');"><span>📄</span>페이지별 가이드 초기화</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(sec);
+    if (typeof updateLastSyncTimeDisplay === 'function') updateLastSyncTimeDisplay();
+}
+
+// ── setView 래핑: 페이지 튜토리얼 트리거 ─────────────────
+function hookSetView() {
+    const existing = typeof setView === 'function' ? setView : null;
+    if (!existing) return;
+    const _wrapped = setView;
+    setView = function(view, el) {
+        _wrapped(view, el);
+        showPageTutorial(view);
     };
-})();
+}
 
-document.addEventListener('DOMContentLoaded', TutorialSystem.init);
+// ── 초기화 ────────────────────────────────────────────────
+function initTutorial() {
+    const done = localStorage.getItem(TUTORIAL_DONE_KEY);
+    if (!done) {
+        setTimeout(() => {
+            injectWelcomeModal();
+            const overlay = $('#tutorialWelcomeOverlay');
+            if (overlay) overlay.classList.add('open');
+        }, 900);
+    } else {
+        // 첫 방문이 아니어도 현재 페이지(전체보기)의 페이지 튜토리얼은 체크
+        setTimeout(() => showPageTutorial('all'), 1200);
+    }
+
+    // 설정 모달 재시작 버튼 주입
+    const settingsOverlay = document.getElementById('masterSettingsOverlay');
+    if (settingsOverlay) {
+        const obs = new MutationObserver(() => {
+            if (settingsOverlay.classList.contains('open')) injectRestartButton();
+        });
+        obs.observe(settingsOverlay, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // setView 래핑 (딜레이로 다른 래퍼가 먼저 실행되도록)
+    setTimeout(hookSetView, 50);
+
+    // 리사이즈 시 스텝 위치 재계산
+    window.addEventListener('resize', () => {
+        if (tutorialActive) renderStep(currentStep);
+        else if (pageTutorialActive) renderPageStep(currentPageStep);
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTutorial);
+} else {
+    setTimeout(initTutorial, 0);
+}
+
+})(); // IIFE 끝
