@@ -1363,6 +1363,8 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   border-radius: 14px;
   padding: 20px 22px;
   width: 300px;
+  max-height: calc(100vh - 28px);
+  overflow-y: auto;
   box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,106,247,0.15);
   pointer-events: all;
   animation: tutorialTooltipIn 0.3s cubic-bezier(0.22,1,0.36,1) forwards;
@@ -1447,16 +1449,24 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 .tutorial-nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   margin-top: 4px;
 }
 
+/* 스텝이 많을 때(최대 30개) 점들이 박스 밖으로 넘치지 않도록
+   가로 스크롤 가능한 영역으로 제한하고, 남는 공간만 차지하게 함 */
 .tutorial-progress-dots {
   display: flex;
   gap: 5px;
   align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
 }
+.tutorial-progress-dots::-webkit-scrollbar { display: none; }
 
 .tutorial-dot {
   width: 6px;
@@ -1465,6 +1475,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   background: var(--border2);
   transition: all 0.25s;
   cursor: pointer;
+  flex-shrink: 0;
 }
 .tutorial-dot.active {
   background: var(--accent);
@@ -1487,6 +1498,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   font-weight: 600;
   transition: 0.15s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .btn-tutorial-prev:hover { background: var(--bg3); color: var(--text); }
 .btn-tutorial-prev:disabled { opacity: 0.3; cursor: default; }
