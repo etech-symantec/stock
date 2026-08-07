@@ -1394,6 +1394,23 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 .tutorial-tooltip.arrow-left::before   { left:-7px; top:20px; border-right:none; border-bottom:none; }
 .tutorial-tooltip.arrow-right::before  { right:-7px; top:20px; border-left:none; border-top:none; }
 
+/* 지금 소개 중인 페이지가 어디인지 보여주는 배지 — 페이지가 바뀔 때마다
+   함께 갱신되어 사용자가 현재 어느 화면을 보고 있는지 알 수 있게 함 */
+.tutorial-page-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  font-family: var(--font-sans);
+}
+
 .tutorial-tooltip-step {
   display: inline-flex;
   align-items: center;
