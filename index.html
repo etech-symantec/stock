@@ -1723,7 +1723,7 @@
       <!-- ========================================== -->
       <div id="settingsTabData" style="display: block;">
 
-        <div class="settings-section" style="margin-top: 0;">
+        <div class="settings-section" id="settingsGithubSection" style="margin-top: 0;">
           <div class="settings-section-title">☁️ GitHub 클라우드 동기화</div>
           <div class="settings-hint">개인 GitHub 저장소를 연결하면 모든 기기에서 장부를 안전하게 동기화합니다.</div>
 
@@ -1766,7 +1766,7 @@
           <div id="accountManageList"></div>
         </div>
 
-        <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:stretch;">
+        <div id="settingsBackupRow" style="display:flex; flex-wrap:wrap; gap:14px; align-items:stretch;">
           <div class="settings-section" style="flex:1 1 200px; margin:0;">
             <div class="settings-section-title">💻 로컬 데이터</div>
             <div class="settings-hint" style="margin-bottom:10px;">이 기기에 저장된 장부 전체를 파일로 백업하거나, 백업 파일에서 복원합니다.</div>
@@ -1799,7 +1799,7 @@
       <div id="settingsTabDisplay" style="display: none;">
         
         <!-- 폰트 크기 제어 -->
-        <div class="settings-section" style="margin-top:0;">
+        <div class="settings-section" id="settingsFontSizeSection" style="margin-top:0;">
           <div class="settings-section-title">🔤 전체 폰트 크기</div>
           <div style="display:flex; gap:6px; margin-top:4px;">
             <button class="font-size-btn" data-level="xs" onclick="applyFontSize('xs')" style="flex:1; padding:8px 4px; font-size:11px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer;">XS</button>
@@ -1813,7 +1813,7 @@
           </div>
         </div>
 
-        <div class="settings-section">
+        <div class="settings-section" id="settingsColorSection">
           <div class="settings-section-title">🎨 수익 / 손실 색상</div>
           <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
          
