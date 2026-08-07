@@ -1594,16 +1594,6 @@ function closeBrokerDropdown() {
   if (dd) dd.style.display = 'none';
 }
 
-// 🌟 계좌별 상세 내역 접기/펼치기 (실현손익 · 배당통계 공용)
-function toggleAcctBreakdown(id, btnEl) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const opening = el.style.display !== 'block';
-    el.style.display = opening ? 'block' : 'none';
-    const arrow = btnEl.querySelector('.rfp-acct-arrow');
-    if (arrow) arrow.textContent = opening ? '▴' : '▾';
-}
-
 // breakdownMap: { 계좌명: 금액 } → 정렬된 행 HTML 문자열 생성
 function _buildAcctRowsHtml(breakdownMap, fmtFn) {
     const entries = Object.entries(breakdownMap || {}).filter(([, v]) => v !== 0);
@@ -7982,10 +7972,8 @@ function updateRfpSankey(krwTotal, usdTotalKrw, brokerKrwMap, brokerUsdMap) {
             <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border); font-size:11px; color:var(--text3); line-height:1.5;">
               🛡️ 국내주식은 양도소득세 비과세 대상입니다
             </div>
-            <div class="rfp-acct-toggle" onclick="toggleAcctBreakdown('realAcctKr', this)">
-              <span>계좌별 보기</span><span class="rfp-acct-arrow">▾</span>
-            </div>
-            <div class="rfp-acct-list" id="realAcctKr" style="display:none;">${krAcctRowsHtml}</div>
+            <div class="rfp-acct-label">계좌별 상세</div>
+            <div class="rfp-acct-list" id="realAcctKr">${krAcctRowsHtml}</div>
           </div>
 
           <!-- 미국주식 + 양도세 -->
@@ -7998,10 +7986,8 @@ function updateRfpSankey(krwTotal, usdTotalKrw, brokerKrwMap, brokerUsdMap) {
               </div>
             </div>
             <div id="capitalGainsTaxPanel" style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);"></div>
-            <div class="rfp-acct-toggle" onclick="toggleAcctBreakdown('realAcctUs', this)">
-              <span>계좌별 보기</span><span class="rfp-acct-arrow">▾</span>
-            </div>
-            <div class="rfp-acct-list" id="realAcctUs" style="display:none;">${usAcctRowsHtml}</div>
+            <div class="rfp-acct-label">계좌별 상세</div>
+            <div class="rfp-acct-list" id="realAcctUs">${usAcctRowsHtml}</div>
           </div>
 
         </div>
