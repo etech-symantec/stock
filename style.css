@@ -2094,23 +2094,14 @@ nav {
 /* ── 🌟 실현손익 — 미국주식 카드 내 양도소득세 컴팩트 요약 ── */
 .rfp-tax-mini { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
 
-/* ── 🌟 국내/해외 박스 내 계좌별 상세 내역 (접기/펼치기) ── */
-.rfp-acct-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+/* ── 🌟 국내/해외 박스 내 계좌별 상세 내역 ── */
+.rfp-acct-label {
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px dashed var(--border);
   font-size: 10.5px;
   color: var(--text3);
-  cursor: pointer;
-  user-select: none;
-  transition: color 0.15s;
 }
-.rfp-acct-toggle:hover { color: var(--text2); }
-.rfp-acct-arrow { font-size: 9px; transition: transform 0.15s; }
 .rfp-acct-list {
   margin-top: 6px;
   max-height: 160px;
