@@ -687,6 +687,46 @@ function hideCurtains() {
     if (ring) ring.style.display = 'none';
 }
 
+// ── 스크롤이 끝나 좌표가 안정될 때까지 대기 ──────────────────
+// scrollIntoView(behavior:'smooth')는 비동기라서, 스크롤 직후 바로 좌표를
+// 읽으면 아직 이동 중인 옛 좌표를 잡게 되어 하이라이트/툴팁이 엉뚱한
+// 위치에 그려집니다. 좌표가 몇 프레임 연속으로 변하지 않을 때까지
+// requestAnimationFrame으로 기다린 뒤에 최종 좌표를 콜백으로 넘깁니다.
+function waitForStableRect(el, done) {
+    const startedAt = (window.performance && performance.now) ? performance.now() : Date.now();
+    let lastTop = null, lastLeft = null, stableFrames = 0;
+
+    function tick() {
+        if (!el.isConnected) { done(el.getBoundingClientRect()); return; }
+        const r = el.getBoundingClientRect();
+        const now = (window.performance && performance.now) ? performance.now() : Date.now();
+
+        if (lastTop !== null && Math.abs(r.top - lastTop) < 0.5 && Math.abs(r.left - lastLeft) < 0.5) {
+            stableFrames++;
+        } else {
+            stableFrames = 0;
+        }
+        lastTop = r.top;
+        lastLeft = r.left;
+
+        // 3프레임 연속으로 좌표가 그대로거나, 900ms를 넘기면(안전장치) 확정
+        if (stableFrames >= 3 || (now - startedAt) > 900) {
+            done(r);
+        } else {
+            requestAnimationFrame(tick);
+        }
+    }
+    requestAnimationFrame(tick);
+}
+
+// 진행 점(dot) 줄에서 현재 스텝의 점이 항상 보이도록 가운데로 스크롤
+function centerActiveDot(tooltipEl) {
+    const row = tooltipEl.querySelector('.tutorial-progress-dots');
+    const active = row && row.querySelector('.tutorial-dot.active');
+    if (!row || !active) return;
+    row.scrollLeft = active.offsetLeft - (row.clientWidth / 2) + (active.offsetWidth / 2);
+}
+
 function positionTooltip(targetRect, arrow) {
     const tt = $('#tutorialTooltip');
     if (!tt) return;
@@ -773,16 +813,6 @@ function paintStep(idx) {
         if (rect.width === 0 && rect.height === 0) targetEl = null;
     }
 
-    if (targetEl) {
-        const rect = targetEl.getBoundingClientRect();
-        positionSpotlight(rect);
-        positionTooltip(rect, step.arrow);
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-        hideCurtains();
-        positionTooltip(null, 'top');
-    }
-
     const dots = STEPS.map((_, i) => {
         const cls = i === idx ? 'active' : (i < idx ? 'done' : '');
         return `<div class="tutorial-dot ${cls}" onclick="goToStep(${i})" title="${i+1}단계"></div>`;
@@ -790,7 +820,7 @@ function paintStep(idx) {
 
     const tt = $('#tutorialTooltip');
     const isLast = idx === total - 1;
-    tt.innerHTML = `
+    const html = `
       <button class="btn-tutorial-close-x" onclick="closeTutorial()" title="튜토리얼 닫기">✕</button>
       <div class="tutorial-tooltip-step">${step.label}</div>
       <span class="tutorial-tooltip-icon">${step.icon}</span>
@@ -805,6 +835,28 @@ function paintStep(idx) {
         </button>
       </div>
     `;
+
+    // 내용을 먼저 채운 뒤(콘텐츠에 맞는 실제 높이가 나온 뒤) 좌표를 계산해야
+    // 이전 스텝의 크기를 기준으로 위치가 어긋나는 문제가 생기지 않습니다.
+    function finishRender(rect) {
+        tt.innerHTML = html;
+        if (rect) {
+            positionSpotlight(rect);
+            positionTooltip(rect, step.arrow);
+        } else {
+            hideCurtains();
+            positionTooltip(null, 'top');
+        }
+        centerActiveDot(tt);
+    }
+
+    if (targetEl) {
+        // 스크롤이 끝나 좌표가 완전히 안정된 뒤에 하이라이트/툴팁을 그림
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        waitForStableRect(targetEl, finishRender);
+    } else {
+        finishRender(null);
+    }
 }
 
 // ── 페이지 튜토리얼 렌더 ──────────────────────────────────
@@ -818,16 +870,6 @@ function renderPageStep(idx) {
         if (rect.width === 0 && rect.height === 0) targetEl = null;
     }
 
-    if (targetEl) {
-        const rect = targetEl.getBoundingClientRect();
-        positionSpotlight(rect);
-        positionTooltip(rect, step.arrow);
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-        hideCurtains();
-        positionTooltip(null, 'top');
-    }
-
     const dots = currentPageSteps.map((_, i) => {
         const cls = i === idx ? 'active' : (i < idx ? 'done' : '');
         return `<div class="tutorial-dot ${cls}" onclick="pageGoToStep(${i})" title="${i+1}단계"></div>`;
@@ -835,7 +877,7 @@ function renderPageStep(idx) {
 
     const tt = $('#tutorialTooltip');
     const isLast = idx === total - 1;
-    tt.innerHTML = `
+    const html = `
       <button class="btn-tutorial-close-x" onclick="closePageTutorial()" title="닫기">✕</button>
       <div class="tutorial-tooltip-step" style="background:rgba(0,200,122,0.1); border-color:rgba(0,200,122,0.3); color:var(--green);">${step.label}</div>
       <span class="tutorial-tooltip-icon">${step.icon}</span>
@@ -853,6 +895,28 @@ function renderPageStep(idx) {
         <button onclick="dontShowPageTutorial()" style="background:none; border:none; font-size:10px; color:var(--text3); cursor:pointer; font-family:var(--font-sans);">다시 보지 않기</button>
       </div>
     `;
+
+    // 내용을 먼저 채운 뒤(콘텐츠에 맞는 실제 높이가 나온 뒤) 좌표를 계산해야
+    // 이전 스텝의 크기를 기준으로 위치가 어긋나는 문제가 생기지 않습니다.
+    function finishRender(rect) {
+        tt.innerHTML = html;
+        if (rect) {
+            positionSpotlight(rect);
+            positionTooltip(rect, step.arrow);
+        } else {
+            hideCurtains();
+            positionTooltip(null, 'top');
+        }
+        centerActiveDot(tt);
+    }
+
+    if (targetEl) {
+        // 스크롤이 끝나 좌표가 완전히 안정된 뒤에 하이라이트/툴팁을 그림
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        waitForStableRect(targetEl, finishRender);
+    } else {
+        finishRender(null);
+    }
 }
 
 // ── 페이지 튜토리얼 트리거 ────────────────────────────────
