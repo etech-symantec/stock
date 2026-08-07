@@ -41,21 +41,11 @@ const STEPS = [
         tip: '💡 계좌명 칸을 클릭하면 이미 등록된 계좌 목록이 떠서 바로 선택할 수 있고, 새 이름을 입력하면 새 계좌로 등록돼요. \"이동\" 유형으로 계좌 간 종목 이동을, \"분할\"로 액면분할을 기록할 수 있어요',
     },
     {
-        target: '.btn-edit-owners[onclick*="openOwnerModal"]',
-        view: 'all',
-        arrow: 'top',
-        icon: '👥',
-        label: '03 — 소유자 설정',
-        title: '가족 계좌도, 각자의 색깔로 관리하세요',
-        body: '장부와 대시보드 전반에 표시될 소유자1·소유자2의 이름, 고유 아이콘, 테마 색상을 자유롭게 바꿀 수 있어요. \"아빠 👨\"와 \"엄마 👩\"처럼 실제 가족 구성원 이름으로 바꿔두면 거래를 입력할 때마다 헷갈릴 일이 없습니다.',
-        tip: '💡 설정한 색상은 통합 자산 화면의 소유자별 탭, 트리맵, 배당·실현수익 필터 등 앱 전반에 일관되게 반영돼요',
-    },
-    {
         target: '#marketSignalBar',
         view: 'all',
         arrow: 'top',
         icon: '📡',
-        label: '04 — 시장 신호 분석',
+        label: '03 — 시장 신호 분석',
         title: '실시간 시장 상황을 한눈에 파악하세요',
         body: 'VIX(공포지수)·MOVE·하이일드·공포&탐욕 등 심리/리스크 지표부터, 미국 10Y 금리·DXY·USD/KRW·신용잔고, Russell 2000·구리·BDI 등 경기 선행지표, 버핏지수·CAPE PE 밸류에이션까지 종합 분석합니다.',
         tip: '💡 종합 신호 점수가 낮을수록 리스크 경계 구간입니다',
@@ -65,7 +55,7 @@ const STEPS = [
         view: 'all',
         arrow: 'top',
         icon: '📊',
-        label: '05 — 통합 자산 패널',
+        label: '04 — 통합 자산 패널',
         title: '내 전체 자산 현황을 한눈에 확인하세요',
         body: '국내·해외 주식의 투자 원금, 현재 평가액, 수익률을 실시간으로 집계합니다. \"현재 보유 / 누적 자산\" 버튼으로 실현수익까지 포함한 누적 자산을 볼 수 있어요.',
         tip: '💡 포트폴리오 맵에서 종목을 꾹 누르면 여러 종목을 선택해 합산 금액을 확인할 수 있어요',
@@ -75,49 +65,29 @@ const STEPS = [
         view: 'all',
         arrow: 'top',
         icon: '🗺️',
-        label: '06 — 포트폴리오 맵',
+        label: '05 — 포트폴리오 맵',
         title: '비중 시각화 맵으로 포트폴리오를 분석하세요',
         body: '종목별 비중을 직사각형 크기로 시각화합니다. 클릭하면 종목 상세 차트가 열리고, 꾹 누르면 선택 모드로 진입해 국장/미장 일괄 선택 또는 태그별 선택으로 합산 금액을 즉시 확인할 수 있어요.',
         tip: '💡 태그 바 차트를 통해 섹터별 비중도 확인할 수 있어요',
-    },
-    {
-        target: '#tabYield',
-        view: 'all',
-        arrow: 'left',
-        icon: '🏆',
-        label: '07 — 평가 자산 랭킹',
-        title: '내 계좌에서, 제일 잘하고 있는 종목은?',
-        body: '거래 장부 사이드바 안에 있는 전용 랭킹 패널이에요. \"전체/소유자1/소유자2 × 보유 중/누적 × 수익률/평가금액\" 조합을 문장형 드롭다운으로 골라 정렬 기준을 바로 바꿀 수 있습니다. 메인 화면의 필터와는 별개로 동작해요.',
-        tip: '💡 🥇🥈🥉 상위 3개 종목은 메달 아이콘으로 표시돼요',
     },
     {
         target: '#portfolioChartWrapper',
         view: 'all',
         arrow: 'bottom',
         icon: '📈',
-        label: '08 — 자산 성장 추이',
+        label: '06 — 자산 성장 추이',
         title: '투자 원금 대비 평가액 흐름을 추적하세요',
         body: '시간 흐름에 따른 총 투자액과 총 평가액을 영역 차트로 보여줍니다. 차트 위를 드래그하면 원하는 구간을 확대할 수 있고, 막대 그래프로 건별 실현수익도 표시됩니다.',
         tip: '💡 초록 막대 = 익절, 파랑 막대 = 손절로 매도 타이밍을 되돌아볼 수 있어요',
-    },
-    {
-        target: '#todayStocksPanel',
-        view: 'all',
-        arrow: 'bottom',
-        icon: '📊',
-        label: '09 — 오늘의 등락',
-        title: '오늘 하루, 내 자산은 얼마나 움직였을까',
-        body: '전날 종가 대비 오늘 보유 종목들의 등락을 한 화면에 모아 보여주는 패널이에요. 국내·미국 종목의 손익을 환율까지 반영해 하나의 원화 기준 금액으로 합산해 보여주고, 상승·하락 종목을 자동으로 나누어 정렬해줍니다.',
-        tip: '💡 자산 성장 추이 차트 옆에 나란히 배치되어 있어요',
     },
     {
         target: '#aiAdviceFab',
         view: 'all',
         arrow: 'left',
         icon: '🤖',
-        label: '10 — AI 투자조언',
+        label: '07 — AI 투자조언',
         title: 'AI에게 내 포트폴리오에 대한 조언을 물어보세요',
-        body: '우측 하단의 AI 투자조언 버튼을 누르면 현재 시장 신호와 내 보유 종목을 종합해 AI가 분석 의견을 제공합니다. ⚙️ 버튼에서 나만의 Gemini API 키와 모델명을 등록하면 사용량 제한 없이 더 자주 물어볼 수 있고, 지난 조언은 🕘 기록에서 날짜별로 다시 확인할 수 있어요.',
+        body: '우측 하단의 AI 투자조언 버튼을 누르면 현재 시장 신호와 내 보유 종목을 종합해 AI가 분석 의견을 제공합니다. 지난 조언은 기록으로 남아 언제든 다시 확인할 수 있어요.',
         tip: '⚠️ AI 조언은 투자 참고용이며, 최종 투자 판단과 책임은 본인에게 있어요',
     },
     {
@@ -125,20 +95,10 @@ const STEPS = [
         view: 'all',
         arrow: 'left',
         icon: '🛰️',
-        label: '11 — 탐사선 띄우기',
+        label: '08 — 탐사선 띄우기',
         title: '탐사선으로 관심 조건을 자동 추적하세요',
         body: 'AI 투자조언 버튼 바로 옆의 탐사선 버튼은 지정한 조건(가격·지표 등)을 주기적으로 점검해 알려주는 Plus 전용 기능이에요. 매번 직접 확인하지 않아도 원하는 조건에 도달하면 놓치지 않을 수 있어요.',
         tip: '💡 버튼 위에 마우스를 올리면 라벨이 펼쳐지며 기능을 바로 확인할 수 있어요',
-    },
-    {
-        target: '#flightPlanBanner',
-        view: 'all',
-        arrow: 'top',
-        icon: '🚀',
-        label: '12 — 비행 계획',
-        title: '도킹, 탈출, 연료 보급 — 가격이 알아서 알려줘요',
-        body: '보유 종목마다 🌕 도킹 지점(목표가), 🛸 비상 탈출(손절가), ⛽ 연료 보급(추가매수 지점)을 종목 상세 차트에서 설정해두면, 현재가가 각 지점에 근접하거나 도달했을 때 이 배너에 자동으로 알림이 떠요. 연료 보급 지점은 종목당 여러 개를 등록해 단계별 물타기 계획도 세울 수 있는 Plus 전용 기능입니다.',
-        tip: '💡 현재가가 지점의 ±3% 이내로 들어오면 \"근접\" 알림이 먼저 떠요',
     },
     {
         target: '#historyControlsBox',
@@ -146,9 +106,9 @@ const STEPS = [
         navSelector: '.vtab[onclick*="history"]',
         arrow: 'top',
         icon: '📜',
-        label: '13 — 거래 내역',
+        label: '09 — 거래 내역',
         title: '전체 거래 이력을 필터링해서 조회하세요',
-        body: '국가·유형·계좌·기간·종목명으로 거래를 검색하고, 날짜 일괄수정·계좌 일괄변경 기능으로 잘못 입력된 정보를 한 번에 수정할 수 있어요. 증권사 CSV 파일을 그대로 올리면 거래 내역이 한 번에 파싱되어 등록되고, 티커를 자동으로 찾지 못한 종목은 직접 검색해 연결할 수 있어요. 한 번 매칭한 종목은 다음 업로드부터 자동으로 연결됩니다.',
+        body: '국가·유형·계좌·기간·종목명으로 거래를 검색하고, 날짜 일괄수정·계좌 일괄변경 기능으로 잘못 입력된 정보를 한 번에 수정할 수 있어요. CSV 파일로 기존 거래 내역을 일괄 업로드할 수도 있습니다.',
         tip: '💡 체크박스로 여러 건을 선택한 뒤 🏦 계좌 일괄변경 버튼을 누르면 선택한 거래의 계좌를 한 번에 바꿀 수 있어요',
     },
     {
@@ -157,7 +117,7 @@ const STEPS = [
         navSelector: '.vtab[onclick*="realized"]',
         arrow: 'top',
         icon: '💵',
-        label: '14 — 실현수익',
+        label: '10 — 실현수익',
         title: '매도를 통해 확정된 수익을 분석하세요',
         body: '합산·국내·해외 실현손익을 균형 있게 3분할로 보여주고, 각 박스 안에는 계좌별 상세 실현손익 내역까지 바로 표시돼요. 해외주식 매도 시 양도소득세(22%)를 자동 계산해 신고 예정세액도 미리 확인할 수 있습니다.',
         tip: '💡 랭킹 항목을 클릭하면 해당 종목의 거래 내역만 필터링됩니다',
@@ -168,7 +128,7 @@ const STEPS = [
         navSelector: '.vtab[onclick*="dividend"]',
         arrow: 'top',
         icon: '🌿',
-        label: '15 — 배당통계',
+        label: '11 — 배당통계',
         title: '배당금 현황과 예정 배당을 추적하세요',
         body: '누적 배당금을 국내·해외로 나눠 균형 있게 보여주고, 각 박스 안에 계좌별 배당금 상세 내역도 함께 표시돼요. 배당 주기를 자동 감지해 다음 예상 배당월과 예상 수령액을 보여주는 \"예정 배당\" 기능도 있어요.',
         tip: '💡 배당 입력 시 \"세전 금액\" 체크하면 배당세(15.4%)가 자동 차감됩니다',
@@ -179,7 +139,7 @@ const STEPS = [
         navSelector: '.vtab[onclick*="moonlight"]',
         arrow: 'top',
         icon: '🌕',
-        label: '16 — 달빛정보',
+        label: '12 — 달빛정보',
         title: '통합 밸류에이션 대시보드를 확인하세요',
         body: '심리·리스크, 자금환경, 경기선행, 밸류에이션 4대 카테고리를 종합한 0~100점 시장 점수를 더 자세히 보여줍니다. 적극적·중립적·보수적 3가지 계산 모드를 선택하면 상단 시장 신호 점수에도 동일하게 반영돼요.',
         tip: '💡 점수가 낮을수록 저평가(매수 유리), 높을수록 고평가(비중축소 경고) 구간이에요',
@@ -189,10 +149,197 @@ const STEPS = [
         view: 'all',
         arrow: 'top',
         icon: '⚙️',
-        label: '17 — 설정 & 계좌 관리',
-        title: '계좌 · 화면 · 백업을 한곳에서 관리하세요',
-        body: '⚙️ 설정은 3개 탭으로 구성돼요. \"데이터 관리\"에서 GitHub 클라우드 동기화·JSON/CSV 백업·초기화는 물론, 🏦 계좌명 관리로 계좌명을 변경하면 관련된 모든 거래 내역이 자동으로 일괄 업데이트됩니다. 📄 CSV 관리에서는 증권사 거래내역 일괄 업로드와 입력용 CSV 양식 다운로드도 가능해요. \"화면 설정\"에서 🌙 라이트/다크 테마, 폰트 크기, 수익/손실 색상을, \"지표 설정\"에서 시장 신호 카드에 표시할 지표를 그룹/개별로 선택할 수 있어요.',
-        tip: '💡 \"자동 동기화\"를 켜면 거래 추가·수정 시 GitHub에 자동으로 저장돼요',
+        label: '13 — 설정 개요',
+        title: '⚙️ 설정 버튼 하나로 모든 걸 관리하세요',
+        body: '데이터 관리·화면 설정·지표 설정 3개 탭으로 구성돼 있어요. 다음 몇 단계에서 탭별 핵심 기능을 하나씩 자세히 살펴볼게요.',
+        tip: '💡 언제든 우측 상단 ⚙️ 버튼을 눌러 바로 이 설정 화면으로 올 수 있어요',
+    },
+    {
+        target: '#settingsGithubSection',
+        view: 'all',
+        modal: 'masterSettingsOverlay',
+        settingsTab: 'data',
+        arrow: 'right',
+        icon: '☁️',
+        label: '14 — GitHub 클라우드 동기화',
+        title: '내 장부를 GitHub에 안전하게 백업하세요',
+        body: '개인 GitHub 저장소를 연결하면 여러 기기에서 동일한 장부를 동기화할 수 있어요. 최초 기기에서 저장소·토큰을 입력해두면, 다른 기기에서는 아이디·비밀번호만 입력해도 자동으로 연결됩니다.',
+        tip: '💡 "내역 수정 시 자동 저장"을 켜두면 거래를 추가·수정할 때마다 자동으로 GitHub에 백업돼요',
+    },
+    {
+        target: '#accountManageList',
+        view: 'all',
+        modal: 'masterSettingsOverlay',
+        settingsTab: 'data',
+        arrow: 'right',
+        icon: '🏦',
+        label: '15 — 계좌명 관리',
+        title: '계좌 이름을 바꾸면 거래 내역도 자동으로 따라와요',
+        body: '거래 내역에 등록된 모든 계좌가 여기 목록으로 표시돼요. "이름 변경"을 누르면 그 계좌로 기록된 모든 거래 내역의 계좌명이 한 번에 일괄 업데이트됩니다. 이미 있는 이름으로 바꾸면 두 계좌가 자동으로 합쳐져요.',
+        tip: '💡 거래내역 페이지에서는 여러 건을 선택해 계좌를 한 번에 바꾸는 "계좌 일괄변경" 기능도 있어요',
+    },
+    {
+        target: '#settingsBackupRow',
+        view: 'all',
+        modal: 'masterSettingsOverlay',
+        settingsTab: 'data',
+        arrow: 'right',
+        icon: '💾',
+        label: '16 — 백업 · CSV · 초기화',
+        title: '데이터를 내보내고, 불러오고, 필요하면 초기화하세요',
+        body: 'JSON 파일로 전체 장부를 백업/복원하거나, 증권사 거래내역을 CSV 양식에 맞춰 한 번에 대량 업로드할 수 있어요. "데이터 초기화"는 모든 거래 내역을 완전히 지우는 되돌릴 수 없는 작업이니 신중하게 사용하세요.',
+        tip: '💡 CSV 양식을 먼저 받아서 각 증권사 거래내역을 그 형식에 맞춰 채운 뒤 업로드하면 편해요',
+    },
+    {
+        target: '#settingsFontSizeSection',
+        view: 'all',
+        modal: 'masterSettingsOverlay',
+        settingsTab: 'display',
+        arrow: 'right',
+        icon: '🔤',
+        label: '17 — 화면 폰트 크기',
+        title: '읽기 편한 글자 크기로 맞추세요',
+        body: 'XS부터 XL까지 5단계로 전체 화면의 폰트 크기를 조절할 수 있어요. 설정값은 자동 저장되어 다음 접속 시에도 그대로 유지됩니다.',
+        tip: '💡 모바일에서 글자가 작게 느껴진다면 "대" 또는 "XL"을 시도해보세요',
+    },
+    {
+        target: '#settingsColorSection',
+        view: 'all',
+        modal: 'masterSettingsOverlay',
+        settingsTab: 'display',
+        arrow: 'right',
+        icon: '🎨',
+        label: '18 — 수익 / 손실 색상',
+        title: '내게 익숙한 색상 규칙으로 바꾸세요',
+        body: '수익·손실을 표시하는 색을 자유롭게 지정할 수 있어요. 국내 전통 방식(빨강=상승), 미국식(빨강=하락) 등 프리셋 버튼으로 한 번에 바꾸거나, 색상 피커로 직접 커스터마이징할 수 있습니다.',
+        tip: '💡 색상을 바꾼 뒤 꼭 "색상 저장" 버튼을 눌러야 반영돼요',
+    },
+    {
+        target: '.signal-settings-grid',
+        view: 'all',
+        modal: 'masterSettingsOverlay',
+        settingsTab: 'signal',
+        arrow: 'top',
+        icon: '📡',
+        label: '19 — 지표 설정',
+        title: '시장 신호 카드에 보여줄 지표를 고르세요',
+        body: '심리·리스크, 자금환경, 경기선행, 밸류에이션 그룹별로, 혹은 그 안의 개별 지표 단위로 표시 여부를 켜고 끌 수 있어요. 관심 없는 지표는 숨기고 자주 보는 지표만 남겨 대시보드를 깔끔하게 정리해보세요.',
+        tip: '💡 "전체 다시 표시" 버튼으로 숨긴 지표를 한 번에 복원할 수 있어요',
+    },
+    {
+        target: '#watchlistSearchGroup',
+        view: 'watch',
+        navSelector: '.vtab[onclick*="watch"]',
+        arrow: 'top',
+        icon: '⭐',
+        label: '20 — 관심종목',
+        title: '아직 보유하지 않은 종목도 지켜보세요',
+        body: '국내/미국 필터를 선택하고 종목명이나 티커를 검색해서 관심종목에 추가하면, 매수 전이라도 실시간 시세를 계속 모니터링할 수 있어요. 매수를 고민 중인 종목의 흐름을 놓치지 않고 확인해보세요.',
+        tip: '💡 관심종목에 태그를 달아두면 카테고리별로 묶어서 볼 수 있어요',
+    },
+    {
+        target: '#listOptionsBar',
+        view: 'watch',
+        arrow: 'top',
+        icon: '🗂️',
+        label: '21 — 종목 보기 옵션',
+        title: '카드형/리스트형 뷰와 정렬을 취향대로 바꾸세요',
+        body: '종목을 카드형(미니 차트 포함)과 리스트형(한눈에 비교) 중 원하는 방식으로 볼 수 있고, 등락률·평가금액·수익률 기준으로 정렬할 수 있어요. ↕️/↔️ 버튼으로 국내/해외 섹션 배치 방향도 바꿀 수 있습니다.',
+        tip: '💡 이 옵션 바는 소유자1·소유자2·관심종목 페이지에서 공통으로 사용돼요',
+    },
+    {
+        target: '#localTagFilterContainer',
+        view: 'all',
+        arrow: 'top',
+        icon: '🏷️',
+        label: '22 — 태그 필터 & 태그 지정',
+        title: '종목에 태그를 달아 나만의 그룹을 만드세요',
+        body: '종목 카드의 🏷️ 버튼으로 "2차전지", "배당용", "장기투자" 같은 태그를 자유롭게 지정할 수 있어요. 여기 태그 필터 바에서 하나 이상의 태그를 선택하면 해당 태그가 달린 종목만 모아서 볼 수 있습니다.',
+        tip: '💡 태그는 포트폴리오 맵의 선택 모드에서도 태그별 일괄 선택으로 활용할 수 있어요',
+    },
+    {
+        target: '#dashboardTopWrapper',
+        view: 'user1',
+        navSelector: '.vtab[onclick*="user1"]',
+        arrow: 'top',
+        icon: '👤',
+        label: '23 — 소유자별 페이지',
+        title: '가족 구성원별로 자산을 따로 관리하세요',
+        body: '상단의 소유자1 · 소유자2 탭을 누르면 거래 장부에 해당 소유자로 기록된 거래만 따로 집계해 개인별 대시보드로 보여줍니다. 국내/해외 투자액·평가액·수익률이 각자 기준으로 표시돼요.',
+        tip: '💡 부부나 가족이 함께 쓸 때 서로의 자산을 침범하지 않고 분리해서 관리할 수 있어요',
+    },
+    {
+        target: '.btn-edit-owners',
+        view: 'all',
+        arrow: 'bottom',
+        icon: '✏️',
+        label: '24 — 소유자 이름 · 아이콘 · 색상',
+        title: '소유자 프로필을 내 취향대로 꾸미세요',
+        body: '"소유자1", "소유자2" 같은 기본 이름을 실제 이름이나 별명으로 바꾸고, 각자를 상징하는 아이콘과 테마 색상을 지정할 수 있어요. 장부와 대시보드 전체에 바로 반영됩니다.',
+        tip: '💡 아이콘은 이모지로 자유롭게 설정할 수 있어요',
+    },
+    {
+        target: '#rangeDropdown',
+        view: 'all',
+        arrow: 'bottom',
+        icon: '📅',
+        label: '25 — 조회 기간 선택',
+        title: '원하는 기간만 잘라서 성과를 확인하세요',
+        body: '1D·1W·1M·3M·6M·1Y·3Y·5Y·전체 중 조회 기간을 선택하면, 자산 성장 추이 차트와 수익률 계산이 해당 기간 기준으로 다시 계산됩니다. 최근 급등락 구간만 짧게 확인하거나, 처음부터 지금까지 전체 흐름을 볼 수도 있어요.',
+        tip: '💡 5Y(5년) 이상 데이터가 쌓이면 자동으로 5Y 옵션이 활성화돼요',
+    },
+    {
+        target: '#btnThemeToggle',
+        view: 'all',
+        arrow: 'bottom',
+        icon: '🌙',
+        label: '26 — 라이트 / 다크 모드',
+        title: '화면 밝기를 상황에 맞게 바꾸세요',
+        body: '한 번 클릭으로 어두운 다크 모드와 밝은 라이트 모드를 전환할 수 있어요. 선택한 테마는 자동 저장되어 다음 접속 때도 그대로 유지됩니다.',
+        tip: '💡 야간에는 다크 모드가 눈의 피로를 줄여줘요',
+    },
+    {
+        target: 'button[onclick*="openBulkDateModal"]',
+        view: 'history',
+        navSelector: '.vtab[onclick*="history"]',
+        arrow: 'top',
+        icon: '📅',
+        label: '27 — 날짜 일괄수정',
+        title: '잘못 입력된 날짜를 한 번에 바로잡으세요',
+        body: '필터된 거래 전체의 날짜를 일괄 처리해요. 날짜 이동(N일 앞/뒤로), 날짜 치환(특정 날짜를 다른 날짜로 교체), 날짜 설정(모두 같은 날짜로 통일) 세 가지 모드를 지원합니다.',
+        tip: '💡 CSV로 대량 업로드한 뒤 날짜를 한 번에 정리할 때 특히 유용해요',
+    },
+    {
+        target: 'button[onclick*="openBulkAccountModal"]',
+        view: 'history',
+        arrow: 'top',
+        icon: '🏦',
+        label: '28 — 계좌 일괄변경',
+        title: '선택한 거래의 계좌를 한 번에 바꾸세요',
+        body: '표에서 체크박스로 거래를 선택한 뒤 이 버튼을 누르면, 새 계좌명을 입력하거나 기존 계좌 목록에서 골라 선택된 거래 전체의 계좌를 한 번에 변경할 수 있어요. 이미 있는 계좌명을 입력하면 두 계좌가 하나로 합쳐집니다.',
+        tip: '💡 상단 헤더의 전체선택 체크박스로 필터된 거래를 한 번에 모두 선택할 수 있어요',
+    },
+    {
+        target: '#realizedRankingPanel',
+        view: 'realized',
+        navSelector: '.vtab[onclick*="realized"]',
+        arrow: 'left',
+        icon: '🏆',
+        label: '29 — 실현수익 랭킹 & What if',
+        title: '어떤 종목이 수익을 가장 많이 줬는지 확인하세요',
+        body: '종목별 실현 수익금·수익률·단타 횟수 랭킹을 제공해요. 탭을 전환하며 수익금 순/수익률 순으로 정렬할 수 있고, "What if?" 섹션에서는 매도하지 않고 계속 보유했다면 지금 얼마였을지 가상 수익도 확인할 수 있어요.',
+        tip: '💡 랭킹 항목을 클릭하면 우측 표가 해당 종목의 거래 내역으로 바로 필터링돼요',
+    },
+    {
+        target: '#upcomingDivTableBody',
+        view: 'dividend',
+        navSelector: '.vtab[onclick*="dividend"]',
+        arrow: 'top',
+        icon: '🔮',
+        label: '30 — 예정 배당',
+        title: '다음에 받을 배당금을 미리 확인하세요',
+        body: '보유 종목의 과거 배당 패턴을 분석해 다음 배당 예상월과 예상 수령 금액을 자동으로 계산해줘요. 월·분기·반기·연 배당 주기를 파악해서 앞으로의 현금 흐름을 미리 계획하는 데 도움이 됩니다.',
+        tip: '💡 배당 주기와 예상월은 과거 배당 이력을 기반으로 추정한 값이라 실제와 다를 수 있어요',
     },
 ];
 
@@ -223,7 +370,7 @@ const PAGE_STEPS = {
             icon: '🏷️',
             label: '전체보기 — 태그 필터',
             title: '태그로 종목을 그룹핑하고 필터링하세요',
-            body: '종목 카드의 🏷️ 버튼으로 종목당 최대 5개까지 태그를 설정하면 (예: 2차전지, 배당용, 장기투자) 여기서 태그별로 필터링할 수 있어요. 여러 태그를 동시에 선택하면 OR 조건으로 필터링됩니다.',
+            body: '종목 카드의 🏷️ 버튼으로 태그를 설정하면 (예: 2차전지, 배당용, 장기투자) 여기서 태그별로 필터링할 수 있어요. 여러 태그를 동시에 선택하면 OR 조건으로 필터링됩니다.',
             tip: '💡 태그는 포트폴리오 맵의 선택 모드에서도 활용할 수 있어요',
         },
         {
@@ -593,9 +740,27 @@ function ensureStepView(step, callback) {
     setTimeout(callback, targetView === 'moonlight' ? 450 : 150);
 }
 
+// ── 모달 헬퍼 (스텝에 modal이 지정되어 있으면 해당 모달을 열고 탭도 전환) ──
+function ensureStepModal(step, callback) {
+    const overlay = document.getElementById('masterSettingsOverlay');
+    const needsModal = !!(step && step.modal);
+
+    if (!needsModal) {
+        if (overlay && overlay.classList.contains('open') && typeof closeModal === 'function') {
+            closeModal('masterSettingsOverlay');
+        }
+        callback();
+        return;
+    }
+
+    if (typeof openMasterSettingsModal === 'function') openMasterSettingsModal();
+    if (step.settingsTab && typeof switchSettingsTab === 'function') switchSettingsTab(step.settingsTab);
+    setTimeout(callback, 200);
+}
+
 // ── 메인 튜토리얼 스텝 렌더 ───────────────────────────────
 function renderStep(idx) {
-    ensureStepView(STEPS[idx], () => paintStep(idx));
+    ensureStepView(STEPS[idx], () => ensureStepModal(STEPS[idx], () => paintStep(idx)));
 }
 
 function paintStep(idx) {
@@ -735,6 +900,10 @@ window.closeTutorial = function() {
     hideCurtains();
     const tt = $('#tutorialTooltip');
     if (tt) tt.style.display = 'none';
+    const overlay = document.getElementById('masterSettingsOverlay');
+    if (overlay && overlay.classList.contains('open') && typeof closeModal === 'function') {
+        closeModal('masterSettingsOverlay');
+    }
 };
 
 window.nextStep = function() {
@@ -823,6 +992,10 @@ function finishTutorial() {
     hideCurtains();
     const tt = $('#tutorialTooltip');
     if (tt) tt.style.display = 'none';
+    const overlay = document.getElementById('masterSettingsOverlay');
+    if (overlay && overlay.classList.contains('open') && typeof closeModal === 'function') {
+        closeModal('masterSettingsOverlay');
+    }
 
     const toast = $('#tutorialDoneToast');
     if (toast) {
