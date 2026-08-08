@@ -1239,6 +1239,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   color: var(--text);
   margin-bottom: 12px;
   line-height: 1.3;
+  word-break: keep-all;
 }
 
 .tutorial-welcome-modal p {
@@ -1246,6 +1247,8 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   color: var(--text2);
   line-height: 1.75;
   margin-bottom: 28px;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .tutorial-welcome-modal .highlight-text {
@@ -1273,6 +1276,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   color: var(--text2);
   transition: 0.2s;
   position: relative;
+  word-break: keep-all;
 }
 
 .tutorial-feature-item--wide {
@@ -1490,6 +1494,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   color: var(--text);
   margin-bottom: 6px;
   line-height: 1.3;
+  word-break: keep-all;
 }
 
 .tutorial-tooltip p {
@@ -1497,6 +1502,8 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   color: var(--text2);
   line-height: 1.65;
   margin-bottom: 16px;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .tutorial-tooltip .tip-tag {
