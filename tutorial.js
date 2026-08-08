@@ -1,1172 +1,3121 @@
-// ============================================================
-// 🎓 Two the Moon 튜토리얼 시스템 v2 — 페이지별 튜토리얼 포함
-// ============================================================
-(function() {
-'use strict';
-
-// ── 상수 & 상태 ────────────────────────────────────────────
-const TUTORIAL_DONE_KEY = 'ttm_tutorial_done_v2';
-const PAGE_DONE_PREFIX  = 'ttm_page_v2_';
-
-let tutorialActive     = false;
-let currentStep        = 0;
-let pageTutorialActive = false;
-let currentPageStep    = 0;
-let currentPageSteps   = [];
-let currentPageView    = '';
-
-// ── DOM 헬퍼 ───────────────────────────────────────────────
-function $(sel) { return document.querySelector(sel); }
-
-// ── 메인 튜토리얼 스텝 ────────────────────────────────────
-const STEPS = [
-    {
-        target: 'nav',
-        view: 'all',
-        arrow: 'top',
-        icon: '🗺️',
-        label: '01 — 네비게이션',
-        title: '상단 메뉴로 화면을 전환하세요',
-        body: '전체보기·소유자1·소유자2·관심종목·거래내역·실현수익·배당통계·달빛정보 탭을 클릭해 각 대시보드로 이동합니다. 각 화면에 첫 방문 시 해당 페이지 가이드가 자동으로 안내됩니다.',
-        tip: '💡 기간 탭(1D·1W…전체)으로 조회 기간을 바꾸고, 🌙 버튼으로 라이트/다크 모드를 전환할 수 있어요',
-    },
-    {
-        target: '#sidebar',
-        view: 'all',
-        arrow: 'left',
-        icon: '✏️',
-        label: '02 — 거래 장부',
-        title: '좌측 장부에서 거래를 기록하세요',
-        body: '소유자, 거래 유형(매수/매도/배당/이동/분할), 발생 일자, 종목, 수량, 단가를 입력하면 전체 포트폴리오에 즉시 반영됩니다. 수량 칸 아래에는 수량×단가 총액이 한글로 자동 표기돼요.',
-        tip: '💡 계좌명 칸을 클릭하면 이미 등록된 계좌 목록이 떠서 바로 선택할 수 있고, 새 이름을 입력하면 새 계좌로 등록돼요. \"이동\" 유형으로 계좌 간 종목 이동을, \"분할\"로 액면분할을 기록할 수 있어요',
-    },
-    {
-        target: '#marketSignalBar',
-        view: 'all',
-        arrow: 'top',
-        icon: '📡',
-        label: '03 — 시장 신호 분석',
-        title: '실시간 시장 상황을 한눈에 파악하세요',
-        body: 'VIX(공포지수)·MOVE·하이일드·공포&탐욕 등 심리/리스크 지표부터, 미국 10Y 금리·DXY·USD/KRW·신용잔고, Russell 2000·구리·BDI 등 경기 선행지표, 버핏지수·CAPE PE 밸류에이션까지 종합 분석합니다.',
-        tip: '💡 종합 신호 점수가 낮을수록 리스크 경계 구간입니다',
-    },
-    {
-        target: '#dashboardTopWrapper',
-        view: 'all',
-        arrow: 'top',
-        icon: '📊',
-        label: '04 — 통합 자산 패널',
-        title: '내 전체 자산 현황을 한눈에 확인하세요',
-        body: '국내·해외 주식의 투자 원금, 현재 평가액, 수익률을 실시간으로 집계합니다. \"현재 보유 / 누적 자산\" 버튼으로 실현수익까지 포함한 누적 자산을 볼 수 있어요.',
-        tip: '💡 포트폴리오 맵에서 종목을 꾹 누르면 여러 종목을 선택해 합산 금액을 확인할 수 있어요',
-    },
-    {
-        target: '#allocationTreemap',
-        view: 'all',
-        arrow: 'top',
-        icon: '🗺️',
-        label: '05 — 포트폴리오 맵',
-        title: '비중 시각화 맵으로 포트폴리오를 분석하세요',
-        body: '종목별 비중을 직사각형 크기로 시각화합니다. 클릭하면 종목 상세 차트가 열리고, 꾹 누르면 선택 모드로 진입해 국장/미장 일괄 선택 또는 태그별 선택으로 합산 금액을 즉시 확인할 수 있어요.',
-        tip: '💡 태그 바 차트를 통해 섹터별 비중도 확인할 수 있어요',
-    },
-    {
-        target: '#portfolioChartWrapper',
-        view: 'all',
-        arrow: 'bottom',
-        icon: '📈',
-        label: '06 — 자산 성장 추이',
-        title: '투자 원금 대비 평가액 흐름을 추적하세요',
-        body: '시간 흐름에 따른 총 투자액과 총 평가액을 영역 차트로 보여줍니다. 차트 위를 드래그하면 원하는 구간을 확대할 수 있고, 막대 그래프로 건별 실현수익도 표시됩니다.',
-        tip: '💡 초록 막대 = 익절, 파랑 막대 = 손절로 매도 타이밍을 되돌아볼 수 있어요',
-    },
-    {
-        target: '#aiAdviceFab',
-        view: 'all',
-        arrow: 'right',
-        icon: '🤖',
-        label: '07 — AI 투자조언',
-        title: 'AI에게 내 포트폴리오에 대한 조언을 물어보세요',
-        body: '우측 하단의 AI 투자조언 버튼을 누르면 현재 시장 신호와 내 보유 종목을 종합해 AI가 분석 의견을 제공합니다. 지난 조언은 기록으로 남아 언제든 다시 확인할 수 있어요.',
-        tip: '⚠️ AI 조언은 투자 참고용이며, 최종 투자 판단과 책임은 본인에게 있어요',
-    },
-    {
-        target: '#watchlistSearchGroup',
-        view: 'watch',
-        navSelector: '.vtab[onclick*="watch"]',
-        arrow: 'top',
-        icon: '⭐',
-        label: '08 — 관심종목',
-        title: '아직 보유하지 않은 종목도 지켜보세요',
-        body: '국내/미국 필터를 선택하고 종목명이나 티커를 검색해서 관심종목에 추가하면, 매수 전이라도 실시간 시세를 계속 모니터링할 수 있어요. 매수를 고민 중인 종목의 흐름을 놓치지 않고 확인해보세요.',
-        tip: '💡 관심종목에 태그를 달아두면 카테고리별로 묶어서 볼 수 있어요',
-    },
-    {
-        target: '#listOptionsBar',
-        view: 'watch',
-        arrow: 'top',
-        icon: '🗂️',
-        label: '09 — 종목 보기 옵션',
-        title: '카드형/리스트형 뷰와 정렬을 취향대로 바꾸세요',
-        body: '종목을 카드형(미니 차트 포함)과 리스트형(한눈에 비교) 중 원하는 방식으로 볼 수 있고, 등락률·평가금액·수익률 기준으로 정렬할 수 있어요. ↕️/↔️ 버튼으로 국내/해외 섹션 배치 방향도 바꿀 수 있습니다.',
-        tip: '💡 이 옵션 바는 소유자1·소유자2·관심종목 페이지에서 공통으로 사용돼요',
-    },
-    {
-        target: '#probeFabBtn',
-        view: 'watch',
-        navSelector: '.vtab[onclick*="watch"]',
-        arrow: 'right',
-        icon: '🛰️',
-        label: '10 — 탐사선 띄우기',
-        title: '탐사선으로 관심 조건을 자동 추적하세요',
-        body: 'AI 투자조언 버튼 바로 옆의 탐사선 버튼은 지정한 조건(가격·지표 등)을 주기적으로 점검해 알려주는 Plus 전용 기능이에요. 매번 직접 확인하지 않아도 원하는 조건에 도달하면 놓치지 않을 수 있어요.',
-        tip: '💡 버튼 위에 마우스를 올리면 라벨이 펼쳐지며 기능을 바로 확인할 수 있어요',
-    },
-    {
-        target: '#localTagFilterContainer',
-        view: 'all',
-        arrow: 'top',
-        icon: '🏷️',
-        label: '11 — 태그 필터 & 태그 지정',
-        title: '종목에 태그를 달아 나만의 그룹을 만드세요',
-        body: '종목 카드의 🏷️ 버튼으로 "2차전지", "배당용", "장기투자" 같은 태그를 자유롭게 지정할 수 있어요. 여기 태그 필터 바에서 하나 이상의 태그를 선택하면 해당 태그가 달린 종목만 모아서 볼 수 있습니다.',
-        tip: '💡 태그는 포트폴리오 맵의 선택 모드에서도 태그별 일괄 선택으로 활용할 수 있어요',
-    },
-    {
-        target: '#dashboardTopWrapper',
-        view: 'user1',
-        navSelector: '.vtab[onclick*="user1"]',
-        arrow: 'top',
-        icon: '👤',
-        label: '12 — 소유자별 페이지',
-        title: '가족 구성원별로 자산을 따로 관리하세요',
-        body: '상단의 소유자1 · 소유자2 탭을 누르면 거래 장부에 해당 소유자로 기록된 거래만 따로 집계해 개인별 대시보드로 보여줍니다. 국내/해외 투자액·평가액·수익률이 각자 기준으로 표시돼요.',
-        tip: '💡 부부나 가족이 함께 쓸 때 서로의 자산을 침범하지 않고 분리해서 관리할 수 있어요',
-    },
-    {
-        target: '.btn-edit-owners',
-        view: 'all',
-        arrow: 'bottom',
-        icon: '✏️',
-        label: '13 — 소유자 이름 · 아이콘 · 색상',
-        title: '소유자 프로필을 내 취향대로 꾸미세요',
-        body: '"소유자1", "소유자2" 같은 기본 이름을 실제 이름이나 별명으로 바꾸고, 각자를 상징하는 아이콘과 테마 색상을 지정할 수 있어요. 장부와 대시보드 전체에 바로 반영됩니다.',
-        tip: '💡 아이콘은 이모지로 자유롭게 설정할 수 있어요',
-    },
-    {
-        target: '#rangeDropdown',
-        view: 'all',
-        arrow: 'bottom',
-        icon: '📅',
-        label: '14 — 조회 기간 선택',
-        title: '원하는 기간만 잘라서 성과를 확인하세요',
-        body: '1D·1W·1M·3M·6M·1Y·3Y·5Y·전체 중 조회 기간을 선택하면, 자산 성장 추이 차트와 수익률 계산이 해당 기간 기준으로 다시 계산됩니다. 최근 급등락 구간만 짧게 확인하거나, 처음부터 지금까지 전체 흐름을 볼 수도 있어요.',
-        tip: '💡 5Y(5년) 이상 데이터가 쌓이면 자동으로 5Y 옵션이 활성화돼요',
-    },
-    {
-        target: '#btnThemeToggle',
-        view: 'all',
-        arrow: 'bottom',
-        icon: '🌙',
-        label: '15 — 라이트 / 다크 모드',
-        title: '화면 밝기를 상황에 맞게 바꾸세요',
-        body: '한 번 클릭으로 어두운 다크 모드와 밝은 라이트 모드를 전환할 수 있어요. 선택한 테마는 자동 저장되어 다음 접속 때도 그대로 유지됩니다.',
-        tip: '💡 야간에는 다크 모드가 눈의 피로를 줄여줘요',
-    },
-    {
-        target: '.btn-sm[onclick*="openMasterSettings"]',
-        view: 'all',
-        arrow: 'top',
-        icon: '⚙️',
-        label: '16 — 설정 개요',
-        title: '⚙️ 설정 버튼 하나로 모든 걸 관리하세요',
-        body: '데이터 관리·화면 설정·지표 설정 3개 탭으로 구성돼 있어요. 다음 몇 단계에서 탭별 핵심 기능을 하나씩 자세히 살펴볼게요.',
-        tip: '💡 언제든 우측 상단 ⚙️ 버튼을 눌러 바로 이 설정 화면으로 올 수 있어요',
-    },
-    {
-        target: '#settingsGithubSection',
-        view: 'all',
-        modal: 'masterSettingsOverlay',
-        settingsTab: 'data',
-        arrow: 'right',
-        icon: '☁️',
-        label: '17 — GitHub 클라우드 동기화',
-        title: '내 장부를 GitHub에 안전하게 백업하세요',
-        body: '개인 GitHub 저장소를 연결하면 여러 기기에서 동일한 장부를 동기화할 수 있어요. 최초 기기에서 저장소·토큰을 입력해두면, 다른 기기에서는 아이디·비밀번호만 입력해도 자동으로 연결됩니다.',
-        tip: '💡 "내역 수정 시 자동 저장"을 켜두면 거래를 추가·수정할 때마다 자동으로 GitHub에 백업돼요',
-    },
-    {
-        target: '#accountManageList',
-        view: 'all',
-        modal: 'masterSettingsOverlay',
-        settingsTab: 'data',
-        arrow: 'right',
-        icon: '🏦',
-        label: '18 — 계좌명 관리',
-        title: '계좌 이름을 바꾸면 거래 내역도 자동으로 따라와요',
-        body: '거래 내역에 등록된 모든 계좌가 여기 목록으로 표시돼요. "이름 변경"을 누르면 그 계좌로 기록된 모든 거래 내역의 계좌명이 한 번에 일괄 업데이트됩니다. 이미 있는 이름으로 바꾸면 두 계좌가 자동으로 합쳐져요.',
-        tip: '💡 거래내역 페이지에서는 여러 건을 선택해 계좌를 한 번에 바꾸는 "계좌 일괄변경" 기능도 있어요',
-    },
-    {
-        target: '#settingsBackupRow',
-        view: 'all',
-        modal: 'masterSettingsOverlay',
-        settingsTab: 'data',
-        arrow: 'right',
-        icon: '💾',
-        label: '19 — 백업 · CSV · 초기화',
-        title: '데이터를 내보내고, 불러오고, 필요하면 초기화하세요',
-        body: 'JSON 파일로 전체 장부를 백업/복원하거나, 증권사 거래내역을 CSV 양식에 맞춰 한 번에 대량 업로드할 수 있어요. "데이터 초기화"는 모든 거래 내역을 완전히 지우는 되돌릴 수 없는 작업이니 신중하게 사용하세요.',
-        tip: '💡 CSV 양식을 먼저 받아서 각 증권사 거래내역을 그 형식에 맞춰 채운 뒤 업로드하면 편해요',
-    },
-    {
-        target: '#settingsFontSizeSection',
-        view: 'all',
-        modal: 'masterSettingsOverlay',
-        settingsTab: 'display',
-        arrow: 'right',
-        icon: '🔤',
-        label: '20 — 화면 폰트 크기',
-        title: '읽기 편한 글자 크기로 맞추세요',
-        body: 'XS부터 XL까지 5단계로 전체 화면의 폰트 크기를 조절할 수 있어요. 설정값은 자동 저장되어 다음 접속 시에도 그대로 유지됩니다.',
-        tip: '💡 모바일에서 글자가 작게 느껴진다면 "대" 또는 "XL"을 시도해보세요',
-    },
-    {
-        target: '#settingsColorSection',
-        view: 'all',
-        modal: 'masterSettingsOverlay',
-        settingsTab: 'display',
-        arrow: 'right',
-        icon: '🎨',
-        label: '21 — 수익 / 손실 색상',
-        title: '내게 익숙한 색상 규칙으로 바꾸세요',
-        body: '수익·손실을 표시하는 색을 자유롭게 지정할 수 있어요. 국내 전통 방식(빨강=상승), 미국식(빨강=하락) 등 프리셋 버튼으로 한 번에 바꾸거나, 색상 피커로 직접 커스터마이징할 수 있습니다.',
-        tip: '💡 색상을 바꾼 뒤 꼭 "색상 저장" 버튼을 눌러야 반영돼요',
-    },
-    {
-        target: '.signal-settings-grid',
-        view: 'all',
-        modal: 'masterSettingsOverlay',
-        settingsTab: 'signal',
-        arrow: 'top',
-        icon: '📡',
-        label: '22 — 지표 설정',
-        title: '시장 신호 카드에 보여줄 지표를 고르세요',
-        body: '심리·리스크, 자금환경, 경기선행, 밸류에이션 그룹별로, 혹은 그 안의 개별 지표 단위로 표시 여부를 켜고 끌 수 있어요. 관심 없는 지표는 숨기고 자주 보는 지표만 남겨 대시보드를 깔끔하게 정리해보세요.',
-        tip: '💡 "전체 다시 표시" 버튼으로 숨긴 지표를 한 번에 복원할 수 있어요',
-    },
-    {
-        target: '#historyControlsBox',
-        view: 'history',
-        navSelector: '.vtab[onclick*="history"]',
-        arrow: 'top',
-        icon: '📜',
-        label: '23 — 거래 내역',
-        title: '전체 거래 이력을 필터링해서 조회하세요',
-        body: '국가·유형·계좌·기간·종목명으로 거래를 검색하고, 날짜 일괄수정·계좌 일괄변경 기능으로 잘못 입력된 정보를 한 번에 수정할 수 있어요. CSV 파일로 기존 거래 내역을 일괄 업로드할 수도 있습니다.',
-        tip: '💡 체크박스로 여러 건을 선택한 뒤 🏦 계좌 일괄변경 버튼을 누르면 선택한 거래의 계좌를 한 번에 바꿀 수 있어요',
-    },
-    {
-        target: 'button[onclick*="openBulkDateModal"]',
-        view: 'history',
-        navSelector: '.vtab[onclick*="history"]',
-        arrow: 'top',
-        icon: '📅',
-        label: '24 — 날짜 일괄수정',
-        title: '잘못 입력된 날짜를 한 번에 바로잡으세요',
-        body: '필터된 거래 전체의 날짜를 일괄 처리해요. 날짜 이동(N일 앞/뒤로), 날짜 치환(특정 날짜를 다른 날짜로 교체), 날짜 설정(모두 같은 날짜로 통일) 세 가지 모드를 지원합니다.',
-        tip: '💡 CSV로 대량 업로드한 뒤 날짜를 한 번에 정리할 때 특히 유용해요',
-    },
-    {
-        target: 'button[onclick*="openBulkAccountModal"]',
-        view: 'history',
-        arrow: 'top',
-        icon: '🏦',
-        label: '25 — 계좌 일괄변경',
-        title: '선택한 거래의 계좌를 한 번에 바꾸세요',
-        body: '표에서 체크박스로 거래를 선택한 뒤 이 버튼을 누르면, 새 계좌명을 입력하거나 기존 계좌 목록에서 골라 선택된 거래 전체의 계좌를 한 번에 변경할 수 있어요. 이미 있는 계좌명을 입력하면 두 계좌가 하나로 합쳐집니다.',
-        tip: '💡 상단 헤더의 전체선택 체크박스로 필터된 거래를 한 번에 모두 선택할 수 있어요',
-    },
-    {
-        target: '#newSankeyContainer, .real-flow-panel',
-        view: 'realized',
-        navSelector: '.vtab[onclick*="realized"]',
-        arrow: 'top',
-        icon: '💵',
-        label: '26 — 실현수익',
-        title: '매도를 통해 확정된 수익을 분석하세요',
-        body: '합산·국내·해외 실현손익을 균형 있게 3분할로 보여주고, 각 박스 안에는 계좌별 상세 실현손익 내역까지 바로 표시돼요. 해외주식 매도 시 양도소득세(22%)를 자동 계산해 신고 예정세액도 미리 확인할 수 있습니다.',
-        tip: '💡 랭킹 항목을 클릭하면 해당 종목의 거래 내역만 필터링됩니다',
-    },
-    {
-        target: '#realizedRankingPanel',
-        view: 'realized',
-        navSelector: '.vtab[onclick*="realized"]',
-        arrow: 'left',
-        icon: '🏆',
-        label: '27 — 실현수익 랭킹 & What if',
-        title: '어떤 종목이 수익을 가장 많이 줬는지 확인하세요',
-        body: '종목별 실현 수익금·수익률·단타 횟수 랭킹을 제공해요. 탭을 전환하며 수익금 순/수익률 순으로 정렬할 수 있고, "What if?" 섹션에서는 매도하지 않고 계속 보유했다면 지금 얼마였을지 가상 수익도 확인할 수 있어요.',
-        tip: '💡 랭킹 항목을 클릭하면 우측 표가 해당 종목의 거래 내역으로 바로 필터링돼요',
-    },
-    {
-        target: '#divStatBanner',
-        view: 'dividend',
-        navSelector: '.vtab[onclick*="dividend"]',
-        arrow: 'top',
-        icon: '🌿',
-        label: '28 — 배당통계',
-        title: '배당금 현황과 예정 배당을 추적하세요',
-        body: '누적 배당금을 국내·해외로 나눠 균형 있게 보여주고, 각 박스 안에 계좌별 배당금 상세 내역도 함께 표시돼요. 배당 주기를 자동 감지해 다음 예상 배당월과 예상 수령액을 보여주는 \"예정 배당\" 기능도 있어요.',
-        tip: '💡 배당 입력 시 \"세전 금액\" 체크하면 배당세(15.4%)가 자동 차감됩니다',
-    },
-    {
-        target: '#upcomingDivTableBody',
-        view: 'dividend',
-        navSelector: '.vtab[onclick*="dividend"]',
-        arrow: 'top',
-        icon: '🔮',
-        label: '29 — 예정 배당',
-        title: '다음에 받을 배당금을 미리 확인하세요',
-        body: '보유 종목의 과거 배당 패턴을 분석해 다음 배당 예상월과 예상 수령 금액을 자동으로 계산해줘요. 월·분기·반기·연 배당 주기를 파악해서 앞으로의 현금 흐름을 미리 계획하는 데 도움이 됩니다.',
-        tip: '💡 배당 주기와 예상월은 과거 배당 이력을 기반으로 추정한 값이라 실제와 다를 수 있어요',
-    },
-    {
-        target: '#moonlightShadowHost',
-        view: 'moonlight',
-        navSelector: '.vtab[onclick*="moonlight"]',
-        arrow: 'top',
-        icon: '🌕',
-        label: '30 — 달빛정보',
-        title: '통합 밸류에이션 대시보드를 확인하세요',
-        body: '심리·리스크, 자금환경, 경기선행, 밸류에이션 4대 카테고리를 종합한 0~100점 시장 점수를 더 자세히 보여줍니다. 적극적·중립적·보수적 3가지 계산 모드를 선택하면 상단 시장 신호 점수에도 동일하게 반영돼요.',
-        tip: '💡 점수가 낮을수록 저평가(매수 유리), 높을수록 고평가(비중축소 경고) 구간이에요',
-    },
-];
-
-// ── 페이지별 튜토리얼 스텝 ─────────────────────────────────
-// ── 페이지(뷰)별 표시 이름 — 튜토리얼이 다른 페이지로 넘어갈 때 안내 배지에 사용 ──
-const VIEW_LABELS = {
-    all:       { icon: '📊', name: '전체보기' },
-    user1:     { icon: '👤', name: '소유자1' },
-    user2:     { icon: '👥', name: '소유자2' },
-    watch:     { icon: '⭐', name: '관심종목' },
-    history:   { icon: '📜', name: '거래내역' },
-    realized:  { icon: '💵', name: '실현수익' },
-    dividend:  { icon: '🌿', name: '배당통계' },
-    moonlight: { icon: '🌕', name: '달빛정보' },
-};
-
-const PAGE_STEPS = {
-    all: [
-        {
-            target: '#marketSignalBar',
-            arrow: 'top',
-            icon: '📡',
-            label: '전체보기 — 시장 신호',
-            title: '실시간 매크로 지표를 분석합니다',
-            body: 'VIX·공포&탐욕·하이일드 스프레드 등 심리/리스크, 금리·달러·환율 등 자금 환경, Russell 2000·구리·BDI 등 경기 선행지표, 버핏지수·CAPE PE 밸류에이션을 종합해 시장 신호 점수를 계산합니다.',
-            tip: '💡 각 지표 카드 위에 마우스를 올리면 세부 설명을 볼 수 있어요',
-        },
-        {
-            target: '#allocationTreemap',
-            arrow: 'top',
-            icon: '🗺️',
-            label: '전체보기 — 포트폴리오 맵',
-            title: '트리맵으로 종목 비중을 확인하세요',
-            body: '클릭 → 종목 상세 차트 열기 / 꾹 누르기(롱프레스) → 선택 모드 진입. 선택 모드에서 국장/미장 일괄 선택 또는 태그별 선택으로 합산 평가금액을 즉시 계산합니다.',
-            tip: '💡 하단 태그 바 차트로 섹터별 자산 비중을 확인할 수 있어요',
-        },
-        {
-            target: '#localTagFilterContainer',
-            arrow: 'top',
-            icon: '🏷️',
-            label: '전체보기 — 태그 필터',
-            title: '태그로 종목을 그룹핑하고 필터링하세요',
-            body: '종목 카드의 🏷️ 버튼으로 태그를 설정하면 (예: 2차전지, 배당용, 장기투자) 여기서 태그별로 필터링할 수 있어요. 여러 태그를 동시에 선택하면 OR 조건으로 필터링됩니다.',
-            tip: '💡 태그는 포트폴리오 맵의 선택 모드에서도 활용할 수 있어요',
-        },
-        {
-            target: '#aiAdviceFab',
-            arrow: 'left',
-            icon: '🤖',
-            label: '전체보기 — AI 투자조언',
-            title: '내 자산 현황을 바탕으로 AI 의견을 받아보세요',
-            body: '우측 하단 버튼을 누르면 현재 시장 신호와 보유 포트폴리오를 함께 분석한 AI 투자조언을 받을 수 있어요. \"기록\" 버튼으로 이전에 받았던 조언들도 날짜별로 다시 볼 수 있습니다.',
-            tip: '⚠️ AI 조언은 참고용이며, 투자 판단과 책임은 본인에게 있어요',
-        },
-    ],
-
-    user1: [
-        {
-            target: '#dashboardTopWrapper',
-            arrow: 'top',
-            icon: '👤',
-            label: '소유자1 — 개인 포트폴리오',
-            title: '소유자1의 자산만 필터링해서 봅니다',
-            body: '거래 장부에서 소유자1로 입력된 거래만 집계해 별도 대시보드로 보여줍니다. 국내/해외 투자액, 평가액, 수익률이 소유자1 기준으로 표시돼요.',
-            tip: '💡 ⚙️ 설정 → 소유자 이름·아이콘·색상을 자유롭게 바꿀 수 있어요',
-        },
-        {
-            target: '#listOptionsBar',
-            arrow: 'top',
-            icon: '🗂️',
-            label: '소유자1 — 종목 보기 옵션',
-            title: '카드/리스트 뷰와 정렬을 조절하세요',
-            body: '카드형 보기와 리스트형 보기 중 선택하고, 등락률·평가금액·수익률 기준으로 정렬할 수 있습니다. ↕️/↔️ 버튼으로 국내/해외 섹션의 배치 방향도 바꿀 수 있어요.',
-            tip: '💡 🔍 검색창으로 종목명이나 티커를 빠르게 찾을 수 있어요',
-        },
-    ],
-
-    user2: [
-        {
-            target: '#dashboardTopWrapper',
-            arrow: 'top',
-            icon: '👥',
-            label: '소유자2 — 개인 포트폴리오',
-            title: '소유자2의 자산만 필터링해서 봅니다',
-            body: '거래 장부에서 소유자2로 입력된 거래만 집계해 별도 대시보드로 보여줍니다. 국내/해외 투자액, 평가액, 수익률이 소유자2 기준으로 표시돼요.',
-            tip: '💡 ⚙️ 설정 → 소유자 이름·아이콘·색상을 자유롭게 바꿀 수 있어요',
-        },
-        {
-            target: '#listOptionsBar',
-            arrow: 'top',
-            icon: '🗂️',
-            label: '소유자2 — 종목 보기 옵션',
-            title: '카드/리스트 뷰와 정렬을 조절하세요',
-            body: '카드형 보기와 리스트형 보기 중 선택하고, 등락률·평가금액·수익률 기준으로 정렬할 수 있습니다. ↕️/↔️ 버튼으로 국내/해외 섹션의 배치 방향도 바꿀 수 있어요.',
-            tip: '💡 🔍 검색창으로 종목명이나 티커를 빠르게 찾을 수 있어요',
-        },
-    ],
-
-    watch: [
-        {
-            target: '#watchlistSearchGroup',
-            arrow: 'top',
-            icon: '⭐',
-            label: '관심종목 — 종목 추가',
-            title: '관심 종목을 검색해서 추가하세요',
-            body: '국내/미국 필터를 선택한 뒤 종목명이나 티커를 입력하면 자동 완성 목록이 나타납니다. 종목을 선택하고 추가 버튼을 누르면 실시간 시세 모니터링이 시작돼요.',
-            tip: '💡 모바일에서는 상단 검색바를 이용해 관심종목을 추가할 수 있어요',
-        },
-        {
-            target: '#listOptionsBar',
-            arrow: 'top',
-            icon: '🏷️',
-            label: '관심종목 — 뷰 & 태그',
-            title: '카드/리스트 뷰와 태그를 활용하세요',
-            body: '카드형 보기에서는 미니 차트와 함께 시세를 확인하고, 리스트형 보기에서는 많은 종목을 한눈에 비교할 수 있어요. 각 종목에 태그를 달아 그룹별로 필터링할 수도 있습니다.',
-            tip: '💡 종목 카드에서 ✕ 버튼을 누르면 관심종목에서 삭제됩니다',
-        },
-    ],
-
-    history: [
-        {
-            target: '#historyControlsBox',
-            arrow: 'top',
-            icon: '🔍',
-            label: '거래내역 — 필터',
-            title: '다양한 조건으로 거래를 검색하세요',
-            body: '기간·소유자·시장(국내/미국)·거래유형(매수/매도/배당)·계좌·종목명으로 복합 필터링할 수 있습니다. 활성화된 필터는 우측에 배지로 표시되고, 클릭하면 해당 필터만 바로 해제됩니다.',
-            tip: '💡 📅 기간 선택 버튼으로 특정 날짜 범위만 조회할 수 있어요',
-        },
-        {
-            target: '#historyRankingPanel',
-            arrow: 'left',
-            icon: '🏆',
-            label: '거래내역 — 거래 랭킹',
-            title: '종목별 거래 통계와 랭킹을 확인하세요',
-            body: '좌측 패널에서 거래 횟수, 매수/매도 총액, 수익 기여도 등 종목별 거래 랭킹을 볼 수 있습니다. 항목을 클릭하면 우측 테이블이 해당 종목으로 바로 필터링돼요.',
-            tip: '💡 체크박스로 여러 거래를 선택한 뒤 일괄 삭제도 가능해요',
-        },
-        {
-            target: 'button[onclick*="openBulkDateModal"]',
-            arrow: 'top',
-            icon: '📅',
-            label: '거래내역 — 날짜 일괄수정',
-            title: '날짜를 한 번에 수정하거나 이동하세요',
-            body: '필터된 거래 전체의 날짜를 일괄 처리합니다. 날짜 이동(N일 앞/뒤로 이동), 날짜 치환(특정 날짜를 다른 날짜로 교체), 날짜 설정(모두 같은 날짜로 통일) 세 가지 모드가 있어요.',
-            tip: '💡 CSV 일괄 업로드 후 날짜를 한 번에 정리할 때 유용해요',
-        },
-        {
-            target: 'button[onclick*="openBulkAccountModal"]',
-            arrow: 'top',
-            icon: '🏦',
-            label: '거래내역 — 계좌 일괄변경',
-            title: '선택한 거래의 계좌를 한 번에 바꾸세요',
-            body: '표에서 체크박스로 거래를 선택한 뒤 이 버튼을 누르면, 새 계좌명을 입력하거나 기존 계좌 목록에서 골라 선택된 거래 전체의 계좌를 한 번에 변경할 수 있어요. 이미 있는 계좌명을 입력하면 두 계좌가 하나로 합쳐집니다.',
-            tip: '💡 상단 헤더의 전체선택 체크박스로 필터된 거래를 한 번에 모두 선택할 수 있어요',
-        },
-    ],
-
-    realized: [
-        {
-            target: '#newSankeyContainer, .real-flow-panel',
-            arrow: 'top',
-            icon: '💵',
-            label: '실현수익 — 수익 요약',
-            title: '확정된 수익의 전체 흐름을 파악하세요',
-            body: '합산 손익 · 국내주식 · 미국주식 순수익을 균형 있게 3분할로 보여줍니다. 국내/미국 박스 안에는 계좌별 실현손익 상세 내역이 바로 표시되어, 어느 계좌에서 얼마나 벌었는지 한눈에 비교할 수 있어요.',
-            tip: '💡 필터를 적용하면 특정 기간·종목·계좌의 실현수익만 집계됩니다',
-        },
-        {
-            target: '#capitalGainsTaxPanel',
-            arrow: 'top',
-            icon: '🧾',
-            label: '실현수익 — 양도소득세',
-            title: '해외주식 양도소득세를 자동으로 계산합니다',
-            body: '해외주식 매도 시 발생하는 양도소득세(22%)를 자동 계산합니다. 기본 공제(250만원)를 적용한 실질 납부 예정세액이 표시되므로 연말 세금 신고를 미리 준비할 수 있어요.',
-            tip: '💡 소유자 필터로 가족 구성원별 세금을 각각 확인할 수 있어요',
-        },
-        {
-            target: '#realizedRankingPanel',
-            arrow: 'left',
-            icon: '🏆',
-            label: '실현수익 — 종목 랭킹',
-            title: '수익을 가장 많이 준 종목을 확인하세요',
-            body: '종목별 실현 수익금, 수익률, 단타 횟수 랭킹을 제공합니다. 탭을 전환하며 수익금 순/수익률 순으로 정렬하고, 항목을 클릭하면 우측 테이블이 해당 종목으로 필터링됩니다.',
-            tip: '💡 \"What if?\" 섹션으로 매도하지 않고 보유했을 때의 가상 수익도 볼 수 있어요',
-        },
-    ],
-
-    dividend: [
-        {
-            target: '#divStatBanner',
-            arrow: 'top',
-            icon: '🌿',
-            label: '배당통계 — 배당금 요약',
-            title: '누적 배당금 현황을 한눈에 확인하세요',
-            body: '국내·해외 배당금을 환산해 합산하고, 국내/해외 비율을 막대 그래프로 보여줍니다. 각 박스 안에는 계좌별 배당금 상세 내역이 바로 표시돼요. 소유자·시장·계좌·기간 필터를 조합해 원하는 조건의 배당 내역만 분석할 수 있어요.',
-            tip: '💡 배당금 입력 시 \"세전 금액\" 옵션으로 배당세(15.4%)를 자동 차감할 수 있어요',
-        },
-        {
-            target: '#divStockList',
-            arrow: 'right',
-            icon: '🏆',
-            label: '배당통계 — 효자 종목',
-            title: '배당금을 가장 많이 준 종목을 확인하세요',
-            body: '좌측 패널에서 배당금 합계, 배당률, 연환산 배당수익률 순으로 정렬해 종목별 배당 기여도를 분석합니다. 종목을 클릭하면 우측에 해당 종목의 배당 내역만 필터링돼요.',
-            tip: '💡 1,000만원 투자 시 월 예상 세후 배당금도 자동으로 계산됩니다',
-        },
-        {
-            target: '#upcomingDivTableBody',
-            arrow: 'top',
-            icon: '🔮',
-            label: '배당통계 — 예정 배당',
-            title: '다음에 받을 배당금을 미리 확인하세요',
-            body: '보유 종목의 과거 배당 패턴을 분석해 다음 배당 예상월과 예상 수령 금액을 자동으로 계산합니다. 배당 주기(월·분기·반기·연)를 파악해 현금 흐름을 계획하는 데 도움이 됩니다.',
-            tip: '💡 배당 주기와 예상월은 과거 배당 이력을 기반으로 추정한 값입니다',
-        },
-    ],
-
-    moonlight: [
-        {
-            target: '#moonlightShadowHost',
-            arrow: 'top',
-            icon: '🌕',
-            label: '달빛정보 — 통합 밸류에이션',
-            title: '시장 전체의 저평가/고평가 상태를 진단하세요',
-            body: '심리·리스크(VIX·공포&탐욕 등), 자금환경(금리·달러·신용잔고), 경기선행(Russell·구리·BDI), 밸류에이션(버핏지수·CAPE PE) 4대 카테고리를 종합해 0~100점의 시장 신호 점수를 계산합니다.',
-            tip: '💡 0~30 적극 매수 · 30~50 분할 매수 · 50~70 관망 유지 · 70~100 비중 축소 구간이에요',
-        },
-        {
-            target: '#moonlightShadowHost',
-            arrow: 'top',
-            icon: '🌗',
-            label: '달빛정보 — 계산 모드',
-            title: '적극적·중립적·보수적 모드 중 선택하세요',
-            body: '지표별 가중치를 다르게 적용하는 3가지 계산 모드를 제공합니다. 여기서 모드를 바꾸면 전체보기 화면 상단의 \"시장 신호\" 종합 점수에도 동일한 모드가 함께 적용됩니다.',
-            tip: '💡 선택한 모드는 자동으로 저장되어 다음 접속 시에도 유지돼요',
-        },
-    ],
-};
-
-// ── 환영 모달 주입 ─────────────────────────────────────────
-function injectWelcomeModal() {
-    if ($('#tutorialWelcomeOverlay')) return;
-    const el = document.createElement('div');
-    el.id = 'tutorialWelcomeOverlay';
-    el.className = 'tutorial-welcome-overlay';
-    el.innerHTML = `
-      <div class="tutorial-welcome-modal" onclick="event.stopPropagation()">
-        <span class="tutorial-welcome-logo">🚀</span>
-        <h2>Two the Moon에 오신 걸 환영합니다!</h2>
-        <p>
-          국내·미국 주식 포트폴리오를 한 곳에서 관리하는
-          <span class="highlight-text">스마트 주식 장부</span>입니다.<br>
-          ${STEPS.length}단계 가이드로 핵심 기능을 바로 익혀보세요!
-        </p>
-
-        <div class="tutorial-feature-grid">
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">📡</span>
-            <span>실시간 <b>시장 신호</b><br>& 매크로 지표 분석</span>
-          </div>
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">🗺️</span>
-            <span>트리맵 <b>포트폴리오 맵</b><br>& 태그 그룹핑</span>
-          </div>
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">💵</span>
-            <span>실현수익 & <b>양도세 자동계산</b><br>배당통계 & 예정배당</span>
-          </div>
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">🤖</span>
-            <span><b>AI 투자조언</b><br>& 🌕 달빛정보 밸류에이션</span>
-          </div>
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">☁️</span>
-            <span>GitHub <b>클라우드 동기화</b><br>& 자동 백업</span>
-          </div>
-        </div>
-
-        <div class="tutorial-welcome-actions">
-          <button class="btn-tutorial-start" onclick="startTutorial()">
-            🎓 전체 가이드 시작하기 (${STEPS.length}단계)
-          </button>
-          <button class="btn-tutorial-skip" onclick="skipTutorial()">
-            건너뛰기 — 각 페이지 방문 시 자동 안내가 표시됩니다
-          </button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(el);
+:root { --bg: #0d0f14; --bg2: #141720; --bg3: #1c2030; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14); --text: #e8eaf0; --text2: #8890a4; --text3: #555e72; --green: #00c87a; --green-bg: rgba(0,200,122,0.1); --red: #ff4d6a; --red-bg: rgba(255,77,106,0.1); --blue: #4d9fff; --accent: #7c6af7; --accent-bg: rgba(124,106,247,0.12); --radius: 8px; --radius-lg: 12px; --font-mono: 'Space Mono', monospace; --font-sans: 'Noto Sans KR', sans-serif;
+  /* 🌟 익절(수익)=빨강, 손절(손실)=파랑 (한국 주식 컨벤션) */
+  --profit: #00C578; --profit-bg: rgba(26,219,30,0.12);
+  --loss: #3A9AFF;   --loss-bg:   rgba(58,154,255,0.12);
 }
 
-// ── 튜토리얼 DOM 주입 ─────────────────────────────────────
-function injectTutorialDOM() {
-    if ($('#tutorialCurtain_top')) return;
-
-    ['top','bottom','left','right'].forEach(dir => {
-        const c = document.createElement('div');
-        c.id = `tutorialCurtain_${dir}`;
-        c.className = 'tutorial-curtain';
-        c.style.display = 'none';
-        c.onclick = () => tutorialActive ? closeTutorial() : closePageTutorial();
-        document.body.appendChild(c);
-    });
-
-    const ring = document.createElement('div');
-    ring.id = 'tutorialHighlightRing';
-    ring.className = 'tutorial-highlight-ring';
-    ring.style.display = 'none';
-    document.body.appendChild(ring);
-
-    const tt = document.createElement('div');
-    tt.id = 'tutorialTooltip';
-    tt.className = 'tutorial-tooltip';
-    tt.style.display = 'none';
-    document.body.appendChild(tt);
-
-    const toast = document.createElement('div');
-    toast.id = 'tutorialDoneToast';
-    toast.className = 'tutorial-done-toast';
-    toast.innerHTML = '🎉 튜토리얼 완료! 이제 Two the Moon을 마음껏 사용하세요';
-    document.body.appendChild(toast);
+/* =====================================================
+   ☀️ 라이트 모드 CSS 변수
+   ===================================================== */
+[data-theme="light"] {
+  --bg: #f0f2f7;
+  --bg2: #ffffff;
+  --bg3: #e8eaf0;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.15);
+  --text: #1a1d2e;
+  --text2: #5a6070;
+  --text3: #9099b0;
+  --green: #009a5c;
+  --green-bg: rgba(0,154,92,0.1);
+  --red: #e02040;
+  --red-bg: rgba(224,32,64,0.1);
+  --blue: #2a7de1;
+  --accent: #6250e0;
+  --accent-bg: rgba(98,80,224,0.1);
+  --profit: #009a5c; --profit-bg: rgba(0,154,92,0.12);
+  --loss: #2a7de1;   --loss-bg:   rgba(42,125,225,0.12);
 }
 
-// ── 스포트라이트 포지셔닝 ─────────────────────────────────
-const PAD = 8;
+/* 라이트모드 스크롤바 */
+[data-theme="light"] * { scrollbar-color: rgba(98,80,224,0.3) transparent; }
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(98,80,224,0.22); }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(98,80,224,0.45); }
 
-function positionSpotlight(rect) {
-    const { top: t, left: l, right: r, bottom: b, width: w, height: h } = rect;
-    const vw = window.innerWidth, vh = window.innerHeight;
+/* 라이트모드 검색 드롭다운 */
+[data-theme="light"] .search-dropdown,
+[data-theme="light"] .tx-dropdown {
+  background-color: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+  border: 1px solid rgba(0,0,0,0.12) !important;
+}
+[data-theme="light"] .search-item:hover { background-color: #f0f2f7 !important; }
+[data-theme="light"] .header-search .search-input { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .header-search .search-input:focus { background: #fff; }
+[data-theme="light"] .toggle-group { background: rgba(0,0,0,0.06); }
+[data-theme="light"] .tx-owner-group,
+[data-theme="light"] .tx-type-group { background: rgba(0,0,0,0.05); }
+[data-theme="light"] .card:hover { border-color: rgba(0,0,0,0.2); }
+[data-theme="light"] .history-table tr:hover td { background: rgba(0,0,0,0.025); }
+[data-theme="light"] .overlay { background: rgba(0,0,0,0.5); }
+[data-theme="light"] #chartjs-tooltip { background: rgba(255,255,255,0.97); color: #1a1d2e; border-color: var(--border2); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+[data-theme="light"] .acc-bar-bg { background: rgba(0,0,0,0.06); }
+[data-theme="light"] .s-tab.active { background: rgba(0,0,0,0.06); }
+[data-theme="light"] .sidebar-header { background: rgba(0,0,0,0.02); }
+[data-theme="light"] .settings-section { background: rgba(0,0,0,0.02); }
+[data-theme="light"] .custom-tag-badge { background: rgba(0,0,0,0.05); }
+[data-theme="light"] .treemap-cell { border-color: #f0f2f7; }
 
-    function curtain(id, styles) {
-        const el = $(`#tutorialCurtain_${id}`);
-        if (el) Object.assign(el.style, { display: 'block', ...styles });
-    }
-    curtain('top',    { top:'0',           left:'0',          width:`${vw}px`,         height:`${t-PAD}px` });
-    curtain('bottom', { top:`${b+PAD}px`,  left:'0',          width:`${vw}px`,         height:`${vh-(b+PAD)}px` });
-    curtain('left',   { top:`${t-PAD}px`,  left:'0',          width:`${l-PAD}px`,      height:`${h+PAD*2}px` });
-    curtain('right',  { top:`${t-PAD}px`,  left:`${r+PAD}px`, width:`${vw-(r+PAD)}px`, height:`${h+PAD*2}px` });
+/* =====================================================
+   🌓 테마 토글 버튼
+   ===================================================== */
+.btn-theme-toggle {
+  padding: 5px 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font-family: var(--font-sans);
+  transition: 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+.btn-theme-toggle:hover { background: var(--bg3); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    const ring = $('#tutorialHighlightRing');
-    if (ring) Object.assign(ring.style, {
-        display: 'block',
-        top:    `${t - PAD}px`,
-        left:   `${l - PAD}px`,
-        width:  `${w + PAD*2}px`,
-        height: `${h + PAD*2}px`,
-    });
+/* =====================================================
+   🎨 전역 스크롤바 스타일 (다크 테마 통일)
+   ===================================================== */
+
+/* Firefox */
+* { scrollbar-width: thin; scrollbar-color: rgba(124,106,247,0.35) transparent; }
+
+/* Webkit (Chrome, Safari, Edge) — 전역 기본값 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: rgba(124,106,247,0.28);
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(124,106,247,0.55); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:active { background: rgba(124,106,247,0.75); background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* 주 대시보드 스크롤바 — 조금 더 눈에 띄게 */
+.dashboard-main::-webkit-scrollbar { width: 7px; }
+.dashboard-main::-webkit-scrollbar-track { background: var(--bg); }
+.dashboard-main::-webkit-scrollbar-thumb {
+    background: rgba(124,106,247,0.22);
+    border-radius: 10px;
+    border: 1px solid rgba(124,106,247,0.08);
+}
+.dashboard-main::-webkit-scrollbar-thumb:hover { background: rgba(124,106,247,0.5); }
+
+/* 사이드바 내부 스크롤 — 얇고 섬세하게 */
+.tx-list::-webkit-scrollbar,
+#sidebarYieldView::-webkit-scrollbar,
+.ledger-sidebar::-webkit-scrollbar { width: 3px; }
+.tx-list::-webkit-scrollbar-thumb,
+#sidebarYieldView::-webkit-scrollbar-thumb,
+.ledger-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(124,106,247,0.3);
+    border-radius: 10px;
+    border: none;
+}
+.tx-list::-webkit-scrollbar-thumb:hover,
+#sidebarYieldView::-webkit-scrollbar-thumb:hover { background: rgba(124,106,247,0.6); }
+
+/* 테이블 컨테이너 스크롤 */
+.history-table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+.history-table-container::-webkit-scrollbar-track { background: var(--bg2); border-radius: 0 0 var(--radius) var(--radius); }
+.history-table-container::-webkit-scrollbar-thumb {
+    background: rgba(124,106,247,0.3);
+    border-radius: 10px;
+}
+.history-table-container::-webkit-scrollbar-thumb:hover { background: rgba(124,106,247,0.55); }
+.history-table-container::-webkit-scrollbar-corner { background: var(--bg2); }
+
+/* 드롭다운/팝업 내부 스크롤 — 매우 얇게 */
+.search-dropdown::-webkit-scrollbar,
+.tx-dropdown::-webkit-scrollbar,
+#unmatchedContainer::-webkit-scrollbar,
+#divStockList::-webkit-scrollbar { width: 3px; }
+.search-dropdown::-webkit-scrollbar-thumb,
+.tx-dropdown::-webkit-scrollbar-thumb,
+#unmatchedContainer::-webkit-scrollbar-thumb,
+#divStockList::-webkit-scrollbar-thumb {
+    background: rgba(124,106,247,0.35);
+    border-radius: 10px;
 }
 
-function hideCurtains() {
-    ['top','bottom','left','right'].forEach(id => {
-        const el = $(`#tutorialCurtain_${id}`);
-        if (el) el.style.display = 'none';
-    });
-    const ring = $('#tutorialHighlightRing');
-    if (ring) ring.style.display = 'none';
+/* 모달 내부 스크롤 */
+.modal::-webkit-scrollbar { width: 4px; }
+.modal::-webkit-scrollbar-track { background: transparent; }
+.modal::-webkit-scrollbar-thumb { background: rgba(124,106,247,0.3); border-radius: 10px; }
+.modal::-webkit-scrollbar-thumb:hover { background: rgba(124,106,247,0.55); }
+
+/* 실현수익 랭킹 패널 */
+#realizedRankingPanel::-webkit-scrollbar { width: 3px; }
+#realizedRankingPanel::-webkit-scrollbar-thumb { background: rgba(124,106,247,0.3); border-radius: 10px; }
+
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; line-height: 1.5; }
+
+.logo { font-family: var(--font-sans); font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; white-space: nowrap; letter-spacing: -0.02em; }
+.logo svg { display: block; flex-shrink: 0; }
+
+.header-search { display: flex; align-items: center; position: relative; max-width: 280px; width: 100%; }
+.header-search .search-input { width: 100%; padding: 8px 36px 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-family: var(--font-sans); outline: none; transition: 0.2s; }
+.header-search .search-input:focus { background: var(--bg2); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,106,247,0.2); }
+.header-search .btn-add-icon { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: var(--accent); border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; line-height: 1; transition: 0.2s; box-shadow: 0 2px 6px rgba(124,106,247,0.4); }
+.header-search .btn-add-icon:hover { background: #6855e0; transform: translateY(-50%) scale(1.05); }
+.header-search .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; list-style: none; z-index: 99999; max-height: 280px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; }
+
+/* 🌟 검색 목록(드롭다운) 배경색 강제 지정 (투명도 제거) */
+.search-dropdown, .tx-dropdown {
+    background-color: #0d0f14 !important; /* 완전히 불투명한 아주 어두운 배경색 */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95) !important; /* 글씨가 묻히지 않게 아주 진한 그림자 추가 */
+    border: 1px solid rgba(255, 255, 255, 0.2) !important; /* 테두리를 살짝 밝게 해서 구분감 부여 */
 }
 
-// ── 스크롤이 끝나 좌표가 안정될 때까지 대기 ──────────────────
-// scrollIntoView(behavior:'smooth')는 비동기라서, 스크롤 직후 바로 좌표를
-// 읽으면 아직 이동 중인 옛 좌표를 잡게 되어 하이라이트/툴팁이 엉뚱한
-// 위치에 그려집니다. 좌표가 몇 프레임 연속으로 변하지 않을 때까지
-// requestAnimationFrame으로 기다린 뒤에 최종 좌표를 콜백으로 넘깁니다.
-function waitForStableRect(el, done) {
-    const startedAt = (window.performance && performance.now) ? performance.now() : Date.now();
-    let lastTop = null, lastLeft = null, stableFrames = 0;
-
-    function tick() {
-        if (!el.isConnected) { done(el.getBoundingClientRect()); return; }
-        const r = el.getBoundingClientRect();
-        const now = (window.performance && performance.now) ? performance.now() : Date.now();
-
-        if (lastTop !== null && Math.abs(r.top - lastTop) < 0.5 && Math.abs(r.left - lastLeft) < 0.5) {
-            stableFrames++;
-        } else {
-            stableFrames = 0;
-        }
-        lastTop = r.top;
-        lastLeft = r.left;
-
-        // 3프레임 연속으로 좌표가 그대로거나, 900ms를 넘기면(안전장치) 확정
-        if (stableFrames >= 3 || (now - startedAt) > 900) {
-            done(r);
-        } else {
-            requestAnimationFrame(tick);
-        }
-    }
-    requestAnimationFrame(tick);
+/* 🌟 검색된 종목(각 줄)에 마우스를 올렸을 때의 색상 */
+.search-item:hover {
+    background-color: #1c2030 !important; 
 }
 
-// 현재 스텝이 어느 페이지를 소개하는지 보여주는 배지 HTML
-function pageBadgeHtml(view) {
-    const v = VIEW_LABELS[view] || VIEW_LABELS.all;
-    return `<div class="tutorial-page-badge">${v.icon} ${v.name}</div>`;
+.btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border2); background: rgba(255,255,255,0.05); color: var(--text); font-family: var(--font-sans); transition: 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+.btn-sm:hover { background: var(--bg3); border-color: rgba(255,255,255,0.3); }
+
+.sync-status { font-size: 10px; font-family: var(--font-mono); color: var(--text3); display: flex; align-items: center; gap: 4px; padding: 0 8px; white-space: nowrap; }
+.sync-status.active { color: var(--green); }
+.sync-status.error { color: var(--red); }
+.sync-spinner { width: 8px; height: 8px; border: 2px solid var(--text3); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.layout-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+.ledger-sidebar { width: 330px; min-width: 330px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; }
+.ledger-sidebar.collapsed { margin-left: -330px; border-right: none; }
+
+.sidebar-header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
+.sidebar-tabs { display: flex; gap: 6px; }
+.s-tab { background: transparent; border: none; color: var(--text3); font-size: 14px; font-weight: 700; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; font-family: var(--font-sans); }
+.s-tab:hover { color: var(--text2); }
+.s-tab.active { color: var(--text); background: rgba(255,255,255,0.05); }
+
+.btn-icon-sm { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; line-height: 1; padding: 0; transition: color 0.2s; }
+.btn-icon-sm:hover { color: var(--text); }
+
+.tx-form { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; position: relative; }
+.form-group label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 5px; }
+.form-input { width: 100%; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 13px; font-family: var(--font-sans); outline: none; transition: border-color 0.2s; }
+.form-input:focus { border-color: var(--accent); }
+.btn-submit { width: 100%; padding: 12px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 5px; transition: 0.2s; }
+.btn-submit:hover { background: #6855e0; }
+
+.edit-mode-banner { position: absolute; top: 0; left: 0; right: 0; background: var(--accent-bg); color: var(--accent); font-size: 11px; font-weight: bold; text-align: center; padding: 4px; display: none; z-index: 10; border-bottom: 1px solid var(--accent); }
+.btn-cancel-edit { position: absolute; right: 8px; top: 4px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; font-weight: bold; }
+.btn-cancel-edit:hover { text-decoration: underline; }
+
+.btn-edit-owners { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; text-decoration: underline; transition: color 0.2s; padding: 0; }
+.btn-edit-owners:hover { color: var(--accent); }
+
+.hidden-radio { display: none; }
+.toggle-group { display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+.toggle-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--text3); border-radius: 6px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.toggle-btn:hover { color: var(--text2); background: rgba(255,255,255,0.05); }
+
+input[name="txOwner"]:checked + .toggle-btn { background: var(--bg3); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border-color: var(--border2); }
+input#typeBuy:checked + .type-buy { background: var(--red-bg); color: var(--red); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,77,106,0.3); }
+input#typeSell:checked + .type-sell { background: rgba(77, 159, 255, 0.15); color: var(--blue); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(77,159,255,0.3); }
+input#typeDiv:checked + .type-div { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,200,122,0.3); }
+input#typeTransfer:checked + .type-transfer { background: rgba(255,183,3,0.15); color: #ffb703; box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,183,3,0.3); }
+input#typeSplitTx:checked + .type-split { background: rgba(124,106,247,0.15); color: var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(124,106,247,0.3); }
+
+/* ── 거래 장부 소유자/유형 통합 블록 ── */
+.tx-owner-type-wrap { background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 0; }
+.tx-meta-row { display: flex; }
+.tx-meta-block { flex: 1; }
+.tx-meta-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.tx-meta-label span { font-size: 10px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.tx-owner-group { background: rgba(0,0,0,0.25); }
+.tx-type-group { background: rgba(0,0,0,0.25); gap: 3px; }
+.tx-type-group .toggle-btn { flex: 1; padding: 7px 2px; flex-direction: column; gap: 2px; font-size: 10px; font-weight: 700; }
+.tx-type-group .type-icon { font-size: 13px; line-height: 1; }
+.tx-type-group .type-text { font-size: 10px; }
+
+.broker-tag { padding: 4px 8px; font-size: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text2); cursor: pointer; transition: 0.2s; font-family: var(--font-sans); }
+.broker-tag:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.05); }
+
+.tx-search-container { position: relative; }
+.tx-dropdown { position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; list-style: none; z-index: 100; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: none; min-width: 290px;}
+.search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+.search-item:hover { background: var(--bg2); }
+
+.tx-history-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; }
+.tx-list { flex: 1; overflow-y: auto; padding: 0 20px 20px; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tx-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 12px; position: relative; transition: border-color 0.2s;}
+.tx-card:hover { border-color: var(--border2); }
+.tx-card-head { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--text2); font-size: 11px; }
+.tx-card-body { display: flex; justify-content: space-between; align-items: flex-end; }
+.tx-sym { font-family: var(--font-sans); font-weight: 700; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; display: inline-block; }
+
+.tx-actions { display: flex; gap: 8px; }
+.tx-action-btn { cursor: pointer; color: var(--text3); font-size: 12px; transition: color 0.2s; background: none; border: none; padding: 0; }
+.tx-action-btn:hover.tx-edit { color: var(--accent); }
+.tx-action-btn:hover.tx-del { color: var(--red); }
+
+.tx-owner-badge { cursor: pointer; padding: 2px 8px; border-radius: 4px; transition: 0.2s; display: inline-block; margin-bottom: 3px; font-size: 10px; font-weight: bold; }
+.tx-owner-badge:hover { filter: brightness(1.2); }
+
+#btnOpenSidebar { position: absolute; left: 0; top: 15px; width: 22px; height: 36px; background: var(--bg2); border: 1px solid var(--border); border-left: none; border-radius: 0 6px 6px 0; color: var(--text3); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.2s; font-size: 10px; padding: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.4); }
+#btnOpenSidebar:hover { color: var(--accent); background: var(--bg3); }
+
+.dashboard-main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 2rem 0; background: var(--bg); position: relative; }
+
+.dashboard-top-wrapper { display: flex; flex-direction: column; gap: 15px; margin-bottom: 1rem; margin-top: 1.5rem; flex-shrink: 0; }
+#marketSignalBar[style*="display: none"] ~ #dashboardTopWrapper,
+#marketSignalBar[style*="display:none"] ~ #dashboardTopWrapper {
+  margin-top: 2.5rem;
+}
+.dashboard-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: stretch; }
+@media (max-width: 1400px) { .dashboard-top { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) { .dashboard-top { grid-template-columns: 1fr; } }
+
+.country-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
+.cp-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.cp-title { font-size: 15px; font-weight: 700; color: var(--text); }
+
+.cp-summary { display: flex; gap: 15px; }
+.cp-sum-box { flex: 1; }
+.cp-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.cp-sum-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
+.cp-sum-val.up { color: var(--profit); } .cp-sum-val.down { color: var(--loss); }
+
+/* 🚀 비행 계획(도킹 지점·비상 탈출·연료 보급) 알림 배너 스타일은 /plus/flightplan.css로 이동했습니다 (Plus 전용). */
+
+/* 🛰️ 상세카드(모달) 전용 탐사선 버튼 - 관심종목 페이지 하단의 probeFabBtn과 동일한 디자인
+   (그라디언트 테두리 알약형, 아이콘 전용 원형 → 호버 시 문구가 펼쳐지는 방식)
+   위치는 모달 우측 상단, 닫기(✕) 버튼 바로 왼쪽에 배치합니다.
+   너비/높이를 고정값으로 지정해 완전한 원형을 보장하고, 아이콘은 flex 중앙 정렬로 항상 정중앙에 오도록 합니다.
+   (선택자 특이도를 높여 probe.js 등 다른 스크립트가 주입하는 스타일보다 항상 우선 적용되도록 함) */
+#chartOverlay .modal #probeModalFab.probe-fab-modal {
+  display: inline-flex !important;
+  position: static !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  flex-shrink: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 0;
+  border-radius: 999px !important;
+  overflow: hidden;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, width 0.35s ease, max-width 0.35s ease, padding 0.35s ease;
+  border: 2.75px solid transparent !important;
+  background-image: linear-gradient(#fff,#fff), linear-gradient(120deg,#2563eb 0%,#06b6d4 45%,#6366f1 100%) !important;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  color: #1e3a5f !important;
+  box-shadow: 0 4px 14px rgba(6,182,212,0.35);
+  white-space: nowrap;
+}
+#chartOverlay .modal #probeModalFab.probe-fab-modal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(6,182,212,0.5);
+}
+#chartOverlay .modal #probeModalFab.probe-fab-modal .probe-fab-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  font-size: 20px;
+  line-height: 1;
+  transform: translate(-1.5px, -1px);
+  transition: transform 0.2s ease;
+}
+#chartOverlay .modal #probeModalFab.probe-fab-modal:hover .probe-fab-icon {
+  transform: translate(-1.5px, -1px) scale(1.5);
+}
+#chartOverlay .modal #probeModalFab.probe-fab-modal .probe-fab-label {
+  display: none;
 }
 
-// 진행 점(dot) 줄에서 현재 스텝의 점이 항상 보이도록 가운데로 스크롤
-function centerActiveDot(tooltipEl) {
-    const row = tooltipEl.querySelector('.tutorial-progress-dots');
-    const active = row && row.querySelector('.tutorial-dot.active');
-    if (!row || !active) return;
-    row.scrollLeft = active.offsetLeft - (row.clientWidth / 2) + (active.offsetWidth / 2);
+/* 🚀 실제 보유 중인 종목의 상세카드에서는 탐사선 버튼을 강제로 숨깁니다 (관심종목엔 영향 없음) */
+#chartOverlay .modal #probeModalFab.probe-fab-modal.probe-fab-hidden-held { display: none !important; }
+
+/* 🚀 관심종목(비보유) 상세창에는 비행계획 패널이 필요 없으므로 숨김 */
+#chartOverlay .modal #mFlightPlanPanel.flight-plan-panel-hidden-watchlist { display: none !important; }
+
+.cp-accounts { display: flex; flex-direction: column; gap: 10px; height: auto; }
+.acc-row { background: var(--bg3); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
+.acc-row:hover { border-color: var(--border2); }
+.acc-row.active-filter { border-color: var(--accent); background: rgba(124,106,247,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+/* 1. 파이 그래프 애니메이션 (기존 .acc-pie-wrap 속성을 이걸로 교체/덮어쓰기) */
+.acc-pie-wrap {
+    width: 85px; 
+    height: 85px; 
+    position: relative; 
+    flex-shrink: 0;
+    margin-right: 16px; /* 텍스트 영역과의 간격 분리 */
+    overflow: hidden;   /* 크기가 0이 될 때 캔버스가 삐져나오지 않게 숨김 처리 */
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                margin 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top center;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.acc-content { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.acc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px; }
+.acc-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acc-count { font-weight: normal; font-size: 11px; color: var(--text3); margin-left: 4px; }
+.acc-pnl { display: flex; align-items: baseline; gap: 6px; font-family: var(--font-mono); font-size: 14px; font-weight: 700; }
+.acc-pnl.up { color: var(--profit); } .acc-pnl.down { color: var(--loss); }
+.acc-roi { font-size: 11px; font-weight: 500; }
+
+.acc-bars { display: flex; flex-direction: column; gap: 6px; }
+.acc-bar-row { display: flex; align-items: center; gap: 8px; }
+.acc-bar-label { font-size: 14px; color: var(--text2); width: 32px; flex-shrink: 0; }
+.acc-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+.acc-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+
+/* 활성화 시 밑으로 빨려 들어가며 사라지는 효과 */
+.acc-row.active-filter .acc-pie-wrap {
+    width: 0px;
+    height: 0px;
+    margin-right: 0px;
+    opacity: 0;
+    transform: translateY(40px) scale(0.2); 
+}
+/* 2. 평가금액 / 투자금액 폰트 1.5배 확대 애니메이션 */
+.acc-bar-val { 
+    font-family: var(--font-mono); 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: var(--text); 
+    width: 100px; 
+    text-align: right; 
+    flex-shrink: 0;
+    transition: font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* 선택 시 14px -> 21px로 커짐 */
+.acc-row.active-filter .acc-bar-val {
+    font-size: 21px; 
+    width: 150px; /* 폰트가 커지면서 줄바꿈이 일어나지 않도록 공간 추가 확보 */
 }
 
-function positionTooltip(targetRect, arrow) {
-    const tt = $('#tutorialTooltip');
-    if (!tt) return;
+/* (선택) 시각적 밸런스를 위해 위쪽 총 수익금 및 계좌명 폰트도 비율에 맞게 살짝 키워줍니다 */
+.acc-pnl, .acc-roi, .acc-name, .acc-bar-label { 
+    transition: font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+.acc-row.active-filter .acc-pnl { font-size: 18px; }
+.acc-row.active-filter .acc-roi { font-size: 13px; }
+.acc-row.active-filter .acc-name { font-size: 16px; }
+.acc-row.active-filter .acc-bar-label { font-size: 16px; }
 
-    tt.className = `tutorial-tooltip arrow-${arrow}`;
-    tt.style.display = 'block';
+.list-options-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; flex-shrink: 0; position: sticky; top: 0; z-index: 30; background: var(--bg); margin-left: -2rem; margin-right: -2rem; padding-left: 2rem; padding-right: 2rem; padding-top: 10px; }
+.list-title-wrap { display: flex; align-items: center; gap: 12px; }
+.section-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin: 0; }
 
-    const TW = tt.offsetWidth  || 300;
-    const TH = tt.offsetHeight || 260;
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const MARGIN = 14;
+.list-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+select.sort-select { background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: var(--font-sans); outline: none; cursor: pointer; }
+.btn-sort-dir { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); border-radius: 6px; padding: 4px 8px; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 32px; }
+.btn-sort-dir:hover { background: var(--bg3); color: var(--text); }
 
-    let top, left;
+.range-group { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
+.rtab { padding: 4px 12px; font-size: 11px; font-family: var(--font-mono); background: transparent; border: none; color: var(--text2); cursor: pointer; border-radius: 4px; transition: background 0.15s, color 0.15s, max-width 0.6s cubic-bezier(0.4,0,0.2,1), opacity 0.5s ease, padding 0.6s cubic-bezier(0.4,0,0.2,1); max-width: 120px; overflow: hidden; }
+.rtab.active { background: var(--accent); color: #fff; }
+.rtab:hover:not(.active) { background: var(--bg3); color: var(--text); }
 
-    if (arrow === 'top') {
-        top  = (targetRect ? targetRect.bottom + PAD + MARGIN : vh / 2 - TH / 2);
-        left = targetRect ? Math.min(targetRect.left, vw - TW - MARGIN) : vw / 2 - TW / 2;
-    } else if (arrow === 'bottom') {
-        top  = (targetRect ? targetRect.top - TH - PAD - MARGIN : vh / 2 - TH / 2);
-        left = targetRect ? Math.min(targetRect.left, vw - TW - MARGIN) : vw / 2 - TW / 2;
-    } else if (arrow === 'left') {
-        left = (targetRect ? targetRect.right + PAD + MARGIN : vw / 2 - TW / 2);
-        top  = targetRect ? targetRect.top : vh / 2 - TH / 2;
-    } else {
-        left = (targetRect ? targetRect.left - TW - PAD - MARGIN : vw / 2 - TW / 2);
-        top  = targetRect ? targetRect.top : vh / 2 - TH / 2;
-    }
+/* 🎚️ 상단 "조회 기간" 드롭다운 — 버튼 9개를 나열하던 바 대신, 화면 폭에 상관없이 항상 고정된 좁은 폭만 차지 */
+.range-select {
+  flex-shrink: 0;
+  width: 60px;
+  height: 34px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  text-align: center;
+  text-align-last: center;
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.range-select:hover { background: var(--bg3); border-color: var(--accent); }
+.range-select:focus { outline: none; border-color: var(--accent); }
+.range-select option { background: var(--bg2); color: var(--text); text-align: left; }
+.range-select option:disabled { color: var(--text3); }
 
-    left = Math.max(MARGIN, Math.min(left, vw - TW - MARGIN));
-    top  = Math.max(MARGIN, Math.min(top,  vh - TH - MARGIN));
-
-    tt.style.top  = `${top}px`;
-    tt.style.left = `${left}px`;
+/* 🎚️ 기간 드롭다운 — 커스텀 스타일 버전 (네이티브 select는 숨기고 이 UI로 대체) */
+.range-dropdown {
+  position: relative;
+  flex-shrink: 0;
+}
+.range-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 64px;
+  height: 34px;
+  padding: 0 10px 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.range-select-trigger:hover {
+  background: var(--bg3);
+  border-color: var(--accent);
+}
+.range-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg, rgba(124,106,247,0.18));
+}
+.range-select-arrow {
+  flex-shrink: 0;
+  color: var(--text3);
+  transition: transform 0.2s ease, color 0.15s ease;
+}
+.range-dropdown.open .range-select-arrow {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+.range-dropdown.open .range-select-trigger {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg, rgba(124,106,247,0.18));
 }
 
-// ── 뷰 전환 헬퍼 (스텝에 view가 지정되어 있으면 해당 화면으로 자동 이동) ──
-function ensureStepView(step, callback) {
-    const targetView = step && step.view;
-    if (!targetView || typeof setView !== 'function') { callback(); return; }
-
-    const nowView = (typeof currentView !== 'undefined') ? currentView : null;
-    if (nowView === targetView) { callback(); return; }
-
-    try {
-        const navBtn = step.navSelector ? $(step.navSelector) : null;
-        setView(targetView, navBtn);
-    } catch (e) { /* 화면 전환 실패 시에도 가이드는 계속 진행 */ }
-
-    // 화면이 바뀐 뒤 대시보드가 그려질 시간을 잠깐 기다립니다
-    // (달빛정보는 비동기로 콘텐츠를 불러오므로 조금 더 여유를 둡니다)
-    setTimeout(callback, targetView === 'moonlight' ? 450 : 150);
+.range-select-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 100px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.16);
+  padding: 6px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.97);
+  transform-origin: top right;
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+}
+.range-dropdown.open .range-select-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.range-select-option {
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text2);
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.12s ease, color 0.12s ease;
+  user-select: none;
+}
+.range-select-option:hover {
+  background: rgba(124, 106, 247, 0.1);
+  color: var(--text);
+}
+.range-select-option.active {
+  background: var(--accent);
+  color: #fff;
+}
+.range-select-option.active:hover {
+  background: var(--accent);
 }
 
-// ── 모달 헬퍼 (스텝에 modal이 지정되어 있으면 해당 모달을 열고 탭도 전환) ──
-function ensureStepModal(step, callback) {
-    const overlay = document.getElementById('masterSettingsOverlay');
-    const needsModal = !!(step && step.modal);
-
-    if (!needsModal) {
-        if (overlay && overlay.classList.contains('open') && typeof closeModal === 'function') {
-            closeModal('masterSettingsOverlay');
-        }
-        callback();
-        return;
-    }
-
-    if (typeof openMasterSettingsModal === 'function') openMasterSettingsModal();
-    if (step.settingsTab && typeof switchSettingsTab === 'function') switchSettingsTab(step.settingsTab);
-    setTimeout(callback, 200);
+/* ── 라이트 모드 ── */
+[data-theme="light"] .range-select-menu {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .range-select-option:hover {
+  background: rgba(98, 80, 224, 0.08);
 }
 
-// ── 메인 튜토리얼 스텝 렌더 ───────────────────────────────
-function renderStep(idx) {
-    ensureStepView(STEPS[idx], () => ensureStepModal(STEPS[idx], () => paintStep(idx)));
+/* 🏆 사이드바 "평가 자산 랭킹" — "{소유자} {종목 기준} {정렬 기준} 기준 랭킹" 문장형 드롭다운 */
+.yield-rank-phrase {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+}
+.yield-rank-phrase .yield-phrase-suffix {
+  color: var(--text2);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.yield-phrase-dd {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.yield-phrase-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--accent);
+  cursor: pointer;
+  border-bottom: 1.5px dashed var(--accent);
+  padding: 0 1px 1px;
+  transition: opacity 0.12s ease;
+  white-space: nowrap;
+}
+.yield-phrase-word::after {
+  content: '';
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 4.5px solid var(--accent);
+  opacity: 0.7;
+  transition: transform 0.16s ease;
+}
+.yield-phrase-dd.open .yield-phrase-word::after {
+  transform: rotate(180deg);
+}
+.yield-phrase-word:hover {
+  opacity: 0.75;
+}
+.yield-phrase-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 96px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.16);
+  padding: 6px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.97);
+  transform-origin: top left;
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+}
+.yield-phrase-dd.open .yield-phrase-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.yield-phrase-option {
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text2);
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease;
+  user-select: none;
+}
+.yield-phrase-option:hover {
+  background: rgba(124, 106, 247, 0.1);
+  color: var(--text);
+}
+.yield-phrase-option.active {
+  background: var(--accent);
+  color: #fff;
+}
+.yield-phrase-option.active:hover {
+  background: var(--accent);
+}
+[data-theme="light"] .yield-phrase-menu {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .yield-phrase-option:hover {
+  background: rgba(98, 80, 224, 0.08);
 }
 
-function paintStep(idx) {
-    const step = STEPS[idx];
-    const total = STEPS.length;
+.grid-container { padding-bottom: 40px; container-type: inline-size; container-name: cardregion; }
+/* 좌우(KR/US) 분할 배치 시 각 영역(region-col)도 별도의 컨테이너 쿼리 기준이 됩니다 */
+.region-col { container-type: inline-size; container-name: cardregion; }
 
-    let targetEl = step.target ? $(step.target) : null;
-    if (targetEl) {
-        const rect = targetEl.getBoundingClientRect();
-        if (rect.width === 0 && rect.height === 0) targetEl = null;
-    }
-
-    const dots = STEPS.map((_, i) => {
-        const cls = i === idx ? 'active' : (i < idx ? 'done' : '');
-        return `<div class="tutorial-dot ${cls}" onclick="goToStep(${i})" title="${i+1}단계"></div>`;
-    }).join('');
-
-    const tt = $('#tutorialTooltip');
-    const isLast = idx === total - 1;
-    const html = `
-      <button class="btn-tutorial-close-x" onclick="closeTutorial()" title="튜토리얼 닫기">✕</button>
-      ${pageBadgeHtml(step.view)}
-      <div class="tutorial-tooltip-step">${step.label}</div>
-      <span class="tutorial-tooltip-icon">${step.icon}</span>
-      <h3>${step.title}</h3>
-      <p>${step.body}</p>
-      ${step.tip ? `<div class="tip-tag">${step.tip}</div>` : ''}
-      <div class="tutorial-nav">
-        <button class="btn-tutorial-prev" onclick="prevStep()" ${idx === 0 ? 'disabled' : ''}>← 이전</button>
-        <div class="tutorial-progress-dots">${dots}</div>
-        <button class="btn-tutorial-next" onclick="nextStep()">
-          ${isLast ? '🎉 완료!' : '다음 →'}
-        </button>
-      </div>
-    `;
-
-    // 내용을 먼저 채운 뒤(콘텐츠에 맞는 실제 높이가 나온 뒤) 좌표를 계산해야
-    // 이전 스텝의 크기를 기준으로 위치가 어긋나는 문제가 생기지 않습니다.
-    function finishRender(rect) {
-        tt.innerHTML = html;
-        if (rect) {
-            positionSpotlight(rect);
-            positionTooltip(rect, step.arrow);
-        } else {
-            hideCurtains();
-            positionTooltip(null, 'top');
-        }
-        centerActiveDot(tt);
-    }
-
-    if (targetEl) {
-        // 스크롤이 끝나 좌표가 완전히 안정된 뒤에 하이라이트/툴팁을 그림
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        waitForStableRect(targetEl, finishRender);
-    } else {
-        finishRender(null);
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  align-content: start;
+}
+/* 🌟 카드 그리드 반응형: 컨테이너(영역) 너비 기준으로 3열 → 2열 → 1열 순으로 줄어듭니다.
+   좌우(KR/US) 분할 배치처럼 그리드의 실제 폭이 화면 전체 폭과 다른 경우에도
+   정확히 동작하도록 뷰포트가 아닌 컨테이너 쿼리를 사용합니다.
+   (container-type은 .grid 자신이 아니라 가장 가까운 상위 요소에 지정해야
+   grid 레이아웃과 컨테이너 크기 계산이 서로 얽히지 않고 안정적으로 동작합니다) */
+@container cardregion (max-width: 660px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@container cardregion (max-width: 320px) {
+  .grid { grid-template-columns: 1fr; }
 }
 
-// ── 페이지 튜토리얼 렌더 ──────────────────────────────────
-function renderPageStep(idx) {
-    const step = currentPageSteps[idx];
-    const total = currentPageSteps.length;
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 12px; position: relative; cursor: pointer; transition: 0.15s; overflow: hidden; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.card.up::before { background: var(--profit); } .card.down::before { background: var(--loss); }
+.card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
 
-    let targetEl = step.target ? $(step.target) : null;
-    if (targetEl) {
-        const rect = targetEl.getBoundingClientRect();
-        if (rect.width === 0 && rect.height === 0) targetEl = null;
-    }
+.card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); border: 1px solid rgba(0,0,0,0.2); }
+.tag-held { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+.country-badge { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 6px; color: #fff; font-family: var(--font-mono); }
+.card-tag .divider { margin: 0 6px; opacity: 0.5; font-weight: normal; }
+.card-tag .broker-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.95; max-width: 180px; }
+.card-tag .icon { margin-right: 4px; font-size: 12px; }
 
-    const dots = currentPageSteps.map((_, i) => {
-        const cls = i === idx ? 'active' : (i < idx ? 'done' : '');
-        return `<div class="tutorial-dot ${cls}" onclick="pageGoToStep(${i})" title="${i+1}단계"></div>`;
-    }).join('');
+.card-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.04em; }
+.badge-up { background: var(--profit-bg); color: var(--profit); } .badge-down { background: var(--loss-bg); color: var(--loss); } .badge-flat { background: var(--bg3); color: var(--text2); }
 
-    const tt = $('#tutorialTooltip');
-    const isLast = idx === total - 1;
-    const html = `
-      <button class="btn-tutorial-close-x" onclick="closePageTutorial()" title="닫기">✕</button>
-      ${pageBadgeHtml(currentPageView)}
-      <div class="tutorial-tooltip-step" style="background:rgba(0,200,122,0.1); border-color:rgba(0,200,122,0.3); color:var(--green);">${step.label}</div>
-      <span class="tutorial-tooltip-icon">${step.icon}</span>
-      <h3>${step.title}</h3>
-      <p>${step.body}</p>
-      ${step.tip ? `<div class="tip-tag">${step.tip}</div>` : ''}
-      <div class="tutorial-nav">
-        <button class="btn-tutorial-prev" onclick="pagePrevStep()" ${idx === 0 ? 'disabled' : ''}>← 이전</button>
-        <div class="tutorial-progress-dots">${dots}</div>
-        <button class="btn-tutorial-next" onclick="pageNextStep()">
-          ${isLast ? '✅ 닫기' : '다음 →'}
-        </button>
-      </div>
-      <div style="text-align:center; margin-top:8px;">
-        <button onclick="dontShowPageTutorial()" style="background:none; border:none; font-size:10px; color:var(--text3); cursor:pointer; font-family:var(--font-sans);">다시 보지 않기</button>
-      </div>
-    `;
+.card-price { font-family: var(--font-mono); font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+.chart-wrap { height: 80px; position: relative; display: flex; align-items: center; justify-content: center; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text2); line-height: 1.4; }
 
-    // 내용을 먼저 채운 뒤(콘텐츠에 맞는 실제 높이가 나온 뒤) 좌표를 계산해야
-    // 이전 스텝의 크기를 기준으로 위치가 어긋나는 문제가 생기지 않습니다.
-    function finishRender(rect) {
-        tt.innerHTML = html;
-        if (rect) {
-            positionSpotlight(rect);
-            positionTooltip(rect, step.arrow);
-        } else {
-            hideCurtains();
-            positionTooltip(null, 'top');
-        }
-        centerActiveDot(tt);
-    }
+.empty { grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text3); border: 1px dashed var(--border2); border-radius: var(--radius-lg); font-size: 13px; }
+.btn-danger { color: var(--text3); border-color: transparent; background: transparent; padding: 4px 8px; font-size: 11px; font-family: var(--font-sans); border-radius: 4px; cursor: pointer; transition: 0.2s; }
+.btn-danger:hover { background: var(--red-bg); color: var(--red); }
 
-    if (targetEl) {
-        // 스크롤이 끝나 좌표가 완전히 안정된 뒤에 하이라이트/툴팁을 그림
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        waitForStableRect(targetEl, finishRender);
-    } else {
-        finishRender(null);
-    }
+#dividendDashboard, #historyDashboard, #realizedDashboard { 
+    display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem;
+    margin-right: -2rem;
+    padding-right: 2rem;
+}
+#dividendDashboard > .page-controls-box,
+#historyDashboard > .page-controls-box,
+#realizedDashboard > .page-controls-box { 
+    margin-top: 0; position: sticky; top: 0; z-index: 50; 
+}
+.div-chart-area { flex: 1.5; min-height: 300px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
+.div-list-area { flex: 1; height: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; }
+.div-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.div-item:last-child { border-bottom: none; }
+
+/* 배당통계와 동일하게 상하 패딩 통일 */
+/* #historyDashboard { display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem; height: 100%; } */
+#realizedDashboard { display: none; flex-direction: column; padding-bottom: 40px; padding-top: 1.5rem; }
+.history-table-container { flex: 1; overflow-y: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); }
+.history-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+.history-table th { padding: 12px 16px; color: var(--text3); font-weight: 700; background: var(--bg3); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.history-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.history-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.overlay.open { display: flex; }
+.modal { background: var(--bg2); padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; border: 1px solid var(--border2); animation: fadeUp 0.2s ease; }
+
+/* 🌟 종목 상세카드(차트 모달)는 우측 비행 계획 설정 패널 공간 확보를 위해 더 넓게 (그래프는 기존 크기 유지) */
+#chartOverlay .modal { max-width: 1127px; } /* 🌟 비행계획 패널 1.5배 확대(190px→285px, /plus/flightplan.css)만큼 함께 확대 */
+
+/* 🚀 비행 계획(도킹 지점·비상 탈출·연료 보급) 설정 패널 스타일은 /plus/flightplan.css로 이동했습니다 (Plus 전용). */
+
+/* 📋 매매기록 요약 / What if 그리드 - 넓어진 모달 폭에 맞춰 4열, 좁아지면 2열로 */
+.mts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+@media (max-width: 900px) {
+  #chartOverlay .modal { max-width: 600px; }
+  #chartOverlay .modal > div[style*="display:flex; gap:16px"] { flex-direction: column; }
+  .mts-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-// ── 페이지 튜토리얼 트리거 ────────────────────────────────
-function showPageTutorial(view) {
-    if (tutorialActive) return;
-    const steps = PAGE_STEPS[view];
-    if (!steps || steps.length === 0) return;
-    const key = PAGE_DONE_PREFIX + view;
-    if (localStorage.getItem(key)) return;
+.modal-sm { max-width: 400px; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
-    setTimeout(() => {
-        injectTutorialDOM();
-        currentPageSteps = steps;
-        currentPageStep  = 0;
-        currentPageView  = view;
-        pageTutorialActive = true;
+.toggle-switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--bg3); border: 1px solid var(--border2); border-radius: 20px; transition: .2s; }
+.slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: var(--text2); border-radius: 50%; transition: .2s; }
+input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
+input:checked + .slider:before { transform: translateX(16px); background-color: #fff; }
 
-        const tt = $('#tutorialTooltip');
-        if (tt) { tt.style.display = 'none'; tt.className = 'tutorial-tooltip'; }
-        hideCurtains();
+#chartjs-tooltip { opacity: 0; position: absolute; background: rgba(20, 23, 32, 0.95); border: 1px solid var(--border2); border-radius: 6px; color: #fff; pointer-events: none; transform: translate(-50%, -110%); transition: all .1s ease; z-index: 999999; padding: 8px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); font-family: var(--font-sans); white-space: nowrap; }
 
-        renderPageStep(0);
-    }, 700);
+.treemap-cell { position: absolute; border: 1px solid var(--bg2); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; box-sizing: border-box; color: #fff; cursor: pointer; transition: 0.2s; border-radius: 4px; padding: 4px; }
+.treemap-cell:hover { opacity: 0.85; transform: scale(0.98); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+
+.settings-section { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.settings-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+/* ===== 📁 설정 > 데이터 관리 탭 — 컴팩트 리디자인 ===== */
+#settingsTabData .settings-section {
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+#settingsTabData .settings-section-title {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.settings-hint {
+  font-size: 10.5px;
+  color: var(--text3);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.settings-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.settings-input-row > * { flex: 1; min-width: 0; }
+#settingsTabData .form-input {
+  padding: 8px 10px;
+  font-size: 12px;
+  margin-bottom: 0;
+}
+#settingsTabData .btn-submit {
+  padding: 8px;
+  font-size: 11.5px;
+  margin-top: 0;
+}
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: var(--bg);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.settings-action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.settings-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: 0.15s;
+}
+.settings-action-btn span:first-child { font-size: 14px; }
+.settings-action-btn:hover { border-color: var(--accent); background: rgba(124,106,247,0.08); }
+.settings-action-btn-accent {
+  background: rgba(0,200,122,0.1);
+  border-color: rgba(0,200,122,0.35);
+  color: var(--green);
+}
+.settings-action-btn-accent:hover { background: rgba(0,200,122,0.18); }
+.settings-section-danger {
+  border-color: rgba(255,77,106,0.3) !important;
+  background: rgba(255,77,106,0.05) !important;
+}
+.settings-danger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.settings-danger-row .settings-section-title { margin-bottom: 2px; }
+.btn-danger-solid {
+  flex-shrink: 0;
+  background: var(--red);
+  color: #fff;
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: 0.15s;
+}
+.btn-danger-solid:hover { background: #e0405a; }
+
+/* 🌟 [수정] 종목 카드 태그(메모) 스타일 */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px; /* 차트와의 간격 */
+}
+.custom-tag-badge {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffd166;
+    border: 1px dashed rgba(255, 209, 102, 0.3);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: normal;
+    display: inline-block;
+    cursor: pointer;
+    transition: 0.2s;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.custom-tag-badge:hover {
+    background: rgba(255, 209, 102, 0.15);
+    border-color: rgba(255, 209, 102, 0.6);
+}
+.add-tag-btn {
+    background: transparent;
+    color: var(--text3);
+    border: 1px dashed var(--border2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    display: inline-block;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.add-tag-btn:hover {
+    color: var(--text);
+    border-color: var(--text3);
+    background: rgba(255,255,255,0.05);
 }
 
-// ── 공개 API — 메인 튜토리얼 ─────────────────────────────
-window.startTutorial = function() {
-    closeWelcome();
-    injectTutorialDOM();
-    tutorialActive = true;
-    pageTutorialActive = false;
-    hideCurtains();
-    currentStep = 0;
-    renderStep(0);
-};
-
-window.skipTutorial = function() {
-    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
-    closeWelcome();
-};
-
-window.closeTutorial = function() {
-    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
-    tutorialActive = false;
-    hideCurtains();
-    const tt = $('#tutorialTooltip');
-    if (tt) tt.style.display = 'none';
-    const overlay = document.getElementById('masterSettingsOverlay');
-    if (overlay && overlay.classList.contains('open') && typeof closeModal === 'function') {
-        closeModal('masterSettingsOverlay');
-    }
-};
-
-window.nextStep = function() {
-    if (!tutorialActive) return;
-    if (currentStep >= STEPS.length - 1) {
-        finishTutorial();
-    } else {
-        currentStep++;
-        renderStep(currentStep);
-    }
-};
-
-window.prevStep = function() {
-    if (!tutorialActive || currentStep <= 0) return;
-    currentStep--;
-    renderStep(currentStep);
-};
-
-window.goToStep = function(idx) {
-    if (!tutorialActive) return;
-    currentStep = idx;
-    renderStep(idx);
-};
-
-window.restartTutorial = function() {
-    closeModal('masterSettingsOverlay');
-    localStorage.removeItem(TUTORIAL_DONE_KEY);
-    injectWelcomeModal();
-    const overlay = $('#tutorialWelcomeOverlay');
-    if (overlay) overlay.classList.add('open');
-};
-
-// ── 공개 API — 페이지 튜토리얼 ───────────────────────────
-window.pageNextStep = function() {
-    if (!pageTutorialActive) return;
-    if (currentPageStep >= currentPageSteps.length - 1) {
-        closePageTutorial();
-    } else {
-        currentPageStep++;
-        renderPageStep(currentPageStep);
-    }
-};
-
-window.pagePrevStep = function() {
-    if (!pageTutorialActive || currentPageStep <= 0) return;
-    currentPageStep--;
-    renderPageStep(currentPageStep);
-};
-
-window.pageGoToStep = function(idx) {
-    if (!pageTutorialActive) return;
-    currentPageStep = idx;
-    renderPageStep(idx);
-};
-
-window.closePageTutorial = function() {
-    pageTutorialActive = false;
-    hideCurtains();
-    const tt = $('#tutorialTooltip');
-    if (tt) tt.style.display = 'none';
-};
-
-window.dontShowPageTutorial = function() {
-    if (currentPageView) {
-        localStorage.setItem(PAGE_DONE_PREFIX + currentPageView, '1');
-    }
-    window.closePageTutorial();
-};
-
-window.resetPageTutorials = function() {
-    ['all','user1','user2','watch','history','realized','dividend','moonlight'].forEach(v => {
-        localStorage.removeItem(PAGE_DONE_PREFIX + v);
-    });
-    alert('모든 페이지 가이드가 초기화됐습니다. 각 탭을 방문하면 다시 표시됩니다.');
-};
-
-// ── 내부 헬퍼 ─────────────────────────────────────────────
-function closeWelcome() {
-    const el = $('#tutorialWelcomeOverlay');
-    if (el) el.classList.remove('open');
+/* 관심종목 뱃지 클릭 유도를 위한 호버 효과 */
+.tag-watch:hover {
+    background: rgba(255, 77, 106, 0.1) !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
 }
 
-function finishTutorial() {
-    localStorage.setItem(TUTORIAL_DONE_KEY, '1');
-    tutorialActive = false;
-    hideCurtains();
-    const tt = $('#tutorialTooltip');
-    if (tt) tt.style.display = 'none';
-    const overlay = document.getElementById('masterSettingsOverlay');
-    if (overlay && overlay.classList.contains('open') && typeof closeModal === 'function') {
-        closeModal('masterSettingsOverlay');
-    }
+/* 🌟 목록형 뷰 전용 스타일 */
+.list-layout { display: flex; flex-direction: column; gap: 10px; }
+.list-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); padding: 12px 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+.list-item:hover { border-color: var(--border2); background: rgba(255,255,255,0.03); }
+.list-item-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.list-item-chart { width: 100px; height: 40px; margin: 0 15px; flex-shrink: 0; position:relative; }
+.list-item-right { text-align: right; min-width: 80px; flex-shrink: 0; }
+.list-item-extra { text-align: right; min-width: 90px; margin-left: 15px; border-left: 1px solid var(--border); padding-left: 15px; flex-shrink: 0; }
 
-    const toast = $('#tutorialDoneToast');
-    if (toast) {
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3800);
-    }
+/* 🌟 목록형 반응형 (모바일 등 좁은 화면에서 그래프 숨김) */
+@media (max-width: 768px) {
+    .list-item { flex-wrap: wrap; }
+    .list-item-chart { display: none; }
+    .list-item-extra { border-left: none; margin-left: 0; padding-left: 0; text-align: right; }
 }
 
-// ── 설정 모달에 재시작 버튼 주입 ──────────────────────────
-function injectRestartButton() {
-    const container = $('#settingsTabData');
-    if (!container || container.querySelector('.tutorial-restart-section')) return;
-
-    const sec = document.createElement('div');
-    sec.className = 'tutorial-restart-section';
-    sec.style.cssText = 'display:flex; flex-wrap:wrap; gap:14px; align-items:stretch; margin-top:14px;';
-    sec.innerHTML = `
-      <div class="settings-section" style="flex:1 1 200px; margin:0;">
-        <div class="settings-section-title">📡 주가 데이터</div>
-        <div class="settings-hint" style="margin-bottom:10px;">시세 캐시를 지우고 최신 가격을 다시 받아옵니다.</div>
-        <div id="marketDataLastUpdated" style="font-size:11px; color:var(--text2); margin-bottom:10px;"></div>
-        <div class="settings-action-grid" style="grid-template-columns:1fr;">
-          <button class="settings-action-btn settings-action-btn-accent" onclick="forceMarketDataUpdate()"><span>🔄</span>캐시 삭제 후 최신화</button>
-        </div>
-      </div>
-      <div class="settings-section" style="flex:1 1 200px; margin:0;">
-        <div class="settings-section-title">🎓 튜토리얼</div>
-        <div class="settings-hint" style="margin-bottom:10px;">전체 가이드를 다시 보거나, 페이지별 안내를 초기화합니다.</div>
-        <div class="settings-action-grid" style="grid-template-columns:1fr;">
-          <button class="settings-action-btn" onclick="restartTutorial()"><span>🔁</span>전체 가이드 다시 보기</button>
-          <button class="settings-action-btn" onclick="resetPageTutorials(); closeModal('masterSettingsOverlay');"><span>📄</span>페이지별 가이드 초기화</button>
-        </div>
-      </div>
-    `;
-    container.appendChild(sec);
-    if (typeof updateLastSyncTimeDisplay === 'function') updateLastSyncTimeDisplay();
+.mapping-label {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
 }
 
-// ── setView 래핑: 페이지 튜토리얼 트리거 ─────────────────
-function hookSetView() {
-    const existing = typeof setView === 'function' ? setView : null;
-    if (!existing) return;
-    const _wrapped = setView;
-    setView = function(view, el) {
-        _wrapped(view, el);
-        showPageTutorial(view);
-    };
+/* ── 차트 드래그 줌 ── */
+.chart-zoom-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.chart-zoom-hint { font-size: 10px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+.chart-zoom-hint span { color: var(--accent); font-weight: 700; }
+.btn-zoom-reset { padding: 3px 10px; font-size: 10px; border-radius: 4px; border: 1px solid rgba(124,106,247,0.4); background: rgba(124,106,247,0.12); color: var(--accent); cursor: pointer; font-family: var(--font-sans); font-weight: 700; transition: 0.2s; white-space: nowrap; display: none; }
+.btn-zoom-reset:hover { background: rgba(124,106,247,0.25); }
+.btn-zoom-reset.active { display: inline-flex; align-items: center; gap: 4px; }
+/* =====================================================
+   📱 모바일 반응형 레이아웃 (768px 이하)
+   ===================================================== */
+
+/* 모바일 햄버거 버튼 */
+.btn-mobile-menu {
+  display: none;
+  padding: 5px 10px;
+  font-size: 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  line-height: 1;
+  transition: 0.15s;
+}
+.btn-mobile-menu:hover { background: var(--bg3); }
+
+/* 모바일 내비 드로어 오버레이 */
+.mobile-nav-drawer {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9000;
+}
+.mobile-nav-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px);
+}
+.mobile-nav-panel {
+  position: absolute;
+  top: 0; right: 0;
+  width: 280px;
+  height: 100%;
+  background: var(--bg2);
+  border-left: 1px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px;
+  gap: 8px;
+  overflow-y: auto;
+  animation: slideInRight 0.25s ease;
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+.mobile-nav-panel .vtab {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+.mobile-nav-panel .vtab.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.mobile-nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.mobile-nav-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.mobile-nav-close {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: 0.15s;
+}
+.mobile-nav-close:hover { color: var(--text); background: var(--bg3); }
+
+.mobile-nav-drawer.open { display: block; }
+
+/* 모바일 하단 탭바 */
+.mobile-bottom-bar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border2);
+  z-index: 200;
+  padding: 6px 4px env(safe-area-inset-bottom, 6px);
+  justify-content: space-around;
+  align-items: center;
+}
+.mobile-tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  color: var(--text3);
+  font-size: 10px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: 0.15s;
+  min-width: 52px;
+}
+.mobile-tab-btn .tab-icon { font-size: 18px; line-height: 1; }
+.mobile-tab-btn.active { color: var(--accent); }
+.mobile-tab-btn:hover { color: var(--text2); background: var(--bg3); }
+
+@media (max-width: 768px) {
+  /* 네비 기본 레이아웃 */
+  nav {
+    padding: 8px 12px;
+    gap: 8px;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .nav-left {
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+  .logo img { width: 160px !important; }
+
+  /* 헤더 검색바 - 모바일에서 숨김 (메인 영역으로 이동) */
+  .header-search { display: none !important; }
+
+  /* 탭 메뉴 - 데스크탑 탭 숨김 */
+  .view-tabs { display: none !important; }
+
+  /* 기간 드롭다운도 모바일에서는 숨김 (하단 탭바/드로어 체계로 대체) */
+  .range-select, .range-dropdown { display: none !important; }
+
+  /* 우측 네비 - 테마 버튼만 */
+  .nav-right .sync-status { display: none; }
+
+  /* 햄버거 버튼 표시 */
+  .btn-mobile-menu { display: flex; }
+
+  /* 하단 탭바 표시 */
+  .mobile-bottom-bar { display: flex; }
+
+  /* 바디 하단 패딩 (탭바 높이만큼) */
+  body { padding-bottom: 64px; }
+
+  /* 레이아웃 */
+  .layout-wrapper { overflow: visible; }
+  .dashboard-main { padding: 0 12px 0; overflow-y: auto; }
+
+  /* 사이드바 - 모바일에서 전체화면 드로어로 */
+  .ledger-sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100%;
+    width: 100% !important;
+    min-width: 0 !important;
+    z-index: 8000;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 0 !important;
+  }
+  .ledger-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .ledger-sidebar.collapsed {
+    transform: translateX(-100%);
+    margin-left: 0 !important;
+  }
+  #btnOpenSidebar { display: none !important; }
+
+  /* 대시보드 상단 그리드 */
+  .dashboard-top { grid-template-columns: 1fr !important; }
+
+  /* 카드 그리드: 3→2→1열 전환은 위쪽 .grid 컨테이너 쿼리에서 처리합니다 */
+
+  /* 옵션바 */
+  .list-options-bar {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .list-controls { gap: 8px; flex-wrap: wrap; }
+
+  /* 거래 내역 테이블 */
+  .history-table { font-size: 11px; }
+  .history-table th,
+  .history-table td { padding: 8px 10px; }
+
+  /* 모달 */
+  .modal { margin: 12px; max-width: calc(100% - 24px) !important; max-height: 85vh; overflow-y: auto; }
+
+  /* 모바일 검색바 (nav 아래 별도 영역) */
+  .mobile-search-bar {
+    display: flex !important;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* 계좌 파이 차트 축소 */
+  .acc-pie-wrap { width: 60px; height: 60px; }
+  .acc-bars { display: none; }
 }
 
-// ── 초기화 ────────────────────────────────────────────────
-function initTutorial() {
-    const done = localStorage.getItem(TUTORIAL_DONE_KEY);
-    if (!done) {
-        setTimeout(() => {
-            injectWelcomeModal();
-            const overlay = $('#tutorialWelcomeOverlay');
-            if (overlay) overlay.classList.add('open');
-        }, 900);
-    } else {
-        // 첫 방문이 아니어도 현재 페이지(전체보기)의 페이지 튜토리얼은 체크
-        setTimeout(() => showPageTutorial('all'), 1200);
-    }
-
-    // 설정 모달 재시작 버튼 주입
-    const settingsOverlay = document.getElementById('masterSettingsOverlay');
-    if (settingsOverlay) {
-        const obs = new MutationObserver(() => {
-            if (settingsOverlay.classList.contains('open')) injectRestartButton();
-        });
-        obs.observe(settingsOverlay, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    // setView 래핑 (딜레이로 다른 래퍼가 먼저 실행되도록)
-    setTimeout(hookSetView, 50);
-
-    // 리사이즈 시 스텝 위치 재계산
-    window.addEventListener('resize', () => {
-        if (tutorialActive) renderStep(currentStep);
-        else if (pageTutorialActive) renderPageStep(currentPageStep);
-    });
+/* 모바일 검색바 (기본 숨김) */
+.mobile-search-bar {
+  display: none;
+  align-items: center;
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTutorial);
-} else {
-    setTimeout(initTutorial, 0);
+
+
+/* =====================================================
+   🎓 튜토리얼 시스템 CSS
+   ===================================================== */
+
+/* ── 환영 모달 ── */
+.tutorial-welcome-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+}
+.tutorial-welcome-overlay.open { display: flex; }
+
+.tutorial-welcome-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 44px 48px;
+  max-width: 520px;
+  width: calc(100% - 40px);
+  text-align: center;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(124,106,247,0.2);
+  animation: tutorialFadeUp 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
 }
 
-})(); // IIFE 끝
+@keyframes tutorialFadeUp {
+  from { opacity:0; transform:translateY(28px) scale(0.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.tutorial-welcome-logo {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.tutorial-welcome-modal h2 {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.tutorial-welcome-modal p {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.75;
+  margin-bottom: 28px;
+}
+
+.tutorial-welcome-modal .highlight-text {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tutorial-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.tutorial-feature-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text2);
+  transition: 0.2s;
+}
+
+.tutorial-feature-item:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.tutorial-feature-item .feat-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.tutorial-welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-tutorial-start {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: 0.2s;
+  box-shadow: 0 4px 20px rgba(124,106,247,0.4);
+}
+
+.btn-tutorial-start:hover {
+  background: #6855e0;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(124,106,247,0.5);
+}
+
+.btn-tutorial-skip {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  padding: 6px;
+  transition: color 0.2s;
+}
+.btn-tutorial-skip:hover { color: var(--text2); }
+
+/* ── 스텝 스포트라이트 ── */
+.tutorial-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 90000;
+  pointer-events: all;
+}
+.tutorial-backdrop.active { display: block; }
+
+/* 4-방향 어두운 커튼 (clip-path 대신 4개 div로 정확한 구멍 뚫기) */
+.tutorial-curtain {
+  position: fixed;
+  background: rgba(0,0,0,0.72);
+  z-index: 90001;
+  pointer-events: all;
+  transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* 하이라이트 테두리 링 */
+.tutorial-highlight-ring {
+  position: fixed;
+  z-index: 90002;
+  border-radius: 10px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 3px var(--accent),
+    0 0 0 6px rgba(124,106,247,0.25),
+    0 0 40px rgba(124,106,247,0.35);
+  transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+  animation: tutorialPulseRing 2s ease-in-out infinite;
+}
+
+@keyframes tutorialPulseRing {
+  0%, 100% { box-shadow: 0 0 0 3px var(--accent), 0 0 0 6px rgba(124,106,247,0.25), 0 0 40px rgba(124,106,247,0.35); }
+  50%       { box-shadow: 0 0 0 3px var(--accent), 0 0 0 10px rgba(124,106,247,0.15), 0 0 60px rgba(124,106,247,0.2); }
+}
+
+/* ── 말풍선 툴팁 ── */
+.tutorial-tooltip {
+  position: fixed;
+  z-index: 90010;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 20px 22px;
+  width: 300px;
+  max-height: calc(100vh - 28px);
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,106,247,0.15);
+  pointer-events: all;
+  animation: tutorialTooltipIn 0.3s cubic-bezier(0.22,1,0.36,1) forwards;
+  transition: top 0.3s cubic-bezier(0.22,1,0.36,1),
+              left 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+
+@keyframes tutorialTooltipIn {
+  from { opacity:0; transform: scale(0.92); }
+  to   { opacity:1; transform: scale(1); }
+}
+
+/* 화살표 꼬리 */
+.tutorial-tooltip::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  transform: rotate(45deg);
+  transition: all 0.3s;
+}
+.tutorial-tooltip.arrow-top::before    { top:-7px; left:24px; border-bottom:none; border-right:none; }
+.tutorial-tooltip.arrow-bottom::before { bottom:-7px; left:24px; border-top:none; border-left:none; }
+.tutorial-tooltip.arrow-left::before   { left:-7px; top:20px; border-right:none; border-bottom:none; }
+.tutorial-tooltip.arrow-right::before  { right:-7px; top:20px; border-left:none; border-top:none; }
+
+/* 페이지 배지 + Plus 배지를 한 줄에 나란히 배치 */
+.tutorial-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+/* 지금 소개 중인 페이지가 어디인지 보여주는 배지 — 페이지가 바뀔 때마다
+   함께 갱신되어 사용자가 현재 어느 화면을 보고 있는지 알 수 있게 함 */
+.tutorial-page-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-family: var(--font-sans);
+}
+
+/* Plus 전용 기능임을 알려주는 배지 */
+.tutorial-plus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: linear-gradient(135deg, #ffd76a, #ffa53d);
+  color: #5a3200;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-family: var(--font-sans);
+  letter-spacing: 0.2px;
+}
+
+.tutorial-tooltip-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-bg);
+  border: 1px solid rgba(124,106,247,0.3);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.tutorial-tooltip-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  display: block;
+  line-height: 1;
+}
+
+.tutorial-tooltip h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.tutorial-tooltip p {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+.tutorial-tooltip .tip-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0,200,122,0.1);
+  border: 1px solid rgba(0,200,122,0.25);
+  color: var(--green);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.tutorial-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* 스텝이 많을 때(최대 30개) 점들이 박스 밖으로 넘치지 않도록
+   가로 스크롤 가능한 영역으로 제한하고, 남는 공간만 차지하게 함 */
+.tutorial-progress-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+.tutorial-progress-dots::-webkit-scrollbar { display: none; }
+
+.tutorial-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border2);
+  transition: all 0.25s;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tutorial-dot.active {
+  background: var(--accent);
+  width: 18px;
+  border-radius: 3px;
+}
+.tutorial-dot.done {
+  background: rgba(124,106,247,0.4);
+}
+
+.btn-tutorial-prev {
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  transition: 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-tutorial-prev:hover { background: var(--bg3); color: var(--text); }
+.btn-tutorial-prev:disabled { opacity: 0.3; cursor: default; }
+
+.btn-tutorial-next {
+  padding: 6px 16px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  transition: 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-tutorial-next:hover { background: #6855e0; }
+
+.btn-tutorial-close-x {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 4px;
+  transition: 0.15s;
+}
+.btn-tutorial-close-x:hover { color: var(--text); background: var(--bg3); }
+
+/* ── 완료 토스트 ── */
+.tutorial-done-toast {
+  display: none;
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  background: linear-gradient(135deg, #7c6af7, #4d9fff);
+  color: #fff;
+  border-radius: 50px;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  box-shadow: 0 8px 32px rgba(124,106,247,0.5);
+  white-space: nowrap;
+  animation: tutorialToastIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.tutorial-done-toast.show { display: block; }
+
+@keyframes tutorialToastIn {
+  from { opacity:0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity:1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── 설정 메뉴 안 튜토리얼 재시작 버튼 ── */
+.btn-restart-tutorial {
+  padding: 6px 10px;
+  background: var(--accent-bg);
+  border: 1px solid rgba(124,106,247,0.3);
+  border-radius: 7px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+  transition: 0.15s;
+}
+.btn-restart-tutorial:hover { background: rgba(124,106,247,0.2); }
+
+/* ── 설정 모달 하단 고정 영역(주가 데이터 / 튜토리얼) — 한 줄 컴팩트 레이아웃 ── */
+.tutorial-restart-section {
+  padding: 8px 14px !important;
+}
+.tutorial-restart-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tutorial-restart-row + .tutorial-restart-row { margin-top: 6px; }
+.tutorial-restart-row .settings-section-title {
+  font-size: 11px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.tutorial-restart-row .btn-restart-tutorial { flex-shrink: 0; }
+#marketDataLastUpdated {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  font-size: 11px;
+  color: var(--text2);
+}
+.tutorial-btn-group {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.tutorial-btn-group .btn-restart-tutorial { flex: 1; min-width: 0; }
+
+/* 모바일 튜토리얼 조정 */
+@media (max-width: 600px) {
+  .tutorial-welcome-modal { padding: 28px 20px; }
+  .tutorial-feature-grid  { grid-template-columns: 1fr; }
+  .tutorial-tooltip       { width: calc(100vw - 32px); max-width: 320px; }
+}
+
+/* ── 차트 행 래퍼 (자산성장추이 + 오늘 종목 현황) ── */
+#chartRowWrapper {
+  display: none;
+  flex-direction: row;
+  gap: 16px;
+  align-items: stretch;
+  height: 450px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+#chartRowWrapper #portfolioChartWrapper,
+#chartRowWrapper #todayStocksPanel {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  max-height: none;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+#todayStocksPanel {
+  display: flex;
+  flex-direction: column;
+}
+
+#todayStocksList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+@media (max-width: 900px) {
+  #chartRowWrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  #chartRowWrapper #portfolioChartWrapper,
+  #chartRowWrapper #todayStocksPanel {
+    min-height: 450px;
+    height: auto;
+  }
+}
+
+
+/* 🔍 검색 결과 목록 컨테이너 수정 */
+.search-suggestions {
+  width: max-content !important; 
+  min-width: 100% !important; 
+  max-width: 400px; 
+}
+
+.search-suggestions div, 
+.search-suggestions span {
+  white-space: normal !important; 
+  word-break: keep-all !important;
+  text-overflow: clip !important;
+  overflow: visible !important;
+}
+
+/* 🌟 수정 모드 배너 및 취소 버튼 크기 확대 */
+.edit-mode-banner {
+    padding: 12px 16px; /* 기존보다 더 넓게 */
+    font-size: 15px;    /* 폰트 크기 확대 */
+    font-weight: 700;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    /* 기존 색상 및 스타일 유지 */
+}
+
+.btn-cancel-edit {
+    padding: 5px 12px;  /* 버튼 클릭 영역 확대 */
+    font-size: 13px;
+    margin-left: 10px;
+}
+
+/* 🌟 사이드바 강조(하이라이트) 효과 */
+.ledger-sidebar.highlight-edit {
+    border: 2px solid var(--accent) !important;
+    box-shadow: 0 0 20px rgba(124, 106, 247, 0.4); /* 강조색으로 빛나는 효과 */
+    animation: pulse-border 1.5s infinite; /* 인지하기 쉽게 깜빡이는 애니메이션 */
+}
+
+@keyframes pulse-border {
+    0% { box-shadow: 0 0 0px rgba(124, 106, 247, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(124, 106, 247, 0.6); }
+    100% { box-shadow: 0 0 0px rgba(124, 106, 247, 0.4); }
+}
+
+/* =================================================
+   🚀 네비게이션 완전 재정의 — flex + 절대중앙 방식
+   ================================================= */
+
+nav {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 80px !important;  /* 최상단 바 높이 */
+  padding: 0 1.5rem !important;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 0 !important;
+}
+
+/* ── 좌측: 로고 ── */
+.nav-left {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex: 0 0 auto;
+  gap: 10px;
+  z-index: 2;
+}
+
+/* ── 중앙: 네비탭 — position:absolute로 완전 정중앙 ── */
+.view-tabs {
+  position: static !important;
+  display: flex !important;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  justify-content: center;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  z-index: 1;
+  margin: 0 auto !important;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.view-tabs::-webkit-scrollbar { display: none; }
+
+/* ── 네비탭 공통 ── */
+.vtab {
+  padding: 8px 16px;            /* 기존 6px 13px → 더 크게 */
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text3);
+  font-size: 16px;              /* 기존 12px → 크게 */
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.vtab:hover {
+  color: var(--text2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── 아이콘 / 텍스트 분리 ── */
+.vtab-icon { font-size: 16px; line-height: 1; flex-shrink: 0; }
+.vtab-text { flex-shrink: 0; }
+
+.view-tabs::-webkit-scrollbar { display: none; }
+
+/* ── 1650px 이하: 네비탭 아이콘 전용 전환 ── */
+@media (max-width: 1650px) and (min-width: 769px) {
+  .vtab-text { display: none; }
+  .vtab { padding: 9px 11px; gap: 0; }
+  .vtab-icon { font-size: 20px; }
+
+  /* 소유자 탭은 1480px에서 텍스트 유지 */
+  #tabUser1 .vtab-text, #tabUser2 .vtab-text { display: inline; }
+  #tabUser1, #tabUser2 { padding: 8px 16px; gap: 6px; }
+}
+
+/* ── 1200px 이하: 소유자1/2 탭 텍스트 숨김 ── */
+@media (max-width: 1200px) and (min-width: 769px) {
+  #tabUser1 .vtab-text, #tabUser2 .vtab-text { display: none; }
+  #tabUser1, #tabUser2 { padding: 9px 11px; gap: 0; }
+}
+
+
+/* ── 우측: 기간 + 테마 + 설정 ── */
+.nav-right {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex: 0 0 auto;
+  position: relative;
+  top: -6px; /* 버튼 줄을 살짝 위로 올려 아래쪽에 sync 문구 공간 확보 */
+  z-index: 2;
+}
+
+/* 우측 상단 컨트롤 줄(기간 선택 + 테마 + 설정 버튼) */
+.nav-right-controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+/* 기간 선택 그룹 */
+.range-group {
+  display: flex;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 3px;
+  flex-shrink: 0;
+}
+.rtab {
+  padding: 4px 9px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: transparent;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: all 0.15s;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* 🌟 사이드바 평가 자산 랭킹의 정렬/범위 토글 — 버튼 2개가 균등하게 늘어나도록 */
+#sidebarYieldSortGroup, #sidebarYieldScopeGroup {
+  display: flex;
+}
+#sidebarYieldSortGroup .rtab, #sidebarYieldScopeGroup .rtab {
+  flex: 1;
+  text-align: center;
+}
+
+/* 테마 토글 */
+.btn-theme-toggle {
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border2) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: var(--text2) !important;
+  cursor: pointer;
+  transition: 0.15s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.btn-theme-toggle:hover {
+  background: var(--bg3) !important;
+  color: var(--text) !important;
+}
+
+/* 설정 버튼 */
+.nav-right .btn-sm {
+  height: 34px;
+  padding: 0 14px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* sync 표시 — 버튼 줄과 nav 하단 사이 여백의 중간에 위치 (레이아웃에는 영향 없음) */
+.nav-right .sync-status {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 7px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* ── 라이트 모드 ── */
+[data-theme="light"] nav {
+  background: #ffffff;
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .view-tabs {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+[data-theme="light"] .range-group {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* ── 모바일 (768px 이하) ── */
+@media (max-width: 768px) {
+  nav {
+    padding: 0 12px !important;
+    height: 52px !important;
+  }
+  .view-tabs { display: none !important; }
+  .range-group { display: none !important; }
+  .range-select, .range-dropdown { display: none !important; }
+  .nav-right .sync-status { display: none; }
+  .btn-mobile-menu { display: flex !important; }
+}
+
+/* =================================================
+   🖼️ 로고 위치 통일 및 이미지 전환 흔들림 방지
+   ================================================= */
+.logo {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.logo img {
+  display: block;
+  width: 340px !important;
+  height: auto !important;      /* 비율에 맞춰 세로 길이는 자동 조절 */
+  max-height: 50px !important;  /* 네비게이션 바(64px)를 뚫고 나가지 않도록 최대 높이 방어선 설정 */
+  object-fit: contain;          /* 찌그러짐 방지 */
+  object-position: left center; /* 크기가 변해도 항상 좌측 중앙에 밀착되도록 정렬 */
+  transition: opacity 0.2s ease;
+}
+
+/* =================================================
+   ✨ 네비탭 hover 애니메이션 (선택보다 연하게)
+   ================================================= */
+.vtab {
+  /* 기존 transition 강화 */
+  transition:
+    color 0.2s ease,
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.18s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 리플 레이어 (::before) */
+.vtab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(124, 106, 247, 0.08);
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+  pointer-events: none;
+}
+
+.vtab:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 호버: 선택 상태보다 훨씬 연한 색 + 살짝 위로 */
+.vtab:hover:not(.active) {
+  color: rgba(124, 106, 247, 0.75);
+  background: rgba(124, 106, 247, 0.06);
+  border-color: rgba(124, 106, 247, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(124, 106, 247, 0.1);
+}
+
+/* 선택(active) 상태는 진하게 유지 */
+.vtab.active {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: rgba(124, 106, 247, 0.3);
+  transform: none;
+  box-shadow: none;
+  transition:
+    color 0.2s ease,
+    background 0.22s ease,
+    border-color 0.22s ease !important;
+}
+
+/* 클릭 시 살짝 눌리는 효과 */
+.vtab:active:not(.active) {
+  transform: translateY(0px) scale(0.97);
+  transition-duration: 0.08s !important;
+}
+
+
+/* =================================================
+   ✨ 기간 선택 rtab hover 애니메이션
+   ================================================= */
+
+.rtab {
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.18s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 리플 레이어 */
+.rtab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(124, 106, 247, 0.12);
+  opacity: 0;
+  transform: scaleX(0.7);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+
+.rtab:hover:not(.active)::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* 호버: 연한 보라 틴트 + 글자 밝게 */
+.rtab:hover:not(.active) {
+  color: rgba(124, 106, 247, 0.8);
+  background: rgba(124, 106, 247, 0.07);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(124, 106, 247, 0.08);
+}
+
+/* 선택 상태 — 진하게 유지, 움직임 없음 */
+.rtab.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 106, 247, 0.4);
+  transform: scale(1.2);
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease !important;
+}
+
+/* 클릭 시 눌리는 효과 */
+.rtab:active:not(.active) {
+  transform: scale(0.94);
+  transition-duration: 0.08s !important;
+}
+
+/* 라이트모드 호버 색상 보정 */
+[data-theme="light"] .vtab:hover:not(.active) {
+  color: var(--accent);
+  background: rgba(98, 80, 224, 0.07);
+  border-color: rgba(98, 80, 224, 0.18);
+  box-shadow: 0 2px 8px rgba(98, 80, 224, 0.08);
+}
+
+[data-theme="light"] .rtab:hover:not(.active) {
+  color: var(--accent);
+  background: rgba(98, 80, 224, 0.08);
+  box-shadow: 0 2px 6px rgba(98, 80, 224, 0.08);
+}
+/* ── stat-banner (실현수익 / 배당통계 요약 패널) ── */
+/* ── 🌟 실현손익 — 미국주식 카드 내 양도소득세 컴팩트 요약 ── */
+.rfp-tax-mini { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+
+/* ── 🌟 국내/해외 박스 내 계좌별 상세 내역 ── */
+.rfp-acct-label {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 10.5px;
+  color: var(--text3);
+}
+.rfp-acct-list {
+  margin-top: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.rfp-acct-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 11px;
+}
+.rfp-acct-row-name {
+  color: var(--text2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.rfp-acct-row-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.rfp-tax-mini-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rfp-tax-mini-label { font-size: 11px; color: var(--text3); }
+.rfp-tax-mini-amt { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: #ff4d6a; }
+.rfp-tax-mini-safe { font-size: 11px; color: var(--text3); }
+.rfp-tax-mini-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+}
+.rfp-tax-mini-more {
+  font-size: 10px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+}
+.stat-banner {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+.stat-banner-accent {
+  width: 4px;
+  flex-shrink: 0;
+}
+.stat-banner-total {
+  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 210px;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.stat-banner-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stat-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.stat-banner-val {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.stat-banner-sub {
+  margin-top: 5px;
+  font-size: 10px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+}
+.stat-banner-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 20px 12px;
+  gap: 10px;
+  min-width: 0;
+}
+.stat-markets {
+  display: flex;
+  gap: 10px;
+}
+.stat-market {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 0;
+  transition: border-color 0.2s;
+}
+.stat-market:hover { border-color: var(--border2); }
+.stat-flag {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.stat-market-info { flex: 1; min-width: 0; }
+.stat-market-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+}
+.stat-market-val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-market-converted {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.stat-ratio-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-ratio-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg3);
+  overflow: hidden;
+  display: flex;
+}
+.stat-ratio-kr {
+  height: 100%;
+  border-radius: 2px 0 0 2px;
+  opacity: 0.75;
+  transition: width 0.5s ease;
+}
+.stat-ratio-us {
+  flex: 1;
+  height: 100%;
+  border-radius: 0 2px 2px 0;
+  opacity: 0.35;
+}
+.stat-ratio-pcts {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+@media (max-width: 768px) {
+  .stat-banner { flex-direction: column; }
+  .stat-banner-accent { width: 100%; height: 4px; }
+  .stat-banner-total { border-right: none; border-bottom: 1px solid var(--border); padding: 14px 16px; min-width: 0; }
+  .stat-banner-val { font-size: 22px; }
+  .stat-markets { flex-direction: column; }
+}
+
+/* 실현수익 배너 3컬럼 — 폰트 확대 */
+#realStatBanner .stat-market-label {
+  font-size: 12px;
+}
+#realStatBanner .stat-market-val {
+  font-size: 26px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+#realStatBanner .stat-market-converted {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ── 범용 뷰 헤더 — 모든 탭 상단 여백 통일 ── */
+.view-header {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.view-header.active { display: flex; }
+.view-header-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+.view-header-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.view-header-badge {
+  font-size: 11px; color: var(--text3); font-weight: 400;
+  background: var(--bg3); border: 1px solid var(--border);
+  padding: 2px 9px; border-radius: 20px;
+  font-family: var(--font-mono);
+}
+
+/* ── 관심종목: listOptionsBar 비스티키 모드 ── */
+.list-options-bar.non-sticky {
+  position: sticky !important;
+  top: 0;
+  z-index: 30;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background: transparent !important;
+  border-bottom: none !important;
+  padding-top: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ── 거래내역 / 실현수익 상단 필터행 여백 ── */
+#historyDashboard > div:first-child { margin-top: 0; position: sticky; top: 0; z-index: 50; }
+#realizedDashboard > div:first-child { margin-top: 0; position: sticky; top: 0; z-index: 50; }
+
+/* =====================================================
+   📦 페이지 컨트롤 박스
+   관심목록 / 거래내역 / 실현수익 / 배당통계 공통
+   ===================================================== */
+
+/* 페이지 뷰 헤더 숨김 (4개 탭은 제목 불필요) */
+#viewHeader { display: none !important; }
+
+/* ── 컨트롤 박스 공통 ── */
+.page-controls-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+/* 컨트롤 박스 안에서 .view-tabs는 absolute 해제 */
+.page-controls-box .view-tabs,
+#dividendDashboard .view-tabs,
+#realizedDashboard .view-tabs {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  max-width: none !important;
+  overflow-x: visible !important;
+  scrollbar-width: none;
+  background: var(--bg3);
+  margin: 0 !important;
+}
+
+/* ── 관심목록(watch): listOptionsBar → 박스형 ── */
+.list-options-bar.non-sticky {
+  background: var(--bg2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 14px 18px !important;
+  margin-top: 1.5rem !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  position: sticky !important;
+  top: 0;
+  z-index: 30;
+  margin-bottom: 16px !important;
+}
+
+/* 관심종목 안 태그 필터 컨테이너 */
+.list-options-bar.non-sticky #localTagFilterContainer {
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+/* ── 거래내역 / 실현수익: 컨트롤 박스 없거나 마진 적용 안 될 때 패딩으로 보완 ── */
+#historyDashboard { padding-top: 1.5rem; }
+#realizedDashboard { padding-top: 1.5rem; }
+/* realizedDashboard 안 page-controls-box는 패딩으로 이미 여백 확보됐으니 margin-top 제거 */
+#realizedDashboard > .page-controls-box,
+#historyDashboard > .page-controls-box  { margin-top: 0; position: sticky; top: 0; z-index: 50; }
+
+@media (max-width: 768px) {
+  #historyDashboard,
+  #realizedDashboard {
+    padding-top: 1rem;
+  }
+  #dividendDashboard, #historyDashboard, #realizedDashboard {
+    margin-right: -12px;
+    padding-right: 12px;
+  }
+}
+
+/* 라이트 모드 대응 */
+[data-theme="light"] .page-controls-box {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.1);
+}
+[data-theme="light"] .list-options-bar.non-sticky {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+/* ── 모바일 ── */
+@media (max-width: 768px) {
+  .page-controls-box {
+    padding: 12px 14px;
+    gap: 8px;
+    margin-top: 1rem;
+    margin-bottom: 12px;
+  }
+  .list-options-bar.non-sticky {
+    padding: 12px 14px !important;
+    margin-top: 1rem !important;
+  }
+}
+
+
+/* 🌟 인라인 버튼 필터 전용 스타일 */
+.inline-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 8px;
+}
+
+.filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text3);
+    margin-right: 6px;
+    margin-left: 4px;
+    user-select: none;
+}
+
+.f-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text2);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+    font-family: var(--font-sans);
+}
+
+.f-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+}
+
+.f-btn.active {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-color: rgba(124, 106, 247, 0.3);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(124, 106, 247, 0.15);
+}
+
+.f-input {
+    width: 85px;
+    height: 28px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 12px;
+    padding: 0 8px;
+    outline: none;
+    transition: 0.2s;
+    font-family: var(--font-mono);
+}
+
+.f-input:focus {
+    border-color: var(--accent);
+    background: var(--bg2);
+}
+
+.f-input::placeholder {
+    color: var(--text3);
+    font-family: var(--font-sans);
+    font-size: 11px;
+}
+/* 거래내역, 실현수익, 배당통계 페이지 레이아웃 통일 */
+.dashboard-page {
+    flex-direction: column;
+    padding-bottom: 40px;
+    padding-top: 1.5rem; /* 배당통계 상단 여백 기준 */
+    min-height: 100%; height: auto;
+}
+
+/* =====================================================
+   💵 실현수익 플로우 패널 (Sankey-style) — 개선버전
+   ===================================================== */
+
+.real-flow-panel {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+  min-height: 250px;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ① 총 실현수익 */
+.rfp-total {
+  flex-shrink: 0;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, rgba(58,154,255,0.12), rgba(58,154,255,0.04));
+  border: 1px solid rgba(58,154,255,0.28);
+  border-radius: 14px;
+}
+.rfp-icon { font-size: 26px; }
+.rfp-label-sm {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3);
+}
+.rfp-main-val {
+  font-family: var(--font-mono);
+  font-size: 30px; font-weight: 700;
+  letter-spacing: -0.03em; line-height: 1.2;
+  color: var(--loss);
+}
+.rfp-hint {
+  font-size: 11px; color: var(--text3); font-family: var(--font-mono);
+}
+
+/* 비중 미니 바 */
+.rfp-ratio-bar-wrap { margin-top: 6px; }
+.rfp-ratio-bar {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--bg3);
+  display: flex;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.rfp-ratio-kr-fill {
+  height: 100%;
+  background: var(--profit);
+  border-radius: 4px 0 0 4px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.rfp-ratio-us-fill {
+  flex: 1;
+  height: 100%;
+  background: var(--loss);
+  border-radius: 0 4px 4px 0;
+  opacity: 0.75;
+}
+.rfp-ratio-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* ② Sankey SVG 흐름 */
+.rfp-sankey {
+  width: 90px;
+  flex-shrink: 0;
+  margin: -20px 0;
+  position: relative;
+  overflow: visible;
+}
+.rfp-sankey-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ③ 국내/해외 카드 */
+.rfp-markets {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-self: stretch;
+  justify-content: center;
+}
+.rfp-mcard {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 220px;
+}
+.rfp-mcard:hover {
+  border-color: var(--border2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.rfp-mcard-kr  { border-left: 4px solid var(--profit); background: rgba(0,200,122,0.05); }
+.rfp-mcard-us  { border-left: 4px solid var(--loss);   background: rgba(58,154,255,0.05); }
+.rfp-mcard-tax {
+  border-left: 4px solid rgba(255,77,106,0.7);
+  background: rgba(255,77,106,0.04);
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0;
+  padding: 10px 14px;
+}
+.rfp-mflag { font-size: 26px; flex-shrink: 0; line-height: 1; }
+.rfp-mval {
+  font-family: var(--font-mono);
+  font-size: 20px; font-weight: 700; line-height: 1.3; margin-top: 4px;
+}
+.rfp-c-profit { color: var(--profit); }
+.rfp-c-loss   { color: var(--loss); }
+
+/* 비중 배지 */
+.rfp-pct-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* ④ 해외 → 양도세 화살표 */
+.rfp-arrow {
+  width: 30px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0 4px;
+}
+.rfp-arrow-space { flex: 1; }
+.rfp-arrow-line  {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.rfp-arrow-line::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 9px; height: 2px;
+  background: rgba(255,77,106,0.45);
+  transform: translateY(-50%);
+}
+.rfp-arrow-line::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 50%;
+  transform: translateY(-50%);
+  border-left: 7px solid rgba(255,77,106,0.6);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+/* ⑤ 양도소득세 래퍼 */
+.rfp-tax-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.rfp-tax-space { flex: 1; }
+
+/* 라이트모드 */
+[data-theme="light"] .rfp-total {
+  background: linear-gradient(135deg, rgba(42,125,225,0.07), rgba(42,125,225,0.02));
+  border-color: rgba(42,125,225,0.2);
+}
+[data-theme="light"] .rfp-mcard-kr { background: rgba(0,154,92,0.04); }
+[data-theme="light"] .rfp-mcard-us { background: rgba(42,125,225,0.04); }
+[data-theme="light"] .rfp-mcard-tax { background: rgba(224,32,64,0.04); }
+
+/* 모바일 */
+@media (max-width: 900px) {
+  .real-flow-panel { flex-wrap: wrap; gap: 12px; min-height: auto; }
+  .rfp-sankey, .rfp-arrow { display: none; }
+  .rfp-total { width: 100%; }
+  .rfp-markets { flex-direction: row; flex-wrap: wrap; width: 100%; }
+  .rfp-mcard { min-width: 0; flex: 1 1 140px; }
+  .rfp-tax-wrap { width: 100%; flex-direction: row; }
+  .rfp-tax-space { display: none; }
+  .rfp-mcard-tax { flex: 1; }
+}
+
+/* 실현수익 배너 3컬럼 — 폰트 확대 */
+#realStatBanner .stat-market-label { font-size: 12px; }
+#realStatBanner .stat-market-val { font-size: 26px; line-height: 1.15; letter-spacing: -0.02em; }
+#realStatBanner .stat-market-converted { font-size: 12px; margin-top: 4px; }
+
+/* ─── 거래내역 필터바 상단 고정 ─── */
+#historyFilterBar {
+    position: sticky;
+    top: 0;
+    z-index: 52;
+    background: var(--bg2);
+    padding-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+/* ─── 실현수익 / 배당통계 활성 배지 영역 상단 고정 ─── */
+#historyActiveBadges,
+#realizedActiveBadges,
+#dividendActiveBadges {
+    position: sticky;
+    top: 0;
+    z-index: 51;
+    background: var(--bg2);
+    padding-bottom: 6px;
+}
+
+/* ─── 라이트 모드 배경 보정 ─── */
+[data-theme="light"] #historyFilterBar,
+[data-theme="light"] #historyActiveBadges,
+[data-theme="light"] #realizedActiveBadges,
+[data-theme="light"] #dividendActiveBadges {
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* =========================================================
+   미니 포트맵 (계좌 하단 펼침 효과)
+========================================================= */
+/* 1. 파이 그래프 컨테이너 기본 상태 및 애니메이션 */
+.chart-wrapper {
+    max-height: 260px; /* 기존 기본 높이 (본인 코드에 맞게 조절 가능) */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.4s ease-out,
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* 🌟 계좌 박스가 선택되었을 때 파이 그래프가 밑으로 흐르며 사라지는 효과 */
+.account-selected-mode .chart-wrapper {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(30px) scale(0.85); /* 밑으로 떨어지며 작아짐 */
+    margin-bottom: 0;
+    pointer-events: none; /* 클릭 방지 */
+}
+
+/* 2. 대형화할 텍스트(예: 총자산 금액 등) 애니메이션 */
+.zoom-text-target {
+    display: inline-block;
+    transform-origin: left center; /* 왼쪽 기준으로 정렬 유지하며 확대 */
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* 살짝 튕기는 부드러운 효과 */
+}
+
+/* 🌟 계좌 박스가 선택되었을 때 폰트 1.5배 확대 */
+.account-selected-mode .zoom-text-target {
+    transform: scale(1.5);
+}
+
+/* =========================================================
+   미니 포트맵 (비중순 가로 막대그래프 리스트 - 스크롤 없음)
+========================================================= */
+.mini-portmap-wrapper {
+    width: 100%;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    /* 고정 스크롤이 아니므로 0.3초간 부드럽게 감도를 조절해 펼쳐지게 합니다 */
+    transition: max-height 0.4s ease-out, opacity 0.3s ease-out, margin 0.3s ease-out;
+    margin-top: 0;
+    flex-shrink: 0;
+}
+
+.mini-portmap-wrapper.open {
+    /* 🌟 고정 높이 대신 none을 주어 자식 요소(종목 리스트) 크기대로 다 늘어나게 만듭니다. */
+    max-height: none; 
+    opacity: 1;
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+
+/* 가로 막대 리스트 컨테이너 */
+.hbar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 각 종목 사이의 간격 */
+    width: 100%;
+    /* 🌟 내부 스크롤 차단 및 내부 여백 조정 */
+    max-height: none;
+    overflow-y: visible; 
+    padding: 4px 0px 4px 0px;
+}
+
+/* 개별 종목 래퍼 */
+.hbar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* 텍스트와 막대바 사이의 간격 */
+}
+
+/* 종목명 및 퍼센트 텍스트 영역 */
+.hbar-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.hbar-name {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
+}
+
+.hbar-ratio-text {
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+}
+
+/* 빈 배경 막대 (트랙) */
+.hbar-track {
+    position: relative; /* 투자/평가 막대를 겹쳐 그리기 위한 기준 */
+    width: 100%;
+    height: 10px; /* 막대 두께 (투자+평가 막대를 함께 표현하기 위해 살짝 확장) */
+    background-color: var(--bg3);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* 비중만큼 채워지는 색상 막대 */
+.hbar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+/* 🌟 종목별 투자금(원금) 막대 — 트랙 전체 높이를 차지하는 옅은 배경 막대 */
+.hbar-cost-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    border-radius: 4px;
+    background: rgba(136,144,164,0.35);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 🌟 종목별 평가금(현재가치) 막대 — 투자금 막대 위에 겹쳐, 손익 색상으로 표시 */
+.hbar-eval-fill {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+}
+
+/* 종목별 투자금/평가금/수익률 텍스트 행 */
+.hbar-amt-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text2);
+}
+
+.hbar-amt-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.hbar-amt-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.hbar-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(136,144,164,0.6);
+    flex-shrink: 0;
+}
+
+.hbar-amt-roi {
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* =========================================================
+   🌟 계좌별 자산 성장 추이 미니 차트
+========================================================= */
+.acc-growth-wrapper {
+    width: 100%;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2, rgba(255,255,255,0.08));
+}
+
+.acc-growth-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text2);
+    margin-bottom: 8px;
+}
+
+.acc-growth-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 110px;
+}
+
+/* 블록 안의 텍스트 여백 */
+.mini-portmap-item span {
+    padding: 0 4px;
+    opacity: 0.95;
+}
+.portmap-bar {
+    display: flex;
+    height: 22px;
+    width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg3);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+.portmap-segment {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(0,0,0,0.1);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.portmap-segment:last-child {
+    border-right: none;
+}
+
+/* =========================================================
+   증권사 계좌 로고 (Favicon 연동)
+========================================================= */
+.broker-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 6px;
+    display: inline-block;
+    object-fit: cover;
+    background-color: #ffffff; /* 투명 배경 로고 방어용 흰색 바탕 */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.broker-logo.default-logo {
+    background-color: var(--bg3);
+    border: 1px solid var(--border);
+    text-align: center;
+    line-height: 18px;
+    font-size: 12px;
+    box-shadow: none;
+}
+
+/* .modal에 position 기준점 추가 */
+.modal { position: relative; }
+
+@keyframes cardJustAddedPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(124,106,247,0.6); transform: scale(1); }
+  30%  { box-shadow: 0 0 0 10px rgba(124,106,247,0.15); transform: scale(1.03); }
+  100% { box-shadow: 0 0 0 0 rgba(124,106,247,0); transform: scale(1); }
+}
+.card-just-added {
+  animation: cardJustAddedPulse 0.9s ease-out 2;
+  border-color: rgba(124,106,247,0.6) !important;
+}
+/* 실시간 로딩 알림(bgLoadingIndicator): 버튼 배경이 좌측에서 우측으로 로딩 %에 따라 차오르는 효과 */
+#bgLoadingIndicator{
+  overflow: hidden;
+  background-color: #4a3fa8; /* 아직 채워지지 않은 구간(어두운 베이스) */
+}
+#bgLoadingIndicator .bg-loading-fill{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.3s ease-out;
+  z-index: 0;
+}
+#bgLoadingIndicator .bg-loading-text{
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
