@@ -5469,12 +5469,47 @@ function resolveStockDisplayName(ticker) {
   return ticker;
 }
 
-// 구글 뉴스 RSS(최근 7일 필터 포함)를 직접 호출해 기사 목록을 가져옵니다.
+// 뉴스 RSS는 외부 서버(Google)가 CORS를 허용하지 않는 경우가 많아, 순서대로 프록시를 시도합니다.
+// 1) 이 앱이 쓰는 자체 Vercel 프록시 → 2) 공개 CORS 프록시(백업)
+async function fetchTextViaProxy(targetUrl) {
+  try {
+    const res = await fetch(`/api/proxy?url=${encodeURIComponent(targetUrl)}`);
+    if (res.ok) {
+      const text = extractProxyBodyText(await res.text());
+      if (text) return text;
+    }
+  } catch (e) { /* 자체 프록시 실패 시 아래 백업 프록시로 계속 진행 */ }
+
+  try {
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`);
+    if (res.ok) {
+      const text = await res.text();
+      if (text) return text;
+    }
+  } catch (e) { /* 백업 프록시도 실패 */ }
+
+  return null;
+}
+
+// 프록시가 JSON으로 감싸서 응답하는 경우({contents: "..."} 등)와 원문을 그대로 전달하는 경우를 모두 처리합니다.
+function extractProxyBodyText(raw) {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (trimmed.startsWith('<')) return raw; // 이미 XML/HTML 원문
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (typeof parsed === 'string') return parsed;
+    if (parsed && typeof parsed.contents === 'string') return parsed.contents;
+    if (parsed && typeof parsed.body === 'string') return parsed.body;
+  } catch (e) { /* JSON이 아니면 원문 그대로 사용 */ }
+  return raw;
+}
+
+// 구글 뉴스 RSS(최근 7일 필터 포함)를 프록시로 호출해 기사 목록을 가져옵니다.
 async function fetchGoogleNewsRss(query) {
   const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' when:7d')}&hl=ko&gl=KR&ceid=KR:ko`;
-  const res = await fetch(rssUrl);
-  if (!res.ok) throw new Error('구글 뉴스 응답 오류');
-  const text = await res.text();
+  const text = await fetchTextViaProxy(rssUrl);
+  if (!text) throw new Error('구글 뉴스 응답을 가져오지 못했습니다');
   const xml = new DOMParser().parseFromString(text, 'text/xml');
   if (xml.querySelector('parsererror')) throw new Error('구글 뉴스 파싱 오류');
   return Array.from(xml.querySelectorAll('item')).slice(0, 6).map(item => {
