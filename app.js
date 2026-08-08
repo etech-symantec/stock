@@ -1915,16 +1915,16 @@ function renderTxList() {
     const oInfo = getOwnerInfo(tx.owner);
 
     return `
-      <li class="tx-card">
+      <li class="tx-card" onclick="openChartModal('${tx.symbol}')" style="cursor:pointer;">
         <div class="tx-card-head">
           <div style="display:flex; align-items:center; gap:6px;">
             <span>${tx.date}</span>
-            <span class="tx-owner-badge" onclick="toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span>
+            <span class="tx-owner-badge" onclick="event.stopPropagation(); toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span>
             <span style="color:var(--text3)">${tx.broker ? `| ${tx.broker}` : ''}</span>
           </div>
           <div class="tx-actions">
-            <button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button>
-            <button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button>
+            <button class="tx-action-btn tx-edit" onclick="event.stopPropagation(); editTransaction(${tx.id})" title="수정">✏️</button>
+            <button class="tx-action-btn tx-del" onclick="event.stopPropagation(); deleteTransaction(${tx.id})" title="삭제">✕</button>
           </div>
         </div>
         <div class="tx-card-body">
@@ -2130,12 +2130,12 @@ function renderHistoryDashboard() {
 
       const isChecked = _histSelectedIds.has(tx.id);
       return `
-      <tr style="border-bottom: 1px solid var(--border); transition: 0.2s; ${isChecked ? 'background:rgba(var(--accent-rgb, 99,102,241),0.07);' : ''}" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='${isChecked ? 'rgba(99,102,241,0.07)' : 'transparent'}'">
-          <td style="padding:12px 8px; text-align:center;">
+      <tr style="border-bottom: 1px solid var(--border); transition: 0.2s; cursor:pointer; ${isChecked ? 'background:rgba(var(--accent-rgb, 99,102,241),0.07);' : ''}" onclick="openChartModal('${tx.symbol}')" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='${isChecked ? 'rgba(99,102,241,0.07)' : 'transparent'}'">
+          <td style="padding:12px 8px; text-align:center;" onclick="event.stopPropagation();">
             <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleHistTxSelect(${tx.id}, this)" style="cursor:pointer; width:15px; height:15px;">
           </td>
           <td style="padding:12px 16px; color:var(--text2);">${tx.date}</td>
-          <td style="padding:12px 16px;"><span class="tx-owner-badge" onclick="toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="margin:0; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span></td>
+          <td style="padding:12px 16px;" onclick="event.stopPropagation();"><span class="tx-owner-badge" onclick="toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="margin:0; background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span></td>
           <td style="padding:12px 16px; color:var(--text2);">${tx.broker || '-'}</td>
           <td style="padding:12px 16px; font-weight:700; color:${typeColor};">${typeLabel}</td>
           <td style="padding:12px 16px;"><div style="font-weight:700; color:var(--text);">${stockName}</div><div style="font-size:10px; font-family:var(--font-mono); color:var(--text3);">${tx.symbol.replace('.KS.DLST','').replace('.DLST','')}</div></td>
@@ -2145,7 +2145,7 @@ function renderHistoryDashboard() {
               ${currencyTag(tx.symbol)}${formatPrice(totalAmt, tx.symbol)}
               ${totalKrw != null ? `<div style="font-size:10px; font-weight:600; margin-top:3px; color:var(--green);">≈ ₩${totalKrw.toLocaleString()} <span style="color:var(--text3);font-weight:400;font-size:9px;">@${Math.round(txFxRate).toLocaleString()}</span></div>` : ''}
           </td>
-          <td style="padding:12px 16px; text-align:center;"><div class="tx-actions" style="justify-content:center;"><button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button><button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button></div></td>
+          <td style="padding:12px 16px; text-align:center;" onclick="event.stopPropagation();"><div class="tx-actions" style="justify-content:center;"><button class="tx-action-btn tx-edit" onclick="editTransaction(${tx.id})" title="수정">✏️</button><button class="tx-action-btn tx-del" onclick="deleteTransaction(${tx.id})" title="삭제">✕</button></div></td>
       </tr>`;
   }).join('');
   const allCb = document.getElementById('histSelectAll');
