@@ -82,22 +82,11 @@ const STEPS = [
         tip: '💡 태그 바 차트를 통해 섹터별 비중도 확인할 수 있어요',
     },
     {
-        target: '#allocationTreemap',
-        view: 'all',
-        arrow: 'top',
-        icon: '📰',
-        plus: true,
-        label: '07 — 종목 상세 뉴스',
-        title: '종목 카드를 클릭하면 최근 뉴스까지 한 번에 확인하세요',
-        body: '포트폴리오 맵이나 종목 카드를 클릭해 상세창을 열면, 그래프 아래에서 해당 종목의 최근 1주일 뉴스를 자동으로 모아 보여줘요. 창을 옮겨 다니지 않고 시세와 뉴스를 한 화면에서 함께 확인할 수 있어요.',
-        tip: '💡 기사를 클릭하면 새 탭에서 원문 기사로 바로 이동해요',
-    },
-    {
         target: '#localTagFilterContainer',
         view: 'all',
         arrow: 'top',
         icon: '🏷️',
-        label: '08 — 태그 필터 & 태그 지정',
+        label: '07 — 태그 필터 & 태그 지정',
         title: '종목에 태그를 달아 나만의 그룹을 만드세요',
         body: '종목 카드의 🏷️ 버튼으로 "2차전지", "배당용", "장기투자" 같은 태그를 자유롭게 지정할 수 있어요. 여기 태그 필터 바에서 하나 이상의 태그를 선택하면 해당 태그가 달린 종목만 모아서 볼 수 있습니다.',
         tip: '💡 태그는 포트폴리오 맵의 선택 모드에서도 태그별 일괄 선택으로 활용할 수 있어요',
@@ -107,10 +96,37 @@ const STEPS = [
         view: 'all',
         arrow: 'bottom',
         icon: '📈',
-        label: '09 — 자산 성장 추이',
+        label: '08 — 자산 성장 추이',
         title: '투자 원금 대비 평가액 흐름을 추적하세요',
         body: '시간 흐름에 따른 총 투자액과 총 평가액을 영역 차트로 보여줍니다. 차트 위를 드래그하면 원하는 구간을 확대할 수 있고, 막대 그래프로 건별 실현수익도 표시됩니다.',
         tip: '💡 초록 막대 = 익절, 파랑 막대 = 손절로 매도 타이밍을 되돌아볼 수 있어요',
+    },
+    {
+        target: null,
+        view: 'all',
+        icon: '📰',
+        plus: true,
+        label: '09 — 종목 상세 뉴스',
+        title: '종목 카드를 클릭하면 최근 뉴스까지 한 번에 확인하세요',
+        body: '종목을 클릭해 상세창을 열면, 그래프 아래에서 해당 종목의 최근 1주일 뉴스를 자동으로 모아 보여줘요. 창을 옮겨 다니지 않고 시세와 뉴스를 한 화면에서 함께 확인할 수 있어요.'
+          + '<div style="margin-top:12px; padding:10px; background:var(--bg2); border:1px solid var(--border2); border-radius:10px;">'
+          + '  <div style="font-size:10px; font-weight:700; color:var(--text3); margin-bottom:8px; letter-spacing:0.02em;">📰 최근 1주일 뉴스 · 샘플 화면</div>'
+          + '  <div style="display:flex; flex-direction:column; gap:6px;">'
+          + '    <div style="padding:7px 9px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px;">'
+          + '      <div style="font-size:11px; font-weight:600; color:var(--text); line-height:1.4; margin-bottom:3px;">삼성전자, 3분기 실적 시장 예상치 상회</div>'
+          + '      <div style="font-size:9px; color:var(--text3);">한국경제 · 3시간 전</div>'
+          + '    </div>'
+          + '    <div style="padding:7px 9px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px;">'
+          + '      <div style="font-size:11px; font-weight:600; color:var(--text); line-height:1.4; margin-bottom:3px;">외국인 순매수 전환, 반도체株 강세 지속</div>'
+          + '      <div style="font-size:9px; color:var(--text3);">매일경제 · 1일 전</div>'
+          + '    </div>'
+          + '    <div style="padding:7px 9px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px;">'
+          + '      <div style="font-size:11px; font-weight:600; color:var(--text); line-height:1.4; margin-bottom:3px;">증권가 목표주가 잇따라 상향 조정</div>'
+          + '      <div style="font-size:9px; color:var(--text3);">연합인포맥스 · 2일 전</div>'
+          + '    </div>'
+          + '  </div>'
+          + '</div>',
+        tip: '💡 기사를 클릭하면 새 탭에서 원문 기사로 바로 이동해요',
     },
     {
         target: '#aiAdviceFab',
@@ -392,16 +408,6 @@ const PAGE_STEPS = {
             tip: '💡 하단 태그 바 차트로 섹터별 자산 비중을 확인할 수 있어요',
         },
         {
-            target: '#allocationTreemap',
-            arrow: 'top',
-            icon: '📰',
-            plus: true,
-            label: '전체보기 — 종목 상세 뉴스',
-            title: '상세창에서 최근 뉴스까지 함께 확인하세요',
-            body: '종목을 클릭해 상세창을 열면 그래프 아래에 해당 종목의 최근 1주일 뉴스가 자동으로 모아져요. 기사를 클릭하면 새 탭에서 원문으로 이동합니다.',
-            tip: '💡 종목 카드나 거래내역에서도 동일하게 클릭 한 번으로 열 수 있어요',
-        },
-        {
             target: '#localTagFilterContainer',
             arrow: 'top',
             icon: '🏷️',
@@ -419,6 +425,28 @@ const PAGE_STEPS = {
             title: '내 자산 현황을 바탕으로 AI 의견을 받아보세요',
             body: '우측 하단 버튼을 누르면 현재 시장 신호와 보유 포트폴리오를 함께 분석한 AI 투자조언을 받을 수 있어요. \"기록\" 버튼으로 이전에 받았던 조언들도 날짜별로 다시 볼 수 있습니다.',
             tip: '⚠️ AI 조언은 참고용이며, 투자 판단과 책임은 본인에게 있어요',
+        },
+        {
+            target: null,
+            icon: '📰',
+            plus: true,
+            label: '전체보기 — 종목 상세 뉴스',
+            title: '상세창에서 최근 뉴스까지 함께 확인하세요',
+            body: '종목을 클릭해 상세창을 열면 그래프 아래에 해당 종목의 최근 1주일 뉴스가 자동으로 모아져요.'
+              + '<div style="margin-top:12px; padding:10px; background:var(--bg2); border:1px solid var(--border2); border-radius:10px;">'
+              + '  <div style="font-size:10px; font-weight:700; color:var(--text3); margin-bottom:8px; letter-spacing:0.02em;">📰 최근 1주일 뉴스 · 샘플 화면</div>'
+              + '  <div style="display:flex; flex-direction:column; gap:6px;">'
+              + '    <div style="padding:7px 9px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px;">'
+              + '      <div style="font-size:11px; font-weight:600; color:var(--text); line-height:1.4; margin-bottom:3px;">삼성전자, 3분기 실적 시장 예상치 상회</div>'
+              + '      <div style="font-size:9px; color:var(--text3);">한국경제 · 3시간 전</div>'
+              + '    </div>'
+              + '    <div style="padding:7px 9px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px;">'
+              + '      <div style="font-size:11px; font-weight:600; color:var(--text); line-height:1.4; margin-bottom:3px;">외국인 순매수 전환, 반도체株 강세 지속</div>'
+              + '      <div style="font-size:9px; color:var(--text3);">매일경제 · 1일 전</div>'
+              + '    </div>'
+              + '  </div>'
+              + '</div>',
+            tip: '💡 기사를 클릭하면 새 탭에서 원문 기사로 바로 이동해요',
         },
     ],
 
