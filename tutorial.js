@@ -606,7 +606,7 @@ function injectWelcomeModal() {
         <div class="tutorial-feature-grid">
           <div class="tutorial-feature-item">
             <span class="feat-icon">📊</span>
-            <span><b>전체보기</b><br>자산 현황 · 시장 신호 · 포트폴리오 맵</span>
+            <span><b>전체보기</b><br>자산 현황 · 시장 신호 · 포트폴리오 맵<br>🤖 AI 투자조언 <span class="feat-plus-inline">Plus</span></span>
           </div>
           <div class="tutorial-feature-item">
             <span class="feat-icon">👤</span>
@@ -614,8 +614,7 @@ function injectWelcomeModal() {
           </div>
           <div class="tutorial-feature-item">
             <span class="feat-icon">⭐</span>
-            <span><b>관심종목</b><br>관심 종목 모아보기 & 🛰️ 탐사선 추적</span>
-            <span class="feat-plus-tag">Plus</span>
+            <span><b>관심종목</b><br>관심 종목 모아보기 & 🛰️ 탐사선 추적 <span class="feat-plus-inline">Plus</span></span>
           </div>
           <div class="tutorial-feature-item">
             <span class="feat-icon">📋</span>
