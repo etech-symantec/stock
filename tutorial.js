@@ -613,16 +613,26 @@ function injectWelcomeModal() {
             <span>트리맵 <b>포트폴리오 맵</b><br>& 태그 그룹핑</span>
           </div>
           <div class="tutorial-feature-item">
-            <span class="feat-icon">💵</span>
-            <span>실현수익 & <b>양도세 자동계산</b><br>배당통계 & 예정배당</span>
+            <span class="feat-icon">⭐</span>
+            <span><b>관심종목</b> 관리<br>& 🛰️ 탐사선 자동추적</span>
+            <span class="feat-plus-tag">Plus</span>
           </div>
           <div class="tutorial-feature-item">
             <span class="feat-icon">🤖</span>
             <span><b>AI 투자조언</b><br>& 🌕 달빛정보 밸류에이션</span>
+            <span class="feat-plus-tag">Plus</span>
           </div>
           <div class="tutorial-feature-item">
+            <span class="feat-icon">💵</span>
+            <span>실현수익 & <b>양도세 자동계산</b><br>배당통계 & 예정배당</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">👤</span>
+            <span><b>소유자별 프로필</b><br>이름 · 아이콘 · 테마 색상</span>
+          </div>
+          <div class="tutorial-feature-item tutorial-feature-item--wide">
             <span class="feat-icon">☁️</span>
-            <span>GitHub <b>클라우드 동기화</b><br>& 자동 백업</span>
+            <span>GitHub <b>클라우드 동기화</b> & 자동 백업</span>
           </div>
         </div>
 
@@ -879,7 +889,7 @@ function paintStep(idx) {
 
     if (targetEl) {
         // 스크롤이 끝나 좌표가 완전히 안정된 뒤에 하이라이트/툴팁을 그림
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         waitForStableRect(targetEl, finishRender);
     } else {
         finishRender(null);
@@ -940,7 +950,7 @@ function renderPageStep(idx) {
 
     if (targetEl) {
         // 스크롤이 끝나 좌표가 완전히 안정된 뒤에 하이라이트/툴팁을 그림
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         waitForStableRect(targetEl, finishRender);
     } else {
         finishRender(null);
