@@ -5423,6 +5423,7 @@ function openChartModal(ticker, probeId = null) {
   
   renderModalChart();
   if (typeof renderFlightPlanPanel === 'function') renderFlightPlanPanel(ticker);
+  renderNewsSection(ticker);
   enforceProbeFabVisibility();
   enforceFlightPlanPanelVisibility();
   document.getElementById('chartOverlay').classList.add('open');
@@ -5433,6 +5434,122 @@ function setModalRange(range, el) {
   document.querySelectorAll('.m-rtab').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderModalChart();
+}
+
+// ══════════════════════════════════════════════
+// 📰 종목 상세 모달 - 최근 1주일 뉴스 (구글 · 네이버)
+// ══════════════════════════════════════════════
+function newsEscapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function newsEscapeRegExp(str) {
+  return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function newsRelativeTime(pubDateStr) {
+  const d = new Date(pubDateStr);
+  if (isNaN(d.getTime())) return '';
+  const diffMs = Date.now() - d.getTime();
+  const diffH = Math.floor(diffMs / 3600000);
+  if (diffH < 1) return '방금 전';
+  if (diffH < 24) return `${diffH}시간 전`;
+  const diffD = Math.floor(diffH / 24);
+  if (diffD < 7) return `${diffD}일 전`;
+  return `${d.getMonth() + 1}.${d.getDate()}`;
+}
+
+// 종목 코드로부터 표시용 종목명을 찾습니다 (거래내역 목록에서 쓰는 것과 동일한 규칙).
+function resolveStockDisplayName(ticker) {
+  const dbMatch = localStockDB && localStockDB.find(s => s.symbol === ticker);
+  const cachedMatch = cachedMarketData[ticker];
+  if (dbMatch) return dbMatch.name;
+  if (cachedMatch && !cachedMatch._failed && cachedMatch.name) return cachedMatch.name;
+  return ticker;
+}
+
+// 구글 뉴스 RSS(최근 7일 필터 포함)를 직접 호출해 기사 목록을 가져옵니다.
+async function fetchGoogleNewsRss(query) {
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' when:7d')}&hl=ko&gl=KR&ceid=KR:ko`;
+  const res = await fetch(rssUrl);
+  if (!res.ok) throw new Error('구글 뉴스 응답 오류');
+  const text = await res.text();
+  const xml = new DOMParser().parseFromString(text, 'text/xml');
+  if (xml.querySelector('parsererror')) throw new Error('구글 뉴스 파싱 오류');
+  return Array.from(xml.querySelectorAll('item')).slice(0, 6).map(item => {
+    const title = item.querySelector('title') ? item.querySelector('title').textContent : '';
+    const link = item.querySelector('link') ? item.querySelector('link').textContent : '';
+    const pubDate = item.querySelector('pubDate') ? item.querySelector('pubDate').textContent : '';
+    const sourceEl = item.querySelector('source');
+    const source = sourceEl ? sourceEl.textContent : '';
+    return { title, link, pubDate, source };
+  });
+}
+
+function newsSearchLinkCard(url, label) {
+  return `<a href="${url}" target="_blank" rel="noopener" style="display:block; padding:10px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; font-size:12px; color:var(--text); text-decoration:none;">${label} ↗</a>`;
+}
+
+function newsArticleCard(item) {
+  const cleanTitle = item.source
+    ? item.title.replace(new RegExp(' - ' + newsEscapeRegExp(item.source) + '$'), '')
+    : item.title;
+  const metaParts = [item.source, newsRelativeTime(item.pubDate)].filter(Boolean);
+  return `
+    <a href="${item.link}" target="_blank" rel="noopener"
+       style="display:block; padding:8px 10px; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; text-decoration:none; transition:border-color 0.15s;"
+       onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">
+      <div style="font-size:12px; font-weight:600; color:var(--text); line-height:1.4; margin-bottom:4px;">${newsEscapeHtml(cleanTitle)}</div>
+      <div style="font-size:10px; color:var(--text3);">${newsEscapeHtml(metaParts.join(' · '))}</div>
+    </a>`;
+}
+
+// 종목 상세 모달을 열 때 호출되어, 구글은 실제 최근 1주일 기사 목록을 불러오고
+// 네이버는 (클라이언트에서 CORS 없이 호출 가능한 공개 API가 없어) 최근 1주일 검색 결과 링크로 안내합니다.
+async function renderNewsSection(ticker) {
+  const body = document.getElementById('mNewsBody');
+  if (!body) return;
+
+  const name = resolveStockDisplayName(ticker);
+  const query = name || ticker;
+  const naverUrl = `https://search.naver.com/search.naver?where=news&query=${encodeURIComponent(query)}&sort=1&nso=so:r,p:1w,a:all`;
+  const googleFallbackUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&tbm=nws&tbs=qdr:w`;
+
+  body.innerHTML = `
+    <div style="display:flex; gap:14px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:220px;">
+        <div style="font-size:11px; font-weight:700; color:var(--text2); margin-bottom:6px;">🔎 Google 뉴스</div>
+        <div id="mNewsGoogle" style="display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:11px; color:var(--text3); padding:10px 0;">뉴스를 불러오는 중...</div>
+        </div>
+      </div>
+      <div style="flex:1; min-width:220px;">
+        <div style="font-size:11px; font-weight:700; color:var(--text2); margin-bottom:6px;">🟢 네이버 뉴스</div>
+        <div id="mNewsNaver" style="display:flex; flex-direction:column; gap:8px;">
+          ${newsSearchLinkCard(naverUrl, `네이버에서 "${newsEscapeHtml(query)}" 최근 1주일 검색 결과 보기`)}
+        </div>
+      </div>
+    </div>
+  `;
+
+  try {
+    const items = await fetchGoogleNewsRss(query);
+    if (currentModalTicker !== ticker) return; // 모달이 닫혔거나 다른 종목으로 바뀐 경우 무시
+    const googleEl = document.getElementById('mNewsGoogle');
+    if (!googleEl) return;
+    if (!items || items.length === 0) {
+      googleEl.innerHTML = newsSearchLinkCard(googleFallbackUrl, `구글에서 "${newsEscapeHtml(query)}" 최근 1주일 검색 결과 보기`);
+      return;
+    }
+    googleEl.innerHTML = items.map(newsArticleCard).join('');
+  } catch (e) {
+    if (currentModalTicker !== ticker) return;
+    const googleEl = document.getElementById('mNewsGoogle');
+    if (!googleEl) return;
+    // 브라우저 환경에 따라 구글 뉴스 RSS 호출이 막히는 경우(CORS 등) 검색 링크로 대체합니다.
+    googleEl.innerHTML = newsSearchLinkCard(googleFallbackUrl, `구글에서 "${newsEscapeHtml(query)}" 최근 1주일 검색 결과 보기`);
+  }
 }
 
 function renderModalChart() {
