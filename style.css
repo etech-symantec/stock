@@ -1293,7 +1293,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   flex-shrink: 0;
 }
 
-/* 해당 기능이 Plus 전용임을 카드 우상단에 살짝 표시 */
+/* 해당 기능이 Plus 전용임을 카드 우상단에 살짝 표시 (카드 전체가 Plus인 경우) */
 .feat-plus-tag {
   position: absolute;
   top: -6px;
@@ -1306,6 +1306,21 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   border-radius: 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
   letter-spacing: 0.2px;
+}
+
+/* 카드 안의 특정 기능(문구) 옆에 붙여 그 기능만 Plus 전용임을 표시 */
+.feat-plus-inline {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #ffd76a, #ffa53d);
+  color: #5a3200;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 20px;
+  vertical-align: middle;
+  margin-left: 2px;
+  white-space: nowrap;
 }
 
 .tutorial-welcome-actions {
