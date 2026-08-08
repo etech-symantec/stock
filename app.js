@@ -1916,11 +1916,13 @@ function renderTxList() {
 
     return `
       <li class="tx-card" onclick="openChartModal('${tx.symbol}')" style="cursor:pointer;">
-        <div class="tx-card-head">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <span>${tx.date}</span>
-            <span class="tx-owner-badge" onclick="event.stopPropagation(); toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span>
-            <span style="color:var(--text3)">${tx.broker ? `| ${tx.broker}` : ''}</span>
+        <div class="tx-card-head" style="align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; gap:3px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span>${tx.date}</span>
+              <span class="tx-owner-badge" onclick="event.stopPropagation(); toggleTxOwner(${tx.id})" title="클릭하여 소유자 변경" style="background:${oInfo.color}20; color:${oInfo.color}; border:1px solid ${oInfo.color}40;">${oInfo.icon} ${tx.owner} ⇄</span>
+            </div>
+            ${tx.broker ? `<span style="color:var(--text3); font-size:10px;">${tx.broker}</span>` : ''}
           </div>
           <div class="tx-actions">
             <button class="tx-action-btn tx-edit" onclick="event.stopPropagation(); editTransaction(${tx.id})" title="수정">✏️</button>
