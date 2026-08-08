@@ -3484,7 +3484,7 @@ function generateCardHtml(item) {
 
   // 🌟 [수정] 아이콘, 소유자 이름 | 계좌명 형식으로 깔끔하게 표시
   const tagContent = isHeld 
-    ? `<span class="icon">${oInfo.icon}</span> <span style="font-weight:600;">${oInfo.name}</span> <span class="divider" style="margin:0 4px; color:var(--text3);">|</span> <span class="broker-text" style="color:var(--text2);">${brokerDisp}</span>` 
+    ? `<span class="icon">${oInfo.icon}</span> <span style="font-weight:600;">${oInfo.name}</span> <span class="divider">|</span> <span class="broker-text">${brokerDisp}</span>` 
     : `<span class="icon" style="font-style:normal;">⭐</span> 관심종목 <span style="margin-left:4px; font-weight:bold; opacity:0.7;">✕</span>`;
 
   const countryBadge = isKorean(item.symbol) 
@@ -3519,7 +3519,9 @@ function generateCardHtml(item) {
       <div style="display:flex; align-items:center;">
         ${countryBadge}
         <div class="card-tag ${isHeld ? 'tag-held' : 'tag-watch'}" 
-             style="margin-bottom:0; background:var(--bg3); color:var(--text); border:1px solid var(--border); ${!isHeld ? 'cursor:pointer;' : ''}"
+             style="margin-bottom:0; ${isHeld
+                ? `background:${oInfo.color}14; color:${oInfo.color}; border:1px solid ${oInfo.color}33;`
+                : `background:var(--bg3); color:var(--text); border:1px solid var(--border); cursor:pointer;`}"
              ${!isHeld ? `onclick="event.stopPropagation(); removeTickerConfirm('${item.symbol}', '${displayName.replace(/'/g, "\\'")}')"` : ''}>
           ${tagContent}
         </div>
