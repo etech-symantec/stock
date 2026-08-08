@@ -695,13 +695,13 @@ select.sort-select { background: var(--bg2); color: var(--text); border: 1px sol
 .card:hover { border-color: var(--border2); transform: translateY(-1px); }
 .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
 
-.card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); border: 1px solid rgba(0,0,0,0.2); }
-.tag-held { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.card-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 12px; font-family: var(--font-sans); border: 1px solid var(--border); background: var(--bg3); }
+.tag-held { box-shadow: none; }
 .tag-watch { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
 .country-badge { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 6px; color: #fff; font-family: var(--font-mono); }
-.card-tag .divider { margin: 0 6px; opacity: 0.5; font-weight: normal; }
-.card-tag .broker-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.95; max-width: 180px; }
-.card-tag .icon { margin-right: 4px; font-size: 12px; }
+.card-tag .divider { margin: 0 7px; opacity: 0.4; font-weight: 400; }
+.card-tag .broker-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.85; max-width: 180px; }
+.card-tag .icon { margin-right: 5px; font-size: 12px; }
 
 .card-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.04em; }
 .badge-up { background: var(--profit-bg); color: var(--profit); } .badge-down { background: var(--loss-bg); color: var(--loss); } .badge-flat { background: var(--bg3); color: var(--text2); }
