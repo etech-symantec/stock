@@ -605,34 +605,34 @@ function injectWelcomeModal() {
 
         <div class="tutorial-feature-grid">
           <div class="tutorial-feature-item">
-            <span class="feat-icon">📡</span>
-            <span>실시간 <b>시장 신호</b><br>& 매크로 지표 분석</span>
-          </div>
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">🗺️</span>
-            <span>트리맵 <b>포트폴리오 맵</b><br>& 태그 그룹핑</span>
-          </div>
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">⭐</span>
-            <span><b>관심종목</b> 관리<br>& 🛰️ 탐사선 자동추적</span>
-            <span class="feat-plus-tag">Plus</span>
-          </div>
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">🤖</span>
-            <span><b>AI 투자조언</b><br>& 🌕 달빛정보 밸류에이션</span>
-            <span class="feat-plus-tag">Plus</span>
-          </div>
-          <div class="tutorial-feature-item">
-            <span class="feat-icon">💵</span>
-            <span>실현수익 & <b>양도세 자동계산</b><br>배당통계 & 예정배당</span>
+            <span class="feat-icon">📊</span>
+            <span><b>전체보기</b><br>자산 현황 · 시장 신호 · 포트폴리오 맵</span>
           </div>
           <div class="tutorial-feature-item">
             <span class="feat-icon">👤</span>
-            <span><b>소유자별 프로필</b><br>이름 · 아이콘 · 테마 색상</span>
+            <span><b>소유자별 보기</b><br>소유자마다 나눠서 자산 확인</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">⭐</span>
+            <span><b>관심종목</b><br>관심 종목 모아보기 & 🛰️ 탐사선 추적</span>
+            <span class="feat-plus-tag">Plus</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">📋</span>
+            <span><b>거래내역</b><br>매수 · 매도 기록 관리</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">💵</span>
+            <span><b>실현수익</b><br>매도 손익 & 양도세 자동계산</span>
+          </div>
+          <div class="tutorial-feature-item">
+            <span class="feat-icon">🌿</span>
+            <span><b>배당통계</b><br>배당 내역 & 예정 배당 확인</span>
           </div>
           <div class="tutorial-feature-item tutorial-feature-item--wide">
-            <span class="feat-icon">☁️</span>
-            <span>GitHub <b>클라우드 동기화</b> & 자동 백업</span>
+            <span class="feat-icon">🌕</span>
+            <span><b>달빛정보</b> — 통합 밸류에이션 대시보드</span>
+            <span class="feat-plus-tag">Plus</span>
           </div>
         </div>
 
