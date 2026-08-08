@@ -1394,6 +1394,15 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 .tutorial-tooltip.arrow-left::before   { left:-7px; top:20px; border-right:none; border-bottom:none; }
 .tutorial-tooltip.arrow-right::before  { right:-7px; top:20px; border-left:none; border-top:none; }
 
+/* 페이지 배지 + Plus 배지를 한 줄에 나란히 배치 */
+.tutorial-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
 /* 지금 소개 중인 페이지가 어디인지 보여주는 배지 — 페이지가 바뀔 때마다
    함께 갱신되어 사용자가 현재 어느 화면을 보고 있는지 알 수 있게 함 */
 .tutorial-page-badge {
@@ -1407,8 +1416,22 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   font-weight: 700;
   padding: 3px 9px;
   border-radius: 20px;
-  margin-bottom: 8px;
   font-family: var(--font-sans);
+}
+
+/* Plus 전용 기능임을 알려주는 배지 */
+.tutorial-plus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: linear-gradient(135deg, #ffd76a, #ffa53d);
+  color: #5a3200;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-family: var(--font-sans);
+  letter-spacing: 0.2px;
 }
 
 .tutorial-tooltip-step {
