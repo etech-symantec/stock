@@ -5437,7 +5437,7 @@ function setModalRange(range, el) {
 }
 
 // ══════════════════════════════════════════════
-// 📰 종목 상세 모달 - 최근 1주일 뉴스 (구글 · 네이버)
+// 📰 종목 상세 모달 - 최근 1주일 뉴스 (구글 뉴스)
 // ══════════════════════════════════════════════
 function newsEscapeHtml(str) {
   return String(str == null ? '' : str)
@@ -5505,50 +5505,32 @@ function newsArticleCard(item) {
     </a>`;
 }
 
-// 종목 상세 모달을 열 때 호출되어, 구글은 실제 최근 1주일 기사 목록을 불러오고
-// 네이버는 (클라이언트에서 CORS 없이 호출 가능한 공개 API가 없어) 최근 1주일 검색 결과 링크로 안내합니다.
 async function renderNewsSection(ticker) {
   const body = document.getElementById('mNewsBody');
   if (!body) return;
 
   const name = resolveStockDisplayName(ticker);
   const query = name || ticker;
-  const naverUrl = `https://search.naver.com/search.naver?where=news&query=${encodeURIComponent(query)}&sort=1&nso=so:r,p:1w,a:all`;
   const googleFallbackUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&tbm=nws&tbs=qdr:w`;
 
-  body.innerHTML = `
-    <div style="display:flex; gap:14px; flex-wrap:wrap;">
-      <div style="flex:1; min-width:220px;">
-        <div style="font-size:11px; font-weight:700; color:var(--text2); margin-bottom:6px;">🔎 Google 뉴스</div>
-        <div id="mNewsGoogle" style="display:flex; flex-direction:column; gap:8px;">
-          <div style="font-size:11px; color:var(--text3); padding:10px 0;">뉴스를 불러오는 중...</div>
-        </div>
-      </div>
-      <div style="flex:1; min-width:220px;">
-        <div style="font-size:11px; font-weight:700; color:var(--text2); margin-bottom:6px;">🟢 네이버 뉴스</div>
-        <div id="mNewsNaver" style="display:flex; flex-direction:column; gap:8px;">
-          ${newsSearchLinkCard(naverUrl, `네이버에서 "${newsEscapeHtml(query)}" 최근 1주일 검색 결과 보기`)}
-        </div>
-      </div>
-    </div>
-  `;
+  body.innerHTML = `<div style="font-size:11px; color:var(--text3); padding:10px 0;">뉴스를 불러오는 중...</div>`;
 
   try {
     const items = await fetchGoogleNewsRss(query);
     if (currentModalTicker !== ticker) return; // 모달이 닫혔거나 다른 종목으로 바뀐 경우 무시
-    const googleEl = document.getElementById('mNewsGoogle');
-    if (!googleEl) return;
+    const target = document.getElementById('mNewsBody');
+    if (!target) return;
     if (!items || items.length === 0) {
-      googleEl.innerHTML = newsSearchLinkCard(googleFallbackUrl, `구글에서 "${newsEscapeHtml(query)}" 최근 1주일 검색 결과 보기`);
+      target.innerHTML = `<div style="font-size:11px; color:var(--text3); padding:10px 0;">최근 1주일간 관련 뉴스를 찾지 못했습니다.</div>`;
       return;
     }
-    googleEl.innerHTML = items.map(newsArticleCard).join('');
+    target.innerHTML = `<div style="display:flex; flex-direction:column; gap:8px;">${items.map(newsArticleCard).join('')}</div>`;
   } catch (e) {
     if (currentModalTicker !== ticker) return;
-    const googleEl = document.getElementById('mNewsGoogle');
-    if (!googleEl) return;
+    const target = document.getElementById('mNewsBody');
+    if (!target) return;
     // 브라우저 환경에 따라 구글 뉴스 RSS 호출이 막히는 경우(CORS 등) 검색 링크로 대체합니다.
-    googleEl.innerHTML = newsSearchLinkCard(googleFallbackUrl, `구글에서 "${newsEscapeHtml(query)}" 최근 1주일 검색 결과 보기`);
+    target.innerHTML = newsSearchLinkCard(googleFallbackUrl, `뉴스를 불러오지 못했습니다. "${newsEscapeHtml(query)}" 검색 결과 보기`);
   }
 }
 
